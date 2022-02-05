@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +19,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/test', function() {
-    return response()->json(["message" => "てすとです"], 200);
+Route::get('/login', function(Request $request) {
+    $email = $request->email;
+    $password = $request->password;
+    \Log::debug(['email' => $email, 'password' => $password]);
+    if(Auth::attempt(['email' => $email, 'password' => $password])) {
+        return Auth::user();
+    }
 });
