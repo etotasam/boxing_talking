@@ -13,11 +13,13 @@ services:
   web:
     image: nginx
     container_name: web
-    expose:
-      - 8080
+    # expose:
+    #   - 8080
+    ports:
+      - "8080:8080"
     volumes:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./laravel:/var/www/html
+      - ./backend:/var/www/html
     depends_on:
       - php
     tty: true
@@ -26,7 +28,7 @@ services:
     build: ./docker/php/
     container_name: php
     volumes:
-      - "./laravel/:/var/www/html"
+      - "./backend/:/var/www/html"
       - "./docker/php/env:/usr/local/etc/php"
     expose:
       - 9000
@@ -55,7 +57,7 @@ services:
     container_name: node
     volumes:
       - "./frontend/:/usr/src/app"
-    # command: npm run dev
+    command: npm run start
     ports:
       - "3000:3000"
     tty: true
