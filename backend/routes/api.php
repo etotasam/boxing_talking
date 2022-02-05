@@ -19,11 +19,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/login', function(Request $request) {
+Route::post('/login', function(Request $request) {
     $email = $request->email;
     $password = $request->password;
     \Log::debug(['email' => $email, 'password' => $password]);
     if(Auth::attempt(['email' => $email, 'password' => $password])) {
         return Auth::user();
     }
+    return response()->json(["message" => "401"], 401);
 });
