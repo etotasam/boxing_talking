@@ -1,4 +1,4 @@
-import axios, { isAxiosError } from "@/libs/axios";
+import axios, { isAxiosError } from "../../libs/axios";
 import { useState, useEffect } from "react";
 import Button from "../../components/Button";
 
