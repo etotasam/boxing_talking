@@ -3,6 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Fighter;
+use App\Models\BoxingMatch;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,15 +18,68 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+/**
+ * ログイン情報のチェック
+ */
+Route::middleware('auth:sanctum')->group(function() {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+    Route::get('/check', function() {
+        return Auth::check();
+    });
 });
 
-Route::get('/login', function(Request $request) {
+Route::post('/logout', function() {
+    return Auth::logout();
+});
+
+Route::post('/login', function(Request $request) {
     $email = $request->email;
     $password = $request->password;
-    \Log::debug(['email' => $email, 'password' => $password]);
+    \Log::debug($email);
     if(Auth::attempt(['email' => $email, 'password' => $password])) {
         return Auth::user();
     }
+    return response()->json(["message" => "401"], 401);
+});
+
+/**
+ * @return
+ */
+Route::post('/fighter', function(Request $request) {
+    $name = $request->name;
+    $country = $request->country;
+    $fighters = Fighter::all();
+    return $fighters;
+});
+
+Route::post('/fight', function(Request $request) {
+    $red_id = $request->redFighterId;
+    $blue_id = $request->blueFighterId;
+    $matchDate = $request->matchDate;
+    $date = date_create($matchDate);
+    BoxingMatch::create([
+        "red_fighter_id" => $red_id,
+        "blue_fighter_id" => $blue_id,
+        "match_date" => $matchDate
+    ]);
+    return response()->json(["message" => "success"], 200);
+});
+
+Route::get('/match', function() {
+    // $all_match = BoxingMatch::all();
+    $all_match = BoxingMatch::orderBy('match_date')->get();
+    $match_array = [];
+    foreach($all_match as $match) {
+        $red_id = $match->red_fighter_id;
+        $blue_id = $match->blue_fighter_id;
+        $red_fighter = Fighter::find($red_id);
+        $blue_fighter = Fighter::find($blue_id);
+        $element = ["red" => $red_fighter, "blue" => $blue_fighter, "date" => $match->match_date];
+        array_push($match_array, $element);
+    };
+    // log::debug($all_match);
+    return response()->json($match_array);
 });
