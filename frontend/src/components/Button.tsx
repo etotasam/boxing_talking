@@ -4,7 +4,7 @@ type Props = {
   className?: string;
 };
 
-const Button = ({ onClick, children }: Props) => {
+const Button = ({ onClick, children, className }: Props) => {
   const click = () => {
     if (!onClick) return;
     onClick();
@@ -12,9 +12,7 @@ const Button = ({ onClick, children }: Props) => {
   return (
     <button
       onClick={click}
-      className={
-        "bg-green-400 hover:bg-green-600 duration-200 text-white rounded px-2 py-1"
-      }
+      className={`bg-green-400 hover:bg-green-600 duration-200 text-white rounded px-2 py-1 ${className}`}
     >
       {children}
     </button>
