@@ -17,9 +17,16 @@ class UsersSeeder extends Seeder
     {
         // User::factory()->count(2)->create();
         DB::table('users')->insert([
-            'name' => "てらかど",
-            'email' => "terakado@test.com",
-            'password' => \Hash::make('test'),
+            [
+                'name' => "てらかど",
+                'email' => "terakado@test.com",
+                'password' => \Hash::make('test'),
+            ],
+            [
+                'name' => "テラシマ",
+                'email' => "terashima@test.com",
+                'password' => \Hash::make('test'),
+            ]
         ]);
     }
 }

@@ -16,28 +16,30 @@ class FightersSeeder extends Seeder
     {
         //
         DB::table('fighters')->insert([
-            'name' => "Crawford",
-            'country' => "USA",
-            'win' => 38,
-            'draw' => 0,
-            'lose' => 0,
-            'ko' => 29,
-        ]);
-        DB::table('fighters')->insert([
-            'name' => "Saul Alvarez",
-            'country' => "Mexico",
-            'win' => 57,
-            'draw' => 2,
-            'lose' => 1,
-            'ko' => 39,
-        ]);
-        DB::table('fighters')->insert([
-            'name' => "Naoya Inoue",
-            'country' => "Japan",
-            'win' => 22,
-            'draw' => 0,
-            'lose' => 0,
-            'ko' => 19,
+            [
+                'name' => "Crawford",
+                'country' => "USA",
+                'win' => 38,
+                'draw' => 0,
+                'lose' => 0,
+                'ko' => 29,
+            ],
+            [
+                'name' => "Saul Alvarez",
+                'country' => "Mexico",
+                'win' => 57,
+                'draw' => 2,
+                'lose' => 1,
+                'ko' => 39,
+            ],
+            [
+                'name' => "Naoya Inoue",
+                'country' => "Japan",
+                'win' => 22,
+                'draw' => 0,
+                'lose' => 0,
+                'ko' => 19,
+            ]
         ]);
     }
 }

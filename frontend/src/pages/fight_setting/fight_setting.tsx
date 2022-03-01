@@ -1,6 +1,6 @@
-import axios, { isAxiosError } from "../../libs/axios";
+import axios, { isAxiosError } from "@/libs/axios";
 import { useEffect, useState } from "react";
-import Button from "../../components/Button";
+import Button from "@/components/Button";
 
 type Fighter = {
   id: number;
@@ -48,7 +48,7 @@ export const FightSetting = () => {
     const redFighterId = redFighter!.id;
     const blueFighterId = blueFighter!.id;
     const matchDate = `${choiseYear}-${choiseMonth}-${choiseDate}`;
-    console.log("送信", matchDate);
+    // console.log("送信", matchDate);
     try {
       const { data } = await axios.post("api/fight", {
         redFighterId,

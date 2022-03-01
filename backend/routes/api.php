@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Fighter;
 use App\Models\BoxingMatch;
 use Illuminate\Support\Facades\Log;
+use App\Models\Comment;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,7 +71,6 @@ Route::post('/fight', function(Request $request) {
 });
 
 Route::get('/match', function() {
-    // $all_match = BoxingMatch::all();
     $all_match = BoxingMatch::orderBy('match_date')->get();
     $match_array = [];
     foreach($all_match as $match) {
@@ -77,9 +78,32 @@ Route::get('/match', function() {
         $blue_id = $match->blue_fighter_id;
         $red_fighter = Fighter::find($red_id);
         $blue_fighter = Fighter::find($blue_id);
-        $element = ["red" => $red_fighter, "blue" => $blue_fighter, "date" => $match->match_date];
+        $element = ["id" => $match->id,"red" => $red_fighter, "blue" => $blue_fighter, "date" => $match->match_date];
         array_push($match_array, $element);
     };
-    // log::debug($all_match);
     return response()->json($match_array);
+});
+
+Route::get('get_comments', function(Request $request) {
+    $match_id = $request->match_id;
+    $comments_array = [];
+    $comments = BoxingMatch::find($match_id)->comments;
+    foreach($comments as $comment) {
+        $user_id = $comment->user_id;
+        $user = User::find($user_id);
+        array_push($comments_array, ['id' => $comment->id, "user" => $user, "comment" => $comment->comment]);
+    }
+    return $comments_array;
+});
+
+Route::post('/post_comment', function(Request $request) {
+    $user_id = $request->userId;
+    $match_id = $request->matchId;
+    $comment = $request->comment;
+    Comment::create([
+        "user_id" => $user_id,
+        "match_id" => $match_id,
+        "comment" => $comment,
+    ]);
+    return response()->json(["message" => "post comment success"], 200);
 });

@@ -1,34 +1,48 @@
-import { useEffect } from "react";
-import Button from "../../components/Button";
-import axios, { isAxiosError } from "../../libs/axios";
+import { useEffect, useState } from "react";
+import axios from "@/libs/axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { selectUser, selectAuth } from "../../store/slice/authUserSlice";
+import { selectUser, selectAuth } from "@/store/slice/authUserSlice";
+import { selectMatches, setMatchesState } from "@/store/slice/matchesSlice";
+import { FighterType, MatchesType } from "@/libs/types";
 
 export const Home = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { name } = useSelector(selectUser);
   const isAuth = useSelector(selectAuth);
+  const matchesState = useSelector(selectMatches);
 
   const MESSAGE = "※コメント閲覧、投稿にはログインが必要です";
-  const click = () => {
-    if (isAuth) return navigate("/comments");
+  const click = (id: number) => {
+    if (isAuth) return navigate(`/comments?id=${id}`);
     navigate("/login", { state: { message: MESSAGE } });
   };
 
-  const getFighters = async () => {
+  // type MatchesType = {
+  //   id: number;
+  //   date: string;
+  //   red: FighterType;
+  //   blue: FighterType;
+  // };
+
+  const [matches, setMatches] = useState<MatchesType[] | undefined>(
+    matchesState
+  );
+  const getMatches = async () => {
     try {
-      const { data } = await axios.post("api/fighter");
-      console.log(data);
+      const { data }: { data: MatchesType[] } = await axios.get("api/match");
+      dispatch(setMatchesState(data));
+      setMatches(data);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
+    if (matches) return;
     (async () => {
-      await getFighters();
+      await getMatches();
     })();
   }, []);
 
@@ -41,7 +55,7 @@ export const Home = () => {
           Loginページ
         </Link>
       </div>
-      <div
+      {/* <div
         onClick={click}
         className="flex w-[500px] bg-green-100 cursor-pointer"
       >
@@ -53,7 +67,40 @@ export const Home = () => {
           <p>lomachenko</p>
           <p>成績</p>
         </div>
-      </div>
+      </div> */}
+      {matches &&
+        matches.map((match) => (
+          <div
+            onClick={() => click(match.id)}
+            key={match.id}
+            className={"border p-3 mt-2 cursor-pointer"}
+          >
+            <h1>{match.date}</h1>
+            <div className="flex">
+              <Fighter fighter={match.red} className={"bg-red-400 w-1/2"} />
+              <Fighter fighter={match.blue} className={"bg-blue-400 w-1/2"} />
+            </div>
+          </div>
+        ))}
     </>
+  );
+};
+
+type FighterProps = {
+  fighter: FighterType;
+  className: string;
+};
+
+const Fighter = ({ fighter, className }: FighterProps) => {
+  return (
+    <div className={className}>
+      {fighter && (
+        <>
+          <p>{fighter.name}</p>
+          <p>{fighter.country}</p>
+          <p>{`${fighter.win}勝 ${fighter.draw}分 ${fighter.lose}敗 ${fighter.ko}KO`}</p>
+        </>
+      )}
+    </div>
   );
 };

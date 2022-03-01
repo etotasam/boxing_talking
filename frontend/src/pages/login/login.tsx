@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import axios, { isAxiosError } from "../../libs/axios";
+import axios, { isAxiosError } from "@/libs/axios";
 import { useState } from "react";
-import Button from "../../components/Button";
+import Button from "@/components/Button";
 import { useDispatch } from "react-redux";
-import { login } from "../../store/slice/authUserSlice";
-import { useNavigate, Outlet, Link, useLocation } from "react-router-dom";
+import { login } from "@/store/slice/authUserSlice";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 
 export const Login = () => {
   const dispatch = useDispatch();
@@ -52,6 +52,7 @@ export const Login = () => {
       loadindEnd();
     };
   }, []);
+
   if (isLoading) return <h1>Loading now...</h1>;
   return (
     <>

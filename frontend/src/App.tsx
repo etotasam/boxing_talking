@@ -14,9 +14,11 @@ function App() {
         <Route element={<AuthCheckOnly />}>
           <Route path="/" element={<Home />} />
         </Route>
+
         <Route element={<PrivateRoute />}>
           <Route path="/comments" element={<Comments />} />
         </Route>
+
         <Route path="/login" element={<Login />} />
         <Route path="/fight" element={<FightSetting />} />
         <Route path="/*" element={<NotFound />} />
