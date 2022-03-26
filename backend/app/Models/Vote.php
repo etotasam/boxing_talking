@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
-class Comment extends Model
+class Vote extends Model
 {
     use HasFactory;
 
@@ -17,12 +18,21 @@ class Comment extends Model
     protected $fillable = [
         'user_id',
         'match_id',
-        'comment',
+        'vote_for'
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
     protected $hidden = [
-        // 'created_at',
+        'created_at',
         'updated_at'
     ];
 
+    // public function votes()
+    // {
+    //     return $this->hasMany(User::class);
+    // }
 }

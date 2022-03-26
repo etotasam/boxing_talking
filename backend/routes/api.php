@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -8,6 +9,7 @@ use App\Models\BoxingMatch;
 use Illuminate\Support\Facades\Log;
 use App\Models\Comment;
 use App\Models\User;
+use App\Models\Vote;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,7 +42,7 @@ Route::post('/logout', function() {
 Route::post('/login', function(Request $request) {
     $email = $request->email;
     $password = $request->password;
-    \Log::debug($email);
+    // \Log::debug($email);
     if(Auth::attempt(['email' => $email, 'password' => $password])) {
         return Auth::user();
     }
@@ -78,7 +80,14 @@ Route::get('/match', function() {
         $blue_id = $match->blue_fighter_id;
         $red_fighter = Fighter::find($red_id);
         $blue_fighter = Fighter::find($blue_id);
-        $element = ["id" => $match->id,"red" => $red_fighter, "blue" => $blue_fighter, "date" => $match->match_date];
+        $element = [
+            "id" => $match->id,
+            "red" => $red_fighter,
+            "blue" => $blue_fighter,
+            "date" => $match->match_date,
+            "count_red" => $match->count_red,
+            "count_blue" => $match->count_blue
+        ];
         array_push($match_array, $element);
     };
     return response()->json($match_array);
@@ -90,8 +99,10 @@ Route::get('get_comments', function(Request $request) {
     $comments = BoxingMatch::find($match_id)->comments;
     foreach($comments as $comment) {
         $user_id = $comment->user_id;
+        $created_at = $comment->created_at;
+        // \Log::debug($comment->created_at);
         $user = User::find($user_id);
-        array_push($comments_array, ['id' => $comment->id, "user" => $user, "comment" => $comment->comment]);
+        array_unshift($comments_array, ['id' => $comment->id, "user" => $user, "comment" => $comment->comment, "created_at" => $created_at]);
     }
     return $comments_array;
 });
@@ -105,5 +116,61 @@ Route::post('/post_comment', function(Request $request) {
         "match_id" => $match_id,
         "comment" => $comment,
     ]);
-    return response()->json(["message" => "post comment success"], 200);
+    return response()->json(["message" => "コメントを投稿しました"], 200);
+});
+
+Route::delete('/delete_comment', function(Request $request) {
+    $user_id = $request->userId;
+    $comment_id = $request->commentId;
+    $user = Auth::user();
+    if($user->id == $user_id) {
+        $comment = Comment::find($comment_id);
+        $comment->delete();
+        return response()->json(["message" => "コメントを削除しました"], 200);
+    }
+    return response()->json(["message" => "削除出来ません"], 401);
+});
+
+Route::put('/{match_id}/{vote}/vote', function(string $match_id, string $vote) {
+
+    try{
+        DB::beginTransaction();
+        $user_id = Auth::user()->id;
+        $match_id = intval($match_id);
+        $test = Vote::where([["user_id", $user_id],["match_id", $match_id]])->first();
+        if($test) {
+            throw new Exception("すでにあるよ");
+        }
+        Vote::create([
+            "user_id" => Auth::user()->id,
+            "match_id" => intval($match_id),
+            "vote_for" => $vote
+        ]);
+        $matches = BoxingMatch::where("id", intval($match_id))->first();
+        if($vote == "red") {
+            $matches->increment("count_red");
+        }else if($vote == "blue") {
+            $matches->increment("count_blue");
+        }
+        $matches->save();
+        DB::commit();
+        return response()->json(["message" => "success vote"],200);
+    }catch (Exception $e) {
+        return response()->json(["message" => $e],500);
+        DB::rollBack();
+    }
+});
+
+Route::get("/{match_id}/check_vote", function(string $match_id) {
+    // return $match_id;
+    $user_id = Auth::user()->id;
+    $match_id = intval($match_id);
+    $has_vote = Vote::where([["user_id", $user_id],["match_id", $match_id]])->first();
+    $test = Auth::user()->votes;
+    return $test;
+});
+
+Route::post("get_votes", function(Request $request) {
+    $votes =User::find($request->userId)->votes;
+    return $votes;
 });

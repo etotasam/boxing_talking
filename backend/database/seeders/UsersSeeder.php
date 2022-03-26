@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Modles\User;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class UsersSeeder extends Seeder
@@ -15,18 +15,18 @@ class UsersSeeder extends Seeder
      */
     public function run()
     {
-        // User::factory()->count(2)->create();
-        DB::table('users')->insert([
-            [
-                'name' => "てらかど",
-                'email' => "terakado@test.com",
-                'password' => \Hash::make('test'),
-            ],
-            [
-                'name' => "テラシマ",
-                'email' => "terashima@test.com",
-                'password' => \Hash::make('test'),
-            ]
-        ]);
+        User::factory()->count(10)->create();
+        // DB::table('users')->insert([
+        //     [
+        //         'name' => "てらかど",
+        //         'email' => "terakado@test.com",
+        //         'password' => \Hash::make('test'),
+        //     ],
+        //     [
+        //         'name' => "テラシマ",
+        //         'email' => "terashima@test.com",
+        //         'password' => \Hash::make('test'),
+        //     ]
+        // ]);
     }
 }

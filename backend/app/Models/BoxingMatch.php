@@ -20,6 +20,8 @@ class BoxingMatch extends Model
         'red_fighter_id',
         'blue_fighter_id',
         'match_date',
+        'count_red',
+        'count_blue',
     ];
 
     protected $hidden = [
