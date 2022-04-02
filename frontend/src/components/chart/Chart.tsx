@@ -1,8 +1,16 @@
 import React from "react";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Doughnut, getElementAtEvent } from "react-chartjs-2";
+// import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Doughnut, Pie, getElementAtEvent } from "react-chartjs-2";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
+// ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
 
 type Props = {
   matchData: any;
@@ -26,16 +34,17 @@ export function TestChart({ matchData }: Props) {
     plugins: {
       legend: {
         onClick: () => false,
+        reverse: true,
       },
     },
   };
   return (
-    <Doughnut
-      ref={chartRef}
-      data={matchData}
-      onClick={click}
-      options={options}
-      className="bg-red-50"
-    />
+    // <Doughnut
+    //   ref={chartRef}
+    //   data={matchData}
+    //   onClick={click}
+    //   options={options}
+    // />
+    <Pie ref={chartRef} data={matchData} onClick={click} options={options} />
   );
 }

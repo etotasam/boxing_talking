@@ -6,7 +6,6 @@ import { FightSetting } from "./pages/fight_setting";
 import { Check } from "./pages/check";
 import NotFound from "./components/NotFound";
 import PrivateRoute from "./middleware/PrivateRoute";
-import GetMatches from "@/middleware/GetMatches";
 import Middleware1 from "./middleware/Middleware1";
 import GuestOnly from "./middleware/GuestOnly";
 
@@ -18,10 +17,8 @@ function App() {
           <Route path="/" element={<Home />} />
         </Route>
 
-        <Route element={<GetMatches />}>
-          <Route element={<PrivateRoute />}>
-            <Route path="/comments" element={<Comments />} />
-          </Route>
+        <Route element={<PrivateRoute />}>
+          <Route path="/comments" element={<Comments />} />
         </Route>
 
         <Route element={<GuestOnly />}>

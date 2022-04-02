@@ -74,8 +74,6 @@ export const FightSetting = () => {
     try {
       const { data } = await axios.get("api/match");
       return data;
-      // setAllMatch(data);
-      // console.log(data);
     } catch (error) {
       if (isAxiosError(error)) {
         console.log(error.response);
@@ -89,8 +87,10 @@ export const FightSetting = () => {
 
   useEffect(() => {
     (async () => {
-      const fighter = await getFighter();
-      const match = await getAllMatch();
+      const tmpFighter = getFighter();
+      const tmpMatch = getAllMatch();
+      const result = await Promise.all([tmpFighter, tmpMatch]);
+      const { fighter, match } = { fighter: result[0], match: result[1] };
       if (typeIs<Fighter[]>(fighter)) {
         setFighters(fighter);
       }

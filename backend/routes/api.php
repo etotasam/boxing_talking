@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Comment;
 use App\Models\User;
 use App\Models\Vote;
+use App\Jobs\SampleJob;
+use GuzzleHttp\Psr7\Message;
 
 /*
 |--------------------------------------------------------------------------
@@ -100,7 +102,6 @@ Route::get('get_comments', function(Request $request) {
     foreach($comments as $comment) {
         $user_id = $comment->user_id;
         $created_at = $comment->created_at;
-        // \Log::debug($comment->created_at);
         $user = User::find($user_id);
         array_unshift($comments_array, ['id' => $comment->id, "user" => $user, "comment" => $comment->comment, "created_at" => $created_at]);
     }
@@ -108,15 +109,20 @@ Route::get('get_comments', function(Request $request) {
 });
 
 Route::post('/post_comment', function(Request $request) {
-    $user_id = $request->userId;
-    $match_id = $request->matchId;
-    $comment = $request->comment;
-    Comment::create([
-        "user_id" => $user_id,
-        "match_id" => $match_id,
-        "comment" => $comment,
-    ]);
-    return response()->json(["message" => "コメントを投稿しました"], 200);
+    try {
+        // throw new Exception("post comment failed");
+        $user_id = $request->userId;
+        $match_id = $request->matchId;
+        $comment = $request->comment;
+        Comment::create([
+            "user_id" => $user_id,
+            "match_id" => $match_id,
+            "comment" => $comment,
+        ]);
+        return response()->json(["message" => "posted comment successfully"], 200);
+    } catch(Exception $e) {
+        return response()->json(["message" => $e->getMessage()], 500);
+    }
 });
 
 Route::delete('/delete_comment', function(Request $request) {
@@ -126,9 +132,9 @@ Route::delete('/delete_comment', function(Request $request) {
     if($user->id == $user_id) {
         $comment = Comment::find($comment_id);
         $comment->delete();
-        return response()->json(["message" => "コメントを削除しました"], 200);
+        return response()->json(["message" => "comment deleted"], 200);
     }
-    return response()->json(["message" => "削除出来ません"], 401);
+    return response()->json(["message" => "comment delete failed"], 401);
 });
 
 Route::put('/{match_id}/{vote}/vote', function(string $match_id, string $vote) {
@@ -137,9 +143,9 @@ Route::put('/{match_id}/{vote}/vote', function(string $match_id, string $vote) {
         DB::beginTransaction();
         $user_id = Auth::user()->id;
         $match_id = intval($match_id);
-        $test = Vote::where([["user_id", $user_id],["match_id", $match_id]])->first();
-        if($test) {
-            throw new Exception("すでにあるよ");
+        $hasVote = Vote::where([["user_id", $user_id],["match_id", $match_id]])->first();
+        if($hasVote) {
+            throw new Exception("Voting is not allowed. You already voted.");
         }
         Vote::create([
             "user_id" => Auth::user()->id,
@@ -154,10 +160,11 @@ Route::put('/{match_id}/{vote}/vote', function(string $match_id, string $vote) {
         }
         $matches->save();
         DB::commit();
+        return ["message" => "voted successfully"];
         return response()->json(["message" => "success vote"],200);
     }catch (Exception $e) {
-        return response()->json(["message" => $e],500);
         DB::rollBack();
+        return response()->json(["message" => $e->getMessage()],406);
     }
 });
 
@@ -173,4 +180,23 @@ Route::get("/{match_id}/check_vote", function(string $match_id) {
 Route::post("get_votes", function(Request $request) {
     $votes =User::find($request->userId)->votes;
     return $votes;
+});
+
+Route::put("/{id}/test", function($id = null) {
+    $data = "";
+    if($id !== null) {
+        $user = User::find($id);
+    }else {
+        $user = null;
+    }
+
+    if ($user != null) {
+        // SampleJob::dispatch($user)->delay(now()->addMinutes(1));
+        SampleJob::dispatch($user)->onQueue('name');
+        $data = User::all();
+    }else {
+        $data = "ログインしてね";
+    }
+
+    return response()->json($data);
 });

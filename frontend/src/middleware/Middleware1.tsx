@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import {
   selectAuth,
   AuthIs,
@@ -34,12 +34,6 @@ const Middleware1 = () => {
   useEffect(() => {
     getMatches();
     authCheck();
-    // (async () => {
-    //   await authCheck();
-    //   if (hasError) {
-    //     console.log(hasError);
-    //   }
-    // })();
   }, []);
   return isLoading || matchesLoading ? <p>Loading...</p> : <Outlet />;
 };

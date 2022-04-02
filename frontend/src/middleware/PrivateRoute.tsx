@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import axios from "../libs/axios";
 import {
   selectAuth,
   selectUser,
@@ -10,21 +9,20 @@ import {
 } from "@/store/slice/authUserSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Outlet } from "react-router-dom";
-import { selectMatches } from "@/store/slice/matchesSlice";
+import { selectMatches, fetchMatches } from "@/store/slice/matchesSlice";
 import {
   UserVoteStateType,
-  setVotes,
   selectVotes,
   fetchUserVotes,
-  selectUserVotesError,
   selectUserVotesLoading,
 } from "@/store/slice/userVoteSlice";
 
 const PrivateRoute = () => {
   const isAuth: AuthIs = useSelector(selectAuth);
   const authUser = useSelector(selectUser);
-  const loading = useSelector(selectAuthUserLoading);
-  const userVotesLoading = useSelector(selectUserVotesLoading);
+  const getingAuthuser = useSelector(selectAuthUserLoading);
+  const allMatches = useSelector(selectMatches);
+  const getingUserVotes = useSelector(selectUserVotesLoading);
   const isMatches = useSelector(selectMatches);
   const userVotes = useSelector(selectVotes);
   const dispatch = useDispatch();
@@ -39,12 +37,11 @@ const PrivateRoute = () => {
     return userVotesId === authUserId;
   };
 
-  const checkTypeUserVoteState = (
-    el: (false | UserVoteStateType)[]
-  ): el is UserVoteStateType[] => {
-    const result = el.filter((e) => e === false);
-    return result.length === 0;
+  const getMatches = async () => {
+    if (allMatches) return;
+    dispatch(fetchMatches());
   };
+
   //! ログインチェック
   const authCheck = async () => {
     if (isAuth === AuthIs.TRUE) return;
@@ -66,21 +63,18 @@ const PrivateRoute = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      await authCheck();
-    })();
+    authCheck();
+    getMatches();
   }, []);
   useEffect(() => {
     if (isNaN(authUser.id)) return;
-    (async () => {
-      await getUserVotes(authUser);
-    })();
+    getUserVotes(authUser);
   }, [authUser]);
 
-  return !loading && !userVotesLoading && isMatches ? (
+  return !getingAuthuser && !getingUserVotes && isMatches ? (
     <Outlet />
   ) : (
-    <p>{loading ? "うんこ" : userVotesLoading ? "ゆーざ" : "何もないよ"}</p>
+    <p>gating data...</p>
   );
   // return isAuth && isMatches ? <Outlet /> : <p>テスト...</p>;
 };

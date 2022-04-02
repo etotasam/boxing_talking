@@ -59,7 +59,7 @@ export const matchesSlice = createSlice({
       state.loading = false
       state.error = "fetchMatchでエラーです"
     })
-    builder.addCase(fetchMatches.fulfilled, (state: State, action: PayloadAction<MatchesType[] | undefined>) => {
+    builder.addCase(fetchMatches.fulfilled, (state: State, action: PayloadAction<MatchesType[] | []>) => {
       state.matches = action.payload
       state.loading = false
     })

@@ -3,13 +3,15 @@ import { render, screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
-
 // const loginUser = {
 //   email: "test@test.com",
 //   password: "test",
 // };
 
 // const sanctumServer = setupServer();
+
+//エラーコンソールを出さない
+jest.spyOn(console, "error").mockImplementation();
 
 const mockeServer = setupServer(
   rest.get("http://localhost:8080/sanctum/csrf-cookie", (req, res, context) => {
@@ -54,12 +56,17 @@ jest.mock("react-router-dom", () => ({
 describe("login.tsx", () => {
   beforeAll(() => mockeServer.listen());
 
+  beforeEach(() => {});
+
   afterEach(() => {
     mockeServer.resetHandlers();
     cleanup();
   });
 
-  afterAll(() => mockeServer.close());
+  afterAll(() => {
+    mockeServer.close();
+    jest.resetAllMocks();
+  });
 
   it(`useLocationでメッセージを受けた時は表示される`, () => {
     render(<Login />);

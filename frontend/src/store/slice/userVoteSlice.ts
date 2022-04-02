@@ -4,16 +4,16 @@ import { RootState } from "../store"
 import { UserType } from "@/store/slice/authUserSlice"
 
 
-export enum VoteColor {
-  RED = "red",
-  BLUE = "blue"
-}
+// export enum VoteColor {
+//   RED = "red",
+//   BLUE = "blue"
+// }
 
 export type UserVoteStateType = {
   id: number;
   user_id: number,
   match_id: number,
-  vote_for: VoteColor | undefined,
+  vote_for: "red" | "blue" | undefined,
 }
 
 

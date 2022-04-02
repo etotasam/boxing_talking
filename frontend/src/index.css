@@ -6,7 +6,13 @@
 }
 
 @layer utilities {
-  .comment-delete-modal {
-    background-color: rgba(0, 0, 0, 0.3);
+  .t-bgcolor-opacity-30 {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  .fighter-color-red {
+    background-color: rgb(252, 113, 113);
+  }
+  .fighter-color-blue {
+    background-color: rgb(86, 153, 254);
   }
 }

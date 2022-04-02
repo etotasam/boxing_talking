@@ -1,6 +1,7 @@
 import { Home } from ".";
 import { render, screen } from "@testing-library/react";
 import { useDispatch, useSelector } from "react-redux";
+import { AuthIs } from "@/store/slice/authUserSlice";
 
 jest.mock("react-redux");
 jest.mock("react-router-dom", () => ({
@@ -12,14 +13,17 @@ jest.mock("react-router-dom", () => ({
   },
 }));
 
-let useDispatchMock = useDispatch as jest.Mock;
-let useSelectorMock = useSelector as jest.Mock;
+const useDispatchMock = useDispatch as jest.Mock;
+const useSelectorMock = useSelector as jest.Mock;
 
 describe("ログインしてない場合", () => {
+  afterAll(() => {
+    jest.resetAllMocks();
+  });
   beforeEach(() => {
     useDispatchMock.mockReturnValue(jest.fn());
     useSelectorMock.mockReturnValueOnce({ name: "てすと" }); //ログインユーザ名
-    useSelectorMock.mockReturnValueOnce(false); //ログインの有無
+    useSelectorMock.mockReturnValueOnce(AuthIs.FALSE); //ログインの有無
     useSelectorMock.mockReturnValueOnce([{ id: 1, date: "1999/1/1" }]);
   });
   afterEach(() => {
@@ -38,7 +42,7 @@ describe("ログインしてる時", () => {
   beforeEach(() => {
     useDispatchMock.mockReturnValue(jest.fn());
     useSelectorMock.mockReturnValueOnce({ name: "てすと" }); //ログインユーザ名
-    useSelectorMock.mockReturnValueOnce(true); //ログインの有無
+    useSelectorMock.mockReturnValueOnce(AuthIs.TRUE); //ログインの有無
     useSelectorMock.mockReturnValueOnce([{ id: 1, date: "1999/1/1" }]);
   });
   afterEach(() => {

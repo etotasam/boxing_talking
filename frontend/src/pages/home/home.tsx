@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   selectUser,
@@ -11,11 +11,12 @@ import { selectMatches } from "@/store/slice/matchesSlice";
 import { FighterType, MatchesType } from "@/store/slice/matchesSlice";
 import Button from "@/components/Button";
 import logoutAPI from "@/libs/apis/logout";
+import axios from "@/libs/axios";
 
 export const Home = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { name } = useSelector(selectUser);
+  const { id: userId, name } = useSelector(selectUser);
   const isAuth: AuthIs = useSelector(selectAuth);
   const matchesState = useSelector(selectMatches);
 
@@ -29,24 +30,28 @@ export const Home = () => {
     matchesState
   );
 
-  const allMaches = useSelector(selectMatches);
-
   const logoutFunc = async () => {
     await logoutAPI();
     dispatch(logout());
   };
 
   useEffect(() => {
-    setMatches(allMaches);
+    setMatches(matchesState);
     // if (matches) return;
     // (async () => {
     //   await getMatches();
     // })();
   }, []);
 
+  const queue = async () => {
+    const { data } = await axios.put(`api/${userId}/test`);
+    console.log(data);
+  };
+
   return (
     <>
       <h1>Home</h1>
+      <Button onClick={queue}>Queue</Button>
       {isAuth === AuthIs.TRUE ? (
         <p data-testid={`name`}>{name}さん</p>
       ) : (

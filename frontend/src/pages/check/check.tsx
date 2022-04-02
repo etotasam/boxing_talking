@@ -1,35 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "@/libs/axios";
+import reducer, {
+  selectComments,
+  fetchComments,
+  selectGettingCommentsState,
+} from "@/store/slice/commentsStateSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { selectUser } from "@/store/slice/authUserSlice";
 
 export const Check = () => {
-  const [state, setState] = React.useState<string>("");
-  const [isLoading, setIsLoading] = useState(true);
-  const click = async () => {
-    try {
-      const { data } = await axios.get(`/api/test`);
-      setState(data);
-    } catch (error) {
-      console.log("なんかのエラー", error);
-    }
-    setIsLoading(false);
-  };
+  const dispatch = useDispatch();
+  const commentsOnMatch = useSelector(selectComments);
+  const commentsGetLoading = useSelector(selectGettingCommentsState);
+  const user = useSelector(selectUser);
 
   useEffect(() => {
-    click();
-  });
+    dispatch(fetchComments(1));
+  }, []);
+
+  if (commentsGetLoading) return <div>loading...</div>;
   return (
     <div>
       <h1>チェック</h1>
-      <div className="relative">
-        <p>{state}</p>
-        {isLoading && (
-          <div className="absolute top-0 left-0 w-full bg-blue-300">
-            <p>loading...</p>
+      {user && <h2>{user.name}さん</h2>}
+      {commentsOnMatch &&
+        commentsOnMatch.length &&
+        commentsOnMatch.map((el) => (
+          <div key={el.id} className={"bg-red-100 m-2"}>
+            <p>{el.comment}</p>
           </div>
-        )}
-      </div>
-      <Link to={"/login"}>テスト</Link>
+        ))}
     </div>
   );
 };
