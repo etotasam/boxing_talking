@@ -1,10 +1,11 @@
 import { useEffect } from "react";
-import axios, { isAxiosError } from "../../libs/axios";
+import Button from "@/components/Button";
+import axios, { isAxiosError } from "@/libs/axios";
 import { useState } from "react";
-import Button from "../../components/Button";
 import { useDispatch } from "react-redux";
-import { login } from "../../store/slice/authUserSlice";
-import { useNavigate, Outlet, Link, useLocation } from "react-router-dom";
+import { login } from "@/store/slice/authUserSlice";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+// import { useSelector } from "react-redux";
 
 export const Login = () => {
   const dispatch = useDispatch();
@@ -33,7 +34,7 @@ export const Login = () => {
     setErrorMessage("");
     loadindStart();
     try {
-      await axios.get("sanctum/csrf-cookie");
+      // await axios.get("sanctum/csrf-cookie");
       const { data } = await axios.post("/api/login", { email, password });
       dispatch(login(data));
       setEmail("");
@@ -41,7 +42,7 @@ export const Login = () => {
       navigate("/");
     } catch (error) {
       if (isAxiosError(error)) {
-        console.log(error.response);
+        // console.log(error.response);
         setErrorMessage(`※ログインに失敗しました`);
         loadindEnd();
       }
@@ -52,6 +53,7 @@ export const Login = () => {
       loadindEnd();
     };
   }, []);
+
   if (isLoading) return <h1>Loading now...</h1>;
   return (
     <>

@@ -49,7 +49,8 @@ services:
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
       - ./docker/db/my_data:/var/lib/mysql
-      - ./docker/db/sql:/docker-entrypoint-initdb.d
+      # - ./docker/db/sql:/docker-entrypoint-initdb.d
+      - ./docker/db/backup:/backup
     ports:
       - ${DB_PORT}:3306
     tty: true

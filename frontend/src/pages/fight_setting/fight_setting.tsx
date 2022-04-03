@@ -1,6 +1,6 @@
-import axios, { isAxiosError } from "../../libs/axios";
+import axios, { isAxiosError } from "@/libs/axios";
 import { useEffect, useState } from "react";
-import Button from "../../components/Button";
+import Button from "@/components/Button";
 
 type Fighter = {
   id: number;
@@ -48,7 +48,7 @@ export const FightSetting = () => {
     const redFighterId = redFighter!.id;
     const blueFighterId = blueFighter!.id;
     const matchDate = `${choiseYear}-${choiseMonth}-${choiseDate}`;
-    console.log("送信", matchDate);
+    // console.log("送信", matchDate);
     try {
       const { data } = await axios.post("api/fight", {
         redFighterId,
@@ -74,8 +74,6 @@ export const FightSetting = () => {
     try {
       const { data } = await axios.get("api/match");
       return data;
-      // setAllMatch(data);
-      // console.log(data);
     } catch (error) {
       if (isAxiosError(error)) {
         console.log(error.response);
@@ -89,8 +87,10 @@ export const FightSetting = () => {
 
   useEffect(() => {
     (async () => {
-      const fighter = await getFighter();
-      const match = await getAllMatch();
+      const tmpFighter = getFighter();
+      const tmpMatch = getAllMatch();
+      const result = await Promise.all([tmpFighter, tmpMatch]);
+      const { fighter, match } = { fighter: result[0], match: result[1] };
       if (typeIs<Fighter[]>(fighter)) {
         setFighters(fighter);
       }

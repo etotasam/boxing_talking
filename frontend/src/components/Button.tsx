@@ -1,17 +1,11 @@
-type Props = {
-  children: string;
-  onClick?: Function;
-  className?: string;
-};
+import React from "react";
+
+type Props = React.ComponentProps<"button">;
 
 const Button = ({ onClick, children, className }: Props) => {
-  const click = () => {
-    if (!onClick) return;
-    onClick();
-  };
   return (
     <button
-      onClick={click}
+      onClick={onClick}
       className={`bg-green-400 hover:bg-green-600 duration-200 text-white rounded px-2 py-1 ${className}`}
     >
       {children}
