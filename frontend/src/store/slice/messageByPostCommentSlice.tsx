@@ -12,18 +12,6 @@ const initialState: State = {
   visibleModal: false,
 };
 
-// const sleep = (msec: number) => {
-//   const start: any = new Date();
-//   while (new Date() as any - start < msec);
-// }
-
-// export const sleep = createAsyncThunk (
-//   "messageByPostComment",
-//   async () => {
-
-//   }
-// )
-
 export const messageByPostCommentSlice = createSlice({
   name: "messageByPostComment",
   initialState,
