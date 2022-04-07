@@ -2,6 +2,7 @@ import axios from '@/libs/axios';
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from "../store"
 import { UserType } from "@/store/slice/authUserSlice"
+import { useSelector } from "react-redux"
 
 
 // export enum VoteColor {
@@ -20,20 +21,20 @@ export type UserVoteStateType = {
 type State = {
   votes: UserVoteStateType[] | undefined,
   loading: boolean,
-  error: any
+  error: boolean
 }
 
 
 const initialState: State = {
   votes: undefined,
   loading: true,
-  error: undefined
+  error: false
 }
 
 export const fetchUserVotes = createAsyncThunk(
   'userVotes',
-  async (authUser: UserType) => {
-    const { data: userVotes }: { data: UserVoteStateType[] } = await axios.post("/api/get_votes", { userId: authUser.id })
+  async (userId: number) => {
+    const { data: userVotes }: { data: UserVoteStateType[] } = await axios.post("/api/get_votes", { userId: userId })
     return userVotes
   }
 )
@@ -49,13 +50,15 @@ export const userVoteSlice = createSlice({
   extraReducers: builder => {
     builder.addCase(fetchUserVotes.pending, (state: State) => {
       state.loading = true
+      state.error = false
     })
     builder.addCase(fetchUserVotes.rejected, (state: State) => {
       state.loading = false
-      state.error = "userVoteの取得失敗"
+      state.error = true
     })
     builder.addCase(fetchUserVotes.fulfilled, (state: State, action: PayloadAction<UserVoteStateType[]>) => {
       state.loading = false
+      state.error = false
       state.votes = action.payload
     })
   }
@@ -72,10 +75,16 @@ export const userVoteSlice = createSlice({
 // })
 
 export const { setVotes } = userVoteSlice.actions
-export const selectVotes = (state: RootState) => state.userVote.votes
-export const selectUserVotesLoading = (state: RootState) => state.userVote.loading
-export const selectUserVotesError = (state: RootState) => state.userVote.error
-// export const selectAuth = (state: RootState) => state.authUser.auth
-// export const selectAuthUser = (state: RootState) => state.authUser
-// export const selectChecked = (state: RootState) => state.authUser.hasAuthCkecked
+// export const selectVotes = (state: RootState) => state.userVote.votes
+// export const selectUserVotesLoading = (state: RootState) => state.userVote.loading
+// export const selectUserVotesError = (state: RootState) => state.userVote.error
+export const useVotes = () => {
+  return useSelector((state: RootState) => state.userVote.votes)
+}
+export const useUserVotesLoading = () => {
+  return useSelector((state: RootState) => state.userVote.loading)
+}
+export const useUserVotesError = () => {
+  return useSelector((state: RootState) => state.userVote.error)
+}
 export default userVoteSlice.reducer

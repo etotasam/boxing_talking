@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from "../store"
 import axios from "@/libs/axios"
+import { useSelector } from "react-redux"
+
 
 export type FighterType = {
   id: number,
@@ -24,13 +26,13 @@ export type MatchesType = {
 type State = {
   matches: MatchesType[] | undefined
   loading: boolean
-  error: any
+  error: boolean
 }
 
 const initialState: State = {
   matches: undefined,
   loading: false,
-  error: undefined
+  error: false
 }
 
 export const fetchMatches = createAsyncThunk(
@@ -54,13 +56,15 @@ export const matchesSlice = createSlice({
   extraReducers: builder => {
     builder.addCase(fetchMatches.pending, (state: State) => {
       state.loading = true
+      state.error = false
     })
     builder.addCase(fetchMatches.rejected, (state: State) => {
       state.loading = false
-      state.error = "fetchMatchでエラーです"
+      state.error = true
     })
     builder.addCase(fetchMatches.fulfilled, (state: State, action: PayloadAction<MatchesType[] | []>) => {
       state.matches = action.payload
+      state.error = false
       state.loading = false
     })
   }
@@ -68,7 +72,13 @@ export const matchesSlice = createSlice({
 
 
 export const { setMatchesState } = matchesSlice.actions
-export const selectMatches = (state: RootState) => state.matches.matches
-export const selectMatchesLoading = (state: RootState) => state.matches.loading
-export const selectMatchesError = (state: RootState) => state.matches.error
+export const useMatches = () => {
+  return useSelector((state: RootState) => state.matches.matches)
+}
+export const useMatchesLoading = () => {
+  return useSelector((state: RootState) => state.matches.loading)
+}
+export const useMatchesError = () => {
+  return useSelector((state: RootState) => state.matches.error)
+}
 export default matchesSlice.reducer

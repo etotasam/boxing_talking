@@ -1,8 +1,8 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
-  selectAuth,
-  selectAuthUserLoading,
+  useHasAuth,
+  useAuthUserLoading,
   fetchAuthUser,
   AuthIs,
 } from "@/store/slice/authUserSlice";
@@ -11,8 +11,8 @@ import { useEffect } from "react";
 const GuestOnly = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const isAuth: AuthIs = useSelector(selectAuth);
-  const loading = useSelector(selectAuthUserLoading);
+  const isAuth: AuthIs = useHasAuth();
+  const loading = useAuthUserLoading();
 
   const authCheck = async () => {
     if (isAuth === AuthIs.TRUE) return navigate("/");

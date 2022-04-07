@@ -6,8 +6,11 @@
 }
 
 @layer utilities {
-  .t-bgcolor-opacity-30 {
+  .t-bgcolor-opacity-1 {
     background-color: rgba(0, 0, 0, 0.1);
+  }
+  .t-bgcolor-opacity-5 {
+    background-color: rgba(0, 0, 0, 0.5);
   }
   .fighter-color-red {
     background-color: rgb(252, 113, 113);

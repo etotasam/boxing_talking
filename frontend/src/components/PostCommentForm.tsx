@@ -1,11 +1,12 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { useCommentPost } from "@/libs/hooks/useCommentPost";
-import { ModalBgColorType } from "@/components/MessageModal";
+import { useCommentPost } from "@/libs/apis/commentPostAPI";
 import { STATUS, MESSAGE } from "@/libs/utils";
-
+import { useMessageController } from "@/libs/hooks/messageController";
+import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
+import { usePostComment } from "@/libs/hooks/postComment";
 import {
-  fetchComments,
+  fetchThisMatchesComments,
   LoadingOFF,
   LoadingON,
 } from "@/store/slice/commentsStateSlice";
@@ -13,42 +14,40 @@ import {
 const PostCommentForm = ({
   userId,
   matchId,
-  // commentsSetProp,
-  messageModaleSetProp,
+  isPostCommentPending,
 }: {
   userId: number;
   matchId: number;
-  // commentsSetProp: (comments: CommentType[]) => void;
-  messageModaleSetProp: (message: MESSAGE, bgColor: ModalBgColorType) => void;
+  isPostCommentPending: (bool: boolean) => void;
 }) => {
-  // const [postComment, setPostComment] = React.useState("");
-  enum IsCommentPosting {
-    TRUE = "true",
-    FALSE = "false",
-  }
   const dispatch = useDispatch();
+  const { postComment: customPostComment, commentPostPending } =
+    usePostComment();
+  const { setMessageToModal } = useMessageController();
   const [comment, setComment] = React.useState<string>("");
   // const [posting, setPosting] = React.useState(IsCommentPosting.FALSE);
   const PostComment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(LoadingON());
+    if (commentPostPending) return;
     try {
       // throw new Error("失敗しました");
-      const status = await useCommentPost(userId, matchId, comment);
-      if (status === STATUS.COMMENT_NULL) {
-        dispatch(LoadingOFF());
-        messageModaleSetProp(MESSAGE.COMMENT_POST_NULL, ModalBgColorType.ERROR);
+      // const status = await useCommentPost(userId, matchId, comment);
+      if (comment === "") {
+        setMessageToModal(MESSAGE.COMMENT_POST_NULL, ModalBgColorType.ERROR);
         return;
       }
-      await dispatch(fetchComments(matchId));
-      messageModaleSetProp(
+      isPostCommentPending(true);
+      await customPostComment(userId, matchId, comment);
+      setComment("");
+      await dispatch(fetchThisMatchesComments(matchId));
+      isPostCommentPending(false);
+      setMessageToModal(
         MESSAGE.COMMENT_POST_SUCCESSFULLY,
         ModalBgColorType.SUCCESS
       );
-      setComment("");
     } catch (error: any) {
-      dispatch(LoadingOFF());
-      messageModaleSetProp(MESSAGE.COMMENT_POST_FAILED, ModalBgColorType.ERROR);
+      // dispatch(LoadingOFF());
+      setMessageToModal(MESSAGE.COMMENT_POST_FAILED, ModalBgColorType.ERROR);
     }
   };
   return (

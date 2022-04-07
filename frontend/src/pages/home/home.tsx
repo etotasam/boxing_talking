@@ -1,72 +1,64 @@
-import { useEffect, useState } from "react";
+import React, { useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
 import {
-  selectUser,
-  selectAuth,
-  logout,
+  // useUser,
+  // useHasAuth,
+  // logout,
   AuthIs,
 } from "@/store/slice/authUserSlice";
-import { selectMatches } from "@/store/slice/matchesSlice";
-import { FighterType, MatchesType } from "@/store/slice/matchesSlice";
+import { FighterType } from "@/store/slice/matchesSlice";
 import Button from "@/components/Button";
-import logoutAPI from "@/libs/apis/logout";
+import { useAuth } from "@/libs/hooks/useAuth";
+import { useGetAllMatches } from "@/libs/hooks/getAllMatches";
 import axios from "@/libs/axios";
+import { useLoginController } from "@/libs/hooks/authController";
+import FullScreenSpinnerModal from "@/components/FullScreenSpinnerModal";
 
 export const Home = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { id: userId, name } = useSelector(selectUser);
-  const isAuth: AuthIs = useSelector(selectAuth);
-  const matchesState = useSelector(selectMatches);
+  // const { id: userId, name } = useUser();
+  // const isAuth: AuthIs = useHasAuth();
+  const { authUser, hasAuth } = useAuth();
+  const { allMatches } = useGetAllMatches();
+  const { logoutCont, pending: authContPending } = useLoginController();
+  // const allMatches = useMatches();
 
   const MESSAGE = "※コメント閲覧、投稿にはログインが必要です";
   const click = (id: number) => {
-    if (isAuth === AuthIs.TRUE) return navigate(`/comments?id=${id}`);
+    if (hasAuth === AuthIs.TRUE) return navigate(`/comments?id=${id}`);
     navigate("/login", { state: { message: MESSAGE } });
   };
 
-  const [matches, setMatches] = useState<MatchesType[] | undefined>(
-    matchesState
-  );
-
-  const logoutFunc = async () => {
-    await logoutAPI();
-    dispatch(logout());
-  };
-
-  useEffect(() => {
-    setMatches(matchesState);
-    // if (matches) return;
-    // (async () => {
-    //   await getMatches();
-    // })();
-  }, []);
-
-  const queue = async () => {
-    const { data } = await axios.put(`api/${userId}/test`);
+  const queue = useCallback(async () => {
+    const { data } = await axios.put(`api/${authUser.id}/test`);
     console.log(data);
+  }, [authUser]);
+
+  const logoutFunc = () => {
+    logoutCont();
   };
 
   return (
-    <>
+    <div className="relative">
       <h1>Home</h1>
-      <Button onClick={queue}>Queue</Button>
-      {isAuth === AuthIs.TRUE ? (
-        <p data-testid={`name`}>{name}さん</p>
+      {/* <Button onClick={queue}>Queue</Button> */}
+      {hasAuth === AuthIs.TRUE ? (
+        <p data-testid={`name`}>{authUser.name}さん</p>
       ) : (
         <p data-testid={`guest`}>ゲストさん</p>
       )}
-      {isAuth === AuthIs.TRUE ? (
-        <Button onClick={logoutFunc}>logout</Button>
+      {hasAuth === AuthIs.TRUE ? (
+        <Button data_testid={"logout-button"} onClick={logoutCont}>
+          logout
+        </Button>
       ) : (
         <Link className="text-blue-500" to="/login">
           Loginページ
         </Link>
       )}
 
-      {Array.isArray(matches) &&
-        matches.map((match) => (
+      {Array.isArray(allMatches) &&
+        allMatches.map((match) => (
           <div
             onClick={() => click(match.id)}
             key={match.id}
@@ -79,7 +71,8 @@ export const Home = () => {
             </div>
           </div>
         ))}
-    </>
+      {authContPending && <FullScreenSpinnerModal />}
+    </div>
   );
 };
 

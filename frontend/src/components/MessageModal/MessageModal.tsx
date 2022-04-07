@@ -1,28 +1,19 @@
 import React from "react";
-import { useDispatch } from "react-redux";
-import { setSuccessMessage } from "@/store/slice/messageByPostCommentSlice";
-import { MESSAGE } from "@/libs/utils";
+import { useMessageController } from "@/libs/hooks/messageController";
+import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
 
-export enum ModalBgColorType {
-  ERROR = "red",
-  SUCCESS = "green",
-  DELETE = "gray",
-}
-
-export const MessageModal = ({
-  message,
-  errorMessage,
-}: {
-  message: string;
-  errorMessage: ModalBgColorType | null;
-}) => {
-  const dispatch = useDispatch();
+export const MessageModal = () => {
+  const {
+    clearMessageOnModal,
+    bgColor: bgColorType,
+    message,
+  } = useMessageController();
   const click = () => {
-    dispatch(setSuccessMessage(MESSAGE.NULL));
+    clearMessageOnModal();
   };
   const [bgColor, setBgColor] = React.useState<string>();
   React.useEffect(() => {
-    switch (errorMessage) {
+    switch (bgColorType) {
       case ModalBgColorType.ERROR:
         setBgColor("bg-red-600");
         break;
@@ -35,7 +26,7 @@ export const MessageModal = ({
       default:
         setBgColor("bg-gray-500");
     }
-  }, [errorMessage]);
+  }, [bgColorType]);
   return (
     <div
       onClick={click}

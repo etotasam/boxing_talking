@@ -1,67 +1,70 @@
+// module
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import axios, { isAxiosError } from "@/libs/axios";
-import Button from "@/components/Button";
-import { useNavigate, useLocation, Link } from "react-router-dom";
-import { TestChart } from "@/components/chart";
+import { useDispatch } from "react-redux";
+import { isAxiosError } from "@/libs/axios";
+import { useLocation, Link } from "react-router-dom";
 import { RiBoxingFill } from "react-icons/ri";
+
+// components
+import Button from "@/components/Button";
+import { TestChart } from "@/components/chart";
 import CommentDeleteModal from "@/components/CommentDeleteModal";
 import SpinnerModal from "@/components/SpinnerModal";
+import FullScreenSpinnerModal from "@/components/FullScreenSpinnerModal";
 import { CommentComponent } from "@/components/CommentComponent";
-import { MessageModal, ModalBgColorType } from "@/components/MessageModal";
-// import { selectvisibleModal } from "@/store/slice/messageByPostCommentSlice";
+import { voteAPI } from "@/libs/apis/voteAPI";
+import PostCommentForm from "@/components/PostCommentForm";
 
+// slice
 import {
-  selectHasNotComments,
-  fetchComments,
-  selectComments,
-  selectGettingCommentsState,
+  useHasNotComment,
+  fetchThisMatchesComments,
+  useComments,
+  useGettingCommentsState,
   commentClear,
 } from "@/store/slice/commentsStateSlice";
-import { logout, selectUser } from "@/store/slice/authUserSlice";
-import { selectVotes, setVotes } from "@/store/slice/userVoteSlice";
+import { useVotes, fetchUserVotes } from "@/store/slice/userVoteSlice";
 import {
   MatchesType,
   FighterType,
-  selectMatches,
+  useMatches,
+  fetchMatches,
 } from "@/store/slice/matchesSlice";
-import {
-  selectMessage,
-  setSuccessMessage,
-} from "@/store/slice/messageByPostCommentSlice";
-import PostCommentForm from "@/components/PostCommentForm";
-// import * as MESSAGE from "@/libs/message";
+import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
+
+// custom hooks
+import { useAuth } from "@/libs/hooks/useAuth";
+import { useMessageController } from "@/libs/hooks/messageController";
 import { MESSAGE } from "@/libs/utils";
+import { useLoginController } from "@/libs/hooks/authController";
+import { usePostComment } from "@/libs/hooks/postComment";
+import { useCommentDelete } from "@/libs/hooks/commentDelete";
 
 export const Comments = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const allVote = useSelector(selectVotes);
+  const { commentPostPending } = usePostComment();
+  // const navigate = useNavigate();
+  const { logoutCont, pending: authContPending } = useLoginController();
+  const { setMessageToModal } = useMessageController();
+  const { isOpenDeleteConfirmModal, isDeletingPending } = useCommentDelete();
+  const allVote = useVotes();
+  const { authUser } = useAuth();
+  const { name: userName, id: userId } = authUser;
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get("id"));
-  const userLogout = async () => {
-    try {
-      await axios.post("api/logout");
-      dispatch(logout());
-      dispatch(setVotes(undefined));
-      navigate("/login");
-    } catch (error) {
-      if (isAxiosError(error)) {
-        console.log(error.response);
-      }
-    }
-  };
 
   //コメント系slice
-  const hasComments = useSelector(selectHasNotComments);
-  const allCommentsByDB = useSelector(selectComments);
+  const hasNotComments = useHasNotComment();
+  const allCommentsByDB = useComments();
 
-  const gettingCommentState = useSelector(selectGettingCommentsState);
+  const gettingCommentState = useGettingCommentsState();
+
+  const [isCommentPending, setIsCommentPending] = useState(false);
 
   const [thisMatch, setThisMatch] = useState<MatchesType>();
-  const getMatch = (thisMatch: MatchesType[], id: number) => {
-    return thisMatch?.find((el) => el.id === id);
+  const getThisMatch = (matches: MatchesType[], id: number) => {
+    return matches?.find((match) => match.id === id);
   };
 
   const redFighterName = thisMatch?.red.name;
@@ -83,13 +86,8 @@ export const Comments = () => {
   };
 
   // data全般
-  const allMatches = useSelector(selectMatches) as MatchesType[];
-  // const [commentsOnThisMatch, setCommentsOnThisMatch] = useState<CommentType[]>(
-  //   []
-  // );
+  const allMatches = useMatches() as MatchesType[];
   const [whichVoteOnDB, setWhichVoteOnDB] = useState<"red" | "blue">();
-  // const [isGettingComments, setIsGettingComments] = useState(false);
-  // const [isNotCommentYet, setIsNotCommentYet] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -100,24 +98,19 @@ export const Comments = () => {
           if (userVoteMatch?.vote_for !== undefined && isMounted) {
             setWhichVoteOnDB(userVoteMatch?.vote_for);
           }
-          const thisMatch = getMatch(allMatches, matchId);
+          const match = getThisMatch(allMatches, matchId);
           if (isMounted) {
-            setThisMatch(thisMatch);
+            setThisMatch(match);
           }
-          dispatch(fetchComments(matchId));
+          dispatch(fetchThisMatchesComments(matchId));
         }
       } catch (error: any) {
         console.log(error);
-      }
-      if (isMounted) {
-        // setIsGettingComments(false);
       }
     };
     fetchData();
     return () => {
       isMounted = false;
-      // unMount時にメッセージを消去して、モーダルが出ない様にする
-      dispatch(setSuccessMessage(MESSAGE.NULL));
       dispatch(commentClear());
     };
   }, []);
@@ -146,95 +139,37 @@ export const Comments = () => {
     setThisMatch(tempGameData);
   };
 
-  const preDeleteConfirmVisble = (commentId: number) => {
-    setDeleteCommentId(commentId);
-    setDeleteConfirmModal(true);
-  };
-
-  // let settimeID: any = null;
-  const [settimeID, setSettimeID] = useState<any>();
-  const wait = (ms: number) => {
-    return new Promise((resolve) => {
-      const id = setTimeout(resolve, ms);
-      setSettimeID(id);
-    });
-  };
-
-  const sleep = () => {
-    const id = setTimeout(() => {
-      dispatch(setSuccessMessage(MESSAGE.NULL));
-      setErrorMessage(null);
-    }, 3000);
-    setSettimeID(id);
-  };
-
-  const operateMessageModal = async (
-    message: MESSAGE,
-    modalBgColor: ModalBgColorType
-  ) => {
-    clearTimeout(settimeID);
-    dispatch(setSuccessMessage(message));
-    if (modalBgColor !== null) {
-      setErrorMessage(modalBgColor);
-    }
-    await wait(3000);
-    dispatch(setSuccessMessage(MESSAGE.NULL));
-    setErrorMessage(null);
-    // sleep();
-    // await wait(3000);
-    // if(true) {
-    //   dispatch(setSuccessMessage(MESSAGE.NULL));
-    //   setErrorMessage(null);
-    // }
-  };
-
-  const [errorMessage, setErrorMessage] = useState<ModalBgColorType | null>(
-    ModalBgColorType.SUCCESS
-  );
   const [invalidButton, setInvalidButton] = useState(false);
-  const voteAPI = async (voteColor: "red" | "blue", matchId: number) => {
+  const voteFunc = async (voteColor: "red" | "blue", matchId: number) => {
     if (invalidButton) return;
     setInvalidButton(true);
     try {
-      const { data, statusText } = await axios.put(
-        `/api/${matchId}/${voteColor}/vote`
-      );
-      console.log(data, statusText);
-      const fighterName = thisMatch![voteColor].name;
-      operateMessageModal(MESSAGE.VOTE_SUCCESSFULLY, ModalBgColorType.SUCCESS);
+      await voteAPI(voteColor, matchId);
+      dispatch(fetchUserVotes(userId));
+      dispatch(fetchMatches());
+      setMessageToModal(MESSAGE.VOTE_SUCCESSFULLY, ModalBgColorType.SUCCESS);
     } catch (e) {
       if (isAxiosError(e)) {
         if (e.response && e.response.status === 406) {
-          // const message = e.response.data.message as string;
-          operateMessageModal(MESSAGE.VOTE_FAILD, ModalBgColorType.ERROR);
+          setMessageToModal(MESSAGE.VOTE_FAILD, ModalBgColorType.ERROR);
         }
       }
     }
     setInvalidButton(false);
   };
 
-  const modalControle = (
-    // comments: CommentType[],
-    message: MESSAGE,
-    bgColor: ModalBgColorType
-  ) => {
-    // setCommentsOnThisMatch(comments);
-    operateMessageModal(message, bgColor);
-  };
   useEffect(() => {
     if (!thisMatch || !voteIs) return;
     setYouVoteFighter(thisMatch[voteIs]);
   }, [voteIs]);
   const [youVoteFighter, setYouVoteFighter] = useState<FighterType>();
-  const [deleteCommentId, setDeleteCommentId] = useState<number>();
-  const [deleteConfirmModal, setDeleteConfirmModal] = useState(false);
-  const messageFromCommentSlice = useSelector(selectMessage);
-  const { name: userName, id: userId } = useSelector(selectUser);
+  // const [deleteCommentId, setDeleteCommentId] = useState<number>();
+
   return (
-    <>
+    <div className="relative">
       <h1>comments</h1>
       <p>{`${userName}さん`}</p>
-      <Button onClick={userLogout}>logout</Button>
+      <Button onClick={logoutCont}>logout</Button>
       <div>
         <Link className="text-blue-400" to="/">
           Homeへ
@@ -246,7 +181,7 @@ export const Comments = () => {
       {/* 試合情報 */}
       {youVoteFighter && (
         <Button
-          onClick={() => voteAPI(voteIs!, matchId)}
+          onClick={() => voteFunc(voteIs!, matchId)}
           className={`${
             whichVoteOnDB === voteIs && "pointer-events-none bg-gray-400"
           }`}
@@ -276,18 +211,9 @@ export const Comments = () => {
             />
           </div>
           <PostCommentForm
+            isPostCommentPending={(bool: boolean) => setIsCommentPending(bool)}
             userId={userId}
             matchId={thisMatch.id}
-            // commentsSetProp={(comments: CommentType[]) =>
-            //   setCommentsOnThisMatch(comments)
-            // }
-            messageModaleSetProp={(
-              message: MESSAGE,
-              bgColor: ModalBgColorType
-            ) => modalControle(message, bgColor)}
-            // commentGettingStateProp={(state: boolean) =>
-            //   setIsGettingComments(state)
-            // }
           />
         </div>
       )}
@@ -303,35 +229,21 @@ export const Comments = () => {
                 comment={comment}
                 userName={user.name}
                 createdAt={created_at}
-                deleteConfirmModalVisible={(commentId: number) =>
-                  preDeleteConfirmVisble(commentId)
-                }
                 className={`${
                   user.id === userId ? "bg-green-100" : "bg-gray-200"
                 }`}
               />
             )
           )}
-        {hasComments && <div>コメントはありません</div>}
-        {gettingCommentState && <SpinnerModal />}
+        {hasNotComments && <div>コメントはありません</div>}
+        {(gettingCommentState || commentPostPending || isDeletingPending) && (
+          <SpinnerModal />
+        )}
       </div>
-      {messageFromCommentSlice && (
-        <MessageModal
-          message={messageFromCommentSlice}
-          errorMessage={errorMessage}
-        />
-      )}
-      {deleteConfirmModal && (
-        <CommentDeleteModal
-          userId={userId}
-          deleteCommentId={deleteCommentId}
-          deleteConfirmModalInvisible={() => setDeleteConfirmModal(false)}
-          operateMessageModale={(message, bgColor) =>
-            operateMessageModal(message, bgColor)
-          }
-        />
-      )}
-    </>
+      {/* {messageFromCommentSlice && <MessageModal />} */}
+      {isOpenDeleteConfirmModal && <CommentDeleteModal userId={userId} />}
+      {(authContPending || isCommentPending) && <FullScreenSpinnerModal />}
+    </div>
   );
 };
 

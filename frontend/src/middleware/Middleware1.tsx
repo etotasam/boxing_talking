@@ -1,21 +1,21 @@
 import { useEffect } from "react";
 import {
-  selectAuth,
+  useHasAuth,
   AuthIs,
-  selectAuthUserLoading,
+  useAuthUserLoading,
   fetchAuthUser,
 } from "@/store/slice/authUserSlice";
 import {
-  selectMatches,
-  selectMatchesLoading,
+  useMatches,
+  useMatchesLoading,
   fetchMatches,
 } from "@/store/slice/matchesSlice";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Outlet } from "react-router-dom";
 
 const Middleware1 = () => {
-  const isAuth: AuthIs = useSelector(selectAuth);
-  const isLoading = useSelector(selectAuthUserLoading);
+  const isAuth: AuthIs = useHasAuth();
+  const isLoading = useAuthUserLoading();
   const dispatch = useDispatch();
 
   const authCheck = () => {
@@ -24,8 +24,8 @@ const Middleware1 = () => {
     dispatch(fetchAuthUser());
   };
 
-  const allMatches = useSelector(selectMatches);
-  const matchesLoading = useSelector(selectMatchesLoading);
+  const allMatches = useMatches();
+  const matchesLoading = useMatchesLoading();
   const getMatches = () => {
     if (allMatches) return;
     dispatch(fetchMatches());

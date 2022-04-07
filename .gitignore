@@ -24,8 +24,6 @@ frontend/.pnp
 frontend/.pnp.js
 frontend/.env
 
-# pases
-frontend/src/pages/check/
 # testing
 frontend/coverage
 

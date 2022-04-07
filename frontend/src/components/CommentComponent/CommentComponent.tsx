@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import dayjs from "dayjs";
 import { FaTrashAlt } from "react-icons/fa";
-import { useSelector } from "react-redux";
-import { selectUser } from "@/store/slice/authUserSlice";
+import { useUser } from "@/store/slice/authUserSlice";
+import { useCommentDelete } from "@/libs/hooks/commentDelete";
 
 type CommentPropsType = {
   commentId: number;
@@ -11,7 +11,7 @@ type CommentPropsType = {
   createdAt: Date;
   className: string;
   commentUserId: number;
-  deleteConfirmModalVisible: (commentId: number) => void;
+  // deleteConfirmModalVisible: (commentId: number) => void;
 };
 const dateFormat = (date: Date) => {
   return dayjs(date).format("YYYY/MM/DD H:mm");
@@ -25,12 +25,19 @@ export const CommentComponent = React.memo(
     createdAt,
     className,
     commentUserId,
-    deleteConfirmModalVisible,
-  }: CommentPropsType) => {
-    const { id: userId } = useSelector(selectUser);
+  }: // deleteConfirmModalVisible,
+  CommentPropsType) => {
+    const { id: userId } = useUser();
+    const classname = className || "";
+    const { openDeleteConfirmModale, getDeleteCommentId } = useCommentDelete();
+
+    const clickButton = () => {
+      getDeleteCommentId(commentId);
+      openDeleteConfirmModale();
+    };
 
     return (
-      <div className={`relative rounded py-2 px-3 mt-3 ${className}`}>
+      <div className={`relative rounded py-2 px-3 mt-3 ${classname}`}>
         <div className="whitespace-pre-wrap">{comment}</div>
         <div className="flex mt-2">
           <time className="text-gray-600 text-sm">{dateFormat(createdAt)}</time>
@@ -39,7 +46,7 @@ export const CommentComponent = React.memo(
         {commentUserId === userId && (
           <button
             data-testid={`trash-box`}
-            onClick={() => deleteConfirmModalVisible(commentId)}
+            onClick={clickButton}
             className="absolute top-3 right-3 text-gray-600 hover:text-black"
           >
             <FaTrashAlt />

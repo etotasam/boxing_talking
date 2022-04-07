@@ -3,9 +3,9 @@ import Button from "@/components/Button";
 import axios, { isAxiosError } from "@/libs/axios";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { login } from "@/store/slice/authUserSlice";
+// import { login } from "@/store/slice/authUserSlice";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-// import { useSelector } from "react-redux";
+import { useLoginController } from "@/libs/hooks/authController";
 
 export const Login = () => {
   const dispatch = useDispatch();
@@ -19,6 +19,7 @@ export const Login = () => {
   const [state, setState] = useState(
     locationState as { message: string } | null
   );
+  const { loginCont } = useLoginController();
 
   const loadindStart = () => {
     setIsLoading(true);
@@ -34,9 +35,9 @@ export const Login = () => {
     setErrorMessage("");
     loadindStart();
     try {
-      // await axios.get("sanctum/csrf-cookie");
-      const { data } = await axios.post("/api/login", { email, password });
-      dispatch(login(data));
+      // const { data } = await axios.post("/api/login", { email, password });
+      // dispatch(login(data));
+      await loginCont(email, password);
       setEmail("");
       setPassword("");
       navigate("/");

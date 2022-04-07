@@ -7,16 +7,19 @@ import userEvent from "@testing-library/user-event";
 import { FaTrashAlt } from "react-icons/fa";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
-import matchesReducer from "@/store/slice/matchesSlice";
+import { MESSAGE } from "@/libs/utils";
+
+import { useVotes } from "@/store/slice/userVoteSlice";
+import { useUser } from "@/store/slice/authUserSlice";
+import { useMessage } from "@/store/slice/messageByPostCommentSlice";
+import {
+  useComments,
+  useHasNotComment,
+} from "@/store/slice/commentsStateSlice";
+import matchesReducer, { useMatches } from "@/store/slice/matchesSlice";
 
 //エラーコンソールを出さない
 jest.spyOn(console, "error").mockImplementation();
-
-const loginUser = {
-  id: 1,
-  name: "ログインユーザー",
-  email: "user@test.com",
-};
 
 const redFighter = {
   id: 1,
@@ -69,54 +72,70 @@ jest.mock("@/components/chart", () => ({
 }));
 
 // !選択されたMatch
-jest.mock("@/store/slice/matchesSlice", () => ({
-  selectMatches: [
-    {
-      id: 1,
-      date: "2020/05/09",
-      red: redFighter,
-      blue: blueFighter,
-      count_red: 5,
-      count_blue: 6,
-    },
-  ],
-}));
+const matches = [
+  {
+    id: 1,
+    date: "2020/05/09",
+    red: redFighter,
+    blue: blueFighter,
+    count_red: 5,
+    count_blue: 6,
+  },
+];
+jest.mock("@/store/slice/matchesSlice");
+const useMatchesMock = useMatches as jest.Mock;
 
 // !userが投票した選手
-jest.mock("@/store/slice/userVoteSlice", () => ({
-  selectVotes: [
-    {
-      id: 1,
-      user_id: 1,
-      match_id: 1,
-      vote_for: "red",
-    },
-  ],
-}));
+const votes = [
+  {
+    id: 1,
+    user_id: 1,
+    match_id: 1,
+    vote_for: "red",
+  },
+];
+jest.mock("@/store/slice/userVoteSlice");
+const useVotesMock = useVotes as jest.Mock;
 
 // !ログインユーザー
-jest.mock("@/store/slice/authUserSlice", () => ({
-  selectUser: loginUser,
-}));
+const loginUser = {
+  id: 1,
+  name: "ログインユーザー",
+  email: "user@test.com",
+};
+
+//! その他のユーザー
+const otherUser = {
+  id: 2,
+  name: "その他のユーザ",
+  email: "other@test.com",
+};
+
+jest.mock("@/store/slice/authUserSlice");
+const useUserMock = useUser as jest.Mock;
 
 // !messageモーダルに表示するコメントの取得
-jest.mock("@/store/slice/messageByPostCommentSlice", () => ({
-  selectMessage: "",
-}));
+jest.mock("@/store/slice/messageByPostCommentSlice");
+const useMessageMock = useMessage as jest.Mock;
 
-const userComment = "ユーザーのコメント";
 // !コメントの取得
-jest.mock("@/store/slice/commentsStateSlice", () => ({
-  selectComments: [
-    {
-      id: 1,
-      user: loginUser,
-      comment: userComment,
-      created_at: "2022/03/31",
-    },
-  ],
-  fetchComments: jest.fn(),
-}));
+const userComment = "ユーザーのコメント";
+const authUserComment = {
+  id: 1,
+  user: loginUser,
+  comment: userComment,
+  created_at: "2022/03/31",
+};
+const nonAuthUserComment = {
+  id: 2,
+  user: otherUser,
+  comment: "ログインしてない人のコメント",
+  created_at: "2022/03/31",
+};
+const commentInfo = [authUserComment];
+jest.mock("@/store/slice/commentsStateSlice");
+const useCommentsMock = useComments as jest.Mock;
+const useHasNotCommentMock = useHasNotComment as jest.Mock;
 
 //! コメント取得中かどうか
 // jest.mock("@/store/slice/commentsStateSlice");
@@ -152,14 +171,15 @@ describe("てすとです", () => {
   beforeAll(() => server.listen());
 
   beforeEach(() => {
-    store = configureStore({
-      reducer: {
-        matches: matchesReducer,
-      },
-    });
     useDispatchMock.mockReturnValue(jest.fn());
     useSelectorMock.mockImplementation((value) => value);
     FaTrashAltMock.mockImplementation(() => <div>ゴミ箱</div>);
+
+    useUserMock.mockReturnValue(loginUser);
+    useMessageMock.mockReturnValue("");
+    useCommentsMock.mockReturnValue(commentInfo);
+    useVotesMock.mockReturnValue(votes);
+    useMatchesMock.mockReturnValue(matches);
   });
 
   afterEach(() => {
@@ -182,17 +202,24 @@ describe("てすとです", () => {
       expect(commentEl).toBeInTheDocument();
     });
   });
-  // it("コメントがない時はそのメッセージが表示される", async () => {
-  //   render(<Comments />);
-  //   const commentEl = await screen.findByText(/コメントはありません/);
-  //   await waitFor(() => {
-  //     expect(commentEl).toBeInTheDocument();
-  //   });
-  // });
-  it("ログインユーザのコメントがある時、削除ボタンが存在する", async () => {
+  it("コメントがない時はそのメッセージが表示される", async () => {
+    useCommentsMock.mockReturnValue([]);
+    useHasNotCommentMock.mockReturnValue(true);
+    render(<Comments />);
+    const commentEl = await screen.findByText(/コメントはありません/);
+    expect(commentEl).toBeInTheDocument();
+  });
+  it("authユーザのコメントに削除ボタンが存在する", async () => {
+    render(<Comments />);
+    expect(await screen.findByTestId(`trash-box`)).toBeTruthy();
+  });
+
+  it("no authユーザのコメントには削除ボタンは存在しない", async () => {
+    useCommentsMock.mockReturnValue([nonAuthUserComment]);
     render(<Comments />);
     await waitFor(() => {
-      expect(screen.getByTestId(`trash-box`)).toBeTruthy();
+      const trashBox = screen.queryByTestId(`trash-box`);
+      expect(trashBox).toBeNull();
     });
   });
 
