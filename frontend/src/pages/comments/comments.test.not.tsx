@@ -5,18 +5,15 @@ import { rest } from "msw";
 import { setupServer } from "msw/node";
 import userEvent from "@testing-library/user-event";
 import { FaTrashAlt } from "react-icons/fa";
-import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
-import { MESSAGE } from "@/libs/utils";
 
-import { useVotes } from "@/store/slice/userVoteSlice";
-import { useUser } from "@/store/slice/authUserSlice";
+import { useAuth } from "@/libs/hooks/useAuth";
 import { useMessage } from "@/store/slice/messageByPostCommentSlice";
-import {
-  useComments,
-  useHasNotComment,
-} from "@/store/slice/commentsStateSlice";
-import matchesReducer, { useMatches } from "@/store/slice/matchesSlice";
+
+// hooks
+import { usePostComment } from "@/libs/hooks/usePostComment";
+import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
+import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+import { useFetchVoteResult } from "@/libs/hooks/useFetchVoteResult";
 
 //エラーコンソールを出さない
 jest.spyOn(console, "error").mockImplementation();
@@ -82,8 +79,8 @@ const matches = [
     count_blue: 6,
   },
 ];
-jest.mock("@/store/slice/matchesSlice");
-const useMatchesMock = useMatches as jest.Mock;
+jest.mock("@/libs/hooks/useFetchAllMatches");
+const useFetchAllMatchesMock = useFetchAllMatches as jest.Mock;
 
 // !userが投票した選手
 const votes = [
@@ -94,8 +91,8 @@ const votes = [
     vote_for: "red",
   },
 ];
-jest.mock("@/store/slice/userVoteSlice");
-const useVotesMock = useVotes as jest.Mock;
+jest.mock("@/libs/hooks/useFetchVoteResult");
+const useFetchVoteResultMock = useFetchVoteResult as jest.Mock;
 
 // !ログインユーザー
 const loginUser = {
@@ -111,8 +108,8 @@ const otherUser = {
   email: "other@test.com",
 };
 
-jest.mock("@/store/slice/authUserSlice");
-const useUserMock = useUser as jest.Mock;
+jest.mock("@/libs/hooks/useAuth");
+const useAuthMock = useAuth as jest.Mock;
 
 // !messageモーダルに表示するコメントの取得
 jest.mock("@/store/slice/messageByPostCommentSlice");
@@ -134,12 +131,14 @@ const nonAuthUserComment = {
 };
 const commentInfo = [authUserComment];
 jest.mock("@/store/slice/commentsStateSlice");
-const useCommentsMock = useComments as jest.Mock;
-const useHasNotCommentMock = useHasNotComment as jest.Mock;
+
+jest.mock("@/libs/hooks/postComment");
+const usePostCommentMock = usePostComment as jest.Mock;
+
+jest.mock("@/libs/hooks/commentDelete");
+const useCommentDeleteMock = useCommentDelete as jest.Mock;
 
 //! コメント取得中かどうか
-// jest.mock("@/store/slice/commentsStateSlice");
-// const selectGettingCommentsStateMock = selectGettingCommentsState as jest.Mock;
 
 // !ゴミ箱アイコン
 jest.mock("react-icons/fa");
@@ -167,7 +166,6 @@ const useDispatchMock = useDispatch as jest.Mock;
 const useSelectorMock = useSelector as jest.Mock;
 
 describe("てすとです", () => {
-  let store: any;
   beforeAll(() => server.listen());
 
   beforeEach(() => {
@@ -175,11 +173,20 @@ describe("てすとです", () => {
     useSelectorMock.mockImplementation((value) => value);
     FaTrashAltMock.mockImplementation(() => <div>ゴミ箱</div>);
 
-    useUserMock.mockReturnValue(loginUser);
+    useAuthMock.mockReturnValue(loginUser);
     useMessageMock.mockReturnValue("");
-    useCommentsMock.mockReturnValue(commentInfo);
-    useVotesMock.mockReturnValue(votes);
-    useMatchesMock.mockReturnValue(matches);
+    useFetchVoteResultMock.mockReturnValue({ voteResultState: { votes } });
+    useFetchAllMatchesMock.mockReturnValue({
+      matchesState: { matches: matches },
+    });
+
+    usePostCommentMock.mockReturnValue({ commentPostPending: false });
+    useCommentDeleteMock.mockReturnValue({
+      isDeletingPending: false,
+      isOpenDeleteConfirmModal: true,
+      getDeleteCommentId: jest.fn(),
+      openDeleteConfirmModale: jest.fn(),
+    });
   });
 
   afterEach(() => {
@@ -203,8 +210,8 @@ describe("てすとです", () => {
     });
   });
   it("コメントがない時はそのメッセージが表示される", async () => {
-    useCommentsMock.mockReturnValue([]);
-    useHasNotCommentMock.mockReturnValue(true);
+    // useCommentsMock.mockReturnValue([]);
+    // useHasNotCommentMock.mockReturnValue(true);
     render(<Comments />);
     const commentEl = await screen.findByText(/コメントはありません/);
     expect(commentEl).toBeInTheDocument();
@@ -215,7 +222,7 @@ describe("てすとです", () => {
   });
 
   it("no authユーザのコメントには削除ボタンは存在しない", async () => {
-    useCommentsMock.mockReturnValue([nonAuthUserComment]);
+    // useCommentsMock.mockReturnValue([nonAuthUserComment]);
     render(<Comments />);
     await waitFor(() => {
       const trashBox = screen.queryByTestId(`trash-box`);
@@ -224,12 +231,17 @@ describe("てすとです", () => {
   });
 
   it("削除ボタン(ゴミ箱)をクリックした時にモーダルが表示され、キャンセル押下で消える", async () => {
-    render(<Comments />);
+    const { rerender } = render(<Comments />);
     const trashBox = await screen.findByTestId(`trash-box`);
     userEvent.click(trashBox);
     expect(screen.getByTestId("delete-modal")).toBeTruthy();
     const cancelButton = screen.getByText(/キャンセル/);
     userEvent.click(cancelButton);
+    useCommentDeleteMock.mockReturnValue({
+      isDeletingPending: false,
+      isOpenDeleteConfirmModal: false,
+    });
+    rerender(<Comments />);
     expect(screen.queryByTestId("delete-modal")).toBeNull();
   });
 });

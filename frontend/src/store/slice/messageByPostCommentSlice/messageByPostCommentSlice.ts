@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../store";
+import { RootState } from "../../store";
 import { MESSAGE } from "@/libs/utils";
 import { useSelector } from "react-redux";
 
@@ -10,19 +10,19 @@ export enum ModalBgColorType {
   NULL = "null",
 }
 
-type State = {
+export type InitialStateType = {
   message: MESSAGE;
   bgColor: ModalBgColorType;
   visibleModal: boolean;
   waitId: NodeJS.Timeout | undefined;
 };
 
-type ActionProps = {
+export type ActionProps = {
   message: MESSAGE;
   bgColor: ModalBgColorType;
 };
 
-const initialState: State = {
+const initialState: InitialStateType = {
   message: MESSAGE.NULL,
   bgColor: ModalBgColorType.SUCCESS,
   visibleModal: false,
@@ -33,7 +33,7 @@ export const messageByPostCommentSlice = createSlice({
   name: "messageByPostComment",
   initialState,
   reducers: {
-    setMessage: (state: State, action: PayloadAction<ActionProps>) => {
+    setMessage: (state: InitialStateType, action: PayloadAction<ActionProps>) => {
       state.message = action.payload.message;
       state.bgColor = action.payload.bgColor;
     },
@@ -49,7 +49,7 @@ export const messageByPostCommentSlice = createSlice({
     //   state.message = action.payload;
     //   state.bgColor = ModalBgColorType.ERROR;
     // },
-    messageClear: (state: State) => {
+    messageClear: (state: InitialStateType) => {
       state.message = MESSAGE.NULL;
       state.bgColor = ModalBgColorType.NULL;
     },

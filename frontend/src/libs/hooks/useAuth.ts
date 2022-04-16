@@ -1,18 +1,11 @@
-import { useEffect } from "react"
 import { useDispatch } from "react-redux"
-import { AuthIs, fetchAuthUser, useUser, useHasAuth, useAuthUserLoading, useAuthUserError } from "@/store/slice/authUserSlice"
+import { AuthIs, fetchAuthUser, useAuthBySlice } from "@/store/slice/authUserSlice"
 
 export const useAuth = () => {
   const dispatch = useDispatch()
-  const hasAuth = useHasAuth()
-  const pendingAuth = useAuthUserLoading()
-  const hasAuthUserError = useAuthUserError()
-  const authUser = useUser()
-  useEffect(() => {
-    if (hasAuth === AuthIs.UNDEFINED) {
-      dispatch(fetchAuthUser())
-    }
-  }, [])
+  const authState = useAuthBySlice()
 
-  return { authUser, hasAuth, pendingAuth, hasAuthUserError }
+  const authCheckAPI = async () => await dispatch(fetchAuthUser())
+
+  return { authState, authCheckAPI }
 }

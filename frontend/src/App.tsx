@@ -6,7 +6,7 @@ import { FightSetting } from "./pages/fight_setting";
 import { Check } from "./pages/check";
 import NotFound from "./components/NotFound";
 import PrivateRoute from "./middleware/PrivateRoute";
-import Middleware1 from "./middleware/Middleware1";
+import AuthCheckOnly from "./middleware/AuthCheckOnly";
 import GuestOnly from "./middleware/GuestOnly";
 import AllComponentWrapper from "./middleware/AllComponent";
 
@@ -15,7 +15,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<AllComponentWrapper />}>
-          <Route element={<Middleware1 />}>
+          <Route element={<AuthCheckOnly />}>
             <Route path="/" element={<Home />} />
           </Route>
 

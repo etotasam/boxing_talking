@@ -1,5 +1,5 @@
 import React from "react"
-import { login, logout } from "@/store/slice/authUserSlice"
+// import { login, logout, useHasAuth } from "@/store/slice/authUserSlice"
 import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom";
 import axios, { isAxiosError } from "../axios"
@@ -19,17 +19,19 @@ export const useLoginController = () => {
     const { data } = await axios.post("api/login", {
       email, password
     })
-    dispatch(login(data))
+    // dispatch(login(data))
     setMessageToModal(MESSAGE.MESSAGE_LOGIN, ModalBgColorType.SUCCESS)
     setPending(false)
   }, [])
+
+  // const hasAuth = useHasAuth()
 
   const logoutCont = React.useCallback(async () => {
     try {
       setPending(true)
       await axios.post("api/logout")
       setMessageToModal(MESSAGE.MESSAGE_LOGOUT, ModalBgColorType.DELETE)
-      dispatch(logout())
+      // dispatch(logout())
       setPending(false)
       navigate("/login")
     } catch (error) {

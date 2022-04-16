@@ -1,27 +1,23 @@
 import React, { useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  // useUser,
-  // useHasAuth,
-  // logout,
-  AuthIs,
-} from "@/store/slice/authUserSlice";
-import { FighterType } from "@/store/slice/matchesSlice";
-import Button from "@/components/Button";
+import { useNavigate } from "react-router-dom";
+import { AuthIs } from "@/store/slice/authUserSlice";
+import { FighterType } from "@/libs/apis/fetchMatchesAPI";
 import { useAuth } from "@/libs/hooks/useAuth";
-import { useGetAllMatches } from "@/libs/hooks/getAllMatches";
+import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 import axios from "@/libs/axios";
-import { useLoginController } from "@/libs/hooks/authController";
+import { useLogout } from "@/libs/hooks/useLogout";
+
+// components
 import FullScreenSpinnerModal from "@/components/FullScreenSpinnerModal";
+import { LayoutDefault } from "@/layout/LayoutDefault";
 
 export const Home = () => {
   const navigate = useNavigate();
-  // const { id: userId, name } = useUser();
-  // const isAuth: AuthIs = useHasAuth();
-  const { authUser, hasAuth } = useAuth();
-  const { allMatches } = useGetAllMatches();
-  const { logoutCont, pending: authContPending } = useLoginController();
-  // const allMatches = useMatches();
+  const {
+    authState: { hasAuth, user: authUser },
+  } = useAuth();
+  const { matchesState } = useFetchAllMatches();
+  const { logoutState } = useLogout();
 
   const MESSAGE = "※コメント閲覧、投稿にはログインが必要です";
   const click = (id: number) => {
@@ -34,31 +30,10 @@ export const Home = () => {
     console.log(data);
   }, [authUser]);
 
-  const logoutFunc = () => {
-    logoutCont();
-  };
-
   return (
-    <div className="relative">
-      <h1>Home</h1>
-      {/* <Button onClick={queue}>Queue</Button> */}
-      {hasAuth === AuthIs.TRUE ? (
-        <p data-testid={`name`}>{authUser.name}さん</p>
-      ) : (
-        <p data-testid={`guest`}>ゲストさん</p>
-      )}
-      {hasAuth === AuthIs.TRUE ? (
-        <Button data_testid={"logout-button"} onClick={logoutCont}>
-          logout
-        </Button>
-      ) : (
-        <Link className="text-blue-500" to="/login">
-          Loginページ
-        </Link>
-      )}
-
-      {Array.isArray(allMatches) &&
-        allMatches.map((match) => (
+    <LayoutDefault>
+      {Array.isArray(matchesState.matches) &&
+        matchesState.matches.map((match) => (
           <div
             onClick={() => click(match.id)}
             key={match.id}
@@ -71,8 +46,8 @@ export const Home = () => {
             </div>
           </div>
         ))}
-      {authContPending && <FullScreenSpinnerModal />}
-    </div>
+      {logoutState.pending && <FullScreenSpinnerModal />}
+    </LayoutDefault>
   );
 };
 

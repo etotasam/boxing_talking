@@ -3,11 +3,7 @@ import { useMessageController } from "@/libs/hooks/messageController";
 import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
 
 export const MessageModal = () => {
-  const {
-    clearMessageOnModal,
-    bgColor: bgColorType,
-    message,
-  } = useMessageController();
+  const { clearMessageOnModal, bgColor: bgColorType, message } = useMessageController();
   const click = () => {
     clearMessageOnModal();
   };

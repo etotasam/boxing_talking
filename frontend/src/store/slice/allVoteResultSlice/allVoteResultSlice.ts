@@ -1,7 +1,7 @@
 import axios from '@/libs/axios';
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
-import { RootState } from "../store"
-import { UserType } from "@/store/slice/authUserSlice"
+import { RootState } from "../../store"
+// import { UserType } from "@/libs/apis/authAPI"
 import { useSelector } from "react-redux"
 
 
@@ -18,16 +18,16 @@ export type UserVoteStateType = {
 }
 
 
-type State = {
+type InitialStateType = {
   votes: UserVoteStateType[] | undefined,
-  loading: boolean,
+  pending: boolean,
   error: boolean
 }
 
 
-const initialState: State = {
+const initialState: InitialStateType = {
   votes: undefined,
-  loading: true,
+  pending: true,
   error: false
 }
 
@@ -43,21 +43,21 @@ export const userVoteSlice = createSlice({
   name: 'userVote',
   initialState,
   reducers: {
-    setVotes: (state: State, action: PayloadAction<UserVoteStateType[] | undefined>) => {
+    setVotes: (state: InitialStateType, action: PayloadAction<UserVoteStateType[] | undefined>) => {
       state.votes = action.payload
     }
   },
   extraReducers: builder => {
-    builder.addCase(fetchUserVotes.pending, (state: State) => {
-      state.loading = true
+    builder.addCase(fetchUserVotes.pending, (state: InitialStateType) => {
+      state.pending = true
       state.error = false
     })
-    builder.addCase(fetchUserVotes.rejected, (state: State) => {
-      state.loading = false
+    builder.addCase(fetchUserVotes.rejected, (state: InitialStateType) => {
+      state.pending = false
       state.error = true
     })
-    builder.addCase(fetchUserVotes.fulfilled, (state: State, action: PayloadAction<UserVoteStateType[]>) => {
-      state.loading = false
+    builder.addCase(fetchUserVotes.fulfilled, (state: InitialStateType, action: PayloadAction<UserVoteStateType[]>) => {
+      state.pending = false
       state.error = false
       state.votes = action.payload
     })
@@ -76,15 +76,15 @@ export const userVoteSlice = createSlice({
 
 export const { setVotes } = userVoteSlice.actions
 // export const selectVotes = (state: RootState) => state.userVote.votes
-// export const selectUserVotesLoading = (state: RootState) => state.userVote.loading
+// export const selectUserVotesLoading = (state: RootState) => state.userVote.pending
 // export const selectUserVotesError = (state: RootState) => state.userVote.error
-export const useVotes = () => {
-  return useSelector((state: RootState) => state.userVote.votes)
+export const useVoteResultState = () => {
+  return useSelector((state: RootState) => state.userVote)
 }
-export const useUserVotesLoading = () => {
-  return useSelector((state: RootState) => state.userVote.loading)
-}
-export const useUserVotesError = () => {
-  return useSelector((state: RootState) => state.userVote.error)
-}
+// export const useUserVotesLoading = () => {
+//   return useSelector((state: RootState) => state.userVote.pending)
+// }
+// export const useUserVotesError = () => {
+//   return useSelector((state: RootState) => state.userVote.error)
+// }
 export default userVoteSlice.reducer

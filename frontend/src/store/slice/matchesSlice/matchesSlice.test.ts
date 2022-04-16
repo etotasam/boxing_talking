@@ -1,0 +1,59 @@
+import reducer, { fetchMatches, InitialStateType } from "."
+import { MatchesType, FighterType } from '@/libs/apis/fetchMatchesAPI'
+
+const initialState: InitialStateType = {
+  matches: undefined,
+  pending: false,
+  error: false
+}
+
+const redFighter: FighterType = {
+  id: 1,
+  name: "red fighter",
+  country: "red country",
+  ko: 1,
+  win: 1,
+  lose: 1,
+  draw: 1,
+}
+const blueFighter: FighterType = {
+  id: 1,
+  name: "blue fighter",
+  country: "blue country",
+  ko: 2,
+  win: 2,
+  lose: 2,
+  draw: 2,
+}
+
+describe("matchesSliceのテスト", () => {
+  it("fulfilled", () => {
+    const payload: MatchesType[] = [{
+      id: 1,
+      date: "2022/4/15",
+      red: redFighter,
+      blue: blueFighter,
+      count_red: 10,
+      count_blue: 20
+    }]
+    const action = { type: fetchMatches.fulfilled.type, payload }
+    const state = reducer(initialState, action)
+    expect(state.matches).toEqual(payload)
+    expect(state.error).toEqual(false)
+    expect(state.pending).toEqual(false)
+  })
+  it("pending", () => {
+    const action = { type: fetchMatches.pending.type }
+    const state = reducer(initialState, action)
+    expect(state.matches).toEqual(undefined)
+    expect(state.error).toEqual(false)
+    expect(state.pending).toEqual(true)
+  })
+  it("rejected", () => {
+    const action = { type: fetchMatches.rejected.type }
+    const state = reducer(initialState, action)
+    expect(state.matches).toEqual(undefined)
+    expect(state.error).toEqual(true)
+    expect(state.pending).toEqual(false)
+  })
+})

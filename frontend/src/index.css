@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --comment-el-height: 0px;
+}
+
 @layer base {
 }
 
@@ -12,10 +16,15 @@
   .t-bgcolor-opacity-5 {
     background-color: rgba(0, 0, 0, 0.5);
   }
+  /*
   .fighter-color-red {
     background-color: rgb(252, 113, 113);
   }
   .fighter-color-blue {
     background-color: rgb(86, 153, 254);
+  }
+  */
+  .t-comment-height {
+    height: var(--comment-el-height);
   }
 }

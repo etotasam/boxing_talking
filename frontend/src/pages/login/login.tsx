@@ -2,64 +2,67 @@ import { useEffect } from "react";
 import Button from "@/components/Button";
 import axios, { isAxiosError } from "@/libs/axios";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
 // import { login } from "@/store/slice/authUserSlice";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useLoginController } from "@/libs/hooks/authController";
+import { useLogin } from "@/libs/hooks/useLogin";
 
 export const Login = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState("");
+  // const [errorMessage, setErrorMessage] = useState("");
+  // const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
   const locationState = location.state;
   const [state, setState] = useState(
     locationState as { message: string } | null
   );
-  const { loginCont } = useLoginController();
+  // const { loginCont } = useLoginController();
+  const { login } = useLogin();
+  const { loginState } = useLogin();
 
-  const loadindStart = () => {
-    setIsLoading(true);
-  };
+  // const loadindStart = () => {
+  //   setIsLoading(true);
+  // };
 
-  const loadindEnd = () => {
-    setIsLoading(false);
-  };
+  // const loadindEnd = () => {
+  //   setIsLoading(false);
+  // };
 
+  const LOGIN_ERROR_MESSAGE = "※ログインに失敗しました";
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setState(null);
-    setErrorMessage("");
-    loadindStart();
-    try {
-      // const { data } = await axios.post("/api/login", { email, password });
-      // dispatch(login(data));
-      await loginCont(email, password);
-      setEmail("");
-      setPassword("");
-      navigate("/");
-    } catch (error) {
-      if (isAxiosError(error)) {
-        // console.log(error.response);
-        setErrorMessage(`※ログインに失敗しました`);
-        loadindEnd();
-      }
-    }
+    await login({ email, password });
+    navigate("/");
+    // setErrorMessage("");
+    // loadindStart();
+    // try {
+    //   await login({ email, password });
+    //   setEmail("");
+    //   setPassword("");
+    //   navigate("/");
+    // } catch (error) {
+    //   if (isAxiosError(error)) {
+    //     setErrorMessage(`※ログインに失敗しました`);
+    //     loadindEnd();
+    //   }
+    // }
   };
-  useEffect(() => {
-    return () => {
-      loadindEnd();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     loadindEnd();
+  //   };
+  // }, []);
 
-  if (isLoading) return <h1>Loading now...</h1>;
+  if (loginState.pending) return <h1>Loading now...</h1>;
   return (
     <>
       <h1>login</h1>
-      {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+      {loginState.error && (
+        <p className="text-red-500">{LOGIN_ERROR_MESSAGE}</p>
+      )}
       {state && <p className="text-red-500">{state.message}</p>}
       <form onSubmit={submit}>
         <input

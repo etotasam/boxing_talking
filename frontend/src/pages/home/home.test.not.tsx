@@ -2,15 +2,17 @@ import { Home } from ".";
 import { render, screen } from "@testing-library/react";
 import { useDispatch, useSelector } from "react-redux";
 import { AuthIs } from "@/store/slice/authUserSlice";
-import { useUser, useHasAuth } from "@/store/slice/authUserSlice";
-import { useMatches } from "@/store/slice/matchesSlice";
+// import { useUser, useHasAuth } from "@/store/slice/authUserSlice";
+import { useAuth } from "@/libs/hooks/useAuth";
+// import { useMatches } from "@/store/slice/matchesSlice";
+import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 
-jest.mock("@/store/slice/authUserSlice");
-const useUserMock = useUser as jest.Mock;
-const useHasAuthMock = useHasAuth as jest.Mock;
+jest.mock("@/libs/hooks/useAuth");
+const useAuthMock = useAuth as jest.Mock;
+// const useHasAuthMock = useHasAuth as jest.Mock;
 
-jest.mock("@/store/slice/matchesSlice");
-const useMathcesMock = useMatches as jest.Mock;
+jest.mock("@/libs/hooks/useFetchAllMatches");
+const useFetchAllMatchesMock = useFetchAllMatches as jest.Mock;
 
 jest.mock("react-redux");
 jest.mock("react-router-dom", () => ({
@@ -35,9 +37,12 @@ describe("ログインしてない場合", () => {
   });
   beforeEach(() => {
     useDispatchMock.mockReturnValue(jest.fn());
-    useUserMock.mockReturnValue({ name: "" });
-    useMathcesMock.mockReturnValue([{ id: 1, date: "1999/1/1" }]);
-    useHasAuthMock.mockReturnValue(AuthIs.FALSE); //ログインの有無
+    useAuthMock.mockReturnValue({ name: "" });
+    // useMathcesMock.mockReturnValue([{ id: 1, date: "1999/1/1" }]);
+    useFetchAllMatchesMock.mockReturnValue({
+      matches: [{ id: 1, date: "1999/1/1" }],
+    });
+    // useHasAuthMock.mockReturnValue(AuthIs.FALSE); //ログインの有無
   });
   afterEach(() => {
     useDispatchMock.mockReset();
@@ -62,9 +67,12 @@ describe("ログインしてない場合", () => {
 describe("ログインしてる時", () => {
   beforeEach(() => {
     useDispatchMock.mockReturnValue(jest.fn());
-    useUserMock.mockReturnValue({ name: "てすと" });
-    useMathcesMock.mockReturnValue([{ id: 1, date: "1999/1/1" }]);
-    useHasAuthMock.mockReturnValue(AuthIs.TRUE); //ログインの有無
+    useAuthMock.mockReturnValue({ name: "てすと" });
+    // useMathcesMock.mockReturnValue([{ id: 1, date: "1999/1/1" }]);
+    useFetchAllMatchesMock.mockReturnValue({
+      matches: [{ id: 1, date: "1999/1/1" }],
+    });
+    // useHasAuthMock.mockReturnValue(AuthIs.TRUE); //ログインの有無
   });
   afterEach(() => {
     useDispatchMock.mockReset();

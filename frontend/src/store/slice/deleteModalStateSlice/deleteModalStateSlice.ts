@@ -1,17 +1,17 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
-import { RootState } from "../store"
+import { RootState } from "../../store"
 import { useSelector } from "react-redux"
 import axios from "@/libs/axios"
 
-type initialStateProps = {
-  isOpenDeleteConfirmModal: boolean
-  deleteCommentId: number | undefined
+export type initialStateProps = {
+  confirmModalVisble: boolean
+  idForDelete: number | undefined
   pending: boolean
 }
 
 const initialState: initialStateProps = {
-  isOpenDeleteConfirmModal: false,
-  deleteCommentId: undefined,
+  confirmModalVisble: false,
+  idForDelete: undefined,
   pending: false
 }
 
@@ -37,14 +37,14 @@ export const deleteConfirmModaleSlice = createSlice({
   name: 'matdeleteConfirmModaleSliceches',
   initialState,
   reducers: {
-    openDeleteModal: (state: initialStateProps) => {
-      state.isOpenDeleteConfirmModal = true
+    openDeleteModalReducer: (state: initialStateProps) => {
+      state.confirmModalVisble = true
     },
-    closeDeleteModal: (state: initialStateProps) => {
-      state.isOpenDeleteConfirmModal = false
+    closeDeleteModalReducer: (state: initialStateProps) => {
+      state.confirmModalVisble = false
     },
-    setDeleteCommentId: (state: initialStateProps, action: PayloadAction<number>) => {
-      state.deleteCommentId = action.payload
+    defineDeleteCommentIdReducer: (state: initialStateProps, action: PayloadAction<number>) => {
+      state.idForDelete = action.payload
     }
   },
   extraReducers: builder => {
@@ -57,14 +57,14 @@ export const deleteConfirmModaleSlice = createSlice({
   }
 })
 
-export const { openDeleteModal, closeDeleteModal, setDeleteCommentId } = deleteConfirmModaleSlice.actions
-export const useIsOpenDeleteConfirmModal = () => {
-  return useSelector((state: RootState) => state.deleteConfirmModalState.isOpenDeleteConfirmModal)
+export const { openDeleteModalReducer, closeDeleteModalReducer, defineDeleteCommentIdReducer } = deleteConfirmModaleSlice.actions
+export const useDeleteCommentsState = () => {
+  return useSelector((state: RootState) => state.deleteConfirmModalState)
 }
-export const useDeleteCommentId = () => {
-  return useSelector((state: RootState) => state.deleteConfirmModalState.deleteCommentId)
-}
-export const useDeletingPending = () => {
-  return useSelector((state: RootState) => state.deleteConfirmModalState.pending)
-}
+// export const useDeleteCommentId = () => {
+//   return useSelector((state: RootState) => state.deleteConfirmModalState.deleteCommentId)
+// }
+// export const useDeletingPending = () => {
+//   return useSelector((state: RootState) => state.deleteConfirmModalState.pending)
+// }
 export default deleteConfirmModaleSlice.reducer
