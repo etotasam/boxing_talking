@@ -1,82 +1,46 @@
 import { useEffect } from "react";
-import {
-  selectAuth,
-  selectUser,
-  selectAuthUserLoading,
-  AuthIs,
-  fetchAuthUser,
-  UserType,
-} from "@/store/slice/authUserSlice";
-import { useSelector, useDispatch } from "react-redux";
+import { AuthIs } from "@/store/slice/authUserSlice";
 import { useNavigate, Outlet } from "react-router-dom";
-import { selectMatches, fetchMatches } from "@/store/slice/matchesSlice";
-import {
-  UserVoteStateType,
-  selectVotes,
-  fetchUserVotes,
-  selectUserVotesLoading,
-} from "@/store/slice/userVoteSlice";
+import { useAuth } from "@/libs/hooks/useAuth";
+import { useFetchVoteResult } from "@/libs/hooks/useFetchVoteResult";
+import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 
 const PrivateRoute = () => {
-  const isAuth: AuthIs = useSelector(selectAuth);
-  const authUser = useSelector(selectUser);
-  const getingAuthuser = useSelector(selectAuthUserLoading);
-  const allMatches = useSelector(selectMatches);
-  const getingUserVotes = useSelector(selectUserVotesLoading);
-  const isMatches = useSelector(selectMatches);
-  const userVotes = useSelector(selectVotes);
-  const dispatch = useDispatch();
+  const { matchesState, fetchAllMatches } = useFetchAllMatches();
+  const { authState, authCheckAPI } = useAuth();
+  const { voteResultState, fetchVoteResult } = useFetchVoteResult();
   const navigate = useNavigate();
 
-  const checkUserVotesId = (
-    userVotes: UserVoteStateType[] | undefined
-  ): boolean => {
-    if (userVotes === undefined) return false;
-    const userVotesId = userVotes[0].user_id;
-    const authUserId = authUser.id;
-    return userVotesId === authUserId;
-  };
-
-  const getMatches = async () => {
-    if (allMatches) return;
-    dispatch(fetchMatches());
-  };
-
-  //! ログインチェック
-  const authCheck = async () => {
-    if (isAuth === AuthIs.TRUE) return;
-    try {
-      const value: any = await dispatch(fetchAuthUser());
-      if (isNaN(value.payload.id)) throw Error;
-    } catch (error) {
-      navigate("/login");
-    }
-  };
-
-  const getUserVotes = async (authUser: UserType) => {
-    if (checkUserVotesId(userVotes)) return;
-    try {
-      dispatch(fetchUserVotes(authUser));
-    } catch (error) {
-      navigate("/login");
-    }
-  };
-
   useEffect(() => {
-    authCheck();
-    getMatches();
-  }, []);
-  useEffect(() => {
-    if (isNaN(authUser.id)) return;
-    getUserVotes(authUser);
-  }, [authUser]);
+    (async () => {
+      // if (matchesState.matches === undefined) {
+      //   fetchAllMatches();
+      // }
+      if (authState.hasAuth === AuthIs.TRUE) {
+        fetchVoteResult(authState.user.id);
+      }
+      if (authState.hasAuth === AuthIs.UNDEFINED) {
+        authCheckAPI();
+      }
+      if (authState.hasAuth === AuthIs.FALSE) {
+        navigate("/login");
+      }
+    })();
+  }, [authState.hasAuth]);
 
-  return !getingAuthuser && !getingUserVotes && isMatches ? (
-    <Outlet />
-  ) : (
-    <p>gating data...</p>
-  );
-  // return isAuth && isMatches ? <Outlet /> : <p>テスト...</p>;
+  const gettingData =
+    (authState.pending && authState.hasAuth === AuthIs.UNDEFINED) ||
+    (voteResultState.pending && voteResultState.votes === undefined) ||
+    (matchesState.pending && matchesState.matches === undefined);
+
+  return gettingData ? <p>gating data...</p> : <Outlet />;
+  // return authState.pending ||
+  //   voteResultState.pending ||
+  //   matchesState.pending ? (
+  //   <p>gating data...</p>
+  // ) : (
+  //   <Outlet />
+  // );
 };
 
 export default PrivateRoute;

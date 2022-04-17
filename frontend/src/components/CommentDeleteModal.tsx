@@ -1,67 +1,46 @@
 import React from "react";
-import axios, { isAxiosError } from "@/libs/axios";
-import Button from "@/components/Button";
+import { CustomButton } from "@/components/Button";
 import { useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchComments,
-  LoadingON,
-  selectGettingCommentsState,
-} from "@/store/slice/commentsStateSlice";
-import { ModalBgColorType } from "@/components/MessageModal";
 import { MESSAGE } from "@/libs/utils";
 
+// slice
+// import { useGettingCommentsState } from "@/store/slice/commentsStateSlice";
+
+// custom hooks
+import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
+import { useFetchThisMatchComments } from "@/libs/hooks/useFetchThisMatchComments";
+
 type CommentDeleteModalType = {
-  deleteConfirmModalInvisible: () => void;
   userId: number;
-  deleteCommentId: number | undefined;
-  operateMessageModale: (message: MESSAGE, bgColor: ModalBgColorType) => void;
+  // deleteCommentId: number | undefined;
 };
 
 const CommentDeleteModal = ({
-  deleteConfirmModalInvisible,
   userId,
-  deleteCommentId,
-  operateMessageModale,
-}: CommentDeleteModalType) => {
-  const dispatch = useDispatch();
+}: // deleteCommentId,
+CommentDeleteModalType) => {
+  const { commentDeleteFunc, closeDeleteConfirmModale, deleteCommentsState } = useCommentDelete();
+  const { commentsState } = useFetchThisMatchComments();
   const parentClick = () => {
-    deleteConfirmModalInvisible();
+    closeDeleteConfirmModale();
   };
   const childClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
   };
 
+  // const deleteId = deleteCommentId
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get("id"));
 
-  const deleting = useSelector(selectGettingCommentsState);
-
   const commentDelete = async () => {
-    dispatch(LoadingON());
-    try {
-      await axios.delete("api/delete_comment", {
-        data: {
-          userId,
-          commentId: deleteCommentId,
-        },
-      });
-      await dispatch(fetchComments(matchId));
-      deleteConfirmModalInvisible();
-      operateMessageModale(MESSAGE.COMMENT_DELETED, ModalBgColorType.DELETE);
-    } catch (error) {
-      if (isAxiosError(error)) {
-        operateMessageModale(
-          MESSAGE.COMMENT_DELETE_FAILED,
-          ModalBgColorType.ERROR
-        );
-      }
-    }
+    if (!deleteCommentsState.idForDelete) return;
+    await commentDeleteFunc(userId, deleteCommentsState.idForDelete, matchId);
   };
 
   React.useEffect(() => {
     document.body.style.overflowY = "hidden";
+    document.body.style.width = "99vw";
     return () => {
       document.body.style.overflowY = "scroll";
     };
@@ -70,29 +49,22 @@ const CommentDeleteModal = ({
     <div
       data-testid={"delete-modal"}
       onClick={parentClick}
-      className="fixed top-0 left-0 w-[100vw] h-[100vh] t-bgcolor-opacity-30 flex justify-center items-center"
+      className="fixed top-0 left-0 w-[100vw] h-[100vh] t-bgcolor-opacity-30 flex justify-center items-center t-bgcolor-opacity-5"
     >
-      <div
-        onClick={(e) => childClick(e)}
-        className="w-1/3 py-4 px-3 bg-white rounded"
-      >
+      <div onClick={(e) => childClick(e)} className="w-1/3 py-4 px-3 bg-white rounded">
         <p className="py-5 text-center whitespace-pre-wrap">
-          {deleting ? MESSAGE.COMMENT_DELETING : MESSAGE.COMMENT_DELETE_CONFIRM}
+          {deleteCommentsState.pending || commentsState.pending
+            ? MESSAGE.COMMENT_DELETING
+            : MESSAGE.COMMENT_DELETE_CONFIRM}
         </p>
-        {!deleting && (
+        {!deleteCommentsState.pending && !commentsState.pending && (
           <div className="flex justify-center items-center">
-            <Button
-              onClick={commentDelete}
-              className="bg-gray-500 hover:bg-gray-600"
-            >
+            <CustomButton onClick={commentDelete} className="bg-gray-500 hover:bg-gray-600">
               削除
-            </Button>
-            <Button
-              onClick={deleteConfirmModalInvisible}
-              className="ml-10 bg-gray-500 hover:bg-gray-600"
-            >
+            </CustomButton>
+            <CustomButton onClick={closeDeleteConfirmModale} className="ml-10 bg-gray-500 hover:bg-gray-600">
               キャンセル
-            </Button>
+            </CustomButton>
           </div>
         )}
       </div>

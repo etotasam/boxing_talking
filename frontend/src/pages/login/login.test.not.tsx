@@ -3,12 +3,7 @@ import { render, screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
-// const loginUser = {
-//   email: "test@test.com",
-//   password: "test",
-// };
-
-// const sanctumServer = setupServer();
+import { useDispatch, useSelector } from "react-redux";
 
 //エラーコンソールを出さない
 jest.spyOn(console, "error").mockImplementation();
@@ -20,27 +15,17 @@ const mockeServer = setupServer(
   rest.post<Record<string, string>>(
     "http://localhost:8080/api/login",
     (req, res, context) => {
-      // const { email, password } = req.body;
-      // if (email === loginUser.email && password === loginUser.password) {
-      //   return res(context.status(200), context.json({ name: "てらかど" }));
-      // }
-      return res(
-        // context.status(200),
-        // context.json({ name: `${email}と${password}` })
-        context.status(401)
-        // context.json({ error: `${email}と${password}ではログインできません` })
-      );
+      return res(context.status(401));
     }
   )
 );
 
 const testMessage = "てすとこめんと";
 const messageWhenFaildLogin = "※ログインに失敗しました";
-jest.mock("react-redux", () => ({
-  useDispatch: () => {
-    return jest.fn();
-  },
-}));
+jest.mock("react-redux");
+const useDispatchMock = useDispatch as jest.Mock;
+const useSelectorMock = useSelector as jest.Mock;
+
 jest.mock("react-router-dom", () => ({
   Link: () => {
     return <a href="/">Homeへ</a>;
@@ -56,7 +41,10 @@ jest.mock("react-router-dom", () => ({
 describe("login.tsx", () => {
   beforeAll(() => mockeServer.listen());
 
-  beforeEach(() => {});
+  beforeEach(() => {
+    useDispatchMock.mockReturnValue(jest.fn());
+    useSelectorMock.mockReturnValue(jest.fn());
+  });
 
   afterEach(() => {
     mockeServer.resetHandlers();
