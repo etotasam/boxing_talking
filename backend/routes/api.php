@@ -75,7 +75,9 @@ Route::post('/fight', function(Request $request) {
 });
 
 Route::get('/match', function() {
-    $all_match = BoxingMatch::orderBy('match_date')->get();
+    $today = date('Y-m-d',strtotime('-1 week'));
+    $all_match = BoxingMatch::where('match_date','>',$today)->orderBy('match_date')->get();
+    // $all_match = BoxingMatch::orderBy('match_date')->get();
     $match_array = [];
     foreach($all_match as $match) {
         $red_id = $match->red_fighter_id;

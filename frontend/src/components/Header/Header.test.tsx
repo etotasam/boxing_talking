@@ -2,9 +2,7 @@ import { Header } from ".";
 import { CustomLink } from "@/components/CustomLink";
 import { cleanup, render, screen } from "@testing-library/react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { LogoutBtn } from "@/components/LogoutBtn";
 // auth data
-import { AuthIs } from "@/store/slice/authUserSlice";
 import { useAuth } from "@/libs/hooks/useAuth";
 
 // test data
@@ -23,6 +21,12 @@ const useNavigateMock = useNavigate as jest.Mock;
 jest.mock("@/components/LogoutBtn", () => ({
   LogoutBtn: () => {
     return <button>Logoutボタン</button>;
+  },
+}));
+
+jest.mock("@/components/LoginForm", () => ({
+  LoginForm: () => {
+    return <button>Loginボタン</button>;
   },
 }));
 
@@ -48,7 +52,7 @@ describe("Headerテスト", () => {
   it("login時、名前はauth userでlogoutボタンがある", () => {
     render(<Header />);
     const logoutBtn = screen.getByText("Logoutボタン");
-    const loginBtn = screen.queryByText("Loginへ");
+    const loginBtn = screen.queryByText("Loginボタン");
     const authUserName = screen.getByText("auth userさん");
     expect(logoutBtn).toBeInTheDocument();
     expect(loginBtn).toBeNull();
@@ -58,7 +62,7 @@ describe("Headerテスト", () => {
     useAuthMock.mockReturnValue({ authState: notAuthState });
     render(<Header />);
     const logoutBtn = screen.queryByText("Logoutボタン");
-    const loginBtn = screen.getByText("Loginへ");
+    const loginBtn = screen.getByText("Loginボタン");
     const authUserName = screen.getByText("ゲストさん");
     expect(logoutBtn).toBeNull();
     expect(loginBtn).toBeInTheDocument();

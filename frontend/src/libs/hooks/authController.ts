@@ -20,7 +20,7 @@ export const useLoginController = () => {
       email, password
     })
     // dispatch(login(data))
-    setMessageToModal(MESSAGE.MESSAGE_LOGIN, ModalBgColorType.SUCCESS)
+    setMessageToModal(MESSAGE.MESSAGE_LOGIN_SUCCESS, ModalBgColorType.SUCCESS)
     setPending(false)
   }, [])
 

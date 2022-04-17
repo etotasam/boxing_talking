@@ -1,23 +1,35 @@
 import React from "react";
-import Button from "../Button";
-import { useLogout } from "@/libs/hooks/useLogout";
 import { useNavigate } from "react-router-dom";
 
-type Props = {
-  className: string;
-};
+// components
+import SpinnerModal from "../SpinnerModal";
+import { CustomButton } from "../Button";
 
-export const LogoutBtn = React.memo(({ className }: Partial<Props>) => {
+// hooks
+import { useLogout } from "@/libs/hooks/useLogout";
+
+export const LogoutBtn = React.memo(() => {
   const navigate = useNavigate();
-  const { logout } = useLogout();
+  const { logout, logoutState } = useLogout();
   const click = async () => {
     await logout();
     navigate("/");
   };
 
   return (
-    <Button data_testid={"logout-button"} onClick={click} className={className}>
-      Logout
-    </Button>
+    <div className="relative">
+      {logoutState.pending && <SpinnerModal />}
+      <CustomButton
+        data_testid={"logout-button"}
+        className={`text-white ${
+          logoutState.pending
+            ? `bg-green-900 text-gray-600 pointer-events-none select-none`
+            : `bg-green-600 hover:bg-green-500 text-white`
+        } duration-200`}
+        onClick={click}
+      >
+        Logout
+      </CustomButton>
+    </div>
   );
 });

@@ -47,8 +47,6 @@ export const CommentComponent = React.memo(({ props, className }: PropsType) => 
 
   return (
     <>
-      {/* <Border className="first:border-0 first:mt-7" /> */}
-      {/* <div className="w-full first:h-[0px] h-[1px] bg-red-400" /> */}
       <hr className="border-gray-400 first:border-0 first:mt-7" />
       <div className={`relative py-3 m-3 last:mb-7 ${classname}`}>
         <div className="whitespace-pre-wrap">{comment}</div>

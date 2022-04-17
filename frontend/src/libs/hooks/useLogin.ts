@@ -18,8 +18,12 @@ export const useLogin = () => {
   const { setMessageToModal } = useMessageController()
 
   const login = React.useCallback(async (props: LoginProps) => {
-    await dispatch(loginAPI(props))
-    setMessageToModal(MESSAGE.MESSAGE_LOGIN, ModalBgColorType.SUCCESS)
+    const res: any = await dispatch(loginAPI(props))
+    if (res.type === "auth/login/rejected") {
+      setMessageToModal(MESSAGE.MESSAGE_LOGIN_FAILD, ModalBgColorType.ERROR)
+      return
+    }
+    setMessageToModal(MESSAGE.MESSAGE_LOGIN_SUCCESS, ModalBgColorType.SUCCESS)
   }, [])
 
   return { login, loginState }

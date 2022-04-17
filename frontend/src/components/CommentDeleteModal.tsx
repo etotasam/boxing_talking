@@ -1,5 +1,5 @@
 import React from "react";
-import Button from "@/components/Button";
+import { CustomButton } from "@/components/Button";
 import { useLocation } from "react-router-dom";
 import { MESSAGE } from "@/libs/utils";
 
@@ -59,12 +59,12 @@ CommentDeleteModalType) => {
         </p>
         {!deleteCommentsState.pending && !commentsState.pending && (
           <div className="flex justify-center items-center">
-            <Button onClick={commentDelete} className="bg-gray-500 hover:bg-gray-600">
+            <CustomButton onClick={commentDelete} className="bg-gray-500 hover:bg-gray-600">
               削除
-            </Button>
-            <Button onClick={closeDeleteConfirmModale} className="ml-10 bg-gray-500 hover:bg-gray-600">
+            </CustomButton>
+            <CustomButton onClick={closeDeleteConfirmModale} className="ml-10 bg-gray-500 hover:bg-gray-600">
               キャンセル
-            </Button>
+            </CustomButton>
           </div>
         )}
       </div>

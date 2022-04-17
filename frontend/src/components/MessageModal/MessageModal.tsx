@@ -26,7 +26,7 @@ export const MessageModal = () => {
   return (
     <div
       onClick={click}
-      className={`fixed top-[20px] left-[50%] translate-x-[-50%] py-2 text-center w-1/2 text-white rounded whitespace-pre-wrap ${bgColor}`}
+      className={`fixed top-[20px] left-[50%] translate-x-[-50%] py-2 text-center w-1/2 text-white rounded whitespace-pre-wrap select-none ${bgColor}`}
     >
       {message}
     </div>

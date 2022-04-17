@@ -5,10 +5,10 @@ import { AuthIs } from "@/store/slice/authUserSlice";
 
 //components
 import { CustomLink } from "@/components/CustomLink";
+import { LoginForm } from "@/components/LoginForm";
 
 //hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-import Button from "../Button";
 
 type Props = {
   className?: string;
@@ -22,32 +22,27 @@ export const Header = React.memo(({ className }: Props) => {
   const userName = authState.hasAuth === AuthIs.TRUE ? authState.user.name : "ゲスト";
 
   return (
-    <header className={className}>
-      <div className="flex">
-        <h1>header</h1>
-        <p>{`${userName}さん`}</p>
-        <div>
-          {currentPage !== "" && (
-            <CustomLink to="/" className="text-blue-400">
-              Homeへ
-            </CustomLink>
-            // <Link className="text-blue-400" to="/">
-            //   Homeへ
-            // </Link>
-          )}
-        </div>
-        <SignInOutBtn />
+    <header className={`${className} w-full px-10 flex justify-between items-center bg-black`}>
+      <h1 className="text-3xl text-white">Boxing Talking</h1>
+      <div>
+        {currentPage !== "" && (
+          <CustomLink to="/" className="text-blue-400">
+            Homeへ
+          </CustomLink>
+          // <Link className="text-blue-400" to="/">
+          //   Homeへ
+          // </Link>
+        )}
+      </div>
+      <div className="relative">
+        <p className="whitespace-nowrap absolute top-[-30px] right-0 text-right text-white">{`${userName}さん`}</p>
+        <LoginOutComponent />
       </div>
     </header>
   );
 });
 
-const SignInOutBtn = () => {
+const LoginOutComponent = () => {
   const { authState } = useAuth();
-  const navigate = useNavigate();
-  return authState.hasAuth === AuthIs.TRUE ? (
-    <LogoutBtn />
-  ) : (
-    <Button onClick={() => navigate("/login")}>Loginへ</Button>
-  );
+  return authState.hasAuth === AuthIs.TRUE ? <LogoutBtn /> : <LoginForm />;
 };

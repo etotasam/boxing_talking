@@ -17,6 +17,12 @@ type Props = {
   getElRefArray: (arr: any[]) => void;
 };
 
+export enum MouseOn {
+  RED = "red",
+  BLUE = "blue",
+  NULL = "null",
+}
+
 export const MatchInfo = ({ getElRefArray }: Props) => {
   const { search } = useLocation();
   const query = new URLSearchParams(search);
@@ -69,14 +75,7 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
     setThisMatch(tempGameData);
   };
 
-  enum MouseOn {
-    RED = "red",
-    BLUE = "blue",
-    NULL = "null",
-  }
-
-  const [whichIsMouseOn, setWhichIsMouseOn] = React.useState<MouseOn>(MouseOn.NULL);
-  const [chartColor, setChartColor] = React.useState();
+  const [mouseOnColor, setMouseOnColor] = React.useState<MouseOn>(MouseOn.NULL);
 
   // chartのデータ
   const matchData = {
@@ -85,8 +84,8 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
       {
         data: [thisMatch?.count_blue, thisMatch?.count_red],
         backgroundColor: [
-          whichIsMouseOn === MouseOn.BLUE ? `rgb(59 130 246)` : `rgb(96 165 250)`,
-          whichIsMouseOn === MouseOn.RED ? `rgb(239 68 68)` : `rgb(248 113 113)`,
+          mouseOnColor === MouseOn.BLUE ? `rgb(59 130 246)` : `rgb(96 165 250)`,
+          mouseOnColor === MouseOn.RED ? `rgb(239 68 68)` : `rgb(248 113 113)`,
         ],
         borderWidth: 1,
       },
@@ -106,7 +105,7 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
       {/* <div> */}
       <div ref={chartRef} className="flex justify-center items-center bg-green-600">
         <div className="max-w-[600px] min-w-[400px] bg-green-200">
-          <TestChart matchData={matchData} />
+          <TestChart setMouseOnColor={(color: MouseOn) => setMouseOnColor(color)} matchData={matchData} />
         </div>
       </div>
       {/* </div> */}
@@ -120,20 +119,20 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
               voteCount={thisMatch.count_red}
               voteColor={voteIs}
               onClick={() => voteToFighter("red")}
-              onMouseOver={() => setWhichIsMouseOn(MouseOn.RED)}
-              onMouseOut={() => setWhichIsMouseOn(MouseOn.NULL)}
+              onMouseOver={() => setMouseOnColor(MouseOn.RED)}
+              onMouseOut={() => setMouseOnColor(MouseOn.NULL)}
               color={"red"}
-              className={"bg-red-400 hover:bg-red-500 duration-500"}
+              className={`${mouseOnColor === MouseOn.RED ? `bg-red-500` : `bg-red-400`} duration-500`}
             />
             <FighterComponent
               fighter={thisMatch.blue}
               voteCount={thisMatch.count_blue}
               voteColor={voteIs}
               onClick={() => voteToFighter("blue")}
-              onMouseOver={() => setWhichIsMouseOn(MouseOn.BLUE)}
-              onMouseOut={() => setWhichIsMouseOn(MouseOn.NULL)}
+              onMouseOver={() => setMouseOnColor(MouseOn.BLUE)}
+              onMouseOut={() => setMouseOnColor(MouseOn.NULL)}
               color={"blue"}
-              className={"bg-blue-400 hover:bg-blue-500 duration-500"}
+              className={`${mouseOnColor === MouseOn.BLUE ? `bg-blue-500` : `bg-blue-400`} duration-500`}
             />
           </div>
         </div>

@@ -6,7 +6,7 @@ import { useLocation } from "react-router-dom";
 // components
 import { LayoutDefault } from "@/layout/LayoutDefault";
 import CommentDeleteModal from "@/components/CommentDeleteModal";
-import FullScreenSpinnerModal from "@/components/FullScreenSpinnerModal";
+// import FullScreenSpinnerModal from "@/components/FullScreenSpinnerModal";
 import PostCommentForm from "@/components/PostCommentForm";
 import { MatchInfo } from "@/components/MatchInfo";
 import { CommentsContainer } from "@/components/CommentsContainer";
@@ -140,7 +140,7 @@ export const Comments = () => {
           <CommentsContainer />
         </div>
         {deleteCommentsState.confirmModalVisble && <CommentDeleteModal userId={authUser.id} />}
-        {logoutState.pending && <FullScreenSpinnerModal />}
+        {/* {logoutState.pending && <FullScreenSpinnerModal />} */}
       </div>
     </LayoutDefault>
   );
