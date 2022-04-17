@@ -6,27 +6,30 @@ import { FightSetting } from "./pages/fight_setting";
 import { Check } from "./pages/check";
 import NotFound from "./components/NotFound";
 import PrivateRoute from "./middleware/PrivateRoute";
-import Middleware1 from "./middleware/Middleware1";
+import AuthCheckOnly from "./middleware/AuthCheckOnly";
 import GuestOnly from "./middleware/GuestOnly";
+import AllComponentWrapper from "./middleware/AllComponent";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<Middleware1 />}>
-          <Route path="/" element={<Home />} />
-        </Route>
+        <Route element={<AllComponentWrapper />}>
+          <Route element={<AuthCheckOnly />}>
+            <Route path="/" element={<Home />} />
+          </Route>
 
-        <Route element={<PrivateRoute />}>
-          <Route path="/comments" element={<Comments />} />
-        </Route>
+          <Route element={<PrivateRoute />}>
+            <Route path="/comments" element={<Comments />} />
+          </Route>
 
-        <Route element={<GuestOnly />}>
-          <Route path="/login" element={<Login />} />
+          <Route element={<GuestOnly />}>
+            <Route path="/login" element={<Login />} />
+          </Route>
+          <Route path="/fight" element={<FightSetting />} />
+          <Route path="/check" element={<Check />} />
+          <Route path="/*" element={<NotFound />} />
         </Route>
-        <Route path="/fight" element={<FightSetting />} />
-        <Route path="/check" element={<Check />} />
-        <Route path="/*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

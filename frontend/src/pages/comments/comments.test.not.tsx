@@ -5,18 +5,18 @@ import { rest } from "msw";
 import { setupServer } from "msw/node";
 import userEvent from "@testing-library/user-event";
 import { FaTrashAlt } from "react-icons/fa";
-import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
-import matchesReducer from "@/store/slice/matchesSlice";
+
+import { useAuth } from "@/libs/hooks/useAuth";
+import { useMessage } from "@/store/slice/messageByPostCommentSlice";
+
+// hooks
+import { usePostComment } from "@/libs/hooks/usePostComment";
+import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
+import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+import { useFetchVoteResult } from "@/libs/hooks/useFetchVoteResult";
 
 //エラーコンソールを出さない
 jest.spyOn(console, "error").mockImplementation();
-
-const loginUser = {
-  id: 1,
-  name: "ログインユーザー",
-  email: "user@test.com",
-};
 
 const redFighter = {
   id: 1,
@@ -69,58 +69,76 @@ jest.mock("@/components/chart", () => ({
 }));
 
 // !選択されたMatch
-jest.mock("@/store/slice/matchesSlice", () => ({
-  selectMatches: [
-    {
-      id: 1,
-      date: "2020/05/09",
-      red: redFighter,
-      blue: blueFighter,
-      count_red: 5,
-      count_blue: 6,
-    },
-  ],
-}));
+const matches = [
+  {
+    id: 1,
+    date: "2020/05/09",
+    red: redFighter,
+    blue: blueFighter,
+    count_red: 5,
+    count_blue: 6,
+  },
+];
+jest.mock("@/libs/hooks/useFetchAllMatches");
+const useFetchAllMatchesMock = useFetchAllMatches as jest.Mock;
 
 // !userが投票した選手
-jest.mock("@/store/slice/userVoteSlice", () => ({
-  selectVotes: [
-    {
-      id: 1,
-      user_id: 1,
-      match_id: 1,
-      vote_for: "red",
-    },
-  ],
-}));
+const votes = [
+  {
+    id: 1,
+    user_id: 1,
+    match_id: 1,
+    vote_for: "red",
+  },
+];
+jest.mock("@/libs/hooks/useFetchVoteResult");
+const useFetchVoteResultMock = useFetchVoteResult as jest.Mock;
 
 // !ログインユーザー
-jest.mock("@/store/slice/authUserSlice", () => ({
-  selectUser: loginUser,
-}));
+const loginUser = {
+  id: 1,
+  name: "ログインユーザー",
+  email: "user@test.com",
+};
+
+//! その他のユーザー
+const otherUser = {
+  id: 2,
+  name: "その他のユーザ",
+  email: "other@test.com",
+};
+
+jest.mock("@/libs/hooks/useAuth");
+const useAuthMock = useAuth as jest.Mock;
 
 // !messageモーダルに表示するコメントの取得
-jest.mock("@/store/slice/messageByPostCommentSlice", () => ({
-  selectMessage: "",
-}));
+jest.mock("@/store/slice/messageByPostCommentSlice");
+const useMessageMock = useMessage as jest.Mock;
 
-const userComment = "ユーザーのコメント";
 // !コメントの取得
-jest.mock("@/store/slice/commentsStateSlice", () => ({
-  selectComments: [
-    {
-      id: 1,
-      user: loginUser,
-      comment: userComment,
-      created_at: "2022/03/31",
-    },
-  ],
-  fetchComments: jest.fn(),
-}));
+const userComment = "ユーザーのコメント";
+const authUserComment = {
+  id: 1,
+  user: loginUser,
+  comment: userComment,
+  created_at: "2022/03/31",
+};
+const nonAuthUserComment = {
+  id: 2,
+  user: otherUser,
+  comment: "ログインしてない人のコメント",
+  created_at: "2022/03/31",
+};
+const commentInfo = [authUserComment];
+jest.mock("@/store/slice/commentsStateSlice");
+
+jest.mock("@/libs/hooks/postComment");
+const usePostCommentMock = usePostComment as jest.Mock;
+
+jest.mock("@/libs/hooks/commentDelete");
+const useCommentDeleteMock = useCommentDelete as jest.Mock;
 
 //! コメント取得中かどうか
-// jest.mock("@/store/slice/commentsStateSlice");
-// const selectGettingCommentsStateMock = selectGettingCommentsState as jest.Mock;
 
 // !ゴミ箱アイコン
 jest.mock("react-icons/fa");
@@ -148,18 +166,27 @@ const useDispatchMock = useDispatch as jest.Mock;
 const useSelectorMock = useSelector as jest.Mock;
 
 describe("てすとです", () => {
-  let store: any;
   beforeAll(() => server.listen());
 
   beforeEach(() => {
-    store = configureStore({
-      reducer: {
-        matches: matchesReducer,
-      },
-    });
     useDispatchMock.mockReturnValue(jest.fn());
     useSelectorMock.mockImplementation((value) => value);
     FaTrashAltMock.mockImplementation(() => <div>ゴミ箱</div>);
+
+    useAuthMock.mockReturnValue(loginUser);
+    useMessageMock.mockReturnValue("");
+    useFetchVoteResultMock.mockReturnValue({ voteResultState: { votes } });
+    useFetchAllMatchesMock.mockReturnValue({
+      matchesState: { matches: matches },
+    });
+
+    usePostCommentMock.mockReturnValue({ commentPostPending: false });
+    useCommentDeleteMock.mockReturnValue({
+      isDeletingPending: false,
+      isOpenDeleteConfirmModal: true,
+      getDeleteCommentId: jest.fn(),
+      openDeleteConfirmModale: jest.fn(),
+    });
   });
 
   afterEach(() => {
@@ -182,27 +209,39 @@ describe("てすとです", () => {
       expect(commentEl).toBeInTheDocument();
     });
   });
-  // it("コメントがない時はそのメッセージが表示される", async () => {
-  //   render(<Comments />);
-  //   const commentEl = await screen.findByText(/コメントはありません/);
-  //   await waitFor(() => {
-  //     expect(commentEl).toBeInTheDocument();
-  //   });
-  // });
-  it("ログインユーザのコメントがある時、削除ボタンが存在する", async () => {
+  it("コメントがない時はそのメッセージが表示される", async () => {
+    // useCommentsMock.mockReturnValue([]);
+    // useHasNotCommentMock.mockReturnValue(true);
+    render(<Comments />);
+    const commentEl = await screen.findByText(/コメントはありません/);
+    expect(commentEl).toBeInTheDocument();
+  });
+  it("authユーザのコメントに削除ボタンが存在する", async () => {
+    render(<Comments />);
+    expect(await screen.findByTestId(`trash-box`)).toBeTruthy();
+  });
+
+  it("no authユーザのコメントには削除ボタンは存在しない", async () => {
+    // useCommentsMock.mockReturnValue([nonAuthUserComment]);
     render(<Comments />);
     await waitFor(() => {
-      expect(screen.getByTestId(`trash-box`)).toBeTruthy();
+      const trashBox = screen.queryByTestId(`trash-box`);
+      expect(trashBox).toBeNull();
     });
   });
 
   it("削除ボタン(ゴミ箱)をクリックした時にモーダルが表示され、キャンセル押下で消える", async () => {
-    render(<Comments />);
+    const { rerender } = render(<Comments />);
     const trashBox = await screen.findByTestId(`trash-box`);
     userEvent.click(trashBox);
     expect(screen.getByTestId("delete-modal")).toBeTruthy();
     const cancelButton = screen.getByText(/キャンセル/);
     userEvent.click(cancelButton);
+    useCommentDeleteMock.mockReturnValue({
+      isDeletingPending: false,
+      isOpenDeleteConfirmModal: false,
+    });
+    rerender(<Comments />);
     expect(screen.queryByTestId("delete-modal")).toBeNull();
   });
 });

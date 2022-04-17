@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "@/libs/axios";
 import { useEffect, useState } from "react";
-import Button from "@/components/Button";
+import { CustomButton } from "@/components/Button";
 
 type Fighter = {
   id: number;
@@ -117,26 +117,17 @@ export const FightSetting = () => {
         {fighter(redFighter, "bg-red-400 w-1/2")}
         {fighter(blueFighter, "bg-blue-400 w-1/2")}
       </div>
-      <Button className="bg-blue-500 hover:bg-blue-400" onClick={clearFighters}>
+      <CustomButton className="bg-blue-500 hover:bg-blue-400" onClick={clearFighters}>
         クリア
-      </Button>
-      <Button
-        className={`${
-          !blueFighter
-            ? `bg-gray-300 pointer-events-none`
-            : `bg-red-500 hover:bg-red-400`
-        }`}
+      </CustomButton>
+      <CustomButton
+        className={`${!blueFighter ? `bg-gray-300 pointer-events-none` : `bg-red-500 hover:bg-red-400`}`}
         onClick={registerFight}
       >
         DBに登録
-      </Button>
-      <Button onClick={getAllMatch}>リーレーションチェック</Button>
-      <select
-        onChange={(e) => setChoiseYear(Number(e.target.value))}
-        name=""
-        id=""
-        className="bg-green-500"
-      >
+      </CustomButton>
+      <CustomButton onClick={getAllMatch}>リーレーションチェック</CustomButton>
+      <select onChange={(e) => setChoiseYear(Number(e.target.value))} name="" id="" className="bg-green-500">
         <option value={thisYear}>{thisYear}</option>
         <option value={thisYear + 1}>{thisYear + 1}</option>
       </select>

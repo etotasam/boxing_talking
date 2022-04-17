@@ -15,6 +15,9 @@ export enum MESSAGE {
   COMMENT_DELETE_CONFIRM = "※コメントを削除します",
   COMMENT_DELETED = "コメントを削除しました",
   COMMENT_DELETE_FAILED = `コメントの削除に失敗しました \n 一度更新して、再度削除を実行してください`,
+  MESSAGE_LOGOUT = "ログアウトしました",
+  MESSAGE_LOGIN_SUCCESS = "ログインしました",
+  MESSAGE_LOGIN_FAILD = "ログインに失敗しました",
   NULL = ""
 }
 

@@ -1,8 +1,21 @@
 import React from "react";
 import dayjs from "dayjs";
 import { FaTrashAlt } from "react-icons/fa";
-import { useSelector } from "react-redux";
-import { selectUser } from "@/store/slice/authUserSlice";
+// import { useUser } from "@/store/slice/authUserSlice";
+import { useAuth } from "@/libs/hooks/useAuth";
+import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
+
+import { UserType } from "@/libs/apis/authAPI";
+
+type PropsType = {
+  props: {
+    id: number;
+    comment: string;
+    user: UserType;
+    created_at: Date;
+  };
+  className: string;
+};
 
 type CommentPropsType = {
   commentId: number;
@@ -10,42 +23,47 @@ type CommentPropsType = {
   userName: string;
   createdAt: Date;
   className: string;
-  commentUserId: number;
-  deleteConfirmModalVisible: (commentId: number) => void;
+  userId: number;
+  // deleteConfirmModalVisible: (commentId: number) => void;
 };
 const dateFormat = (date: Date) => {
   return dayjs(date).format("YYYY/MM/DD H:mm");
 };
 
-export const CommentComponent = React.memo(
-  ({
-    commentId,
-    comment,
-    userName,
-    createdAt,
-    className,
-    commentUserId,
-    deleteConfirmModalVisible,
-  }: CommentPropsType) => {
-    const { id: userId } = useSelector(selectUser);
+export const CommentComponent = React.memo(({ props, className }: PropsType) => {
+  const {
+    authState: { user: authUser },
+  } = useAuth();
+  const { id: commentId, comment, user: postUser, created_at } = props;
+  // const { user: authUser } = authState;
+  // const { id: userId } = useUser();
+  const classname = className || "";
+  const { openDeleteConfirmModale, defineDeleteCommentId } = useCommentDelete();
 
-    return (
-      <div className={`relative rounded py-2 px-3 mt-3 ${className}`}>
+  const commentDelete = () => {
+    defineDeleteCommentId(commentId);
+    openDeleteConfirmModale();
+  };
+
+  return (
+    <>
+      <hr className="border-gray-400 first:border-0 first:mt-7" />
+      <div className={`relative py-3 m-3 last:mb-7 ${classname}`}>
         <div className="whitespace-pre-wrap">{comment}</div>
         <div className="flex mt-2">
-          <time className="text-gray-600 text-sm">{dateFormat(createdAt)}</time>
-          <p className="text-gray-700 text-sm ml-5">{userName}</p>
+          <time className="text-gray-600 text-sm">{dateFormat(created_at)}</time>
+          <p className="text-gray-700 text-sm ml-5">{postUser.name}</p>
         </div>
-        {commentUserId === userId && (
+        {postUser.id === authUser.id && (
           <button
             data-testid={`trash-box`}
-            onClick={() => deleteConfirmModalVisible(commentId)}
+            onClick={commentDelete}
             className="absolute top-3 right-3 text-gray-600 hover:text-black"
           >
             <FaTrashAlt />
           </button>
         )}
       </div>
-    );
-  }
-);
+    </>
+  );
+});
