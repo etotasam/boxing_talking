@@ -23,7 +23,7 @@ type deleteCommentAPIProps = {
 export const deleteCommentAPI = createAsyncThunk<any, deleteCommentAPIProps, {}>(
   'dleteCommentAPI',
   async ({ userId, commentId }) => {
-    const { data } = await axios.delete("api/delete_comment", {
+    const { data } = await axios.delete("api/comment", {
       data: {
         userId,
         commentId
@@ -34,7 +34,7 @@ export const deleteCommentAPI = createAsyncThunk<any, deleteCommentAPIProps, {}>
 )
 
 export const deleteConfirmModaleSlice = createSlice({
-  name: 'matdeleteConfirmModaleSliceches',
+  name: 'deleteConfirmModaleSlice',
   initialState,
   reducers: {
     openDeleteModalReducer: (state: initialStateProps) => {

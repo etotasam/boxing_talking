@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import { MessageModal } from "@/components/MessageModal";
+import { MessageModal } from "@/components/modal/MessageModal";
 import { useMessageController } from "@/libs/hooks/messageController";
 import { MESSAGE } from "@/libs/utils";
 import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";

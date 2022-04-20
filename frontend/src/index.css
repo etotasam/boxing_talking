@@ -27,4 +27,29 @@
   .t-comment-height {
     height: var(--comment-el-height);
   }
+
+  .t-flag {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .t-flag-jp {
+    background-image: url("./libs/images/flags/japan.svg");
+  }
+  .t-flag-mx {
+    background-image: url("./libs/images/flags/mexico.svg");
+  }
+  .t-flag-us {
+    background-image: url("./libs/images/flags/usa.svg");
+  }
+  .t-flag-kz {
+    background-image: url("./libs/images/flags/kz.svg");
+  }
+  .t-flag-uk {
+    background-image: url("./libs/images/flags/uk.svg");
+  }
+  .t-flag-ru {
+    background-image: url("./libs/images/flags/rusia.svg");
+  }
 }

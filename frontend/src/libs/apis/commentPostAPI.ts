@@ -6,7 +6,7 @@ export const useCommentPost = async (userId: number, matchId: number, comment: s
     return STATUS.COMMENT_NULL
   }
   const { status } = await axios.post(
-    "api/post_comment",
+    "api/comment",
     {
       userId,
       matchId,

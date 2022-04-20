@@ -13,6 +13,8 @@ use App\Models\Vote;
 use App\Jobs\SampleJob;
 use GuzzleHttp\Psr7\Message;
 
+use function PHPUnit\Framework\isEmpty;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -51,17 +53,96 @@ Route::post('/login', function(Request $request) {
     return response()->json(["message" => "401"], 401);
 });
 
+Route::delete('/match/delete', function(Request $request) {
+    $match_id = $request->matchId;
+    try{
+        DB::beginTransaction();
+        Comment::where("match_id", $match_id)->delete();
+        Vote::where("match_id", $match_id)->delete();
+        $match = BoxingMatch::find($match_id);
+        if(!isset($match)) {
+            throw new Exception("not exit match");
+        }
+        $match->delete();
+        DB::commit();
+        return response()->json(["message" => "match deleted"],200);
+    }catch(Exception $e){
+        DB::rollBack();
+        if($e->getMessage()) {
+            return response()->json(["message" => $e->getMessage()],500);
+        }
+        return response()->json(["message" => "faild while match delete"],500);
+    }
+});
+
 /**
  * @return
  */
-Route::post('/fighter', function(Request $request) {
-    $name = $request->name;
-    $country = $request->country;
+Route::get('/fighter', function(Request $request) {
     $fighters = Fighter::all();
     return $fighters;
 });
 
-Route::post('/fight', function(Request $request) {
+Route::post('/fighter/register', function(Request $request) {
+    try {
+        // $name = $request->name;
+        // $country = $request->country;
+        // $birth = $request->birth;
+        // $height = $request->height;
+        // $stance = $request->stance;
+        // $win = $request->win;
+        // $ko = $request->ko;
+        // $draw = $request->draw;
+        // $lose = $request->lose;
+        Fighter::create([
+            "name" => $request->name,
+            "country" => $request->country,
+            "birth" => $request->birth,
+            "height" => $request->height,
+            "stance" => $request->stance,
+            "win" => $request->win,
+            "ko" => $request->ko,
+            "draw" => $request->draw,
+            "lose" => $request->lose
+        ]);
+        return response()->json(["message" => "created fighter"], 200);
+    }catch (Exception $e) {
+        return response()->json(["message" => "faild register"], 500);
+    }
+});
+
+Route::delete('/fighter/delete', function(Request $request) {
+    try {
+        $id = $request->fighterId;
+        $fighter = Fighter::find($id);
+        $fighter->delete();
+        return response()->json(["message" => "fighter deleted"], 200);
+    }catch(Exception $e) {
+        return response()->json(["message" => "delete error"], 500);
+    }
+});
+
+Route::put('/fighter/update', function(Request $request) {
+    $id = $request->id;
+    try{
+        Fighter::find($id)->update([
+            'name' => $request->name,
+            'country' => $request->country,
+            'birth' => $request->birth,
+            'height' => $request->height,
+            'stance' => $request->stance,
+            'win' => $request->win,
+            'ko' => $request->ko,
+            'draw' => $request->draw,
+            'lose' => $request->lose,
+        ]);
+        return response()->json(["message" => "fighter updated"], 200);
+    }catch(Exception $e) {
+        return response()->json(["message" => "faild fighter update"], 500);
+    }
+});
+
+Route::post('/match/register', function(Request $request) {
     $red_id = $request->redFighterId;
     $blue_id = $request->blueFighterId;
     $matchDate = $request->matchDate;
@@ -97,7 +178,7 @@ Route::get('/match', function() {
     return response()->json($match_array);
 });
 
-Route::get('get_comments', function(Request $request) {
+Route::get('comment', function(Request $request) {
     $match_id = $request->match_id;
     $comments_array = [];
     $comments = BoxingMatch::find($match_id)->comments;
@@ -110,7 +191,7 @@ Route::get('get_comments', function(Request $request) {
     return $comments_array;
 });
 
-Route::post('/post_comment', function(Request $request) {
+Route::post('/comment', function(Request $request) {
     try {
         // throw new Exception("post comment failed");
         $user_id = $request->userId;
@@ -127,7 +208,7 @@ Route::post('/post_comment', function(Request $request) {
     }
 });
 
-Route::delete('/delete_comment', function(Request $request) {
+Route::delete('/comment', function(Request $request) {
     $user_id = $request->userId;
     $comment_id = $request->commentId;
     $user = Auth::user();
@@ -162,7 +243,7 @@ Route::put('/{match_id}/{vote}/vote', function(string $match_id, string $vote) {
         }
         $matches->save();
         DB::commit();
-        return ["message" => "voted successfully"];
+        // return ["message" => "voted successfully"];
         return response()->json(["message" => "success vote"],200);
     }catch (Exception $e) {
         DB::rollBack();

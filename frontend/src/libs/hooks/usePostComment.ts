@@ -15,7 +15,7 @@ export const usePostComment = () => {
     setCommentPosting(true)
     try {
       await axios.post(
-        "api/post_comment",
+        "api/comment",
         {
           userId,
           matchId,
