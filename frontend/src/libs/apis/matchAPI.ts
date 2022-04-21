@@ -30,3 +30,18 @@ export const fetchMatchesAPI = async (): Promise<MatchesType[]> => {
   );
   return data
 }
+
+type RegstarMatchPropsType = {
+  red_fighter_id: number,
+  blue_fighter_id: number,
+  match_date: string
+}
+
+export const registerMatchAPI = async ({ red_fighter_id, blue_fighter_id, match_date }: RegstarMatchPropsType): Promise<Record<string, string>> => {
+  const { data } = await axios.post("api/match/register", {
+    red_fighter_id,
+    blue_fighter_id,
+    match_date
+  });
+  return data
+}

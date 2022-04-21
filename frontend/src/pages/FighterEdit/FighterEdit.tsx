@@ -2,9 +2,13 @@ import React from "react";
 // import { fetchFighterAPI } from "@/libs/apis/fetchFightersAPI";
 import { FighterType } from "@/libs/types/fighter";
 import axios, { isAxiosError } from "@/libs/axios";
+import { isEqual } from "lodash";
 
 import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
 import { MESSAGE } from "@/libs/utils";
+
+// api
+import { updateFighter } from "@/libs/apis/fighterAPI";
 
 // hooks
 import { useFetchFighters } from "@/libs/hooks/useFetchFighters";
@@ -15,40 +19,45 @@ import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 
 // component
 import { Fighter } from "@/components/module/Fighter";
-import { FighterEditForm, FighterProfile } from "@/components/module/FighterEditForm";
+import { FighterEditForm } from "@/components/module/FighterEditForm";
 import { SpinnerModal } from "@/components/modal/SpinnerModal";
 import { EditActionBtns } from "@/components/module/EditActionBtns";
+import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 
 export const FighterEdit = () => {
   // const [fighters, setFighters] = React.useState<FighterType[]>();
-  const [fighterInfo, setFighterInfo] = React.useState<FighterProfile>();
+  const [fighterInfo, setFighterInfo] = React.useState<FighterType>();
   const [selectFighterId, setSelectFighterId] = React.useState<number>();
 
   const { setMessageToModal } = useMessageController();
 
   const { fetchAllFighters, fightersState, cancel: cancelFetchFighters } = useFetchFighters();
 
+  const [fighterDeletePending, setFighterDeletePending] = React.useState(false);
   const fighterDelete = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (selectFighterId === undefined) {
       setMessageToModal(MESSAGE.NO_SELECT_DELETE_FIGHTER, ModalBgColorType.ERROR);
       return;
     }
+    setFighterDeletePending(true);
     try {
-      const { data } = await axios.delete("api/fighter/delete", { data: { fighterId: selectFighterId } });
-      console.log(data);
+      await axios.delete("api/fighter", { data: { fighterId: selectFighterId } });
       await fetchAllFighters();
+      setMessageToModal(MESSAGE.FIGHTER_DELETED, ModalBgColorType.SUCCESS);
     } catch (e) {
+      setMessageToModal(MESSAGE.FAILD_FIGHTER_DELETE, ModalBgColorType.ERROR);
       if (isAxiosError(e)) {
         if (!e.response) return;
         const { data, status } = e.response;
         console.log(data, status);
       }
     }
+    setFighterDeletePending(false);
   };
 
   const [updatePending, setUpdatePending] = React.useState(false);
-  const fighterEdit = async (e: React.FormEvent<HTMLFormElement>, inputFighterInfo: FighterProfile) => {
+  const tryFighterEdit = async (e: React.FormEvent<HTMLFormElement>, inputFighterInfo: FighterType) => {
     e.preventDefault();
     if (selectFighterId === undefined) {
       setMessageToModal(MESSAGE.NO_SELECT_EDIT_FIGHTER, ModalBgColorType.ERROR);
@@ -56,9 +65,9 @@ export const FighterEdit = () => {
     }
     setUpdatePending(true);
     try {
-      const { data } = await axios.put("api/fighter/update", inputFighterInfo);
+      const responseUpdate = await updateFighter({ inputFighterInfo });
       await fetchAllFighters();
-      console.log(data);
+      console.log(responseUpdate);
     } catch (error) {
       console.log("エラーです");
     }
@@ -116,11 +125,12 @@ export const FighterEdit = () => {
         <div className="w-1/3">
           <FighterEditForm
             className="sticky top-[110px] left-0 flex justify-center w-[90%]"
-            onSubmit={(event, inputFighterInfo) => fighterEdit(event, inputFighterInfo)}
+            onSubmit={(event, inputFighterInfo) => tryFighterEdit(event, inputFighterInfo)}
             fighterInfo={fighterInfo}
           />
         </div>
       </div>
+      {fighterDeletePending && <FullScreenSpinnerModal />}
     </LayoutForEditPage>
   );
 };

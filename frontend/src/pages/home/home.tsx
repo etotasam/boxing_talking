@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import axios from "@/libs/axios";
 import { useNavigate } from "react-router-dom";
 import { AuthIs } from "@/store/slice/authUserSlice";
@@ -35,6 +35,10 @@ export const Home = React.memo(() => {
     }
     navigate(`/match?id=${id}`);
   };
+
+  // useEffect(() => {
+  //   console.log(matchesState.matches);
+  // }, [matchesState.matches]);
 
   return (
     <LayoutDefault>

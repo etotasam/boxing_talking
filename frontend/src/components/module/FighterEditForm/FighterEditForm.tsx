@@ -2,38 +2,42 @@ import React, { useState } from "react";
 import { Button } from "@/components/atomic/Button";
 import { Stance, Nationality } from "@/libs/types/fighter";
 
+import { FighterType } from "@/libs/types/fighter";
+
 type Props = {
-  onSubmit: (e: React.FormEvent<HTMLFormElement>, inputFighterInfo: FighterProfile) => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>, inputFighterInfo: FighterType) => void;
   className?: string;
-  fighterInfo?: FighterProfile;
+  fighterInfo?: FighterType;
 };
 
-export type FighterProfile = {
-  name: string;
-  country: Nationality | undefined;
-  birth: string;
-  height: string;
-  stance: Stance;
-  win: string;
-  ko: string;
-  draw: string;
-  lose: string;
-};
+// export type FighterProfile = {
+//   id: number;
+//   name: string;
+//   country: Nationality | undefined;
+//   birth: string;
+//   height: string;
+//   stance: Stance;
+//   win: string;
+//   ko: string;
+//   draw: string;
+//   lose: string;
+// };
 
-const initialFighterInfoState: FighterProfile = {
+const initialFighterInfoState: FighterType = {
+  id: NaN,
   name: "",
   country: undefined,
   birth: "1990-01-01",
-  height: "",
+  height: 0,
   stance: Stance.Orthodox,
-  win: "0",
-  ko: "0",
-  draw: "0",
-  lose: "0",
+  win: 0,
+  ko: 0,
+  draw: 0,
+  lose: 0,
 };
 
 export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => {
-  const [fighterInfoState, setFighterInfoState] = useState<FighterProfile>(initialFighterInfoState);
+  const [fighterInfoState, setFighterInfoState] = useState<FighterType>(initialFighterInfoState);
 
   React.useEffect(() => {
     if (!fighterInfo) return;
@@ -88,7 +92,7 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               type="number"
               min="0"
               value={fighterInfoState?.height}
-              onChange={(e) => setFighterInfoState({ ...fighterInfoState!, height: e.target.value })}
+              onChange={(e) => setFighterInfoState({ ...fighterInfoState!, height: Number(e.target.value) })}
             />
           </div>
 
@@ -113,7 +117,7 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               <input
                 className="w-full"
                 value={fighterInfoState?.win}
-                onChange={(e) => setFighterInfoState({ ...fighterInfoState!, win: e.target.value })}
+                onChange={(e) => setFighterInfoState({ ...fighterInfoState!, win: Number(e.target.value) })}
                 type="number"
                 min="0"
                 id="win"
@@ -125,7 +129,7 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               <input
                 className="w-full"
                 value={fighterInfoState?.ko}
-                onChange={(e) => setFighterInfoState({ ...fighterInfoState!, ko: e.target.value })}
+                onChange={(e) => setFighterInfoState({ ...fighterInfoState!, ko: Number(e.target.value) })}
                 type="number"
                 min="0"
                 id="ko"
@@ -137,7 +141,7 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               <input
                 className="w-full"
                 value={fighterInfoState?.draw}
-                onChange={(e) => setFighterInfoState({ ...fighterInfoState!, draw: e.target.value })}
+                onChange={(e) => setFighterInfoState({ ...fighterInfoState!, draw: Number(e.target.value) })}
                 type="number"
                 min="0"
                 id="draw"
@@ -149,7 +153,7 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               <input
                 className="w-full"
                 value={fighterInfoState?.lose}
-                onChange={(e) => setFighterInfoState({ ...fighterInfoState!, lose: e.target.value })}
+                onChange={(e) => setFighterInfoState({ ...fighterInfoState!, lose: Number(e.target.value) })}
                 type="number"
                 min="0"
                 id="lose"

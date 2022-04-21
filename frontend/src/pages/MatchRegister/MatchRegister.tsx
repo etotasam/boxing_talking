@@ -7,11 +7,15 @@ import dayjs from "dayjs";
 // layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 
+// api
+import { registerMatchAPI } from "@/libs/apis/matchAPI";
+
 // hooks
 import { useFetchFighters } from "@/libs/hooks/useFetchFighters";
 import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 
 //component
+import { Button } from "@/components/atomic/Button";
 import { Fighter } from "@/components/module/Fighter";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 
@@ -32,6 +36,13 @@ export const MatchRegister = () => {
   type MatchSlectFightersType = {
     red: string | null;
     blue: string | null;
+  };
+
+  const clearChecked = () => {
+    setSelectFightersId({ red: null, blue: null });
+  };
+  const isChecked = (id: number) => {
+    return Object.values(selectFightersId).some((value) => value === String(id));
   };
   const [selectFightersId, setSelectFightersId] = useState<MatchSlectFightersType>({ red: null, blue: null });
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,15 +91,15 @@ export const MatchRegister = () => {
     if (!redFighter || !blueFighter || !matchDate) return;
     try {
       setPostMatchPending(true);
-      const { data } = await axios.post("api/match/register", {
-        redFighterId: redFighter?.id,
-        blueFighterId: blueFighter?.id,
-        matchDate: matchDate,
+      const registerResponse = await registerMatchAPI({
+        red_fighter_id: redFighter?.id,
+        blue_fighter_id: blueFighter?.id,
+        match_date: matchDate,
       });
       await fetchAllMatches();
-      setSelectFightersId({ red: null, blue: null });
+      clearChecked();
       setMatchDate("");
-      console.log(data);
+      console.log(registerResponse);
     } catch (error) {
       if (isAxiosError(error)) {
         console.log(error.response);
@@ -103,11 +114,12 @@ export const MatchRegister = () => {
         redFighter={redFighter}
         blueFighter={blueFighter}
         selectFightersId={selectFightersId}
-        register={register}
+        matchDate={matchDate}
+        submit={register}
       />
       <div className="flex mt-[150px]">
         <div className="w-2/3">
-          <h1>選手一覧</h1>
+          <h1 onClick={clearChecked}>選手一覧</h1>
           <div className="mt-5">
             {fightersState.fighters &&
               fightersState.fighters.map((fighter) => (
@@ -116,6 +128,7 @@ export const MatchRegister = () => {
                     type="checkbox"
                     id={`fighter_${fighter.id}`}
                     value={fighter.id}
+                    checked={isChecked(fighter.id)}
                     disabled={canCheck(fighter.id)}
                     onChange={handleCheckboxChange}
                     className={`absolute top-[50%] left-3 translate-y-[-50%]`}
@@ -128,15 +141,20 @@ export const MatchRegister = () => {
           </div>
         </div>
         <div className="w-1/3 bg-red-200">
-          <div className="sticky top-[200px]">
-            <label htmlFor="match-date">試合日</label>
-            <input
-              id="match-date"
-              type="date"
-              value={matchDate}
-              min={dayjs().format("YYYY-MM-DD")}
-              onChange={(e) => setMatchDate(e.target.value)}
-            />
+          <div className="flex flex-col sticky top-[200px]">
+            <div>
+              <label htmlFor="match-date">試合日</label>
+              <input
+                id="match-date"
+                type="date"
+                value={matchDate}
+                min={dayjs().format("YYYY-MM-DD")}
+                onChange={(e) => setMatchDate(e.target.value)}
+              />
+            </div>
+            <div>
+              <Button onClick={clearChecked}>選択選手クリア</Button>
+            </div>
           </div>
         </div>
       </div>
@@ -149,14 +167,15 @@ type SelectFightersProps = {
   redFighter: FighterType | undefined;
   blueFighter: FighterType | undefined;
   selectFightersId: Record<"red" | "blue", string | null>;
-  register: () => void;
+  matchDate: string;
+  submit: () => void;
 };
 
-const SelectFighters = ({ redFighter, blueFighter, selectFightersId, register }: SelectFightersProps) => {
-  const [fillSelectFighter, setFIllSelectFighter] = useState(false);
+const SelectFighters = ({ redFighter, blueFighter, selectFightersId, matchDate, submit }: SelectFightersProps) => {
+  const [isSelectFighters, setIsSelectFighters] = useState(false);
   useEffect(() => {
     const result = !Object.values(selectFightersId).some((value) => value === null);
-    setFIllSelectFighter(result);
+    setIsSelectFighters(result);
   }, [selectFightersId]);
   return (
     <div className="z-10 w-full fixed top-[50px] left-0 bg-stone-600">
@@ -164,26 +183,19 @@ const SelectFighters = ({ redFighter, blueFighter, selectFightersId, register }:
         {redFighter ? <Fighter className="w-1/2" cornerColor="red" fighter={redFighter} /> : <div className="w-1/2" />}
         {blueFighter && <Fighter className="w-1/2" fighter={blueFighter} />}
       </div>
-      {fillSelectFighter && (
+      {isSelectFighters && matchDate && (
         <button
-          onClick={register}
+          onClick={submit}
           className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-stone-600 text-white px-3 py-1"
         >
           登録
         </button>
       )}
+      {isSelectFighters && (
+        <div className="absolute top-[75%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-stone-600 text-white px-3 py-1">
+          {matchDate ? dayjs(matchDate).format("YYYY/M/D") : "試合日が未設定です"}
+        </div>
+      )}
     </div>
   );
 };
-
-// const RightObject = () => {
-//   const handleInputDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     console.log(e.target.value);
-//   };
-//   return (
-//     <div className="sticky top-[200px]">
-//       <label htmlFor="match-date">試合日</label>
-//       <input id="match-date" type="date" min={dayjs().format("YYYY-MM-DD")} onChange={handleInputDateChange} />
-//     </div>
-//   );
-// };

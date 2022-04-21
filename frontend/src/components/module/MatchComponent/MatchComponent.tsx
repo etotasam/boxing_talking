@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { MatchesType } from "@/libs/apis/fetchMatchesAPI";
+import { MatchesType } from "@/libs/apis/matchAPI";
 
 // component
 import { Fighter } from "@/components/module/Fighter";

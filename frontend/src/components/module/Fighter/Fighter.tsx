@@ -49,7 +49,7 @@ export const Fighter = ({ fighter, className, cornerColor }: FighterProps) => {
         return NationaFlag.Rusia;
     }
   }, []);
-  const nationalFlag = checkNationality(fighter.country);
+  const nationalFlag = checkNationality(fighter.country!);
   return (
     <div className={`flex p-3 bg-stone-100 ${cornerColor === "red" && `flex-row-reverse`} ${className}`}>
       {fighter && (

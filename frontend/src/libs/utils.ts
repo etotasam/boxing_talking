@@ -30,6 +30,9 @@ export enum MESSAGE {
   NO_SELECT_EDIT_FIGHTER = "編集する選手を選択してください",
   NO_SELECT_DELETE_FIGHTER = "削除する選手を選択してください",
 
+  FIGHTER_DELETED = "選手を削除しました",
+  FAILD_FIGHTER_DELETE = "選手削除に失敗しました",
+
   NO_SELECT_DELETE_MATCH = "削除する試合を選択してください"
 }
 

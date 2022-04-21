@@ -1,5 +1,5 @@
 import reducer, { fetchMatches, InitialStateType } from "."
-import { MatchesType } from '@/libs/apis/fetchMatchesAPI'
+import { MatchesType } from '@/libs/apis/matchAPI'
 import { Stance, Nationality } from "@/libs/types/fighter";
 
 // types

@@ -25,8 +25,8 @@ export const deleteCommentAPI = createAsyncThunk<any, deleteCommentAPIProps, {}>
   async ({ userId, commentId }) => {
     const { data } = await axios.delete("api/comment", {
       data: {
-        userId,
-        commentId
+        user_id: userId,
+        comment_id: commentId
       },
     })
     return data

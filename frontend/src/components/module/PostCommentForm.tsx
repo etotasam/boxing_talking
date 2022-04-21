@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useCommentPost } from "@/libs/apis/commentPostAPI";
+import { commentPostAPI } from "@/libs/apis/commentPostAPI";
 import { STATUS, MESSAGE } from "@/libs/utils";
 import { useMessageController } from "@/libs/hooks/messageController";
 import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";

@@ -1,3 +1,5 @@
+
+
 export enum Stance {
   Southpaw = "southpaw",
   Orthodox = "orthodox",
@@ -15,12 +17,13 @@ export enum Nationality {
 export type FighterType = {
   id: number,
   name: string,
-  country: Nationality,
+  country: Nationality | undefined,
   birth: string;
-  height: number,
+  height: number | undefined,
   stance: Stance,
   ko: number,
   win: number,
   lose: number,
   draw: number
 }
+

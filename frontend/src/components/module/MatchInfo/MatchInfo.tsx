@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 //types
-import { MatchesType } from "@/libs/apis/fetchMatchesAPI";
+import { MatchesType } from "@/libs/apis/matchAPI";
 import { FighterType } from "@/libs/types/fighter";
 //component
 import { TestChart } from "@/components/module/Chart";

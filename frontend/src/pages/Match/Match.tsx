@@ -14,7 +14,7 @@ import { MatchInfo } from "@/components/module/MatchInfo";
 import { CommentsContainer } from "@/components/module/CommentsContainer";
 
 //api
-import { MatchesType } from "@/libs/apis/fetchMatchesAPI";
+import { MatchesType } from "@/libs/apis/matchAPI";
 
 // custom hooks
 import { useAuth } from "@/libs/hooks/useAuth";
