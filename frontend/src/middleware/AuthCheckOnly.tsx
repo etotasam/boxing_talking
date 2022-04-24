@@ -3,9 +3,12 @@ import { AuthIs, fetchAuthUser } from "@/store/slice/authUserSlice";
 import { useDispatch } from "react-redux";
 import { Outlet } from "react-router-dom";
 
-// hooks
+//! hooks
 import { useAuth } from "@/libs/hooks/useAuth";
 import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+
+//! component
+import { LoadingModal } from "@/components/modal/LoadingModal";
 
 const AuthCheckOnly = () => {
   const {
@@ -25,7 +28,7 @@ const AuthCheckOnly = () => {
   useEffect(() => {
     authCheck();
   }, []);
-  return authPending || matchesState.pending ? <p>Loading...</p> : <Outlet />;
+  return authPending || matchesState.pending ? <LoadingModal /> : <Outlet />;
 };
 
 export default AuthCheckOnly;

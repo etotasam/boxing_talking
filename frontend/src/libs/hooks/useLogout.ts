@@ -12,9 +12,16 @@ export const useLogout = () => {
   const logoutState = useLogoutStateBySlice()
   const { setMessageToModal } = useMessageController()
 
-  const logout = React.useCallback(async () => {
-    await dispatch(logoutAPI())
-    setMessageToModal(MESSAGE.MESSAGE_LOGOUT, ModalBgColorType.NULL)
+  const logout = React.useCallback(async ({ userId }: { userId: number }) => {
+    try {
+      await dispatch(logoutAPI({ userId }))
+      if (logoutState.error) {
+        throw MESSAGE.MESSAGE_FAILD_LOGOUT
+      }
+      setMessageToModal(MESSAGE.MESSAGE_LOGOUT, ModalBgColorType.NULL)
+    } catch (error) {
+      setMessageToModal(error as MESSAGE, ModalBgColorType.ERROR)
+    }
   }, [])
 
   return { logout, logoutState }

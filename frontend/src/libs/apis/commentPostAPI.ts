@@ -1,15 +1,17 @@
 import axios from "@/libs/axios"
 import { STATUS } from "@/libs/utils"
 
-export const useCommentPost = async (userId: number, matchId: number, comment: string) => {
+type Props = { userId: number, matchId: number, comment: string }
+
+export const commentPostAPI = async ({ userId, matchId, comment }: Props) => {
   if (comment === "") {
     return STATUS.COMMENT_NULL
   }
   const { status } = await axios.post(
-    "api/post_comment",
+    "api/comment",
     {
-      userId,
-      matchId,
+      user_id: userId,
+      match_id: matchId,
       comment,
     })
   return status

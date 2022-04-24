@@ -34,7 +34,7 @@ const initialState: InitialStateType = {
 export const fetchUserVotes = createAsyncThunk(
   'userVotes',
   async (userId: number) => {
-    const { data: userVotes }: { data: UserVoteStateType[] } = await axios.post("/api/get_votes", { userId: userId })
+    const { data: userVotes }: { data: UserVoteStateType[] } = await axios.get(`/api/vote/${userId}`)
     return userVotes
   }
 )

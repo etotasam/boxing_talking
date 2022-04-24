@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from "../../store"
 import { useSelector } from "react-redux"
-import { fetchMatchesAPI, MatchesType } from '@/libs/apis/fetchMatchesAPI'
+import { fetchMatchesAPI, MatchesType } from '@/libs/apis/matchAPI'
 
 export type InitialStateType = {
   matches: MatchesType[] | undefined

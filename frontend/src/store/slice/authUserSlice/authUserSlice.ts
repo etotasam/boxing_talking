@@ -73,8 +73,8 @@ export const loginAPI = createAsyncThunk(
 
 export const logoutAPI = createAsyncThunk(
   `auth/logout`,
-  async () => {
-    const response = await authAPI.logout()
+  async ({ userId }: { userId: number }) => {
+    const response = await authAPI.logout({ userId })
     return response
   }
 )

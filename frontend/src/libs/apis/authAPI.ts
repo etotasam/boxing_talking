@@ -18,8 +18,8 @@ export const authAPI = {
     return data
   },
 
-  logout: async (): Promise<any> => {
-    const { data } = await axios.post("api/logout")
+  logout: async ({ userId }: { userId: number }): Promise<any> => {
+    const { data } = await axios.post("api/logout", { user_id: userId })
     return data
   },
 
