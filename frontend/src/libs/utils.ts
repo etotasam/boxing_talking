@@ -19,6 +19,7 @@ export enum MESSAGE {
   COMMENT_DELETE_FAILED = `コメントの削除に失敗しました \n 一度更新して、再度削除を実行してください`,
 
   MESSAGE_LOGOUT = "ログアウトしました",
+  MESSAGE_FAILD_LOGOUT = "ログアウトできません",
   MESSAGE_LOGIN_SUCCESS = "ログインしました",
   MESSAGE_LOGIN_FAILD = "ログインに失敗しました",
   NOT_AUTHORIZED = 'ログインが必要です',
@@ -28,6 +29,7 @@ export enum MESSAGE {
   FIGHTER_REGISTER_FAILD = "選手を登録できませんでした",
 
   NO_SELECT_EDIT_FIGHTER = "編集する選手を選択してください",
+  NOT_EDIT_FIGHTER = "選択した選手は未編集です",
   NO_SELECT_DELETE_FIGHTER = "削除する選手を選択してください",
 
   FIGHTER_DELETED = "選手を削除しました",

@@ -18,14 +18,16 @@ import { useFetchFighters } from "@/libs/hooks/useFetchFighters";
 export const FighterRegister = () => {
   const [registerPending, setRegisterPending] = useState(false);
   const { fetchAllFighters } = useFetchFighters();
-  const register = async (event: React.FormEvent<HTMLFormElement>, inputFighterInfo: FighterType) => {
+  const register = async (
+    event: React.FormEvent<HTMLFormElement>,
+    inputFighterInfo: FighterType
+  ) => {
     event.preventDefault();
     setRegisterPending(true);
     try {
-      const { data: result } = await axios.post("api/fighter", inputFighterInfo);
+      await axios.post("api/fighter", inputFighterInfo);
       fetchAllFighters();
       setMessageToModal(MESSAGE.FIGHTER_REGISTER_SUCCESS, ModalBgColorType.SUCCESS);
-      console.log(result);
     } catch (error) {
       setMessageToModal(MESSAGE.FIGHTER_REGISTER_FAILD, ModalBgColorType.ERROR);
     }
@@ -37,7 +39,9 @@ export const FighterRegister = () => {
   return (
     <LayoutForEditPage>
       <div className="min-h-[calc(100vh-50px)] bg-stone-50 flex justify-center items-center">
-        <FighterEditForm onSubmit={(event, inputFighterInfo) => register(event, inputFighterInfo)} />
+        <FighterEditForm
+          onSubmit={(event, inputFighterInfo) => register(event, inputFighterInfo)}
+        />
         {registerPending && <FullScreenSpinnerModal />}
       </div>
     </LayoutForEditPage>

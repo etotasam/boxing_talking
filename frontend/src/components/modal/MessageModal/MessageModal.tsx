@@ -19,6 +19,9 @@ export const MessageModal = () => {
       case ModalBgColorType.DELETE:
         setBgColor("bg-gray-700");
         break;
+      case ModalBgColorType.NOTICE:
+        setBgColor("bg-blue-600");
+        break;
       default:
         setBgColor("bg-gray-500");
     }

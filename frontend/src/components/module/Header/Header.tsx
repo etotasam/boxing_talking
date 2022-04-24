@@ -23,7 +23,7 @@ export const Header = ({ className }: Props) => {
 
   return (
     <header className={`${className} w-full px-10 flex justify-between items-center bg-black`}>
-      <h1 className="text-3xl text-white">Boxing Talking</h1>
+      <h1 className="text-3xl text-white">BOXING TALKING</h1>
       <div>
         {currentPage !== "" && (
           <CustomLink to="/" className="text-blue-400">

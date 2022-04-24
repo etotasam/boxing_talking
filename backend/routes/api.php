@@ -4,22 +4,19 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Fighter;
 use App\Models\BoxingMatch;
 use Illuminate\Support\Facades\Log;
-use App\Models\Comment;
 use App\Models\User;
 use App\Models\Vote;
 use App\Jobs\SampleJob;
 use GuzzleHttp\Psr7\Message;
 
 // controller
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\VoteController;
 use App\Http\Controllers\FighterController;
-
-use function PHPUnit\Framework\isEmpty;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,44 +35,28 @@ use function PHPUnit\Framework\isEmpty;
 Route::middleware('auth:sanctum')->group(function() {
     Route::get('/user', function (Request $request) {
         return $request->user();
-    });
+    })->name('auth.user');
 
     Route::get('/check', function() {
         return Auth::check();
-    });
+    })->name('auth.check');
 });
 
-Route::post('/logout', function() {
-    return Auth::logout();
-});
+Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
+Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
-Route::post('/login', function(Request $request) {
-    $email = $request->email;
-    $password = $request->password;
-    // \Log::debug($email);
-    if(Auth::attempt(['email' => $email, 'password' => $password])) {
-        return Auth::user();
-    }
-    return response()->json(["message" => "401"], 401);
-});
+Route::get('/fighter',[FighterController::class, 'fetch'])->name('fighter.fetch');
+Route::post('/fighter',[FighterController::class, 'register'])->name('fighter.register');
+Route::put('/fighter/update', [FighterController::class, 'update'])->name('fighter.update');
+Route::delete('/fighter',[FighterController::class, 'delete'])->name('fighter.delete');
 
+Route::get('/match', [MatchController::class, 'fetch'])->name('match.fetch');
+Route::post('/match/register', [MatchController::class, 'register'])->name('match.register');
+Route::delete('/match/delete', [MatchController::class, 'delete'])->name('match.delete');
 
-
-
-
-
-Route::get('/fighter',[FighterController::class, 'fetch']);
-Route::post('/fighter',[FighterController::class, 'register']);
-Route::put('/fighter/update', [FighterController::class, 'update']);
-Route::delete('/fighter',[FighterController::class, 'delete']);
-
-Route::get('/match', [MatchController::class, 'fetch']);
-Route::post('/match/register', [MatchController::class, 'register']);
-Route::delete('/match/delete', [MatchController::class, 'delete']);
-
-Route::get('/comment', [CommentController::class, 'fetch']);
-Route::post('/comment', [CommentController::class, 'store']);
-Route::delete('/comment', [CommentController::class, 'delete']);
+Route::get('/comment', [CommentController::class, 'fetch'])->name('comment.fetch');
+Route::post('/comment', [CommentController::class, 'store'])->name('comment.store');
+Route::delete('/comment', [CommentController::class, 'delete'])->name('comment.delete');
 
 Route::get('/vote/{user_id}', [VoteController::class, 'fetch']);
 

@@ -10,7 +10,7 @@ import { RiBoxingFill } from "react-icons/ri";
 
 //hooks
 import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
-import { useFetchVoteResult } from "@/libs/hooks/useFetchVoteResult";
+import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
 import { useResizeCommentsComponent } from "@/libs/hooks/useResizeCommentsComponent";
 
 type Props = {
@@ -34,12 +34,12 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
   const [thisMatch, setThisMatch] = React.useState<MatchesType>();
 
   //ユーザが勝敗を予想した試合
-  const { voteResultState } = useFetchVoteResult();
+  const { userVoteState } = useFetchUserVote();
 
   //ユーザがこの試合の勝敗予測をした、また、そのデータ
   const getUsersVoteThisMatchById = (matchId: number) => {
-    if (!voteResultState.votes) return;
-    return voteResultState.votes.find((el) => el.match_id === matchId);
+    if (!userVoteState.votes) return;
+    return userVoteState.votes.find((el) => el.match_id === matchId);
   };
 
   //投票先(forontend側)

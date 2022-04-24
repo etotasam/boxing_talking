@@ -13,7 +13,7 @@ import { useMessage } from "@/store/slice/messageByPostCommentSlice";
 import { usePostComment } from "@/libs/hooks/usePostComment";
 import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
-import { useFetchVoteResult } from "@/libs/hooks/useFetchVoteResult";
+import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
 
 //エラーコンソールを出さない
 jest.spyOn(console, "error").mockImplementation();
@@ -92,7 +92,7 @@ const votes = [
   },
 ];
 jest.mock("@/libs/hooks/useFetchVoteResult");
-const useFetchVoteResultMock = useFetchVoteResult as jest.Mock;
+const useFetchVoteResultMock = useFetchUserVote as jest.Mock;
 
 // !ログインユーザー
 const loginUser = {

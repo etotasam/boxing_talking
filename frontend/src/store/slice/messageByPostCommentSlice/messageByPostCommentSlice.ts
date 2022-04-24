@@ -7,6 +7,7 @@ export enum ModalBgColorType {
   ERROR = "red",
   SUCCESS = "green",
   DELETE = "gray",
+  NOTICE = "blue",
   NULL = "null",
 }
 

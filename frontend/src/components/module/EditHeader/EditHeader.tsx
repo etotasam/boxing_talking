@@ -28,7 +28,7 @@ export const EditHeader = React.memo(({ className }: Props) => {
             <NavLink
               key={el.title}
               className={({ isActive }) =>
-                isActive ? `text-stone-200 border-b border-stone-200 ml-5` : `text-stone-200 ml-5`
+                isActive ? `text-stone-200 border-b border-stone-200 ml-5 pb-1` : `text-stone-200 ml-5 pb-1`
               }
               to={el.link}
             >

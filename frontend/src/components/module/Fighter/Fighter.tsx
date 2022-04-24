@@ -16,6 +16,7 @@ enum NationaFlag {
   Kazakhstan = "t-flag-kz",
   UK = "t-flag-uk",
   Rusia = "t-flag-ru",
+  Philpin = "t-flag-ph",
 }
 
 export const Fighter = ({ fighter, className, cornerColor }: FighterProps) => {
@@ -47,6 +48,8 @@ export const Fighter = ({ fighter, className, cornerColor }: FighterProps) => {
         return NationaFlag.UK;
       case Nationality.Rusia:
         return NationaFlag.Rusia;
+      case Nationality.Philpin:
+        return NationaFlag.Philpin;
     }
   }, []);
   const nationalFlag = checkNationality(fighter.country!);

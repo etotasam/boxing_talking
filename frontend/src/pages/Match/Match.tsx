@@ -25,7 +25,7 @@ import { usePostComment } from "@/libs/hooks/usePostComment";
 import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { useResizeCommentsComponent } from "@/libs/hooks/useResizeCommentsComponent";
 import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
-import { useFetchVoteResult } from "@/libs/hooks/useFetchVoteResult";
+import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
 import { useFetchThisMatchComments } from "@/libs/hooks/useFetchThisMatchComments";
 
 export const Match = () => {

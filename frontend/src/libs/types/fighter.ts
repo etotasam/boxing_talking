@@ -11,7 +11,8 @@ export enum Nationality {
   USA = "USA",
   Kazakhstan = "Kazakhstan",
   UK = "UK",
-  Rusia = "Rusia"
+  Rusia = "Rusia",
+  Philpin = "Philpin"
 }
 
 export type FighterType = {

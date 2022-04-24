@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import axios from "@/libs/axios";
 import { useNavigate } from "react-router-dom";
 import { AuthIs } from "@/store/slice/authUserSlice";
@@ -36,15 +36,11 @@ export const Home = React.memo(() => {
     navigate(`/match?id=${id}`);
   };
 
-  // useEffect(() => {
-  //   console.log(matchesState.matches);
-  // }, [matchesState.matches]);
-
   return (
     <LayoutDefault>
       <div className={`w-2/3 my-5 ml-5 rounded-md pb-3 bg-white`}>
         <h1 className="rounded-t-md bg-stone-800 text-white text-2xl p-2">SCHEDULE</h1>
-        {Array.isArray(matchesState.matches) &&
+        {matchesState.matches !== undefined &&
           matchesState.matches.map((match) => (
             <MatchComponent key={match.id} onClick={(matchId: number) => click(matchId)} match={match} />
           ))}

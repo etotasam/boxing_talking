@@ -7,12 +7,14 @@ import { CustomButton } from "@/components/atomic/Button";
 
 // hooks
 import { useLogout } from "@/libs/hooks/useLogout";
+import { useAuth } from "@/libs/hooks/useAuth";
 
 export const LogoutBtn = React.memo(() => {
   const navigate = useNavigate();
+  const { authState } = useAuth();
   const { logout, logoutState } = useLogout();
   const click = async () => {
-    await logout();
+    await logout({ userId: authState.user.id });
     navigate("/");
   };
 

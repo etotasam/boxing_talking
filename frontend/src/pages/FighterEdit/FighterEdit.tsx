@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 // import { fetchFighterAPI } from "@/libs/apis/fetchFightersAPI";
 import { FighterType } from "@/libs/types/fighter";
 import axios, { isAxiosError } from "@/libs/axios";
@@ -7,46 +7,48 @@ import { isEqual } from "lodash";
 import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
 import { MESSAGE } from "@/libs/utils";
 
-// api
+//! api
 import { updateFighter } from "@/libs/apis/fighterAPI";
 
-// hooks
+//! hooks
 import { useFetchFighters } from "@/libs/hooks/useFetchFighters";
 import { useMessageController } from "@/libs/hooks/messageController";
 
-// layout
+//! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 
-// component
+//! component
 import { Fighter } from "@/components/module/Fighter";
 import { FighterEditForm } from "@/components/module/FighterEditForm";
 import { SpinnerModal } from "@/components/modal/SpinnerModal";
 import { EditActionBtns } from "@/components/module/EditActionBtns";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 
+//! data for test
+export let _fighterInfo: FighterType | undefined;
+
 export const FighterEdit = () => {
-  // const [fighters, setFighters] = React.useState<FighterType[]>();
-  const [fighterInfo, setFighterInfo] = React.useState<FighterType>();
-  const [selectFighterId, setSelectFighterId] = React.useState<number>();
+  const [fighterInfo, setFighterInfo] = useState<FighterType>();
+  _fighterInfo = fighterInfo;
 
   const { setMessageToModal } = useMessageController();
 
   const { fetchAllFighters, fightersState, cancel: cancelFetchFighters } = useFetchFighters();
 
-  const [fighterDeletePending, setFighterDeletePending] = React.useState(false);
+  const [fighterDeletePending, setFighterDeletePending] = useState(false);
   const fighterDelete = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (selectFighterId === undefined) {
-      setMessageToModal(MESSAGE.NO_SELECT_DELETE_FIGHTER, ModalBgColorType.ERROR);
+    if (fighterInfo === undefined) {
+      setMessageToModal(MESSAGE.NO_SELECT_DELETE_FIGHTER, ModalBgColorType.NOTICE);
       return;
     }
     setFighterDeletePending(true);
     try {
-      await axios.delete("api/fighter", { data: { fighterId: selectFighterId } });
+      await axios.delete("api/fighter", { data: { fighterId: fighterInfo.id } });
       await fetchAllFighters();
       setMessageToModal(MESSAGE.FIGHTER_DELETED, ModalBgColorType.SUCCESS);
     } catch (e) {
-      setMessageToModal(MESSAGE.FAILD_FIGHTER_DELETE, ModalBgColorType.ERROR);
+      setMessageToModal(MESSAGE.FAILD_FIGHTER_DELETE, ModalBgColorType.NOTICE);
       if (isAxiosError(e)) {
         if (!e.response) return;
         const { data, status } = e.response;
@@ -56,11 +58,22 @@ export const FighterEdit = () => {
     setFighterDeletePending(false);
   };
 
-  const [updatePending, setUpdatePending] = React.useState(false);
+  const getFighterWithId = (fighterId: number) => {
+    if (!fightersState.fighters) return;
+    return fightersState.fighters.find((fighter) => fighter.id === fighterId);
+  };
+
+  const [updatePending, setUpdatePending] = useState(false);
   const tryFighterEdit = async (e: React.FormEvent<HTMLFormElement>, inputFighterInfo: FighterType) => {
     e.preventDefault();
-    if (selectFighterId === undefined) {
-      setMessageToModal(MESSAGE.NO_SELECT_EDIT_FIGHTER, ModalBgColorType.ERROR);
+    //? 選手を選択していない場合return
+    if (fighterInfo === undefined) {
+      setMessageToModal(MESSAGE.NO_SELECT_EDIT_FIGHTER, ModalBgColorType.NOTICE);
+      return;
+    }
+    //? 選手dataを編集していない場合return
+    if (isEqual(getFighterWithId(inputFighterInfo.id), inputFighterInfo)) {
+      setMessageToModal(MESSAGE.NOT_EDIT_FIGHTER, ModalBgColorType.NOTICE);
       return;
     }
     setUpdatePending(true);
@@ -72,19 +85,6 @@ export const FighterEdit = () => {
       console.log("エラーです");
     }
     setUpdatePending(false);
-  };
-
-  const selectFighterSetToForm = (fighterId: number) => {
-    if (!fighterId) return;
-    setSelectFighterId(fighterId);
-    const sub = fightersState.fighters!.find((el) => el.id === fighterId);
-    if (!!sub) {
-      const result = (Object.keys(sub) as (keyof FighterType)[]).reduce((acc, key: keyof FighterType) => {
-        return { ...acc, [key]: String(sub[key]) };
-      }, {});
-      // @ts-ignore
-      setFighterInfo(result);
-    }
   };
 
   React.useEffect(() => {
@@ -105,18 +105,18 @@ export const FighterEdit = () => {
       <div className="flex mt-[50px]">
         <form id="fighter-edit" className="w-2/3 relative" onSubmit={fighterDelete}>
           {fightersState.fighters &&
-            fightersState.fighters.map((el) => (
-              <div key={el.id} className={`relative bg-stone-200 m-2`}>
+            fightersState.fighters.map((fighter) => (
+              <div key={fighter.id} className={`relative bg-stone-200 m-2`}>
                 <input
                   className="absolute top-[50%] left-5 translate-y-[-50%]"
-                  id={`${el.id}_${el.name}`}
+                  id={`${fighter.id}_${fighter.name}`}
                   type="radio"
                   name="fighter"
-                  value={el.id}
-                  onChange={(e) => selectFighterSetToForm(Number(e.target.value))}
+                  onChange={() => setFighterInfo(fighter)}
+                  data-testid={`input-${fighter.id}`}
                 />
-                <label className={"w-[90%] cursor-pointer"} htmlFor={`${el.id}_${el.name}`}>
-                  <Fighter fighter={el} />
+                <label className={"w-[90%] cursor-pointer"} htmlFor={`${fighter.id}_${fighter.name}`}>
+                  <Fighter fighter={fighter} />
                 </label>
               </div>
             ))}
