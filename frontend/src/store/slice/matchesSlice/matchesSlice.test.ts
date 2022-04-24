@@ -1,5 +1,11 @@
 import reducer, { fetchMatches, InitialStateType } from "."
-import { MatchesType, FighterType } from '@/libs/apis/fetchMatchesAPI'
+import { MatchesType } from '@/libs/apis/matchAPI'
+import { Stance, Nationality } from "@/libs/types/fighter";
+
+// types
+import { FighterType } from "@/libs/types/fighter";
+
+
 
 const initialState: InitialStateType = {
   matches: undefined,
@@ -10,7 +16,10 @@ const initialState: InitialStateType = {
 const redFighter: FighterType = {
   id: 1,
   name: "red fighter",
-  country: "red country",
+  country: Nationality.Japan,
+  birth: "1970-01-01",
+  height: 170,
+  stance: Stance.Southpaw,
   ko: 1,
   win: 1,
   lose: 1,
@@ -19,7 +28,10 @@ const redFighter: FighterType = {
 const blueFighter: FighterType = {
   id: 1,
   name: "blue fighter",
-  country: "blue country",
+  country: Nationality.USA,
+  birth: "1970-01-01",
+  height: 170,
+  stance: Stance.Orthodox,
   ko: 2,
   win: 2,
   lose: 2,
@@ -30,7 +42,7 @@ describe("matchesSliceのテスト", () => {
   it("fulfilled", () => {
     const payload: MatchesType[] = [{
       id: 1,
-      date: "2022/4/15",
+      date: new Date("2022-04-15"),
       red: redFighter,
       blue: blueFighter,
       count_red: 10,

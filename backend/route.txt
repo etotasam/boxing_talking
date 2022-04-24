@@ -1,9 +1,25 @@
-+--------+----------+---------------------+------+------------------------------------------------------------+------------------------------------------+
-| Domain | Method   | URI                 | Name | Action                                                     | Middleware                               |
-+--------+----------+---------------------+------+------------------------------------------------------------+------------------------------------------+
-|        | GET|HEAD | /                   |      | Closure                                                    | web                                      |
-|        | GET|HEAD | api/test            |      | Closure                                                    | api                                      |
-|        | GET|HEAD | api/user            |      | Closure                                                    | api                                      |
-|        |          |                     |      |                                                            | App\Http\Middleware\Authenticate:sanctum |
-|        | GET|HEAD | sanctum/csrf-cookie |      | Laravel\Sanctum\Http\Controllers\CsrfCookieController@show | web                                      |
-+--------+----------+---------------------+------+------------------------------------------------------------+------------------------------------------+
++--------+----------+----------------------------+------+------------------------------------------------------------+------------------------------------------+
+| Domain | Method   | URI                        | Name | Action                                                     | Middleware                               |
++--------+----------+----------------------------+------+------------------------------------------------------------+------------------------------------------+
+|        | GET|HEAD | api/check                  |      | Closure                                                    | api                                      |
+|        |          |                            |      |                                                            | App\Http\Middleware\Authenticate:sanctum |
+|        | GET|HEAD | api/comment                |      | Closure                                                    | api                                      |
+|        | POST     | api/comment                |      | Closure                                                    | api                                      |
+|        | DELETE   | api/comment                |      | Closure                                                    | api                                      |
+|        | GET|HEAD | api/fighter                |      | Closure                                                    | api                                      |
+|        | DELETE   | api/fighter/delete         |      | Closure                                                    | api                                      |
+|        | POST     | api/fighter/register       |      | Closure                                                    | api                                      |
+|        | PUT      | api/fighter/update         |      | Closure                                                    | api                                      |
+|        | POST     | api/get_votes              |      | Closure                                                    | api                                      |
+|        | POST     | api/login                  |      | Closure                                                    | api                                      |
+|        | POST     | api/logout                 |      | Closure                                                    | api                                      |
+|        | GET|HEAD | api/match                  |      | Closure                                                    | api                                      |
+|        | DELETE   | api/match/delete           |      | Closure                                                    | api                                      |
+|        | POST     | api/match/register         |      | Closure                                                    | api                                      |
+|        | GET|HEAD | api/user                   |      | Closure                                                    | api                                      |
+|        |          |                            |      |                                                            | App\Http\Middleware\Authenticate:sanctum |
+|        | PUT      | api/{id}/test              |      | Closure                                                    | api                                      |
+|        | GET|HEAD | api/{match_id}/check_vote  |      | Closure                                                    | api                                      |
+|        | PUT      | api/{match_id}/{vote}/vote |      | Closure                                                    | api                                      |
+|        | GET|HEAD | sanctum/csrf-cookie        |      | Laravel\Sanctum\Http\Controllers\CsrfCookieController@show | web                                      |
++--------+----------+----------------------------+------+------------------------------------------------------------+------------------------------------------+

@@ -21,7 +21,11 @@ export const useCommentDelete = () => {
 
   const deleteCommentsState = useDeleteCommentsState()
 
-  const commentDeleteFunc = async (userId: number, commentId: number, matchId: number) => {
+
+  type commentDeleteFuncType = {
+    userId: number, commentId: number, matchId: number
+  }
+  const deleteComment = async ({ userId, commentId, matchId }: commentDeleteFuncType): Promise<void> => {
     // setPending(true)
     await dispatch(deleteCommentAPI({ userId, commentId }))
     await dispatch(fetchThisMatchesComments(matchId))
@@ -30,5 +34,5 @@ export const useCommentDelete = () => {
     closeDeleteConfirmModale()
   }
 
-  return { commentDeleteFunc, deleteCommentsState, openDeleteConfirmModale, closeDeleteConfirmModale, defineDeleteCommentId }
+  return { deleteComment, deleteCommentsState, openDeleteConfirmModale, closeDeleteConfirmModale, defineDeleteCommentId }
 }

@@ -5,6 +5,7 @@ import voteReducer from './slice/allVoteResultSlice'
 import messageByPostCommentReducer from './slice/messageByPostCommentSlice'
 import commentsReducer from './slice/commentsStateSlice'
 import deleteConfirmModalReducer from "./slice/deleteModalStateSlice"
+import fightersSliceReducer from "./slice/fightersSlice"
 
 export const store = configureStore({
   reducer: {
@@ -13,7 +14,8 @@ export const store = configureStore({
     userVote: voteReducer,
     messageByPostMessage: messageByPostCommentReducer,
     commentsState: commentsReducer,
-    deleteConfirmModalState: deleteConfirmModalReducer
+    deleteConfirmModalState: deleteConfirmModalReducer,
+    fighters: fightersSliceReducer
   },
 })
 

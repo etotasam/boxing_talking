@@ -17,6 +17,9 @@ class Fighter extends Model
     protected $fillable = [
         'name',
         'country',
+        'height',
+        'birth',
+        'stance',
         'win',
         'draw',
         'lose',

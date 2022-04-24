@@ -30,7 +30,7 @@ export const fetchThisMatchesComments = createAsyncThunk<CommentType[], number, 
   `comments/fetchByMatchId`,
   async (matchId: number) => {
     source = CancelToken.source()
-    const { data: comments } = await axios.get("api/get_comments", {
+    const { data: comments } = await axios.get("api/comment", {
       params: {
         match_id: matchId,
       },
