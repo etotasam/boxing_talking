@@ -17,15 +17,6 @@ type PropsType = {
   className: string;
 };
 
-type CommentPropsType = {
-  commentId: number;
-  comment: string;
-  userName: string;
-  createdAt: Date;
-  className: string;
-  userId: number;
-  // deleteConfirmModalVisible: (commentId: number) => void;
-};
 const dateFormat = (date: Date) => {
   return dayjs(date).format("YYYY/MM/DD H:mm");
 };

@@ -58,7 +58,7 @@ Route::get('/comment', [CommentController::class, 'fetch'])->name('comment.fetch
 Route::post('/comment', [CommentController::class, 'store'])->name('comment.store');
 Route::delete('/comment', [CommentController::class, 'delete'])->name('comment.delete');
 
-Route::get('/vote/{user_id}', [VoteController::class, 'fetch']);
+Route::get('/vote/{user_id}', [VoteController::class, 'fetch'])->name('vote.fetch');
 
 Route::put('/{match_id}/{vote}/vote', function(string $match_id, string $vote) {
     try{

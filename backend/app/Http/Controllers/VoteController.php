@@ -17,7 +17,7 @@ class VoteController extends Controller
      */
     public function fetch($user_id)
     {
-        $votes =User::find($user_id)->votes;
+        $votes = User::find($user_id)->votes;
         return $votes;
     }
 }

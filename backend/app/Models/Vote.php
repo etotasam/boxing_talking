@@ -13,7 +13,9 @@ class Vote extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var int user_id
+     * @var int match_id
+     * @var string vote_for "red" | "blue"
      */
     protected $fillable = [
         'user_id',
