@@ -38,11 +38,15 @@ export const Home = React.memo(() => {
 
   return (
     <LayoutDefault>
-      <div className={`w-2/3 my-5 ml-5 rounded-md pb-3 bg-white`}>
+      <div className={`w-2/3 my-5 ml-5 rounded-md pb-3 bg-stone-50`}>
         <h1 className="rounded-t-md bg-stone-800 text-white text-2xl p-2">SCHEDULE</h1>
         {matchesState.matches !== undefined &&
           matchesState.matches.map((match) => (
-            <MatchComponent key={match.id} onClick={(matchId: number) => click(matchId)} match={match} />
+            <MatchComponent
+              key={match.id}
+              onClick={(matchId: number) => click(matchId)}
+              match={match}
+            />
           ))}
       </div>
     </LayoutDefault>

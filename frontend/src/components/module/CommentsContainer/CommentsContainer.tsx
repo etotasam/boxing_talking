@@ -37,7 +37,7 @@ export const CommentsContainer = () => {
 
   return (
     <>
-      <div className={`relative h-full overflow-y-auto box-border border border-gray-400 px-5 rounded-xl`}>
+      <div className={`relative h-full overflow-y-auto box-border bg-white border border-gray-400 px-5 rounded-xl`}>
         {commentsState.comments &&
           commentsState.comments.map((props) => (
             <CommentComponent

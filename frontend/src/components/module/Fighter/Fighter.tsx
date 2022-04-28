@@ -54,7 +54,7 @@ export const Fighter = ({ fighter, className, cornerColor }: FighterProps) => {
   }, []);
   const nationalFlag = checkNationality(fighter.country!);
   return (
-    <div className={`flex p-3 bg-stone-100 ${cornerColor === "red" && `flex-row-reverse`} ${className}`}>
+    <div className={`flex p-3 ${cornerColor === "red" && `flex-row-reverse`} ${className}`}>
       {fighter && (
         <>
           <div className="flex flex-col w-1/2">
@@ -69,12 +69,12 @@ export const Fighter = ({ fighter, className, cornerColor }: FighterProps) => {
 
           <div className="w-1/2">
             <div className="flex">
-              <div className="flex-1 text-stone-400 text-xs text-center">WIN</div>
-              <div className="flex-1 text-stone-400 text-xs text-center">DRWA</div>
-              <div className="flex-1 text-stone-400 text-xs text-center">LOSE</div>
+              <div className="flex-1 text-stone-500 text-xs text-center">WIN</div>
+              <div className="flex-1 text-stone-500 text-xs text-center">DRWA</div>
+              <div className="flex-1 text-stone-500 text-xs text-center">LOSE</div>
             </div>
             <div className="flex">
-              <div className="flex-1 py-1 text-white text-center bg-red-400">{`${fighter.win}`}</div>
+              <div className="flex-1 py-1 text-white text-center bg-green-500">{`${fighter.win}`}</div>
               <div className="flex-1 py-1 text-white text-center bg-stone-400">{fighter.draw}</div>
               <div className="flex-1 py-1 text-white text-center bg-stone-800">{fighter.lose}</div>
             </div>

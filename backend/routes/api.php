@@ -119,3 +119,13 @@ Route::put("/{id}/test", function($id = null) {
 
     return response()->json($data);
 });
+
+Route::get('/test', function() {
+
+    try{
+        // throw new Exception("エラーです");
+        return "fetch data complete";
+    }catch(Exception $e){
+        return response()->json(["message" => $e->getMessage()],500);
+    }
+});

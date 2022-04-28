@@ -9,6 +9,15 @@
 @layer base {
 }
 
+@layer components {
+  .t-fighter-blue-inactive {
+    background-color: #a7a5fd;
+  }
+  .t-fighter-blue-active {
+    background-color: #717ffd;
+  }
+}
+
 @layer utilities {
   .t-bgcolor-opacity-1 {
     background-color: rgba(0, 0, 0, 0.1);

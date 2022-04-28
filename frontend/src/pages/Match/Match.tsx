@@ -1,10 +1,6 @@
 // module
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
-
-// types
-import { FighterType } from "@/libs/types/fighter";
 
 // components
 import { LayoutDefault } from "@/layout/LayoutDefault";
@@ -18,15 +14,9 @@ import { MatchesType } from "@/libs/apis/matchAPI";
 
 // custom hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-import { useMessageController } from "@/libs/hooks/messageController";
-import { MESSAGE } from "@/libs/utils";
-import { useLogout } from "@/libs/hooks/useLogout";
-import { usePostComment } from "@/libs/hooks/usePostComment";
 import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { useResizeCommentsComponent } from "@/libs/hooks/useResizeCommentsComponent";
 import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
-import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
-import { useFetchThisMatchComments } from "@/libs/hooks/useFetchThisMatchComments";
 
 export const Match = () => {
   const { deleteCommentsState } = useCommentDelete();
@@ -71,14 +61,14 @@ export const Match = () => {
 
   return (
     <LayoutDefault>
-      <div className="grid grid-cols-2">
-        <div className="col-span-1">
+      <div className="grid grid-cols-5">
+        <div className="col-span-3">
           <MatchInfo getElRefArray={(arr: any[]) => setElRefArray((v) => [...v, ...arr])} />
           {thisMatch && (
             <PostCommentForm getPostComRef={(el: any) => setElRefArray((v) => [...v, el])} matchId={thisMatch.id} />
           )}
         </div>
-        <div className={`col-span-1 p-5 t-comment-height`}>
+        <div className={`col-span-2 p-5 t-comment-height`}>
           <CommentsContainer />
         </div>
         {deleteCommentsState.confirmModalVisble && <CommentDeleteModal userId={authUser.id} />}

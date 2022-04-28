@@ -26,9 +26,12 @@ export const MatchComponent = ({ match, className, onClick = () => null }: Props
   return (
     <div key={match.id} className={`px-4 pt-4 ${className}`}>
       <h1 className={`bg-stone-700 py-1 pl-3 ${matchDayStyle(match.date)}`}>{match.date}</h1>
-      <div onClick={() => onClick(match.id)} className="flex cursor-pointer border-x border-b border-stone-400">
-        <Fighter fighter={match.red} cornerColor={"red"} className={"w-1/2"} />
-        <Fighter fighter={match.blue} cornerColor={"blue"} className={"w-1/2"} />
+      <div
+        onClick={() => onClick(match.id)}
+        className="flex cursor-pointer border-x border-b border-stone-400"
+      >
+        <Fighter fighter={match.red} cornerColor={"red"} className={"bg-stone-100 w-1/2"} />
+        <Fighter fighter={match.blue} cornerColor={"blue"} className={"bg-stone-100 w-1/2"} />
       </div>
     </div>
   );

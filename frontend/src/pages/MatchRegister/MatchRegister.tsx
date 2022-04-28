@@ -11,7 +11,8 @@ import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 import { registerMatchAPI } from "@/libs/apis/matchAPI";
 
 // hooks
-import { useFetchFighters } from "@/libs/hooks/useFetchFighters";
+import { useFighters } from "@/libs/hooks/fetchers";
+// import { useFetchFighters } from "@/libs/hooks/useFetchFighters";
 import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 
 //component
@@ -20,14 +21,19 @@ import { Fighter } from "@/components/module/Fighter";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 
 export const MatchRegister = () => {
-  const { fetchAllFighters, fightersState, cancel: fetchFighterCancel } = useFetchFighters();
+  const { data: frightersData, error, refetch } = useFighters();
+  // const { fetchAllFighters, fightersState, cancel: fetchFighterCancel } = useFetchFighters();
+  // useEffect(() => {
+  //   if (fightersState.fighters !== undefined) return;
+  //   fetchAllFighters();
+  //   return () => {
+  //     fetchFighterCancel();
+  //   };
+  // }, []);
+
   useEffect(() => {
-    if (fightersState.fighters !== undefined) return;
-    fetchAllFighters();
-    return () => {
-      fetchFighterCancel();
-    };
-  }, []);
+    console.log(frightersData);
+  }, [frightersData]);
 
   const typeIs = <T,>(el: T | undefined): el is T => {
     return typeof el !== "undefined";
@@ -44,7 +50,10 @@ export const MatchRegister = () => {
   const isChecked = (id: number) => {
     return Object.values(selectFightersId).some((value) => value === String(id));
   };
-  const [selectFightersId, setSelectFightersId] = useState<MatchSlectFightersType>({ red: null, blue: null });
+  const [selectFightersId, setSelectFightersId] = useState<MatchSlectFightersType>({
+    red: null,
+    blue: null,
+  });
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
       if (selectFightersId.red === null) {
@@ -77,10 +86,10 @@ export const MatchRegister = () => {
   const [redFighter, setRedFighter] = useState<FighterType>();
   const [blueFighter, setBlueFighter] = useState<FighterType>();
   useEffect(() => {
-    if (fightersState.fighters === undefined) return;
-    const red = fightersState.fighters.find((el) => el.id === Number(selectFightersId.red));
+    if (frightersData === undefined) return;
+    const red = frightersData.find((el) => el.id === Number(selectFightersId.red));
     setRedFighter(red);
-    const blue = fightersState.fighters.find((el) => el.id === Number(selectFightersId.blue));
+    const blue = frightersData.find((el) => el.id === Number(selectFightersId.blue));
     setBlueFighter(blue);
   }, [selectFightersId]);
 
@@ -121,8 +130,8 @@ export const MatchRegister = () => {
         <div className="w-2/3">
           <h1 onClick={clearChecked}>選手一覧</h1>
           <div className="mt-5">
-            {fightersState.fighters &&
-              fightersState.fighters.map((fighter) => (
+            {frightersData &&
+              frightersData.map((fighter) => (
                 <div key={fighter.id} className="relative mt-3 first:mt-0">
                   <input
                     type="checkbox"
@@ -134,7 +143,7 @@ export const MatchRegister = () => {
                     className={`absolute top-[50%] left-3 translate-y-[-50%]`}
                   />
                   <label htmlFor={`fighter_${fighter.id}`}>
-                    <Fighter fighter={fighter} />
+                    <Fighter fighter={fighter} className={`bg-stone-100`} />
                   </label>
                 </div>
               ))}
@@ -171,7 +180,13 @@ type SelectFightersProps = {
   submit: () => void;
 };
 
-const SelectFighters = ({ redFighter, blueFighter, selectFightersId, matchDate, submit }: SelectFightersProps) => {
+const SelectFighters = ({
+  redFighter,
+  blueFighter,
+  selectFightersId,
+  matchDate,
+  submit,
+}: SelectFightersProps) => {
   const [isSelectFighters, setIsSelectFighters] = useState(false);
   useEffect(() => {
     const result = !Object.values(selectFightersId).some((value) => value === null);
@@ -180,8 +195,12 @@ const SelectFighters = ({ redFighter, blueFighter, selectFightersId, matchDate, 
   return (
     <div className="z-10 w-full fixed top-[50px] left-0 bg-stone-600">
       <div className="flex w-full h-[150px] p-3">
-        {redFighter ? <Fighter className="w-1/2" cornerColor="red" fighter={redFighter} /> : <div className="w-1/2" />}
-        {blueFighter && <Fighter className="w-1/2" fighter={blueFighter} />}
+        {redFighter ? (
+          <Fighter className="w-1/2 bg-stone-100" cornerColor="red" fighter={redFighter} />
+        ) : (
+          <div className="w-1/2" />
+        )}
+        {blueFighter && <Fighter className="w-1/2 bg-stone-100" fighter={blueFighter} />}
       </div>
       {isSelectFighters && matchDate && (
         <button
