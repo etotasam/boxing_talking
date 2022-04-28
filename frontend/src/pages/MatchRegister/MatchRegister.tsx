@@ -11,9 +11,9 @@ import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 import { registerMatchAPI } from "@/libs/apis/matchAPI";
 
 // hooks
-import { useFighters } from "@/libs/hooks/fetchers";
+import { useFighters, useMatches } from "@/libs/hooks/fetchers";
 // import { useFetchFighters } from "@/libs/hooks/useFetchFighters";
-import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+// import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 
 //component
 import { Button } from "@/components/atomic/Button";
@@ -21,7 +21,8 @@ import { Fighter } from "@/components/module/Fighter";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 
 export const MatchRegister = () => {
-  const { data: frightersData, error, refetch } = useFighters();
+  const { data: frightersData, error, mutate } = useFighters();
+  const { data: matchesData, mutate: matchesMutate } = useMatches();
   // const { fetchAllFighters, fightersState, cancel: fetchFighterCancel } = useFetchFighters();
   // useEffect(() => {
   //   if (fightersState.fighters !== undefined) return;
@@ -93,19 +94,23 @@ export const MatchRegister = () => {
     setBlueFighter(blue);
   }, [selectFightersId]);
 
-  const { fetchAllMatches } = useFetchAllMatches();
+  // const { fetchAllMatches } = useFetchAllMatches();
   const [postMatchPending, setPostMatchPending] = useState(false);
   const [matchDate, setMatchDate] = useState<string>("");
   const register = async (): Promise<void> => {
     if (!redFighter || !blueFighter || !matchDate) return;
     try {
       setPostMatchPending(true);
+      //? matchesデータの登録
       const registerResponse = await registerMatchAPI({
         red_fighter_id: redFighter?.id,
         blue_fighter_id: blueFighter?.id,
         match_date: matchDate,
       });
-      await fetchAllMatches();
+      // await fetchAllMatches();
+      //? matchesデータの再取得
+      await matchesMutate({ ...matchesData });
+      mutate();
       clearChecked();
       setMatchDate("");
       console.log(registerResponse);

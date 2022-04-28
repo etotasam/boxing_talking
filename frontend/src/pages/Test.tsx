@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Doughnut, Pie, Bar, getElementAtEvent } from "react-chartjs-2";
 import { Chart as ChartJS, RadialLinearScale, ArcElement, Tooltip, Legend } from "chart.js";
 import { PolarArea } from "react-chartjs-2";
@@ -53,6 +54,7 @@ const options = {
 export const Test = () => {
   // const { mutate } = useSWRConfig();
   const fetcher = async () => await axios.get("/api/test").then((value) => value.data);
+  // const { mutate } = useSWRConfig();
   const { data: fetchData, error, mutate } = useSWR("/api/test", fetcher);
   useEffect(() => {
     // (async () => {
@@ -73,6 +75,14 @@ export const Test = () => {
     ],
   };
 
+  const [pending, setPending] = useState(false);
+  const testFunc = async () => {
+    setPending(true);
+    await mutate(fetchData);
+    console.log("test");
+    setPending(false);
+  };
+
   if (error) return <div>error</div>;
 
   return (
@@ -86,8 +96,8 @@ export const Test = () => {
           <Doughnut data={data1} options={options} plugins={[ChartDataLabels]} />
         </div>
       </div>
-      <button onClick={() => mutate("test", false)}>refetch</button>
-      {!fetchData && <LoadingModal />}
+      <button onClick={testFunc}>refetch</button>
+      {(!fetchData || pending) && <LoadingModal />}
     </>
   );
 };

@@ -11,7 +11,7 @@ import { MESSAGE } from "@/libs/utils";
 import { updateFighter } from "@/libs/apis/fighterAPI";
 
 //! hooks
-import { useFetchFighters } from "@/libs/hooks/useFetchFighters";
+import { useFighters } from "@/libs/hooks/fetchers";
 import { useMessageController } from "@/libs/hooks/messageController";
 
 //! layout
@@ -28,24 +28,31 @@ import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModa
 export let _fighterInfo: FighterType | undefined;
 
 export const FighterEdit = () => {
-  const [fighterInfo, setFighterInfo] = useState<FighterType>();
-  _fighterInfo = fighterInfo;
+  const [selectFighterInfo, setSelectFighterInfo] = useState<FighterType>();
+  _fighterInfo = selectFighterInfo;
 
   const { setMessageToModal } = useMessageController();
 
-  const { fetchAllFighters, fightersState, cancel: cancelFetchFighters } = useFetchFighters();
+  const { data: fightersData, error, mutate: fightersMutate } = useFighters();
 
   const [fighterDeletePending, setFighterDeletePending] = useState(false);
   const fighterDelete = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (fighterInfo === undefined) {
+    if (selectFighterInfo === undefined) {
       setMessageToModal(MESSAGE.NO_SELECT_DELETE_FIGHTER, ModalBgColorType.NOTICE);
       return;
     }
     setFighterDeletePending(true);
     try {
-      await axios.delete("api/fighter", { data: { fighterId: fighterInfo.id } });
-      await fetchAllFighters();
+      await axios.delete("api/fighter", { data: { fighterId: selectFighterInfo.id } });
+
+      //? 削除対象選手を抜いた選手データ
+      const widthOutSelectFighterData = fightersData?.filter(
+        (fighter) => fighter.id !== selectFighterInfo.id
+      );
+
+      //? refetch
+      await fightersMutate(widthOutSelectFighterData);
       setMessageToModal(MESSAGE.FIGHTER_DELETED, ModalBgColorType.SUCCESS);
     } catch (e) {
       setMessageToModal(MESSAGE.FAILD_FIGHTER_DELETE, ModalBgColorType.NOTICE);
@@ -59,15 +66,18 @@ export const FighterEdit = () => {
   };
 
   const getFighterWithId = (fighterId: number) => {
-    if (!fightersState.fighters) return;
-    return fightersState.fighters.find((fighter) => fighter.id === fighterId);
+    if (!fightersData) return;
+    return fightersData.find((fighter) => fighter.id === fighterId);
   };
 
   const [updatePending, setUpdatePending] = useState(false);
-  const tryFighterEdit = async (e: React.FormEvent<HTMLFormElement>, inputFighterInfo: FighterType) => {
+  const tryFighterEdit = async (
+    e: React.FormEvent<HTMLFormElement>,
+    inputFighterInfo: FighterType
+  ) => {
     e.preventDefault();
     //? 選手を選択していない場合return
-    if (fighterInfo === undefined) {
+    if (selectFighterInfo === undefined) {
       setMessageToModal(MESSAGE.NO_SELECT_EDIT_FIGHTER, ModalBgColorType.NOTICE);
       return;
     }
@@ -78,24 +88,22 @@ export const FighterEdit = () => {
     }
     setUpdatePending(true);
     try {
-      const responseUpdate = await updateFighter({ inputFighterInfo });
-      await fetchAllFighters();
-      console.log(responseUpdate);
+      //? 選手データの更新
+      await updateFighter({ inputFighterInfo });
+      //? 選手データを更新(frontend側)
+      const updateFightersData = fightersData?.reduce((acc: FighterType[], curr: FighterType) => {
+        if (curr.id === inputFighterInfo.id) {
+          return [...acc, inputFighterInfo];
+        }
+        return [...acc, curr];
+      }, []);
+      //? refetch
+      fightersMutate(updateFightersData);
     } catch (error) {
       console.log("エラーです");
     }
     setUpdatePending(false);
   };
-
-  React.useEffect(() => {
-    if (fightersState.fighters !== undefined) return;
-    (async () => {
-      await fetchAllFighters();
-    })();
-    return () => {
-      cancelFetchFighters();
-    };
-  }, []);
 
   const actionBtns = [{ btnTitle: "選手の削除", form: "fighter-edit" }];
 
@@ -104,18 +112,21 @@ export const FighterEdit = () => {
       <EditActionBtns actionBtns={actionBtns} />
       <div className="flex mt-[50px]">
         <form id="fighter-edit" className="w-2/3 relative" onSubmit={fighterDelete}>
-          {fightersState.fighters &&
-            fightersState.fighters.map((fighter) => (
+          {fightersData &&
+            fightersData.map((fighter) => (
               <div key={fighter.id} className={`relative bg-stone-200 m-2`}>
                 <input
                   className="absolute top-[50%] left-5 translate-y-[-50%]"
                   id={`${fighter.id}_${fighter.name}`}
                   type="radio"
                   name="fighter"
-                  onChange={() => setFighterInfo(fighter)}
+                  onChange={() => setSelectFighterInfo(fighter)}
                   data-testid={`input-${fighter.id}`}
                 />
-                <label className={"w-[90%] cursor-pointer"} htmlFor={`${fighter.id}_${fighter.name}`}>
+                <label
+                  className={"w-[90%] cursor-pointer"}
+                  htmlFor={`${fighter.id}_${fighter.name}`}
+                >
                   <Fighter fighter={fighter} />
                 </label>
               </div>
@@ -126,11 +137,11 @@ export const FighterEdit = () => {
           <FighterEditForm
             className="sticky top-[110px] left-0 flex justify-center w-[90%]"
             onSubmit={(event, inputFighterInfo) => tryFighterEdit(event, inputFighterInfo)}
-            fighterInfo={fighterInfo}
+            fighterInfo={selectFighterInfo}
           />
         </div>
       </div>
-      {fighterDeletePending && <FullScreenSpinnerModal />}
+      {!fightersData && <FullScreenSpinnerModal />}
     </LayoutForEditPage>
   );
 };

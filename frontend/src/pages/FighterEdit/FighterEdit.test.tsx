@@ -5,8 +5,10 @@ import userEvent from "@testing-library/user-event";
 import { FighterType } from "@/libs/types/fighter";
 
 //! hooks
-import { useFetchFighters } from "@/libs/hooks/useFetchFighters";
+import { useFighters } from "@/libs/hooks/fetchers";
 import { useMessageController } from "@/libs/hooks/messageController";
+
+//! api
 import { updateFighter } from "@/libs/apis/fighterAPI";
 
 //! layout
@@ -24,8 +26,8 @@ import { ReactNode } from "react";
 import { test_data_fighters, test_data_fighter_2 } from "@/libs/test-data";
 
 //! hooks mock
-jest.mock("@/libs/hooks/useFetchFighters");
-const useFetchFightersMock = useFetchFighters as jest.Mock;
+jest.mock("@/libs/hooks/fetchers");
+const useFightersMock = useFighters as jest.Mock;
 jest.mock("@/libs/hooks/messageController");
 const useMessageControllerMock = useMessageController as jest.Mock;
 jest.mock("@/libs/apis/fighterAPI");
@@ -50,10 +52,11 @@ const FullScreenSpinnerModalMock = FullScreenSpinnerModal as jest.Mock;
 describe("FighterEdigのテスト", () => {
   beforeEach(() => {
     //! hooks mock implement
-    useFetchFightersMock.mockReturnValue({
-      fetchAllFighters: jest.fn(),
-      fightersState: { fighters: test_data_fighters },
-      cancel: jest.fn(),
+    useFightersMock.mockReturnValue({
+      // fetchAllFighters: jest.fn(),
+      data: test_data_fighters,
+      // cancel: jest.fn(),
+      mutate: jest.fn(),
     });
     useMessageControllerMock.mockReturnValue({ setMessageToModal: jest.fn() });
     updateFighterMock.mockReturnValue(jest.fn());
