@@ -1,18 +1,18 @@
-// module
+//! module
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-// components
+//! components
 import { LayoutDefault } from "@/layout/LayoutDefault";
 import { CommentDeleteModal } from "@/components/modal/CommentDeleteModal";
 import { PostCommentForm } from "@/components/module/PostCommentForm";
 import { MatchInfo } from "@/components/module/MatchInfo";
 import { CommentsContainer } from "@/components/module/CommentsContainer";
 
-//api
+//! api
 import { MatchesType } from "@/libs/apis/matchAPI";
 
-// custom hooks
+//! custom hooks
 import { useAuth } from "@/libs/hooks/useAuth";
 import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { useResizeCommentsComponent } from "@/libs/hooks/useResizeCommentsComponent";
@@ -26,10 +26,10 @@ export const Match = () => {
   const query = new URLSearchParams(search);
   const matchId = Number(query.get("id"));
 
-  // ユーザー情報
+  //? ユーザー情報
   const { user: authUser } = authState;
 
-  // 試合情報
+  //? 試合情報
   const { matchesState } = useFetchAllMatches();
   // const { voteResultState } = useFetchVoteResult();
   const [thisMatch, setThisMatch] = useState<MatchesType>();
@@ -43,13 +43,12 @@ export const Match = () => {
     setThisMatch(match);
   }, [matchesState.matches]);
 
-  // data全般
 
-  // Commets Componentの高さを決めるコード(cssの変数を操作)
+  //? Commets Componentの高さを決めるコード(cssの変数を操作)
   const [elRefArray, setElRefArray] = useState<React.RefObject<HTMLDivElement>[]>([]);
   const [elsArray, setElsArray] = useState<(HTMLDivElement | null)[]>([]);
 
-  // refからelementを取得
+  //? refからelementを取得
   useEffect(() => {
     const result = elRefArray.reduce((acc: (HTMLDivElement | null)[], curr) => {
       return [...acc, curr.current];
@@ -57,6 +56,7 @@ export const Match = () => {
     setElsArray(result);
   }, [elRefArray]);
 
+  //? コメントコンポーネントのサイズを画面に合わせる為のhook
   useResizeCommentsComponent(...elsArray);
 
   return (

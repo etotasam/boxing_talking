@@ -25,8 +25,14 @@ export enum MESSAGE {
   NOT_AUTHORIZED = 'ログインが必要です',
   NULL = "",
 
+  MATCH_REGISTER_SUCCESS = "試合情報の登録が完了しました",
+  MATCH_REGISTER_FAILD = "試合情報の登録に失敗しました \n 再度登録してください",
+
   FIGHTER_REGISTER_SUCCESS = "選手を登録しました",
   FIGHTER_REGISTER_FAILD = "選手を登録できませんでした",
+
+  FIGHTER_EDIT_SUCCESS = "選手情報を編集しました",
+  FIGHTER_EDIT_FAILD = "選手情報の編集に失敗しました \n 再度行ってください",
 
   NO_SELECT_EDIT_FIGHTER = "編集する選手を選択してください",
   NOT_EDIT_FIGHTER = "選択した選手は未編集です",
@@ -52,3 +58,5 @@ export enum MESSAGE {
 //   COMMENT_DELETE_FAILED: `コメントの削除に失敗しました \n 一度更新して、再度削除を実行してください`,
 //   NULL: ""
 // } as const
+
+

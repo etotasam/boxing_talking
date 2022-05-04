@@ -8,7 +8,7 @@ import { InitialStateProps, CommentType } from "@/store/slice/commentsStateSlice
 
 
 // fighter
-import { FighterType, Nationality, Stance } from "@/libs/types/fighter"
+import { FighterType, Nationality, Stance } from "@/libs/hooks/fetchers"
 
 export const test_data_fighter_1: FighterType = {
   id: 1,
@@ -81,7 +81,7 @@ export const notAuthState: AuthUserStateType = {
 
 const commentUser = { id: 2, name: "コメントユーザー", email: "commentUser@test.com" }
 export const comment = "コメント1"
-const comments = [{
+export const comments = [{
   user: commentUser,
   id: 2,
   comment: comment,

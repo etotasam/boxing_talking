@@ -1,8 +1,12 @@
 import axios, { isAxiosError } from "@/libs/axios";
 import { useEffect, useState } from "react";
 import { CustomButton } from "@/components/atomic/Button";
-import { FighterType } from "@/libs/types/fighter";
 import dayjs from "dayjs";
+import { MESSAGE } from "@/libs/utils";
+import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
+
+// type
+import { FighterType } from "@/libs/hooks/fetchers";
 
 // layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
@@ -12,6 +16,7 @@ import { registerMatchAPI } from "@/libs/apis/matchAPI";
 
 // hooks
 import { useFighters, useMatches } from "@/libs/hooks/fetchers";
+import { useMessageController } from "@/libs/hooks/messageController";
 // import { useFetchFighters } from "@/libs/hooks/useFetchFighters";
 // import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 
@@ -21,8 +26,9 @@ import { Fighter } from "@/components/module/Fighter";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 
 export const MatchRegister = () => {
-  const { data: frightersData, error, mutate } = useFighters();
+  const { data: frightersData, error, mutate: fightersMutate } = useFighters();
   const { data: matchesData, mutate: matchesMutate } = useMatches();
+  const { setMessageToModal } = useMessageController();
   // const { fetchAllFighters, fightersState, cancel: fetchFighterCancel } = useFetchFighters();
   // useEffect(() => {
   //   if (fightersState.fighters !== undefined) return;
@@ -97,7 +103,7 @@ export const MatchRegister = () => {
   // const { fetchAllMatches } = useFetchAllMatches();
   const [postMatchPending, setPostMatchPending] = useState(false);
   const [matchDate, setMatchDate] = useState<string>("");
-  const register = async (): Promise<void> => {
+  const matchRegister = async (): Promise<void> => {
     if (!redFighter || !blueFighter || !matchDate) return;
     try {
       setPostMatchPending(true);
@@ -109,12 +115,14 @@ export const MatchRegister = () => {
       });
       // await fetchAllMatches();
       //? matchesデータの再取得
-      await matchesMutate({ ...matchesData });
-      mutate();
+      matchesMutate([...matchesData!]);
+      // fightersMutate();
       clearChecked();
       setMatchDate("");
+      setMessageToModal(MESSAGE.MATCH_REGISTER_SUCCESS, ModalBgColorType.SUCCESS);
       console.log(registerResponse);
     } catch (error) {
+      setMessageToModal(MESSAGE.MATCH_REGISTER_FAILD, ModalBgColorType.ERROR);
       if (isAxiosError(error)) {
         console.log(error.response);
       }
@@ -129,7 +137,7 @@ export const MatchRegister = () => {
         blueFighter={blueFighter}
         selectFightersId={selectFightersId}
         matchDate={matchDate}
-        submit={register}
+        submit={matchRegister}
       />
       <div className="flex mt-[150px]">
         <div className="w-2/3">
@@ -210,13 +218,17 @@ const SelectFighters = ({
       {isSelectFighters && matchDate && (
         <button
           onClick={submit}
-          className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-stone-600 text-white px-3 py-1"
+          className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-green-500 text-white px-3 py-1"
         >
           登録
         </button>
       )}
       {isSelectFighters && (
-        <div className="absolute top-[75%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-stone-600 text-white px-3 py-1">
+        <div
+          className={`absolute top-[75%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-white px-3 py-1 ${
+            matchDate ? `bg-stone-600` : `bg-red-500`
+          }`}
+        >
           {matchDate ? dayjs(matchDate).format("YYYY/M/D") : "試合日が未設定です"}
         </div>
       )}

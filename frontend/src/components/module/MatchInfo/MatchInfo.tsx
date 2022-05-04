@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 
 //types
 import { MatchesType } from "@/libs/apis/matchAPI";
-import { FighterType } from "@/libs/types/fighter";
+import { FighterType } from "@/libs/hooks/fetchers";
 
 //component
 import { TestChart } from "@/components/module/Chart";

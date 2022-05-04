@@ -1,5 +1,5 @@
 import axios from "../axios";
-import { Stance, Nationality, FighterType } from "@/libs/types/fighter";
+import { Stance, Nationality, FighterType } from "@/libs/hooks/fetchers";
 
 
 // export type FighterType = {

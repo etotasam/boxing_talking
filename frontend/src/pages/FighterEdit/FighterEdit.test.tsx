@@ -1,8 +1,6 @@
-import { FighterEdit, _fighterInfo } from ".";
+import { FighterEdit, _selectFighter } from ".";
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-//! types
-import { FighterType } from "@/libs/types/fighter";
 
 //! hooks
 import { useFighters } from "@/libs/hooks/fetchers";
@@ -93,8 +91,8 @@ describe("FighterEdigのテスト", () => {
         <FighterEdit />
       </LayoutForEditPageMock>
     );
-    expect(_fighterInfo).toBe(undefined);
+    expect(_selectFighter).toBe(undefined);
     userEvent.click(screen.getByTestId("input-2"));
-    expect(_fighterInfo).toBe(test_data_fighter_2);
+    expect(_selectFighter).toBe(test_data_fighter_2);
   });
 });

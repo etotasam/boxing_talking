@@ -2,22 +2,24 @@ import { useState } from "react";
 import axios from "@/libs/axios";
 import { MESSAGE } from "@/libs/utils";
 import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
-import { FighterType } from "@/libs/types/fighter";
 
-// component
+//! type
+import { FighterType } from "@/libs/hooks/fetchers";
+
+//! component
 import { FighterEditForm } from "@/components/module/FighterEditForm";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 
-// layout
+//! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 
-// hooks
+//! hooks
 import { useMessageController } from "@/libs/hooks/messageController";
-import { useFetchFighters } from "@/libs/hooks/useFetchFighters";
+import { useFighters } from "@/libs/hooks/fetchers";
 
 export const FighterRegister = () => {
   const [registerPending, setRegisterPending] = useState(false);
-  const { fetchAllFighters } = useFetchFighters();
+  const { data: fightersData, mutate: fightersMutate } = useFighters();
   const register = async (
     event: React.FormEvent<HTMLFormElement>,
     inputFighterInfo: FighterType
@@ -26,7 +28,7 @@ export const FighterRegister = () => {
     setRegisterPending(true);
     try {
       await axios.post("api/fighter", inputFighterInfo);
-      fetchAllFighters();
+      fightersMutate([...fightersData!, inputFighterInfo]);
       setMessageToModal(MESSAGE.FIGHTER_REGISTER_SUCCESS, ModalBgColorType.SUCCESS);
     } catch (error) {
       setMessageToModal(MESSAGE.FIGHTER_REGISTER_FAILD, ModalBgColorType.ERROR);

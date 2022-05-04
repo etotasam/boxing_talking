@@ -1,7 +1,6 @@
 import React from "react";
 import dayjs from "dayjs";
-import { FighterType } from "@/libs/types/fighter";
-import { Stance, Nationality } from "@/libs/types/fighter";
+import { FighterType, Stance, Nationality } from "@/libs/hooks/fetchers";
 
 type FighterProps = {
   fighter: FighterType;
@@ -58,7 +57,11 @@ export const Fighter = ({ fighter, className, cornerColor }: FighterProps) => {
       {fighter && (
         <>
           <div className="flex flex-col w-1/2">
-            <div className={`flex justify-center items-center ${cornerColor === "red" && `flex-row-reverse`}`}>
+            <div
+              className={`flex justify-center items-center ${
+                cornerColor === "red" && `flex-row-reverse`
+              }`}
+            >
               <span className={`${nationalFlag} t-flag w-[25px] h-full`}></span>
               <p className="p-2">{fighter.name}</p>
             </div>

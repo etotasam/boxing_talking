@@ -1,5 +1,4 @@
 import React from "react";
-import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 import axios from "@/libs/axios";
 import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
 import { MESSAGE } from "@/libs/utils";
@@ -11,13 +10,14 @@ import { EditActionBtns } from "@/components/module/EditActionBtns";
 
 // hooks
 import { useMessageController } from "@/libs/hooks/messageController";
+import { useMatches } from "@/libs/hooks/fetchers";
 
 // layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 
 export const MatchEdit = () => {
   const [deleteMatchId, setDeleteMatchId] = React.useState<number>();
-  const { matchesState, fetchAllMatches } = useFetchAllMatches();
+  const { data: matchesData, mutate: matchesMutate } = useMatches();
 
   const { setMessageToModal } = useMessageController();
 
@@ -28,11 +28,15 @@ export const MatchEdit = () => {
       setMessageToModal(MESSAGE.NO_SELECT_DELETE_MATCH, ModalBgColorType.ERROR);
       return;
     }
+    //? 対象を削除した試合データの取得
+    const matchesDataWithoutDeleteMatch = matchesData?.filter(
+      (match) => match.id !== deleteMatchId
+    );
     setPending(true);
     try {
       const { data } = await axios.delete("api/match/delete", { data: { matchId: deleteMatchId } });
       console.log(data);
-      await fetchAllMatches();
+      matchesMutate(matchesDataWithoutDeleteMatch);
     } catch (error) {
       console.log(error);
     }
@@ -45,8 +49,8 @@ export const MatchEdit = () => {
       <EditActionBtns actionBtns={actionBtns} />
       <div className="flex mt-[50px]">
         <form id={"match-delete"} className="w-2/3" onSubmit={matchDelete}>
-          {matchesState.matches &&
-            matchesState.matches.map((match) => (
+          {matchesData &&
+            matchesData.map((match) => (
               <div key={match.id} className={`relative bg-stone-200 m-2`}>
                 <input
                   className="absolute top-[50%] left-5 translate-y-[-50%]"

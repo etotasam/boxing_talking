@@ -1,5 +1,5 @@
 import axios from "../axios";
-import { FighterType } from "@/libs/types/fighter";
+import { FighterType } from "@/libs/hooks/fetchers";
 
 type Props = {
   inputFighterInfo: FighterType

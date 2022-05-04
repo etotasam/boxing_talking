@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/atomic/Button";
-import { Stance, Nationality } from "@/libs/types/fighter";
-
-import { FighterType } from "@/libs/types/fighter";
+import { Stance, Nationality, FighterType } from "@/libs/hooks/fetchers";
 
 type Props = {
   onSubmit: (e: React.FormEvent<HTMLFormElement>, inputFighterInfo: FighterType) => void;

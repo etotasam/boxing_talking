@@ -1,10 +1,8 @@
 import reducer, { fetchMatches, InitialStateType } from "."
 import { MatchesType } from '@/libs/apis/matchAPI'
-import { Stance, Nationality } from "@/libs/types/fighter";
 
 // types
-import { FighterType } from "@/libs/types/fighter";
-
+import { FighterType, Stance, Nationality } from "@/libs/hooks/fetchers";
 
 
 const initialState: InitialStateType = {

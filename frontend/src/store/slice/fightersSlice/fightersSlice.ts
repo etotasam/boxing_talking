@@ -3,7 +3,7 @@ import { RootState } from "../../store"
 import { useSelector } from "react-redux"
 import axios, { CancelToken } from "@/libs/axios"
 
-import { FighterType } from "@/libs/types/fighter";
+import { FighterType } from "@/libs/hooks/fetchers";
 
 type InitialStateType = {
   fighters: FighterType[] | undefined

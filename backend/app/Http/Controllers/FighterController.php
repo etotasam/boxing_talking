@@ -64,6 +64,7 @@ class FighterController extends Controller
      */
     public function update(Request $request)
     {
+        // throw new Exception();
         $id = $request->id;
         $update_fighter_data = $request->toArray();
         try{
