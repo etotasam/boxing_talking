@@ -5,7 +5,7 @@ import { CommentComponent } from ".";
 import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { useAuth } from "@/libs/hooks/useAuth";
 
-// コメント投稿ユーザー
+// コメント投稿ユーザー & ログインユーザー
 const user = {
   id: 1,
   name: "ログインユーザー",
@@ -20,10 +20,7 @@ const commentState = {
   created_at: new Date("2022/4/13"),
 };
 
-// ログインユーザー
-const authState = {
-  user,
-};
+let data: typeof user;
 
 jest.mock("@/libs/hooks/useAuth");
 const useAuthMock = useAuth as jest.Mock;
@@ -33,7 +30,8 @@ const useCommentDeleteMock = useCommentDelete as jest.Mock;
 
 describe("CommentComponentのテスト", () => {
   beforeEach(() => {
-    useAuthMock.mockReturnValue({ authState });
+    data = user;
+    useAuthMock.mockReturnValue({ data });
     useCommentDeleteMock.mockReturnValue(jest.fn());
   });
 
@@ -52,7 +50,8 @@ describe("CommentComponentのテスト", () => {
   });
 
   it("not auth user のコメントにはゴミ箱は表示されない", () => {
-    useAuthMock.mockReturnValue({ authState: { user: { id: 2, name: "ユーザー", email: "notAuthUser@test.com" } } });
+    data = { id: 2, name: "ユーザー", email: "notAuthUser@test.com" };
+    useAuthMock.mockReturnValue({ data });
     render(<CommentComponent props={commentState} className={"className"} />);
     const trashBox = screen.queryByTestId(`trash-box`);
     expect(trashBox).toBeNull();

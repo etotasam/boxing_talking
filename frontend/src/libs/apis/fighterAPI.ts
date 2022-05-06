@@ -1,11 +1,8 @@
-import axios from "../axios";
+import { Axios } from "../axios";
 import { FighterType } from "@/libs/hooks/fetchers";
 
-type Props = {
-  inputFighterInfo: FighterType
-}
 
-export const updateFighter = async ({ inputFighterInfo }: Props): Promise<Record<string, string>> => {
-  const { data } = await axios.put("api/fighter/update", inputFighterInfo);
+export const updateFighter = async (updateFighterData: FighterType): Promise<Record<string, string>> => {
+  const { data } = await Axios.put("api/fighter/update", updateFighterData);
   return data
 }

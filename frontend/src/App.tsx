@@ -10,7 +10,6 @@ import { Edit } from "@/pages/Edit";
 import { Test } from "@/pages/Test";
 import { NotFound } from "@/pages/NotFound";
 import PrivateRoute from "./middleware/PrivateRoute";
-import AuthCheckOnly from "./middleware/AuthCheckOnly";
 import AdminOnly from "./middleware/AdminOnly";
 import Container from "./middleware/Container";
 

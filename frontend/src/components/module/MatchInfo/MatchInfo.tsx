@@ -11,8 +11,9 @@ import { FighterChart } from "@/components/module/FighterChart";
 import { RiBoxingFill } from "react-icons/ri";
 import { Fighter } from "../Fighter";
 
-//hooks
-import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+//! hooks
+// import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
 import { useFetchFighters } from "@/libs/hooks/useFetchFighters";
 import { useResizeCommentsComponent } from "@/libs/hooks/useResizeCommentsComponent";
@@ -32,7 +33,8 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get("id"));
-  const { matchesState } = useFetchAllMatches();
+  // const { matchesState } = useFetchAllMatches();
+  const { data: matchesData } = useFetchMatches();
   const getThisMatch = (matches: MatchesType[], id: number): MatchesType | undefined => {
     return matches?.find((match) => match.id === id);
   };
@@ -61,13 +63,13 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
 
   // 試合のデータを取得
   React.useEffect(() => {
-    if (matchesState.matches === undefined) return;
-    const match = getThisMatch(matchesState.matches, matchId);
+    if (!matchesData) return;
+    const match = getThisMatch(matchesData, matchId);
     setThisMatch(match);
     if (!match) return;
     const userVoteData = getUsersVoteThisMatchById(match.id);
     setVoteIs(userVoteData?.vote_for);
-  }, [matchesState.matches]);
+  }, [matchesData]);
 
   // 投票
   const voteToFighter = async (vote: "red" | "blue") => {

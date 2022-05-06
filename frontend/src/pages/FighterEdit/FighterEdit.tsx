@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // import { fetchFighterAPI } from "@/libs/apis/fetchFightersAPI";
-import axios, { isAxiosError } from "@/libs/axios";
+import { Axios, isAxiosError } from "@/libs/axios";
 import { isEqual } from "lodash";
 
 import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
 import { MESSAGE } from "@/libs/utils";
+
+import { initialFighterInfoState } from "@/components/module/FighterEditForm";
 
 //! type
 import { FighterType } from "@/libs/hooks/fetchers";
@@ -13,8 +15,10 @@ import { FighterType } from "@/libs/hooks/fetchers";
 import { updateFighter } from "@/libs/apis/fighterAPI";
 
 //! hooks
-import { useFighters } from "@/libs/hooks/fetchers";
+// import { useFighters } from "@/libs/hooks/fetchers";
 import { useMessageController } from "@/libs/hooks/messageController";
+import { useQueryState } from "@/libs/hooks/useQueryState";
+import { useFetchFighters, useUpdateFighter } from "@/libs/hooks/useFighter";
 
 //! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
@@ -30,31 +34,49 @@ import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModa
 export let _selectFighter: FighterType | undefined;
 
 export const FighterEdit = () => {
-  const [selectFighter, setSelectFighter] = useState<FighterType>();
-  _selectFighter = selectFighter;
+  // const queryClient = useQueryClient();
+  //? ReactQueryでFighterEditFormとデータを共有
+  // const { data: fighterData } = useQuery("q/fighterData", {
+  //   enabled: false,
+  //   initialData: initialFighterInfoState,
+  // }) as any;
+  const [fighterData, setFighterData] = useQueryState<any>(
+    "q/fighterData",
+    initialFighterInfoState
+  );
+  _selectFighter = fighterData;
 
   const { setMessageToModal } = useMessageController();
 
-  const { data: fightersData, error: fetchFightersError, mutate: fightersMutate } = useFighters();
+  // const { data: fightersData, error: fetchFightersError, mutate: fightersMutate } = useFighters();
+  //? 選手データの取得(react query)
+  const {
+    data: fightersData,
+    isError: isErrorFetchFighters,
+    isLoading: isLoadingFetchFighters,
+  } = useFetchFighters();
+  // //? 選手データの更新
+  // const { mutate: fighterDataMutate } = useMutation(updateFighter);
+  const { updateFighter, isLoading: isUpdatingFighter } = useUpdateFighter();
 
   const [fighterDeletePending, setFighterDeletePending] = useState(false);
   const fighterDelete = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (selectFighter === undefined) {
+    if (fighterData === undefined) {
       setMessageToModal(MESSAGE.NO_SELECT_DELETE_FIGHTER, ModalBgColorType.NOTICE);
       return;
     }
     try {
       setFighterDeletePending(true);
-      await axios.delete("api/fighter", { data: { fighterId: selectFighter.id } });
+      await Axios.delete("api/fighter", { data: { fighterId: fighterData.id } });
       setFighterDeletePending(false);
       //? 削除対象選手を抜いた選手データ
       const widthOutSelectFighterData = fightersData?.filter(
-        (fighter) => fighter.id !== selectFighter.id
+        (fighter) => fighter.id !== fighterData.id
       );
 
       //? refetch
-      await fightersMutate(widthOutSelectFighterData);
+      // await fightersMutate(widthOutSelectFighterData);
       setMessageToModal(MESSAGE.FIGHTER_DELETED, ModalBgColorType.SUCCESS);
     } catch (e) {
       setFighterDeletePending(false);
@@ -73,47 +95,29 @@ export const FighterEdit = () => {
     return fightersData.find((fighter) => fighter.id === fighterId);
   };
 
-  const [updatePending, setUpdatePending] = useState(false);
   const tryFighterEdit = async (
     e: React.FormEvent<HTMLFormElement>,
     inputFighterInfo: FighterType
   ) => {
     e.preventDefault();
     //? 選手を選択していない場合return
-    if (selectFighter === undefined) {
+    if (fighterData === undefined) {
       setMessageToModal(MESSAGE.NO_SELECT_EDIT_FIGHTER, ModalBgColorType.NOTICE);
       return;
     }
     //? 選手dataを編集していない場合return
     if (isEqual(getFighterWithId(inputFighterInfo.id), inputFighterInfo)) {
-      setMessageToModal(MESSAGE.NOT_EDIT_FIGHTER, ModalBgColorType.NOTICE);
+      setMessageToModal(MESSAGE.NOT_EDIT_FIGHTER, ModalBgColorType.NULL);
       return;
     }
-    setUpdatePending(true);
-    try {
-      //? 選手データの更新
-      await updateFighter({ inputFighterInfo });
-      //? 選手データを更新(frontend側)
-      const updateFightersData = fightersData?.reduce((acc: FighterType[], curr: FighterType) => {
-        if (curr.id === inputFighterInfo.id) {
-          return [...acc, inputFighterInfo];
-        }
-        return [...acc, curr];
-      }, []);
-      //? refetch
-      fightersMutate(updateFightersData);
-      setMessageToModal(MESSAGE.FIGHTER_EDIT_SUCCESS, ModalBgColorType.SUCCESS);
-    } catch (error) {
-      setMessageToModal(MESSAGE.COMMENT_DELETE_FAILED, ModalBgColorType.ERROR);
-      console.log("エラーです");
-    }
-    setUpdatePending(false);
+    //? 選手データ編集実行
+    updateFighter(inputFighterInfo);
   };
 
   const actionBtns = [{ btnTitle: "選手の削除", form: "fighter-edit" }];
 
   //todo エラー時の画面を表示しよう(未作成)
-  if (fetchFightersError) return <p>error</p>;
+  if (isErrorFetchFighters) return <p>error</p>;
   return (
     <LayoutForEditPage>
       <EditActionBtns actionBtns={actionBtns} />
@@ -127,7 +131,7 @@ export const FighterEdit = () => {
                   id={`${fighter.id}_${fighter.name}`}
                   type="radio"
                   name="fighter"
-                  onChange={() => setSelectFighter(fighter)}
+                  onChange={() => setFighterData(fighter)}
                   data-testid={`input-${fighter.id}`}
                 />
                 <label
@@ -138,17 +142,18 @@ export const FighterEdit = () => {
                 </label>
               </div>
             ))}
-          {updatePending && <SpinnerModal className="" />}
+          {/* {isFatchingFightes && <SpinnerModal className="" />} */}
         </form>
         <div className="w-1/3">
           <FighterEditForm
             className="sticky top-[110px] left-0 flex justify-center w-[90%]"
             onSubmit={(event, inputFighterInfo) => tryFighterEdit(event, inputFighterInfo)}
-            fighterInfo={selectFighter}
+            isUpdatingFighterData={isUpdatingFighter}
+            // fighterInfo={selectFighter}
           />
         </div>
       </div>
-      {(!fightersData || fighterDeletePending) && <FullScreenSpinnerModal />}
+      {(isLoadingFetchFighters || fighterDeletePending) && <FullScreenSpinnerModal />}
     </LayoutForEditPage>
   );
 };

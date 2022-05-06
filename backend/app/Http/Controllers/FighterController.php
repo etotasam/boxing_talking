@@ -62,16 +62,16 @@ class FighterController extends Controller
      *
      * @param
      */
-    public function update(Request $request)
+    public function update(Request $request): void
     {
         // throw new Exception();
         $id = $request->id;
         $update_fighter_data = $request->toArray();
         try{
             Fighter::find($id)->update($update_fighter_data);
-            return response()->json(["message" => "fighter updated"], 200);
+            // return response()->json(["message" => "fighter updated"], 200);
         }catch(Exception $e) {
-            return response()->json(["message" => "faild fighter update"], 500);
+            // return response()->json(["message" => "faild fighter update"], 500);
         }
     }
 }

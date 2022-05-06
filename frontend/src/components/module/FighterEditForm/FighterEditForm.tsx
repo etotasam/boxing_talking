@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/atomic/Button";
 import { Stance, Nationality, FighterType } from "@/libs/hooks/fetchers";
+//! custom hook
+import { useQueryState } from "@/libs/hooks/useQueryState";
+
+//! component
+import { SpinnerModal } from "@/components/modal/SpinnerModal";
 
 type Props = {
   onSubmit: (e: React.FormEvent<HTMLFormElement>, inputFighterInfo: FighterType) => void;
   className?: string;
-  fighterInfo?: FighterType;
+  isUpdatingFighterData?: boolean;
+  // fighterInfo?: FighterType;
 };
 
 type ToStringType<T> = T extends Record<"id", number> ? Record<string, string> : T;
 
-const initialFighterInfoState: ToStringType<FighterType> = {
+export const initialFighterInfoState: any = {
   id: "",
   name: "",
   country: "",
@@ -23,40 +29,35 @@ const initialFighterInfoState: ToStringType<FighterType> = {
   lose: "",
 };
 
-export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => {
-  const [fighterInfoState, setFighterInfoState] = useState<any>(initialFighterInfoState);
-
-  React.useEffect(() => {
-    if (!fighterInfo) return;
-    setFighterInfoState(fighterInfo);
-  }, [fighterInfo]);
+export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: Props) => {
+  //? ReactQueryでFighterEditとデータを共有
+  const [fighterData, setFighterData] = useQueryState<any>(
+    "q/fighterData",
+    initialFighterInfoState
+  );
 
   return (
     <div className={className}>
       <div className="p-10 bg-stone-200">
         <h1 className="text-3xl text-center">選手情報</h1>
-        <form className="flex flex-col" onSubmit={(e) => onSubmit(e, fighterInfoState)}>
+        <form className="flex flex-col" onSubmit={(e) => onSubmit(e, fighterData)}>
           <input
             className="mt-3 px-1 bourder rounded border-black"
             type="text"
             placeholder="選手名"
-            value={fighterInfoState?.name}
-            onChange={(e) =>
-              setFighterInfoState({
-                ...fighterInfoState!,
-                name: e.target.value,
-              })
-            }
+            name="name"
+            value={fighterData?.name}
+            onChange={(e) => setFighterData({ ...fighterData, name: e.target.value })}
           />
           <div className="flex mt-3">
             <label htmlFor="countrys">国籍:</label>
             <select
               name="country"
-              value={fighterInfoState?.country}
+              value={fighterData?.country}
               onChange={(e) =>
-                setFighterInfoState({
-                  ...fighterInfoState!,
-                  country: e.target.value as Nationality,
+                setFighterData({
+                  ...fighterData,
+                  country: e.target.value,
                 })
               }
               id="countrys"
@@ -77,26 +78,22 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               type="date"
               id="birth"
               min="1970-01-01"
-              value={fighterInfoState?.birth}
-              onChange={(e) =>
-                setFighterInfoState({
-                  ...fighterInfoState!,
-                  birth: e.target.value,
-                })
-              }
+              value={fighterData?.birth}
+              onChange={(e) => setFighterData({ ...fighterData, birth: e.target.value })}
             />
           </div>
 
           <div className="mt-3 flex p-1">
             <label htmlFor="height">身長:</label>
             <input
+              id="height"
               className="px-1"
               type="number"
               min="0"
-              value={fighterInfoState?.height}
+              value={fighterData?.height}
               onChange={(e) =>
-                setFighterInfoState({
-                  ...fighterInfoState!,
+                setFighterData({
+                  ...fighterData,
                   height: e.target.value,
                 })
               }
@@ -107,11 +104,11 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
           <div className="mt-3 flex p-1">
             <label htmlFor="stance">スタイル:</label>
             <select
-              value={fighterInfoState?.stance}
+              value={fighterData?.stance}
               onChange={(e) =>
-                setFighterInfoState({
-                  ...fighterInfoState!,
-                  stance: e.target.value as Stance,
+                setFighterData({
+                  ...fighterData,
+                  stance: e.target.value,
                 })
               }
               name="boxing-style"
@@ -128,13 +125,8 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               <label htmlFor="win">win</label>
               <input
                 className="w-full"
-                value={fighterInfoState?.win}
-                onChange={(e) =>
-                  setFighterInfoState({
-                    ...fighterInfoState!,
-                    win: e.target.value,
-                  })
-                }
+                value={fighterData?.win}
+                onChange={(e) => setFighterData({ ...fighterData, win: e.target.value })}
                 type="number"
                 min="0"
                 id="win"
@@ -145,13 +137,8 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               <label htmlFor="ko">ko</label>
               <input
                 className="w-full"
-                value={fighterInfoState?.ko}
-                onChange={(e) =>
-                  setFighterInfoState({
-                    ...fighterInfoState!,
-                    ko: e.target.value,
-                  })
-                }
+                value={fighterData?.ko}
+                onChange={(e) => setFighterData({ ...fighterData, ko: e.target.value })}
                 type="number"
                 min="0"
                 id="ko"
@@ -162,10 +149,10 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               <label htmlFor="draw">draw</label>
               <input
                 className="w-full"
-                value={fighterInfoState?.draw}
+                value={fighterData?.draw}
                 onChange={(e) =>
-                  setFighterInfoState({
-                    ...fighterInfoState!,
+                  setFighterData({
+                    ...fighterData,
                     draw: e.target.value,
                   })
                 }
@@ -179,10 +166,10 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               <label htmlFor="lose">lose</label>
               <input
                 className="w-full"
-                value={fighterInfoState?.lose}
+                value={fighterData?.lose}
                 onChange={(e) =>
-                  setFighterInfoState({
-                    ...fighterInfoState!,
+                  setFighterData({
+                    ...fighterData,
                     lose: e.target.value,
                   })
                 }
@@ -192,7 +179,14 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               />
             </div>
           </div>
-          <Button>登録</Button>
+          <div className="relative">
+            <button
+              className={`bg-green-600 hover:bg-green-500 w-full duration-300 py-1 px-2 rounded text-white`}
+            >
+              登録
+            </button>
+            {isUpdatingFighterData && <SpinnerModal className="bg-stone-700" />}
+          </div>
         </form>
       </div>
     </div>

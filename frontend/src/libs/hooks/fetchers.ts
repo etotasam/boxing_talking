@@ -1,4 +1,4 @@
-import axios from "../axios"
+import { Axios } from "../axios"
 // import { FighterType } from "@/libs/types/fighter";
 // import { MatchesType } from "@/libs/types"
 import useSWR from 'swr'
@@ -34,7 +34,7 @@ export type FighterType = {
 }
 
 export const useFighters = () => {
-  const fetcher = async () => await axios.get("api/fighter").then(value => value.data) as FighterType[]
+  const fetcher = async () => await Axios.get("api/fighter").then(value => value.data) as FighterType[]
   const { data, error, mutate } = useSWR("api/fighter", fetcher);
 
   return { data, error, mutate }
@@ -51,7 +51,7 @@ export type MatchesType = {
 };
 
 export const useMatches = () => {
-  const fetcher = async () => await axios.get("api/match").then(value => value.data) as MatchesType[]
+  const fetcher = async () => await Axios.get("api/match").then(value => value.data) as MatchesType[]
   const { data, error, mutate } = useSWR("api/match", fetcher);
 
   return { data, error, mutate }
@@ -66,7 +66,7 @@ export type CommentType = {
 };
 
 export const useCommentsOnMatch = (matchId: number) => {
-  const fetcher = async () => await axios.get("api/comment", {
+  const fetcher = async () => await Axios.get("api/comment", {
     params: {
       match_id: matchId,
     },

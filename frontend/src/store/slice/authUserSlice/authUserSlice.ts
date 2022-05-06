@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from "../../store"
-import axios from "@/libs/axios"
+import { Axios } from "@/libs/axios"
 import { useSelector } from "react-redux"
 import { UserType, authAPI } from "@/libs/apis/authAPI"
 

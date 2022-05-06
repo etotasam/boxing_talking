@@ -1,10 +1,14 @@
 import { FighterEdit, _selectFighter } from ".";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, queryByTitle, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { act, renderHook } from "@testing-library/react-hooks";
 
 //! hooks
-import { useFighters } from "@/libs/hooks/fetchers";
+// import { useFighters } from "@/libs/hooks/fetchers";
 import { useMessageController } from "@/libs/hooks/messageController";
+import { useQueryState } from "@/libs/hooks/useQueryState";
+import { useFetchFighters, useUpdateFighter } from "@/libs/hooks/useFighter";
 
 //! api
 import { updateFighter } from "@/libs/apis/fighterAPI";
@@ -21,11 +25,16 @@ import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModa
 import { ReactNode } from "react";
 
 //! test data
-import { test_data_fighters, test_data_fighter_2 } from "@/libs/test-data";
+import { test_data_fighters, test_data_fighter_2, test_data_fighter_1 } from "@/libs/test-data";
 
 //! hooks mock
-jest.mock("@/libs/hooks/fetchers");
-const useFightersMock = useFighters as jest.Mock;
+// jest.mock("@/libs/hooks/fetchers");
+// const useFightersMock = useFighters as jest.Mock;
+jest.mock("@/libs/hooks/reactQueryHooks");
+const useFetchFightersMock = useFetchFighters as jest.Mock;
+const useUpdateFighterMock = useUpdateFighter as jest.Mock;
+jest.mock("@/libs/hooks/useQueryState");
+const useQueryStateMock = useQueryState as jest.Mock;
 jest.mock("@/libs/hooks/messageController");
 const useMessageControllerMock = useMessageController as jest.Mock;
 jest.mock("@/libs/apis/fighterAPI");
@@ -47,14 +56,40 @@ const EditActionBtnsMock = EditActionBtns as jest.Mock;
 jest.mock("@/components/modal/FullScreenSpinnerModal");
 const FullScreenSpinnerModalMock = FullScreenSpinnerModal as jest.Mock;
 
-describe("FighterEdigのテスト", () => {
+const clientStub = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      //※refetchが走らないように
+      staleTime: Infinity,
+    },
+  },
+});
+clientStub.setQueryData("q/fighterData", undefined);
+
+describe("FighterEditのテスト", () => {
+  let setFighterDataMock = jest.fn();
   beforeEach(() => {
     //! hooks mock implement
-    useFightersMock.mockReturnValue({
-      // fetchAllFighters: jest.fn(),
+    useFetchFightersMock.mockReturnValue({
       data: test_data_fighters,
-      // cancel: jest.fn(),
-      mutate: jest.fn(),
+      isError: false,
+      isLoading: false,
+    });
+    useQueryStateMock.mockImplementation(
+      jest.fn((queryKey: string) => {
+        if (queryKey === "q/fighterData") {
+          let fighterData = clientStub.getQueryData(queryKey);
+          setFighterDataMock.mockImplementation(
+            jest.fn((data: any) => clientStub.setQueryData(queryKey, data))
+          );
+          return [fighterData, setFighterDataMock];
+        }
+      })
+    );
+    useUpdateFighterMock.mockReturnValue({
+      updateFighter: jest.fn(),
+      isLoading: false,
     });
     useMessageControllerMock.mockReturnValue({ setMessageToModal: jest.fn() });
     updateFighterMock.mockReturnValue(jest.fn());
@@ -78,21 +113,34 @@ describe("FighterEdigのテスト", () => {
   });
   it("取得した選手データがレンダリングされる", () => {
     render(
-      <LayoutForEditPageMock>
-        <FighterEdit />
-      </LayoutForEditPageMock>
+      <QueryClientProvider client={clientStub}>
+        <LayoutForEditPageMock>
+          <FighterEdit />
+        </LayoutForEditPageMock>
+      </QueryClientProvider>
     );
     const FighterMockCount = test_data_fighters.length;
     expect(FighterMock).toBeCalledTimes(FighterMockCount);
   });
-  it("セレクトした選手データがFighterEditFormに渡される", () => {
-    render(
-      <LayoutForEditPageMock>
-        <FighterEdit />
-      </LayoutForEditPageMock>
+  it("セレクトした選手データがuseQueryStateで共有される", () => {
+    const { rerender } = render(
+      <QueryClientProvider client={clientStub}>
+        <LayoutForEditPageMock>
+          <FighterEdit />
+        </LayoutForEditPageMock>
+      </QueryClientProvider>
     );
     expect(_selectFighter).toBe(undefined);
+    // screen.debug();
     userEvent.click(screen.getByTestId("input-2"));
+    expect(setFighterDataMock).toBeCalledTimes(1);
+    rerender(
+      <QueryClientProvider client={clientStub}>
+        <LayoutForEditPageMock>
+          <FighterEdit />
+        </LayoutForEditPageMock>
+      </QueryClientProvider>
+    );
     expect(_selectFighter).toBe(test_data_fighter_2);
   });
 });

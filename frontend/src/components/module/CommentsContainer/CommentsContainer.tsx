@@ -13,7 +13,7 @@ import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { useCommentsOnMatch } from "@/libs/hooks/fetchers";
 
 export const CommentsContainer = () => {
-  const { authState } = useAuth();
+  const { data: authUser } = useAuth();
 
   //? urlからmatchIdを取得
   const { search } = useLocation();
@@ -65,7 +65,7 @@ export const CommentsContainer = () => {
             <CommentComponent
               key={props.id}
               props={props}
-              className={`${props.user.id === authState.user.id ? "bg-green-100" : ""}`}
+              className={`${props.user.id === authUser!.id ? "bg-green-100" : ""}`}
             />
           ))}
         {hasComment === false && <div>コメントはありません</div>}

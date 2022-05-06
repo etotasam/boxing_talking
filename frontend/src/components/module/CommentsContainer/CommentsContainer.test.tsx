@@ -2,31 +2,31 @@ import { CommentsContainer } from ".";
 import { cleanup, render, screen } from "@testing-library/react";
 import { useLocation } from "react-router-dom";
 
-// components
+//! components
 import { SpinnerModal } from "@/components/modal/SpinnerModal";
 
-// hooks
+//! hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-// import { useFetchThisMatchComments } from "@/libs/hooks/useFetchThisMatchComments";
+//! import { useFetchThisMatchComments } from "@/libs/hooks/useFetchThisMatchComments";
 import { usePostComment } from "@/libs/hooks/usePostComment";
 import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { useCommentsOnMatch } from "@/libs/hooks/fetchers";
 
-// test data
-import { authUserState, comments, comment } from "@/libs/test-data";
+//! test data
+import { authUser, comments, comment } from "@/libs/test-data";
 
 jest.mock("react-router-dom");
 const useLocationMock = useLocation as jest.Mock;
 
-//spinerのモック
+//?spinerのモック
 jest.mock("@/components/modal/SpinnerModal");
 const SpinnerModalMock = SpinnerModal as jest.Mock;
 
-//ログインユーザーのモック
+//?ログインユーザーのモック
 jest.mock("@/libs/hooks/useAuth");
 const useAuthMock = useAuth as jest.Mock;
 
-// コメントのモック
+//? コメントのモック
 jest.mock("@/libs/hooks/fetchers");
 const useCommentsOnMatchMock = useCommentsOnMatch as jest.Mock;
 const useCommentsOnMatchMockReturnValue = {
@@ -48,11 +48,13 @@ const usePostCommentMock = usePostComment as jest.Mock;
 jest.mock("@/libs/hooks/useCommentDelete");
 const useCommentDeleteMock = useCommentDelete as jest.Mock;
 
+let data: typeof authUser;
 describe("CommentsContainerのテスト", () => {
   beforeEach(() => {
-    const authState = authUserState.auth;
+    // const authState = authUser;
     useLocationMock.mockReturnValue(jest.fn());
-    useAuthMock.mockReturnValue({ authState });
+    data = authUser;
+    useAuthMock.mockReturnValue({ data });
     useCommentsOnMatchMock.mockReturnValue(useCommentsOnMatchMockReturnValue);
     // useFetchThisMatchCommentsMock.mockReturnValue({ commentsState, ...useFetchThisMatchCommentsMockReturnValue });
     usePostCommentMock.mockReturnValue({ commentPosting: false });

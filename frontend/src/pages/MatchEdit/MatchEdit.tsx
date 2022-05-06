@@ -1,18 +1,18 @@
 import React from "react";
-import axios from "@/libs/axios";
+import { Axios } from "@/libs/axios";
 import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
 import { MESSAGE } from "@/libs/utils";
 
-// component
+//! component
 import { MatchComponent } from "@/components/module/MatchComponent";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 import { EditActionBtns } from "@/components/module/EditActionBtns";
 
-// hooks
+//! hooks
 import { useMessageController } from "@/libs/hooks/messageController";
 import { useMatches } from "@/libs/hooks/fetchers";
 
-// layout
+//! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 
 export const MatchEdit = () => {
@@ -34,7 +34,7 @@ export const MatchEdit = () => {
     );
     setPending(true);
     try {
-      const { data } = await axios.delete("api/match/delete", { data: { matchId: deleteMatchId } });
+      const { data } = await Axios.delete("api/match/delete", { data: { matchId: deleteMatchId } });
       console.log(data);
       matchesMutate(matchesDataWithoutDeleteMatch);
     } catch (error) {

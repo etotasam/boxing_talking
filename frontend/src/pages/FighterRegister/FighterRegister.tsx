@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "@/libs/axios";
+import { Axios } from "@/libs/axios";
 import { MESSAGE } from "@/libs/utils";
 import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
 
@@ -27,7 +27,7 @@ export const FighterRegister = () => {
     event.preventDefault();
     setRegisterPending(true);
     try {
-      await axios.post("api/fighter", inputFighterInfo);
+      await Axios.post("api/fighter", inputFighterInfo);
       fightersMutate([...fightersData!, inputFighterInfo]);
       setMessageToModal(MESSAGE.FIGHTER_REGISTER_SUCCESS, ModalBgColorType.SUCCESS);
     } catch (error) {

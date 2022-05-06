@@ -1,5 +1,5 @@
 import React from "react"
-import axios from "../axios"
+import { Axios } from "../axios"
 import {
   fetchThisMatchesComments,
 } from "@/store/slice/commentsStateSlice";

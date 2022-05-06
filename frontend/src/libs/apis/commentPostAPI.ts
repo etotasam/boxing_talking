@@ -1,4 +1,4 @@
-import axios from "@/libs/axios"
+import { Axios } from "@/libs/axios"
 import { STATUS } from "@/libs/utils"
 
 type Props = { userId: number, matchId: number, comment: string }
@@ -7,7 +7,7 @@ export const commentPostAPI = async ({ userId, matchId, comment }: Props) => {
   if (comment === "") {
     return STATUS.COMMENT_NULL
   }
-  const { status } = await axios.post(
+  const { status } = await Axios.post(
     "api/comment",
     {
       user_id: userId,

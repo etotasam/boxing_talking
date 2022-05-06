@@ -1,6 +1,7 @@
 //! module
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 //! components
 import { LayoutDefault } from "@/layout/LayoutDefault";
@@ -16,33 +17,42 @@ import { MatchesType } from "@/libs/apis/matchAPI";
 import { useAuth } from "@/libs/hooks/useAuth";
 import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { useResizeCommentsComponent } from "@/libs/hooks/useResizeCommentsComponent";
-import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+// import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+import { useFetchMatches } from "@/libs/hooks/useMatches";
 
 export const Match = () => {
   const { deleteCommentsState } = useCommentDelete();
-  const { authState } = useAuth();
+  const { data: authUser } = useAuth();
 
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get("id"));
-
-  //? ユーザー情報
-  const { user: authUser } = authState;
+  const navigate = useNavigate();
 
   //? 試合情報
-  const { matchesState } = useFetchAllMatches();
+  const { data: matchesData } = useFetchMatches();
+
+  //? 存在しないmatch_idでアクセスされた場合homeへ
+  useEffect(() => {
+    if (!matchesData) return;
+    const hasExistMatch = matchesData.some((match) => match.id === matchId);
+    if (!matchId || !hasExistMatch) return navigate("/");
+  }, [matchesData]);
+
   // const { voteResultState } = useFetchVoteResult();
   const [thisMatch, setThisMatch] = useState<MatchesType>();
-  const getThisMatch = (matches: MatchesType[], matchIdByPrams: number): MatchesType | undefined => {
+  const getThisMatch = (
+    matches: MatchesType[],
+    matchIdByPrams: number
+  ): MatchesType | undefined => {
     return matches?.find((match) => match.id === matchIdByPrams);
   };
 
   useEffect(() => {
-    if (!matchesState.matches) return;
-    const match = getThisMatch(matchesState.matches, matchId);
+    if (!matchesData) return;
+    const match = getThisMatch(matchesData, matchId);
     setThisMatch(match);
-  }, [matchesState.matches]);
-
+  }, [matchesData, matchId]);
 
   //? Commets Componentの高さを決めるコード(cssの変数を操作)
   const [elRefArray, setElRefArray] = useState<React.RefObject<HTMLDivElement>[]>([]);
@@ -65,13 +75,16 @@ export const Match = () => {
         <div className="col-span-3">
           <MatchInfo getElRefArray={(arr: any[]) => setElRefArray((v) => [...v, ...arr])} />
           {thisMatch && (
-            <PostCommentForm getPostComRef={(el: any) => setElRefArray((v) => [...v, el])} matchId={thisMatch.id} />
+            <PostCommentForm
+              getPostComRef={(el: any) => setElRefArray((v) => [...v, el])}
+              matchId={thisMatch.id}
+            />
           )}
         </div>
         <div className={`col-span-2 p-5 t-comment-height`}>
           <CommentsContainer />
         </div>
-        {deleteCommentsState.confirmModalVisble && <CommentDeleteModal userId={authUser.id} />}
+        {deleteCommentsState.confirmModalVisble && <CommentDeleteModal userId={authUser!.id} />}
       </div>
     </LayoutDefault>
   );

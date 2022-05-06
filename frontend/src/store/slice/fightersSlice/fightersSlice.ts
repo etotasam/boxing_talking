@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from "../../store"
 import { useSelector } from "react-redux"
-import axios, { CancelToken } from "@/libs/axios"
+import { Axios, CancelToken } from "@/libs/axios"
 
 import { FighterType } from "@/libs/hooks/fetchers";
 
@@ -22,7 +22,7 @@ export const fetchFighters = createAsyncThunk(
   'fetchFighter',
   async () => {
     axiosSource = CancelToken.source()
-    const { data }: { data: FighterType[] } = await axios.get("api/fighter", {
+    const { data }: { data: FighterType[] } = await Axios.get("api/fighter", {
       cancelToken: axiosSource.token
     })
     return data

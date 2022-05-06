@@ -19,7 +19,7 @@ export const PostCommentForm = ({
   getPostComRef: (el: any) => void;
 }) => {
   const dispatch = useDispatch();
-  const { authState } = useAuth();
+  const { data: authUser } = useAuth();
   const { postComment: customPostComment, commentPosting } = usePostComment();
   const { setMessageToModal } = useMessageController();
   const [comment, setComment] = React.useState<string>("");
@@ -36,7 +36,7 @@ export const PostCommentForm = ({
         setMessageToModal(MESSAGE.COMMENT_POST_NULL, ModalBgColorType.ERROR);
         return;
       }
-      await customPostComment(authState.user.id, matchId, comment);
+      await customPostComment(authUser!.id, matchId, comment);
       setComment("");
       await commentsMutate();
       // await dispatch(fetchThisMatchesComments(matchId));

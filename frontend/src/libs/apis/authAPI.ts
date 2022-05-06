@@ -1,4 +1,4 @@
-import axios from "@/libs/axios"
+import { Axios } from "@/libs/axios"
 
 export type UserType = {
   id: number,
@@ -14,17 +14,17 @@ type LoginProps = {
 export const authAPI = {
 
   login: async (props: LoginProps): Promise<UserType> => {
-    const { data } = await axios.post("api/login", { ...props })
+    const { data } = await Axios.post("api/login", { ...props })
     return data
   },
 
   logout: async ({ userId }: { userId: number }): Promise<any> => {
-    const { data } = await axios.post("api/logout", { user_id: userId })
+    const { data } = await Axios.post("api/logout", { user_id: userId })
     return data
   },
 
   getAuthUser: async (): Promise<UserType> => {
-    const { data } = await axios.get(`/api/user`)
+    const { data } = await Axios.get(`/api/user`)
     return data
   }
 }

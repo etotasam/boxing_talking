@@ -1,4 +1,4 @@
-import axios from '@/libs/axios';
+import { Axios } from '@/libs/axios';
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from "../../store"
 // import { UserType } from "@/libs/apis/authAPI"
@@ -34,7 +34,7 @@ const initialState: InitialStateType = {
 export const fetchUserVotes = createAsyncThunk(
   'userVotes',
   async (userId: number) => {
-    const { data: userVotes }: { data: UserVoteStateType[] } = await axios.get(`/api/vote/${userId}`)
+    const { data: userVotes }: { data: UserVoteStateType[] } = await Axios.get(`/api/vote/${userId}`)
     return userVotes
   }
 )

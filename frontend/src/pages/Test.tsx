@@ -5,11 +5,14 @@ import { PolarArea } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Context } from "chartjs-plugin-datalabels";
 import { Link } from "react-router-dom";
-import axios from "@/libs/axios";
+import { Axios } from "@/libs/axios";
 
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import { useEffect } from "react";
 import { LoadingModal } from "@/components/modal/LoadingModal";
+
+//! custom hooks
+import { useQueryState } from "@/libs/hooks/useQueryState";
 
 ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
 
@@ -52,17 +55,10 @@ const options = {
 };
 
 export const Test = () => {
-  // const { mutate } = useSWRConfig();
-  const fetcher = async () => await axios.get("/api/test").then((value) => value.data);
-  // const { mutate } = useSWRConfig();
+  const [testData, setTestData] = useQueryState<string>("q_test", "testの初期値");
+  const [nameData, setNameData] = useQueryState<string>("q_name", "test");
+  const fetcher = async () => await Axios.get("/api/test").then((value) => value.data);
   const { data: fetchData, error, mutate } = useSWR("/api/test", fetcher);
-  useEffect(() => {
-    // (async () => {
-    //   const { data: fetchData } = await axios.get("/api/test");
-    //   console.log(fetchData);
-    // })();
-    console.log(fetchData);
-  }, [fetchData]);
   const data1 = {
     labels: ["red", "blue"],
     datasets: [
@@ -83,10 +79,18 @@ export const Test = () => {
     setPending(false);
   };
 
+  useEffect(() => {
+    console.log(nameData);
+  }, [nameData]);
+
   if (error) return <div>error</div>;
 
   return (
     <>
+      <h1>{testData}</h1>
+      <button onClick={() => setTestData("テスト更新")} className={`bg-red-500`}>
+        ぼたん
+      </button>
       <Link to={`/check`}>check</Link>
       <div className={`flex`}>
         <div className="relative w-[300px] h-[300px]">
@@ -97,6 +101,18 @@ export const Test = () => {
         </div>
       </div>
       <button onClick={testFunc}>refetch</button>
+      <div className="bg-red-50">
+        <form onSubmit={() => null}>
+          <input
+            className="mt-3 px-1 bourder rounded border-black"
+            type="text"
+            placeholder="選手名"
+            name="name"
+            value={nameData}
+            onChange={(e) => setNameData(e.target.value)}
+          />
+        </form>
+      </div>
       {(!fetchData || pending) && <LoadingModal />}
     </>
   );

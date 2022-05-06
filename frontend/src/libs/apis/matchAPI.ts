@@ -1,4 +1,4 @@
-import axios from "../axios";
+import { Axios } from "../axios";
 import { Stance, Nationality, FighterType } from "@/libs/hooks/fetchers";
 
 
@@ -25,7 +25,7 @@ export type MatchesType = {
 };
 
 export const fetchMatchesAPI = async (): Promise<MatchesType[]> => {
-  const { data } = await axios.get(
+  const { data } = await Axios.get(
     "api/match"
   );
   return data
@@ -38,7 +38,7 @@ type RegstarMatchPropsType = {
 }
 
 export const registerMatchAPI = async ({ red_fighter_id, blue_fighter_id, match_date }: RegstarMatchPropsType): Promise<Record<string, string>> => {
-  const { data } = await axios.post("api/match/register", {
+  const { data } = await Axios.post("api/match/register", {
     red_fighter_id,
     blue_fighter_id,
     match_date

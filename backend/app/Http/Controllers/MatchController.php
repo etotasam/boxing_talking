@@ -20,6 +20,7 @@ class MatchController extends Controller
      */
     public function fetch()
     {
+        // throw new Exception();
         $today = date('Y-m-d',strtotime('-1 week'));
         $all_match = BoxingMatch::where('match_date','>',$today)->orderBy('match_date')->get();
 

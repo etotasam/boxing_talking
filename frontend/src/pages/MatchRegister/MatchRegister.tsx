@@ -1,4 +1,4 @@
-import axios, { isAxiosError } from "@/libs/axios";
+import { Axios, isAxiosError } from "@/libs/axios";
 import { useEffect, useState } from "react";
 import { CustomButton } from "@/components/atomic/Button";
 import dayjs from "dayjs";
