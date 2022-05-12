@@ -1,24 +1,27 @@
 import React from "react"
 import { useQuery, QueryKey, useQueryClient } from "react-query"
 
-export const useQueryState = <T extends {}>(key: QueryKey, initialState?: T): [T, React.Dispatch<React.SetStateAction<T>>] => {
+export const useQueryState = <T>(key: QueryKey, initialState?: T): { state: T, setter: React.Dispatch<React.SetStateAction<T>>, getLatestState: () => T | undefined } => {
   const state = useQuery(key, {
     enabled: false,
     ...((initialState !== undefined) ? { initialData: initialState } : {})
   }).data as T
 
+
   const queryClient = useQueryClient()
+
+  const getLatestState = () => queryClient.getQueryData<T>(key)
 
   const setter = (arg: ((arg: T) => void) | T): void => {
     let newValue;
     if (typeof arg === "function") {
-      const nowValue = queryClient.getQueryData<T>(key)
-      newValue = nowValue as any
+      const prevValue = queryClient.getQueryData<T>(key)
+      newValue = (arg as any)(prevValue)
     } else {
       newValue = arg as any
     }
     queryClient.setQueryData<T>(key, newValue)
   }
 
-  return [state, setter]
+  return { state, setter, getLatestState }
 }

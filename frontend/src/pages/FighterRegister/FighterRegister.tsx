@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Axios } from "@/libs/axios";
-import { MESSAGE } from "@/libs/utils";
 import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
-
+import { MESSAGE } from "@/libs/utils";
+// import { useQueryClient } from "react-query";
+import { initialFighterInfoState } from "@/components/module/FighterEditForm";
+import { useEffect } from "react";
 //! type
 import { FighterType } from "@/libs/hooks/fetchers";
 
@@ -13,38 +13,43 @@ import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModa
 //! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 
-//! hooks
+//! cutom hooks
+import { useRegisterFighter, useFetchFighters } from "@/libs/hooks/useFighter";
 import { useMessageController } from "@/libs/hooks/messageController";
-import { useFighters } from "@/libs/hooks/fetchers";
+import { queryKeys } from "@/libs/queryKeys";
+import { useQueryState } from "@/libs/hooks/useQueryState";
 
 export const FighterRegister = () => {
-  const [registerPending, setRegisterPending] = useState(false);
-  const { data: fightersData, mutate: fightersMutate } = useFighters();
-  const register = async (
-    event: React.FormEvent<HTMLFormElement>,
-    inputFighterInfo: FighterType
-  ) => {
-    event.preventDefault();
-    setRegisterPending(true);
-    try {
-      await Axios.post("api/fighter", inputFighterInfo);
-      fightersMutate([...fightersData!, inputFighterInfo]);
-      setMessageToModal(MESSAGE.FIGHTER_REGISTER_SUCCESS, ModalBgColorType.SUCCESS);
-    } catch (error) {
-      setMessageToModal(MESSAGE.FIGHTER_REGISTER_FAILD, ModalBgColorType.ERROR);
+  // const queryClient = useQueryClient();
+  const { registerFighter, isLoading: isRegisterFighterPending } = useRegisterFighter();
+  const { setMessageToModal } = useMessageController();
+  const { data: fightersData } = useFetchFighters();
+  const { getLatestState: getLatestFighterDataFromForm, setter: setFighterDataFromForm } =
+    useQueryState<FighterType>(queryKeys.fighterEditData);
+
+  const register = async () => {
+    const fighterDataForRegistration = getLatestFighterDataFromForm();
+    //? 選手がすでに存在しているかをチェック(チェックしてるのは名前だけ)
+    const hasThatFighterOnDB = fightersData?.some(
+      (fighter) => fighter.name === fighterDataForRegistration!.name
+    );
+    if (hasThatFighterOnDB) {
+      return setMessageToModal(MESSAGE.FIGHTER_NOT_ABLE_TO_REGISTER, ModalBgColorType.NOTICE);
     }
-    setRegisterPending(false);
+    registerFighter(fighterDataForRegistration!);
   };
 
-  const { setMessageToModal } = useMessageController();
+  useEffect(() => {
+    return () => {
+      setFighterDataFromForm(initialFighterInfoState);
+    };
+  }, []);
 
   return (
     <LayoutForEditPage>
       <div className="min-h-[calc(100vh-50px)] bg-stone-50 flex justify-center items-center">
-        <FighterEditForm
-          onSubmit={(event, inputFighterInfo) => register(event, inputFighterInfo)}
-        />
-        {registerPending && <FullScreenSpinnerModal />}
+        <FighterEditForm onSubmit={register} />
+        {isRegisterFighterPending && <FullScreenSpinnerModal />}
       </div>
     </LayoutForEditPage>
   );

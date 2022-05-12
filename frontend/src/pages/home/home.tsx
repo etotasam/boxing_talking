@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Axios } from "@/libs/axios";
 import { useNavigate } from "react-router-dom";
 import { AuthIs } from "@/store/slice/authUserSlice";
@@ -19,12 +19,7 @@ import { MatchComponent } from "@/components/module/MatchComponent";
 export const Home = React.memo(() => {
   const navigate = useNavigate();
   const { data: authUser } = useAuth();
-  // const {
-  //   authState: { hasAuth, user: authUser },
-  // } = useAuth();
-
-  // const { matchesState } = useFetchAllMatches();
-  const { data: matchesState } = useFetchMatches();
+  const { data: matchesState, isError: isErrorOnFetchMatches } = useFetchMatches();
 
   const queue = useCallback(async () => {
     if (!authUser) return;
@@ -33,27 +28,36 @@ export const Home = React.memo(() => {
   }, [authUser]);
 
   const { setMessageToModal } = useMessageController();
-  const click = (id: number) => {
-    if (!authUser) {
-      setMessageToModal(MESSAGE.NOT_AUTHORIZED, ModalBgColorType.ERROR);
-      return;
-    }
-    navigate(`/match?id=${id}`);
-  };
+  const click = useCallback(
+    (id: number) => {
+      if (!authUser) {
+        setMessageToModal(MESSAGE.NOT_AUTHORIZED, ModalBgColorType.ERROR);
+        return;
+      }
+      navigate(`/match?id=${id}`);
+    },
+    [authUser]
+  );
 
   return (
     <LayoutDefault>
       <div className={`w-2/3 my-5 ml-5 rounded-md pb-3 bg-stone-50`}>
         <h1 className="rounded-t-md bg-stone-800 text-white text-2xl p-2">SCHEDULE</h1>
-        {matchesState !== undefined &&
+        {isErrorOnFetchMatches && <MatchesFetchErrorComponent />}
+        {matchesState &&
           matchesState.map((match) => (
-            <MatchComponent
-              key={match.id}
-              onClick={(matchId: number) => click(matchId)}
-              match={match}
-            />
+            <MatchComponent key={match.id} onClick={(matchId: number) => click(matchId)} match={match} />
           ))}
       </div>
     </LayoutDefault>
   );
 });
+
+const MatchesFetchErrorComponent = () => {
+  return (
+    <div className="flex flex-col items-center w-full py-5">
+      <span>データの取得に失敗しました</span>
+      <span>画面を更新してください</span>
+    </div>
+  );
+};

@@ -6,6 +6,7 @@ export const STATUS = {
 
 
 export enum MESSAGE {
+  INVALID_COUNTRY = "国籍が無効です",
   COMMENT_POST_SUCCESSFULLY = "コメントを投稿しました",
   COMMENT_POST_FAILED = `コメント投稿に失敗しました \n お手数ですが、時間を空けて再度投稿してください`,
   COMMENT_POST_NULL = `コメントを入力してください`,
@@ -25,20 +26,29 @@ export enum MESSAGE {
   NOT_AUTHORIZED = 'ログインが必要です',
   NULL = "",
 
+  MATCH_NOT_SELECTED = "変更する試合を選択してください",
+  MATCH_NOT_ALTER = "試合情報に変更がありません",
   MATCH_REGISTER_SUCCESS = "試合情報の登録が完了しました",
   MATCH_REGISTER_FAILD = "試合情報の登録に失敗しました \n 再度登録してください",
+  MATCH_DELETED = "試合情報を削除しました",
+  MATCH_DELETE_FAILD = "試合情報の削除に失敗しました \n 一度画面を更新し、再度削除の実行を行ってください",
+  MATCH_UPDATE_SUCCESS = "試合情報を更新しました",
+  MATCH_UPDATE_FAILD = "試合情報の更新に失敗しました \n 一度画面を更新し、再度更新の実行を行ってください",
 
+  FIGHTER_NOT_ABLE_TO_REGISTER = "すでに登録されている選手です",
+  FIGHTER_REGISTER_PENDING = "選手登録を実行中...",
   FIGHTER_REGISTER_SUCCESS = "選手を登録しました",
   FIGHTER_REGISTER_FAILD = "選手を登録できませんでした",
 
-  FIGHTER_EDIT_UPDATEING = "選手情報の編集を実行中です...",
-  FIGHTER_EDIT_SUCCESS = "選手情報を編集しました",
+  FIGHTER_EDIT_UPDATEING = "選手情報を編集中です...",
+  FIGHTER_EDIT_SUCCESS = "選手情報が更新されました",
   FIGHTER_EDIT_FAILD = "選手情報の編集に失敗しました \n 再度行ってください",
 
-  NO_SELECT_EDIT_FIGHTER = "編集する選手を選択してください",
+  NO_SELECT_EDIT_FIGHTER = "対象選手を選択してください",
   NOT_EDIT_FIGHTER = "選択した選手は未編集です",
   NO_SELECT_DELETE_FIGHTER = "削除する選手を選択してください",
 
+  FIGHTER_DELETING = "選手情報を削除中...",
   FIGHTER_DELETED = "選手を削除しました",
   FAILD_FIGHTER_DELETE = "選手削除に失敗しました",
 

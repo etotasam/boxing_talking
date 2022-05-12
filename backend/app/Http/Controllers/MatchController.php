@@ -86,4 +86,22 @@ class MatchController extends Controller
         }
     }
 
+    /**
+     * update
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request)
+    {
+        $id = $request->id;
+        $alter_match_data = $request->toArray();
+        // \Log::debug($alter_match_data);
+        try {
+            BoxingMatch::find($id)->update($alter_match_data);
+        }catch(Exception $e) {
+
+        }
+    }
+
 }

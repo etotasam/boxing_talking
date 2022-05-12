@@ -14,13 +14,60 @@ class FighterController extends Controller
      *
      * @return array 選手情報
      */
-    public function fetch()
+    public function fetch(Request $request)
     {
         try{
-            $fighters = Fighter::all();
-            return response()->json($fighters, 200);
+            $limit = $request->limit;
+            $page = $request->page;
+            $name = $request->name;
+            $country = $request->country;
+
+            if(!isset($page)) $page = 1;
+            $under = ($page - 1) * $limit;
+
+            $arr_word = compact("name", "country");
+            $arr_query = array_map(function($key, $value) {
+                if(isset($value)) {
+                    if($key == 'name') {
+                        return [$key, 'like', "%". addcslashes($value, '%_\\') ."%"];
+                    }else {
+                        return [$key, 'like', $value];
+                    }
+                }
+            },array_keys($arr_word), array_values($arr_word));
+
+            $like_querys = array_filter($arr_query, function($el) {
+                if(isset($el)) {
+                    return $el;
+                }
+            });
+
+            $fighters_count = Fighter::where($like_querys)->count();
+            // \Log::debug($fighters_count);
+            $fighters = Fighter::where($like_querys)->offset($under)->limit($limit)->get();
+            $value = compact("fighters", "fighters_count");
+
+            return response()->json($value, 200);
         }catch(Exception $e) {
             return response()->json(["message" => "faild fetch Fighters"], 500);
+        }
+    }
+
+
+    /**
+     * count fighters
+     *
+     * @return int 選手の数
+     */
+    public function count()
+    {
+        try{
+            $count = Fighter::all()->count();
+
+            // \Log::debug($count);
+            return response()->json($count, 200);
+        }catch(Exception $e) {
+            return response()->json(["message" => "faild get count fighters"], 500);
         }
     }
 
@@ -31,6 +78,7 @@ class FighterController extends Controller
      */
     public function register(Request $request)
     {
+        // throw new Exception();
         $fighter = $request->toArray();
         try {
             Fighter::create($fighter);
@@ -47,6 +95,7 @@ class FighterController extends Controller
      */
     public function delete(Request $request)
     {
+        // throw new Exception();
         try {
             $id = $request->fighterId;
             $fighter = Fighter::find($id);

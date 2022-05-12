@@ -3,12 +3,18 @@ import { cleanup, queryByTitle, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { act, renderHook } from "@testing-library/react-hooks";
-
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { queryKeys } from "@/libs/queryKeys";
 //! hooks
 // import { useFighters } from "@/libs/hooks/fetchers";
 import { useMessageController } from "@/libs/hooks/messageController";
 import { useQueryState } from "@/libs/hooks/useQueryState";
-import { useFetchFighters, useUpdateFighter } from "@/libs/hooks/useFighter";
+import {
+  useFetchFighters,
+  useUpdateFighter,
+  useDeleteFighter,
+  // useCountFighters,
+} from "@/libs/hooks/useFighter";
 
 //! api
 import { updateFighter } from "@/libs/apis/fighterAPI";
@@ -26,13 +32,31 @@ import { ReactNode } from "react";
 
 //! test data
 import { test_data_fighters, test_data_fighter_2, test_data_fighter_1 } from "@/libs/test-data";
+import { initialFighterInfoState } from "@/components/module/FighterEditForm";
+import { JsxEmit } from "typescript";
 
 //! hooks mock
 // jest.mock("@/libs/hooks/fetchers");
 // const useFightersMock = useFighters as jest.Mock;
-jest.mock("@/libs/hooks/reactQueryHooks");
+
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  Link: () => {
+    return <a href="/page">page</a>;
+  },
+  useLocation: () => {
+    return { search: jest.fn() };
+  },
+  useNavigate: () => {
+    return jest.fn();
+  },
+}));
+
+jest.mock("@/libs/hooks/useFighter");
 const useFetchFightersMock = useFetchFighters as jest.Mock;
 const useUpdateFighterMock = useUpdateFighter as jest.Mock;
+const useDeleteFighterMock = useDeleteFighter as jest.Mock;
+// const useCountFightersMock = useCountFighters as jest.Mock;
 jest.mock("@/libs/hooks/useQueryState");
 const useQueryStateMock = useQueryState as jest.Mock;
 jest.mock("@/libs/hooks/messageController");
@@ -46,6 +70,7 @@ const LayoutForEditPageMock = LayoutForEditPage as jest.Mock;
 
 //! components mock
 jest.mock("@/components/module/Fighter");
+//@ts-ignore
 const FighterMock = Fighter as jest.Mock;
 jest.mock("@/components/module/FighterEditForm");
 const FighterEditFormMock = FighterEditForm as jest.Mock;
@@ -65,11 +90,20 @@ const clientStub = new QueryClient({
     },
   },
 });
-clientStub.setQueryData("q/fighterData", undefined);
+clientStub.setQueryData(queryKeys.fighterEditData, initialFighterInfoState);
+clientStub.setQueryData(queryKeys.isSelectedFighter, false);
+clientStub.setQueryData(queryKeys.fighterPaginate, undefined);
 
 describe("FighterEditのテスト", () => {
-  let setFighterDataMock = jest.fn();
+  let setFighterDataFromFormMock = jest.fn();
+  let setIsSelectedFighterMock = jest.fn();
+  let setFighterPaginateMock = jest.fn();
   beforeEach(() => {
+    // useQuerySpy.mockImplementation((queryKey: string) => {
+    //   if (queryKey === queryKeys.fighterEditData) {
+    //     return { data: "data" };
+    //   }
+    // });
     //! hooks mock implement
     useFetchFightersMock.mockReturnValue({
       data: test_data_fighters,
@@ -78,12 +112,26 @@ describe("FighterEditのテスト", () => {
     });
     useQueryStateMock.mockImplementation(
       jest.fn((queryKey: string) => {
-        if (queryKey === "q/fighterData") {
-          let fighterData = clientStub.getQueryData(queryKey);
-          setFighterDataMock.mockImplementation(
+        if (queryKey === queryKeys.fighterEditData) {
+          let fighterDataFromForm = clientStub.getQueryData(queryKey);
+          setFighterDataFromFormMock.mockImplementation(
             jest.fn((data: any) => clientStub.setQueryData(queryKey, data))
           );
-          return [fighterData, setFighterDataMock];
+          return { state: fighterDataFromForm, setter: setFighterDataFromFormMock };
+        }
+        if (queryKey === queryKeys.isSelectedFighter) {
+          let isSelectedFighter = clientStub.getQueryData(queryKey);
+          setIsSelectedFighterMock.mockImplementation(
+            jest.fn((data: any) => clientStub.setQueryData(queryKey, data))
+          );
+          return { state: isSelectedFighter, setter: setIsSelectedFighterMock };
+        }
+        if (queryKey === queryKeys.fighterPaginate) {
+          let fighterPaginate = clientStub.getQueryData(queryKey);
+          setFighterPaginateMock.mockImplementation(
+            jest.fn((data: any) => clientStub.setQueryData(queryKey, data))
+          );
+          return { state: fighterPaginate, setter: setFighterPaginateMock };
         }
       })
     );
@@ -94,13 +142,22 @@ describe("FighterEditのテスト", () => {
     useMessageControllerMock.mockReturnValue({ setMessageToModal: jest.fn() });
     updateFighterMock.mockReturnValue(jest.fn());
 
+    useDeleteFighterMock.mockReturnValue({
+      deleteFighter: jest.fn(),
+      isLoading: false,
+    });
+
+    // useCountFightersMock.mockReturnValue({
+    //   data: 10,
+    // });
+
     //! layout mock implement
     LayoutForEditPageMock.mockImplementation(({ children }: { children: ReactNode }) => {
       return <div>{children}</div>;
     });
 
     //! component mock implement
-    FighterMock.mockImplementation(jest.fn(() => <div>FighterMock</div>));
+    FighterMock.mockImplementation(() => <div>FighterMock</div>);
     FighterEditFormMock.mockReturnValue(<div>FighterEditFormMock</div>);
     SpinnerModalMock.mockReturnValue(<div>SpinnerModalMock</div>);
     EditActionBtnsMock.mockReturnValue(<div>EditActionBtnsMock</div>);
@@ -119,6 +176,7 @@ describe("FighterEditのテスト", () => {
         </LayoutForEditPageMock>
       </QueryClientProvider>
     );
+
     const FighterMockCount = test_data_fighters.length;
     expect(FighterMock).toBeCalledTimes(FighterMockCount);
   });
@@ -130,10 +188,10 @@ describe("FighterEditのテスト", () => {
         </LayoutForEditPageMock>
       </QueryClientProvider>
     );
-    expect(_selectFighter).toBe(undefined);
+    expect(_selectFighter).toBe(initialFighterInfoState);
     // screen.debug();
     userEvent.click(screen.getByTestId("input-2"));
-    expect(setFighterDataMock).toBeCalledTimes(1);
+    expect(setFighterDataFromFormMock).toBeCalledTimes(1);
     rerender(
       <QueryClientProvider client={clientStub}>
         <LayoutForEditPageMock>
@@ -141,6 +199,6 @@ describe("FighterEditのテスト", () => {
         </LayoutForEditPageMock>
       </QueryClientProvider>
     );
-    expect(_selectFighter).toBe(test_data_fighter_2);
+    expect(_selectFighter).toStrictEqual(test_data_fighter_2);
   });
 });

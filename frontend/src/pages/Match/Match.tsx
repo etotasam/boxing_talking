@@ -9,6 +9,7 @@ import { CommentDeleteModal } from "@/components/modal/CommentDeleteModal";
 import { PostCommentForm } from "@/components/module/PostCommentForm";
 import { MatchInfo } from "@/components/module/MatchInfo";
 import { CommentsContainer } from "@/components/module/CommentsContainer";
+import { DataFetchErrorComponent } from "@/components/module/DataFetchErrorComponent";
 
 //! api
 import { MatchesType } from "@/libs/apis/matchAPI";
@@ -30,7 +31,15 @@ export const Match = () => {
   const navigate = useNavigate();
 
   //? 試合情報
-  const { data: matchesData } = useFetchMatches();
+  const { data: matchesData, isError: isErrorOnFetchMatches } = useFetchMatches();
+
+  //? エラー情報
+  const [hasAnyError, setHasAnyError] = useState(false);
+  const errors = [isErrorOnFetchMatches];
+  useEffect(() => {
+    const hasError = errors.includes(true);
+    setHasAnyError(hasError);
+  }, [...errors]);
 
   //? 存在しないmatch_idでアクセスされた場合homeへ
   useEffect(() => {
@@ -68,6 +77,10 @@ export const Match = () => {
 
   //? コメントコンポーネントのサイズを画面に合わせる為のhook
   useResizeCommentsComponent(...elsArray);
+
+  if (hasAnyError) {
+    return <DataFetchErrorComponent />;
+  }
 
   return (
     <LayoutDefault>

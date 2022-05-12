@@ -1,23 +1,9 @@
 import { Axios } from "../axios";
 import { Stance, Nationality, FighterType } from "@/libs/hooks/fetchers";
 
-
-// export type FighterType = {
-//   id: number,
-//   name: string,
-//   country: Nationality,
-//   birth: string;
-//   height: number,
-//   stance: Stance,
-//   ko: number,
-//   win: number,
-//   lose: number,
-//   draw: number
-// }
-
 export type MatchesType = {
   id: number;
-  date: Date;
+  date: Date | string;
   red: FighterType;
   blue: FighterType;
   count_red: number;

@@ -4,7 +4,7 @@ import { Chart as ChartJS, RadialLinearScale, ArcElement, Tooltip, Legend } from
 import { PolarArea } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Context } from "chartjs-plugin-datalabels";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Axios } from "@/libs/axios";
 
 import useSWR from "swr";
@@ -55,8 +55,11 @@ const options = {
 };
 
 export const Test = () => {
-  const [testData, setTestData] = useQueryState<string>("q_test", "testの初期値");
-  const [nameData, setNameData] = useQueryState<string>("q_name", "test");
+  const { state: testData, setter: setTestData } = useQueryState<Record<string, string>>("q_test", {
+    red: "あか",
+    blue: "あお",
+  });
+  const { state: nameData, setter: setNameData } = useQueryState<string>("q_name", "test");
   const fetcher = async () => await Axios.get("/api/test").then((value) => value.data);
   const { data: fetchData, error, mutate } = useSWR("/api/test", fetcher);
   const data1 = {
@@ -87,10 +90,19 @@ export const Test = () => {
 
   return (
     <>
-      <h1>{testData}</h1>
-      <button onClick={() => setTestData("テスト更新")} className={`bg-red-500`}>
+      <h1>{testData.red}</h1>
+      <h1>{testData.blue}</h1>
+      <button
+        onClick={() =>
+          setTestData((oldData) => {
+            return { red: oldData.red, blue: "うんこ" };
+          })
+        }
+        className={`bg-red-500`}
+      >
         ぼたん
       </button>
+
       <Link to={`/check`}>check</Link>
       <div className={`flex`}>
         <div className="relative w-[300px] h-[300px]">

@@ -16,9 +16,10 @@ enum NationaFlag {
   UK = "t-flag-uk",
   Rusia = "t-flag-ru",
   Philpin = "t-flag-ph",
+  Ukrine = "t-flag-ua",
 }
 
-export const Fighter = ({ fighter, className, cornerColor }: FighterProps) => {
+export const Fighter = React.memo(({ fighter, className, cornerColor }: FighterProps) => {
   const today = dayjs();
   const birthday = fighter.birth;
   const age = today.diff(birthday, "year");
@@ -49,6 +50,8 @@ export const Fighter = ({ fighter, className, cornerColor }: FighterProps) => {
         return NationaFlag.Rusia;
       case Nationality.Philpin:
         return NationaFlag.Philpin;
+      case Nationality.Ukrine:
+        return NationaFlag.Ukrine;
     }
   }, []);
   const nationalFlag = checkNationality(fighter.country!);
@@ -57,11 +60,7 @@ export const Fighter = ({ fighter, className, cornerColor }: FighterProps) => {
       {fighter && (
         <>
           <div className="flex flex-col w-1/2">
-            <div
-              className={`flex justify-center items-center ${
-                cornerColor === "red" && `flex-row-reverse`
-              }`}
-            >
+            <div className={`flex justify-center items-center ${cornerColor === "red" && `flex-row-reverse`}`}>
               <span className={`${nationalFlag} t-flag w-[25px] h-full`}></span>
               <p className="p-2">{fighter.name}</p>
             </div>
@@ -87,4 +86,4 @@ export const Fighter = ({ fighter, className, cornerColor }: FighterProps) => {
       )}
     </div>
   );
-};
+});
