@@ -45,14 +45,17 @@ Route::middleware('auth:sanctum')->group(function() {
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
+// Route::get('/fighter/count', [FighterController::class, 'count'])->name('fighter.count');
+Route::get('/fighter/search', [FighterController::class, 'search'])->name('fighter.search');
 Route::get('/fighter',[FighterController::class, 'fetch'])->name('fighter.fetch');
 Route::post('/fighter',[FighterController::class, 'register'])->name('fighter.register');
-Route::put('/fighter/update', [FighterController::class, 'update'])->name('fighter.update');
+Route::put('/fighter', [FighterController::class, 'update'])->name('fighter.update');
 Route::delete('/fighter',[FighterController::class, 'delete'])->name('fighter.delete');
 
 Route::get('/match', [MatchController::class, 'fetch'])->name('match.fetch');
-Route::post('/match/register', [MatchController::class, 'register'])->name('match.register');
-Route::delete('/match/delete', [MatchController::class, 'delete'])->name('match.delete');
+Route::post('/match', [MatchController::class, 'register'])->name('match.register');
+Route::delete('/match', [MatchController::class, 'delete'])->name('match.delete');
+Route::put('/match', [MatchController::class, 'update'])->name('match.delete');
 
 Route::get('/comment', [CommentController::class, 'fetch'])->name('comment.fetch');
 Route::post('/comment', [CommentController::class, 'store'])->name('comment.store');
@@ -118,4 +121,14 @@ Route::put("/{id}/test", function($id = null) {
     }
 
     return response()->json($data);
+});
+
+Route::get('/test', function() {
+
+    try{
+        // throw new Exception("エラーです");
+        return "fetch data complete";
+    }catch(Exception $e){
+        return response()->json(["message" => $e->getMessage()],500);
+    }
 });

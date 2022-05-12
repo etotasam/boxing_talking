@@ -20,6 +20,7 @@ class MatchController extends Controller
      */
     public function fetch()
     {
+        // throw new Exception();
         $today = date('Y-m-d',strtotime('-1 week'));
         $all_match = BoxingMatch::where('match_date','>',$today)->orderBy('match_date')->get();
 
@@ -82,6 +83,24 @@ class MatchController extends Controller
                 return response()->json(["message" => $e->getMessage()],500);
             }
             return response()->json(["message" => "faild while match delete"],500);
+        }
+    }
+
+    /**
+     * update
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request)
+    {
+        $id = $request->id;
+        $alter_match_data = $request->toArray();
+        // \Log::debug($alter_match_data);
+        try {
+            BoxingMatch::find($id)->update($alter_match_data);
+        }catch(Exception $e) {
+
         }
     }
 

@@ -7,8 +7,10 @@ import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
 import { AuthIs } from "@/store/slice/authUserSlice";
 
 //! hooks
-import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+// import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useAuth } from "@/libs/hooks/useAuth";
+// import { useAuth } from "@/libs/hooks/useAuth";
 import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
 
 //! component
@@ -19,32 +21,34 @@ const Container = () => {
   const [msg, setMsg] = React.useState<MESSAGE>(MESSAGE.NULL);
   const [waitId, setWaitId] = React.useState<NodeJS.Timeout>();
 
-  const { authState, authCheckAPI } = useAuth();
-  const { matchesState, fetchAllMatches } = useFetchAllMatches();
+  // const { authState, authCheckAPI } = useAuth();
+  // const { matchesState, fetchAllMatches } = useFetchAllMatches();
+  const { data: authUser, isLoading: isCheckingAuth } = useAuth();
+  const { isLoading: isFetchingMatches } = useFetchMatches();
   const { userVoteState, fetchUserVoteWithUserId } = useFetchUserVote();
 
   //? authチェックと試合情報の取得
-  const [isDataLoading, setIsDataLoading] = useState(true);
-  useEffect(() => {
-    let auth;
-    let matches;
-    if (authState.hasAuth === AuthIs.UNDEFINED) {
-      auth = authCheckAPI();
-    }
-    if (matchesState.matches === undefined) {
-      matches = fetchAllMatches();
-    }
-    (async () => {
-      await Promise.all([auth, matches]);
-      setIsDataLoading(false);
-    })();
-  }, []);
+  // const [isDataLoading, setIsDataLoading] = useState(true);
+  // useEffect(() => {
+  //   let auth;
+  //   let matches;
+  //   if (authState.hasAuth === AuthIs.UNDEFINED) {
+  //     auth = authCheckAPI();
+  //   }
+  //   if (matchesState.matches === undefined) {
+  //     matches = fetchAllMatches();
+  //   }
+  //   (async () => {
+  //     await Promise.all([auth, matches]);
+  //     setIsDataLoading(false);
+  //   })();
+  // }, []);
 
   //? ログイン状態の場合はuserの選手への投票を取得する
   useEffect(() => {
-    if (authState.hasAuth !== AuthIs.TRUE) return;
-    fetchUserVoteWithUserId(authState.user.id);
-  }, [authState.hasAuth]);
+    if (!authUser) return;
+    fetchUserVoteWithUserId(authUser.id);
+  }, [authUser]);
 
   //? メッセージモーダルのタイマーセット
   useEffect(() => {
@@ -53,7 +57,7 @@ const Container = () => {
         clearTimeout(waitId);
       }
       setMsg(message);
-      await wait(3000);
+      await wait(5000);
       setMsg(MESSAGE.NULL);
       setMessageToModal(MESSAGE.NULL, ModalBgColorType.NULL);
     })();
@@ -69,7 +73,7 @@ const Container = () => {
     <div className="w-full">
       <Outlet />
       {msg !== MESSAGE.NULL && <MessageModal />}
-      {isDataLoading && <LoadingModal />}
+      {(isCheckingAuth || isFetchingMatches) && <LoadingModal />}
     </div>
   );
 };

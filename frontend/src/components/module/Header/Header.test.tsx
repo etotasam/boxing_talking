@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/libs/hooks/useAuth";
 
 // test data
-import { authUserState, notAuthState } from "@/libs/test-data";
+import { authUser } from "@/libs/test-data";
 
 jest.mock("@/libs/hooks/useAuth");
 const useAuthMock = useAuth as jest.Mock;
@@ -34,8 +34,8 @@ describe("Headerテスト", () => {
   beforeAll(() => {});
 
   beforeEach(() => {
-    const authState = authUserState.auth;
-    useAuthMock.mockReturnValue({ authState });
+    const data = authUser;
+    useAuthMock.mockReturnValue({ data });
     useLocationMock.mockReturnValue({ pathname: "/comments" });
     CustomLinkMock.mockReturnValue(<a href="/">Homeへ</a>);
     useNavigateMock.mockImplementation();
@@ -59,7 +59,7 @@ describe("Headerテスト", () => {
     expect(authUserName).toBeInTheDocument();
   });
   it("logout時、名前はゲストでloginボタンが存在する", () => {
-    useAuthMock.mockReturnValue({ authState: notAuthState });
+    useAuthMock.mockReturnValue({ authState: undefined });
     render(<Header />);
     const logoutBtn = screen.queryByText("Logoutボタン");
     const loginBtn = screen.getByText("Loginボタン");

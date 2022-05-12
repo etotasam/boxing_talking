@@ -9,12 +9,27 @@
 @layer base {
 }
 
+@layer components {
+  .t-fighter-blue-inactive {
+    background-color: #a7a5fd;
+  }
+  .t-fighter-blue-active {
+    background-color: #717ffd;
+  }
+}
+
 @layer utilities {
   .t-bgcolor-opacity-1 {
     background-color: rgba(0, 0, 0, 0.1);
   }
+  .t-bgcolor-opacity-3 {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
   .t-bgcolor-opacity-5 {
     background-color: rgba(0, 0, 0, 0.5);
+  }
+  .t-bgcolor-white-opacity-5 {
+    background-color: rgba(255, 255, 255, 0.5);
   }
   /*
   .fighter-color-red {
@@ -54,5 +69,8 @@
   }
   .t-flag-ph {
     background-image: url("./libs/images/flags/philpin.svg");
+  }
+  .t-flag-ua {
+    background-image: url("./libs/images/flags/ukrine.svg");
   }
 }

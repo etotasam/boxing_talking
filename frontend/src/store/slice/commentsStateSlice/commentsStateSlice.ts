@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { UserType } from "@/libs/apis/authAPI";
 import { RootState } from "../../store"
-import axios, { CancelToken } from "@/libs/axios"
+import { Axios, CancelToken } from "@/libs/axios"
 import { useSelector } from 'react-redux';
 
 
@@ -30,7 +30,7 @@ export const fetchThisMatchesComments = createAsyncThunk<CommentType[], number, 
   `comments/fetchByMatchId`,
   async (matchId: number) => {
     source = CancelToken.source()
-    const { data: comments } = await axios.get("api/comment", {
+    const { data: comments } = await Axios.get("api/comment", {
       params: {
         match_id: matchId,
       },

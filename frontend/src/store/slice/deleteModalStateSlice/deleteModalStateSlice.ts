@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from "../../store"
 import { useSelector } from "react-redux"
-import axios from "@/libs/axios"
+import { Axios } from "@/libs/axios"
 
 export type initialStateProps = {
   confirmModalVisble: boolean
@@ -23,7 +23,7 @@ type deleteCommentAPIProps = {
 export const deleteCommentAPI = createAsyncThunk<any, deleteCommentAPIProps, {}>(
   'dleteCommentAPI',
   async ({ userId, commentId }) => {
-    const { data } = await axios.delete("api/comment", {
+    const { data } = await Axios.delete("api/comment", {
       data: {
         user_id: userId,
         comment_id: commentId

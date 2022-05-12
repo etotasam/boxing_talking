@@ -1,17 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 //types
 import { MatchesType } from "@/libs/apis/matchAPI";
-import { FighterType } from "@/libs/types/fighter";
+import { FighterType } from "@/libs/hooks/fetchers";
+
 //component
 import { TestChart } from "@/components/module/Chart";
-import { RiBoxingFill } from "react-icons/ri";
+import { Fighter } from "../Fighter";
 
-//hooks
-import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+//! hooks
+// import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
-import { useResizeCommentsComponent } from "@/libs/hooks/useResizeCommentsComponent";
+import dayjs from "dayjs";
 
 type Props = {
   getElRefArray: (arr: any[]) => void;
@@ -27,35 +29,45 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get("id"));
-  const { matchesState } = useFetchAllMatches();
+  // const { matchesState } = useFetchAllMatches();
+  const { data: matchesData } = useFetchMatches();
   const getThisMatch = (matches: MatchesType[], id: number): MatchesType | undefined => {
     return matches?.find((match) => match.id === id);
   };
   const [thisMatch, setThisMatch] = React.useState<MatchesType>();
 
-  //ユーザが勝敗を予想した試合
+  //? 選手データ
+  // const {fightersState} = useFetchFighters()
+  const [selectFighter, setSelectFighter] = useState<FighterType>();
+
+  const clickFighter = ({ fighter, color }: { fighter: FighterType; color: "red" | "blue" }) => {
+    voteToFighter(color);
+    setSelectFighter(fighter);
+  };
+
+  //? ユーザが勝敗を予想した試合
   const { userVoteState } = useFetchUserVote();
 
-  //ユーザがこの試合の勝敗予測をした、また、そのデータ
+  //? ユーザがこの試合の勝敗予測をした、また、そのデータ
   const getUsersVoteThisMatchById = (matchId: number) => {
     if (!userVoteState.votes) return;
     return userVoteState.votes.find((el) => el.match_id === matchId);
   };
 
-  //投票先(forontend側)
+  //? 投票先(forontend側)
   const [voteIs, setVoteIs] = React.useState<"red" | "blue" | undefined>();
 
-  // 試合のデータを取得
+  //? 試合のデータを取得
   React.useEffect(() => {
-    if (matchesState.matches === undefined) return;
-    const match = getThisMatch(matchesState.matches, matchId);
+    if (!matchesData) return;
+    const match = getThisMatch(matchesData, matchId);
     setThisMatch(match);
     if (!match) return;
     const userVoteData = getUsersVoteThisMatchById(match.id);
     setVoteIs(userVoteData?.vote_for);
-  }, [matchesState.matches]);
+  }, [matchesData]);
 
-  // 投票
+  //? 投票
   const voteToFighter = async (vote: "red" | "blue") => {
     let tempGameData: MatchesType = { ...thisMatch! };
     if (vote === "red" && voteIs !== "red") {
@@ -77,106 +89,93 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
 
   const [mouseOnColor, setMouseOnColor] = React.useState<MouseOn>(MouseOn.NULL);
 
-  // chartのデータ
+  //? chartのデータ
   const matchData = {
     labels: [thisMatch?.blue.name, thisMatch?.red.name],
     datasets: [
       {
         data: [thisMatch?.count_blue, thisMatch?.count_red],
         backgroundColor: [
-          mouseOnColor === MouseOn.BLUE ? `rgb(59 130 246)` : `rgb(96 165 250)`,
-          mouseOnColor === MouseOn.RED ? `rgb(239 68 68)` : `rgb(248 113 113)`,
+          mouseOnColor === MouseOn.BLUE ? `rgb(96 165 250)` : `#6c6c6c`,
+          mouseOnColor === MouseOn.RED ? `rgb(248 113 113)` : `#b1b1b1`,
         ],
+        // borderColor: [
+        //   mouseOnColor === MouseOn.BLUE ? `#d6d5ff` : `#717ffd`,
+        //   mouseOnColor === MouseOn.RED ? `#ffe0e0` : `#ff6868`,
+        // ],
+        borderWidth: 0,
+      },
+    ],
+  };
+  // chartのデータ
+  const fighterData = {
+    labels: [thisMatch?.blue.name, thisMatch?.red.name],
+    datasets: [
+      {
+        data: [thisMatch?.count_blue, thisMatch?.count_red],
+        backgroundColor: [
+          mouseOnColor === MouseOn.BLUE ? `rgb(96 165 250)` : `rgb(191 219 254)`,
+          mouseOnColor === MouseOn.RED ? `rgb(248 113 113)` : `rgb(254 202 202)`,
+        ],
+        // borderColor: [
+        //   mouseOnColor === MouseOn.BLUE ? `#d6d5ff` : `#717ffd`,
+        //   mouseOnColor === MouseOn.RED ? `#ffe0e0` : `#ff6868`,
+        // ],
         borderWidth: 1,
       },
     ],
   };
 
-  // elementRefを親に送る
+  //? elementRefを親に送る
   const matchesRef = React.useRef<HTMLDivElement>(null);
   const chartRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    getElRefArray([matchesRef, chartRef]);
+    getElRefArray([chartRef]);
   }, []);
+
+  const test = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    // if (mouseOnColor === MouseOn.BLUE) return;
+    // e.stopPropagation();
+    setMouseOnColor(MouseOn.BLUE);
+  };
 
   return (
     <>
-      {/* <div> */}
-      <div ref={chartRef} className="flex justify-center items-center bg-green-600">
-        <div className="max-w-[600px] min-w-[400px] bg-green-200">
-          <TestChart setMouseOnColor={(color: MouseOn) => setMouseOnColor(color)} matchData={matchData} />
-        </div>
-      </div>
-      {/* </div> */}
-      {/* 試合情報 */}
-      {thisMatch && (
-        <div ref={matchesRef} className="w-full">
-          <h1 className="bg-gray-600 text-white">{thisMatch.date}</h1>
-          <div className="flex">
-            <FighterComponent
-              fighter={thisMatch.red}
-              voteCount={thisMatch.count_red}
-              voteColor={voteIs}
+      <div ref={chartRef} className="grid grid-cols-5 grid-rows-1">
+        <TestChart
+          className="col-span-3 row-span-1"
+          setMouseOnColor={(color: MouseOn) => setMouseOnColor(color)}
+          matchData={matchData}
+        />
+        {thisMatch && (
+          <div className="col-span-2 row-span-1 grid grid-rows-[1fr_30px_1fr] bg-green-300">
+            <h1 className="col-span-1 row-span-1 row-start-2 bg-gray-600 text-center text-white text-xl">
+              {dayjs(thisMatch.date).format("YYYY/M/D")}
+            </h1>
+            <div
+              className={`w-full col-span-1 row-span-1 flex items-center cursor-pointer ${
+                mouseOnColor === MouseOn.RED ? `bg-red-400` : `bg-stone-200`
+              } duration-500`}
               onClick={() => voteToFighter("red")}
               onMouseOver={() => setMouseOnColor(MouseOn.RED)}
               onMouseOut={() => setMouseOnColor(MouseOn.NULL)}
-              color={"red"}
-              className={`${mouseOnColor === MouseOn.RED ? `bg-red-500` : `bg-red-400`} duration-500`}
-            />
-            <FighterComponent
-              fighter={thisMatch.blue}
-              voteCount={thisMatch.count_blue}
-              voteColor={voteIs}
+            >
+              <Fighter fighter={thisMatch.red} className={`w-full`} />
+            </div>
+            <div
+              className={`w-full col-span-1 row-span-1 flex items-center cursor-pointer ${
+                mouseOnColor === MouseOn.BLUE ? `bg-blue-400` : `bg-stone-200`
+              } duration-500`}
               onClick={() => voteToFighter("blue")}
               onMouseOver={() => setMouseOnColor(MouseOn.BLUE)}
               onMouseOut={() => setMouseOnColor(MouseOn.NULL)}
-              color={"blue"}
-              className={`${mouseOnColor === MouseOn.BLUE ? `bg-blue-500` : `bg-blue-400`} duration-500`}
-            />
+            >
+              <Fighter fighter={thisMatch.blue} className={`w-full`} />
+            </div>
           </div>
-        </div>
-      )}
-    </>
-  );
-};
-
-type FighterComponentProps = {
-  fighter: FighterType;
-  className: string;
-  voteColor: "red" | "blue" | undefined;
-  onClick?: () => void;
-  onMouseOver?: () => void;
-  onMouseOut: () => void;
-  voteCount: number;
-  color: "red" | "blue";
-};
-
-const FighterComponent = ({
-  fighter,
-  className,
-  onClick,
-  voteCount,
-  voteColor,
-  color,
-  onMouseOver,
-  onMouseOut,
-}: FighterComponentProps) => {
-  return (
-    <div
-      onClick={onClick}
-      onMouseOver={onMouseOver}
-      onMouseOut={onMouseOut}
-      className={`w-1/2 cursor-pointer ${className}`}
-    >
-      <div className={"h-[30px] flex justify-center items-center"}>
-        {voteColor === color && <RiBoxingFill className={"text-white text-2xl"} />}
+        )}
       </div>
-      <h2>
-        {fighter.name} 投票数: {voteCount}
-      </h2>
-      <p>{fighter.country}</p>
-      <p>{`${fighter.win}勝 ${fighter.draw}分 ${fighter.lose}敗 ${fighter.ko}KO`}</p>
-    </div>
+    </>
   );
 };

@@ -4,19 +4,27 @@ import { commentPostAPI } from "@/libs/apis/commentPostAPI";
 import { STATUS, MESSAGE } from "@/libs/utils";
 import { useMessageController } from "@/libs/hooks/messageController";
 import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
-import { fetchThisMatchesComments, LoadingOFF, LoadingON } from "@/store/slice/commentsStateSlice";
+// import { fetchThisMatchesComments, LoadingOFF, LoadingON } from "@/store/slice/commentsStateSlice";
 
 //hooks
 import { useAuth } from "@/libs/hooks/useAuth";
 import { usePostComment } from "@/libs/hooks/usePostComment";
+import { useCommentsOnMatch } from "@/libs/hooks/fetchers";
 
-export const PostCommentForm = ({ matchId, getPostComRef }: { matchId: number; getPostComRef: (el: any) => void }) => {
+export const PostCommentForm = ({
+  matchId,
+  getPostComRef,
+}: {
+  matchId: number;
+  getPostComRef: (el: any) => void;
+}) => {
   const dispatch = useDispatch();
-  const { authState } = useAuth();
+  const { data: authUser } = useAuth();
   const { postComment: customPostComment, commentPosting } = usePostComment();
   const { setMessageToModal } = useMessageController();
   const [comment, setComment] = React.useState<string>("");
   // const [posting, setPosting] = React.useState(IsCommentPosting.FALSE);
+  const { data, error, mutate: commentsMutate } = useCommentsOnMatch(matchId);
 
   const PostComment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -28,9 +36,10 @@ export const PostCommentForm = ({ matchId, getPostComRef }: { matchId: number; g
         setMessageToModal(MESSAGE.COMMENT_POST_NULL, ModalBgColorType.ERROR);
         return;
       }
-      await customPostComment(authState.user.id, matchId, comment);
+      await customPostComment(authUser!.id, matchId, comment);
       setComment("");
-      await dispatch(fetchThisMatchesComments(matchId));
+      await commentsMutate();
+      // await dispatch(fetchThisMatchesComments(matchId));
       setMessageToModal(MESSAGE.COMMENT_POST_SUCCESSFULLY, ModalBgColorType.SUCCESS);
     } catch (error: any) {
       // dispatch(LoadingOFF());

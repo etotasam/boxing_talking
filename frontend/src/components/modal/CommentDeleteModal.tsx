@@ -3,12 +3,12 @@ import { CustomButton } from "@/components/atomic/Button";
 import { useLocation } from "react-router-dom";
 import { MESSAGE } from "@/libs/utils";
 
-// slice
 // import { useGettingCommentsState } from "@/store/slice/commentsStateSlice";
 
-// custom hooks
+//! hooks
 import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
-import { useFetchThisMatchComments } from "@/libs/hooks/useFetchThisMatchComments";
+// import { useFetchThisMatchComments } from "@/libs/hooks/useFetchThisMatchComments";
+import { useCommentsOnMatch } from "@/libs/hooks/fetchers";
 
 type CommentDeleteModalType = {
   userId: number;
@@ -20,7 +20,7 @@ export const CommentDeleteModal = ({
 }: // deleteCommentId,
 CommentDeleteModalType) => {
   const { deleteComment, closeDeleteConfirmModale, deleteCommentsState } = useCommentDelete();
-  const { commentsState } = useFetchThisMatchComments();
+  // const { commentsState } = useFetchThisMatchComments();
   const parentClick = () => {
     closeDeleteConfirmModale();
   };
@@ -28,14 +28,16 @@ CommentDeleteModalType) => {
     e.stopPropagation();
   };
 
-  // const deleteId = deleteCommentId
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get("id"));
 
+  const { data: commentsData, mutate: commentsMutate } = useCommentsOnMatch(matchId);
+
   const commentDelete = async () => {
     if (!deleteCommentsState.idForDelete) return;
     await deleteComment({ userId, commentId: deleteCommentsState.idForDelete, matchId });
+    commentsMutate();
   };
 
   React.useEffect(() => {
@@ -53,16 +55,19 @@ CommentDeleteModalType) => {
     >
       <div onClick={(e) => childClick(e)} className="w-1/3 py-4 px-3 bg-white rounded">
         <p className="py-5 text-center whitespace-pre-wrap">
-          {deleteCommentsState.pending || commentsState.pending
+          {deleteCommentsState.pending || commentsData === undefined
             ? MESSAGE.COMMENT_DELETING
             : MESSAGE.COMMENT_DELETE_CONFIRM}
         </p>
-        {!deleteCommentsState.pending && !commentsState.pending && (
+        {!deleteCommentsState.pending && commentsData && (
           <div className="flex justify-center items-center">
             <CustomButton onClick={commentDelete} className="bg-gray-500 hover:bg-gray-600">
               削除
             </CustomButton>
-            <CustomButton onClick={closeDeleteConfirmModale} className="ml-10 bg-gray-500 hover:bg-gray-600">
+            <CustomButton
+              onClick={closeDeleteConfirmModale}
+              className="ml-10 bg-gray-500 hover:bg-gray-600"
+            >
               キャンセル
             </CustomButton>
           </div>

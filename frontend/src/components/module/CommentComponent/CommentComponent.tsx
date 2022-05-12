@@ -31,9 +31,7 @@ const dateFormat = (date: Date) => {
 };
 
 export const CommentComponent = React.memo(({ props, className }: PropsType) => {
-  const {
-    authState: { user: authUser },
-  } = useAuth();
+  const { data: authUser } = useAuth();
   const { id: commentId, comment, user: postUser, created_at } = props;
   // const { user: authUser } = authState;
   // const { id: userId } = useUser();
@@ -54,7 +52,7 @@ export const CommentComponent = React.memo(({ props, className }: PropsType) => 
           <time className="text-gray-600 text-sm">{dateFormat(created_at)}</time>
           <p className="text-gray-700 text-sm ml-5">{postUser.name}</p>
         </div>
-        {postUser.id === authUser.id && (
+        {postUser.id === authUser!.id && (
           <button
             data-testid={`trash-box`}
             onClick={commentDelete}

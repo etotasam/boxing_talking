@@ -15,6 +15,7 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        // throw new Exception();
         $email = $request->email;
         $password = $request->password;
         if(Auth::attempt(['email' => $email, 'password' => $password])) {
@@ -31,6 +32,7 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        // throw new Exception();
         $user_id = $request->user_id;
         $auth_user_id = Auth::User()->id;
         try{

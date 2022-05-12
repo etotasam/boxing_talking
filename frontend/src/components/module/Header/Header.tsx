@@ -7,7 +7,8 @@ import { AuthIs } from "@/store/slice/authUserSlice";
 import { CustomLink } from "@/components/module/CustomLink";
 import { LoginForm } from "@/components/module/LoginForm";
 
-//hooks
+//! hooks
+// import { useAuth } from "@/libs/hooks/useAuth";
 import { useAuth } from "@/libs/hooks/useAuth";
 
 type Props = {
@@ -15,11 +16,12 @@ type Props = {
 };
 
 export const Header = ({ className }: Props) => {
-  const { authState } = useAuth();
+  // const { authState } = useAuth();
+  const { data: authState } = useAuth();
   const { pathname } = useLocation();
   const currentPage = pathname.split("/")[1];
 
-  const userName = authState.hasAuth === AuthIs.TRUE ? authState.user.name : "ゲスト";
+  const userName = authState ? authState.name : "ゲスト";
 
   return (
     <header className={`${className} w-full px-10 flex justify-between items-center bg-black`}>
@@ -44,6 +46,6 @@ export const Header = ({ className }: Props) => {
 };
 
 const LoginOutComponent = () => {
-  const { authState } = useAuth();
-  return authState.hasAuth === AuthIs.TRUE ? <LogoutBtn /> : <LoginForm />;
+  const { data: authState } = useAuth();
+  return authState ? <LogoutBtn /> : <LoginForm />;
 };
