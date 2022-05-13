@@ -5,6 +5,7 @@ import { FighterType, Stance, Nationality } from "@/libs/hooks/fetchers";
 type FighterProps = {
   fighter: FighterType;
   className?: string;
+  recordTextColor?: string;
   cornerColor?: "red" | "blue";
 };
 
@@ -19,7 +20,7 @@ enum NationaFlag {
   Ukrine = "t-flag-ua",
 }
 
-export const Fighter = React.memo(({ fighter, className, cornerColor }: FighterProps) => {
+export const Fighter = React.memo(({ fighter, className, cornerColor, recordTextColor }: FighterProps) => {
   const today = dayjs();
   const birthday = fighter.birth;
   const age = today.diff(birthday, "year");
@@ -55,6 +56,7 @@ export const Fighter = React.memo(({ fighter, className, cornerColor }: FighterP
     }
   }, []);
   const nationalFlag = checkNationality(fighter.country!);
+  const textColor = recordTextColor ? recordTextColor : `text-stone-500`;
   return (
     <div className={`flex p-3 ${cornerColor === "red" && `flex-row-reverse`} ${className}`}>
       {fighter && (
@@ -71,16 +73,16 @@ export const Fighter = React.memo(({ fighter, className, cornerColor }: FighterP
 
           <div className="w-1/2">
             <div className="flex">
-              <div className="flex-1 text-stone-500 text-xs text-center">WIN</div>
-              <div className="flex-1 text-stone-500 text-xs text-center">DRWA</div>
-              <div className="flex-1 text-stone-500 text-xs text-center">LOSE</div>
+              <div className={`flex-1 text-xs text-center ${textColor}`}>WIN</div>
+              <div className={`flex-1 text-xs text-center ${textColor}`}>DRWA</div>
+              <div className={`flex-1 text-xs text-center ${textColor}`}>LOSE</div>
             </div>
             <div className="flex">
               <div className="flex-1 py-1 text-white text-center bg-green-500">{`${fighter.win}`}</div>
               <div className="flex-1 py-1 text-white text-center bg-stone-400">{fighter.draw}</div>
               <div className="flex-1 py-1 text-white text-center bg-stone-800">{fighter.lose}</div>
             </div>
-            <div className="w-1/3 text-stone-500 text-center text-xs">{`${fighter.ko} KO`}</div>
+            <div className={`w-1/3 text-center text-xs ${textColor}`}>{`${fighter.ko} KO`}</div>
           </div>
         </>
       )}

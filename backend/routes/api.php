@@ -58,7 +58,7 @@ Route::delete('/match', [MatchController::class, 'delete'])->name('match.delete'
 Route::put('/match', [MatchController::class, 'update'])->name('match.delete');
 
 Route::get('/comment', [CommentController::class, 'fetch'])->name('comment.fetch');
-Route::post('/comment', [CommentController::class, 'store'])->name('comment.store');
+Route::post('/comment', [CommentController::class, 'post'])->name('comment.post');
 Route::delete('/comment', [CommentController::class, 'delete'])->name('comment.delete');
 
 Route::get('/vote/{user_id}', [VoteController::class, 'fetch']);

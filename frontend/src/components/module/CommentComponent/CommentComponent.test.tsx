@@ -44,7 +44,7 @@ describe("CommentComponentのテスト", () => {
   });
 
   it("auth userのコメントにはゴミ箱が表示される", () => {
-    render(<CommentComponent props={commentState} className={"className"} />);
+    render(<CommentComponent commentData={commentState} className={"className"} />);
     const trashBox = screen.getByTestId(`trash-box`);
     expect(trashBox).toBeInTheDocument();
   });
@@ -52,7 +52,7 @@ describe("CommentComponentのテスト", () => {
   it("not auth user のコメントにはゴミ箱は表示されない", () => {
     data = { id: 2, name: "ユーザー", email: "notAuthUser@test.com" };
     useAuthMock.mockReturnValue({ data });
-    render(<CommentComponent props={commentState} className={"className"} />);
+    render(<CommentComponent commentData={commentState} className={"className"} />);
     const trashBox = screen.queryByTestId(`trash-box`);
     expect(trashBox).toBeNull();
   });

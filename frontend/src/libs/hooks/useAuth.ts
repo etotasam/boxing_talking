@@ -16,7 +16,8 @@ import { useQueryState } from "@/libs/hooks/useQueryState"
 export type UserType = {
   id: number,
   name: string,
-  email: string
+  email: string,
+  administrator?: boolean
 }
 
 export enum AuthIs {
@@ -50,12 +51,7 @@ type LoginPropsType = {
 export const useAuth = () => {
 
   const api = useCallback(async () => {
-    try {
-      return await Axios.get(`/api/user`).then(value => value.data)
-    } catch (error: any) {
-      console.log("status code:", error.status);
-      return false
-    }
+    return await Axios.get(`/api/user`).then(value => value.data)
   }, [])
   const { data, isLoading, isError } = useQuery<UserType>(queryKeys.auth, api, {
     retry: false

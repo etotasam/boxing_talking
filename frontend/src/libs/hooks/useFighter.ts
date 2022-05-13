@@ -69,11 +69,11 @@ export const useFetchFighters = () => {
   if (!paramPage) {
     paramPage = 1
   }
-  const fetcher = async ({ page, limit, searchWords }: FetcherPropsType) => {
+  const api = async ({ page, limit, searchWords }: FetcherPropsType) => {
     const res = await Axios.get<{ fighters: FighterType[], fighters_count: number }>(queryKeys.fighter, { params: { page, limit, ...searchWords } }).then(value => value.data)
     return res
   }
-  const { data: fighters, isLoading, isError, isPreviousData, refetch, isRefetching } = useQuery<{ fighters: FighterType[], fighters_count: number }>([queryKeys.fighter, { page: paramPage }], () => fetcher({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), { keepPreviousData: true })
+  const { data: fighters, isLoading, isError, isPreviousData, refetch, isRefetching } = useQuery<{ fighters: FighterType[], fighters_count: number }>([queryKeys.fighter, { page: paramPage }], () => api({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), { keepPreviousData: true, staleTime: Infinity })
   const data = fighters?.fighters
   const count = fighters?.fighters_count
   return { data, count, isLoading, isError, isPreviousData, refetch, isRefetching }

@@ -4,6 +4,7 @@
 
 :root {
   --comment-el-height: 0px;
+  --textarea-height: 35px;
 }
 
 @layer base {
@@ -31,14 +32,6 @@
   .t-bgcolor-white-opacity-5 {
     background-color: rgba(255, 255, 255, 0.5);
   }
-  /*
-  .fighter-color-red {
-    background-color: rgb(252, 113, 113);
-  }
-  .fighter-color-blue {
-    background-color: rgb(86, 153, 254);
-  }
-  */
   .t-comment-height {
     height: var(--comment-el-height);
   }
@@ -72,5 +65,13 @@
   }
   .t-flag-ua {
     background-image: url("./libs/images/flags/ukrine.svg");
+  }
+
+  .t-bg-none {
+    background: none;
+  }
+
+  .t-textarea-height {
+    height: var(--textarea-height);
   }
 }

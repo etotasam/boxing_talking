@@ -10,7 +10,8 @@ import { useAuth } from "@/libs/hooks/useAuth";
 // import { useFetchThisMatchComments } from "@/libs/hooks/useFetchThisMatchComments";
 import { usePostComment } from "@/libs/hooks/usePostComment";
 import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
-import { useCommentsOnMatch } from "@/libs/hooks/fetchers";
+// import { useCommentsOnMatch } from "@/libs/hooks/fetchers";
+import { useFetchCommentsOnMatch } from "@/libs/hooks/useComment";
 
 export const CommentsContainer = () => {
   const { data: authUser } = useAuth();
@@ -21,20 +22,26 @@ export const CommentsContainer = () => {
   const matchId = Number(query.get("id"));
 
   //? この試合へのコメントを取得
-  const { data: commentsData, mutate: commentsMutate } = useCommentsOnMatch(matchId);
+  const {
+    data: commentsData,
+    isLoading: isFetchingComments,
+    isFetching: isRefetchingComments,
+  } = useFetchCommentsOnMatch(matchId);
+  // const { data: commentsData, mutate: commentsMutate } = useCommentsOnMatch(matchId);
   // const { commentsState, fetchThisMatchComments, clearComments, cancelFetchComments } = useFetchThisMatchComments();
   const [hasComment, setHasComment] = useState<boolean | undefined>(undefined);
-  useEffect(() => {
-    if (!commentsData) return;
-    if (commentsData.length) {
-      setHasComment(true);
-    } else {
-      setHasComment(false);
-    }
-    return () => {
-      commentsMutate(undefined);
-    };
-  }, [commentsData]);
+
+  // useEffect(() => {
+  //   if (!commentsData) return;
+  //   if (commentsData.length) {
+  //     setHasComment(true);
+  //   } else {
+  //     setHasComment(false);
+  //   }
+  //   return () => {
+  //     commentsMutate(undefined);
+  //   };
+  // }, [commentsData]);
 
   //? post comments state
   const { commentPosting } = usePostComment();
@@ -43,8 +50,7 @@ export const CommentsContainer = () => {
   const { deleteCommentsState } = useCommentDelete();
 
   //? コメント欄をloadingにする条件
-  const commentsPending =
-    commentsData === undefined || commentPosting || deleteCommentsState.pending;
+  const commentsPending = isFetchingComments;
 
   // useEffect(() => {
   //   if (!matchId || isNaN(matchId)) return;
@@ -57,19 +63,17 @@ export const CommentsContainer = () => {
 
   return (
     <>
-      <div
-        className={`relative h-full overflow-y-auto box-border bg-white border border-gray-400 px-5 rounded-xl`}
-      >
+      <div className={`relative h-full overflow-y-auto box-border border-x border-gray-400 px-5`}>
         {commentsData &&
-          commentsData.map((props) => (
+          commentsData.map((comment) => (
             <CommentComponent
-              key={props.id}
-              props={props}
-              className={`${props.user.id === authUser!.id ? "bg-green-100" : ""}`}
+              key={comment.id}
+              commentData={comment}
+              className={`${comment.user.id === authUser?.id ? "" : ""}`}
             />
           ))}
         {hasComment === false && <div>コメントはありません</div>}
-        {commentsPending && <SpinnerModal />}
+        {(commentsPending || isRefetchingComments) && <SpinnerModal />}
       </div>
     </>
   );

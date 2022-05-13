@@ -11,14 +11,7 @@ const AdminOnly = () => {
   useEffect(() => {
     if (isLoading) return;
     if (!authUser) return navigate("/");
-    if (authUser) {
-      const { id, name, email } = authUser;
-      if (id !== 2 || name !== "テラシマ" || email !== "terashima@test.com") {
-        navigate("/");
-        return;
-      }
-      return;
-    }
+    if (!authUser.administrator) return navigate("/");
   }, [isLoading]);
   return <Outlet />;
 };

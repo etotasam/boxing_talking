@@ -6,10 +6,14 @@ import { useMessageController } from "@/libs/hooks/messageController";
 import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
 // import { fetchThisMatchesComments, LoadingOFF, LoadingON } from "@/store/slice/commentsStateSlice";
 
-//hooks
+//! components
+import { SpinnerModal } from "@/components/modal/SpinnerModal";
+
+//! hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-import { usePostComment } from "@/libs/hooks/usePostComment";
-import { useCommentsOnMatch } from "@/libs/hooks/fetchers";
+// import { usePostComment } from "@/libs/hooks/usePostComment";
+// import { useCommentsOnMatch } from "@/libs/hooks/fetchers";
+import { usePostComment } from "@/libs/hooks/useComment";
 
 export const PostCommentForm = ({
   matchId,
@@ -20,49 +24,76 @@ export const PostCommentForm = ({
 }) => {
   const dispatch = useDispatch();
   const { data: authUser } = useAuth();
-  const { postComment: customPostComment, commentPosting } = usePostComment();
+  // const { postComment: customPostComment, commentPosting } = usePostComment();
+  const {
+    postComment,
+    isLoading: isPostingComment,
+    isSuccess: isSuccessPostComment,
+  } = usePostComment();
   const { setMessageToModal } = useMessageController();
   const [comment, setComment] = React.useState<string>("");
   // const [posting, setPosting] = React.useState(IsCommentPosting.FALSE);
-  const { data, error, mutate: commentsMutate } = useCommentsOnMatch(matchId);
+  // const { data, error, mutate: commentsMutate } = useCommentsOnMatch(matchId);
 
-  const PostComment = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (commentPosting) return;
-    try {
-      // throw new Error("失敗しました");
-      // const status = await useCommentPost(userId, matchId, comment);
-      if (comment === "") {
-        setMessageToModal(MESSAGE.COMMENT_POST_NULL, ModalBgColorType.ERROR);
-        return;
-      }
-      await customPostComment(authUser!.id, matchId, comment);
-      setComment("");
-      await commentsMutate();
-      // await dispatch(fetchThisMatchesComments(matchId));
-      setMessageToModal(MESSAGE.COMMENT_POST_SUCCESSFULLY, ModalBgColorType.SUCCESS);
-    } catch (error: any) {
-      // dispatch(LoadingOFF());
-      setMessageToModal(MESSAGE.COMMENT_POST_FAILED, ModalBgColorType.ERROR);
+  //? コメントの投稿
+  const post = async () => {
+    if (!authUser) return;
+    setMessageToModal(MESSAGE.NULL, ModalBgColorType.NULL);
+    if (comment === "") {
+      setMessageToModal(MESSAGE.COMMENT_POST_NULL, ModalBgColorType.NOTICE);
+      return;
     }
+    postComment({ userId: authUser.id, matchId, comment });
   };
 
-  // elementRefを親に送る
+  const divRef = React.useRef(null);
+  //? コメント投稿が成功した時
+  useEffect(() => {
+    if (!isSuccessPostComment) return;
+    setComment("");
+    const commentDiv = divRef.current! as HTMLDivElement;
+    commentDiv.innerText = "";
+  }, [isSuccessPostComment]);
+
+  //? elementRefを親に送る(heightを調べる為)
   const comFormRef = React.useRef<HTMLDivElement>(null);
   useEffect(() => {
     getPostComRef(comFormRef);
   }, []);
 
+  //? 投稿コメントをセットする
+  const commentEl = React.useRef(comment);
+  const commentInput = (e: React.FormEvent<HTMLDivElement>) => {
+    const commentDiv = e.target as HTMLDivElement;
+    setComment(commentDiv.innerText);
+  };
+
+  const [isFocus, setIsFocus] = React.useState(false);
+
   return (
-    <div ref={comFormRef}>
-      <form onSubmit={PostComment}>
-        <textarea
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          className={"border border-gray-300 rounded py-2 px-3 resize-none w-[300px] h-[100px]"}
-        />
-        <button>送信</button>
-      </form>
+    <div ref={comFormRef} className="w-full pb-5">
+      <div className={`w-full flex items-end px-10`}>
+        <div
+          ref={divRef}
+          className={`w-full px-2 py-1 border-b outline-none text-stone-600 border-stone-600 ${
+            (isFocus || comment) && `bg-white`
+          }`}
+          contentEditable
+          onInput={commentInput}
+          onFocus={() => setIsFocus(true)}
+          onBlur={() => setIsFocus(false)}
+          dangerouslySetInnerHTML={{ __html: commentEl.current }}
+        ></div>
+        <div className="relative w-[80px] ml-3">
+          <button
+            onClick={post}
+            className="border rounded bg-stone-400 hover:bg-green-500 focus:bg-green-500 duration-300 text-stone-50 px-3 py-1 w-full h-[35px]"
+          >
+            送信
+          </button>
+          {isPostingComment && <SpinnerModal />}
+        </div>
+      </div>
     </div>
   );
 };

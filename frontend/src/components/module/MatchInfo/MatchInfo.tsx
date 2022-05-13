@@ -6,7 +6,7 @@ import { MatchesType } from "@/libs/apis/matchAPI";
 import { FighterType } from "@/libs/hooks/fetchers";
 
 //component
-import { TestChart } from "@/components/module/Chart";
+import { Chart } from "@/components/module/Chart";
 import { Fighter } from "../Fighter";
 
 //! hooks
@@ -96,32 +96,14 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
       {
         data: [thisMatch?.count_blue, thisMatch?.count_red],
         backgroundColor: [
-          mouseOnColor === MouseOn.BLUE ? `rgb(96 165 250)` : `#6c6c6c`,
-          mouseOnColor === MouseOn.RED ? `rgb(248 113 113)` : `#b1b1b1`,
+          mouseOnColor === MouseOn.BLUE ? `rgb(30 64 175)` : `rgb(147 197 253)`,
+          mouseOnColor === MouseOn.RED ? `rgb(185 28 28)` : `rgb(254 202 202)`,
         ],
         // borderColor: [
         //   mouseOnColor === MouseOn.BLUE ? `#d6d5ff` : `#717ffd`,
         //   mouseOnColor === MouseOn.RED ? `#ffe0e0` : `#ff6868`,
         // ],
         borderWidth: 0,
-      },
-    ],
-  };
-  // chartのデータ
-  const fighterData = {
-    labels: [thisMatch?.blue.name, thisMatch?.red.name],
-    datasets: [
-      {
-        data: [thisMatch?.count_blue, thisMatch?.count_red],
-        backgroundColor: [
-          mouseOnColor === MouseOn.BLUE ? `rgb(96 165 250)` : `rgb(191 219 254)`,
-          mouseOnColor === MouseOn.RED ? `rgb(248 113 113)` : `rgb(254 202 202)`,
-        ],
-        // borderColor: [
-        //   mouseOnColor === MouseOn.BLUE ? `#d6d5ff` : `#717ffd`,
-        //   mouseOnColor === MouseOn.RED ? `#ffe0e0` : `#ff6868`,
-        // ],
-        borderWidth: 1,
       },
     ],
   };
@@ -134,44 +116,38 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
     getElRefArray([chartRef]);
   }, []);
 
-  const test = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    // if (mouseOnColor === MouseOn.BLUE) return;
-    // e.stopPropagation();
-    setMouseOnColor(MouseOn.BLUE);
-  };
-
   return (
     <>
-      <div ref={chartRef} className="grid grid-cols-5 grid-rows-1">
-        <TestChart
+      <div ref={chartRef} className="grid grid-cols-5 grid-rows-1 border-b py-3 border-stone-400">
+        <Chart
           className="col-span-3 row-span-1"
           setMouseOnColor={(color: MouseOn) => setMouseOnColor(color)}
           matchData={matchData}
         />
         {thisMatch && (
-          <div className="col-span-2 row-span-1 grid grid-rows-[1fr_30px_1fr] bg-green-300">
-            <h1 className="col-span-1 row-span-1 row-start-2 bg-gray-600 text-center text-white text-xl">
+          <div className="col-span-2 row-span-1 grid grid-rows-[1fr_30px_1fr]">
+            <h1 className="col-span-1 row-span-1 row-start-2 bg-stone-800 text-center text-white text-xl">
               {dayjs(thisMatch.date).format("YYYY/M/D")}
             </h1>
             <div
-              className={`w-full col-span-1 row-span-1 flex items-center cursor-pointer ${
-                mouseOnColor === MouseOn.RED ? `bg-red-400` : `bg-stone-200`
-              } duration-500`}
+              className={`w-full col-span-1 row-span-1 flex items-center cursor-pointer duration-500 ${
+                mouseOnColor === MouseOn.RED ? `bg-red-700` : `bg-stone-800`
+              }`}
               onClick={() => voteToFighter("red")}
               onMouseOver={() => setMouseOnColor(MouseOn.RED)}
               onMouseOut={() => setMouseOnColor(MouseOn.NULL)}
             >
-              <Fighter fighter={thisMatch.red} className={`w-full`} />
+              <Fighter fighter={thisMatch.red} recordTextColor={`text-gray-200`} className={`w-full text-gray-200`} />
             </div>
             <div
-              className={`w-full col-span-1 row-span-1 flex items-center cursor-pointer ${
-                mouseOnColor === MouseOn.BLUE ? `bg-blue-400` : `bg-stone-200`
-              } duration-500`}
+              className={`w-full col-span-1 row-span-1 flex items-center cursor-pointer duration-500 ${
+                mouseOnColor === MouseOn.BLUE ? `bg-blue-800` : `bg-stone-800`
+              }`}
               onClick={() => voteToFighter("blue")}
               onMouseOver={() => setMouseOnColor(MouseOn.BLUE)}
               onMouseOut={() => setMouseOnColor(MouseOn.NULL)}
             >
-              <Fighter fighter={thisMatch.blue} className={`w-full`} />
+              <Fighter fighter={thisMatch.blue} recordTextColor={`text-gray-200`} className={`w-full text-gray-200`} />
             </div>
           </div>
         )}

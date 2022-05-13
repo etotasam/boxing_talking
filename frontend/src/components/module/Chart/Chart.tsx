@@ -15,10 +15,10 @@ type Props = {
   className?: string;
 };
 
-export function TestChart({ matchData, setMouseOnColor, className }: Props) {
+export function Chart({ matchData, setMouseOnColor, className }: Props) {
   const chartRef = React.useRef<any>(null);
   // callback of when mouse move on Graph
-  const click = (event: any): void => {
+  const mouseMove = (event: any): void => {
     if (chartRef !== null) {
       const el = getElementAtEvent(chartRef.current, event);
       if (el.length !== 0) {
@@ -89,8 +89,8 @@ export function TestChart({ matchData, setMouseOnColor, className }: Props) {
           plugins={[ChartDataLabels]}
           options={options}
           // onMouseLeave={() => setMouseOnColor(MouseOn.NULL)}
-          onMouseMove={click}
-          onClick={click}
+          onMouseMove={mouseMove}
+          // onClick={click}
         />
       </div>
     </div>

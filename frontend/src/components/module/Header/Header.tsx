@@ -24,22 +24,21 @@ export const Header = ({ className }: Props) => {
   const userName = authState ? authState.name : "ゲスト";
 
   return (
-    <header className={`${className} w-full px-10 flex justify-between items-center bg-black`}>
-      <h1 className="text-3xl text-white">BOXING TALKING</h1>
-      <div>
-        {currentPage !== "" && (
-          <CustomLink to="/" className="text-blue-400">
-            Homeへ
-          </CustomLink>
-          // <Link className="text-blue-400" to="/">
-          //   Homeへ
-          // </Link>
-        )}
-      </div>
-      <div className="relative">
-        <p className="whitespace-nowrap absolute top-[-30px] right-0 text-right text-white">{`${userName}さん`}</p>
-        <LoginOutComponent />
-        {/* <Notice /> */}
+    <header className={`${className} flex justify-center items-center px-10 bg-stone-900`}>
+      <div className="grid grid-rows-1 grid-cols-[250px_1fr_500px] w-full">
+        <h1 className="text-3xl text-white w-[250px] col-span-1">BOXING TALKING</h1>
+        <div className="col-span-1 pl-5 flex items-end">
+          {currentPage !== "" && (
+            <CustomLink to="/" className="text-white">
+              Home
+            </CustomLink>
+          )}
+        </div>
+        <div className="relative col-span-1 flex items-center justify-end">
+          <p className="whitespace-nowrap absolute top-[-30px] right-0 text-right text-white">{`${userName}さん`}</p>
+          <LoginOutComponent />
+          {/* <Notice /> */}
+        </div>
       </div>
     </header>
   );

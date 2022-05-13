@@ -50,10 +50,7 @@ export const Match = () => {
 
   // const { voteResultState } = useFetchVoteResult();
   const [thisMatch, setThisMatch] = useState<MatchesType>();
-  const getThisMatch = (
-    matches: MatchesType[],
-    matchIdByPrams: number
-  ): MatchesType | undefined => {
+  const getThisMatch = (matches: MatchesType[], matchIdByPrams: number): MatchesType | undefined => {
     return matches?.find((match) => match.id === matchIdByPrams);
   };
 
@@ -87,14 +84,13 @@ export const Match = () => {
       <div className="grid grid-cols-5">
         <div className="col-span-3">
           <MatchInfo getElRefArray={(arr: any[]) => setElRefArray((v) => [...v, ...arr])} />
-          {thisMatch && (
-            <PostCommentForm
-              getPostComRef={(el: any) => setElRefArray((v) => [...v, el])}
-              matchId={thisMatch.id}
-            />
-          )}
+          <div className="mt-10">
+            {thisMatch && (
+              <PostCommentForm getPostComRef={(el: any) => setElRefArray((v) => [...v, el])} matchId={thisMatch.id} />
+            )}
+          </div>
         </div>
-        <div className={`col-span-2 p-5 t-comment-height`}>
+        <div className={`col-span-2 pr-5 t-comment-height`}>
           <CommentsContainer />
         </div>
         {deleteCommentsState.confirmModalVisble && <CommentDeleteModal userId={authUser!.id} />}
