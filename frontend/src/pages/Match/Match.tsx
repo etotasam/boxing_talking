@@ -5,24 +5,24 @@ import { useNavigate } from "react-router-dom";
 
 //! components
 import { LayoutDefault } from "@/layout/LayoutDefault";
-import { CommentDeleteModal } from "@/components/modal/CommentDeleteModal";
 import { PostCommentForm } from "@/components/module/PostCommentForm";
 import { MatchInfo } from "@/components/module/MatchInfo";
 import { CommentsContainer } from "@/components/module/CommentsContainer";
 import { DataFetchErrorComponent } from "@/components/module/DataFetchErrorComponent";
 
 //! api
-import { MatchesType } from "@/libs/apis/matchAPI";
+import { MatchesType } from "@/libs/hooks/useMatches";
 
 //! custom hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
+// import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
+import { useDeleteComment } from "@/libs/hooks/useComment";
 import { useResizeCommentsComponent } from "@/libs/hooks/useResizeCommentsComponent";
 // import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 import { useFetchMatches } from "@/libs/hooks/useMatches";
 
 export const Match = () => {
-  const { deleteCommentsState } = useCommentDelete();
+  const { deleteComment } = useDeleteComment();
   const { data: authUser } = useAuth();
 
   const { search } = useLocation();
@@ -50,7 +50,10 @@ export const Match = () => {
 
   // const { voteResultState } = useFetchVoteResult();
   const [thisMatch, setThisMatch] = useState<MatchesType>();
-  const getThisMatch = (matches: MatchesType[], matchIdByPrams: number): MatchesType | undefined => {
+  const getThisMatch = (
+    matches: MatchesType[],
+    matchIdByPrams: number
+  ): MatchesType | undefined => {
     return matches?.find((match) => match.id === matchIdByPrams);
   };
 
@@ -86,14 +89,17 @@ export const Match = () => {
           <MatchInfo getElRefArray={(arr: any[]) => setElRefArray((v) => [...v, ...arr])} />
           <div className="mt-10">
             {thisMatch && (
-              <PostCommentForm getPostComRef={(el: any) => setElRefArray((v) => [...v, el])} matchId={thisMatch.id} />
+              <PostCommentForm
+                getPostComRef={(el: any) => setElRefArray((v) => [...v, el])}
+                matchId={thisMatch.id}
+              />
             )}
           </div>
         </div>
         <div className={`col-span-2 pr-5 t-comment-height`}>
           <CommentsContainer />
         </div>
-        {deleteCommentsState.confirmModalVisble && <CommentDeleteModal userId={authUser!.id} />}
+        {/* {deleteCommentsState.confirmModalVisble && <CommentDeleteModal userId={authUser!.id} />} */}
       </div>
     </LayoutDefault>
   );

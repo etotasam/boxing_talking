@@ -1,14 +1,6 @@
 
-// auth user
-import { AuthUserStateType, AuthIs } from "@/store/slice/authUserSlice"
-import { UserType } from "@/libs/apis/authAPI"
-
-// comments of match
-import { InitialStateProps, CommentType } from "@/store/slice/commentsStateSlice"
-
-
-// fighter
-import { FighterType, Nationality, Stance } from "@/libs/hooks/fetchers"
+import { UserType } from "@/libs/hooks/useAuth"
+import { FighterType, Nationality, Stance } from "@/libs/hooks/useFighter"
 
 export const test_data_fighter_1: FighterType = {
   id: 1,
@@ -51,10 +43,4 @@ export const comments = [{
   comment: comment,
   created_at: new Date("2202/04/12")
 }]
-export const commentsState: InitialStateProps = {
-  comments: comments,
-  pending: false,
-  hasNotComments: false,
-  error: "エラーです"
-}
 

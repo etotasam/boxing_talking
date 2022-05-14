@@ -8,7 +8,7 @@ import { useAuth } from "@/libs/hooks/useAuth";
 //! custom hooks
 import { useDeleteComment } from "@/libs/hooks/useComment";
 
-import { UserType } from "@/libs/apis/authAPI";
+import { UserType } from "@/libs/hooks/useAuth";
 
 type PropsType = {
   commentData: {

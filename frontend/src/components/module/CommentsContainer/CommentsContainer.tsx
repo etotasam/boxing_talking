@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from "react";
-
-// component
+//! component
 import { CommentComponent } from "@/components/module/CommentComponent";
 import { SpinnerModal } from "@/components/modal/SpinnerModal";
 import { useLocation } from "react-router-dom";
-
-//hooks
+//!hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-// import { useFetchThisMatchComments } from "@/libs/hooks/useFetchThisMatchComments";
-import { usePostComment } from "@/libs/hooks/usePostComment";
-import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
-// import { useCommentsOnMatch } from "@/libs/hooks/fetchers";
 import { useFetchCommentsOnMatch } from "@/libs/hooks/useComment";
 
 export const CommentsContainer = () => {
@@ -27,39 +21,10 @@ export const CommentsContainer = () => {
     isLoading: isFetchingComments,
     isFetching: isRefetchingComments,
   } = useFetchCommentsOnMatch(matchId);
-  // const { data: commentsData, mutate: commentsMutate } = useCommentsOnMatch(matchId);
-  // const { commentsState, fetchThisMatchComments, clearComments, cancelFetchComments } = useFetchThisMatchComments();
   const [hasComment, setHasComment] = useState<boolean | undefined>(undefined);
-
-  // useEffect(() => {
-  //   if (!commentsData) return;
-  //   if (commentsData.length) {
-  //     setHasComment(true);
-  //   } else {
-  //     setHasComment(false);
-  //   }
-  //   return () => {
-  //     commentsMutate(undefined);
-  //   };
-  // }, [commentsData]);
-
-  //? post comments state
-  const { commentPosting } = usePostComment();
-
-  // comment delete state
-  const { deleteCommentsState } = useCommentDelete();
 
   //? コメント欄をloadingにする条件
   const commentsPending = isFetchingComments;
-
-  // useEffect(() => {
-  //   if (!matchId || isNaN(matchId)) return;
-  //   fetchThisMatchComments(matchId);
-  //   return () => {
-  //     clearComments();
-  //     cancelFetchComments();
-  //   };
-  // }, [matchId]);
 
   return (
     <>

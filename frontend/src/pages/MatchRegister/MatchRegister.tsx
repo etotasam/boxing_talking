@@ -1,32 +1,25 @@
 import React from "react";
-import { isAxiosError } from "@/libs/axios";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-import { MESSAGE } from "@/libs/utils";
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { queryKeys } from "@/libs/queryKeys";
 //! type
-import { FighterType } from "@/libs/hooks/fetchers";
-
+import { FighterType } from "@/libs/hooks/useFighter";
 //! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
-
-//! api
-// import { registerMatchAPI } from "@/libs/apis/matchAPI";
-
 //! hooks
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useFetchFighters, limit } from "@/libs/hooks/useFighter";
-import { useMessageController } from "@/libs/hooks/messageController";
 import { useRegisterMatch } from "@/libs/hooks/useMatches";
-
 //! component
 import { Button } from "@/components/atomic/Button";
 import { Fighter } from "@/components/module/Fighter";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 import { FighterSearchForm } from "@/components/module/FighterSearchForm";
 import { PendingModal } from "@/components/modal/PendingModal";
+//! message contoller
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { MESSAGE } from "@/libs/utils";
 
 type MatchFightersDataType = {
   red: FighterType | null;
@@ -64,8 +57,7 @@ export const MatchRegister = () => {
     return acc;
   }, "");
 
-  const { data: fighterData, count: fightersCount, isLoading: isFetchingFighters, isPreviousData } = useFetchFighters();
-  const { setMessageToModal } = useMessageController();
+  const { data: fighterData, count: fightersCount, isPreviousData } = useFetchFighters();
 
   const clearChecked = () => {
     setMatchData((oldData) => {
@@ -76,13 +68,16 @@ export const MatchRegister = () => {
     return Object.values(matchData.fighters).some((fighter) => Number(fighter?.id) === Number(id));
   };
 
-  const { state: matchData, setter: setMatchData } = useQueryState<MatchDataType>(queryKeys.registerMatchData, {
-    fighters: {
-      red: null,
-      blue: null,
-    },
-    matchDate: null,
-  });
+  const { state: matchData, setter: setMatchData } = useQueryState<MatchDataType>(
+    queryKeys.registerMatchData,
+    {
+      fighters: {
+        red: null,
+        blue: null,
+      },
+      matchDate: null,
+    }
+  );
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, fighter: FighterType) => {
     if (e.target.checked) {
@@ -109,7 +104,9 @@ export const MatchRegister = () => {
       return;
     }
     //? checked状態のobjectをクリックした時はチェックを外す
-    const fightersState = (Object.keys(matchData.fighters) as Array<keyof MatchFightersDataType>).reduce((acc, key) => {
+    const fightersState = (
+      Object.keys(matchData.fighters) as Array<keyof MatchFightersDataType>
+    ).reduce((acc, key) => {
       if (matchData.fighters[key]?.id === fighter.id) {
         return { ...acc, [key]: null };
       }
@@ -166,7 +163,9 @@ export const MatchRegister = () => {
             {pageCountArray.map((page) => (
               <div key={page} className="text-center flex justify-center items-center">
                 <Link
-                  className={`ml-3 px-2 ${page === paramPage ? `bg-green-500 text-white` : `bg-stone-200`}`}
+                  className={`ml-3 px-2 ${
+                    page === paramPage ? `bg-green-500 text-white` : `bg-stone-200`
+                  }`}
                   to={`/match/register?page=${page}${params}`}
                 >
                   {page}
@@ -223,11 +222,17 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
     <div className="z-10 w-[100vw] fixed top-[50px] left-0 bg-stone-600">
       <div className="flex w-full h-[150px] p-3">
         {matchData.fighters.red ? (
-          <Fighter className="w-1/2 bg-stone-100" cornerColor="red" fighter={matchData.fighters.red} />
+          <Fighter
+            className="w-1/2 bg-stone-100"
+            cornerColor="red"
+            fighter={matchData.fighters.red}
+          />
         ) : (
           <div className="w-1/2" />
         )}
-        {matchData.fighters.blue && <Fighter className="w-1/2 bg-stone-100" fighter={matchData.fighters.blue} />}
+        {matchData.fighters.blue && (
+          <Fighter className="w-1/2 bg-stone-100" fighter={matchData.fighters.blue} />
+        )}
       </div>
       {isSelectFighters && matchData.matchDate && (
         <button
@@ -243,7 +248,9 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
             matchData.matchDate ? `bg-stone-600` : `bg-red-500`
           }`}
         >
-          {matchData.matchDate ? dayjs(matchData.matchDate).format("YYYY/M/D") : "試合日が未設定です"}
+          {matchData.matchDate
+            ? dayjs(matchData.matchDate).format("YYYY/M/D")
+            : "試合日が未設定です"}
         </div>
       )}
     </div>

@@ -1,7 +1,6 @@
 import React from "react"
 import { useQueryState } from "./useQueryState"
 import { MESSAGE } from "@/libs/utils"
-import { useQueryClient } from "react-query"
 
 const queryKeys = {
   toastModalMessage: "toastModalMessage"
@@ -21,19 +20,14 @@ type ToastModalMessageType = {
 }
 
 export const useToastModal = () => {
-  const queryClient = useQueryClient()
-  // queryClient.setQueryData<ToastModalMessageType>(queryKeys.toastModalMessage, {message, bgColor})
 
-  // const { state } = useQueryState<ToastModalMessageType>(queryKeys.toastModalMessage, { message, bgColor })
-
+  const { state, setter } = useQueryState<ToastModalMessageType>(queryKeys.toastModalMessage, { message: MESSAGE.NULL, bgColor: ModalBgColorType.NULL })
   const setToastModalMessage = ({ message, bgColor }: ToastModalMessageType) => {
-    queryClient.setQueryData<ToastModalMessageType>(queryKeys.toastModalMessage, { message, bgColor })
+    setter({ message, bgColor })
   }
+  const { message, bgColor } = state
 
-  const res = queryClient.getQueryData<ToastModalMessageType>(queryKeys.toastModalMessage)
+  const clearToastModaleMessage = () => setter({ message: MESSAGE.NULL, bgColor: ModalBgColorType.NULL })
 
-  if (!res) return
-  const { message, bgColor } = res!
-
-  return { setToastModalMessage, message, bgColor }
+  return { setToastModalMessage, message, bgColor, clearToastModaleMessage }
 }

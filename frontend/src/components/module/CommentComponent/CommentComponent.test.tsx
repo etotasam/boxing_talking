@@ -1,8 +1,9 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { CommentComponent } from ".";
 
-// hooks
-import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
+//! hooks
+// import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
+import { useDeleteComment } from "@/libs/hooks/useComment";
 import { useAuth } from "@/libs/hooks/useAuth";
 
 // コメント投稿ユーザー & ログインユーザー
@@ -25,14 +26,14 @@ let data: typeof user;
 jest.mock("@/libs/hooks/useAuth");
 const useAuthMock = useAuth as jest.Mock;
 
-jest.mock("@/libs/hooks/useCommentDelete");
-const useCommentDeleteMock = useCommentDelete as jest.Mock;
+jest.mock("@/libs/hooks/useComment");
+const useDeleteCommentMock = useDeleteComment as jest.Mock;
 
 describe("CommentComponentのテスト", () => {
   beforeEach(() => {
     data = user;
     useAuthMock.mockReturnValue({ data });
-    useCommentDeleteMock.mockReturnValue(jest.fn());
+    useDeleteCommentMock.mockReturnValue(jest.fn());
   });
 
   afterEach(() => {

@@ -5,9 +5,11 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { act, renderHook } from "@testing-library/react-hooks";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { queryKeys } from "@/libs/queryKeys";
+//! message contoller
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { MESSAGE } from "@/libs/utils";
+
 //! hooks
-// import { useFighters } from "@/libs/hooks/fetchers";
-import { useMessageController } from "@/libs/hooks/messageController";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import {
   useFetchFighters,
@@ -17,7 +19,7 @@ import {
 } from "@/libs/hooks/useFighter";
 
 //! api
-import { updateFighter } from "@/libs/apis/fighterAPI";
+// import { updateFighter } from "@/libs/apis/fighterAPI";
 
 //! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
@@ -56,13 +58,8 @@ jest.mock("@/libs/hooks/useFighter");
 const useFetchFightersMock = useFetchFighters as jest.Mock;
 const useUpdateFighterMock = useUpdateFighter as jest.Mock;
 const useDeleteFighterMock = useDeleteFighter as jest.Mock;
-// const useCountFightersMock = useCountFighters as jest.Mock;
 jest.mock("@/libs/hooks/useQueryState");
 const useQueryStateMock = useQueryState as jest.Mock;
-jest.mock("@/libs/hooks/messageController");
-const useMessageControllerMock = useMessageController as jest.Mock;
-jest.mock("@/libs/apis/fighterAPI");
-const updateFighterMock = updateFighter as jest.Mock;
 
 //! layout mock
 jest.mock("@/layout/LayoutForEditPage");
@@ -85,7 +82,7 @@ const clientStub = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
-      //※refetchが走らないように
+      //?※refetchが走らないように
       staleTime: Infinity,
     },
   },
@@ -139,17 +136,11 @@ describe("FighterEditのテスト", () => {
       updateFighter: jest.fn(),
       isLoading: false,
     });
-    useMessageControllerMock.mockReturnValue({ setMessageToModal: jest.fn() });
-    updateFighterMock.mockReturnValue(jest.fn());
 
     useDeleteFighterMock.mockReturnValue({
       deleteFighter: jest.fn(),
       isLoading: false,
     });
-
-    // useCountFightersMock.mockReturnValue({
-    //   data: 10,
-    // });
 
     //! layout mock implement
     LayoutForEditPageMock.mockImplementation(({ children }: { children: ReactNode }) => {

@@ -5,8 +5,7 @@ import { Axios, isAxiosError } from "../axios"
 import { useNavigate } from "react-router-dom";
 
 //! message contoller
-import { useMessageController } from "@/libs/hooks/messageController";
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
+import { useToastModal, ModalBgColorType } from "./useToastModal";
 import { MESSAGE } from "@/libs/utils";
 
 
@@ -62,14 +61,14 @@ export const useAuth = () => {
 
 export const useLogin = () => {
   const queryClient = useQueryClient()
-  const { setMessageToModal } = useMessageController()
+  const { setToastModalMessage } = useToastModal()
   const api = useCallback(async (props: LoginPropsType) => {
     try {
       const res = await Axios.post<UserType>("api/login", { ...props }).then(value => value.data)
-      setMessageToModal(MESSAGE.MESSAGE_LOGIN_SUCCESS, ModalBgColorType.SUCCESS)
+      setToastModalMessage({ message: MESSAGE.MESSAGE_LOGIN_SUCCESS, bgColor: ModalBgColorType.SUCCESS })
       queryClient.setQueryData(queryKeys.auth, res)
     } catch (error) {
-      setMessageToModal(MESSAGE.MESSAGE_LOGIN_FAILD, ModalBgColorType.ERROR)
+      setToastModalMessage({ message: MESSAGE.MESSAGE_LOGIN_FAILD, bgColor: ModalBgColorType.ERROR })
     }
   }, [])
   const { mutate, isLoading } = useMutation(api)
@@ -92,15 +91,15 @@ export const useLogin = () => {
 export const useLogout = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient()
-  const { setMessageToModal } = useMessageController()
+  const { setToastModalMessage } = useToastModal()
   const api = useCallback(async ({ userId }: { userId: number }) => {
     try {
       await Axios.post<void>("api/logout", { user_id: userId }).then(value => value.data)
       queryClient.setQueryData<boolean>(queryKeys.auth, false)
-      setMessageToModal(MESSAGE.MESSAGE_LOGOUT, ModalBgColorType.NULL)
+      setToastModalMessage({ message: MESSAGE.MESSAGE_LOGOUT, bgColor: ModalBgColorType.NULL })
       navigate("/");
     } catch (error) {
-      setMessageToModal(MESSAGE.MESSAGE_FAILD_LOGOUT, ModalBgColorType.ERROR)
+      setToastModalMessage({ message: MESSAGE.MESSAGE_FAILD_LOGOUT, bgColor: ModalBgColorType.ERROR })
     }
   }, [])
 

@@ -1,12 +1,11 @@
 import { useCallback } from "react"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { queryKeys } from "@/libs/queryKeys"
-import { Axios, isAxiosError } from "../axios"
-import { useLocation, useNavigate } from "react-router-dom";
+import { Axios } from "../axios"
+import { useLocation } from "react-router-dom";
 
 //! message contoller
-import { useMessageController } from "@/libs/hooks/messageController";
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 import { MESSAGE } from "@/libs/utils";
 
 //! types
@@ -47,7 +46,8 @@ export const usePostComment = () => {
     comment: string
   }
   const queryClient = useQueryClient()
-  const { setMessageToModal } = useMessageController()
+  // const { setMessageToModal } = useMessageController()
+  const { setToastModalMessage } = useToastModal()
   const api = useCallback(async ({ userId, matchId, comment }: ApiPropsType) => {
     await Axios.post(queryKeys.comments, {
       user_id: userId,
@@ -62,10 +62,10 @@ export const usePostComment = () => {
     mutate({ userId, matchId, comment }, {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.comments, { id: matchId }])
-        setMessageToModal(MESSAGE.COMMENT_POST_SUCCESSFULLY, ModalBgColorType.SUCCESS)
+        setToastModalMessage({ message: MESSAGE.COMMENT_POST_SUCCESSFULLY, bgColor: ModalBgColorType.SUCCESS })
       },
       onError: () => {
-        setMessageToModal(MESSAGE.COMMENT_POST_FAILED, ModalBgColorType.ERROR)
+        setToastModalMessage({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: ModalBgColorType.ERROR })
       }
     })
   }
@@ -75,14 +75,14 @@ export const usePostComment = () => {
 
 //! コメントの削除
 
-
 export const useDeleteComment = () => {
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   let matchIdOnParam = Number(query.get("id"));
 
   type ApiPropsType = { userId: number, commentId: number }
-  const { setMessageToModal } = useMessageController()
+  // const { setMessageToModal } = useMessageController()
+  const { setToastModalMessage } = useToastModal()
   const queryClient = useQueryClient()
 
   const api = useCallback(async ({ userId, commentId }: ApiPropsType) => {
@@ -99,10 +99,10 @@ export const useDeleteComment = () => {
     mutate({ userId, commentId }, {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.comments, { id: matchIdOnParam }])
-        setMessageToModal(MESSAGE.COMMENT_DELETED, ModalBgColorType.DELETE)
+        setToastModalMessage({ message: MESSAGE.COMMENT_DELETED, bgColor: ModalBgColorType.DELETE })
       },
       onError: () => {
-        setMessageToModal(MESSAGE.COMMENT_DELETE_FAILED, ModalBgColorType.ERROR)
+        setToastModalMessage({ message: MESSAGE.COMMENT_DELETE_FAILED, bgColor: ModalBgColorType.ERROR })
       }
     })
   }

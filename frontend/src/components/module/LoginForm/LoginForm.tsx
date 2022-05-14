@@ -1,13 +1,9 @@
 import { CustomButton } from "@/components/atomic/Button";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-
-// hooks
-import { useMessageController } from "@/libs/hooks/messageController";
-// import { useLogin } from "@/libs/hooks/useLogin";
-import {useLogin} from "@/libs/hooks/useAuth"
-
-// component
+//! hooks
+import { useLogin } from "@/libs/hooks/useAuth";
+//! component
 import { SpinnerModal } from "@/components/modal/SpinnerModal";
 
 export const LoginForm = () => {
@@ -18,7 +14,7 @@ export const LoginForm = () => {
   const locationState = location.state;
   const [state, setState] = useState(locationState as { message: string } | null);
   // const { login, loginState } = useLogin();
-  const {login, isLoading: isAuthChecking} = useLogin()
+  const { login, isLoading: isAuthChecking } = useLogin();
 
   const [isNotice, setIsNotice] = useState(false);
   const [noticeMsg, setNoticeMsg] = useState("");

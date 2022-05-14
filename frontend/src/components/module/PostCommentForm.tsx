@@ -1,18 +1,11 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { commentPostAPI } from "@/libs/apis/commentPostAPI";
-import { STATUS, MESSAGE } from "@/libs/utils";
-import { useMessageController } from "@/libs/hooks/messageController";
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
-// import { fetchThisMatchesComments, LoadingOFF, LoadingON } from "@/store/slice/commentsStateSlice";
-
+//! message contoller
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { MESSAGE } from "@/libs/utils";
 //! components
 import { SpinnerModal } from "@/components/modal/SpinnerModal";
-
 //! hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-// import { usePostComment } from "@/libs/hooks/usePostComment";
-// import { useCommentsOnMatch } from "@/libs/hooks/fetchers";
 import { usePostComment } from "@/libs/hooks/useComment";
 
 export const PostCommentForm = ({
@@ -22,7 +15,6 @@ export const PostCommentForm = ({
   matchId: number;
   getPostComRef: (el: any) => void;
 }) => {
-  const dispatch = useDispatch();
   const { data: authUser } = useAuth();
   // const { postComment: customPostComment, commentPosting } = usePostComment();
   const {
@@ -30,7 +22,7 @@ export const PostCommentForm = ({
     isLoading: isPostingComment,
     isSuccess: isSuccessPostComment,
   } = usePostComment();
-  const { setMessageToModal } = useMessageController();
+  const { setToastModalMessage } = useToastModal();
   const [comment, setComment] = React.useState<string>("");
   // const [posting, setPosting] = React.useState(IsCommentPosting.FALSE);
   // const { data, error, mutate: commentsMutate } = useCommentsOnMatch(matchId);
@@ -38,9 +30,12 @@ export const PostCommentForm = ({
   //? コメントの投稿
   const post = async () => {
     if (!authUser) return;
-    setMessageToModal(MESSAGE.NULL, ModalBgColorType.NULL);
+    setToastModalMessage({ message: MESSAGE.NULL, bgColor: ModalBgColorType.NULL });
     if (comment === "") {
-      setMessageToModal(MESSAGE.COMMENT_POST_NULL, ModalBgColorType.NOTICE);
+      setToastModalMessage({
+        message: MESSAGE.COMMENT_POST_NULL,
+        bgColor: ModalBgColorType.NOTICE,
+      });
       return;
     }
     postComment({ userId: authUser.id, matchId, comment });

@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { queryKeys } from "@/libs/queryKeys";
-import { Stance, Nationality, FighterType } from "@/libs/hooks/fetchers";
+import { Nationality } from "@/libs/hooks/useFighter";
 import { useQueryClient, useQuery } from "react-query";
-import { useMessageController } from "@/libs/hooks/messageController";
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
-import { MESSAGE } from "@/libs/utils";
 //! custom hook
 import { useQueryState } from "@/libs/hooks/useQueryState";
+//! message contoller
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { MESSAGE } from "@/libs/utils";
 
 type Props = {
   onSubmit: () => void;
   className?: string;
   isUpdatingFighterData?: boolean;
 };
+
+export enum Stance {
+  Southpaw = "southpaw",
+  Orthodox = "orthodox",
+}
 
 const countryUndefined = "国籍の選択";
 
@@ -30,7 +35,7 @@ export const initialFighterInfoState: any = {
 };
 
 export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: Props) => {
-  const { setMessageToModal } = useMessageController();
+  const { setToastModalMessage } = useToastModal();
   const queryClient = useQueryClient();
   //? ReactQueryでFighterEditとデータを共有
   // const [fighterEditData, setFighterData] = useQueryState<any>(
@@ -64,7 +69,7 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
   const sendData = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (country === undefined) {
-      setMessageToModal(MESSAGE.INVALID_COUNTRY, ModalBgColorType.NOTICE);
+      setToastModalMessage({ message: MESSAGE.INVALID_COUNTRY, bgColor: ModalBgColorType.NOTICE });
       return;
     }
     queryClient.setQueryData(queryKeys.fighterEditData, {

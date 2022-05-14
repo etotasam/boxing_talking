@@ -1,20 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Axios } from "@/libs/axios";
 import { useNavigate } from "react-router-dom";
-import { AuthIs } from "@/store/slice/authUserSlice";
-import { MESSAGE } from "@/libs/utils";
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
 
 //! hooks
-// import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useAuth } from "@/libs/hooks/useAuth";
-// import { useAuth } from "@/libs/hooks/useAuth";
-import { useMessageController } from "@/libs/hooks/messageController";
 
 //! components
 import { LayoutDefault } from "@/layout/LayoutDefault";
 import { MatchComponent } from "@/components/module/MatchComponent";
+
+//! message contoller
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { MESSAGE } from "@/libs/utils";
 
 export const Home = React.memo(() => {
   const navigate = useNavigate();
@@ -27,11 +25,11 @@ export const Home = React.memo(() => {
     console.log(data);
   }, [authUser]);
 
-  const { setMessageToModal } = useMessageController();
+  const { setToastModalMessage } = useToastModal();
   const click = useCallback(
     (id: number) => {
       if (!authUser) {
-        setMessageToModal(MESSAGE.NOT_AUTHORIZED, ModalBgColorType.ERROR);
+        setToastModalMessage({ message: MESSAGE.NOT_AUTHORIZED, bgColor: ModalBgColorType.ERROR });
         return;
       }
       navigate(`/match?id=${id}`);
@@ -46,7 +44,11 @@ export const Home = React.memo(() => {
         {isErrorOnFetchMatches && <MatchesFetchErrorComponent />}
         {matchesState &&
           matchesState.map((match) => (
-            <MatchComponent key={match.id} onClick={(matchId: number) => click(matchId)} match={match} />
+            <MatchComponent
+              key={match.id}
+              onClick={(matchId: number) => click(matchId)}
+              match={match}
+            />
           ))}
       </div>
     </LayoutDefault>

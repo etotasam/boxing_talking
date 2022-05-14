@@ -2,27 +2,20 @@ import React, { useEffect, useState } from "react";
 // import { fetchFighterAPI } from "@/libs/apis/fetchFightersAPI";
 import { Axios, isAxiosError } from "@/libs/axios";
 import { isEqual } from "lodash";
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
-import { MESSAGE } from "@/libs/utils";
 import { queryKeys } from "@/libs/queryKeys";
 import { initialFighterInfoState } from "@/components/module/FighterEditForm";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-//! type
-import { FighterType } from "@/libs/hooks/fetchers";
-
-//! api
-import { updateFighter } from "@/libs/apis/fighterAPI";
-
+//! message contoller
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { MESSAGE } from "@/libs/utils";
 //! hooks
-// import { useFighters } from "@/libs/hooks/fetchers";
-import { useMessageController } from "@/libs/hooks/messageController";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import {
   useFetchFighters,
   useUpdateFighter,
   useDeleteFighter,
-  // useCountFighters,
   limit,
+  FighterType,
 } from "@/libs/hooks/useFighter";
 
 //! layout
@@ -80,7 +73,7 @@ export const FighterEdit = () => {
     };
   }, []);
 
-  const { setMessageToModal } = useMessageController();
+  const { setToastModalMessage } = useToastModal();
 
   //? 選手データの取得(react query)
   const {
@@ -115,7 +108,10 @@ export const FighterEdit = () => {
     if (isSelectedFighter) {
       deleteFighter(fighterEidtData);
     } else {
-      setMessageToModal(MESSAGE.NO_SELECT_EDIT_FIGHTER, ModalBgColorType.NOTICE);
+      setToastModalMessage({
+        message: MESSAGE.NO_SELECT_EDIT_FIGHTER,
+        bgColor: ModalBgColorType.NOTICE,
+      });
     }
   };
 
@@ -128,12 +124,15 @@ export const FighterEdit = () => {
     const latestFighterDataFromForm = getLetestFighterDataFromForm();
     //? 選手を選択していない場合return
     if (!isSelectedFighter) {
-      setMessageToModal(MESSAGE.NO_SELECT_EDIT_FIGHTER, ModalBgColorType.NOTICE);
+      setToastModalMessage({
+        message: MESSAGE.NO_SELECT_EDIT_FIGHTER,
+        bgColor: ModalBgColorType.NOTICE,
+      });
       return;
     }
     //? 選手dataを編集していない場合return
     if (isEqual(getFighterWithId(latestFighterDataFromForm.id), latestFighterDataFromForm)) {
-      setMessageToModal(MESSAGE.NOT_EDIT_FIGHTER, ModalBgColorType.NULL);
+      setToastModalMessage({ message: MESSAGE.NOT_EDIT_FIGHTER, bgColor: ModalBgColorType.NULL });
       return;
     }
     //? 選手データ編集実行
@@ -181,7 +180,10 @@ export const FighterEdit = () => {
                     onChange={() => setFighterEditData(fighter)}
                     data-testid={`input-${fighter.id}`}
                   />
-                  <label className={"w-[90%] cursor-pointer"} htmlFor={`${fighter.id}_${fighter.name}`}>
+                  <label
+                    className={"w-[90%] cursor-pointer"}
+                    htmlFor={`${fighter.id}_${fighter.name}`}
+                  >
                     <Fighter fighter={fighter} />
                   </label>
                   {conditionVisibleSpinner(fighter) && <SpinnerModal className="" />}
@@ -219,7 +221,9 @@ const Paginate = ({ pageCountArray, params, currentPage }: PaginatePropsType) =>
         {pageCountArray.length >= 2 &&
           pageCountArray.map((page) => (
             <div
-              className={`ml-3 px-2 ${page === currentPage ? `bg-green-500 text-white` : `bg-stone-200`}`}
+              className={`ml-3 px-2 ${
+                page === currentPage ? `bg-green-500 text-white` : `bg-stone-200`
+              }`}
               key={page}
             >
               <Link to={`/fighter/edit?page=${page}${params}`}>{page}</Link>

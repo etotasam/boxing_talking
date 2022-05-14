@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 //types
-import { MatchesType } from "@/libs/apis/matchAPI";
-import { FighterType } from "@/libs/hooks/fetchers";
+import { MatchesType } from "@/libs/hooks/useMatches";
+import { FighterType } from "@/libs/hooks/useFighter";
 
 //component
 import { Chart } from "@/components/module/Chart";
@@ -12,7 +12,7 @@ import { Fighter } from "../Fighter";
 //! hooks
 // import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 import { useFetchMatches } from "@/libs/hooks/useMatches";
-import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
+// import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
 import dayjs from "dayjs";
 
 type Props = {
@@ -46,13 +46,13 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
   };
 
   //? ユーザが勝敗を予想した試合
-  const { userVoteState } = useFetchUserVote();
+  // const { userVoteState } = useFetchUserVote();
 
   //? ユーザがこの試合の勝敗予測をした、また、そのデータ
-  const getUsersVoteThisMatchById = (matchId: number) => {
-    if (!userVoteState.votes) return;
-    return userVoteState.votes.find((el) => el.match_id === matchId);
-  };
+  // const getUsersVoteThisMatchById = (matchId: number) => {
+  //   if (!userVoteState.votes) return;
+  //   return userVoteState.votes.find((el) => el.match_id === matchId);
+  // };
 
   //? 投票先(forontend側)
   const [voteIs, setVoteIs] = React.useState<"red" | "blue" | undefined>();
@@ -63,8 +63,8 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
     const match = getThisMatch(matchesData, matchId);
     setThisMatch(match);
     if (!match) return;
-    const userVoteData = getUsersVoteThisMatchById(match.id);
-    setVoteIs(userVoteData?.vote_for);
+    // const userVoteData = getUsersVoteThisMatchById(match.id);
+    // setVoteIs(userVoteData?.vote_for);
   }, [matchesData]);
 
   //? 投票
@@ -137,7 +137,11 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
               onMouseOver={() => setMouseOnColor(MouseOn.RED)}
               onMouseOut={() => setMouseOnColor(MouseOn.NULL)}
             >
-              <Fighter fighter={thisMatch.red} recordTextColor={`text-gray-200`} className={`w-full text-gray-200`} />
+              <Fighter
+                fighter={thisMatch.red}
+                recordTextColor={`text-gray-200`}
+                className={`w-full text-gray-200`}
+              />
             </div>
             <div
               className={`w-full col-span-1 row-span-1 flex items-center cursor-pointer duration-500 ${
@@ -147,7 +151,11 @@ export const MatchInfo = ({ getElRefArray }: Props) => {
               onMouseOver={() => setMouseOnColor(MouseOn.BLUE)}
               onMouseOut={() => setMouseOnColor(MouseOn.NULL)}
             >
-              <Fighter fighter={thisMatch.blue} recordTextColor={`text-gray-200`} className={`w-full text-gray-200`} />
+              <Fighter
+                fighter={thisMatch.blue}
+                recordTextColor={`text-gray-200`}
+                className={`w-full text-gray-200`}
+              />
             </div>
           </div>
         )}

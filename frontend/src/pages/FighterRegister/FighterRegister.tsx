@@ -1,10 +1,7 @@
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
-import { MESSAGE } from "@/libs/utils";
-// import { useQueryClient } from "react-query";
 import { initialFighterInfoState } from "@/components/module/FighterEditForm";
 import { useEffect } from "react";
 //! type
-import { FighterType } from "@/libs/hooks/fetchers";
+import { FighterType } from "@/libs/hooks/useFighter";
 
 //! component
 import { FighterEditForm } from "@/components/module/FighterEditForm";
@@ -15,14 +12,17 @@ import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 
 //! cutom hooks
 import { useRegisterFighter, useFetchFighters } from "@/libs/hooks/useFighter";
-import { useMessageController } from "@/libs/hooks/messageController";
 import { queryKeys } from "@/libs/queryKeys";
 import { useQueryState } from "@/libs/hooks/useQueryState";
+
+//! message contoller
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { MESSAGE } from "@/libs/utils";
 
 export const FighterRegister = () => {
   // const queryClient = useQueryClient();
   const { registerFighter, isLoading: isRegisterFighterPending } = useRegisterFighter();
-  const { setMessageToModal } = useMessageController();
+  const { setToastModalMessage } = useToastModal();
   const { data: fightersData } = useFetchFighters();
   const { getLatestState: getLatestFighterDataFromForm, setter: setFighterDataFromForm } =
     useQueryState<FighterType>(queryKeys.fighterEditData);
@@ -34,7 +34,10 @@ export const FighterRegister = () => {
       (fighter) => fighter.name === fighterDataForRegistration!.name
     );
     if (hasThatFighterOnDB) {
-      return setMessageToModal(MESSAGE.FIGHTER_NOT_ABLE_TO_REGISTER, ModalBgColorType.NOTICE);
+      return setToastModalMessage({
+        message: MESSAGE.FIGHTER_NOT_ABLE_TO_REGISTER,
+        bgColor: ModalBgColorType.NOTICE,
+      });
     }
     registerFighter(fighterDataForRegistration!);
   };

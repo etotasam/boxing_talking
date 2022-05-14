@@ -1,7 +1,6 @@
 import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { LogoutBtn } from "@/components/module/LogoutBtn";
-import { AuthIs } from "@/store/slice/authUserSlice";
 
 //components
 import { CustomLink } from "@/components/module/CustomLink";
