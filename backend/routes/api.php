@@ -61,37 +61,9 @@ Route::get('/comment', [CommentController::class, 'fetch'])->name('comment.fetch
 Route::post('/comment', [CommentController::class, 'post'])->name('comment.post');
 Route::delete('/comment', [CommentController::class, 'delete'])->name('comment.delete');
 
-Route::get('/vote/{user_id}', [VoteController::class, 'fetch']);
+Route::get('/vote', [VoteController::class, 'fetch'])->name('vote.fetch');
+Route::put('/vote', [VoteController::class, 'vote'])->name('vote');
 
-Route::put('/{match_id}/{vote}/vote', function(string $match_id, string $vote) {
-    try{
-        DB::beginTransaction();
-        $user_id = Auth::user()->id;
-        $match_id = intval($match_id);
-        $hasVote = Vote::where([["user_id", $user_id],["match_id", $match_id]])->first();
-        if($hasVote) {
-            throw new Exception("Voting is not allowed. You already voted.");
-        }
-        Vote::create([
-            "user_id" => Auth::user()->id,
-            "match_id" => intval($match_id),
-            "vote_for" => $vote
-        ]);
-        $matches = BoxingMatch::where("id", intval($match_id))->first();
-        if($vote == "red") {
-            $matches->increment("count_red");
-        }else if($vote == "blue") {
-            $matches->increment("count_blue");
-        }
-        $matches->save();
-        DB::commit();
-        // return ["message" => "voted successfully"];
-        return response()->json(["message" => "success vote"],200);
-    }catch (Exception $e) {
-        DB::rollBack();
-        return response()->json(["message" => $e->getMessage()],406);
-    }
-});
 
 Route::get("/{match_id}/check_vote", function(string $match_id) {
     // return $match_id;

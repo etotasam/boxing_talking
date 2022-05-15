@@ -94,7 +94,7 @@ export const useDeleteComment = () => {
     })
   }, [])
 
-  const { mutate, isLoading } = useMutation(api)
+  const { mutate, isLoading, isSuccess } = useMutation(api)
   const deleteComment = ({ userId, commentId }: ApiPropsType & { matchId?: number }) => {
     mutate({ userId, commentId }, {
       onSuccess: () => {
@@ -107,5 +107,5 @@ export const useDeleteComment = () => {
     })
   }
 
-  return { deleteComment, isLoading }
+  return { deleteComment, isLoading, isSuccess }
 }

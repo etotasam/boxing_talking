@@ -8,15 +8,8 @@ import { SpinnerModal } from "@/components/modal/SpinnerModal";
 import { useAuth } from "@/libs/hooks/useAuth";
 import { usePostComment } from "@/libs/hooks/useComment";
 
-export const PostCommentForm = ({
-  matchId,
-  getPostComRef,
-}: {
-  matchId: number;
-  getPostComRef: (el: any) => void;
-}) => {
+export const PostCommentForm = ({ matchId }: { matchId: number }) => {
   const { data: authUser } = useAuth();
-  // const { postComment: customPostComment, commentPosting } = usePostComment();
   const {
     postComment,
     isLoading: isPostingComment,
@@ -50,12 +43,6 @@ export const PostCommentForm = ({
     commentDiv.innerText = "";
   }, [isSuccessPostComment]);
 
-  //? elementRefを親に送る(heightを調べる為)
-  const comFormRef = React.useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    getPostComRef(comFormRef);
-  }, []);
-
   //? 投稿コメントをセットする
   const commentEl = React.useRef(comment);
   const commentInput = (e: React.FormEvent<HTMLDivElement>) => {
@@ -66,12 +53,12 @@ export const PostCommentForm = ({
   const [isFocus, setIsFocus] = React.useState(false);
 
   return (
-    <div ref={comFormRef} className="w-full pb-5">
-      <div className={`w-full flex items-end px-10`}>
+    <div className="w-full flex justify-center">
+      <div className={`w-[80%] flex items-end`}>
         <div
           ref={divRef}
-          className={`w-full px-2 py-1 border-b outline-none text-stone-600 border-stone-600 ${
-            (isFocus || comment) && `bg-white`
+          className={`w-full pl-3 pr-10 py-1 rounded outline-none text-stone-600 duration-300 ${
+            isFocus || comment ? `bg-white` : `bg-stone-300`
           }`}
           contentEditable
           onInput={commentInput}
@@ -82,7 +69,7 @@ export const PostCommentForm = ({
         <div className="relative w-[80px] ml-3">
           <button
             onClick={post}
-            className="border rounded bg-stone-400 hover:bg-green-500 focus:bg-green-500 duration-300 text-stone-50 px-3 py-1 w-full h-[35px]"
+            className="border rounded bg-stone-400 hover:bg-stone-700 focus:bg-stone-700 duration-300 text-stone-50 px-3 w-full h-[34px]"
           >
             送信
           </button>

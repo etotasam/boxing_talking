@@ -1,3 +1,4 @@
+import React from "react";
 //! module
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -17,7 +18,7 @@ import { MatchesType } from "@/libs/hooks/useMatches";
 import { useAuth } from "@/libs/hooks/useAuth";
 // import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { useDeleteComment } from "@/libs/hooks/useComment";
-import { useResizeCommentsComponent } from "@/libs/hooks/useResizeCommentsComponent";
+import { useAdjustCommentsContainer } from "@/libs/hooks/useAdjustCommentsContainer";
 // import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 import { useFetchMatches } from "@/libs/hooks/useMatches";
 
@@ -63,20 +64,11 @@ export const Match = () => {
     setThisMatch(match);
   }, [matchesData, matchId]);
 
-  //? Commets Componentの高さを決めるコード(cssの変数を操作)
-  const [elRefArray, setElRefArray] = useState<React.RefObject<HTMLDivElement>[]>([]);
-  const [elsArray, setElsArray] = useState<(HTMLDivElement | null)[]>([]);
-
-  //? refからelementを取得
-  useEffect(() => {
-    const result = elRefArray.reduce((acc: (HTMLDivElement | null)[], curr) => {
-      return [...acc, curr.current];
-    }, []);
-    setElsArray(result);
-  }, [elRefArray]);
-
-  //? コメントコンポーネントのサイズを画面に合わせる為のhook
-  useResizeCommentsComponent(...elsArray);
+  //? 下記Refの高さに合わせてCommentsContainerコンポーネントの高さを操作(cssの変数を操作)
+  const matchInfoRef = React.useRef<HTMLDivElement>(null);
+  const formDivRef = React.useRef<HTMLDivElement>(null);
+  //? CommentsContainerコンポーネントのサイズを画面に合わせる為のhook
+  useAdjustCommentsContainer([matchInfoRef, formDivRef]);
 
   if (hasAnyError) {
     return <DataFetchErrorComponent />;
@@ -86,17 +78,14 @@ export const Match = () => {
     <LayoutDefault>
       <div className="grid grid-cols-5">
         <div className="col-span-3">
-          <MatchInfo getElRefArray={(arr: any[]) => setElRefArray((v) => [...v, ...arr])} />
-          <div className="mt-10">
-            {thisMatch && (
-              <PostCommentForm
-                getPostComRef={(el: any) => setElRefArray((v) => [...v, el])}
-                matchId={thisMatch.id}
-              />
-            )}
+          <div ref={matchInfoRef}>
+            <MatchInfo />
+          </div>
+          <div ref={formDivRef} className="py-10">
+            {thisMatch && <PostCommentForm matchId={thisMatch.id} />}
           </div>
         </div>
-        <div className={`col-span-2 pr-5 t-comment-height`}>
+        <div className={`relative col-span-2 pr-5 t-comment-height`}>
           <CommentsContainer />
         </div>
         {/* {deleteCommentsState.confirmModalVisble && <CommentDeleteModal userId={authUser!.id} />} */}

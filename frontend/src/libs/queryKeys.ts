@@ -3,6 +3,8 @@ export const queryKeys = {
   search: "api/fighter/search",
   countFighter: "api/fighter/count",
 
+  vote: "api/vote",
+
   match: "api/match",
 
   comments: "api/comment",

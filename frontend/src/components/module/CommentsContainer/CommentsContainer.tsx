@@ -21,25 +21,31 @@ export const CommentsContainer = () => {
     isLoading: isFetchingComments,
     isFetching: isRefetchingComments,
   } = useFetchCommentsOnMatch(matchId);
-  const [hasComment, setHasComment] = useState<boolean | undefined>(undefined);
 
   //? コメント欄をloadingにする条件
-  const commentsPending = isFetchingComments;
+  const pending = isFetchingComments || isRefetchingComments;
 
   return (
     <>
       <div className={`relative h-full overflow-y-auto box-border border-x border-gray-400 px-5`}>
         {commentsData &&
-          commentsData.map((comment) => (
-            <CommentComponent
-              key={comment.id}
-              commentData={comment}
-              className={`${comment.user.id === authUser?.id ? "" : ""}`}
-            />
+          (commentsData.length ? (
+            commentsData.map((comment) => (
+              <div
+                key={comment.id}
+                className="last:mb-7 first:mt-7 border-b last:border-0 border-gray-400"
+              >
+                <CommentComponent
+                  commentData={comment}
+                  className={`${comment.user.id === authUser?.id ? "" : ""}`}
+                />
+              </div>
+            ))
+          ) : (
+            <div>コメントはありません</div>
           ))}
-        {hasComment === false && <div>コメントはありません</div>}
-        {(commentsPending || isRefetchingComments) && <SpinnerModal />}
       </div>
+      {pending && <SpinnerModal />}
     </>
   );
 };

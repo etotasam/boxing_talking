@@ -1,35 +1,27 @@
 import React, { useState, useRef, useEffect } from "react";
-
+// import { Charttest } from "@/components/module/Charttest";
 export const Test = () => {
-  const [text, setText] = useState("しょきち");
-  const divRef = useRef(text);
-  const test = (e: React.FormEvent<HTMLDivElement>) => {
-    const el = e.target as HTMLDivElement;
-    setText(el.innerText);
+  //? chartのデータ
+  const matchData = {
+    labels: ["A", "B"],
+    datasets: [
+      {
+        data: [500, 412],
+        backgroundColor: [`rgb(30 64 175)`, `rgb(185 28 28)`],
+        // borderColor: [
+        //   mouseOnColor === MouseOn.BLUE ? `#d6d5ff` : `#717ffd`,
+        //   mouseOnColor === MouseOn.RED ? `#ffe0e0` : `#ff6868`,
+        // ],
+        borderWidth: 0,
+      },
+    ],
   };
 
   return (
     <div>
-      <div
-        className="m-10 border border-stone-800 rounded"
-        contentEditable
-        onInput={test}
-        dangerouslySetInnerHTML={{ __html: divRef.current }}
-      ></div>
-      <ContentEditable value={text} />
-    </div>
-  );
-};
-
-const ContentEditable = ({ value }: { value: string }) => {
-  const defaultValue = useRef(value);
-  return (
-    <div>
-      <div
-        className="m-10 border border-stone-800 rounded"
-        contentEditable
-        dangerouslySetInnerHTML={{ __html: defaultValue.current }}
-      ></div>
+      <div className="bg-red-500">
+        {/* <Charttest matchData={matchData} setMouseOnColor={() => null} /> */}
+      </div>
     </div>
   );
 };

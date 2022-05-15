@@ -7,7 +7,6 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Context } from "chartjs-plugin-datalabels";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
-// ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
 
 type Props = {
   matchData: any;
@@ -57,7 +56,7 @@ export function Chart({ matchData, setMouseOnColor, className }: Props) {
   const options = {
     cutout: "78%",
     layout: {
-      padding: 30,
+      padding: 45,
     },
     plugins: {
       legend: {
@@ -72,25 +71,20 @@ export function Chart({ matchData, setMouseOnColor, className }: Props) {
     },
   };
   return (
-    // <Doughnut
-    //   ref={chartRef}
-    //   data={matchData}
-    //   onClick={click}
-    //   options={options}
-    // />
     <div className={`relative flex justify-center items-center ${className}`}>
-      <div className="max-w-[500px] min-w-[400px] p-10">
+      {/* <div className="mx-auto max-w-min p-10"> */}
+      <div className="max-w-[700px] min-w-[400px] p-10">
         <h1 className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-stone-600 text-xl select-none">
           みんなの試合予想
         </h1>
         <Doughnut
           ref={chartRef}
+          width={500}
+          height={500}
           data={matchData}
           plugins={[ChartDataLabels]}
           options={options}
-          // onMouseLeave={() => setMouseOnColor(MouseOn.NULL)}
           onMouseMove={mouseMove}
-          // onClick={click}
         />
       </div>
     </div>
