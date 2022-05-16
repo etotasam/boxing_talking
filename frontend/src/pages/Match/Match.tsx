@@ -49,7 +49,6 @@ export const Match = () => {
     if (!matchId || !hasExistMatch) return navigate("/");
   }, [matchesData]);
 
-  // const { voteResultState } = useFetchVoteResult();
   const [thisMatch, setThisMatch] = useState<MatchesType>();
   const getThisMatch = (
     matches: MatchesType[],

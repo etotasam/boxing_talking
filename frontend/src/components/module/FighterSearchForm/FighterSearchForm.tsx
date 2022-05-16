@@ -39,6 +39,7 @@ export const FighterSearchForm = ({ className }: Props) => {
     }, "");
 
     queryClient.removeQueries(queryKeys.fighter);
+    queryClient.removeQueries(queryKeys.countFighter);
     navigate(`?page=1${params}`);
   };
 
@@ -91,7 +92,9 @@ export const FighterSearchForm = ({ className }: Props) => {
               リセット
             </button>
 
-            <button className={`mt-5 w-full duration-300 py-1 px-2 rounded bg-green-600 hover:bg-green-500 text-white`}>
+            <button
+              className={`mt-5 w-full duration-300 py-1 px-2 rounded bg-green-600 hover:bg-green-500 text-white`}
+            >
               検索
             </button>
           </div>

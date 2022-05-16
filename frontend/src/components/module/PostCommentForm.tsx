@@ -7,6 +7,7 @@ import { SpinnerModal } from "@/components/modal/SpinnerModal";
 //! hooks
 import { useAuth } from "@/libs/hooks/useAuth";
 import { usePostComment } from "@/libs/hooks/useComment";
+import { useQueryState } from "@/libs/hooks/useQueryState";
 
 export const PostCommentForm = ({ matchId }: { matchId: number }) => {
   const { data: authUser } = useAuth();
@@ -17,8 +18,12 @@ export const PostCommentForm = ({ matchId }: { matchId: number }) => {
   } = usePostComment();
   const { setToastModalMessage } = useToastModal();
   const [comment, setComment] = React.useState<string>("");
-  // const [posting, setPosting] = React.useState(IsCommentPosting.FALSE);
-  // const { data, error, mutate: commentsMutate } = useCommentsOnMatch(matchId);
+
+  //? isLoading: isPostingComment,を外で使いたいのでuseQueryStateで共有
+  const { setter } = useQueryState<boolean>("q/isPostingComment");
+  useEffect(() => {
+    setter(isPostingComment);
+  }, [isPostingComment]);
 
   //? コメントの投稿
   const post = async () => {

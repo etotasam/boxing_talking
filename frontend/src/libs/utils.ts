@@ -1,7 +1,8 @@
 
 export const STATUS = {
   COMMENT_NULL: "COMMENT_NULL",
-  SUCCESS: 200
+  SUCCESS: 200,
+  NOT_ACCEPTABLE: 406,
 } as const
 
 
@@ -38,11 +39,12 @@ export enum MESSAGE {
   FIGHTER_NOT_ABLE_TO_REGISTER = "すでに登録されている選手です",
   FIGHTER_REGISTER_PENDING = "選手登録を実行中...",
   FIGHTER_REGISTER_SUCCESS = "選手を登録しました",
-  FIGHTER_REGISTER_FAILD = "選手を登録できませんでした",
+  FIGHTER_REGISTER_FAILD = "選手の登録に失敗しました",
 
   FIGHTER_EDIT_UPDATEING = "選手情報を編集中です...",
   FIGHTER_EDIT_SUCCESS = "選手情報が更新されました",
   FIGHTER_EDIT_FAILD = "選手情報の編集に失敗しました \n 再度行ってください",
+  FIGHTER_CAN_NOT_DELETE = "試合が登録されている選手情報は削除できません",
 
   NO_SELECT_EDIT_FIGHTER = "対象選手を選択してください",
   NOT_EDIT_FIGHTER = "選択した選手は未編集です",

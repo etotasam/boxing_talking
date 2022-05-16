@@ -10,6 +10,7 @@ import { MESSAGE } from "@/libs/utils";
 
 
 //! custom hooks
+import { useFetchMatchPredictVote } from "@/libs/hooks/useMatchPredict"
 import { useQueryState } from "@/libs/hooks/useQueryState"
 
 export type UserType = {
@@ -59,63 +60,50 @@ export const useAuth = () => {
   return { data, isLoading, isError }
 }
 
+//! ログイン
 export const useLogin = () => {
   const queryClient = useQueryClient()
   const { setToastModalMessage } = useToastModal()
   const api = useCallback(async (props: LoginPropsType) => {
-    try {
-      const res = await Axios.post<UserType>("api/login", { ...props }).then(value => value.data)
-      setToastModalMessage({ message: MESSAGE.MESSAGE_LOGIN_SUCCESS, bgColor: ModalBgColorType.SUCCESS })
-      queryClient.setQueryData(queryKeys.auth, res)
-    } catch (error) {
-      setToastModalMessage({ message: MESSAGE.MESSAGE_LOGIN_FAILD, bgColor: ModalBgColorType.ERROR })
-    }
+    const res = await Axios.post<UserType>("api/login", { ...props }).then(value => value.data)
+    return { res }
   }, [])
   const { mutate, isLoading } = useMutation(api)
   const login = (props: LoginPropsType) => {
     mutate({ ...props }, {
-      // onSuccess: (data) => {
-      //   setMessageToModal(MESSAGE.MESSAGE_LOGIN_SUCCESS, ModalBgColorType.SUCCESS)
-      //   queryClient.setQueryData(queryKeys.auth, data)
-      // },
-      // onSettled: (data, error) => {
-      //   if (error) {
-      //     setMessageToModal(MESSAGE.MESSAGE_LOGIN_FAILD, ModalBgColorType.ERROR)
-      //   }
-      // }
+      onSuccess: (data) => {
+        setToastModalMessage({ message: MESSAGE.MESSAGE_LOGIN_SUCCESS, bgColor: ModalBgColorType.SUCCESS })
+        queryClient.setQueryData(queryKeys.auth, data)
+      },
+      onError: () => {
+        setToastModalMessage({ message: MESSAGE.MESSAGE_LOGIN_FAILD, bgColor: ModalBgColorType.ERROR })
+      }
     })
   }
   return { login, isLoading }
 }
-
+//! ログアウト
 export const useLogout = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient()
   const { setToastModalMessage } = useToastModal()
   const api = useCallback(async ({ userId }: { userId: number }) => {
-    try {
-      await Axios.post<void>("api/logout", { user_id: userId }).then(value => value.data)
-      queryClient.setQueryData<boolean>(queryKeys.auth, false)
-      setToastModalMessage({ message: MESSAGE.MESSAGE_LOGOUT, bgColor: ModalBgColorType.NULL })
-      navigate("/");
-    } catch (error) {
-      setToastModalMessage({ message: MESSAGE.MESSAGE_FAILD_LOGOUT, bgColor: ModalBgColorType.ERROR })
-    }
+    await Axios.post<void>("api/logout", { user_id: userId }).then(value => value.data)
   }, [])
 
   const { mutate, isLoading } = useMutation(api)
   const logout = useCallback(({ userId }: { userId: number }) => {
     mutate({ userId }, {
-      // onSuccess: () => {
-      //   queryClient.setQueryData<boolean>(queryKeys.auth, false)
-      //   setMessageToModal(MESSAGE.MESSAGE_LOGOUT, ModalBgColorType.NULL)
-      //   navigate("/");
-      // },
-      // onSettled: (error) => {
-      //   if (error) {
-      //     setMessageToModal(MESSAGE.MESSAGE_FAILD_LOGOUT, ModalBgColorType.ERROR)
-      //   }
-      // }
+      onSuccess: () => {
+        setToastModalMessage({ message: MESSAGE.MESSAGE_LOGOUT, bgColor: ModalBgColorType.NULL })
+        queryClient.setQueryData<boolean>(queryKeys.auth, false)
+        //? ユーザの勝敗予想データのキャッシュを削除
+        queryClient.removeQueries(queryKeys.vote)
+        navigate("/")
+      },
+      onError: () => {
+        setToastModalMessage({ message: MESSAGE.MESSAGE_FAILD_LOGOUT, bgColor: ModalBgColorType.ERROR })
+      }
     })
   }, [])
   return { logout, isLoading }

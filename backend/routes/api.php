@@ -45,7 +45,7 @@ Route::middleware('auth:sanctum')->group(function() {
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
-// Route::get('/fighter/count', [FighterController::class, 'count'])->name('fighter.count');
+Route::get('/fighter/count', [FighterController::class, 'count'])->name('fighter.count');
 Route::get('/fighter/search', [FighterController::class, 'search'])->name('fighter.search');
 Route::get('/fighter',[FighterController::class, 'fetch'])->name('fighter.fetch');
 Route::post('/fighter',[FighterController::class, 'register'])->name('fighter.register');

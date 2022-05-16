@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 //! message contoller
 import { useToastModal, ModalBgColorType } from "./useToastModal";
-import { MESSAGE } from "@/libs/utils";
+import { MESSAGE, STATUS } from "@/libs/utils";
 
 
 //! 選手データ
@@ -40,8 +40,12 @@ export type FighterType = {
   draw: number
 }
 
-//! 検索した選手数の取得
+//! 選手数の取得
 // export const useCountFighters = () => {
+//   type FetcherPropsType = {
+//     name?: string | undefined,
+//     country?: Nationality | undefined
+//   }
 //   const fetcher = async () => await Axios.get<number>(queryKeys.countFighter).then(v => v.data)
 //   const { data, isLoading } = useQuery(queryKeys.countFighter, fetcher)
 //   return { data, isLoading }
@@ -61,7 +65,7 @@ export const useFetchFighters = () => {
     searchWords: SearchWordType | undefined
   }
 
-  //? params page の取得
+  //? params の取得
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   let paramPage = Number(query.get("page"));
@@ -70,13 +74,16 @@ export const useFetchFighters = () => {
   if (!paramPage) {
     paramPage = 1
   }
-  const api = async ({ page, limit, searchWords }: FetcherPropsType) => {
-    const res = await Axios.get<{ fighters: FighterType[], fighters_count: number }>(queryKeys.fighter, { params: { page, limit, ...searchWords } }).then(value => value.data)
+  const fetchFightersApi = async ({ page, limit, searchWords }: FetcherPropsType) => {
+    const res = await Axios.get<FighterType[]>(queryKeys.fighter, { params: { page, limit, ...searchWords } }).then(value => value.data)
     return res
   }
-  const { data: fighters, isLoading, isError, isPreviousData, refetch, isRefetching } = useQuery<{ fighters: FighterType[], fighters_count: number }>([queryKeys.fighter, { page: paramPage }], () => api({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), { keepPreviousData: true, staleTime: Infinity })
-  const data = fighters?.fighters
-  const count = fighters?.fighters_count
+  const { data, isLoading, isError, isPreviousData, refetch, isRefetching } = useQuery<FighterType[]>([queryKeys.fighter, { page: paramPage }], () => fetchFightersApi({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), { keepPreviousData: true, staleTime: Infinity })
+  // const data = fighters
+
+  const fetchFightersCount = async (searchWords: SearchWordType) => await Axios.get<number>(queryKeys.countFighter, { params: { ...searchWords } }).then(v => v.data)
+  const { data: count } = useQuery<number>(queryKeys.countFighter, () => fetchFightersCount({ name: paramName, country: paramCountry }), { staleTime: Infinity })
+  // const count = fighters?.fighters_count
   return { data, count, isLoading, isError, isPreviousData, refetch, isRefetching }
 }
 
@@ -100,10 +107,10 @@ export const useUpdateFighter = () => {
         return [...acc, curr];
       }, []);
       await Axios.put(queryKeys.fighter, updateFighterData);
-      queryClient.setQueryData([queryKeys.fighter, { page: paramPage }], { fighters: updateFightersData, fightes_count: snapshotFighters?.fighters_count })
+      queryClient.setQueryData([queryKeys.fighter, { page: paramPage }], updateFightersData)
       setToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: ModalBgColorType.SUCCESS });
     } catch (error) {
-      console.log(error);
+      console.log("選手データ更新:", error);
       queryClient.setQueryData([queryKeys.fighter, { page: paramPage }], snapshotFighters)
       setToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_FAILD, bgColor: ModalBgColorType.ERROR });
     }
@@ -121,16 +128,11 @@ export const useRegisterFighter = () => {
   const { count: fightersCount } = useFetchFighters()
   const { setToastModalMessage } = useToastModal()
   const api = useCallback(async (newFighterData: FighterType) => {
-    try {
-      setToastModalMessage({ message: MESSAGE.FIGHTER_REGISTER_PENDING, bgColor: ModalBgColorType.NOTICE })
-      await Axios.post(queryKeys.fighter, newFighterData).then(v => v.data)
-      setToastModalMessage({ message: MESSAGE.FIGHTER_REGISTER_SUCCESS, bgColor: ModalBgColorType.SUCCESS })
-    } catch (error) {
-      setToastModalMessage({ message: MESSAGE.FIGHTER_REGISTER_FAILD, bgColor: ModalBgColorType.ERROR })
-    }
+    await Axios.post(queryKeys.fighter, newFighterData).then(v => v.data)
   }, []);
-  const { mutate, isLoading, isError } = useMutation(api, {
+  const { mutate, isLoading, isError, isSuccess } = useMutation(api, {
     onMutate: async () => {
+      setToastModalMessage({ message: MESSAGE.FIGHTER_REGISTER_PENDING, bgColor: ModalBgColorType.NOTICE })
       // const fightersCount = queryClient.getQueryData<number>(queryKeys.countFighter)
       if (!fightersCount) return
       const isLeeway = !!(fightersCount % limit)
@@ -141,26 +143,32 @@ export const useRegisterFighter = () => {
   const registerFighter = (newFighterData: FighterType) => {
     mutate(newFighterData, {
       onSuccess: (data, newFighterData, context) => {
+        setToastModalMessage({ message: MESSAGE.FIGHTER_REGISTER_SUCCESS, bgColor: ModalBgColorType.SUCCESS })
+        queryClient.setQueryData<number>(queryKeys.countFighter, (prev) => prev! + 1)
         if (context.isLeeway) {
-          const fightersData = queryClient.getQueryData<{ fighters: FighterType[], fighters_count: number }>([queryKeys.fighter, { page: context.pageCount }])!.fighters
+          const fightersData = queryClient.getQueryData<FighterType[]>([queryKeys.fighter, { page: context.pageCount }])
           if (fightersData?.length) {
-            queryClient.setQueryData<{ fighters: FighterType[], fighters_count: number }>([queryKeys.fighter, { page: context.pageCount }], (oldData) => {
-              return { fighters: [...fightersData, newFighterData], fighters_count: oldData!.fighters_count }
-            })
+            queryClient.setQueryData<FighterType[]>([queryKeys.fighter, { page: context.pageCount }], [...fightersData, newFighterData])
           }
         } else {
-          queryClient.setQueryData<{ fighters: FighterType[], fighters_count: number }>([queryKeys.fighter, { page: context.pageCount++ }], (oldData) => {
-            return { fighters: [newFighterData], fighters_count: oldData!.fighters_count }
-          })
+          queryClient.setQueryData<FighterType[]>([queryKeys.fighter, { page: context.pageCount++ }], [newFighterData])
         }
+        //? 選手数を更新
         queryClient.setQueryData<number>(queryKeys.countFighter, (prevFightersCount) => {
           return prevFightersCount! ++
         })
         queryClient.invalidateQueries(queryKeys.fighter)
+      },
+      onError: (error: any) => {
+        if (error.status === STATUS.NOT_ACCEPTABLE) {
+          setToastModalMessage({ message: MESSAGE.FIGHTER_NOT_ABLE_TO_REGISTER, bgColor: ModalBgColorType.ERROR })
+          return
+        }
+        setToastModalMessage({ message: MESSAGE.FIGHTER_REGISTER_FAILD, bgColor: ModalBgColorType.ERROR })
       }
     })
   }
-  return { registerFighter, isLoading, isError }
+  return { registerFighter, isLoading, isError, isSuccess }
 }
 
 //! 選手データ削除
@@ -189,8 +197,8 @@ export const useDeleteFighter = () => {
   const { mutate, isLoading, isError } = useMutation(api, {
     onMutate: (fighterData) => {
       // setMessageToModal(MESSAGE.FIGHTER_DELETING, ModalBgColorType.NOTICE)
-      const snapshotFighters = queryClient.getQueryData<{ fighters: FighterType[], fighters_count: number }>([queryKeys.fighter, { page: paramPage }])!.fighters
-      const widtoutDeleteFighters = queryClient.getQueryData<{ fighters: FighterType[], fighters_count: number }>([queryKeys.fighter, { page: paramPage }])!.fighters.filter(fighter => fighter.id !== fighterData.id)
+      const snapshotFighters = queryClient.getQueryData<FighterType[]>([queryKeys.fighter, { page: paramPage }])
+      const widtoutDeleteFighters = queryClient.getQueryData<FighterType[]>([queryKeys.fighter, { page: paramPage }])!.filter(fighter => fighter.id !== fighterData.id)
       return { snapshotFighters, widtoutDeleteFighters }
     }
   })
@@ -198,9 +206,7 @@ export const useDeleteFighter = () => {
     mutate(fighterData, {
       onSuccess: async (data, fighterData, context) => {
         setToastModalMessage({ message: MESSAGE.FIGHTER_DELETED, bgColor: ModalBgColorType.DELETE })
-        queryClient.setQueryData<{ fighters: FighterType[], fighters_count: number }>([queryKeys.fighter, { page: paramPage }], (oldData) => {
-          return { fighters: context.widtoutDeleteFighters, fighters_count: oldData!.fighters_count - 1 }
-        })
+        queryClient.setQueryData<FighterType[]>([queryKeys.fighter, { page: paramPage }], context.widtoutDeleteFighters)
         // queryClient.setQueryData<number>(queryKeys.countFighter, ((prevFightersCount) => {
         //   return prevFightersCount! - 1
         // }))
@@ -209,6 +215,15 @@ export const useDeleteFighter = () => {
             navigate(`/fighter/edit?page=${paramPage - 1}`)
           }
         }
+
+        //todo
+        // const thisPageKey = [queryKeys.fighter, { page: paramPage }]
+        // const fightersOnThisPage = queryClient.getQueryData<FighterType[]>(thisPageKey)
+        // if (!fightersOnThisPage?.length) {
+        //   queryClient.removeQueries(thisPageKey)
+        // }
+        //? 選手数を更新
+        queryClient.setQueryData<number>(queryKeys.countFighter, (prev) => prev! - 1)
         //? 削除した選手より後のpage情報は再取得させる
         const pages = [...Array(pageCount + 1)].map((_, num) => num).filter(n => n >= paramPage)
         pages.forEach((page) => {
@@ -216,7 +231,11 @@ export const useDeleteFighter = () => {
         })
         queryClient.setQueryData(queryKeys.fighterEditData, initialFighterInfoState)
       },
-      onError: () => {
+      onError: (error: any) => {
+        if (error.status === STATUS.NOT_ACCEPTABLE) {
+          setToastModalMessage({ message: MESSAGE.FIGHTER_CAN_NOT_DELETE, bgColor: ModalBgColorType.ERROR })
+          return
+        }
         setToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_FAILD, bgColor: ModalBgColorType.ERROR })
       }
     })

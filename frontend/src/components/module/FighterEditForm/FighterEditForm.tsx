@@ -99,7 +99,6 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
             name="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            // onChange={(e) => setFighterData({ ...fighterEditData, name: e.target.value })}
           />
           <div className="flex mt-3">
             <label htmlFor="countrys">国籍:</label>
@@ -113,7 +112,6 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
                   setCountry(e.target.value);
                 }
               }}
-              // onChange={(e) => setFighterData({ ...fighterEditData, country: e.target.value })}
               id="countrys"
             >
               <option value={undefined}>{countryUndefined}</option>
@@ -133,7 +131,6 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
               id="birth"
               min="1970-01-01"
               value={birth}
-              // onChange={(e) => setFighterData({ ...fighterEditData, birth: e.target.value })}
               onChange={(e) => setBirth(e.target.value)}
             />
           </div>
@@ -146,7 +143,6 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
               type="number"
               min="0"
               value={height}
-              // onChange={(e) => setFighterData({ ...fighterEditData, height: e.target.value })}
               onChange={(e) => setHeight(e.target.value)}
             />
           </div>
@@ -157,7 +153,6 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
             <select
               value={stance}
               onChange={(e) => setStance(e.target.value)}
-              // onChange={(e) => setFighterData({ ...fighterEditData, stance: e.target.value })}
               name="boxing-style"
               id="stance"
             >
@@ -173,7 +168,6 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
               <input
                 className="w-full"
                 value={win}
-                // onChange={(e) => setFighterData({ ...fighterEditData, win: e.target.value })}
                 onChange={(e) => setWin(e.target.value)}
                 type="number"
                 min="0"

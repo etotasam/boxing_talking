@@ -36,6 +36,7 @@ export const useAdjustCommentsContainer = ([...ref]: (React.RefObject<HTMLDivEle
     calcCommentComponentHeight()
     window.addEventListener('resize', calcCommentComponentHeight, false)
     return () => {
+      observer.disconnect()
       window.removeEventListener('resize', calcCommentComponentHeight, false)
     }
   }, [])

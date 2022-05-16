@@ -23,7 +23,7 @@ export const CommentsContainer = () => {
   } = useFetchCommentsOnMatch(matchId);
 
   //? コメント欄をloadingにする条件
-  const pending = isFetchingComments || isRefetchingComments;
+  const pending = isFetchingComments;
 
   return (
     <>

@@ -1,8 +1,11 @@
-import { useCallback } from "react"
+import React, { useCallback } from "react"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { queryKeys } from "@/libs/queryKeys"
 import { Axios } from "../axios"
 import { useLocation } from "react-router-dom";
+
+//! hooks
+import { useAuth } from "@/libs/hooks/useAuth"
 
 //! message contoller
 import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
@@ -10,6 +13,8 @@ import { MESSAGE } from "@/libs/utils";
 
 //! types
 import { UserType } from "@/libs/hooks/useAuth"
+import dayjs from "dayjs";
+import { useQueryState } from "./useQueryState";
 
 
 //! 試合のコメントの取得
@@ -46,7 +51,7 @@ export const usePostComment = () => {
     comment: string
   }
   const queryClient = useQueryClient()
-  // const { setMessageToModal } = useMessageController()
+  const { data: user } = useAuth()
   const { setToastModalMessage } = useToastModal()
   const api = useCallback(async ({ userId, matchId, comment }: ApiPropsType) => {
     await Axios.post(queryKeys.comments, {
@@ -57,14 +62,22 @@ export const usePostComment = () => {
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
+    onMutate: ({ matchId, comment }) => {
+      const nowDate = dayjs().format('YYYY/MM/DD')
+      const snapshot = queryClient.getQueryData<CommentType[]>([queryKeys.comments, { id: matchId }])
+      queryClient.setQueryData([queryKeys.comments, { id: matchId }], [{ id: NaN, user, comment, created_at: nowDate }, ...snapshot!])
+      return { snapshot }
+    }
   })
   const postComment = ({ userId, matchId, comment }: ApiPropsType) => {
-    mutate({ userId, matchId, comment }, {
+    const trimmedComment = comment.trim()
+    mutate({ userId, matchId, comment: trimmedComment }, {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.comments, { id: matchId }])
         setToastModalMessage({ message: MESSAGE.COMMENT_POST_SUCCESSFULLY, bgColor: ModalBgColorType.SUCCESS })
       },
-      onError: () => {
+      onError: (error, variables, context) => {
+        queryClient.setQueryData([queryKeys.comments, { id: matchId }], context?.snapshot)
         setToastModalMessage({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: ModalBgColorType.ERROR })
       }
     })
@@ -97,7 +110,11 @@ export const useDeleteComment = () => {
   const { mutate, isLoading, isSuccess } = useMutation(api)
   const deleteComment = ({ userId, commentId }: ApiPropsType & { matchId?: number }) => {
     mutate({ userId, commentId }, {
-      onSuccess: () => {
+      onSuccess: (data, { commentId }) => {
+        console.log("test");
+        const snapshot = queryClient.getQueryData<CommentType[]>([queryKeys.comments, { id: matchIdOnParam }])
+        const commentsWidthoutDeleteComment = snapshot!.filter(commentState => commentState.id !== commentId)
+        queryClient.setQueryData([queryKeys.comments, { id: matchIdOnParam }], commentsWidthoutDeleteComment)
         queryClient.invalidateQueries([queryKeys.comments, { id: matchIdOnParam }])
         setToastModalMessage({ message: MESSAGE.COMMENT_DELETED, bgColor: ModalBgColorType.DELETE })
       },

@@ -18,14 +18,13 @@ export function Chart({ matchData, setMouseOnColor, className }: Props) {
   const chartRef = React.useRef<any>(null);
   // callback of when mouse move on Graph
   const mouseMove = (event: any): void => {
-    if (chartRef !== null) {
-      const el = getElementAtEvent(chartRef.current, event);
-      if (el.length !== 0) {
-        const mouseOnColor = el[0].index === 0 ? MouseOn.BLUE : MouseOn.RED;
-        setMouseOnColor(mouseOnColor);
-      } else {
-        setMouseOnColor(MouseOn.NULL);
-      }
+    if (!chartRef.current) return;
+    const el = getElementAtEvent(chartRef.current, event);
+    if (el.length !== 0) {
+      const mouseOnColor = el[0].index === 0 ? MouseOn.BLUE : MouseOn.RED;
+      setMouseOnColor(mouseOnColor);
+    } else {
+      setMouseOnColor(MouseOn.NULL);
     }
   };
 
@@ -56,7 +55,7 @@ export function Chart({ matchData, setMouseOnColor, className }: Props) {
   const options = {
     cutout: "78%",
     layout: {
-      padding: 45,
+      padding: 50,
     },
     plugins: {
       legend: {
@@ -73,7 +72,7 @@ export function Chart({ matchData, setMouseOnColor, className }: Props) {
   return (
     <div className={`relative flex justify-center items-center ${className}`}>
       {/* <div className="mx-auto max-w-min p-10"> */}
-      <div className="max-w-[700px] min-w-[400px] p-10">
+      <div className="w-[400px]">
         <h1 className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-stone-600 text-xl select-none">
           みんなの試合予想
         </h1>

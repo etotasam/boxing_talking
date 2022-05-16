@@ -21,7 +21,13 @@ import { MESSAGE } from "@/libs/utils";
 
 export const FighterRegister = () => {
   // const queryClient = useQueryClient();
-  const { registerFighter, isLoading: isRegisterFighterPending } = useRegisterFighter();
+  const {
+    registerFighter,
+    isLoading: isRegisterFighterPending,
+    isSuccess: isRegisteredFighter,
+  } = useRegisterFighter();
+  // const {} = useQueryState<boolean>("q/isRegisteredFighter", false)
+
   const { setToastModalMessage } = useToastModal();
   const { data: fightersData } = useFetchFighters();
   const { getLatestState: getLatestFighterDataFromForm, setter: setFighterDataFromForm } =
@@ -30,17 +36,22 @@ export const FighterRegister = () => {
   const register = async () => {
     const fighterDataForRegistration = getLatestFighterDataFromForm();
     //? 選手がすでに存在しているかをチェック(チェックしてるのは名前だけ)
-    const hasThatFighterOnDB = fightersData?.some(
-      (fighter) => fighter.name === fighterDataForRegistration!.name
-    );
-    if (hasThatFighterOnDB) {
-      return setToastModalMessage({
-        message: MESSAGE.FIGHTER_NOT_ABLE_TO_REGISTER,
-        bgColor: ModalBgColorType.NOTICE,
-      });
-    }
+    // const hasThatFighterOnDB = fightersData?.some(
+    //   (fighter) => fighter.name === fighterDataForRegistration!.name
+    // );
+    // if (hasThatFighterOnDB) {
+    //   return setToastModalMessage({
+    //     message: MESSAGE.FIGHTER_NOT_ABLE_TO_REGISTER,
+    //     bgColor: ModalBgColorType.NOTICE,
+    //   });
+    // }
     registerFighter(fighterDataForRegistration!);
   };
+
+  useEffect(() => {
+    if (!isRegisteredFighter) return;
+    setFighterDataFromForm(initialFighterInfoState);
+  }, [isRegisteredFighter]);
 
   useEffect(() => {
     return () => {

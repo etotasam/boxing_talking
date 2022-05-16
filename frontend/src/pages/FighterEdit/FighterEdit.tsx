@@ -26,8 +26,8 @@ import { Fighter } from "@/components/module/Fighter";
 import { FighterEditForm } from "@/components/module/FighterEditForm";
 import { SpinnerModal } from "@/components/modal/SpinnerModal";
 import { EditActionBtns } from "@/components/module/EditActionBtns";
-import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 import { PendingModal } from "@/components/modal/PendingModal";
+import { ConfirmModal } from "@/components/modal/ConfirmModal";
 import { FighterSearchForm } from "@/components/module/FighterSearchForm";
 
 //! data for test
@@ -101,18 +101,30 @@ export const FighterEdit = () => {
     setIsSelectedFighter(isChecked);
   }, [isChecked]);
 
-  //? 選手データの削除
-  const { deleteFighter, isLoading: isDeletingFighter } = useDeleteFighter();
-  const fighterDelete = async (e: React.FormEvent<HTMLFormElement>) => {
+  //? 削除確認のモーダル visible/invisible
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setToastModalMessage({
+      message: MESSAGE.NULL,
+      bgColor: ModalBgColorType.NULL,
+    });
     if (isSelectedFighter) {
-      deleteFighter(fighterEidtData);
+      setOpenConfirmModal(true);
     } else {
       setToastModalMessage({
         message: MESSAGE.NO_SELECT_EDIT_FIGHTER,
         bgColor: ModalBgColorType.NOTICE,
       });
     }
+  };
+
+  //? 選手データの削除
+  const { deleteFighter, isLoading: isDeletingFighter } = useDeleteFighter();
+  const fighterDelete = async () => {
+    setOpenConfirmModal(false);
+    deleteFighter(fighterEidtData);
   };
 
   const getFighterWithId = (fighterId: number) => {
@@ -143,7 +155,6 @@ export const FighterEdit = () => {
   const [pageCountArray, setPageCountArray] = useState<number[]>([]);
   useEffect(() => {
     if (fightersCount === undefined) return;
-    // if (fightersCount < 2) return;
     const pagesCount = Math.ceil(fightersCount / limit);
     const pagesLength = [...Array(pagesCount + 1)].map((_, num) => num).filter((n) => n >= 1);
     setPageCountArray(pagesLength);
@@ -168,7 +179,7 @@ export const FighterEdit = () => {
       <div className="flex mt-[50px] w-[100vw]">
         <div className="w-2/3">
           <Paginate pageCountArray={pageCountArray} params={params} currentPage={paramPage} />
-          <form id="fighter-edit" className="relative" onSubmit={fighterDelete}>
+          <form id="fighter-edit" className="relative" onSubmit={onSubmit}>
             {fetchFightersData &&
               fetchFightersData.map((fighter) => (
                 <div key={fighter.id} className={`relative bg-stone-200 m-2`}>
@@ -204,6 +215,14 @@ export const FighterEdit = () => {
         </div>
       </div>
       {isLoadingFetchFighters && <PendingModal />}
+      {openConfirmModal && (
+        <ConfirmModal
+          execution={fighterDelete}
+          message="選手を削除しますか？"
+          okBtnString="削除"
+          cancel={() => setOpenConfirmModal(false)}
+        />
+      )}
     </LayoutForEditPage>
   );
 };
