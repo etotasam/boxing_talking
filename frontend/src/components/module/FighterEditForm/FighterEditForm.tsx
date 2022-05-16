@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/atomic/Button";
-import { Stance, Nationality } from "@/libs/types/fighter";
-
-import { FighterType } from "@/libs/types/fighter";
+import { queryKeys } from "@/libs/queryKeys";
+import { Nationality } from "@/libs/hooks/useFighter";
+import { useQueryClient, useQuery } from "react-query";
+//! custom hook
+import { useQueryState } from "@/libs/hooks/useQueryState";
+//! message contoller
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { MESSAGE } from "@/libs/utils";
 
 type Props = {
-  onSubmit: (e: React.FormEvent<HTMLFormElement>, inputFighterInfo: FighterType) => void;
+  onSubmit: () => void;
   className?: string;
-  fighterInfo?: FighterType;
+  isUpdatingFighterData?: boolean;
 };
 
-type ToStringType<T> = T extends Record<"id", number> ? Record<string, string> : T;
+export enum Stance {
+  Southpaw = "southpaw",
+  Orthodox = "orthodox",
+}
 
-const initialFighterInfoState: ToStringType<FighterType> = {
+const countryUndefined = "国籍の選択";
+
+export const initialFighterInfoState: any = {
   id: "",
   name: "",
   country: "",
@@ -25,45 +34,87 @@ const initialFighterInfoState: ToStringType<FighterType> = {
   lose: "",
 };
 
-export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => {
-  const [fighterInfoState, setFighterInfoState] = useState<any>(initialFighterInfoState);
+export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: Props) => {
+  const { setToastModalMessage } = useToastModal();
+  const queryClient = useQueryClient();
+  //? ReactQueryでFighterEditとデータを共有
+  // const [fighterEditData, setFighterData] = useQueryState<any>(
+  //   queryKeys.fighterEditData,
+  //   initialFighterInfoState
+  // );
+  const fighterEditData = queryClient.getQueryData<any>(queryKeys.fighterEditData);
 
-  React.useEffect(() => {
-    if (!fighterInfo) return;
-    setFighterInfoState(fighterInfo);
-  }, [fighterInfo]);
+  const [name, setName] = useState<string>(initialFighterInfoState.name);
+  const [country, setCountry] = useState<string | undefined>(initialFighterInfoState.country);
+  const [birth, setBirth] = useState<string>(initialFighterInfoState.birth);
+  const [height, setHeight] = useState<string>(initialFighterInfoState.height);
+  const [stance, setStance] = useState<string>(initialFighterInfoState.stance);
+  const [win, setWin] = useState<string>(initialFighterInfoState.win);
+  const [ko, setKo] = useState<string>(initialFighterInfoState.ko);
+  const [draw, setDraw] = useState<string>(initialFighterInfoState.draw);
+  const [lose, setLose] = useState<string>(initialFighterInfoState.lose);
+
+  useEffect(() => {
+    setName(fighterEditData?.name);
+    setCountry(fighterEditData?.country);
+    setBirth(fighterEditData?.birth);
+    setHeight(fighterEditData?.height);
+    setStance(fighterEditData?.stance);
+    setWin(fighterEditData?.win);
+    setKo(fighterEditData?.ko);
+    setDraw(fighterEditData?.draw);
+    setLose(fighterEditData?.lose);
+  }, [fighterEditData]);
+
+  const sendData = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (country === undefined) {
+      setToastModalMessage({ message: MESSAGE.INVALID_COUNTRY, bgColor: ModalBgColorType.NOTICE });
+      return;
+    }
+    queryClient.setQueryData(queryKeys.fighterEditData, {
+      ...fighterEditData,
+      name,
+      stance,
+      country,
+      birth,
+      height,
+      win,
+      ko,
+      draw,
+      lose,
+    });
+    onSubmit();
+  };
 
   return (
     <div className={className}>
       <div className="p-10 bg-stone-200">
         <h1 className="text-3xl text-center">選手情報</h1>
-        <form className="flex flex-col" onSubmit={(e) => onSubmit(e, fighterInfoState)}>
+        <form className="flex flex-col" onSubmit={sendData}>
           <input
             className="mt-3 px-1 bourder rounded border-black"
             type="text"
             placeholder="選手名"
-            value={fighterInfoState?.name}
-            onChange={(e) =>
-              setFighterInfoState({
-                ...fighterInfoState!,
-                name: e.target.value,
-              })
-            }
+            name="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
           <div className="flex mt-3">
             <label htmlFor="countrys">国籍:</label>
             <select
               name="country"
-              value={fighterInfoState?.country}
-              onChange={(e) =>
-                setFighterInfoState({
-                  ...fighterInfoState!,
-                  country: e.target.value as Nationality,
-                })
-              }
+              value={country}
+              onChange={(e) => {
+                if (e.target.value === countryUndefined) {
+                  setCountry(undefined);
+                } else {
+                  setCountry(e.target.value);
+                }
+              }}
               id="countrys"
             >
-              <option value={undefined}>選択してね</option>
+              <option value={undefined}>{countryUndefined}</option>
               {Object.values(Nationality).map((nationalName) => (
                 <option key={nationalName} value={nationalName}>
                   {nationalName}
@@ -79,29 +130,20 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               type="date"
               id="birth"
               min="1970-01-01"
-              value={fighterInfoState?.birth}
-              onChange={(e) =>
-                setFighterInfoState({
-                  ...fighterInfoState!,
-                  birth: e.target.value,
-                })
-              }
+              value={birth}
+              onChange={(e) => setBirth(e.target.value)}
             />
           </div>
 
           <div className="mt-3 flex p-1">
             <label htmlFor="height">身長:</label>
             <input
+              id="height"
               className="px-1"
               type="number"
               min="0"
-              value={fighterInfoState?.height}
-              onChange={(e) =>
-                setFighterInfoState({
-                  ...fighterInfoState!,
-                  height: e.target.value,
-                })
-              }
+              value={height}
+              onChange={(e) => setHeight(e.target.value)}
             />
           </div>
 
@@ -109,13 +151,8 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
           <div className="mt-3 flex p-1">
             <label htmlFor="stance">スタイル:</label>
             <select
-              value={fighterInfoState?.stance}
-              onChange={(e) =>
-                setFighterInfoState({
-                  ...fighterInfoState!,
-                  stance: e.target.value as Stance,
-                })
-              }
+              value={stance}
+              onChange={(e) => setStance(e.target.value)}
               name="boxing-style"
               id="stance"
             >
@@ -130,13 +167,8 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               <label htmlFor="win">win</label>
               <input
                 className="w-full"
-                value={fighterInfoState?.win}
-                onChange={(e) =>
-                  setFighterInfoState({
-                    ...fighterInfoState!,
-                    win: e.target.value,
-                  })
-                }
+                value={win}
+                onChange={(e) => setWin(e.target.value)}
                 type="number"
                 min="0"
                 id="win"
@@ -147,13 +179,8 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               <label htmlFor="ko">ko</label>
               <input
                 className="w-full"
-                value={fighterInfoState?.ko}
-                onChange={(e) =>
-                  setFighterInfoState({
-                    ...fighterInfoState!,
-                    ko: e.target.value,
-                  })
-                }
+                value={ko}
+                onChange={(e) => setKo(e.target.value)}
                 type="number"
                 min="0"
                 id="ko"
@@ -164,13 +191,8 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               <label htmlFor="draw">draw</label>
               <input
                 className="w-full"
-                value={fighterInfoState?.draw}
-                onChange={(e) =>
-                  setFighterInfoState({
-                    ...fighterInfoState!,
-                    draw: e.target.value,
-                  })
-                }
+                value={draw}
+                onChange={(e) => setDraw(e.target.value)}
                 type="number"
                 min="0"
                 id="draw"
@@ -181,20 +203,25 @@ export const FighterEditForm = ({ onSubmit, className, fighterInfo }: Props) => 
               <label htmlFor="lose">lose</label>
               <input
                 className="w-full"
-                value={fighterInfoState?.lose}
-                onChange={(e) =>
-                  setFighterInfoState({
-                    ...fighterInfoState!,
-                    lose: e.target.value,
-                  })
-                }
+                value={lose}
+                onChange={(e) => setLose(e.target.value)}
                 type="number"
                 min="0"
                 id="lose"
               />
             </div>
           </div>
-          <Button>登録</Button>
+          <div className="relative">
+            <button
+              className={`w-full duration-300 py-1 px-2 mt-3 rounded ${
+                isUpdatingFighterData
+                  ? `bg-stone-700 select-none pointer-events-none text-stone-600`
+                  : `bg-green-600 hover:bg-green-500 text-white`
+              }`}
+            >
+              登録
+            </button>
+          </div>
         </form>
       </div>
     </div>

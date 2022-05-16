@@ -1,11 +1,12 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { CommentComponent } from ".";
 
-// hooks
-import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
+//! hooks
+// import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
+import { useDeleteComment } from "@/libs/hooks/useComment";
 import { useAuth } from "@/libs/hooks/useAuth";
 
-// コメント投稿ユーザー
+// コメント投稿ユーザー & ログインユーザー
 const user = {
   id: 1,
   name: "ログインユーザー",
@@ -20,21 +21,19 @@ const commentState = {
   created_at: new Date("2022/4/13"),
 };
 
-// ログインユーザー
-const authState = {
-  user,
-};
+let data: typeof user;
 
 jest.mock("@/libs/hooks/useAuth");
 const useAuthMock = useAuth as jest.Mock;
 
-jest.mock("@/libs/hooks/useCommentDelete");
-const useCommentDeleteMock = useCommentDelete as jest.Mock;
+jest.mock("@/libs/hooks/useComment");
+const useDeleteCommentMock = useDeleteComment as jest.Mock;
 
 describe("CommentComponentのテスト", () => {
   beforeEach(() => {
-    useAuthMock.mockReturnValue({ authState });
-    useCommentDeleteMock.mockReturnValue(jest.fn());
+    data = user;
+    useAuthMock.mockReturnValue({ data });
+    useDeleteCommentMock.mockReturnValue(jest.fn());
   });
 
   afterEach(() => {
@@ -46,14 +45,15 @@ describe("CommentComponentのテスト", () => {
   });
 
   it("auth userのコメントにはゴミ箱が表示される", () => {
-    render(<CommentComponent props={commentState} className={"className"} />);
+    render(<CommentComponent commentData={commentState} className={"className"} />);
     const trashBox = screen.getByTestId(`trash-box`);
     expect(trashBox).toBeInTheDocument();
   });
 
   it("not auth user のコメントにはゴミ箱は表示されない", () => {
-    useAuthMock.mockReturnValue({ authState: { user: { id: 2, name: "ユーザー", email: "notAuthUser@test.com" } } });
-    render(<CommentComponent props={commentState} className={"className"} />);
+    data = { id: 2, name: "ユーザー", email: "notAuthUser@test.com" };
+    useAuthMock.mockReturnValue({ data });
+    render(<CommentComponent commentData={commentState} className={"className"} />);
     const trashBox = screen.queryByTestId(`trash-box`);
     expect(trashBox).toBeNull();
   });

@@ -1,48 +1,69 @@
-import { useState } from "react";
-import axios from "@/libs/axios";
-import { MESSAGE } from "@/libs/utils";
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
-import { FighterType } from "@/libs/types/fighter";
+import { initialFighterInfoState } from "@/components/module/FighterEditForm";
+import { useEffect } from "react";
+//! type
+import { FighterType } from "@/libs/hooks/useFighter";
 
-// component
+//! component
 import { FighterEditForm } from "@/components/module/FighterEditForm";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 
-// layout
+//! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 
-// hooks
-import { useMessageController } from "@/libs/hooks/messageController";
-import { useFetchFighters } from "@/libs/hooks/useFetchFighters";
+//! cutom hooks
+import { useRegisterFighter, useFetchFighters } from "@/libs/hooks/useFighter";
+import { queryKeys } from "@/libs/queryKeys";
+import { useQueryState } from "@/libs/hooks/useQueryState";
+
+//! message contoller
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { MESSAGE } from "@/libs/utils";
 
 export const FighterRegister = () => {
-  const [registerPending, setRegisterPending] = useState(false);
-  const { fetchAllFighters } = useFetchFighters();
-  const register = async (
-    event: React.FormEvent<HTMLFormElement>,
-    inputFighterInfo: FighterType
-  ) => {
-    event.preventDefault();
-    setRegisterPending(true);
-    try {
-      await axios.post("api/fighter", inputFighterInfo);
-      fetchAllFighters();
-      setMessageToModal(MESSAGE.FIGHTER_REGISTER_SUCCESS, ModalBgColorType.SUCCESS);
-    } catch (error) {
-      setMessageToModal(MESSAGE.FIGHTER_REGISTER_FAILD, ModalBgColorType.ERROR);
-    }
-    setRegisterPending(false);
+  // const queryClient = useQueryClient();
+  const {
+    registerFighter,
+    isLoading: isRegisterFighterPending,
+    isSuccess: isRegisteredFighter,
+  } = useRegisterFighter();
+  // const {} = useQueryState<boolean>("q/isRegisteredFighter", false)
+
+  const { setToastModalMessage } = useToastModal();
+  const { data: fightersData } = useFetchFighters();
+  const { getLatestState: getLatestFighterDataFromForm, setter: setFighterDataFromForm } =
+    useQueryState<FighterType>(queryKeys.fighterEditData);
+
+  const register = async () => {
+    const fighterDataForRegistration = getLatestFighterDataFromForm();
+    //? 選手がすでに存在しているかをチェック(チェックしてるのは名前だけ)
+    // const hasThatFighterOnDB = fightersData?.some(
+    //   (fighter) => fighter.name === fighterDataForRegistration!.name
+    // );
+    // if (hasThatFighterOnDB) {
+    //   return setToastModalMessage({
+    //     message: MESSAGE.FIGHTER_NOT_ABLE_TO_REGISTER,
+    //     bgColor: ModalBgColorType.NOTICE,
+    //   });
+    // }
+    registerFighter(fighterDataForRegistration!);
   };
 
-  const { setMessageToModal } = useMessageController();
+  useEffect(() => {
+    if (!isRegisteredFighter) return;
+    setFighterDataFromForm(initialFighterInfoState);
+  }, [isRegisteredFighter]);
+
+  useEffect(() => {
+    return () => {
+      setFighterDataFromForm(initialFighterInfoState);
+    };
+  }, []);
 
   return (
     <LayoutForEditPage>
       <div className="min-h-[calc(100vh-50px)] bg-stone-50 flex justify-center items-center">
-        <FighterEditForm
-          onSubmit={(event, inputFighterInfo) => register(event, inputFighterInfo)}
-        />
-        {registerPending && <FullScreenSpinnerModal />}
+        <FighterEditForm onSubmit={register} />
+        {isRegisterFighterPending && <FullScreenSpinnerModal />}
       </div>
     </LayoutForEditPage>
   );

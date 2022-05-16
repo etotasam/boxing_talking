@@ -1,61 +1,48 @@
 import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { MessageModal } from "@/components/modal/MessageModal";
-import { useMessageController } from "@/libs/hooks/messageController";
+// import { MessageModal } from "@/components/modal/MessageModal";
+import { ToastModal } from "@/components/modal/ToastModal";
 import { MESSAGE } from "@/libs/utils";
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
-import { AuthIs } from "@/store/slice/authUserSlice";
 
 //! hooks
-import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useAuth } from "@/libs/hooks/useAuth";
 import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
+import { useToastModal } from "@/libs/hooks/useToastModal";
 
 //! component
 import { LoadingModal } from "@/components/modal/LoadingModal";
 
-const Container = () => {
-  const { message, setMessageToModal } = useMessageController();
+const Container = React.memo(() => {
+  const { message, setToastModalMessage, clearToastModaleMessage } = useToastModal();
+  // const { message, setMessageToModal } = useMessageController();
   const [msg, setMsg] = React.useState<MESSAGE>(MESSAGE.NULL);
   const [waitId, setWaitId] = React.useState<NodeJS.Timeout>();
 
-  const { authState, authCheckAPI } = useAuth();
-  const { matchesState, fetchAllMatches } = useFetchAllMatches();
-  const { userVoteState, fetchUserVoteWithUserId } = useFetchUserVote();
-
-  //? authチェックと試合情報の取得
-  const [isDataLoading, setIsDataLoading] = useState(true);
-  useEffect(() => {
-    let auth;
-    let matches;
-    if (authState.hasAuth === AuthIs.UNDEFINED) {
-      auth = authCheckAPI();
-    }
-    if (matchesState.matches === undefined) {
-      matches = fetchAllMatches();
-    }
-    (async () => {
-      await Promise.all([auth, matches]);
-      setIsDataLoading(false);
-    })();
-  }, []);
+  const { data: authUser, isLoading: isCheckingAuth } = useAuth();
+  const { isLoading: isFetchingMatches } = useFetchMatches();
+  // const { userVoteState, fetchUserVoteWithUserId } = useFetchUserVote();
 
   //? ログイン状態の場合はuserの選手への投票を取得する
-  useEffect(() => {
-    if (authState.hasAuth !== AuthIs.TRUE) return;
-    fetchUserVoteWithUserId(authState.user.id);
-  }, [authState.hasAuth]);
+  // useEffect(() => {
+  //   if (!authUser) return;
+  //   fetchUserVoteWithUserId(authUser.id);
+  // }, [authUser]);
 
   //? メッセージモーダルのタイマーセット
   useEffect(() => {
+    if (!message) {
+      clearToastModaleMessage();
+    }
     (async () => {
       if (waitId) {
         clearTimeout(waitId);
       }
       setMsg(message);
-      await wait(3000);
+      await wait(5000);
       setMsg(MESSAGE.NULL);
-      setMessageToModal(MESSAGE.NULL, ModalBgColorType.NULL);
+      clearToastModaleMessage();
+      // setMessageToModal(MESSAGE.NULL, ModalBgColorType.NULL);
     })();
   }, [message]);
 
@@ -68,10 +55,10 @@ const Container = () => {
   return (
     <div className="w-full">
       <Outlet />
-      {msg !== MESSAGE.NULL && <MessageModal />}
-      {isDataLoading && <LoadingModal />}
+      {msg !== MESSAGE.NULL && <ToastModal />}
+      {(isCheckingAuth || isFetchingMatches) && <LoadingModal />}
     </div>
   );
-};
+});
 
 export default Container;

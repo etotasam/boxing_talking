@@ -15,20 +15,24 @@ type ActionBtnsType = {
 
 export const EditHeader = React.memo(({ className }: Props) => {
   const links = [
-    { title: "選手編集", link: "/fighter/edit" },
+    { title: "選手編集", link: "/fighter/edit?page=1" },
     { title: "選手登録", link: "/fighter/register" },
     { title: "試合登録", link: "/match/register" },
     { title: "試合削除", link: "/match/delete" },
   ];
   return (
     <>
-      <header className={`z-10 fixed top-0 left-0 h-[50px] flex items-center w-full bg-stone-800 ${className}`}>
+      <header
+        className={`z-10 fixed top-0 left-0 h-[50px] flex items-center w-full bg-stone-800 ${className}`}
+      >
         <nav className="">
           {links.map((el) => (
             <NavLink
               key={el.title}
               className={({ isActive }) =>
-                isActive ? `text-stone-200 border-b border-stone-200 ml-5 pb-1` : `text-stone-200 ml-5 pb-1`
+                isActive
+                  ? `text-stone-200 border-b border-stone-200 ml-5 pb-1`
+                  : `text-stone-200 ml-5 pb-1`
               }
               to={el.link}
             >

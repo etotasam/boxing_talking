@@ -4,18 +4,18 @@ import { useLocation } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 
 // hooks
-import { useLogin } from "@/libs/hooks/useLogin";
+import { useLogin } from "@/libs/hooks/useAuth";
 
 jest.mock("react-router-dom");
 const useLocationMock = useLocation as jest.Mock;
 
-jest.mock("@/libs/hooks/useLogin");
+jest.mock("@/libs/hooks/useAuth");
 const useLoginMock = useLogin as jest.Mock;
 
 describe("LoginFormのテスト", () => {
   beforeEach(() => {
     useLocationMock.mockReturnValue({ state: { message: "メッセージ" } });
-    useLoginMock.mockReturnValue({ login: jest.fn(), loginState: { pending: false } });
+    useLoginMock.mockReturnValue({ login: jest.fn() });
   });
   afterEach(() => {
     jest.clearAllMocks();

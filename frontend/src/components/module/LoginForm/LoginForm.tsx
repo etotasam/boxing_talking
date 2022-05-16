@@ -1,12 +1,9 @@
 import { CustomButton } from "@/components/atomic/Button";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-
-// hooks
-import { useMessageController } from "@/libs/hooks/messageController";
-import { useLogin } from "@/libs/hooks/useLogin";
-
-// component
+//! hooks
+import { useLogin } from "@/libs/hooks/useAuth";
+//! component
 import { SpinnerModal } from "@/components/modal/SpinnerModal";
 
 export const LoginForm = () => {
@@ -16,7 +13,8 @@ export const LoginForm = () => {
   const location = useLocation();
   const locationState = location.state;
   const [state, setState] = useState(locationState as { message: string } | null);
-  const { login, loginState } = useLogin();
+  // const { login, loginState } = useLogin();
+  const { login, isLoading: isAuthChecking } = useLogin();
 
   const [isNotice, setIsNotice] = useState(false);
   const [noticeMsg, setNoticeMsg] = useState("");
@@ -66,11 +64,11 @@ export const LoginForm = () => {
           placeholder="Password"
         />
         <div className="relative">
-          {loginState.pending && <SpinnerModal />}
+          {isAuthChecking && <SpinnerModal />}
           <CustomButton
             dataTestid={"login-btn"}
             className={`text-white ${
-              loginState.pending
+              isAuthChecking
                 ? `bg-green-900 text-gray-600 pointer-events-none select-none`
                 : `bg-green-600 hover:bg-green-500 text-white`
             } duration-200`}

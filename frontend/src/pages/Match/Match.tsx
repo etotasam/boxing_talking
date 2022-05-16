@@ -1,87 +1,93 @@
-// module
+import React from "react";
+//! module
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-// types
-import { FighterType } from "@/libs/types/fighter";
-
-// components
+//! components
 import { LayoutDefault } from "@/layout/LayoutDefault";
-import { CommentDeleteModal } from "@/components/modal/CommentDeleteModal";
 import { PostCommentForm } from "@/components/module/PostCommentForm";
 import { MatchInfo } from "@/components/module/MatchInfo";
 import { CommentsContainer } from "@/components/module/CommentsContainer";
+import { DataFetchErrorComponent } from "@/components/module/DataFetchErrorComponent";
 
-//api
-import { MatchesType } from "@/libs/apis/matchAPI";
+//! api
+import { MatchesType } from "@/libs/hooks/useMatches";
 
-// custom hooks
+//! custom hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-import { useMessageController } from "@/libs/hooks/messageController";
-import { MESSAGE } from "@/libs/utils";
-import { useLogout } from "@/libs/hooks/useLogout";
-import { usePostComment } from "@/libs/hooks/usePostComment";
-import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
-import { useResizeCommentsComponent } from "@/libs/hooks/useResizeCommentsComponent";
-import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
-import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
-import { useFetchThisMatchComments } from "@/libs/hooks/useFetchThisMatchComments";
+// import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
+import { useDeleteComment } from "@/libs/hooks/useComment";
+import { useAdjustCommentsContainer } from "@/libs/hooks/useAdjustCommentsContainer";
+// import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
+import { useFetchMatches } from "@/libs/hooks/useMatches";
 
 export const Match = () => {
-  const { deleteCommentsState } = useCommentDelete();
-  const { authState } = useAuth();
+  const { deleteComment } = useDeleteComment();
+  const { data: authUser } = useAuth();
 
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get("id"));
+  const navigate = useNavigate();
 
-  // ユーザー情報
-  const { user: authUser } = authState;
+  //? 試合情報
+  const { data: matchesData, isError: isErrorOnFetchMatches } = useFetchMatches();
 
-  // 試合情報
-  const { matchesState } = useFetchAllMatches();
-  // const { voteResultState } = useFetchVoteResult();
+  //? エラー情報
+  const [hasAnyError, setHasAnyError] = useState(false);
+  const errors = [isErrorOnFetchMatches];
+  useEffect(() => {
+    const hasError = errors.includes(true);
+    setHasAnyError(hasError);
+  }, [...errors]);
+
+  //? 存在しないmatch_idでアクセスされた場合homeへ
+  useEffect(() => {
+    if (!matchesData) return;
+    const hasExistMatch = matchesData.some((match) => match.id === matchId);
+    if (!matchId || !hasExistMatch) return navigate("/");
+  }, [matchesData]);
+
   const [thisMatch, setThisMatch] = useState<MatchesType>();
-  const getThisMatch = (matches: MatchesType[], matchIdByPrams: number): MatchesType | undefined => {
+  const getThisMatch = (
+    matches: MatchesType[],
+    matchIdByPrams: number
+  ): MatchesType | undefined => {
     return matches?.find((match) => match.id === matchIdByPrams);
   };
 
   useEffect(() => {
-    if (!matchesState.matches) return;
-    const match = getThisMatch(matchesState.matches, matchId);
+    if (!matchesData) return;
+    const match = getThisMatch(matchesData, matchId);
     setThisMatch(match);
-  }, [matchesState.matches]);
+  }, [matchesData, matchId]);
 
-  // data全般
+  //? 下記Refの高さに合わせてCommentsContainerコンポーネントの高さを操作(cssの変数を操作)
+  const matchInfoRef = React.useRef<HTMLDivElement>(null);
+  const formDivRef = React.useRef<HTMLDivElement>(null);
+  //? CommentsContainerコンポーネントのサイズを画面に合わせる為のhook
+  useAdjustCommentsContainer([matchInfoRef, formDivRef]);
 
-  // Commets Componentの高さを決めるコード(cssの変数を操作)
-  const [elRefArray, setElRefArray] = useState<React.RefObject<HTMLDivElement>[]>([]);
-  const [elsArray, setElsArray] = useState<(HTMLDivElement | null)[]>([]);
-
-  // refからelementを取得
-  useEffect(() => {
-    const result = elRefArray.reduce((acc: (HTMLDivElement | null)[], curr) => {
-      return [...acc, curr.current];
-    }, []);
-    setElsArray(result);
-  }, [elRefArray]);
-
-  useResizeCommentsComponent(...elsArray);
+  if (hasAnyError) {
+    return <DataFetchErrorComponent />;
+  }
 
   return (
     <LayoutDefault>
-      <div className="grid grid-cols-2">
-        <div className="col-span-1">
-          <MatchInfo getElRefArray={(arr: any[]) => setElRefArray((v) => [...v, ...arr])} />
-          {thisMatch && (
-            <PostCommentForm getPostComRef={(el: any) => setElRefArray((v) => [...v, el])} matchId={thisMatch.id} />
-          )}
+      <div className="grid grid-cols-5">
+        <div className="col-span-3">
+          <div ref={matchInfoRef}>
+            <MatchInfo />
+          </div>
+          <div ref={formDivRef} className="py-10">
+            {thisMatch && <PostCommentForm matchId={thisMatch.id} />}
+          </div>
         </div>
-        <div className={`col-span-1 p-5 t-comment-height`}>
+        <div className={`relative col-span-2 pr-5 t-comment-height`}>
           <CommentsContainer />
         </div>
-        {deleteCommentsState.confirmModalVisble && <CommentDeleteModal userId={authUser.id} />}
+        {/* {deleteCommentsState.confirmModalVisble && <CommentDeleteModal userId={authUser!.id} />} */}
       </div>
     </LayoutDefault>
   );

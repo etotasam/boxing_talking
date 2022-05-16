@@ -41,7 +41,7 @@ class CommentController extends Controller
      * @param string comment
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function post(Request $request)
     {
         try {
             // throw new Exception("post comment failed");
