@@ -24,7 +24,7 @@ import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 //! component
 import { Fighter } from "@/components/module/Fighter";
 import { FighterEditForm } from "@/components/module/FighterEditForm";
-import { SpinnerModal } from "@/components/modal/SpinnerModal";
+import { Spinner } from "@/components/module/Spinner";
 import { EditActionBtns } from "@/components/module/EditActionBtns";
 import { PendingModal } from "@/components/modal/PendingModal";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
@@ -61,11 +61,11 @@ export const FighterEdit = () => {
 
   //? ReactQueryでFighterEditFormとデータを共有
   const {
-    state: fighterEidtData,
+    state: fighterEidtDataOnCache,
     setter: setFighterEditData,
     getLatestState: getLetestFighterDataFromForm,
-  } = useQueryState<any>(queryKeys.fighterEditData, initialFighterInfoState);
-  _selectFighter = fighterEidtData;
+  } = useQueryState<any>(queryKeys.fighterEditData);
+  _selectFighter = fighterEidtDataOnCache;
 
   useEffect(() => {
     return () => {
@@ -124,7 +124,7 @@ export const FighterEdit = () => {
   const { deleteFighter, isLoading: isDeletingFighter } = useDeleteFighter();
   const fighterDelete = async () => {
     setOpenConfirmModal(false);
-    deleteFighter(fighterEidtData);
+    deleteFighter(fighterEidtDataOnCache);
   };
 
   const getFighterWithId = (fighterId: number) => {
@@ -163,8 +163,8 @@ export const FighterEdit = () => {
   //? spinnerを出す条件
   const conditionVisibleSpinner = (fighter: FighterType) => {
     const isLoading =
-      (isDeletingFighter && fighterEidtData.id === fighter.id) ||
-      (isUpdatingFighter && fighterEidtData.id === fighter.id) ||
+      (isDeletingFighter && fighterEidtDataOnCache.id === fighter.id) ||
+      (isUpdatingFighter && fighterEidtDataOnCache.id === fighter.id) ||
       !fighter.id;
     return isLoading;
   };
@@ -176,7 +176,7 @@ export const FighterEdit = () => {
   return (
     <LayoutForEditPage>
       <EditActionBtns actionBtns={actionBtns} />
-      <div className="flex mt-[50px] w-[100vw]">
+      <div className="flex mt-[50px] w-full">
         <div className="w-2/3">
           <Paginate pageCountArray={pageCountArray} params={params} currentPage={paramPage} />
           <form id="fighter-edit" className="relative" onSubmit={onSubmit}>
@@ -197,7 +197,7 @@ export const FighterEdit = () => {
                   >
                     <Fighter fighter={fighter} />
                   </label>
-                  {conditionVisibleSpinner(fighter) && <SpinnerModal className="" />}
+                  {conditionVisibleSpinner(fighter) && <Spinner className="" />}
                 </div>
               ))}
             {isPreviousData && <PendingModal message="選手データ取得中..." />}
@@ -208,7 +208,7 @@ export const FighterEdit = () => {
             <FighterEditForm
               className="flex justify-center w-full"
               onSubmit={tryFighterEdit}
-              isUpdatingFighterData={isUpdatingFighter}
+              isPending={isUpdatingFighter}
             />
             <FighterSearchForm className="bg-stone-200 w-full mt-5" />
           </div>
@@ -218,7 +218,7 @@ export const FighterEdit = () => {
       {openConfirmModal && (
         <ConfirmModal
           execution={fighterDelete}
-          message="選手を削除しますか？"
+          message={`${fighterEidtDataOnCache.name}を削除しますか？`}
           okBtnString="削除"
           cancel={() => setOpenConfirmModal(false)}
         />

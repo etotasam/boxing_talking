@@ -6,10 +6,10 @@ type FighterProps = {
   fighter: FighterType;
   className?: string;
   recordTextColor?: string;
-  cornerColor?: "red" | "blue";
+  cornerColor?: "red" | "blue" | `undefined`;
 };
 
-enum NationaFlag {
+export enum NationaFlag {
   Japan = "t-flag-jp",
   Mexico = "t-flag-mx",
   USA = "t-flag-us",
@@ -19,6 +19,27 @@ enum NationaFlag {
   Philpin = "t-flag-ph",
   Ukrine = "t-flag-ua",
 }
+
+export const checkNationality = (countory: string) => {
+  switch (countory) {
+    case Nationality.Japan:
+      return NationaFlag.Japan;
+    case Nationality.Mexico:
+      return NationaFlag.Mexico;
+    case Nationality.USA:
+      return NationaFlag.USA;
+    case Nationality.Kazakhstan:
+      return NationaFlag.Kazakhstan;
+    case Nationality.UK:
+      return NationaFlag.UK;
+    case Nationality.Rusia:
+      return NationaFlag.Rusia;
+    case Nationality.Philpin:
+      return NationaFlag.Philpin;
+    case Nationality.Ukrine:
+      return NationaFlag.Ukrine;
+  }
+};
 
 export const Fighter = React.memo(
   ({ fighter, className, cornerColor, recordTextColor }: FighterProps) => {
@@ -36,62 +57,51 @@ export const Fighter = React.memo(
     }, []);
     const stance = boxingStyle(fighter.stance);
 
-    const checkNationality = React.useCallback((countory: string) => {
-      switch (countory) {
-        case Nationality.Japan:
-          return NationaFlag.Japan;
-        case Nationality.Mexico:
-          return NationaFlag.Mexico;
-        case Nationality.USA:
-          return NationaFlag.USA;
-        case Nationality.Kazakhstan:
-          return NationaFlag.Kazakhstan;
-        case Nationality.UK:
-          return NationaFlag.UK;
-        case Nationality.Rusia:
-          return NationaFlag.Rusia;
-        case Nationality.Philpin:
-          return NationaFlag.Philpin;
-        case Nationality.Ukrine:
-          return NationaFlag.Ukrine;
-      }
-    }, []);
     const nationalFlag = checkNationality(fighter.country!);
     const textColor = recordTextColor ? recordTextColor : `text-stone-500`;
     return (
-      <div className={`flex p-3 ${cornerColor === "red" && `flex-row-reverse`} ${className}`}>
+      <div className={`flex flex-col p-3 ${className}`}>
         {fighter && (
           <>
-            <div className="flex flex-col w-1/2">
-              <div
-                className={`flex justify-center items-center ${
-                  cornerColor === "red" && `flex-row-reverse`
-                }`}
-              >
-                <span className={`${nationalFlag} t-flag w-[25px] h-full`}></span>
-                <p className="p-2">{fighter.name}</p>
-              </div>
-              <p className="text-center">{age}才</p>
-              <p className="text-center">身長: {fighter.height}cm</p>
-              <p className="text-center">{stance}</p>
+            {/* name */}
+            <div
+              className={`flex justify-start px-10 items-center ${
+                cornerColor === "red" && `flex-row-reverse`
+              }`}
+            >
+              <span className={`${nationalFlag} block t-flag w-[25px] h-[25px]`}></span>
+              <p className="p-2">{fighter.name}</p>
             </div>
 
-            <div className="w-1/2">
-              <div className="flex">
-                <div className={`flex-1 text-xs text-center ${textColor}`}>WIN</div>
-                <div className={`flex-1 text-xs text-center ${textColor}`}>DRWA</div>
-                <div className={`flex-1 text-xs text-center ${textColor}`}>LOSE</div>
+            <div className={`flex ${cornerColor === "red" && `flex-row-reverse`}`}>
+              <div className="flex flex-col w-1/2">
+                <p className="text-center">{age}才</p>
+                <p className="text-center">身長: {fighter.height}cm</p>
+                <p className="text-center">{stance}</p>
               </div>
-              <div className="flex">
-                <div className="flex-1 py-1 text-white text-center bg-green-500">{`${fighter.win}`}</div>
-                <div className="flex-1 py-1 text-white text-center bg-stone-400">
-                  {fighter.draw}
-                </div>
-                <div className="flex-1 py-1 text-white text-center bg-stone-800">
-                  {fighter.lose}
+
+              {/* 戦績 */}
+              <div className="w-1/2">
+                <div className="w-full">
+                  <div className="flex">
+                    <div className={`flex-1 text-xs text-center ${textColor}`}>WIN</div>
+                    <div className={`flex-1 text-xs text-center ${textColor}`}>DRWA</div>
+                    <div className={`flex-1 text-xs text-center ${textColor}`}>LOSE</div>
+                  </div>
+                  <div className="flex">
+                    <div className="flex-1 py-1 text-white text-center bg-green-500">{`${fighter.win}`}</div>
+                    <div className="flex-1 py-1 text-white text-center bg-stone-400">
+                      {fighter.draw}
+                    </div>
+                    <div className="flex-1 py-1 text-white text-center bg-stone-800">
+                      {fighter.lose}
+                    </div>
+                  </div>
+                  <div
+                    className={`w-1/3 text-center text-xs ${textColor}`}
+                  >{`${fighter.ko} KO`}</div>
                 </div>
               </div>
-              <div className={`w-1/3 text-center text-xs ${textColor}`}>{`${fighter.ko} KO`}</div>
             </div>
           </>
         )}
@@ -99,3 +109,38 @@ export const Fighter = React.memo(
     );
   }
 );
+
+export const FighterMin = ({ fighter, className, cornerColor, recordTextColor }: FighterProps) => {
+  const nationalFlag = checkNationality(fighter.country!);
+  const textColor = recordTextColor ? recordTextColor : `text-stone-500`;
+  return (
+    <div className={`p-3 ${className}`}>
+      {/* name */}
+      <div
+        className={`flex justify-center items-center ${
+          cornerColor === "red" && `flex-row-reverse`
+        }`}
+      >
+        <span className={`${nationalFlag} block t-flag w-[25px] h-[25px]`}></span>
+        <p className="p-2">{fighter.name}</p>
+      </div>
+
+      {/* 戦績 */}
+      {/* <div className="w-full"> */}
+      <div className="w-full px-5">
+        <div className="flex">
+          <div className={`flex-1 text-xs text-center ${textColor}`}>WIN</div>
+          <div className={`flex-1 text-xs text-center ${textColor}`}>DRWA</div>
+          <div className={`flex-1 text-xs text-center ${textColor}`}>LOSE</div>
+        </div>
+        <div className="flex">
+          <div className="flex-1 py-1 text-white text-center bg-green-500">{`${fighter.win}`}</div>
+          <div className="flex-1 py-1 text-white text-center bg-stone-400">{fighter.draw}</div>
+          <div className="flex-1 py-1 text-white text-center bg-stone-800">{fighter.lose}</div>
+        </div>
+        <div className={`w-1/3 text-center text-xs ${textColor}`}>{`${fighter.ko} KO`}</div>
+      </div>
+    </div>
+    // </div>
+  );
+};

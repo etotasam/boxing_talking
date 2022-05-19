@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function() {
         return Auth::check();
     })->name('auth.check');
 });
+Route::post('/user/create', [AuthController::class, 'create'])->name('auth.create');
 
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
@@ -66,7 +67,6 @@ Route::put('/vote', [VoteController::class, 'vote'])->name('vote');
 
 
 Route::get("/{match_id}/check_vote", function(string $match_id) {
-    // return $match_id;
     $user_id = Auth::user()->id;
     $match_id = intval($match_id);
     $has_vote = Vote::where([["user_id", $user_id],["match_id", $match_id]])->first();

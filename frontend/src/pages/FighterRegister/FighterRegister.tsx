@@ -11,40 +11,22 @@ import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModa
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 
 //! cutom hooks
-import { useRegisterFighter, useFetchFighters } from "@/libs/hooks/useFighter";
+import { useRegisterFighter } from "@/libs/hooks/useFighter";
 import { queryKeys } from "@/libs/queryKeys";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 
-//! message contoller
-import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
-import { MESSAGE } from "@/libs/utils";
-
 export const FighterRegister = () => {
-  // const queryClient = useQueryClient();
   const {
     registerFighter,
     isLoading: isRegisterFighterPending,
     isSuccess: isRegisteredFighter,
   } = useRegisterFighter();
-  // const {} = useQueryState<boolean>("q/isRegisteredFighter", false)
 
-  const { setToastModalMessage } = useToastModal();
-  const { data: fightersData } = useFetchFighters();
   const { getLatestState: getLatestFighterDataFromForm, setter: setFighterDataFromForm } =
     useQueryState<FighterType>(queryKeys.fighterEditData);
 
   const register = async () => {
     const fighterDataForRegistration = getLatestFighterDataFromForm();
-    //? 選手がすでに存在しているかをチェック(チェックしてるのは名前だけ)
-    // const hasThatFighterOnDB = fightersData?.some(
-    //   (fighter) => fighter.name === fighterDataForRegistration!.name
-    // );
-    // if (hasThatFighterOnDB) {
-    //   return setToastModalMessage({
-    //     message: MESSAGE.FIGHTER_NOT_ABLE_TO_REGISTER,
-    //     bgColor: ModalBgColorType.NOTICE,
-    //   });
-    // }
     registerFighter(fighterDataForRegistration!);
   };
 

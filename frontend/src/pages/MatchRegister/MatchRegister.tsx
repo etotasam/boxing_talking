@@ -57,7 +57,12 @@ export const MatchRegister = () => {
     return acc;
   }, "");
 
-  const { data: fighterData, count: fightersCount, isPreviousData } = useFetchFighters();
+  const {
+    data: fighterData,
+    count: fightersCount,
+    isPreviousData: isPreviousFightersData,
+    isLoading: isFetchingFighters,
+  } = useFetchFighters();
 
   const clearChecked = () => {
     setMatchData((oldData) => {
@@ -68,17 +73,25 @@ export const MatchRegister = () => {
     return Object.values(matchData.fighters).some((fighter) => Number(fighter?.id) === Number(id));
   };
 
+  const initialSetupData = {
+    fighters: {
+      red: null,
+      blue: null,
+    },
+    matchDate: null,
+  };
+  //? setup data
   const { state: matchData, setter: setMatchData } = useQueryState<MatchDataType>(
     queryKeys.registerMatchData,
-    {
-      fighters: {
-        red: null,
-        blue: null,
-      },
-      matchDate: null,
-    }
+    initialSetupData
   );
+  useEffect(() => {
+    return () => {
+      setMatchData(initialSetupData);
+    };
+  }, []);
 
+  //? setup to the match data
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, fighter: FighterType) => {
     if (e.target.checked) {
       //? redが空いていれば入れる
@@ -154,24 +167,25 @@ export const MatchRegister = () => {
   return (
     <LayoutForEditPage>
       <SelectFighters submit={matchRegister} />
-      <div className="flex mt-[150px] w-[100vw]">
+      <div className="flex mt-[150px] w-full">
         <div className="w-2/3">
           {/* ページネーション */}
           <div
             className={`z-50 flex justify-center items-center text-center sticky top-[200px] left-0 h-[35px] t-bgcolor-opacity-5 w-full`}
           >
-            {pageCountArray.map((page) => (
-              <div key={page} className="text-center flex justify-center items-center">
-                <Link
-                  className={`ml-3 px-2 ${
-                    page === paramPage ? `bg-green-500 text-white` : `bg-stone-200`
-                  }`}
-                  to={`/match/register?page=${page}${params}`}
-                >
-                  {page}
-                </Link>
-              </div>
-            ))}
+            {pageCountArray.length > 1 &&
+              pageCountArray.map((page) => (
+                <div key={page} className="text-center flex justify-center items-center">
+                  <Link
+                    className={`ml-3 px-2 ${
+                      page === paramPage ? `bg-green-500 text-white` : `bg-stone-200`
+                    }`}
+                    to={`/match/register?page=${page}${params}`}
+                  >
+                    {page}
+                  </Link>
+                </div>
+              ))}
           </div>
           <div className="mt-3 mx-2">
             {fighterData &&
@@ -191,7 +205,7 @@ export const MatchRegister = () => {
                   </label>
                 </div>
               ))}
-            {isPreviousData && <PendingModal />}
+            {isPreviousFightersData && <PendingModal />}
           </div>
         </div>
         <div className="w-1/3">
@@ -203,6 +217,7 @@ export const MatchRegister = () => {
       </div>
       {postMatchPending && <FullScreenSpinnerModal />}
       {isRegistringMatch && <PendingModal message="試合データ登録中..." />}
+      {isFetchingFighters && <PendingModal message="選手データ取得中..." />}
     </LayoutForEditPage>
   );
 };

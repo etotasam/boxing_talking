@@ -6,7 +6,7 @@ import { useLocation } from "react-router-dom";
 
 //! hooks
 import { useAuth } from "@/libs/hooks/useAuth"
-
+import { VoteType } from "@/libs/hooks/useMatchPredict"
 //! message contoller
 import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 import { MESSAGE } from "@/libs/utils";
@@ -23,6 +23,7 @@ export type CommentType = {
   id: number;
   user: UserType;
   comment: string;
+  vote: string | undefined,
   created_at: Date;
 };
 
@@ -46,7 +47,7 @@ export const useFetchCommentsOnMatch = (matchId: number) => {
 
 export const usePostComment = () => {
   type ApiPropsType = {
-    userId: number,
+    userId: number | null,
     matchId: number,
     comment: string
   }
@@ -63,9 +64,11 @@ export const usePostComment = () => {
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: ({ matchId, comment }) => {
-      const nowDate = dayjs().format('YYYY/MM/DD')
+      const nowDate = dayjs().format('YYYY/MM/DD H:mm')
+      //? userのこの試合のvote
+      const vote = queryClient.getQueryData<VoteType[]>(queryKeys.vote)?.find(v => v.match_id === matchId)
       const snapshot = queryClient.getQueryData<CommentType[]>([queryKeys.comments, { id: matchId }])
-      queryClient.setQueryData([queryKeys.comments, { id: matchId }], [{ id: NaN, user, comment, created_at: nowDate }, ...snapshot!])
+      queryClient.setQueryData([queryKeys.comments, { id: matchId }], [{ id: NaN, user, comment, vote: vote?.vote_for, created_at: nowDate }, ...snapshot!])
       return { snapshot }
     }
   })
@@ -111,7 +114,6 @@ export const useDeleteComment = () => {
   const deleteComment = ({ userId, commentId }: ApiPropsType & { matchId?: number }) => {
     mutate({ userId, commentId }, {
       onSuccess: (data, { commentId }) => {
-        console.log("test");
         const snapshot = queryClient.getQueryData<CommentType[]>([queryKeys.comments, { id: matchIdOnParam }])
         const commentsWidthoutDeleteComment = snapshot!.filter(commentState => commentState.id !== commentId)
         queryClient.setQueryData([queryKeys.comments, { id: matchIdOnParam }], commentsWidthoutDeleteComment)

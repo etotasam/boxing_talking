@@ -3,9 +3,9 @@ import React, { useEffect } from "react";
 import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 import { MESSAGE } from "@/libs/utils";
 //! components
-import { SpinnerModal } from "@/components/modal/SpinnerModal";
+import { Spinner } from "@/components/module/Spinner";
 //! hooks
-import { useAuth } from "@/libs/hooks/useAuth";
+import { useAuth, UserType } from "@/libs/hooks/useAuth";
 import { usePostComment } from "@/libs/hooks/useComment";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 
@@ -27,7 +27,8 @@ export const PostCommentForm = ({ matchId }: { matchId: number }) => {
 
   //? コメントの投稿
   const post = async () => {
-    if (!authUser) return;
+    // if (!authUser) return;
+    const userId = authUser ? authUser.id : null;
     setToastModalMessage({ message: MESSAGE.NULL, bgColor: ModalBgColorType.NULL });
     if (comment === "") {
       setToastModalMessage({
@@ -36,7 +37,7 @@ export const PostCommentForm = ({ matchId }: { matchId: number }) => {
       });
       return;
     }
-    postComment({ userId: authUser.id, matchId, comment });
+    postComment({ userId: userId, matchId, comment });
   };
 
   const divRef = React.useRef(null);
@@ -59,7 +60,7 @@ export const PostCommentForm = ({ matchId }: { matchId: number }) => {
 
   return (
     <div className="w-full flex justify-center">
-      <div className={`w-[80%] flex items-end`}>
+      <div className={`w-[90%] md:w-[80%] flex items-end`}>
         <div
           ref={divRef}
           className={`w-full pl-3 pr-10 py-1 rounded outline-none text-stone-600 duration-300 ${
@@ -74,11 +75,13 @@ export const PostCommentForm = ({ matchId }: { matchId: number }) => {
         <div className="relative w-[80px] ml-3">
           <button
             onClick={post}
-            className="border rounded bg-stone-400 hover:bg-stone-700 focus:bg-stone-700 duration-300 text-stone-50 px-3 w-full h-[34px]"
+            className={`border rounded duration-300 text-stone-50 px-3 w-full h-[34px] ${
+              comment ? `bg-stone-700` : `bg-stone-400`
+            }`}
           >
             送信
           </button>
-          {isPostingComment && <SpinnerModal />}
+          {isPostingComment && <Spinner size={20} />}
         </div>
       </div>
     </div>

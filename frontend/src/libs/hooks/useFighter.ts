@@ -95,12 +95,12 @@ export const useUpdateFighter = () => {
   const query = new URLSearchParams(search);
   let paramPage = Number(query.get("page"));
   const { setToastModalMessage } = useToastModal()
-  const snapshotFighters = queryClient.getQueryData<{ fighters: FighterType[], fighters_count: number }>([queryKeys.fighter, { page: paramPage }])
+  const snapshotFighters = queryClient.getQueryData<FighterType[]>([queryKeys.fighter, { page: paramPage }])
   const api = async (updateFighterData: FighterType): Promise<Record<string, string> | void> => {
     try {
       // setMessageToModal(MESSAGE.FIGHTER_EDIT_UPDATEING, ModalBgColorType.NOTICE);
       //? 編集した選手データを含めた全選手データ
-      const updateFightersData = snapshotFighters?.fighters.reduce((acc: FighterType[], curr: FighterType) => {
+      const updateFightersData = snapshotFighters?.reduce((acc: FighterType[], curr: FighterType) => {
         if (curr.id === updateFighterData.id) {
           return [...acc, updateFighterData];
         }
@@ -110,7 +110,7 @@ export const useUpdateFighter = () => {
       queryClient.setQueryData([queryKeys.fighter, { page: paramPage }], updateFightersData)
       setToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: ModalBgColorType.SUCCESS });
     } catch (error) {
-      console.log("選手データ更新:", error);
+      console.error("選手データ更新:", error);
       queryClient.setQueryData([queryKeys.fighter, { page: paramPage }], snapshotFighters)
       setToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_FAILD, bgColor: ModalBgColorType.ERROR });
     }
@@ -205,7 +205,7 @@ export const useDeleteFighter = () => {
   const deleteFighter = (fighterData: FighterType) => {
     mutate(fighterData, {
       onSuccess: async (data, fighterData, context) => {
-        setToastModalMessage({ message: MESSAGE.FIGHTER_DELETED, bgColor: ModalBgColorType.DELETE })
+        setToastModalMessage({ message: MESSAGE.FIGHTER_DELETED, bgColor: ModalBgColorType.SUCCESS })
         queryClient.setQueryData<FighterType[]>([queryKeys.fighter, { page: paramPage }], context.widtoutDeleteFighters)
         // queryClient.setQueryData<number>(queryKeys.countFighter, ((prevFightersCount) => {
         //   return prevFightersCount! - 1

@@ -7,9 +7,9 @@ import { useQueryState } from "@/libs/hooks/useQueryState"
 import { useToastModal, ModalBgColorType } from "./useToastModal";
 import { MESSAGE } from "@/libs/utils";
 //! hooks
-import { useAuth } from "@/libs/hooks/useAuth"
+import { useAuth, UserType } from "@/libs/hooks/useAuth"
 
-type VoteType = {
+export type VoteType = {
   id: number,
   match_id: number,
   user_id: number,
@@ -18,17 +18,30 @@ type VoteType = {
 
 //! ユーザの試合予想を取得(fetch user vote for predict of a match)
 export const useFetchMatchPredictVote = () => {
+  const queryClient = useQueryClient()
   const api = useCallback(async () => {
     const res = await Axios.get<VoteType[]>(queryKeys.vote).then(v => v.data)
     return res
   }, [])
-  const { data, isLoading } = useQuery(queryKeys.vote, api, { staleTime: Infinity })
-  return { data, isLoading }
+  const { data, isLoading, isRefetching } = useQuery(queryKeys.vote, api, {
+    staleTime: Infinity,
+    onError: () => {
+      queryClient.setQueryData(queryKeys.vote, [])
+    }
+  })
+  return { data, isLoading, isRefetching }
+}
+
+export const feetchUserVote = async () => {
+  const { data } = await Axios.get<VoteType[]>(queryKeys.vote)
+  return data
 }
 
 //! 試合予想の投票
 export const useMatchPredictVote = () => {
   const queryClient = useQueryClient()
+  //? pending時にcontainerでモーダルを使う為のbool
+  const { setter: setIsPendingVote } = useQueryState<boolean>("q/isPendingVote", false)
   const { data: authUser } = useAuth()
   // const {state, setter} = useQueryState(queryKeys.vote)
   const { setToastModalMessage } = useToastModal()
@@ -44,6 +57,7 @@ export const useMatchPredictVote = () => {
   }, [])
   const { mutate, isLoading } = useMutation(api, {
     onMutate: ({ matchId, vote }) => {
+      setIsPendingVote(true)
       const snapshot = queryClient.getQueryData<VoteType[]>(queryKeys.vote)
       if (!authUser) return
       const newVoteData = { id: NaN, match_id: matchId, user_id: authUser.id, vote_for: vote }
@@ -56,11 +70,21 @@ export const useMatchPredictVote = () => {
   const matchPredictVote = ({ matchId, vote }: ApiPropsType) => {
     mutate({ matchId, vote }, {
       onSuccess: () => {
+        setIsPendingVote(false)
         queryClient.invalidateQueries(queryKeys.vote)
+        //? コメントの再取得(投票によるchartデータを更新させる為)
+        queryClient.invalidateQueries(queryKeys.match)
+        //? コメントの再取得(どっちに投票しているかを反映させる為)
+        queryClient.invalidateQueries([queryKeys.comments, { id: matchId }])
         setToastModalMessage({ message: MESSAGE.VOTE_SUCCESSFULLY, bgColor: ModalBgColorType.SUCCESS })
       },
-      onError: (error, variables, context) => {
+      onError: (error: any, variables, context) => {
+        setIsPendingVote(false)
         queryClient.setQueryData(queryKeys.vote, context?.snapshot)
+        if (error.status === 401) {
+          setToastModalMessage({ message: MESSAGE.VOTE_FAILED_WITH_NO_AUTH, bgColor: ModalBgColorType.ERROR })
+          return
+        }
         setToastModalMessage({ message: MESSAGE.VOTE_FAILD, bgColor: ModalBgColorType.ERROR })
       }
     })

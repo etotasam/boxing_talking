@@ -1,7 +1,7 @@
 import React from "react";
 
 // components
-import { SpinnerModal } from "@/components/modal/SpinnerModal";
+import { Spinner } from "@/components/module/Spinner";
 import { CustomButton } from "@/components/atomic/Button";
 
 // hooks
@@ -19,7 +19,7 @@ export const LogoutBtn = React.memo(() => {
 
   return (
     <div className="relative">
-      {isLogoutPending && <SpinnerModal />}
+      {isLogoutPending && <Spinner size={20} />}
       <CustomButton
         dataTestid={"logout-button"}
         className={`text-white ${
@@ -29,7 +29,7 @@ export const LogoutBtn = React.memo(() => {
         } duration-200`}
         onClick={click}
       >
-        Logout
+        ログアウト
       </CustomButton>
     </div>
   );

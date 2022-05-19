@@ -27,7 +27,7 @@ import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 //! component
 import { Fighter } from "@/components/module/Fighter";
 import { FighterEditForm } from "@/components/module/FighterEditForm";
-import { SpinnerModal } from "@/components/modal/SpinnerModal";
+import { Spinner } from "@/components/module/Spinner";
 import { EditActionBtns } from "@/components/module/EditActionBtns";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 import { ReactNode } from "react";
@@ -71,8 +71,8 @@ jest.mock("@/components/module/Fighter");
 const FighterMock = Fighter as jest.Mock;
 jest.mock("@/components/module/FighterEditForm");
 const FighterEditFormMock = FighterEditForm as jest.Mock;
-jest.mock("@/components/modal/SpinnerModal");
-const SpinnerModalMock = SpinnerModal as jest.Mock;
+jest.mock("@/components/module/Spinner");
+const SpinnerMock = Spinner as jest.Mock;
 jest.mock("@/components/module/EditActionBtns");
 const EditActionBtnsMock = EditActionBtns as jest.Mock;
 jest.mock("@/components/modal/FullScreenSpinnerModal");
@@ -150,7 +150,7 @@ describe("FighterEditのテスト", () => {
     //! component mock implement
     FighterMock.mockImplementation(() => <div>FighterMock</div>);
     FighterEditFormMock.mockReturnValue(<div>FighterEditFormMock</div>);
-    SpinnerModalMock.mockReturnValue(<div>SpinnerModalMock</div>);
+    SpinnerMock.mockReturnValue(<div>SpinnerMock</div>);
     EditActionBtnsMock.mockReturnValue(<div>EditActionBtnsMock</div>);
     FullScreenSpinnerModalMock.mockReturnValue(<div>FullScreenSpinnerModalMock </div>);
   });

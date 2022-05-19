@@ -18,6 +18,7 @@ const commentState = {
   id: 1,
   comment: "こめんと",
   user: user,
+  vote: "red",
   created_at: new Date("2022/4/13"),
 };
 

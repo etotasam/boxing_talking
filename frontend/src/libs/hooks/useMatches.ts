@@ -86,7 +86,7 @@ export const useDeleteMatch = () => {
     await Axios.delete(queryKeys.match, { data: { matchId } })
   }, [])
 
-  const { mutate, isLoading } = useMutation(api, {
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
       const snapshot = matchesState
       return { snapshot }
@@ -107,7 +107,7 @@ export const useDeleteMatch = () => {
     })
   }
 
-  return { deleteMatch, isLoading }
+  return { deleteMatch, isLoading, isSuccess }
 }
 
 //! 試合日の変更

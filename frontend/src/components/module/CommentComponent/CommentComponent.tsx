@@ -5,42 +5,36 @@ import { FaTrashAlt } from "react-icons/fa";
 // import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 
 //! components
-import { SpinnerModal } from "@/components/modal/SpinnerModal";
+import { Spinner } from "@/components/module/Spinner";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
 import { PendingModal } from "@/components/modal/PendingModal";
 //! custom hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-import { useDeleteComment, useFetchCommentsOnMatch } from "@/libs/hooks/useComment";
+import { useDeleteComment, useFetchCommentsOnMatch, CommentType } from "@/libs/hooks/useComment";
 //! types
 import { UserType } from "@/libs/hooks/useAuth";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 
 type PropsType = {
-  commentData: {
-    id: number;
-    comment: string;
-    user: UserType;
-    created_at: Date;
-  };
-  className: string;
+  commentData: CommentType;
+  className?: string;
 };
 
-type CommentPropsType = {
-  commentId: number;
-  comment: string;
-  userName: string;
-  createdAt: Date;
-  className: string;
-  userId: number;
-  // deleteConfirmModalVisible: (commentId: number) => void;
-};
+// type CommentPropsType = {
+//   commentId: number;
+//   comment: string;
+//   userName: string;
+//   createdAt: Date;
+//   className: string;
+//   userId: number;
+// };
 const dateFormat = (date: Date) => {
   return dayjs(date).format("YYYY/MM/DD H:mm");
 };
 
 export const CommentComponent = ({ commentData, className }: PropsType) => {
   const { data: authUser } = useAuth();
-  const { id: commentId, comment, user: postUser, created_at } = commentData;
+  const { id: commentId, comment, user: postUser, created_at, vote } = commentData;
   // const { id: userId } = useUser();
   const classname = className || "";
   // const { openDeleteConfirmModale, defineDeleteCommentId } = useCommentDelete();
@@ -87,28 +81,39 @@ export const CommentComponent = ({ commentData, className }: PropsType) => {
 
   return (
     <>
-      <div className={`relative py-3 px-3 ${classname}`}>
+      <div className={`relative py-3 md:px-3 pl-5 ${classname}`}>
         <div className="mr-10">
           <div className="whitespace-pre-wrap text-stone-600">{comment}</div>
           <div className="flex mt-2">
             <time className="text-gray-600 text-sm">{dateFormat(created_at)}</time>
-            <p className="text-gray-700 text-sm ml-5">{postUser.name}</p>
+            <div className="flex">
+              <p className="text-gray-700 text-sm ml-5">
+                {postUser ? postUser.name : process.env.REACT_APP_GUEST_NAME}
+              </p>
+              <div className="flex justify-center items-center ml-2">
+                <span
+                  className={`block w-[7px] h-[7px] rounded-lg ${
+                    vote === "red" ? `bg-red-600` : vote === "blue" && `bg-blue-600`
+                  }`}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        {postUser.id === authUser?.id && (
+        {postUser && postUser.id === authUser?.id && (
           <button
             data-testid={`trash-box`}
             onClick={() => onClickButton(commentId)}
-            className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            className="absolute top-3 right-5 text-gray-600 hover:text-black"
           >
             <FaTrashAlt />
           </button>
         )}
-        {isPostingComment && isNaN(commentData.id) && <SpinnerModal />}
-        {isCommentDeletePending && commentData.id === deleteTargetId && <SpinnerModal />}
+        {isPostingComment && isNaN(commentData.id) && <Spinner />}
+        {isCommentDeletePending && commentData.id === deleteTargetId && <Spinner />}
       </div>
-      {openDeleteConfirmModal && (
+      {openDeleteConfirmModal && deleteTargetId === commentData.id && (
         <ConfirmModal
           message={"コメントを削除しますか？"}
           okBtnString={"削除"}

@@ -18,14 +18,11 @@ import { MatchesType } from "@/libs/hooks/useMatches";
 import { useAuth } from "@/libs/hooks/useAuth";
 // import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { useDeleteComment } from "@/libs/hooks/useComment";
-import { useAdjustCommentsContainer } from "@/libs/hooks/useAdjustCommentsContainer";
+// import { useAdjustCommentsContainer } from "@/libs/hooks/useAdjustCommentsContainer";
 // import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 import { useFetchMatches } from "@/libs/hooks/useMatches";
 
 export const Match = () => {
-  const { deleteComment } = useDeleteComment();
-  const { data: authUser } = useAuth();
-
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get("id"));
@@ -63,11 +60,11 @@ export const Match = () => {
     setThisMatch(match);
   }, [matchesData, matchId]);
 
-  //? 下記Refの高さに合わせてCommentsContainerコンポーネントの高さを操作(cssの変数を操作)
-  const matchInfoRef = React.useRef<HTMLDivElement>(null);
-  const formDivRef = React.useRef<HTMLDivElement>(null);
-  //? CommentsContainerコンポーネントのサイズを画面に合わせる為のhook
-  useAdjustCommentsContainer([matchInfoRef, formDivRef]);
+  // //? 下記Refの高さに合わせてCommentsContainerコンポーネントの高さを操作(cssの変数を操作)
+  // const matchInfoRef = React.useRef<HTMLDivElement>(null);
+  // const formDivRef = React.useRef<HTMLDivElement>(null);
+  // //? CommentsContainerコンポーネントのサイズを画面に合わせる為のhook
+  // useAdjustCommentsContainer([matchInfoRef, formDivRef]);
 
   if (hasAnyError) {
     return <DataFetchErrorComponent />;
@@ -75,19 +72,26 @@ export const Match = () => {
 
   return (
     <LayoutDefault>
-      <div className="grid grid-cols-5">
-        <div className="col-span-3">
-          <div ref={matchInfoRef}>
+      <div className="lg:grid lg:grid-cols-[3fr_2fr] lg:grid-rows-[460px_150px_calc(100vh-760px)]">
+        <div className="lg:col-span-1">
+          <div
+          // ref={matchInfoRef}
+          >
             <MatchInfo />
           </div>
-          <div ref={formDivRef} className="py-10">
-            {thisMatch && <PostCommentForm matchId={thisMatch.id} />}
-          </div>
         </div>
-        <div className={`relative col-span-2 pr-5 t-comment-height`}>
+
+        <div
+          // ref={formDivRef}
+          className="z-20 lg:col-span-1 sticky top-0 py-5 lg:py-0 flex items-center bg-stone-200 border-b border-stone-400 lg:border-none"
+        >
+          {thisMatch && <PostCommentForm matchId={thisMatch.id} />}
+        </div>
+
+        <div className={`relative lg:row-start-1 lg:row-span-3 lg:col-start-2`}>
+          {/* <div className={`relative row-span-1 col-start-3 lg:t-comment-height`}> */}
           <CommentsContainer />
         </div>
-        {/* {deleteCommentsState.confirmModalVisble && <CommentDeleteModal userId={authUser!.id} />} */}
       </div>
     </LayoutDefault>
   );

@@ -5,13 +5,28 @@ export const STATUS = {
   NOT_ACCEPTABLE: 406,
 } as const
 
+export const WINDOW_WIDTH = {
+  sm: 640,
+  md: 768,
+  lg: 1024,
+  xl: 1280
+} as const
+
 
 export enum MESSAGE {
+
+  SIGNUP_LACK_INPUT = "入力情報が不足しています",
+
+  USER_REGISTER_SUCCESSFULLY = "登録が完了しました",
+  USER_ALREADY_EXIST = "すでに登録されているEmailです",
+  USER_NAME_ALREADY_USE = "その名前はすでに使われています \n 別の名前を検討してください",
+
   INVALID_COUNTRY = "国籍が無効です",
   COMMENT_POST_SUCCESSFULLY = "コメントを投稿しました",
   COMMENT_POST_FAILED = `コメント投稿に失敗しました \n お手数ですが、時間を空けて再度投稿してください`,
   COMMENT_POST_NULL = `コメントを入力してください`,
 
+  VOTE_FAILED_WITH_NO_AUTH = '勝敗予想を投票するにはログインが必要です',
   VOTE_FAILD = `投票はできません \n すでに投票しています`,
   VOTE_SUCCESSFULLY = `投票しました`,
 
@@ -27,7 +42,7 @@ export enum MESSAGE {
   NOT_AUTHORIZED = 'ログインが必要です',
   NULL = "",
 
-  MATCH_NOT_SELECTED = "変更する試合を選択してください",
+  MATCH_NOT_SELECTED = "対象の試合を選択してください",
   MATCH_NOT_ALTER = "試合情報に変更がありません",
   MATCH_REGISTER_SUCCESS = "試合情報の登録が完了しました",
   MATCH_REGISTER_FAILD = "試合情報の登録に失敗しました \n 再度登録してください",

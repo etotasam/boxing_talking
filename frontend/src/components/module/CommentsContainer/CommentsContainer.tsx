@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 //! component
 import { CommentComponent } from "@/components/module/CommentComponent";
-import { SpinnerModal } from "@/components/modal/SpinnerModal";
+import { Spinner } from "@/components/module/Spinner";
 import { useLocation } from "react-router-dom";
 //!hooks
 import { useAuth } from "@/libs/hooks/useAuth";
@@ -27,7 +27,9 @@ export const CommentsContainer = () => {
 
   return (
     <>
-      <div className={`relative h-full overflow-y-auto box-border border-x border-gray-400 px-5`}>
+      <div
+        className={`relative h-full min-h-[50px] overflow-y-auto box-border border-x border-gray-400 md:px-5`}
+      >
         {commentsData &&
           (commentsData.length ? (
             commentsData.map((comment) => (
@@ -35,17 +37,14 @@ export const CommentsContainer = () => {
                 key={comment.id}
                 className="last:mb-7 first:mt-7 border-b last:border-0 border-gray-400"
               >
-                <CommentComponent
-                  commentData={comment}
-                  className={`${comment.user.id === authUser?.id ? "" : ""}`}
-                />
+                <CommentComponent commentData={comment} />
               </div>
             ))
           ) : (
             <div>コメントはありません</div>
           ))}
       </div>
-      {pending && <SpinnerModal />}
+      {pending && <Spinner />}
     </>
   );
 };

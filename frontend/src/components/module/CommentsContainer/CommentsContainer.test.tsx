@@ -3,7 +3,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { useLocation } from "react-router-dom";
 
 //! components
-import { SpinnerModal } from "@/components/modal/SpinnerModal";
+import { Spinner } from "@/components/module/Spinner";
 
 //! hooks
 import { useAuth } from "@/libs/hooks/useAuth";
@@ -20,7 +20,7 @@ const useLocationMock = useLocation as jest.Mock;
 
 //?spinerのモック
 jest.mock("@/components/modal/SpinnerModal");
-const SpinnerModalMock = SpinnerModal as jest.Mock;
+const SpinnerMock = Spinner as jest.Mock;
 
 //?ログインユーザーのモック
 jest.mock("@/libs/hooks/useAuth");
@@ -91,7 +91,7 @@ describe("CommentsContainerのテスト", () => {
     };
     useFetchCommentsOnMatchMock.mockReturnValue(useCommentsOnMatchMockReturnValue);
     // useFetchThisMatchCommentsMock.mockReturnValue({ commentsState, ...useFetchThisMatchCommentsMockReturnValue });
-    SpinnerModalMock.mockImplementation(jest.fn(() => <div>スピナー</div>));
+    SpinnerMock.mockImplementation(jest.fn(() => <div>スピナー</div>));
     render(<CommentsContainer />);
     expect(screen.getByText("スピナー")).toBeInTheDocument();
   });

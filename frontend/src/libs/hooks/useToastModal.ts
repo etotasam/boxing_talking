@@ -12,6 +12,7 @@ export enum ModalBgColorType {
   DELETE = "gray",
   NOTICE = "blue",
   NULL = "null",
+  GRAY = "stone"
 }
 
 type ToastModalMessageType = {
