@@ -8,7 +8,7 @@ import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 import { MESSAGE } from "@/libs/utils";
 
-type Props = {
+type PropsType = {
   onSubmit: () => void;
   className?: string;
   isPending?: boolean;
@@ -34,7 +34,7 @@ export const initialFighterInfoState: any = {
   lose: "",
 };
 
-export const FighterEditForm = ({ onSubmit, className, isPending }: Props) => {
+export const FighterEditForm = ({ onSubmit, className, isPending }: PropsType) => {
   const { setToastModalMessage } = useToastModal();
   const queryClient = useQueryClient();
   //? ReactQueryでFighterEditとデータを共有

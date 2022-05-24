@@ -5,6 +5,7 @@ import { useQueryClient } from "react-query";
 import { queryKeys } from "@/libs/queryKeys";
 import dayjs from "dayjs";
 import { WINDOW_WIDTH } from "@/libs/utils";
+import { motion } from "framer-motion";
 //!types
 import { MatchesType } from "@/libs/hooks/useMatches";
 import { FighterType } from "@/libs/hooks/useFighter";
@@ -168,7 +169,12 @@ export const MatchInfo = () => {
           </div>
         </div>
         {thisMatch && (
-          <div className="grid sm:col-span-2 sm:row-span-1 sm:grid-rows-[1fr_30px_1fr] mt-3 sm:m-0">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="grid sm:col-span-2 sm:row-span-1 sm:grid-rows-[1fr_30px_1fr] mt-3 sm:m-0"
+          >
             <h1 className="sm:col-span-1 sm:row-span-1 sm:row-start-2 col-span-2 bg-stone-800 text-center text-white text-xl">
               {dayjs(thisMatch.date).format("YYYY/M/D")}
             </h1>
@@ -217,7 +223,7 @@ export const MatchInfo = () => {
                 />
               )}
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
       {openVoteConfirmModal && (

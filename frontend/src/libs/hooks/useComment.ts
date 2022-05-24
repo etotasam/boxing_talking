@@ -51,6 +51,7 @@ export const usePostComment = () => {
     matchId: number,
     comment: string
   }
+  const { setter: setIsCommentPosting } = useQueryState("q/isCommentPosting", false)
   const queryClient = useQueryClient()
   const { data: user } = useAuth()
   const { setToastModalMessage } = useToastModal()
@@ -64,6 +65,7 @@ export const usePostComment = () => {
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: ({ matchId, comment }) => {
+      setIsCommentPosting(true)
       const nowDate = dayjs().format('YYYY/MM/DD H:mm')
       //? userのこの試合のvote
       const vote = queryClient.getQueryData<VoteType[]>(queryKeys.vote)?.find(v => v.match_id === matchId)
@@ -76,10 +78,12 @@ export const usePostComment = () => {
     const trimmedComment = comment.trim()
     mutate({ userId, matchId, comment: trimmedComment }, {
       onSuccess: () => {
+        setIsCommentPosting(false)
         queryClient.invalidateQueries([queryKeys.comments, { id: matchId }])
         setToastModalMessage({ message: MESSAGE.COMMENT_POST_SUCCESSFULLY, bgColor: ModalBgColorType.SUCCESS })
       },
       onError: (error, variables, context) => {
+        setIsCommentPosting(false)
         queryClient.setQueryData([queryKeys.comments, { id: matchId }], context?.snapshot)
         setToastModalMessage({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: ModalBgColorType.ERROR })
       }
@@ -92,6 +96,7 @@ export const usePostComment = () => {
 //! コメントの削除
 
 export const useDeleteComment = () => {
+  const { setter: setIsCommentDeleting } = useQueryState("q/isCommentDeleting", false)
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   let matchIdOnParam = Number(query.get("id"));
@@ -110,10 +115,15 @@ export const useDeleteComment = () => {
     })
   }, [])
 
-  const { mutate, isLoading, isSuccess } = useMutation(api)
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
+    onMutate: () => {
+      setIsCommentDeleting(true)
+    }
+  })
   const deleteComment = ({ userId, commentId }: ApiPropsType & { matchId?: number }) => {
     mutate({ userId, commentId }, {
       onSuccess: (data, { commentId }) => {
+        setIsCommentDeleting(false)
         const snapshot = queryClient.getQueryData<CommentType[]>([queryKeys.comments, { id: matchIdOnParam }])
         const commentsWidthoutDeleteComment = snapshot!.filter(commentState => commentState.id !== commentId)
         queryClient.setQueryData([queryKeys.comments, { id: matchIdOnParam }], commentsWidthoutDeleteComment)
@@ -121,6 +131,7 @@ export const useDeleteComment = () => {
         setToastModalMessage({ message: MESSAGE.COMMENT_DELETED, bgColor: ModalBgColorType.DELETE })
       },
       onError: () => {
+        setIsCommentDeleting(false)
         setToastModalMessage({ message: MESSAGE.COMMENT_DELETE_FAILED, bgColor: ModalBgColorType.ERROR })
       }
     })

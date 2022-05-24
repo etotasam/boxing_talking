@@ -8,6 +8,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 
 //! custom hooks
 import { useFetchFighters } from "@/libs/hooks/useFighter";
+import { Button } from "@/components/atomic/Button";
 
 type Props = React.ComponentProps<"form">;
 
@@ -85,18 +86,11 @@ export const FighterSearchForm = ({ className }: Props) => {
               ))}
             </select>
 
-            <button
-              onClick={reset}
-              className={`float-right mt-5 duration-300 py-1 px-2 rounded bg-green-600 hover:bg-green-500 text-white`}
-            >
+            <Button type="button" onClick={reset} className={`float-right mt-5`}>
               リセット
-            </button>
+            </Button>
 
-            <button
-              className={`mt-5 w-full duration-300 py-1 px-2 rounded bg-green-600 hover:bg-green-500 text-white`}
-            >
-              検索
-            </button>
+            <Button className={`mt-5 w-full`}>検索</Button>
           </div>
         </form>
       </div>

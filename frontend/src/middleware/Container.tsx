@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 // import { MessageModal } from "@/components/modal/MessageModal";
 import { ToastModal } from "@/components/modal/ToastModal";
-import { MESSAGE } from "@/libs/utils";
+import { motion, AnimatePresence } from "framer-motion";
 import { useQueryClient } from "react-query";
 //! hooks
 import { useFetchMatches } from "@/libs/hooks/useMatches";
@@ -11,7 +11,7 @@ import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
 import { useToastModal } from "@/libs/hooks/useToastModal";
 import { queryKeys } from "@/libs/queryKeys";
 import { useQueryState } from "@/libs/hooks/useQueryState";
-
+import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
 //! component
 import { LoadingModal } from "@/components/modal/LoadingModal";
 import { ClearModal } from "@/components/modal/ClearModal";
@@ -20,9 +20,9 @@ import { LoginModal } from "@/components/modal/LoginModal";
 
 const Container = React.memo(() => {
   const queryClient = useQueryClient();
-  const { message, setToastModalMessage, clearToastModaleMessage } = useToastModal();
+  const { clearToastModaleMessage, isOpenToastModal } = useToastModal();
   // const { message, setMessageToModal } = useMessageController();
-  const [msg, setMsg] = React.useState<MESSAGE>(MESSAGE.NULL);
+  // const [msg, setMsg] = React.useState<MESSAGE>(MESSAGE.NULL);
   const [waitId, setWaitId] = React.useState<NodeJS.Timeout>();
 
   const { data: authUser, isLoading: isCheckingAuth, isError } = useAuth();
@@ -38,9 +38,18 @@ const Container = React.memo(() => {
   const { state: isPendingVote } = useQueryState<boolean>("q/isPendingVote");
   //? loginモーダルの状態管理
   const { state: isOpenLoginModal } = useQueryState<boolean>("q/isOpenLoginModal");
+  //? コメント削除のpending状態
+  const { state: isPendingCommentDelete } = useQueryState("q/isCommentDeleting");
+  //? コメント投稿中の状態
+  const { state: isCommentPosting } = useQueryState("q/isCommentPosting");
 
   //? ClearModalが表示される条件
-  const pending = isPendingVote || isPendingLogin || isPendingLogout;
+  const pending =
+    isPendingVote ||
+    isPendingLogin ||
+    isPendingLogout ||
+    isPendingCommentDelete ||
+    isCommentPosting;
 
   //? cookieでログインチェック。なければfalseを入れる
   useEffect(() => {
@@ -50,20 +59,17 @@ const Container = React.memo(() => {
 
   //? メッセージモーダルのタイマーセット
   useEffect(() => {
-    if (!message) {
+    if (!isOpenToastModal) {
       clearToastModaleMessage();
     }
     (async () => {
       if (waitId) {
         clearTimeout(waitId);
       }
-      setMsg(message);
       await wait(5000);
-      setMsg(MESSAGE.NULL);
       clearToastModaleMessage();
-      // setMessageToModal(MESSAGE.NULL, ModalBgColorType.NULL);
     })();
-  }, [message]);
+  }, [isOpenToastModal]);
 
   const wait = (ms: number) => {
     return new Promise((resolve) => {
@@ -71,10 +77,20 @@ const Container = React.memo(() => {
       setWaitId(id);
     });
   };
+
+  const windowWidth = useGetWindowWidth();
+
   return (
     <div className="relative w-full">
       <Outlet />
-      {msg !== MESSAGE.NULL && <ToastModal />}
+      {/* {msg !== MESSAGE.NULL && <ToastModal />} */}
+      <AnimatePresence>
+        {isOpenToastModal && (
+          <motion.div>
+            <ToastModal windowWidth={windowWidth} />
+          </motion.div>
+        )}
+      </AnimatePresence>
       {(isCheckingAuth || isFetchingMatches) && <LoadingModal />}
       {isOpenSignUpModal && <SignUpModal />}
       {isOpenLoginModal && <LoginModal />}

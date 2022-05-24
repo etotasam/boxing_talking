@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { WINDOW_WIDTH } from "@/libs/utils";
 //! custom hooks
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useCreateUser } from "@/libs/hooks/useAuth";
+import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
 //! components
 import { Spinner } from "@/components/module/Spinner";
 //! message contoller
@@ -10,6 +12,7 @@ import { MESSAGE } from "@/libs/utils";
 
 export const SignUpModal = () => {
   const { setter: setIsOpenSignUpModal } = useQueryState<boolean>("q/isOpenSignUpModal");
+  const { setter: setIsOpenLoginModal } = useQueryState<boolean>("q/isOpenLoginModal");
 
   const { createUser, isLoading: isCreatingUser, isSuccess: isSuccessCreateUser } = useCreateUser();
   const { setToastModalMessage } = useToastModal();
@@ -36,6 +39,12 @@ export const SignUpModal = () => {
     setEmail("");
     setPassword("");
   }, [isSuccessCreateUser]);
+
+  const windowWidth = useGetWindowWidth();
+  const openLoginModal = () => {
+    setIsOpenSignUpModal(false);
+    setIsOpenLoginModal(true);
+  };
 
   return (
     <div
@@ -84,6 +93,16 @@ export const SignUpModal = () => {
               </button>
               {isCreatingUser && <Spinner size={20} />}
             </div>
+            {windowWidth < WINDOW_WIDTH.lg && (
+              <div className="text-right mt-5">
+                <span
+                  onClick={openLoginModal}
+                  className="hover:border-b hover:border-blue-600 text-blue-600 text-sm cursor-pointer"
+                >
+                  ログイン
+                </span>
+              </div>
+            )}
           </form>
         </div>
       </div>

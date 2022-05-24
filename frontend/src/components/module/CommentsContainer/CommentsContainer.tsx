@@ -3,9 +3,10 @@ import React, { useEffect, useState } from "react";
 import { CommentComponent } from "@/components/module/CommentComponent";
 import { Spinner } from "@/components/module/Spinner";
 import { useLocation } from "react-router-dom";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 //!hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-import { useFetchCommentsOnMatch } from "@/libs/hooks/useComment";
+import { useFetchCommentsOnMatch, CommentType } from "@/libs/hooks/useComment";
 
 export const CommentsContainer = () => {
   const { data: authUser } = useAuth();
@@ -24,26 +25,30 @@ export const CommentsContainer = () => {
 
   //? コメント欄をloadingにする条件
   const pending = isFetchingComments;
-
   return (
     <>
-      <div
+      <ul
         className={`relative h-full min-h-[50px] overflow-y-auto box-border border-x border-gray-400 md:px-5`}
       >
         {commentsData &&
           (commentsData.length ? (
             commentsData.map((comment) => (
-              <div
+              <motion.li
+                layout
+                // initial={{ opacity: 0 }}
+                // animate={{ opacity: 1, transition: { delay: 0.1 } }}
+                // exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
                 key={comment.id}
                 className="last:mb-7 first:mt-7 border-b last:border-0 border-gray-400"
               >
                 <CommentComponent commentData={comment} />
-              </div>
+              </motion.li>
             ))
           ) : (
             <div>コメントはありません</div>
           ))}
-      </div>
+      </ul>
       {pending && <Spinner />}
     </>
   );

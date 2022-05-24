@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { queryKeys } from "@/libs/queryKeys";
 import { NationaFlag, checkNationality } from "@/components/module/Fighter";
+import { WINDOW_WIDTH } from "@/libs/utils";
 //! types
 import { MatchesType } from "@/libs/hooks/useMatches";
 //! component
@@ -10,6 +11,7 @@ import { PendingModal } from "@/components/modal/PendingModal";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
 import { Spinner } from "@/components/module/Spinner";
 //! hooks
+import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useFetchMatches, useDeleteMatch, useUpdateMatch } from "@/libs/hooks/useMatches";
 //! layout
@@ -28,6 +30,8 @@ export const MatchEdit = () => {
   const { updateMatch, isLoading: isUpdateingMatch, isSuccess: isUpdatedMatch } = useUpdateMatch();
 
   const { setToastModalMessage, clearToastModaleMessage } = useToastModal();
+
+  const windowWidth = useGetWindowWidth();
 
   //todo
   const [isOpenConfirmModal, setIsOpenConfirmModal] = React.useState(false);
@@ -83,8 +87,13 @@ export const MatchEdit = () => {
   return (
     <LayoutForEditPage>
       <EditActionBtns actionBtns={actionBtns} />
-      <div className="flex mt-[50px] w-full">
-        <form id={"match-delete"} className="w-2/3" onSubmit={submit}>
+      <div className="flex flex-col md:flex-row-reverse mt-[50px] w-full">
+        <div className={`z-20 w-full md:w-1/3 sticky top-[100px] right-0`}>
+          <div className="md:sticky md:top-[100px] md:right-0 md:pt-2">
+            <MatchEditForm matchUpdate={(updateData: MatchesType) => updateMatch(updateData)} />
+          </div>
+        </div>
+        <form id={"match-delete"} className="w-full md:w-2/3" onSubmit={submit}>
           {matchesData &&
             matchesData.map((match) => (
               <div key={match.id} className={`relative bg-stone-200 m-2`}>
@@ -108,11 +117,6 @@ export const MatchEdit = () => {
               </div>
             ))}
         </form>
-        <div className={`w-1/3`}>
-          <div className="sticky top-[100px] right-0 pt-2">
-            <MatchEditForm matchUpdate={(updateData: MatchesType) => updateMatch(updateData)} />
-          </div>
-        </div>
       </div>
       {isDeletingMatch && <PendingModal message="試合データの削除中です..." />}
       {isOpenConfirmModal && (
@@ -167,15 +171,20 @@ const MatchEditForm = ({ matchUpdate }: MatchEditFormPropsType) => {
 
   return (
     <>
-      <form className="p-5 bg-stone-200" onSubmit={alterMatchDate}>
-        <label htmlFor="match-date">試合日の変更:</label>
-        <input
-          id="match-date"
-          type="date"
-          value={(targetMatchState?.date as string) || ""}
-          onChange={onChange}
-        />
-        <button className="bg-green-500 text-white py-1 px-5 rounded float-right">変更</button>
+      <form
+        className="p-5 bg-stone-200 flex justify-between md:flex-col lg:flex-row"
+        onSubmit={alterMatchDate}
+      >
+        <div>
+          <label htmlFor="match-date">試合日の変更:</label>
+          <input
+            id="match-date"
+            type="date"
+            value={(targetMatchState?.date as string) || ""}
+            onChange={onChange}
+          />
+        </div>
+        <button className="bg-green-500 text-white py-1 px-5 md:mt-3 lg:mt-0 rounded">変更</button>
       </form>
     </>
   );

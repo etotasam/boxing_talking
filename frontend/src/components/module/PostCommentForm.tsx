@@ -16,7 +16,7 @@ export const PostCommentForm = ({ matchId }: { matchId: number }) => {
     isLoading: isPostingComment,
     isSuccess: isSuccessPostComment,
   } = usePostComment();
-  const { setToastModalMessage } = useToastModal();
+  const { setToastModalMessage, clearToastModaleMessage } = useToastModal();
   const [comment, setComment] = React.useState<string>("");
 
   //? isLoading: isPostingComment,を外で使いたいのでuseQueryStateで共有
@@ -29,7 +29,7 @@ export const PostCommentForm = ({ matchId }: { matchId: number }) => {
   const post = async () => {
     // if (!authUser) return;
     const userId = authUser ? authUser.id : null;
-    setToastModalMessage({ message: MESSAGE.NULL, bgColor: ModalBgColorType.NULL });
+    clearToastModaleMessage();
     if (comment === "") {
       setToastModalMessage({
         message: MESSAGE.COMMENT_POST_NULL,

@@ -13,6 +13,7 @@ import { MESSAGE } from "@/libs/utils";
 
 export const LoginModal = () => {
   const { setter: setIsOpenLoginModal } = useQueryState<boolean>("q/isOpenLoginModal");
+  const { setter: setIsOpenSignUpModal } = useQueryState<boolean>("q/isOpenSignUpModal");
 
   // const { createUser, isLoading: isCreatingUser, isSuccess: isSuccessCreateUser } = useCreateUser();
   const { login, isSuccess: isSuccessfullyLogin, isLoading: isLoadingLogin } = useLogin();
@@ -49,6 +50,11 @@ export const LoginModal = () => {
     setEmail("");
     setPassword("");
   }, [isSuccessfullyLogin]);
+
+  const openAccountModal = () => {
+    setIsOpenLoginModal(false);
+    setIsOpenSignUpModal(true);
+  };
 
   return (
     <div
@@ -89,7 +95,10 @@ export const LoginModal = () => {
               {isLoadingLogin && <Spinner size={20} />}
             </div>
             <div className="text-right mt-5">
-              <span className="hover:border-b hover:border-blue-600 text-blue-600 text-sm cursor-pointer">
+              <span
+                onClick={openAccountModal}
+                className="hover:border-b hover:border-blue-600 text-blue-600 text-sm cursor-pointer"
+              >
                 アカウント作成
               </span>
             </div>

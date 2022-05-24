@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { queryKeys } from "@/libs/queryKeys";
+import { WINDOW_WIDTH } from "@/libs/utils";
 //! type
 import { FighterType } from "@/libs/hooks/useFighter";
 //! layout
@@ -11,6 +12,7 @@ import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useFetchFighters, limit } from "@/libs/hooks/useFighter";
 import { useRegisterMatch } from "@/libs/hooks/useMatches";
+import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
 //! component
 import { Button } from "@/components/atomic/Button";
 import { Fighter } from "@/components/module/Fighter";
@@ -40,6 +42,8 @@ export const MatchRegister = () => {
   const paramName = query.get("name");
   const paramCountry = query.get("country");
   const navigate = useNavigate();
+
+  const windowWidth = useGetWindowWidth();
 
   useEffect(() => {
     if (!paramPage) return navigate("?page=1");
@@ -168,10 +172,10 @@ export const MatchRegister = () => {
     <LayoutForEditPage>
       <SelectFighters submit={matchRegister} />
       <div className="flex mt-[150px] w-full">
-        <div className="w-2/3">
+        <div className="w-full md:w-2/3">
           {/* ページネーション */}
           <div
-            className={`z-50 flex justify-center items-center text-center sticky top-[200px] left-0 h-[35px] t-bgcolor-opacity-5 w-full`}
+            className={`z-50 flex justify-center items-center text-center sticky top-[200px] left-0 h-[35px] bg-black/50 w-full`}
           >
             {pageCountArray.length > 1 &&
               pageCountArray.map((page) => (
@@ -188,7 +192,7 @@ export const MatchRegister = () => {
               ))}
           </div>
           <div className="mt-3 mx-2">
-            {fighterData &&
+            {fighterData && fighterData.length ? (
               fighterData.map((fighter) => (
                 <div key={fighter.id} className="relative mt-3 first:mt-0">
                   <input
@@ -204,16 +208,21 @@ export const MatchRegister = () => {
                     <Fighter fighter={fighter} className={`bg-stone-200`} />
                   </label>
                 </div>
-              ))}
+              ))
+            ) : (
+              <div>該当の選手はいませんでした</div>
+            )}
             {isPreviousFightersData && <PendingModal />}
           </div>
         </div>
-        <div className="w-1/3">
-          <div className="flex flex-col sticky top-[200px]">
-            <FighterSearchForm className="bg-stone-200" />
-            <MatchControlForm onClick={clearChecked} />
+        {windowWidth > WINDOW_WIDTH.md && (
+          <div className="w-1/3 max-w-[500px]">
+            <div className="flex flex-col sticky top-[200px]">
+              <FighterSearchForm className="bg-stone-200" />
+              <MatchDayEditForm onClick={clearChecked} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
       {postMatchPending && <FullScreenSpinnerModal />}
       {isRegistringMatch && <PendingModal message="試合データ登録中..." />}
@@ -272,15 +281,15 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
   );
 };
 
-type MatchControlFormPropsType = {
+type MatchDayEditFormPropsType = {
   onClick: () => void;
 };
 
-const MatchControlForm = ({ onClick }: MatchControlFormPropsType) => {
+const MatchDayEditForm = ({ onClick }: MatchDayEditFormPropsType) => {
   const { setter: setMatchData } = useQueryState<MatchDataType>(queryKeys.registerMatchData);
   return (
     <div className="bg-stone-200 flex justify-center items-center py-5 mt-5">
-      <div className="w-[80%] flex justify-between">
+      <div className="w-[80%]">
         <div>
           <label htmlFor="match-date">試合日</label>
           <input
@@ -298,8 +307,10 @@ const MatchControlForm = ({ onClick }: MatchControlFormPropsType) => {
             }
           />
         </div>
-        <div>
-          <Button onClick={onClick}>選手クリア</Button>
+        <div className="mt-3">
+          <Button className={`w-full`} onClick={onClick}>
+            選手クリア
+          </Button>
         </div>
       </div>
     </div>

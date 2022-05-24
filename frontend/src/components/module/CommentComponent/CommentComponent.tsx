@@ -3,31 +3,26 @@ import dayjs from "dayjs";
 import { FaTrashAlt } from "react-icons/fa";
 // import { useUser } from "@/store/slice/authUserSlice";
 // import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
-
+import { motion, AnimatePresence } from "framer-motion";
 //! components
 import { Spinner } from "@/components/module/Spinner";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
 import { PendingModal } from "@/components/modal/PendingModal";
 //! custom hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-import { useDeleteComment, useFetchCommentsOnMatch, CommentType } from "@/libs/hooks/useComment";
+import { useDeleteComment, CommentType } from "@/libs/hooks/useComment";
 //! types
 import { UserType } from "@/libs/hooks/useAuth";
 import { useQueryState } from "@/libs/hooks/useQueryState";
+//! toast message contoller
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { MESSAGE, STATUS } from "@/libs/utils";
 
 type PropsType = {
   commentData: CommentType;
   className?: string;
 };
 
-// type CommentPropsType = {
-//   commentId: number;
-//   comment: string;
-//   userName: string;
-//   createdAt: Date;
-//   className: string;
-//   userId: number;
-// };
 const dateFormat = (date: Date) => {
   return dayjs(date).format("YYYY/MM/DD H:mm");
 };
@@ -37,18 +32,14 @@ export const CommentComponent = ({ commentData, className }: PropsType) => {
   const { id: commentId, comment, user: postUser, created_at, vote } = commentData;
   // const { id: userId } = useUser();
   const classname = className || "";
-  // const { openDeleteConfirmModale, defineDeleteCommentId } = useCommentDelete();
+
+  const { clearToastModaleMessage } = useToastModal();
+
   const {
     deleteComment,
     isLoading: isCommentDeleting,
     isSuccess: isCommentDeleted,
   } = useDeleteComment();
-  //? modalを挟んでdeleteCommentを実行するからなのか isLoading が反映されないが、useQueryで共有すれば反映される。なぜかは謎
-  const { state: isCommentDeletePending, setter: setIsCommentDeleting } =
-    useQueryState("q/isCommentDeleting");
-  useEffect(() => {
-    setIsCommentDeleting(isCommentDeleting);
-  }, [isCommentDeleting]);
 
   //? delete対象コメントのidを共有
   const { state: deleteTargetId, setter: setDeleteTargetId } = useQueryState<number | undefined>(
@@ -72,12 +63,18 @@ export const CommentComponent = ({ commentData, className }: PropsType) => {
   const { state: openDeleteConfirmModal, setter: setOpenDeleteConfirmModal } =
     useQueryState<boolean>("q/openDeleteConfirmModal", false);
 
-  const onClickButton = (commentId: number) => {
+  const clickTrashBtn = (commentId: number) => {
+    clearToastModaleMessage();
     setDeleteTargetId(commentId);
     setOpenDeleteConfirmModal(true);
   };
 
   const { state: isPostingComment } = useQueryState<boolean>("q/isPostingComment");
+
+  const variant = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
 
   return (
     <>
@@ -103,24 +100,27 @@ export const CommentComponent = ({ commentData, className }: PropsType) => {
 
         {postUser && postUser.id === authUser?.id && (
           <button
+            // whileHover={{ scale: 1.3 }}
             data-testid={`trash-box`}
-            onClick={() => onClickButton(commentId)}
-            className="absolute top-3 right-5 text-gray-600 hover:text-black"
+            onClick={() => clickTrashBtn(commentId)}
+            className="absolute top-3 right-5 text-gray-600 hover:text-black hover:scale-125 duration-300"
           >
             <FaTrashAlt />
           </button>
         )}
         {isPostingComment && isNaN(commentData.id) && <Spinner />}
-        {isCommentDeletePending && commentData.id === deleteTargetId && <Spinner />}
+        {isCommentDeleting && commentData.id === deleteTargetId && <Spinner />}
       </div>
-      {openDeleteConfirmModal && deleteTargetId === commentData.id && (
-        <ConfirmModal
-          message={"コメントを削除しますか？"}
-          okBtnString={"削除"}
-          cancel={() => setOpenDeleteConfirmModal(false)}
-          execution={commentDelete}
-        />
-      )}
+      <AnimatePresence>
+        {openDeleteConfirmModal && deleteTargetId === commentData.id && (
+          <ConfirmModal
+            message={"コメントを削除しますか？"}
+            okBtnString={"削除"}
+            cancel={() => setOpenDeleteConfirmModal(false)}
+            execution={commentDelete}
+          />
+        )}
+      </AnimatePresence>
       {/* <CommentDeleteConfirmModal isDeleting={true} commentDelete={commentDelete} /> */}
     </>
   );

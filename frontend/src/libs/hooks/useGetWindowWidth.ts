@@ -1,8 +1,8 @@
 import React from "react"
-// import { useQueryState } from "@/libs/hooks/useQueryState"
 
 export const useGetWindowWidth = (): number => {
   const [width, setWidth] = React.useState(0)
+  // const { state: windowWidth, setter } = useQueryState<number>("q/windowWidth", 0)
 
   const getWindowWidth = () => {
     const width = window.innerWidth

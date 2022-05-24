@@ -1,4 +1,5 @@
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Props = {
   message: string | JSX.Element;
@@ -6,13 +7,26 @@ type Props = {
   cancel: <T>(arg?: T) => void;
   execution: <T>(arg?: T) => void;
 };
+
+const motionProps = {
+  duration: 0.2,
+} as const;
+
 export const ConfirmModal = ({ execution, message, okBtnString, cancel }: Props) => {
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: motionProps.duration }}
       onClick={cancel}
       className={`z-50 w-[100vw] h-[100vh] fixed top-0 left-0 flex justify-center items-center bg-black/10`}
     >
-      <div
+      <motion.div
+        initial={{ y: -10 }}
+        animate={{ y: 0 }}
+        exit={{ y: 10 }}
+        transition={{ duration: motionProps.duration }}
         onClick={(e) => {
           e.stopPropagation();
         }}
@@ -33,7 +47,7 @@ export const ConfirmModal = ({ execution, message, okBtnString, cancel }: Props)
             {okBtnString}
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
