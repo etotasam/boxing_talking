@@ -20,9 +20,8 @@ function App() {
         <Route element={<Container />}>
           <Route path="/" element={<Home />} />
 
-          <Route element={<PrivateRoute />}>
-            <Route path="/match" element={<Match />} />
-          </Route>
+          <Route element={<PrivateRoute />}></Route>
+          <Route path="/match" element={<Match />} />
 
           <Route path="/*" element={<NotFound />} />
 

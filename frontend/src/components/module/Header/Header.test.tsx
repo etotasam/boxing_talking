@@ -2,14 +2,19 @@ import { Header } from ".";
 import { CustomLink } from "@/components/module/CustomLink";
 import { cleanup, render, screen } from "@testing-library/react";
 import { useLocation, useNavigate } from "react-router-dom";
-// auth data
+import { act, renderHook, RenderHookResult } from "@testing-library/react-hooks";
+import { QueryClientProvider, QueryClient } from "react-query";
+//! hooks
+import { useQueryState } from "@/libs/hooks/useQueryState";
+//! auth data
 import { useAuth } from "@/libs/hooks/useAuth";
-
-// test data
+//! test data
 import { authUser } from "@/libs/test-data";
 
 jest.mock("@/libs/hooks/useAuth");
 const useAuthMock = useAuth as jest.Mock;
+jest.mock("@/libs/hooks/useQueryState");
+const useQueryStateMock = useQueryState as jest.Mock;
 
 jest.mock("@/components/module/CustomLink");
 const CustomLinkMock = CustomLink as jest.Mock;
@@ -30,11 +35,17 @@ jest.mock("@/components/module/LoginForm", () => ({
   },
 }));
 
+type wrapperType = { children: React.ReactNode };
+
 describe("Headerテスト", () => {
-  beforeAll(() => {});
+  const queryClient = new QueryClient();
+  const Wrapper = ({ children }: wrapperType) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
 
   beforeEach(() => {
     const data = authUser;
+    useQueryStateMock.mockReturnValue(jest.fn());
     useAuthMock.mockReturnValue({ data });
     useLocationMock.mockReturnValue({ pathname: "/comments" });
     CustomLinkMock.mockReturnValue(<a href="/">Homeへ</a>);
@@ -50,7 +61,11 @@ describe("Headerテスト", () => {
   });
 
   it("login時、名前はauth userでlogoutボタンがある", () => {
-    render(<Header />);
+    render(
+      <Wrapper>
+        <Header />
+      </Wrapper>
+    );
     const logoutBtn = screen.getByText("Logoutボタン");
     const loginBtn = screen.queryByText("Loginボタン");
     const authUserName = screen.getByText("auth userさん");
@@ -60,9 +75,13 @@ describe("Headerテスト", () => {
   });
   it("logout時、名前はゲストでloginボタンが存在する", () => {
     useAuthMock.mockReturnValue({ authState: undefined });
-    render(<Header />);
+    render(
+      <Wrapper>
+        <Header />
+      </Wrapper>
+    );
     const logoutBtn = screen.queryByText("Logoutボタン");
-    const loginBtn = screen.getByText("Loginボタン");
+    const loginBtn = screen.getByText("ログイン");
     const authUserName = screen.getByText("ゲストさん");
     expect(logoutBtn).toBeNull();
     expect(loginBtn).toBeInTheDocument();
@@ -71,14 +90,22 @@ describe("Headerテスト", () => {
 
   it("homeを表示時 Homeへ ボタンが存在しない", () => {
     useLocationMock.mockReturnValue({ pathname: "/" });
-    render(<Header />);
+    render(
+      <Wrapper>
+        <Header />
+      </Wrapper>
+    );
     const linkBtn = screen.queryByText("Homeへ");
     expect(linkBtn).toBeNull();
   });
 
   it("表示がhome以外の時 Homeへ ボタンが存在する", () => {
     useLocationMock.mockReturnValue({ pathname: "/comments" });
-    render(<Header />);
+    render(
+      <Wrapper>
+        <Header />
+      </Wrapper>
+    );
     const linkBtn = screen.getByText("Homeへ");
     expect(linkBtn).toBeInTheDocument();
   });

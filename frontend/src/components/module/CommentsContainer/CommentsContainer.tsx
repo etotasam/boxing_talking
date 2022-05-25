@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 //! component
 import { CommentComponent } from "@/components/module/CommentComponent";
-import { SpinnerModal } from "@/components/modal/SpinnerModal";
+import { Spinner } from "@/components/module/Spinner";
 import { useLocation } from "react-router-dom";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 //!hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-import { useFetchCommentsOnMatch } from "@/libs/hooks/useComment";
+import { useFetchCommentsOnMatch, CommentType } from "@/libs/hooks/useComment";
 
 export const CommentsContainer = () => {
   const { data: authUser } = useAuth();
@@ -24,28 +25,28 @@ export const CommentsContainer = () => {
 
   //? コメント欄をloadingにする条件
   const pending = isFetchingComments;
-
   return (
     <>
-      <div className={`relative h-full overflow-y-auto box-border border-x border-gray-400 px-5`}>
+      <ul
+        className={`relative h-full min-h-[50px] md:overflow-y-auto box-border border-x border-gray-400 md:px-5`}
+      >
         {commentsData &&
           (commentsData.length ? (
             commentsData.map((comment) => (
-              <div
+              <motion.li
+                layout
+                transition={{ duration: 0.3 }}
                 key={comment.id}
-                className="last:mb-7 first:mt-7 border-b last:border-0 border-gray-400"
+                className="last:pb-7 first:pt-7 border-b last:border-0 border-gray-400"
               >
-                <CommentComponent
-                  commentData={comment}
-                  className={`${comment.user.id === authUser?.id ? "" : ""}`}
-                />
-              </div>
+                <CommentComponent commentData={comment} />
+              </motion.li>
             ))
           ) : (
             <div>コメントはありません</div>
           ))}
-      </div>
-      {pending && <SpinnerModal />}
+      </ul>
+      {pending && <Spinner />}
     </>
   );
 };

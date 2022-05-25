@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Exception;
 // models
 use App\Models\User;
 use App\Models\Vote;
 use App\Models\BoxingMatch;
+
+use \Symfony\Component\HttpFoundation\Response;
 
 class VoteController extends Controller
 {
@@ -19,10 +22,19 @@ class VoteController extends Controller
      */
     public function fetch()
     {
-        $user_id = Auth::user()->id;;
-        // $user_id = $request->user_id;
-        $votes =User::find($user_id)->votes;
-        return $votes;
+        try {
+            if(!Auth::user()) {
+                throw new Exception('no auth', Response::HTTP_UNAUTHORIZED);
+            }
+            $user_id = Auth::user()->id;
+            $votes =User::find($user_id)->votes;
+            return $votes;
+        }catch(Exception $e) {
+            if($e->getCode() == Response::HTTP_UNAUTHORIZED) {
+                return response()->json(["message" => $e->getMessage()], Response::HTTP_UNAUTHORIZED);
+            }
+            return response()->json(["message" => "get user vote faild"], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -34,14 +46,21 @@ class VoteController extends Controller
      */
     public function vote(Request $request)
     {
-        $match_id = $request->match_id;
-        $vote = $request->vote;
         try{
-            DB::beginTransaction();
+            if(!Auth::user()) {
+                throw new Exception('no auth', Response::HTTP_UNAUTHORIZED);
+            }
             $user_id = Auth::user()->id;
+            $match_id = $request->match_id;
+            $vote = $request->vote;
             $match_id = intval($match_id);
-            $hasVote = Vote::where([["user_id", $user_id],["match_id", $match_id]])->first();
-            if($hasVote) {
+            DB::beginTransaction();
+            $is_match = BoxingMatch::find($match_id)->exists();
+            if(!$is_match) {
+                throw new Exception('the match not exist');
+            }
+            $has_vote = Vote::where([["user_id", $user_id],["match_id", $match_id]])->first();
+            if($has_vote) {
                 throw new Exception("Voting is not allowed. You already voted.");
             }
             Vote::create([
@@ -58,10 +77,13 @@ class VoteController extends Controller
             $matches->save();
             DB::commit();
             // return ["message" => "voted successfully"];
-            return response()->json(["message" => "success vote"],200);
+            return response()->json(["message" => "success vote"],Response::HTTP_OK);
         }catch (Exception $e) {
             DB::rollBack();
-            return response()->json(["message" => $e->getMessage()],406);
+            if($e->getCode() == Response::HTTP_UNAUTHORIZED) {
+                return response()->json($e->getMessage(), Response::HTTP_UNAUTHORIZED);
+            }
+            return response()->json(["message" => 'vote failed'],Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

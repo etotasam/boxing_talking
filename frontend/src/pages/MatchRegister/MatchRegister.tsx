@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { queryKeys } from "@/libs/queryKeys";
+import { WINDOW_WIDTH } from "@/libs/utils";
 //! type
 import { FighterType } from "@/libs/hooks/useFighter";
 //! layout
@@ -11,6 +12,7 @@ import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useFetchFighters, limit } from "@/libs/hooks/useFighter";
 import { useRegisterMatch } from "@/libs/hooks/useMatches";
+import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
 //! component
 import { Button } from "@/components/atomic/Button";
 import { Fighter } from "@/components/module/Fighter";
@@ -41,6 +43,8 @@ export const MatchRegister = () => {
   const paramCountry = query.get("country");
   const navigate = useNavigate();
 
+  const windowWidth = useGetWindowWidth();
+
   useEffect(() => {
     if (!paramPage) return navigate("?page=1");
   }, [paramPage]);
@@ -57,7 +61,12 @@ export const MatchRegister = () => {
     return acc;
   }, "");
 
-  const { data: fighterData, count: fightersCount, isPreviousData } = useFetchFighters();
+  const {
+    data: fighterData,
+    count: fightersCount,
+    isPreviousData: isPreviousFightersData,
+    isLoading: isFetchingFighters,
+  } = useFetchFighters();
 
   const clearChecked = () => {
     setMatchData((oldData) => {
@@ -68,17 +77,25 @@ export const MatchRegister = () => {
     return Object.values(matchData.fighters).some((fighter) => Number(fighter?.id) === Number(id));
   };
 
+  const initialSetupData = {
+    fighters: {
+      red: null,
+      blue: null,
+    },
+    matchDate: null,
+  };
+  //? setup data
   const { state: matchData, setter: setMatchData } = useQueryState<MatchDataType>(
     queryKeys.registerMatchData,
-    {
-      fighters: {
-        red: null,
-        blue: null,
-      },
-      matchDate: null,
-    }
+    initialSetupData
   );
+  useEffect(() => {
+    return () => {
+      setMatchData(initialSetupData);
+    };
+  }, []);
 
+  //? setup to the match data
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, fighter: FighterType) => {
     if (e.target.checked) {
       //? redが空いていれば入れる
@@ -154,27 +171,28 @@ export const MatchRegister = () => {
   return (
     <LayoutForEditPage>
       <SelectFighters submit={matchRegister} />
-      <div className="flex mt-[150px] w-[100vw]">
-        <div className="w-2/3">
+      <div className="flex mt-[150px] w-full">
+        <div className="w-full md:w-2/3">
           {/* ページネーション */}
           <div
-            className={`z-50 flex justify-center items-center text-center sticky top-[200px] left-0 h-[35px] t-bgcolor-opacity-5 w-full`}
+            className={`z-50 flex justify-center items-center text-center sticky top-[200px] left-0 h-[35px] bg-black/50 w-full`}
           >
-            {pageCountArray.map((page) => (
-              <div key={page} className="text-center flex justify-center items-center">
-                <Link
-                  className={`ml-3 px-2 ${
-                    page === paramPage ? `bg-green-500 text-white` : `bg-stone-200`
-                  }`}
-                  to={`/match/register?page=${page}${params}`}
-                >
-                  {page}
-                </Link>
-              </div>
-            ))}
+            {pageCountArray.length > 1 &&
+              pageCountArray.map((page) => (
+                <div key={page} className="text-center flex justify-center items-center">
+                  <Link
+                    className={`ml-3 px-2 ${
+                      page === paramPage ? `bg-green-500 text-white` : `bg-stone-200`
+                    }`}
+                    to={`/match/register?page=${page}${params}`}
+                  >
+                    {page}
+                  </Link>
+                </div>
+              ))}
           </div>
           <div className="mt-3 mx-2">
-            {fighterData &&
+            {fighterData && fighterData.length ? (
               fighterData.map((fighter) => (
                 <div key={fighter.id} className="relative mt-3 first:mt-0">
                   <input
@@ -190,19 +208,25 @@ export const MatchRegister = () => {
                     <Fighter fighter={fighter} className={`bg-stone-200`} />
                   </label>
                 </div>
-              ))}
-            {isPreviousData && <PendingModal />}
+              ))
+            ) : (
+              <div>該当の選手はいませんでした</div>
+            )}
+            {isPreviousFightersData && <PendingModal />}
           </div>
         </div>
-        <div className="w-1/3">
-          <div className="flex flex-col sticky top-[200px]">
-            <FighterSearchForm className="bg-stone-200" />
-            <MatchControlForm onClick={clearChecked} />
+        {windowWidth > WINDOW_WIDTH.md && (
+          <div className="w-1/3 max-w-[500px]">
+            <div className="flex flex-col sticky top-[200px]">
+              <FighterSearchForm className="bg-stone-200" />
+              <MatchDayEditForm onClick={clearChecked} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
       {postMatchPending && <FullScreenSpinnerModal />}
       {isRegistringMatch && <PendingModal message="試合データ登録中..." />}
+      {isFetchingFighters && <PendingModal message="選手データ取得中..." />}
     </LayoutForEditPage>
   );
 };
@@ -257,15 +281,15 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
   );
 };
 
-type MatchControlFormPropsType = {
+type MatchDayEditFormPropsType = {
   onClick: () => void;
 };
 
-const MatchControlForm = ({ onClick }: MatchControlFormPropsType) => {
+const MatchDayEditForm = ({ onClick }: MatchDayEditFormPropsType) => {
   const { setter: setMatchData } = useQueryState<MatchDataType>(queryKeys.registerMatchData);
   return (
     <div className="bg-stone-200 flex justify-center items-center py-5 mt-5">
-      <div className="w-[80%] flex justify-between">
+      <div className="w-[80%]">
         <div>
           <label htmlFor="match-date">試合日</label>
           <input
@@ -283,8 +307,10 @@ const MatchControlForm = ({ onClick }: MatchControlFormPropsType) => {
             }
           />
         </div>
-        <div>
-          <Button onClick={onClick}>選手クリア</Button>
+        <div className="mt-3">
+          <Button className={`w-full`} onClick={onClick}>
+            選手クリア
+          </Button>
         </div>
       </div>
     </div>

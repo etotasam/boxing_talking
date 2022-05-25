@@ -1,24 +1,38 @@
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Props = {
-  message: string;
+  message: string | JSX.Element;
   okBtnString: string;
   cancel: <T>(arg?: T) => void;
   execution: <T>(arg?: T) => void;
 };
+
+const motionProps = {
+  duration: 0.2,
+} as const;
+
 export const ConfirmModal = ({ execution, message, okBtnString, cancel }: Props) => {
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: motionProps.duration }}
       onClick={cancel}
-      className={`z-50 w-[100vw] h-[100vh] fixed top-0 left-0 flex justify-center items-center t-bgcolor-opacity-1`}
+      className={`z-50 w-[100vw] h-[100vh] fixed top-0 left-0 flex justify-center items-center bg-black/10`}
     >
-      <div
+      <motion.div
+        initial={{ y: -10 }}
+        animate={{ y: 0 }}
+        exit={{ y: 10 }}
+        transition={{ duration: motionProps.duration }}
         onClick={(e) => {
           e.stopPropagation();
         }}
-        className="bg-white w-1/3 px-10 py-5 rounded flex flex-col justify-center items-center drop-shadow-lg"
+        className="bg-stone-100 w-1/3 max-w-[500px] min-w-[350px] px-10 py-5 rounded flex flex-col justify-center items-center drop-shadow-lg"
       >
-        <p dangerouslySetInnerHTML={{ __html: message }}></p>
+        <div className="text-center w-full">{message}</div>
         <div className="flex mt-5">
           <button
             onClick={cancel}
@@ -33,7 +47,7 @@ export const ConfirmModal = ({ execution, message, okBtnString, cancel }: Props)
             {okBtnString}
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };

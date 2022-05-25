@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { CommentComponent } from ".";
-
+import { QueryClientProvider, QueryClient } from "react-query";
 //! hooks
 // import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { useDeleteComment } from "@/libs/hooks/useComment";
@@ -18,6 +18,7 @@ const commentState = {
   id: 1,
   comment: "こめんと",
   user: user,
+  vote: "red",
   created_at: new Date("2022/4/13"),
 };
 
@@ -29,7 +30,14 @@ const useAuthMock = useAuth as jest.Mock;
 jest.mock("@/libs/hooks/useComment");
 const useDeleteCommentMock = useDeleteComment as jest.Mock;
 
+type wrapperType = { children: React.ReactNode };
+
 describe("CommentComponentのテスト", () => {
+  const queryClient = new QueryClient();
+  const Wrapper = ({ children }: wrapperType) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+
   beforeEach(() => {
     data = user;
     useAuthMock.mockReturnValue({ data });
@@ -45,7 +53,11 @@ describe("CommentComponentのテスト", () => {
   });
 
   it("auth userのコメントにはゴミ箱が表示される", () => {
-    render(<CommentComponent commentData={commentState} className={"className"} />);
+    render(
+      <Wrapper>
+        <CommentComponent commentData={commentState} className={"className"} />
+      </Wrapper>
+    );
     const trashBox = screen.getByTestId(`trash-box`);
     expect(trashBox).toBeInTheDocument();
   });
@@ -53,7 +65,11 @@ describe("CommentComponentのテスト", () => {
   it("not auth user のコメントにはゴミ箱は表示されない", () => {
     data = { id: 2, name: "ユーザー", email: "notAuthUser@test.com" };
     useAuthMock.mockReturnValue({ data });
-    render(<CommentComponent commentData={commentState} className={"className"} />);
+    render(
+      <Wrapper>
+        <CommentComponent commentData={commentState} className={"className"} />
+      </Wrapper>
+    );
     const trashBox = screen.queryByTestId(`trash-box`);
     expect(trashBox).toBeNull();
   });
