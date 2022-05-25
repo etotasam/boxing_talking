@@ -6,7 +6,7 @@ import { useLocation } from "react-router-dom";
 
 //! hooks
 import { useAuth } from "@/libs/hooks/useAuth"
-
+import { VoteType } from "@/libs/hooks/useMatchPredict"
 //! message contoller
 import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 import { MESSAGE } from "@/libs/utils";
@@ -23,6 +23,7 @@ export type CommentType = {
   id: number;
   user: UserType;
   comment: string;
+  vote: string | undefined,
   created_at: Date;
 };
 
@@ -46,10 +47,11 @@ export const useFetchCommentsOnMatch = (matchId: number) => {
 
 export const usePostComment = () => {
   type ApiPropsType = {
-    userId: number,
+    userId: number | null,
     matchId: number,
     comment: string
   }
+  const { setter: setIsCommentPosting } = useQueryState("q/isCommentPosting", false)
   const queryClient = useQueryClient()
   const { data: user } = useAuth()
   const { setToastModalMessage } = useToastModal()
@@ -63,9 +65,12 @@ export const usePostComment = () => {
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: ({ matchId, comment }) => {
-      const nowDate = dayjs().format('YYYY/MM/DD')
+      setIsCommentPosting(true)
+      const nowDate = dayjs().format('YYYY/MM/DD H:mm')
+      //? userのこの試合のvote
+      const vote = queryClient.getQueryData<VoteType[]>(queryKeys.vote)?.find(v => v.match_id === matchId)
       const snapshot = queryClient.getQueryData<CommentType[]>([queryKeys.comments, { id: matchId }])
-      queryClient.setQueryData([queryKeys.comments, { id: matchId }], [{ id: NaN, user, comment, created_at: nowDate }, ...snapshot!])
+      queryClient.setQueryData([queryKeys.comments, { id: matchId }], [{ id: NaN, user, comment, vote: vote?.vote_for, created_at: nowDate }, ...snapshot!])
       return { snapshot }
     }
   })
@@ -73,10 +78,12 @@ export const usePostComment = () => {
     const trimmedComment = comment.trim()
     mutate({ userId, matchId, comment: trimmedComment }, {
       onSuccess: () => {
+        setIsCommentPosting(false)
         queryClient.invalidateQueries([queryKeys.comments, { id: matchId }])
         setToastModalMessage({ message: MESSAGE.COMMENT_POST_SUCCESSFULLY, bgColor: ModalBgColorType.SUCCESS })
       },
       onError: (error, variables, context) => {
+        setIsCommentPosting(false)
         queryClient.setQueryData([queryKeys.comments, { id: matchId }], context?.snapshot)
         setToastModalMessage({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: ModalBgColorType.ERROR })
       }
@@ -89,6 +96,7 @@ export const usePostComment = () => {
 //! コメントの削除
 
 export const useDeleteComment = () => {
+  const { setter: setIsCommentDeleting } = useQueryState("q/isCommentDeleting", false)
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   let matchIdOnParam = Number(query.get("id"));
@@ -107,11 +115,15 @@ export const useDeleteComment = () => {
     })
   }, [])
 
-  const { mutate, isLoading, isSuccess } = useMutation(api)
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
+    onMutate: () => {
+      setIsCommentDeleting(true)
+    }
+  })
   const deleteComment = ({ userId, commentId }: ApiPropsType & { matchId?: number }) => {
     mutate({ userId, commentId }, {
       onSuccess: (data, { commentId }) => {
-        console.log("test");
+        setIsCommentDeleting(false)
         const snapshot = queryClient.getQueryData<CommentType[]>([queryKeys.comments, { id: matchIdOnParam }])
         const commentsWidthoutDeleteComment = snapshot!.filter(commentState => commentState.id !== commentId)
         queryClient.setQueryData([queryKeys.comments, { id: matchIdOnParam }], commentsWidthoutDeleteComment)
@@ -119,6 +131,7 @@ export const useDeleteComment = () => {
         setToastModalMessage({ message: MESSAGE.COMMENT_DELETED, bgColor: ModalBgColorType.DELETE })
       },
       onError: () => {
+        setIsCommentDeleting(false)
         setToastModalMessage({ message: MESSAGE.COMMENT_DELETE_FAILED, bgColor: ModalBgColorType.ERROR })
       }
     })

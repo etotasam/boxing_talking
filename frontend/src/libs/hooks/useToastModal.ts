@@ -12,6 +12,7 @@ export enum ModalBgColorType {
   DELETE = "gray",
   NOTICE = "blue",
   NULL = "null",
+  GRAY = "stone"
 }
 
 type ToastModalMessageType = {
@@ -21,13 +22,16 @@ type ToastModalMessageType = {
 
 export const useToastModal = () => {
 
+  const { state: isOpenToastModal, setter: setIsOpenToastModal } = useQueryState<boolean>("q/isOpenToastModal")
+
   const { state, setter } = useQueryState<ToastModalMessageType>(queryKeys.toastModalMessage, { message: MESSAGE.NULL, bgColor: ModalBgColorType.NULL })
   const setToastModalMessage = ({ message, bgColor }: ToastModalMessageType) => {
+    setIsOpenToastModal(true)
     setter({ message, bgColor })
   }
   const { message, bgColor } = state
 
-  const clearToastModaleMessage = () => setter({ message: MESSAGE.NULL, bgColor: ModalBgColorType.NULL })
+  const clearToastModaleMessage = () => setIsOpenToastModal(false)
 
-  return { setToastModalMessage, message, bgColor, clearToastModaleMessage }
+  return { setToastModalMessage, message, bgColor, clearToastModaleMessage, isOpenToastModal }
 }

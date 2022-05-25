@@ -10,7 +10,6 @@ export const queryKeys = {
   comments: "api/comment",
 
   auth: "/api/user",
-  login: "api/login",
 
   fighterPaginate: "q/paginate",
   isSelectedFighter: "q/isSelectedFighter",

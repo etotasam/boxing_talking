@@ -27,7 +27,7 @@ import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 //! component
 import { Fighter } from "@/components/module/Fighter";
 import { FighterEditForm } from "@/components/module/FighterEditForm";
-import { SpinnerModal } from "@/components/modal/SpinnerModal";
+import { Spinner } from "@/components/module/Spinner";
 import { EditActionBtns } from "@/components/module/EditActionBtns";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 import { ReactNode } from "react";
@@ -35,7 +35,6 @@ import { ReactNode } from "react";
 //! test data
 import { test_data_fighters, test_data_fighter_2, test_data_fighter_1 } from "@/libs/test-data";
 import { initialFighterInfoState } from "@/components/module/FighterEditForm";
-import { JsxEmit } from "typescript";
 
 //! hooks mock
 // jest.mock("@/libs/hooks/fetchers");
@@ -54,6 +53,17 @@ jest.mock("react-router-dom", () => ({
   },
 }));
 
+jest.mock("@/libs/hooks/useToastModal");
+const useToastModalMock = useToastModal as jest.Mock;
+
+// const useToastModalSpy = jest.spyOn(require("@/libs/hooks/useToastModal"), "useToastModal");
+// useToastModalSpy.mockImplementation(() => {
+//   return {
+//     isOpenToastModal: false,
+//     setToastModalMessage: jest.fn(),
+//   };
+// });
+
 jest.mock("@/libs/hooks/useFighter");
 const useFetchFightersMock = useFetchFighters as jest.Mock;
 const useUpdateFighterMock = useUpdateFighter as jest.Mock;
@@ -67,17 +77,18 @@ const LayoutForEditPageMock = LayoutForEditPage as jest.Mock;
 
 //! components mock
 jest.mock("@/components/module/Fighter");
-//@ts-ignore
-const FighterMock = Fighter as jest.Mock;
+const FighterMock = Fighter as unknown as jest.Mock;
+
 jest.mock("@/components/module/FighterEditForm");
 const FighterEditFormMock = FighterEditForm as jest.Mock;
-jest.mock("@/components/modal/SpinnerModal");
-const SpinnerModalMock = SpinnerModal as jest.Mock;
+jest.mock("@/components/module/Spinner");
+const SpinnerMock = Spinner as jest.Mock;
 jest.mock("@/components/module/EditActionBtns");
 const EditActionBtnsMock = EditActionBtns as jest.Mock;
 jest.mock("@/components/modal/FullScreenSpinnerModal");
 const FullScreenSpinnerModalMock = FullScreenSpinnerModal as jest.Mock;
 
+//? queryClientのcacheモック
 const clientStub = new QueryClient({
   defaultOptions: {
     queries: {
@@ -96,6 +107,12 @@ describe("FighterEditのテスト", () => {
   let setIsSelectedFighterMock = jest.fn();
   let setFighterPaginateMock = jest.fn();
   beforeEach(() => {
+    useToastModalMock.mockImplementation(() => {
+      return {
+        setToastModalMessage: () => null,
+        clearToastModaleMessage: () => null,
+      };
+    });
     // useQuerySpy.mockImplementation((queryKey: string) => {
     //   if (queryKey === queryKeys.fighterEditData) {
     //     return { data: "data" };
@@ -148,9 +165,9 @@ describe("FighterEditのテスト", () => {
     });
 
     //! component mock implement
-    FighterMock.mockImplementation(() => <div>FighterMock</div>);
+    FighterMock.mockReturnValue(<div>FighterMock</div>);
     FighterEditFormMock.mockReturnValue(<div>FighterEditFormMock</div>);
-    SpinnerModalMock.mockReturnValue(<div>SpinnerModalMock</div>);
+    SpinnerMock.mockReturnValue(<div>SpinnerMock</div>);
     EditActionBtnsMock.mockReturnValue(<div>EditActionBtnsMock</div>);
     FullScreenSpinnerModalMock.mockReturnValue(<div>FullScreenSpinnerModalMock </div>);
   });
@@ -167,8 +184,8 @@ describe("FighterEditのテスト", () => {
         </LayoutForEditPageMock>
       </QueryClientProvider>
     );
-
     const FighterMockCount = test_data_fighters.length;
+    expect(Fighter).toBeCalledTimes(FighterMockCount);
     expect(FighterMock).toBeCalledTimes(FighterMockCount);
   });
   it("セレクトした選手データがuseQueryStateで共有される", () => {
@@ -180,7 +197,6 @@ describe("FighterEditのテスト", () => {
       </QueryClientProvider>
     );
     expect(_selectFighter).toBe(initialFighterInfoState);
-    // screen.debug();
     userEvent.click(screen.getByTestId("input-2"));
     expect(setFighterDataFromFormMock).toBeCalledTimes(1);
     rerender(

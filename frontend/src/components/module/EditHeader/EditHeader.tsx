@@ -1,7 +1,9 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 
+//! components
 import { CustomButton } from "@/components/atomic/Button";
+import { LogoutBtn } from "@/components/module/LogoutBtn";
 
 type Props = {
   className?: string;
@@ -15,15 +17,15 @@ type ActionBtnsType = {
 
 export const EditHeader = React.memo(({ className }: Props) => {
   const links = [
-    { title: "選手編集", link: "/fighter/edit?page=1" },
     { title: "選手登録", link: "/fighter/register" },
+    { title: "選手編集", link: "/fighter/edit?page=1" },
     { title: "試合登録", link: "/match/register" },
-    { title: "試合削除", link: "/match/delete" },
+    { title: "試合編集", link: "/match/delete" },
   ];
   return (
     <>
       <header
-        className={`z-10 fixed top-0 left-0 h-[50px] flex items-center w-full bg-stone-800 ${className}`}
+        className={`z-10 fixed top-0 left-0 h-[50px] px-5 flex justify-between items-center w-full bg-stone-800 ${className}`}
       >
         <nav className="">
           {links.map((el) => (
@@ -31,8 +33,8 @@ export const EditHeader = React.memo(({ className }: Props) => {
               key={el.title}
               className={({ isActive }) =>
                 isActive
-                  ? `text-stone-200 border-b border-stone-200 ml-5 pb-1`
-                  : `text-stone-200 ml-5 pb-1`
+                  ? `text-stone-200 border-b border-stone-200 first:ml-0 ml-5 pb-1`
+                  : `text-stone-200 first:ml-0 ml-5 pb-1`
               }
               to={el.link}
             >
@@ -40,13 +42,7 @@ export const EditHeader = React.memo(({ className }: Props) => {
             </NavLink>
           ))}
         </nav>
-        {/* <div className="flex items-center px-5 bg-stone-600 w-full h-[50px]">
-          {actionBtns.map((el) => (
-            <CustomButton form={el.form} className="bg-gray-300">
-              {el.title}
-            </CustomButton>
-          ))}
-        </div> */}
+        <LogoutBtn />
       </header>
     </>
   );

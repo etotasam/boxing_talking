@@ -13,10 +13,10 @@ class FighterController extends Controller
     /**
      * fetch fighters data from DB
      *
-     * @param int limit
-     * @param int page
+     * @param int require limit
+     * @param int require page
      * @param string name
-     * @param string county
+     * @param string country
      * @return array 選手情報
      */
     public function fetch(Request $request)
