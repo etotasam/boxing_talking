@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Home } from "@/pages/Home/Home";
+import { Home } from "@/pages/Home";
 import { Check } from "@/pages/check";
 import { Match } from "@/pages/Match";
 import { MatchRegister } from "@/pages/MatchRegister";
