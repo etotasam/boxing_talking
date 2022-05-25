@@ -71,11 +71,6 @@ export const CommentComponent = ({ commentData, className }: PropsType) => {
 
   const { state: isPostingComment } = useQueryState<boolean>("q/isPostingComment");
 
-  const variant = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-  };
-
   return (
     <>
       <div className={`relative py-3 md:px-3 pl-5 ${classname}`}>

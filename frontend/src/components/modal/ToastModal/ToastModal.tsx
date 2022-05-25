@@ -39,7 +39,7 @@ export const ToastModal = ({ windowWidth }: { windowWidth: number }) => {
       },
     },
     visible: {
-      y: "-130%",
+      y: "-150%",
       x: "-50%",
       transition: {
         duration: 0.5,
@@ -57,7 +57,7 @@ export const ToastModal = ({ windowWidth }: { windowWidth: number }) => {
       },
     },
     visible: {
-      y: "30%",
+      y: "50%",
       x: "-50%",
       transition: {
         duration: 0.5,
