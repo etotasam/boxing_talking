@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-// import { fetchFighterAPI } from "@/libs/apis/fetchFightersAPI";
-import { Axios, isAxiosError } from "@/libs/axios";
 import { isEqual } from "lodash";
 import { queryKeys } from "@/libs/queryKeys";
 import { initialFighterInfoState } from "@/components/module/FighterEditForm";
@@ -17,10 +15,8 @@ import {
   limit,
   FighterType,
 } from "@/libs/hooks/useFighter";
-
 //! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
-
 //! component
 import { Fighter } from "@/components/module/Fighter";
 import { FighterEditForm } from "@/components/module/FighterEditForm";
@@ -29,7 +25,6 @@ import { EditActionBtns } from "@/components/module/EditActionBtns";
 import { PendingModal } from "@/components/modal/PendingModal";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
 import { FighterSearchForm } from "@/components/module/FighterSearchForm";
-
 //! data for test
 export let _selectFighter: FighterType | undefined;
 
@@ -60,20 +55,20 @@ export const FighterEdit = () => {
   }, "");
 
   //? ReactQueryでFighterEditFormとデータを共有
-  const {
-    state: fighterEidtDataOnCache,
-    setter: setFighterEditData,
-    getLatestState: getLetestFighterDataFromForm,
-  } = useQueryState<any>(queryKeys.fighterEditData);
-  _selectFighter = fighterEidtDataOnCache;
-
+  const { state: fighterEditData, setter: setFighterEditData } = useQueryState<FighterType>(
+    queryKeys.fighterEditData,
+    initialFighterInfoState
+  );
+  //? testで使う為の変数
+  _selectFighter = fighterEditData;
+  //? unMount時にfighterEditDataを初期化
   useEffect(() => {
     return () => {
       setFighterEditData(initialFighterInfoState);
     };
   }, []);
 
-  const { setToastModalMessage } = useToastModal();
+  const { setToastModalMessage, clearToastModaleMessage } = useToastModal();
 
   //? 選手データの取得(react query)
   const {
@@ -106,10 +101,7 @@ export const FighterEdit = () => {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setToastModalMessage({
-      message: MESSAGE.NULL,
-      bgColor: ModalBgColorType.NULL,
-    });
+    clearToastModaleMessage();
     if (isSelectedFighter) {
       setOpenConfirmModal(true);
     } else {
@@ -124,7 +116,7 @@ export const FighterEdit = () => {
   const { deleteFighter, isLoading: isDeletingFighter } = useDeleteFighter();
   const fighterDelete = async () => {
     setOpenConfirmModal(false);
-    deleteFighter(fighterEidtDataOnCache);
+    deleteFighter(fighterEditData!);
   };
 
   const getFighterWithId = (fighterId: number) => {
@@ -133,7 +125,8 @@ export const FighterEdit = () => {
   };
 
   const tryFighterEdit = async () => {
-    const latestFighterDataFromForm = getLetestFighterDataFromForm();
+    if (!fighterEditData) return;
+    clearToastModaleMessage();
     //? 選手を選択していない場合return
     if (!isSelectedFighter) {
       setToastModalMessage({
@@ -143,12 +136,12 @@ export const FighterEdit = () => {
       return;
     }
     //? 選手dataを編集していない場合return
-    if (isEqual(getFighterWithId(latestFighterDataFromForm.id), latestFighterDataFromForm)) {
+    if (isEqual(getFighterWithId(fighterEditData.id), fighterEditData)) {
       setToastModalMessage({ message: MESSAGE.NOT_EDIT_FIGHTER, bgColor: ModalBgColorType.NULL });
       return;
     }
     //? 選手データ編集実行
-    updateFighter(latestFighterDataFromForm);
+    updateFighter(fighterEditData);
   };
 
   //? page数の計算
@@ -162,9 +155,10 @@ export const FighterEdit = () => {
 
   //? spinnerを出す条件
   const conditionVisibleSpinner = (fighter: FighterType) => {
+    if (!fighterEditData) return;
     const isLoading =
-      (isDeletingFighter && fighterEidtDataOnCache.id === fighter.id) ||
-      (isUpdatingFighter && fighterEidtDataOnCache.id === fighter.id) ||
+      (isDeletingFighter && fighterEditData.id === fighter.id) ||
+      (isUpdatingFighter && fighterEditData.id === fighter.id) ||
       !fighter.id;
     return isLoading;
   };
@@ -209,6 +203,7 @@ export const FighterEdit = () => {
               className="flex justify-center w-full"
               onSubmit={tryFighterEdit}
               isPending={isUpdatingFighter}
+              fighterData={fighterEditData}
             />
             <FighterSearchForm className="bg-stone-200 w-full mt-5" />
           </div>
@@ -218,7 +213,7 @@ export const FighterEdit = () => {
       {openConfirmModal && (
         <ConfirmModal
           execution={fighterDelete}
-          message={`${fighterEidtDataOnCache.name}を削除しますか？`}
+          message={`${fighterEditData!.name}を削除しますか？`}
           okBtnString="削除"
           cancel={() => setOpenConfirmModal(false)}
         />
@@ -235,7 +230,7 @@ type PaginatePropsType = {
 
 const Paginate = ({ pageCountArray, params, currentPage }: PaginatePropsType) => {
   return (
-    <div className="sticky top-[100px] w-full z-50 t-bgcolor-opacity-5 h-[35px] flex items-center justify-center">
+    <div className="sticky top-[100px] w-full z-50 bg-black/50 h-[35px] flex items-center justify-center">
       <div className="flex justify-center">
         {pageCountArray.length >= 2 &&
           pageCountArray.map((page) => (

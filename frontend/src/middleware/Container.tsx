@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 // import { MessageModal } from "@/components/modal/MessageModal";
 import { ToastModal } from "@/components/modal/ToastModal";
@@ -7,7 +7,6 @@ import { useQueryClient } from "react-query";
 //! hooks
 import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useAuth } from "@/libs/hooks/useAuth";
-import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
 import { useToastModal } from "@/libs/hooks/useToastModal";
 import { queryKeys } from "@/libs/queryKeys";
 import { useQueryState } from "@/libs/hooks/useQueryState";

@@ -1,10 +1,8 @@
 import React from "react";
-
-// components
+//! components
 import { Spinner } from "@/components/module/Spinner";
 import { CustomButton } from "@/components/atomic/Button";
-
-// hooks
+//! hooks
 // import { useLogout } from "@/libs/hooks/useLogout";
 import { useAuth, useLogout } from "@/libs/hooks/useAuth";
 

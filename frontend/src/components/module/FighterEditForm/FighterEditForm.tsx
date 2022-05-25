@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { queryKeys } from "@/libs/queryKeys";
 import { Nationality } from "@/libs/hooks/useFighter";
-import { useQueryClient, useQuery } from "react-query";
+//! type
+import { FighterType } from "@/libs/hooks/useFighter";
 //! custom hook
 import { useQueryState } from "@/libs/hooks/useQueryState";
 //! message contoller
@@ -12,6 +13,7 @@ type PropsType = {
   onSubmit: () => void;
   className?: string;
   isPending?: boolean;
+  fighterData?: FighterType;
 };
 
 export enum Stance {
@@ -34,29 +36,20 @@ export const initialFighterInfoState: any = {
   lose: "",
 };
 
-export const FighterEditForm = ({ onSubmit, className, isPending }: PropsType) => {
+export const FighterEditForm = ({ onSubmit, className, isPending, fighterData }: PropsType) => {
   const { setToastModalMessage } = useToastModal();
-  const queryClient = useQueryClient();
   //? ReactQueryでFighterEditとデータを共有
-  const fighterEditStoreData = queryClient.getQueryData<any>(
+  const { state: fighterEditData, setter: setFighterEditData } = useQueryState<FighterType>(
     queryKeys.fighterEditData,
     initialFighterInfoState
   );
 
-  const [editData, setEditData] = useState<any>();
-
-  useEffect(() => {
-    if (!fighterEditStoreData) return;
-    setEditData(fighterEditStoreData);
-  }, [fighterEditStoreData]);
-
   const sendData = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (editData.country === undefined) {
+    if (fighterEditData.country === undefined) {
       setToastModalMessage({ message: MESSAGE.INVALID_COUNTRY, bgColor: ModalBgColorType.NOTICE });
       return;
     }
-    queryClient.setQueryData(queryKeys.fighterEditData, editData);
     onSubmit();
   };
 
@@ -70,9 +63,9 @@ export const FighterEditForm = ({ onSubmit, className, isPending }: PropsType) =
             type="text"
             placeholder="選手名"
             name="name"
-            value={editData?.name}
+            value={fighterEditData?.name}
             onChange={(e) =>
-              setEditData((prev: any) => {
+              setFighterEditData((prev: any) => {
                 return { ...prev, name: e.target.value };
               })
             }
@@ -81,14 +74,14 @@ export const FighterEditForm = ({ onSubmit, className, isPending }: PropsType) =
             <label htmlFor="countrys">国籍:</label>
             <select
               name="country"
-              value={editData?.country}
+              value={fighterEditData?.country}
               onChange={(e) => {
                 if (e.target.value === countryUndefined) {
-                  setEditData((prev: any) => {
+                  setFighterEditData((prev: any) => {
                     return { ...prev, country: undefined };
                   });
                 } else {
-                  setEditData((prev: any) => {
+                  setFighterEditData((prev: any) => {
                     return { ...prev, country: e.target.value };
                   });
                 }
@@ -111,9 +104,9 @@ export const FighterEditForm = ({ onSubmit, className, isPending }: PropsType) =
               type="date"
               id="birth"
               min="1970-01-01"
-              value={editData?.birth}
+              value={fighterEditData?.birth}
               onChange={(e) =>
-                setEditData((prev: any) => {
+                setFighterEditData((prev: any) => {
                   return { ...prev, birth: e.target.value };
                 })
               }
@@ -127,9 +120,9 @@ export const FighterEditForm = ({ onSubmit, className, isPending }: PropsType) =
               className="px-1"
               type="number"
               min="0"
-              value={editData?.height}
+              value={fighterEditData?.height}
               onChange={(e) =>
-                setEditData((prev: any) => {
+                setFighterEditData((prev: any) => {
                   return { ...prev, height: e.target.value };
                 })
               }
@@ -140,9 +133,9 @@ export const FighterEditForm = ({ onSubmit, className, isPending }: PropsType) =
           <div className="mt-3 flex p-1">
             <label htmlFor="stance">スタイル:</label>
             <select
-              value={editData?.stance}
+              value={fighterEditData?.stance}
               onChange={(e) =>
-                setEditData((prev: any) => {
+                setFighterEditData((prev: any) => {
                   return { ...prev, stance: e.target.value };
                 })
               }
@@ -160,9 +153,9 @@ export const FighterEditForm = ({ onSubmit, className, isPending }: PropsType) =
               <label htmlFor="win">win</label>
               <input
                 className="w-full"
-                value={editData?.win}
+                value={fighterEditData?.win}
                 onChange={(e) =>
-                  setEditData((prev: any) => {
+                  setFighterEditData((prev: any) => {
                     return { ...prev, win: e.target.value };
                   })
                 }
@@ -176,9 +169,9 @@ export const FighterEditForm = ({ onSubmit, className, isPending }: PropsType) =
               <label htmlFor="ko">ko</label>
               <input
                 className="w-full"
-                value={editData?.ko}
+                value={fighterEditData?.ko}
                 onChange={(e) =>
-                  setEditData((prev: any) => {
+                  setFighterEditData((prev: any) => {
                     return { ...prev, ko: e.target.value };
                   })
                 }
@@ -192,9 +185,9 @@ export const FighterEditForm = ({ onSubmit, className, isPending }: PropsType) =
               <label htmlFor="draw">draw</label>
               <input
                 className="w-full"
-                value={editData?.draw}
+                value={fighterEditData?.draw}
                 onChange={(e) =>
-                  setEditData((prev: any) => {
+                  setFighterEditData((prev: any) => {
                     return { ...prev, draw: e.target.value };
                   })
                 }
@@ -208,9 +201,9 @@ export const FighterEditForm = ({ onSubmit, className, isPending }: PropsType) =
               <label htmlFor="lose">lose</label>
               <input
                 className="w-full"
-                value={editData?.lose}
+                value={fighterEditData?.lose}
                 onChange={(e) =>
-                  setEditData((prev: any) => {
+                  setFighterEditData((prev: any) => {
                     return { ...prev, lose: e.target.value };
                   })
                 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 //! module
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -21,6 +21,7 @@ import { useDeleteComment } from "@/libs/hooks/useComment";
 // import { useAdjustCommentsContainer } from "@/libs/hooks/useAdjustCommentsContainer";
 // import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 import { useFetchMatches } from "@/libs/hooks/useMatches";
+import { useQueryState } from "@/libs/hooks/useQueryState";
 
 export const Match = () => {
   const { search } = useLocation();
@@ -60,11 +61,8 @@ export const Match = () => {
     setThisMatch(match);
   }, [matchesData, matchId]);
 
-  // //? 下記Refの高さに合わせてCommentsContainerコンポーネントの高さを操作(cssの変数を操作)
-  // const matchInfoRef = React.useRef<HTMLDivElement>(null);
-  // const formDivRef = React.useRef<HTMLDivElement>(null);
-  // //? CommentsContainerコンポーネントのサイズを画面に合わせる為のhook
-  // useAdjustCommentsContainer([matchInfoRef, formDivRef]);
+  //? コメント投稿時にコメントcontainerのtopにスクロールさせる位置の取得の為のref
+  const matchInfoRef = useRef<HTMLDivElement>(null);
 
   if (hasAnyError) {
     return <DataFetchErrorComponent />;
@@ -73,19 +71,12 @@ export const Match = () => {
   return (
     <LayoutDefault>
       <div className="lg:grid lg:grid-cols-[3fr_2fr] lg:grid-rows-[460px_150px_calc(100vh-760px)]">
-        <div className="lg:col-span-1">
-          <div
-          // ref={matchInfoRef}
-          >
-            <MatchInfo />
-          </div>
+        <div ref={matchInfoRef} className="lg:col-span-1">
+          <MatchInfo />
         </div>
 
-        <div
-          // ref={formDivRef}
-          className="z-20 lg:col-span-1 sticky top-0 py-5 lg:py-0 flex items-center bg-stone-200 border-b border-stone-400 lg:border-none"
-        >
-          {thisMatch && <PostCommentForm matchId={thisMatch.id} />}
+        <div className="z-20 lg:col-span-1 sticky top-0 py-5 lg:py-0 flex items-center bg-stone-200 border-b border-stone-400 lg:border-none">
+          {thisMatch && <PostCommentForm matchId={thisMatch.id} matchInfoRef={matchInfoRef} />}
         </div>
 
         <div className={`relative lg:row-start-1 lg:row-span-3 lg:col-start-2`}>

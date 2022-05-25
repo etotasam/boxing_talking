@@ -98,15 +98,17 @@ export const CommentComponent = ({ commentData, className }: PropsType) => {
           </div>
         </div>
 
-        {postUser && postUser.id === authUser?.id && (
-          <button
-            // whileHover={{ scale: 1.3 }}
+        {postUser && !isNaN(commentId) && postUser.id === authUser?.id && (
+          <motion.button
+            whileHover={{ scale: 1.3, color: "black" }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1, transition: { duration: 0.2 } }}
             data-testid={`trash-box`}
             onClick={() => clickTrashBtn(commentId)}
-            className="absolute top-3 right-5 text-gray-600 hover:text-black hover:scale-125 duration-300"
+            className="absolute top-3 right-5 text-gray-600"
           >
             <FaTrashAlt />
-          </button>
+          </motion.button>
         )}
         {isPostingComment && isNaN(commentData.id) && <Spinner />}
         {isCommentDeleting && commentData.id === deleteTargetId && <Spinner />}

@@ -28,19 +28,16 @@ export const CommentsContainer = () => {
   return (
     <>
       <ul
-        className={`relative h-full min-h-[50px] overflow-y-auto box-border border-x border-gray-400 md:px-5`}
+        className={`relative h-full min-h-[50px] md:overflow-y-auto box-border border-x border-gray-400 md:px-5`}
       >
         {commentsData &&
           (commentsData.length ? (
             commentsData.map((comment) => (
               <motion.li
                 layout
-                // initial={{ opacity: 0 }}
-                // animate={{ opacity: 1, transition: { delay: 0.1 } }}
-                // exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 key={comment.id}
-                className="last:mb-7 first:mt-7 border-b last:border-0 border-gray-400"
+                className="last:pb-7 first:pt-7 border-b last:border-0 border-gray-400"
               >
                 <CommentComponent commentData={comment} />
               </motion.li>

@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
+import { WINDOW_WIDTH } from "@/libs/utils";
 //! message contoller
 import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 import { MESSAGE } from "@/libs/utils";
@@ -8,8 +9,15 @@ import { Spinner } from "@/components/module/Spinner";
 import { useAuth, UserType } from "@/libs/hooks/useAuth";
 import { usePostComment } from "@/libs/hooks/useComment";
 import { useQueryState } from "@/libs/hooks/useQueryState";
+import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
 
-export const PostCommentForm = ({ matchId }: { matchId: number }) => {
+export const PostCommentForm = ({
+  matchId,
+  matchInfoRef,
+}: {
+  matchId: number;
+  matchInfoRef: React.RefObject<HTMLDivElement>;
+}) => {
   const { data: authUser } = useAuth();
   const {
     postComment,
@@ -25,9 +33,10 @@ export const PostCommentForm = ({ matchId }: { matchId: number }) => {
     setter(isPostingComment);
   }, [isPostingComment]);
 
+  const windowWidth = useGetWindowWidth();
+
   //? コメントの投稿
   const post = async () => {
-    // if (!authUser) return;
     const userId = authUser ? authUser.id : null;
     clearToastModaleMessage();
     if (comment === "") {
@@ -38,6 +47,19 @@ export const PostCommentForm = ({ matchId }: { matchId: number }) => {
       return;
     }
     postComment({ userId: userId, matchId, comment });
+
+    //? コメント投稿時に投稿コメントが表示される位置までスクロールする
+    if (windowWidth < WINDOW_WIDTH.md) {
+      const el = matchInfoRef.current?.getBoundingClientRect();
+      if (!el) {
+        console.error("matchInfoRefが取得できてない");
+        return;
+      }
+      const commentsContainerTopPosition = window.pageYOffset + el.bottom;
+      if (window.pageYOffset > commentsContainerTopPosition) {
+        window.scrollTo(0, commentsContainerTopPosition);
+      }
+    }
   };
 
   const divRef = React.useRef(null);
@@ -63,7 +85,7 @@ export const PostCommentForm = ({ matchId }: { matchId: number }) => {
       <div className={`w-[90%] md:w-[80%] flex items-end`}>
         <div
           ref={divRef}
-          className={`w-full pl-3 pr-10 py-1 rounded outline-none text-stone-600 duration-300 ${
+          className={`w-full px-3 py-1 rounded outline-none text-stone-600 duration-300 ${
             isFocus || comment ? `bg-white` : `bg-stone-300`
           }`}
           contentEditable

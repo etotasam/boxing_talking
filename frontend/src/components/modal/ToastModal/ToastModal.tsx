@@ -39,7 +39,7 @@ export const ToastModal = ({ windowWidth }: { windowWidth: number }) => {
       },
     },
     visible: {
-      y: 0,
+      y: "-130%",
       x: "-50%",
       transition: {
         duration: 0.5,
@@ -57,7 +57,7 @@ export const ToastModal = ({ windowWidth }: { windowWidth: number }) => {
       },
     },
     visible: {
-      y: 30,
+      y: "30%",
       x: "-50%",
       transition: {
         duration: 0.5,
@@ -75,7 +75,7 @@ export const ToastModal = ({ windowWidth }: { windowWidth: number }) => {
       variants={windowWidth > WINDOW_WIDTH.md ? lgVariant : mdVariant}
       // variants={mdVariant}
       onClick={clearToastModaleMessage}
-      className={`z-[999] fixed top-[90vh] md:top-0 left-[50%] py-2 px-5 min-w-[80%] md:min-w-[30%] text-center text-white rounded whitespace-pre-wrap select-none ${color}`}
+      className={`z-[999] fixed top-[100vh] md:top-0 left-[50%] py-2 px-5 min-w-[80%] md:min-w-[30%] text-center text-white rounded whitespace-pre-wrap select-none ${color}`}
     >
       {message}
     </motion.div>
