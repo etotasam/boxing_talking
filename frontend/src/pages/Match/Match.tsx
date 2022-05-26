@@ -66,15 +66,14 @@ export const Match = () => {
 
   return (
     <LayoutDefault>
-      {/* <div className="lg:grid lg:grid-cols-[3fr_2fr] lg:grid-rows-[460px_150px_calc(100vh-760px)]"> */}
-      <div className="lg:grid lg:grid-cols-[3fr_2fr]">
+      <div className="lg:grid lg:grid-cols-[3fr_2fr] xl:grid-cols-[1fr_1fr]">
         <div ref={matchInfoRef} className="lg:col-span-1">
           <MatchInfo />
         </div>
 
         <div
           ref={commentFormRef}
-          className="z-20 lg:col-span-1 sticky top-0 py-5 flex items-center bg-stone-200 border-b border-stone-400 lg:border-none"
+          className="z-20 lg:col-span-1 sticky top-0 py-5 flex items-center bg-stone-200"
         >
           {thisMatch && <PostCommentForm matchId={thisMatch.id} matchInfoRef={matchInfoRef} />}
         </div>
@@ -82,7 +81,6 @@ export const Match = () => {
         <div
           className={`relative lg:row-start-1 lg:row-span-3 lg:col-start-2 lg:t-comment-container-height`}
         >
-          {/* <div className={`relative row-span-1 col-start-3 lg:t-comment-height`}> */}
           <CommentsContainer />
         </div>
       </div>

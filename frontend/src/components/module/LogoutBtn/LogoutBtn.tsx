@@ -3,12 +3,10 @@ import React from "react";
 import { Spinner } from "@/components/module/Spinner";
 import { CustomButton } from "@/components/atomic/Button";
 //! hooks
-// import { useLogout } from "@/libs/hooks/useLogout";
 import { useAuth, useLogout } from "@/libs/hooks/useAuth";
 
 export const LogoutBtn = React.memo(() => {
   const { data: authUser } = useAuth();
-  // const { logout, logoutState } = useLogout();
   const { logout, isLoading: isLogoutPending } = useLogout();
   const click = async () => {
     if (!authUser) return;

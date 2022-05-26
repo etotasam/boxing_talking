@@ -72,10 +72,10 @@ export function Chart({ matchData, setMouseOnColor, className }: Props) {
   return (
     <div className={`relative flex justify-center items-center ${className}`}>
       {/* <div className="mx-auto max-w-min p-10"> */}
-      <div className="w-[400px]">
-        <h1 className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-stone-600 text-xl select-none">
-          みんなの試合予想
-        </h1>
+      <h1 className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-stone-600 text-xl select-none">
+        みんなの試合予想
+      </h1>
+      <div className="w-[350px]">
         <Doughnut
           ref={chartRef}
           width={500}

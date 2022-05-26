@@ -27,9 +27,7 @@ export const CommentsContainer = () => {
   const pending = isFetchingComments;
   return (
     <>
-      <ul
-        className={`relative h-full min-h-[50px] md:overflow-y-auto box-border border-x border-gray-400 md:px-5`}
-      >
+      <ul className={`relative h-full min-h-[50px] md:overflow-y-auto px-4 md:px-10`}>
         {commentsData &&
           (commentsData.length ? (
             commentsData.map((comment) => (
@@ -37,7 +35,7 @@ export const CommentsContainer = () => {
                 layout
                 transition={{ duration: 0.3 }}
                 key={comment.id}
-                className="last:pb-7 first:pt-7 border-b last:border-0 border-gray-400"
+                className="last:pb-3 first:pt-3 mb-4 last:mb-0 "
               >
                 <CommentComponent commentData={comment} />
               </motion.li>

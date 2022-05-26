@@ -1,22 +1,17 @@
 import React, { useEffect } from "react";
 import dayjs from "dayjs";
 import { FaTrashAlt } from "react-icons/fa";
-// import { useUser } from "@/store/slice/authUserSlice";
-// import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { motion, AnimatePresence } from "framer-motion";
 //! components
 import { Spinner } from "@/components/module/Spinner";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
-import { PendingModal } from "@/components/modal/PendingModal";
 //! custom hooks
 import { useAuth } from "@/libs/hooks/useAuth";
 import { useDeleteComment, CommentType } from "@/libs/hooks/useComment";
 //! types
-import { UserType } from "@/libs/hooks/useAuth";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 //! toast message contoller
-import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
-import { MESSAGE, STATUS } from "@/libs/utils";
+import { useToastModal } from "@/libs/hooks/useToastModal";
 
 type PropsType = {
   commentData: CommentType;
@@ -73,22 +68,25 @@ export const CommentComponent = ({ commentData, className }: PropsType) => {
 
   return (
     <>
-      <div className={`relative py-3 md:px-3 pl-5 ${classname}`}>
+      <div className={`relative py-3 md:px-5 pl-5 bg-white rounded-xl ${classname}`}>
         <div className="mr-10">
           <div className="whitespace-pre-wrap text-stone-600">{comment}</div>
           <div className="flex mt-2">
-            <time className="text-gray-600 text-sm">{dateFormat(created_at)}</time>
             <div className="flex">
-              <p className="text-gray-700 text-sm ml-5">
-                {postUser ? postUser.name : process.env.REACT_APP_GUEST_NAME}
-              </p>
-              <div className="flex justify-center items-center ml-2">
+              {/* 予想color */}
+              <div className="flex justify-center items-center">
                 <span
                   className={`block w-[7px] h-[7px] rounded-lg ${
                     vote === "red" ? `bg-red-600` : vote === "blue" && `bg-blue-600`
                   }`}
                 />
               </div>
+              {/* 名前 */}
+              <p className="text-gray-500 text-sm ml-2">
+                {postUser ? postUser.name : process.env.REACT_APP_GUEST_NAME}
+              </p>
+              {/* 投稿時間 */}
+              <time className="text-gray-400 text-sm ml-2">{dateFormat(created_at)}</time>
             </div>
           </div>
         </div>
@@ -105,8 +103,12 @@ export const CommentComponent = ({ commentData, className }: PropsType) => {
             <FaTrashAlt />
           </motion.button>
         )}
-        {isPostingComment && isNaN(commentData.id) && <Spinner />}
-        {isCommentDeleting && commentData.id === deleteTargetId && <Spinner />}
+        {isPostingComment && isNaN(commentData.id) && (
+          <Spinner className="rounded-xl bg-black/20" />
+        )}
+        {isCommentDeleting && commentData.id === deleteTargetId && (
+          <Spinner className="rounded-xl bg-black/20" />
+        )}
       </div>
       <AnimatePresence>
         {openDeleteConfirmModal && deleteTargetId === commentData.id && (

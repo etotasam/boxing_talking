@@ -22,8 +22,8 @@ export const Header = ({ className }: Props) => {
   const currentPage = pathname.split("/")[1];
 
   return (
-    <header className={`${className} flex justify-start items-center pl-5 bg-stone-900`}>
-      <div className="grid grid-rows-1 grid-cols-[150px_1fr_250px] lg:grid-cols-[250px_1fr_500px] w-[90vw] sm:w-[93vw] md:w-[95vw]">
+    <header className={`${className} flex justify-start items-center px-5 bg-stone-900`}>
+      <div className="grid grid-rows-1 grid-cols-[150px_1fr_120px] lg:grid-cols-[250px_1fr_500px] w-full">
         <h1 className="text-3xl text-white col-span-1">BOXING TALKING</h1>
         <div className="col-span-1 flex justify-start items-end">
           {currentPage !== "" && (

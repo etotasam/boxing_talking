@@ -82,10 +82,10 @@ export const PostCommentForm = ({
 
   return (
     <div className="w-full flex justify-center">
-      <div className={`w-[90%] md:w-[80%] flex items-end`}>
+      <div className={`w-full flex items-end px-4 md:px-10`}>
         <div
           ref={divRef}
-          className={`w-full px-3 py-1 rounded outline-none text-stone-600 duration-300 ${
+          className={`w-full px-3 py-1 rounded-md outline-none text-stone-600 duration-300 ${
             isFocus || comment ? `bg-white` : `bg-stone-300`
           }`}
           contentEditable

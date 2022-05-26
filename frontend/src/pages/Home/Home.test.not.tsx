@@ -49,29 +49,27 @@ describe("ログインしてない場合", () => {
   });
   afterEach(() => {});
   // useSelectorMock.mockReturnValue(false)
-  it("名前がゲストとなっているかどうか", () => {
-    render(<Home />);
-    expect(screen.getByTestId(`guest`)).toBeTruthy();
-    expect(screen.getByText(/ゲストさん/)).toBeTruthy();
-  });
+  // it("名前がゲストとなっているかどうか", () => {
+  //   render(<Home />);
+  //   expect(screen.getByTestId(`guest`)).toBeTruthy();
+  //   expect(screen.getByText(/ゲストさん/)).toBeTruthy();
+  // });
 
-  it("loginボタンはある、logoutボタンはない", () => {
-    render(<Home />);
-    const loginButton = screen.getByTestId("login-button");
-    const logoutButton = screen.queryByTestId("logout-button");
-    expect(loginButton).toBeTruthy();
-    expect(logoutButton).toBeNull();
-  });
+  // it("loginボタンはある、logoutボタンはない", () => {
+  //   render(<Home />);
+  //   const loginButton = screen.getByTestId("login-button");
+  //   const logoutButton = screen.queryByTestId("logout-button");
+  //   expect(loginButton).toBeTruthy();
+  //   expect(logoutButton).toBeNull();
+  // });
 });
 
 describe("ログインしてる時", () => {
   beforeEach(() => {
     useAuthMock.mockReturnValue({ name: "てすと" });
-    // useMathcesMock.mockReturnValue([{ id: 1, date: "1999/1/1" }]);
     useFetchMatchesMock.mockReturnValue({
       matches: [{ id: 1, date: "1999/1/1" }],
     });
-    // useHasAuthMock.mockReturnValue(AuthIs.TRUE); //ログインの有無
   });
   afterEach(() => {});
   it("名前がログインユーザ名になっている", () => {
