@@ -1,19 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Axios } from "@/libs/axios";
 import { useNavigate } from "react-router-dom";
-
 //! hooks
 import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useAuth } from "@/libs/hooks/useAuth";
 import { useQueryState } from "@/libs/hooks/useQueryState";
-
 //! components
 import { LayoutDefault } from "@/layout/LayoutDefault";
 import { MatchComponent } from "@/components/module/MatchComponent";
-
-//! message contoller
-import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
-import { MESSAGE } from "@/libs/utils";
+import { TestMatchComponent } from "@/components/module/TestMatchComponent";
 
 export const Home = React.memo(() => {
   const navigate = useNavigate();
@@ -45,7 +40,7 @@ export const Home = React.memo(() => {
         {isErrorOnFetchMatches && <MatchesFetchErrorComponent />}
         {matchesState &&
           matchesState.map((match) => (
-            <MatchComponent
+            <TestMatchComponent
               key={match.id}
               onClick={(matchId: number) => click(matchId)}
               match={match}

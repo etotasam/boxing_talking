@@ -28,8 +28,9 @@ export function Chart({ matchData, setMouseOnColor, className }: Props) {
     }
   };
 
-  const datalabels: any = {
+  const datalabels = {
     formatter: (value: any, ctx: Context) => {
+      if (value === undefined) return;
       const dataArray = ctx.dataset.data
         .map((el) => {
           if (typeof el !== "number") return null;
@@ -41,13 +42,15 @@ export function Chart({ matchData, setMouseOnColor, className }: Props) {
         return acc + curr;
       });
       if (total === 0) return "0%";
-      return `${Math.round((value / total) * 100)}%`;
+      const fighterName = (ctx.dataset as any).labels[ctx.dataIndex];
+      return ` ${value}票 \n ${Math.round((value / total) * 100)}%`;
     },
-    color: "#414141",
+    color: "#4e4e4e",
     align: "end",
-    offset: 25,
+    offset: 20,
     font: {
       size: 16,
+      weight: 500,
     },
   };
 
@@ -63,7 +66,7 @@ export function Chart({ matchData, setMouseOnColor, className }: Props) {
         onClick: () => false,
         reverse: true,
       },
-      datalabels: datalabels,
+      datalabels: datalabels as any,
       tooltip: {
         enabled: false,
       },

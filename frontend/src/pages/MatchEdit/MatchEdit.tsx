@@ -5,6 +5,7 @@ import { WINDOW_WIDTH } from "@/libs/utils";
 //! types
 import { MatchesType } from "@/libs/hooks/useMatches";
 //! component
+import { TestMatchComponent } from "@/components/module/TestMatchComponent";
 import { MatchComponent } from "@/components/module/MatchComponent";
 import { EditActionBtns } from "@/components/module/EditActionBtns";
 import { PendingModal } from "@/components/modal/PendingModal";
@@ -109,7 +110,7 @@ export const MatchEdit = () => {
                 />
                 <div className={"flex flex-row-reverse cursor-pointer relative"}>
                   <label className="w-[95%]" htmlFor={`match_${match.id}`}>
-                    <MatchComponent match={match} className={""} />
+                    <TestMatchComponent match={match} className={""} />
                   </label>
                   {!match.id && <Spinner />}
                   {isUpdateingMatch && targetMatchState?.id === match.id && <Spinner />}

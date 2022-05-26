@@ -13,6 +13,7 @@ import { UserType } from "@/libs/hooks/useAuth";
 //!component
 import { Chart } from "@/components/module/Chart";
 import { Fighter } from "../Fighter";
+import { TestFighter } from "../TestFighter";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
 import { Spinner } from "@/components/module/Spinner";
 //! hooks
@@ -121,10 +122,11 @@ export const MatchInfo = () => {
     labels: [thisMatch?.blue.name, thisMatch?.red.name],
     datasets: [
       {
+        labels: [thisMatch?.blue.name, thisMatch?.red.name],
         data: [thisMatch?.count_blue, thisMatch?.count_red],
         backgroundColor: [
-          mouseOnColor === MouseOn.BLUE ? `rgb(30 64 175)` : `rgb(96 165 250)`,
-          mouseOnColor === MouseOn.RED ? `rgb(185 28 28)` : `rgb(248 113 113)`,
+          mouseOnColor === MouseOn.BLUE ? `#0284c7` : `#38bdf8`,
+          mouseOnColor === MouseOn.RED ? `#e11d48` : `#fb7185`,
         ],
         // borderColor: [
         //   mouseOnColor === MouseOn.BLUE ? `#d6d5ff` : `#717ffd`,
@@ -137,8 +139,8 @@ export const MatchInfo = () => {
 
   return (
     <>
-      <h1 className="text-center text-stone-700 text-xl">
-        {thisMatch && dayjs(thisMatch.date).format("YYYY年M月D日")}
+      <h1 className="text-center text-stone-600 font-thin text-xl">
+        {thisMatch && dayjs(thisMatch.date).format("YYYY/M/D")}
       </h1>
       <div className="pt-3 md:flex md:px-10 lg:px-0">
         <div className="px-5 flex justify-center items-center">
@@ -284,7 +286,7 @@ const FightersInfo = ({
             }`}
           >
             {/* {windowWidth > WINDOW_WIDTH.md ? ( */}
-            <Fighter
+            <TestFighter
               fighter={thisMatch.red}
               recordTextColor={`text-gray-200`}
               className={`w-full text-gray-200`}
@@ -311,7 +313,7 @@ const FightersInfo = ({
             }`}
           >
             {/* {windowWidth > WINDOW_WIDTH.md ? ( */}
-            <Fighter
+            <TestFighter
               fighter={thisMatch.blue}
               recordTextColor={`text-gray-200`}
               className={`w-full text-gray-200`}

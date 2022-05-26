@@ -8,6 +8,7 @@ import { FighterEdit } from "@/pages/FighterEdit";
 import { MatchEdit } from "@/pages/MatchEdit";
 import { Edit } from "@/pages/Edit";
 import { Test } from "@/pages/Test";
+// import { Test2 } from "@/pages/Test2";
 import { NotFound } from "@/pages/NotFound";
 import PrivateRoute from "./middleware/PrivateRoute";
 import AdminOnly from "./middleware/AdminOnly";
@@ -36,6 +37,7 @@ function App() {
 
         <Route path="/check" element={<Check />} />
         <Route path="/test" element={<Test />} />
+        {/* <Route path="/test2" element={<Test2 />} /> */}
       </Routes>
     </BrowserRouter>
   );

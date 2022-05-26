@@ -6,7 +6,7 @@ import { WINDOW_WIDTH } from "@/libs/utils";
 import { Button } from "@/components/atomic/Button";
 import { CustomLink } from "@/components/module/CustomLink";
 import { LoginForm } from "@/components/module/LoginForm";
-
+import { Hamburger } from "@/components/module/Hamburger";
 //! hooks
 // import { useAuth } from "@/libs/hooks/useAuth";
 import { useAuth } from "@/libs/hooks/useAuth";
@@ -22,9 +22,9 @@ export const Header = ({ className }: Props) => {
   const currentPage = pathname.split("/")[1];
 
   return (
-    <header className={`${className} flex justify-start items-center px-5 bg-stone-900`}>
-      <div className="grid grid-rows-1 grid-cols-[150px_1fr_120px] lg:grid-cols-[250px_1fr_500px] w-full">
-        <h1 className="text-3xl text-white col-span-1">BOXING TALKING</h1>
+    <header className={`${className} flex justify-start items-center px-5 md:px-10 bg-stone-900`}>
+      <div className="grid grid-rows-1 grid-cols-[150px_1fr_1fr] md:grid-cols-[150px_1fr_500px] w-full">
+        <h1 className="text-3xl text-white col-span-1 flex items-center">BOXING TALKING</h1>
         <div className="col-span-1 flex justify-start items-end">
           {currentPage !== "" && (
             <CustomLink to="/" className="text-white">
@@ -59,8 +59,8 @@ const AuthControlComponent = () => {
     <>
       {/* {windowWidth > WINDOW_WIDTH.lg ? ( */}
       <div className="relative col-span-1 flex items-center justify-end">
-        <p className="whitespace-nowrap absolute top-[-30px] right-0 text-right text-white">{`${userName}さん`}</p>
-        {windowWidth > WINDOW_WIDTH.lg ? (
+        <p className="whitespace-nowrap absolute top-[-30px] right-0 text-right font-extralight text-sm md:text-base text-white">{`${userName}さん`}</p>
+        {windowWidth > WINDOW_WIDTH.md ? (
           <>
             <LoginOutComponent />
             {!authState && (
@@ -74,15 +74,16 @@ const AuthControlComponent = () => {
             )}
           </>
         ) : (
-          <>
-            {authState ? (
-              <LogoutBtn />
-            ) : (
-              <div>
-                <Button onClick={() => setIsOpenLoginModal(true)}>ログイン</Button>
-              </div>
-            )}
-          </>
+          <Hamburger />
+          // <>
+          //   {authState ? (
+          //     <LogoutBtn />
+          //   ) : (
+          //     <div>
+          //       <Button onClick={() => setIsOpenLoginModal(true)}>ログイン</Button>
+          //     </div>
+          //   )}
+          // </>
         )}
         {/* <Notice /> */}
       </div>

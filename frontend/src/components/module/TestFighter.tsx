@@ -81,7 +81,7 @@ export const TestFighter = React.memo(
                   backgroundRepeat: "no-repeat",
                 }}
               ></span>
-              <p className="p-2 text-xs sm:text-lg font-thin">{fighter.name}</p>
+              <p className="p-2 text-base sm:text-lg font-thin">{fighter.name}</p>
             </div>
 
             <div className={`flex ${cornerColor === "red" && `flex-row-reverse`}`}>

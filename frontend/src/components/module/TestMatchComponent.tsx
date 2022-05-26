@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import dayjs from "dayjs";
 import { MatchesType } from "@/libs/hooks/useMatches";
-import { WINDOW_WIDTH } from "@/libs/utils";
 import { motion } from "framer-motion";
-//! hooks
-import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
 //! component
 import { Fighter } from "@/components/module/Fighter";
 import { TestFighter } from "@/components/module/TestFighter";
@@ -73,19 +70,19 @@ export const TestMatchComponent = ({ match, className, onClick = () => null }: P
     <div
       onClick={() => console.log("test")}
       key={match.id}
-      className={`px-1 md:px-4 bg-white rounded-xl mt-5 mx-2 md:mx-5 cursor-pointer drop-shadow-sm hover:drop-shadow-md duration-300 ${style}`}
+      className={`px-1 md:px-4 bg-white rounded-xl mt-5 last:mb-5 mx-2 md:mx-5 cursor-pointer drop-shadow-sm duration-300 ${style}`}
     >
       {/* 試合日 */}
       <h1 className={`text-center font-thin text-lg pt-2 ${matchDayStyle(match.date as Date)}`}>
         {dayjs(match.date).format("YYYY/M/D")}
       </h1>
       {/* 勝利予想の比率 */}
-      <div className="w-full px-2 sm:px-10 mt-3">
-        <div className="w-full flex justify-between text-sm font-thin select-none text-stone-500">
+      <div className="w-full px-2 sm:px-10">
+        <div className="w-full flex justify-between text-sm font-thin select-none text-stone-600">
           <span>{ratioRed}</span>
           <span>{ratioBlue}</span>
         </div>
-        <div className="flex justify-between w-full bg-stone-300 h-[2px]">
+        <div className="flex justify-between w-full bg-stone-200 h-[2px]">
           <motion.span
             initial="initial"
             animate="redAnimate"
