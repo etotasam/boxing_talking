@@ -1,10 +1,11 @@
 import React, { DependencyList, useState, useEffect } from "react";
 
-export const useAdjustCommentsContainer = ([...ref]: (React.RefObject<HTMLDivElement> | null)[]): void => {
+export const useAdjustCommentsContainer = ([...ref]: (React.RefObject<HTMLDivElement> | null)[]): number | undefined => {
 
   const headerAndFooterHeight = 150
   const [allHeight, setAllHeight] = useState(0)
 
+  const [commentsContainerHeight, setCommentsContainerHeight] = useState<number>()
   const calcCommentComponentHeight = () => {
     if (ref.some(el => el === null)) return
     const totalElHeight = ref.reduce((acc, curr) => {
@@ -14,7 +15,8 @@ export const useAdjustCommentsContainer = ([...ref]: (React.RefObject<HTMLDivEle
     }, 0);
     const mainElHeight = window.innerHeight - headerAndFooterHeight;
     const height = Math.max(totalElHeight, mainElHeight);
-    document.documentElement.style.setProperty("--comment-el-height", `${height}px`);
+    setCommentsContainerHeight(height)
+    // document.documentElement.style.setProperty("--comment-el-height", `${height}px`);
   }
 
   useEffect(() => {
@@ -40,4 +42,5 @@ export const useAdjustCommentsContainer = ([...ref]: (React.RefObject<HTMLDivEle
       window.removeEventListener('resize', calcCommentComponentHeight, false)
     }
   }, [])
+  return commentsContainerHeight
 }

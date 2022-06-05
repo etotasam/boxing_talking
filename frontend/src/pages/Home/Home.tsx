@@ -23,10 +23,6 @@ export const Home = React.memo(() => {
 
   const click = useCallback(
     (id: number) => {
-      // if (!authUser) {
-      //   setToastModalMessage({ message: MESSAGE.NOT_AUTHORIZED, bgColor: ModalBgColorType.ERROR });
-      //   return;
-      // }
       navigate(`/match?id=${id}`);
     },
     [authUser]
@@ -34,9 +30,7 @@ export const Home = React.memo(() => {
 
   return (
     <LayoutDefault>
-      <div className="px-2 md:px-5">
-        {/* <div className={`w-full lg:w-2/3 my-5 rounded-md pb-3 bg-stone-50`}> */}
-        {/* <h1 className="rounded-t-md bg-stone-800 text-white text-2xl p-2">SCHEDULE</h1> */}
+      <div className="px-2 md:px-5 py-5">
         {isErrorOnFetchMatches && <MatchesFetchErrorComponent />}
         {matchesState &&
           matchesState.map((match) => (

@@ -5,13 +5,15 @@ export const CustomLink = ({
   className,
   children,
   to,
+  onClick,
 }: {
   className?: string;
   children: React.ReactNode;
-  to: string;
+  to?: string;
+  onClick?: (e: any) => void;
 }) => {
   return (
-    <Link className={className} to={to}>
+    <Link onClick={onClick} className={className} to={to ? to : ""}>
       {children}
     </Link>
   );

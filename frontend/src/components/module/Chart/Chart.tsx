@@ -78,7 +78,7 @@ export function Chart({ matchData, setMouseOnColor, className }: Props) {
       <h1 className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-stone-600 text-xl select-none">
         みんなの試合予想
       </h1>
-      <div className="w-[350px]">
+      <div className="w-[350px] h-[350px]">
         <Doughnut
           ref={chartRef}
           width={500}

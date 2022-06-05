@@ -70,7 +70,7 @@ export const TestMatchComponent = ({ match, className, onClick = () => null }: P
     <div
       onClick={() => console.log("test")}
       key={match.id}
-      className={`px-1 md:px-4 bg-white rounded-xl mt-5 last:mb-5 mx-2 md:mx-5 cursor-pointer drop-shadow-sm duration-300 ${style}`}
+      className={`px-1 md:px-4 bg-white rounded-xl mt-5 first:mt-0 cursor-pointer drop-shadow-sm duration-300 ${style}`}
     >
       {/* 試合日 */}
       <h1 className={`text-center font-thin text-lg pt-2 ${matchDayStyle(match.date as Date)}`}>

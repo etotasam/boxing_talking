@@ -5,7 +5,6 @@ import { useQueryClient } from "react-query";
 import { queryKeys } from "@/libs/queryKeys";
 import dayjs from "dayjs";
 import { WINDOW_WIDTH } from "@/libs/utils";
-import { motion } from "framer-motion";
 //!types
 import { MatchesType } from "@/libs/hooks/useMatches";
 import { FighterType } from "@/libs/hooks/useFighter";
@@ -19,7 +18,7 @@ import { Spinner } from "@/components/module/Spinner";
 //! hooks
 import { useMatchPredictVote, useFetchMatchPredictVote } from "@/libs/hooks/useMatchPredict";
 import { useFetchMatches } from "@/libs/hooks/useMatches";
-import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 //! message
 import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 import { MESSAGE } from "@/libs/utils";
@@ -257,14 +256,9 @@ const FightersInfo = ({
   userVoteColor,
   voteFighter,
 }: FighterInfoPropsType) => {
-  const windowWidth = useGetWindowWidth();
+  const { width: windowWidth } = useGetWindowSize();
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="mt-3 sm:m-0 md:p-0 w-full flex items-center px-4"
-    >
+    <div className="mt-3 sm:m-0 md:p-0 w-full flex items-center px-4">
       <div className="w-full grid grid-rows-[32px_1fr] grid-cols-[1fr_1fr] md:grid-rows-[1fr_32px_1fr] md:grid-cols-1">
         {/* 投票ボタン */}
         <div className="col-span-2 md:col-span-1 md:row-start-2">
@@ -328,6 +322,6 @@ const FightersInfo = ({
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };

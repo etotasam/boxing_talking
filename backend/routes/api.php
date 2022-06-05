@@ -17,6 +17,7 @@ use App\Http\Controllers\MatchController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\VoteController;
 use App\Http\Controllers\FighterController;
+use App\Http\Controllers\MailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +42,8 @@ Route::middleware('auth:sanctum')->group(function() {
         return Auth::check();
     })->name('auth.check');
 });
-Route::post('/user/create', [AuthController::class, 'create'])->name('auth.create');
+Route::post('/user/create', [AuthController::class, 'test_create'])->name('auth.create');
+// Route::post('/user/create', [AuthController::class, 'create'])->name('auth.create');
 
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
@@ -64,6 +66,8 @@ Route::delete('/comment', [CommentController::class, 'delete'])->name('comment.d
 
 Route::get('/vote', [VoteController::class, 'fetch'])->name('vote.fetch');
 Route::put('/vote', [VoteController::class, 'vote'])->name('vote');
+
+Route::get('/mail', [MailController::class, 'send'])->name('mail.send');
 
 
 Route::get("/{match_id}/check_vote", function(string $match_id) {

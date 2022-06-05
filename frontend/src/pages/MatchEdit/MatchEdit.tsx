@@ -12,7 +12,7 @@ import { PendingModal } from "@/components/modal/PendingModal";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
 import { Spinner } from "@/components/module/Spinner";
 //! hooks
-import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useFetchMatches, useDeleteMatch, useUpdateMatch } from "@/libs/hooks/useMatches";
 //! layout
@@ -32,7 +32,7 @@ export const MatchEdit = () => {
 
   const { setToastModalMessage, clearToastModaleMessage } = useToastModal();
 
-  const windowWidth = useGetWindowWidth();
+  const { width: windowWidth } = useGetWindowSize();
 
   //todo
   const [isOpenConfirmModal, setIsOpenConfirmModal] = React.useState(false);

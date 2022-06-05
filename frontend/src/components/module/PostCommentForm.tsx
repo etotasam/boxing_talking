@@ -9,7 +9,7 @@ import { Spinner } from "@/components/module/Spinner";
 import { useAuth, UserType } from "@/libs/hooks/useAuth";
 import { usePostComment } from "@/libs/hooks/useComment";
 import { useQueryState } from "@/libs/hooks/useQueryState";
-import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 
 export const PostCommentForm = ({
   matchId,
@@ -33,7 +33,7 @@ export const PostCommentForm = ({
     setter(isPostingComment);
   }, [isPostingComment]);
 
-  const windowWidth = useGetWindowWidth();
+  const { width: windowWidth } = useGetWindowSize();
 
   //? コメントの投稿
   const post = async () => {

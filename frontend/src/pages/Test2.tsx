@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion, useAnimation } from "framer-motion";
+import { Axios } from "@/libs/axios";
 
 export const Test2 = () => {
   const [isActive, setIsActive] = useState(false);
@@ -20,8 +21,13 @@ export const Test2 = () => {
       controls.start((i: number) => i === 2 && { rotate: 0, y: 0 });
     }
   };
+
+  const mailSend = async () => {
+    const { data } = await Axios.get("api/mail");
+    console.log(data);
+  };
   return (
-    <>
+    <div className="bg-blue-300 w-[100vw] min-h-[100vh]">
       <div className="p-10">
         <div
           onClick={() => setIsActive((v) => !v)}
@@ -47,6 +53,7 @@ export const Test2 = () => {
           ></motion.span>
         </div>
       </div>
-    </>
+      <button onClick={mailSend}>てすと</button>
+    </div>
   );
 };

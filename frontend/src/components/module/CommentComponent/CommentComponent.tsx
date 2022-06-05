@@ -68,7 +68,13 @@ export const CommentComponent = ({ commentData, className }: PropsType) => {
 
   return (
     <>
-      <div className={`relative py-3 md:px-5 pl-5 bg-white rounded-xl ${classname}`}>
+      <motion.div
+        layout
+        initial={false}
+        className={`relative py-3 md:px-5 pl-5 rounded-xl drop-shadow ${
+          vote === "red" ? `bg-red-100` : vote === "blue" ? `bg-blue-100` : `bg-stone-100`
+        } ${classname}`}
+      >
         <div className="mr-10">
           <div className="whitespace-pre-wrap text-stone-600">{comment}</div>
           <div className="flex mt-2">
@@ -109,7 +115,7 @@ export const CommentComponent = ({ commentData, className }: PropsType) => {
         {isCommentDeleting && commentData.id === deleteTargetId && (
           <Spinner className="rounded-xl bg-black/20" />
         )}
-      </div>
+      </motion.div>
       <AnimatePresence>
         {openDeleteConfirmModal && deleteTargetId === commentData.id && (
           <ConfirmModal

@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { WINDOW_WIDTH } from "@/libs/utils";
 //! module
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -12,6 +13,7 @@ import { DataFetchErrorComponent } from "@/components/module/DataFetchErrorCompo
 //! api
 import { MatchesType } from "@/libs/hooks/useMatches";
 //! custom hooks
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 import { useAuth } from "@/libs/hooks/useAuth";
 // import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { useDeleteComment } from "@/libs/hooks/useComment";
@@ -21,6 +23,7 @@ import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 
 export const Match = () => {
+  // window.scroll({ top: 0 });
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get("id"));
@@ -62,7 +65,8 @@ export const Match = () => {
   //? 2.commentContainerの高さがcommentFormの高さの変化に対応する為のhook、その為のref
   const matchInfoRef = useRef<HTMLDivElement>(null);
   const commentFormRef = useRef<HTMLDivElement>(null);
-  useAdjustCommentsContainer([matchInfoRef, commentFormRef]);
+  const commentContainerHeight = useAdjustCommentsContainer([matchInfoRef, commentFormRef]);
+  const { width: windowWidth } = useGetWindowSize();
 
   return (
     <LayoutDefault>
@@ -78,11 +82,14 @@ export const Match = () => {
           {thisMatch && <PostCommentForm matchId={thisMatch.id} matchInfoRef={matchInfoRef} />}
         </div>
 
-        <div
-          className={`relative lg:row-start-1 lg:row-span-3 lg:col-start-2 lg:t-comment-container-height`}
-        >
-          <CommentsContainer />
-        </div>
+        {thisMatch && (
+          <div
+            className={`relative lg:row-start-1 lg:row-span-3 lg:col-start-2`}
+            style={windowWidth > WINDOW_WIDTH.lg ? { height: `${commentContainerHeight}px` } : {}}
+          >
+            <CommentsContainer />
+          </div>
+        )}
       </div>
     </LayoutDefault>
   );

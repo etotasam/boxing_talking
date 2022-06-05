@@ -49,14 +49,14 @@ export const LoginForm = () => {
     <div className="relative">
       <form className="flex" onSubmit={login}>
         <input
-          className="rounded-sm p-1 mr-3"
+          className="rounded-sm p-1 mr-3 h-[30px]"
           type="text"
           onChange={(e) => setEmail(e.target.value)}
           value={email}
           placeholder="Email"
         />
         <input
-          className="rounded-sm p-1 mr-3"
+          className="rounded-sm p-1 mr-3 h-[30px]"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
           value={password}
@@ -66,7 +66,7 @@ export const LoginForm = () => {
           {isAuthChecking && <Spinner size={20} />}
           <CustomButton
             dataTestid={"login-btn"}
-            className={`text-white ${
+            className={`text-white text-sm h-[30px] ${
               isAuthChecking
                 ? `bg-green-900 text-gray-600 pointer-events-none select-none`
                 : `bg-green-600 hover:bg-green-700 text-white`

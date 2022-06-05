@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { FighterType, Stance, Nationality } from "@/libs/hooks/useFighter";
 import { WINDOW_WIDTH } from "@/libs/utils";
 //! hooks
-import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 
 type FighterProps = {
   fighter: FighterType;
@@ -49,7 +49,7 @@ export const TestFighter = React.memo(
     const today = dayjs();
     const birthday = fighter.birth;
     const age = today.diff(birthday, "year");
-    const windowWidth = useGetWindowWidth();
+    const { width: windowWidth } = useGetWindowSize();
 
     const boxingStyle = React.useCallback((stance: Stance) => {
       switch (stance) {

@@ -10,12 +10,13 @@ import { useAuth } from "@/libs/hooks/useAuth";
 import { useToastModal } from "@/libs/hooks/useToastModal";
 import { queryKeys } from "@/libs/queryKeys";
 import { useQueryState } from "@/libs/hooks/useQueryState";
-import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 //! component
 import { LoadingModal } from "@/components/modal/LoadingModal";
 import { ClearModal } from "@/components/modal/ClearModal";
 import { SignUpModal } from "@/components/modal/SignUpModal";
 import { LoginModal } from "@/components/modal/LoginModal";
+import { Header } from "@/components/module/Header";
 
 const Container = React.memo(() => {
   const queryClient = useQueryClient();
@@ -77,10 +78,11 @@ const Container = React.memo(() => {
     });
   };
 
-  const windowWidth = useGetWindowWidth();
+  const { width: windowWidth } = useGetWindowSize();
 
   return (
     <div className="relative w-full">
+      <Header />
       <Outlet />
       {/* {msg !== MESSAGE.NULL && <ToastModal />} */}
       <AnimatePresence>

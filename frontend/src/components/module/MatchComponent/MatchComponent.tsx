@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import { MatchesType } from "@/libs/hooks/useMatches";
 import { WINDOW_WIDTH } from "@/libs/utils";
 //! hooks
-import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 //! component
 import { Fighter } from "@/components/module/Fighter";
 import { TestFighter } from "@/components/module/TestFighter";
@@ -27,7 +27,7 @@ export const MatchComponent = ({ match, className, onClick = () => null }: Props
     if (today < subDate) return MatchIs.FUTURE;
   };
 
-  const windowWidth = useGetWindowWidth();
+  const { width: windowWidth } = useGetWindowSize();
 
   return (
     <div key={match.id} className={`px-1 md:px-4 pt-4 ${className}`}>
