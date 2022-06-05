@@ -44,7 +44,7 @@ export const checkNationality = (countory: string) => {
   }
 };
 
-export const Fighter = React.memo(
+export const TestFighter = React.memo(
   ({ fighter, className, cornerColor, recordTextColor }: FighterProps) => {
     const today = dayjs();
     const birthday = fighter.birth;
@@ -64,30 +64,46 @@ export const Fighter = React.memo(
     const nationalFlag = checkNationality(fighter.country!);
     const textColor = recordTextColor ? recordTextColor : `text-stone-500`;
     return (
-      <div className={`flex flex-col p-3 ${className}`}>
+      <div className={`flex flex-col py-2 px-2 sm:px-10 ${className}`}>
         {fighter && (
           <>
             {/* name */}
             <div
-              className={`flex justify-start items-center md:px-10 ${
-                cornerColor === "red" && `flex-row-reverse`
+              className={`flex justify-center items-center md:px-10  ${
+                cornerColor === "red" ? `flex-row-reverse` : ``
               }`}
             >
-              <span className={`${nationalFlag} block t-flag w-[25px] h-[25px]`}></span>
-              <p className="p-2 text-xs md:text-lg font-thin text-center w-full">{fighter.name}</p>
+              <span
+                className={`${nationalFlag} block w-[25px] h-[20px]`}
+                style={{
+                  backgroundSize: "contain",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                }}
+              ></span>
+              <p className="p-2 text-base sm:text-lg font-thin">{fighter.name}</p>
             </div>
 
             <div className={`flex ${cornerColor === "red" && `flex-row-reverse`}`}>
-              {windowWidth > WINDOW_WIDTH.md && (
-                <div className="flex flex-col w-1/2">
-                  <p className="text-center">{age}才</p>
-                  <p className="text-center">身長: {fighter.height}cm</p>
-                  <p className="text-center">{stance}</p>
-                </div>
-              )}
+              {/* {windowWidth >= WINDOW_WIDTH.sm && (
+                <dl className="flex flex-col w-1/2 text-stone-600">
+                  <div className="flex w-2/3">
+                    <dt className="w-1/2">年齢</dt>
+                    <dd>{age}</dd>
+                  </div>
+                  <div className="flex w-2/3">
+                    <dt className="w-1/2">身長</dt>
+                    <dd>{fighter.height}cm</dd>
+                  </div>
+                  <div className="flex w-2/3">
+                    <dt className="w-1/2">スタイル</dt>
+                    <dd className="text-xs">{stance}</dd>
+                  </div>
+                </dl>
+              )} */}
 
               {/* 戦績 */}
-              <div className="w-full md:w-1/2">
+              <div className="w-full">
                 <div className="w-full">
                   <div className="flex">
                     <div className={`flex-1 text-xs text-center ${textColor}`}>WIN</div>
@@ -95,11 +111,11 @@ export const Fighter = React.memo(
                     <div className={`flex-1 text-xs text-center ${textColor}`}>LOSE</div>
                   </div>
                   <div className="flex">
-                    <div className="flex-1 py-1 text-white text-center bg-green-500">{`${fighter.win}`}</div>
+                    <div className="flex-1 py-1 text-white text-center bg-green-500 rounded-l-md">{`${fighter.win}`}</div>
                     <div className="flex-1 py-1 text-white text-center bg-stone-400">
                       {fighter.draw}
                     </div>
-                    <div className="flex-1 py-1 text-white text-center bg-stone-700">
+                    <div className="flex-1 py-1 text-white text-center bg-stone-700 rounded-r-md">
                       {fighter.lose}
                     </div>
                   </div>

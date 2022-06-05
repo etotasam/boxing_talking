@@ -4,7 +4,7 @@ import { WINDOW_WIDTH } from "@/libs/utils";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useCreateUser } from "@/libs/hooks/useAuth";
 import { useLogin } from "@/libs/hooks/useAuth";
-import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 //! components
 import { Spinner } from "@/components/module/Spinner";
 //! message contoller
@@ -36,7 +36,7 @@ export const LoginModal = () => {
   };
 
   //? window widthが指定のサイズ以上になったら閉じる
-  const windowWidth = useGetWindowWidth();
+  const { width: windowWidth } = useGetWindowSize();
   useEffect(() => {
     if (windowWidth > WINDOW_WIDTH.lg) {
       setIsOpenLoginModal(false);
@@ -95,12 +95,12 @@ export const LoginModal = () => {
               {isLoadingLogin && <Spinner size={20} />}
             </div>
             <div className="text-right mt-5">
-              <span
+              <button
                 onClick={openAccountModal}
                 className="hover:border-b hover:border-blue-600 text-blue-600 text-sm cursor-pointer"
               >
                 アカウント作成
-              </span>
+              </button>
             </div>
           </form>
         </div>

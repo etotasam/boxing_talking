@@ -3,7 +3,7 @@ import { WINDOW_WIDTH } from "@/libs/utils";
 //! custom hooks
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useCreateUser } from "@/libs/hooks/useAuth";
-import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 //! components
 import { Spinner } from "@/components/module/Spinner";
 //! message contoller
@@ -40,7 +40,7 @@ export const SignUpModal = () => {
     setPassword("");
   }, [isSuccessCreateUser]);
 
-  const windowWidth = useGetWindowWidth();
+  const { width: windowWidth } = useGetWindowSize();
   const openLoginModal = () => {
     setIsOpenSignUpModal(false);
     setIsOpenLoginModal(true);
@@ -95,12 +95,12 @@ export const SignUpModal = () => {
             </div>
             {windowWidth < WINDOW_WIDTH.lg && (
               <div className="text-right mt-5">
-                <span
+                <button
                   onClick={openLoginModal}
                   className="hover:border-b hover:border-blue-600 text-blue-600 text-sm cursor-pointer"
                 >
                   ログイン
-                </span>
+                </button>
               </div>
             )}
           </form>

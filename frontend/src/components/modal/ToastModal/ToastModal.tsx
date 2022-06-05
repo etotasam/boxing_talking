@@ -11,16 +11,16 @@ export const ToastModal = ({ windowWidth }: { windowWidth: number }) => {
   React.useEffect(() => {
     switch (bgColor) {
       case ModalBgColorType.ERROR:
-        setColor("bg-red-700");
+        setColor("bg-rose-500");
         break;
       case ModalBgColorType.SUCCESS:
-        setColor("bg-green-600");
+        setColor("bg-emerald-600");
         break;
       case ModalBgColorType.DELETE:
         setColor("bg-stone-700");
         break;
       case ModalBgColorType.NOTICE:
-        setColor("bg-blue-600");
+        setColor("bg-sky-600");
         break;
       case ModalBgColorType.GRAY:
         setColor("bg-stone-600");
@@ -39,7 +39,7 @@ export const ToastModal = ({ windowWidth }: { windowWidth: number }) => {
       },
     },
     visible: {
-      y: "-130%",
+      y: "-150%",
       x: "-50%",
       transition: {
         duration: 0.5,
@@ -57,7 +57,7 @@ export const ToastModal = ({ windowWidth }: { windowWidth: number }) => {
       },
     },
     visible: {
-      y: "30%",
+      y: "50%",
       x: "-50%",
       transition: {
         duration: 0.5,

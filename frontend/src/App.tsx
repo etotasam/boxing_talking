@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Home } from "@/pages/Home/Home";
+import { Home } from "@/pages/Home";
 import { Check } from "@/pages/check";
 import { Match } from "@/pages/Match";
 import { MatchRegister } from "@/pages/MatchRegister";
@@ -8,6 +8,8 @@ import { FighterEdit } from "@/pages/FighterEdit";
 import { MatchEdit } from "@/pages/MatchEdit";
 import { Edit } from "@/pages/Edit";
 import { Test } from "@/pages/Test";
+import { Test2 } from "@/pages/Test2";
+import { UserRegisterwidthVerifyEmail } from "@/pages/UserRegisterwidthVerifyEmail";
 import { NotFound } from "@/pages/NotFound";
 import PrivateRoute from "./middleware/PrivateRoute";
 import AdminOnly from "./middleware/AdminOnly";
@@ -23,8 +25,6 @@ function App() {
           <Route element={<PrivateRoute />}></Route>
           <Route path="/match" element={<Match />} />
 
-          <Route path="/*" element={<NotFound />} />
-
           <Route element={<AdminOnly />}>
             {/* <Route path="/edit" element={<Edit />} /> */}
             <Route path="/fighter/register" element={<FighterRegister />} />
@@ -36,6 +36,9 @@ function App() {
 
         <Route path="/check" element={<Check />} />
         <Route path="/test" element={<Test />} />
+        <Route path="/test2" element={<Test2 />} />
+        <Route path="/register/:token/:id" element={<UserRegisterwidthVerifyEmail />} />
+        <Route path="/*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

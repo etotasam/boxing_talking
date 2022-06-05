@@ -12,7 +12,7 @@ import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useFetchFighters, limit } from "@/libs/hooks/useFighter";
 import { useRegisterMatch } from "@/libs/hooks/useMatches";
-import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 //! component
 import { Button } from "@/components/atomic/Button";
 import { Fighter } from "@/components/module/Fighter";
@@ -43,7 +43,7 @@ export const MatchRegister = () => {
   const paramCountry = query.get("country");
   const navigate = useNavigate();
 
-  const windowWidth = useGetWindowWidth();
+  const { width: windowWidth } = useGetWindowSize();
 
   useEffect(() => {
     if (!paramPage) return navigate("?page=1");

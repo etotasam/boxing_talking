@@ -10,7 +10,7 @@ export const Spinner = ({ className, size = 30 }: Partial<Props>) => {
   const style = className || "";
   return (
     <div
-      className={`w-full h-full absolute top-0 left-0 flex justify-center items-center t-bgcolor-white-opacity-5 select-none  ${style}`}
+      className={`w-full h-full absolute top-0 left-0 flex justify-center items-center select-none  ${style}`}
     >
       <RotatingLines
         strokeColor="#151515"

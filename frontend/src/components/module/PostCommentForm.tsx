@@ -9,7 +9,7 @@ import { Spinner } from "@/components/module/Spinner";
 import { useAuth, UserType } from "@/libs/hooks/useAuth";
 import { usePostComment } from "@/libs/hooks/useComment";
 import { useQueryState } from "@/libs/hooks/useQueryState";
-import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 
 export const PostCommentForm = ({
   matchId,
@@ -33,7 +33,7 @@ export const PostCommentForm = ({
     setter(isPostingComment);
   }, [isPostingComment]);
 
-  const windowWidth = useGetWindowWidth();
+  const { width: windowWidth } = useGetWindowSize();
 
   //? コメントの投稿
   const post = async () => {
@@ -49,7 +49,7 @@ export const PostCommentForm = ({
     postComment({ userId: userId, matchId, comment });
 
     //? コメント投稿時に投稿コメントが表示される位置までスクロールする
-    if (windowWidth < WINDOW_WIDTH.md) {
+    if (windowWidth < WINDOW_WIDTH.lg) {
       const el = matchInfoRef.current?.getBoundingClientRect();
       if (!el) {
         console.error("matchInfoRefが取得できてない");
@@ -82,10 +82,10 @@ export const PostCommentForm = ({
 
   return (
     <div className="w-full flex justify-center">
-      <div className={`w-[90%] md:w-[80%] flex items-end`}>
+      <div className={`w-full flex items-end px-4 md:px-10`}>
         <div
           ref={divRef}
-          className={`w-full px-3 py-1 rounded outline-none text-stone-600 duration-300 ${
+          className={`w-full px-3 py-1 rounded-md outline-none text-stone-600 duration-300 ${
             isFocus || comment ? `bg-white` : `bg-stone-300`
           }`}
           contentEditable

@@ -2,9 +2,10 @@ import dayjs from "dayjs";
 import { MatchesType } from "@/libs/hooks/useMatches";
 import { WINDOW_WIDTH } from "@/libs/utils";
 //! hooks
-import { useGetWindowWidth } from "@/libs/hooks/useGetWindowWidth";
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 //! component
-import { Fighter, FighterMin } from "@/components/module/Fighter";
+import { Fighter } from "@/components/module/Fighter";
+import { TestFighter } from "@/components/module/TestFighter";
 
 type Props = {
   match: MatchesType;
@@ -26,32 +27,21 @@ export const MatchComponent = ({ match, className, onClick = () => null }: Props
     if (today < subDate) return MatchIs.FUTURE;
   };
 
-  const windowWidth = useGetWindowWidth();
+  const { width: windowWidth } = useGetWindowSize();
 
   return (
-    <div key={match.id} className={`px-4 pt-4 ${className}`}>
-      <h1 className={`bg-stone-700 py-1 pl-3 ${matchDayStyle(match.date as Date)}`}>
-        {match.date}
+    <div key={match.id} className={`px-1 md:px-4 pt-4 ${className}`}>
+      <h1 className={`bg-stone-700 py-1 pl-3 text-center ${matchDayStyle(match.date as Date)}`}>
+        {dayjs(match.date).format("YYYY月M月D日")}
       </h1>
       <div
         onClick={() => onClick(match.id)}
         className="flex cursor-pointer border-x border-b border-stone-400"
       >
-        {windowWidth > WINDOW_WIDTH.md ? (
-          <>
-            <Fighter fighter={match.red} cornerColor={"red"} className={"bg-stone-100 w-1/2"} />
-            <Fighter fighter={match.blue} cornerColor={"blue"} className={"bg-stone-100 w-1/2"} />
-          </>
-        ) : (
-          <>
-            <FighterMin fighter={match.red} cornerColor={"red"} className={"bg-stone-100 w-1/2"} />
-            <FighterMin
-              fighter={match.blue}
-              cornerColor={"blue"}
-              className={"bg-stone-100 w-1/2"}
-            />
-          </>
-        )}
+        <TestFighter fighter={match.red} cornerColor={"red"} className={"bg-stone-100 w-1/2"} />
+        <TestFighter fighter={match.blue} cornerColor={"blue"} className={"bg-stone-100 w-1/2"} />
+        {/* <Fighter fighter={match.red} cornerColor={"red"} className={"bg-stone-100 w-1/2"} />
+        <Fighter fighter={match.blue} cornerColor={"blue"} className={"bg-stone-100 w-1/2"} /> */}
       </div>
     </div>
   );

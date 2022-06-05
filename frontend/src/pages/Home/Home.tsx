@@ -1,19 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Axios } from "@/libs/axios";
 import { useNavigate } from "react-router-dom";
-
 //! hooks
 import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useAuth } from "@/libs/hooks/useAuth";
 import { useQueryState } from "@/libs/hooks/useQueryState";
-
 //! components
 import { LayoutDefault } from "@/layout/LayoutDefault";
 import { MatchComponent } from "@/components/module/MatchComponent";
-
-//! message contoller
-import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
-import { MESSAGE } from "@/libs/utils";
+import { TestMatchComponent } from "@/components/module/TestMatchComponent";
 
 export const Home = React.memo(() => {
   const navigate = useNavigate();
@@ -28,10 +23,6 @@ export const Home = React.memo(() => {
 
   const click = useCallback(
     (id: number) => {
-      // if (!authUser) {
-      //   setToastModalMessage({ message: MESSAGE.NOT_AUTHORIZED, bgColor: ModalBgColorType.ERROR });
-      //   return;
-      // }
       navigate(`/match?id=${id}`);
     },
     [authUser]
@@ -39,20 +30,18 @@ export const Home = React.memo(() => {
 
   return (
     <LayoutDefault>
-      <div className="px-2 md:px-5">
-        <div className={`w-full lg:w-2/3 my-5 rounded-md pb-3 bg-stone-50`}>
-          <h1 className="rounded-t-md bg-stone-800 text-white text-2xl p-2">SCHEDULE</h1>
-          {isErrorOnFetchMatches && <MatchesFetchErrorComponent />}
-          {matchesState &&
-            matchesState.map((match) => (
-              <MatchComponent
-                key={match.id}
-                onClick={(matchId: number) => click(matchId)}
-                match={match}
-              />
-            ))}
-        </div>
+      <div className="px-2 md:px-5 py-5">
+        {isErrorOnFetchMatches && <MatchesFetchErrorComponent />}
+        {matchesState &&
+          matchesState.map((match) => (
+            <TestMatchComponent
+              key={match.id}
+              onClick={(matchId: number) => click(matchId)}
+              match={match}
+            />
+          ))}
       </div>
+      {/* </div> */}
     </LayoutDefault>
   );
 });

@@ -1,53 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+//! component
+import { TestFighter } from "@/components/module/TestFighter";
+import { useFetchFighters } from "@/libs/hooks/useFighter";
+import { useFetchMatches } from "@/libs/hooks/useMatches";
+import { TestMatchComponent } from "@/components/module/TestMatchComponent";
+
 export const Test = () => {
-  const [comments, setComments] = useState<string[]>([]);
-  const [comment, setComment] = useState<string>("");
-  const send = () => {
-    setComments([...comments, comment]);
-    setComment("");
-  };
-  const commentDelete = (index: number) => {
-    if (!comments) return;
-    const test = comments.filter((c, i) => i !== index);
-    setComments(test);
-  };
+  const { data: fighters } = useFetchFighters();
+  const { data: matches } = useFetchMatches();
   return (
-    <div>
-      <div className="bg-blue-300">
-        <input
-          type="text"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="こめんと"
-        />
-        <button onClick={send}>送信</button>
-      </div>
+    <div className="w-full min-h-[100vh] bg-stone-200">
       <div className="">
-        <ul>
-          <AnimatePresence>
-            {comments
-              .map((c, i) => (
-                <motion.li
-                  layout
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4 }}
-                  key={i}
-                >
-                  <div className="mt-3 bg-red-300">
-                    <span>{i}</span>
-                    <p>{c}</p>
-                    <span className="cursor-pointer" onClick={() => commentDelete(i)}>
-                      ✕
-                    </span>
-                  </div>
-                </motion.li>
-              ))
-              .reverse()}
-          </AnimatePresence>
-        </ul>
+        {/* <div>{fighters && fighters.map((fighter) => <TestFighter fighter={fighter} />)}</div> */}
+        {matches && matches.map((match) => <TestMatchComponent key={match.id} match={match} />)}
       </div>
     </div>
   );

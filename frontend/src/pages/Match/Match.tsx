@@ -1,29 +1,29 @@
 import React, { useRef } from "react";
+import { WINDOW_WIDTH } from "@/libs/utils";
 //! module
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
 //! components
 import { LayoutDefault } from "@/layout/LayoutDefault";
 import { PostCommentForm } from "@/components/module/PostCommentForm";
 import { MatchInfo } from "@/components/module/MatchInfo";
 import { CommentsContainer } from "@/components/module/CommentsContainer";
 import { DataFetchErrorComponent } from "@/components/module/DataFetchErrorComponent";
-
 //! api
 import { MatchesType } from "@/libs/hooks/useMatches";
-
 //! custom hooks
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 import { useAuth } from "@/libs/hooks/useAuth";
 // import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
 import { useDeleteComment } from "@/libs/hooks/useComment";
-// import { useAdjustCommentsContainer } from "@/libs/hooks/useAdjustCommentsContainer";
+import { useAdjustCommentsContainer } from "@/libs/hooks/useAdjustCommentsContainer";
 // import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 
 export const Match = () => {
+  // window.scroll({ top: 0 });
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get("id"));
@@ -61,28 +61,35 @@ export const Match = () => {
     setThisMatch(match);
   }, [matchesData, matchId]);
 
-  //? コメント投稿時にコメントcontainerのtopにスクロールさせる位置の取得の為のref
+  //? 1.コメント投稿時にコメントcontainerのtopにスクロールさせる位置の取得の為のref(matchInfoRef)
+  //? 2.commentContainerの高さがcommentFormの高さの変化に対応する為のhook、その為のref
   const matchInfoRef = useRef<HTMLDivElement>(null);
-
-  if (hasAnyError) {
-    return <DataFetchErrorComponent />;
-  }
+  const commentFormRef = useRef<HTMLDivElement>(null);
+  const commentContainerHeight = useAdjustCommentsContainer([matchInfoRef, commentFormRef]);
+  const { width: windowWidth } = useGetWindowSize();
 
   return (
     <LayoutDefault>
-      <div className="lg:grid lg:grid-cols-[3fr_2fr] lg:grid-rows-[460px_150px_calc(100vh-760px)]">
+      <div className="lg:grid lg:grid-cols-[3fr_2fr] xl:grid-cols-[1fr_1fr]">
         <div ref={matchInfoRef} className="lg:col-span-1">
           <MatchInfo />
         </div>
 
-        <div className="z-20 lg:col-span-1 sticky top-0 py-5 lg:py-0 flex items-center bg-stone-200 border-b border-stone-400 lg:border-none">
+        <div
+          ref={commentFormRef}
+          className="z-20 lg:col-span-1 sticky top-0 py-5 flex items-center bg-stone-200"
+        >
           {thisMatch && <PostCommentForm matchId={thisMatch.id} matchInfoRef={matchInfoRef} />}
         </div>
 
-        <div className={`relative lg:row-start-1 lg:row-span-3 lg:col-start-2`}>
-          {/* <div className={`relative row-span-1 col-start-3 lg:t-comment-height`}> */}
-          <CommentsContainer />
-        </div>
+        {thisMatch && (
+          <div
+            className={`relative lg:row-start-1 lg:row-span-3 lg:col-start-2`}
+            style={windowWidth > WINDOW_WIDTH.lg ? { height: `${commentContainerHeight}px` } : {}}
+          >
+            <CommentsContainer />
+          </div>
+        )}
       </div>
     </LayoutDefault>
   );
