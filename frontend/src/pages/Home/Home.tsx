@@ -18,7 +18,6 @@ export const Home = React.memo(() => {
   const queue = useCallback(async () => {
     if (!authUser) return;
     const { data } = await Axios.put(`api/${authUser.id}/test`);
-    console.log(data);
   }, [authUser]);
 
   const click = useCallback(
@@ -29,7 +28,7 @@ export const Home = React.memo(() => {
   );
 
   return (
-    <LayoutDefault>
+    <>
       <div className="px-2 md:px-5 py-5">
         {isErrorOnFetchMatches && <MatchesFetchErrorComponent />}
         {matchesState &&
@@ -41,8 +40,7 @@ export const Home = React.memo(() => {
             />
           ))}
       </div>
-      {/* </div> */}
-    </LayoutDefault>
+    </>
   );
 });
 

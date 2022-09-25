@@ -82,7 +82,7 @@ export const PostCommentForm = ({
 
   return (
     <div className="w-full flex justify-center">
-      <div className={`w-full flex items-end px-4 md:px-10`}>
+      <div className={`w-full flex items-end px-4 md:px-5 lg:px-0`}>
         <div
           ref={divRef}
           className={`w-full px-3 py-1 rounded-md outline-none text-stone-600 duration-300 ${

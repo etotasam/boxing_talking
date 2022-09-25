@@ -10,6 +10,8 @@ import { PostCommentForm } from "@/components/module/PostCommentForm";
 import { MatchInfo } from "@/components/module/MatchInfo";
 import { CommentsContainer } from "@/components/module/CommentsContainer";
 import { DataFetchErrorComponent } from "@/components/module/DataFetchErrorComponent";
+//! modal
+import { Spinner } from "@/components/module/Spinner";
 //! api
 import { MatchesType } from "@/libs/hooks/useMatches";
 //! custom hooks
@@ -47,6 +49,7 @@ export const Match = () => {
     if (!matchId || !hasExistMatch) return navigate("/");
   }, [matchesData]);
 
+  //? matches配列の中からurlパラメータから受け取ったidで試合を特定
   const [thisMatch, setThisMatch] = useState<MatchesType>();
   const getThisMatch = (
     matches: MatchesType[],
@@ -54,7 +57,6 @@ export const Match = () => {
   ): MatchesType | undefined => {
     return matches?.find((match) => match.id === matchIdByPrams);
   };
-
   useEffect(() => {
     if (!matchesData) return;
     const match = getThisMatch(matchesData, matchId);
@@ -69,8 +71,8 @@ export const Match = () => {
   const { width: windowWidth } = useGetWindowSize();
 
   return (
-    <LayoutDefault>
-      <div className="lg:grid lg:grid-cols-[3fr_2fr] xl:grid-cols-[1fr_1fr]">
+    <>
+      <div className="lg:grid lg:grid-cols-[1fr_1fr]">
         <div ref={matchInfoRef} className="lg:col-span-1">
           <MatchInfo />
         </div>
@@ -91,6 +93,6 @@ export const Match = () => {
           </div>
         )}
       </div>
-    </LayoutDefault>
+    </>
   );
 };

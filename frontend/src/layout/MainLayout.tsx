@@ -18,14 +18,14 @@ import { SignUpModal } from "@/components/modal/SignUpModal";
 import { LoginModal } from "@/components/modal/LoginModal";
 import { Header } from "@/components/module/Header";
 
-const Container = React.memo(() => {
+const MainLayout = React.memo(() => {
   const queryClient = useQueryClient();
   const { clearToastModaleMessage, isOpenToastModal } = useToastModal();
   // const { message, setMessageToModal } = useMessageController();
   // const [msg, setMsg] = React.useState<MESSAGE>(MESSAGE.NULL);
   const [waitId, setWaitId] = React.useState<NodeJS.Timeout>();
 
-  const { data: authUser, isLoading: isCheckingAuth, isError } = useAuth();
+  // const { data: authUser, isLoading: isCheckingAuth, isError } = useAuth();
   const { isLoading: isFetchingMatches } = useFetchMatches();
 
   //? アカウント作成モーダルの状態管理cache
@@ -44,60 +44,65 @@ const Container = React.memo(() => {
   const { state: isCommentPosting } = useQueryState("q/isCommentPosting");
 
   //? ClearModalが表示される条件
-  // const pending =
-  //   isPendingVote ||
-  //   isPendingLogin ||
-  //   isPendingLogout ||
-  //   isPendingCommentDelete ||
-  //   isCommentPosting;
+  const pending =
+    isPendingVote ||
+    isPendingLogin ||
+    isPendingLogout ||
+    isPendingCommentDelete ||
+    isCommentPosting;
 
   //? cookieでログインチェック。なければfalseを入れる
-  useEffect(() => {
-    if (!isError) return;
-    queryClient.setQueryData(queryKeys.auth, false);
-  }, [isError]);
+  // useEffect(() => {
+  //   if (!isError) return;
+  //   queryClient.setQueryData(queryKeys.auth, false);
+  // }, [isError]);
 
   //? メッセージモーダルのタイマーセット
-  // useEffect(() => {
-  //   if (!isOpenToastModal) {
-  //     clearToastModaleMessage();
-  //   }
-  //   (async () => {
-  //     if (waitId) {
-  //       clearTimeout(waitId);
-  //     }
-  //     await wait(5000);
-  //     clearToastModaleMessage();
-  //   })();
-  // }, [isOpenToastModal]);
+  useEffect(() => {
+    if (!isOpenToastModal) {
+      clearToastModaleMessage();
+    }
+    (async () => {
+      if (waitId) {
+        clearTimeout(waitId);
+      }
+      await wait(5000);
+      clearToastModaleMessage();
+    })();
+  }, [isOpenToastModal]);
 
-  // const wait = (ms: number) => {
-  //   return new Promise((resolve) => {
-  //     const id: NodeJS.Timeout = setTimeout(resolve, ms);
-  //     setWaitId(id);
-  //   });
-  // };
+  const wait = (ms: number) => {
+    return new Promise((resolve) => {
+      const id: NodeJS.Timeout = setTimeout(resolve, ms);
+      setWaitId(id);
+    });
+  };
 
   const { width: windowWidth } = useGetWindowSize();
 
   return (
-    <>
-      {/* <Header /> */}
-      <Outlet />
+    <div className="bg-stone-200">
+      <Header />
+      <main className={`min-h-[calc(100vh-50px)] pt-[100px] mx-auto max-w-[1024px]`}>
+        <Outlet />
+      </main>
+      <footer className="h-[50px] bg-stone-200 border-t border-stone-300 text-center">
+        ©footer
+      </footer>
       {/* 以下 modal */}
-      {/* <AnimatePresence>
+      <AnimatePresence>
         {isOpenToastModal && (
           <motion.div>
             <ToastModal windowWidth={windowWidth} />
           </motion.div>
         )}
-      </AnimatePresence> */}
-      {(isCheckingAuth || isFetchingMatches) && <LoadingModal />}
-      {/* {isOpenSignUpModal && <SignUpModal />}
+      </AnimatePresence>
+      {isFetchingMatches && <LoadingModal />}
+      {isOpenSignUpModal && <SignUpModal />}
       {isOpenLoginModal && <LoginModal />}
-      {pending && <ClearModal />} */}
-    </>
+      {pending && <ClearModal />}
+    </div>
   );
 });
 
-export default Container;
+export default MainLayout;

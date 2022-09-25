@@ -1,15 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import dayjs from "dayjs";
 import { FighterType, Stance, Nationality } from "@/libs/hooks/useFighter";
 import { WINDOW_WIDTH } from "@/libs/utils";
-//! hooks
-import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 
 type FighterProps = {
   fighter: FighterType;
-  className?: string;
+  bgColorClassName?: string;
+  windowWidth: number;
   recordTextColor?: string;
-  cornerColor?: "red" | "blue" | `undefined`;
+  isReverse?: boolean;
 };
 
 export enum NationaFlag {
@@ -45,11 +44,17 @@ export const checkNationality = (countory: string) => {
 };
 
 export const Fighter = React.memo(
-  ({ fighter, className, cornerColor, recordTextColor }: FighterProps) => {
+  ({
+    fighter,
+    bgColorClassName,
+    isReverse = false,
+    recordTextColor,
+    windowWidth,
+  }: FighterProps) => {
+    const bgColor = bgColorClassName ? bgColorClassName : `bg-stone-200`;
     const today = dayjs();
     const birthday = fighter.birth;
     const age = today.diff(birthday, "year");
-    const { width: windowWidth } = useGetWindowSize();
 
     const boxingStyle = React.useCallback((stance: Stance) => {
       switch (stance) {
@@ -64,30 +69,43 @@ export const Fighter = React.memo(
     const nationalFlag = checkNationality(fighter.country!);
     const textColor = recordTextColor ? recordTextColor : `text-stone-500`;
     return (
-      <div className={`flex flex-col p-3 ${className}`}>
+      <div className={`flex flex-col p-3 ${bgColor}`}>
         {fighter && (
           <>
             {/* name */}
             <div
-              className={`flex justify-start items-center md:px-10 ${
-                cornerColor === "red" && `flex-row-reverse`
+              className={`flex justify-center items-center md:px-10 ${
+                isReverse && `flex-row-reverse`
               }`}
             >
-              <span className={`${nationalFlag} block t-flag w-[25px] h-[25px]`}></span>
-              <p className="p-2 text-xs md:text-lg font-thin text-center w-full">{fighter.name}</p>
+              <p className="p-2 text-base sm:text-lg font-thin text-center">{fighter.name}</p>
+              <span className={`${nationalFlag} block t-flag w-[25px] h-[25px]`} />
             </div>
 
-            <div className={`flex ${cornerColor === "red" && `flex-row-reverse`}`}>
-              {windowWidth > WINDOW_WIDTH.md && (
-                <div className="flex flex-col w-1/2">
-                  <p className="text-center">{age}才</p>
-                  <p className="text-center">身長: {fighter.height}cm</p>
-                  <p className="text-center">{stance}</p>
+            <div className={`flex sm:justify-between ${isReverse && `flex-row-reverse`}`}>
+              {windowWidth > WINDOW_WIDTH.sm && (
+                <div className="sm:w-2/5 md:w-1/2 text-stone-700 flex justify-center">
+                  <table className="w-[70%] ">
+                    <tbody>
+                      <tr>
+                        <td>年齢</td>
+                        <td>{age}</td>
+                      </tr>
+                      <tr>
+                        <td>身長</td>
+                        <td>{fighter.height} cm</td>
+                      </tr>
+                      <tr>
+                        <td>スタイル</td>
+                        <td>{fighter.stance}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               )}
 
               {/* 戦績 */}
-              <div className="w-full md:w-1/2">
+              <div className="w-full sm:w-3/5 md:w-1/2">
                 <div className="w-full">
                   <div className="flex">
                     <div className={`flex-1 text-xs text-center ${textColor}`}>WIN</div>
@@ -95,11 +113,11 @@ export const Fighter = React.memo(
                     <div className={`flex-1 text-xs text-center ${textColor}`}>LOSE</div>
                   </div>
                   <div className="flex">
-                    <div className="flex-1 py-1 text-white text-center bg-green-500">{`${fighter.win}`}</div>
+                    <div className="flex-1 py-1 text-white text-center bg-green-500 rounded-l-md">{`${fighter.win}`}</div>
                     <div className="flex-1 py-1 text-white text-center bg-stone-400">
                       {fighter.draw}
                     </div>
-                    <div className="flex-1 py-1 text-white text-center bg-stone-700">
+                    <div className="flex-1 py-1 text-white text-center bg-stone-700 rounded-r-md">
                       {fighter.lose}
                     </div>
                   </div>
