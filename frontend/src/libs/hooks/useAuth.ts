@@ -140,7 +140,7 @@ export const useLogout = () => {
     await Axios.post<void>("api/logout", { user_id: userId }).then(value => value.data)
   }, [])
 
-  const { mutate, isLoading } = useMutation(api, {
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
       setIsPendingLogout(true)
     }
@@ -162,5 +162,5 @@ export const useLogout = () => {
       }
     })
   }, [])
-  return { logout, isLoading }
+  return { logout, isLoading, isSuccess }
 }

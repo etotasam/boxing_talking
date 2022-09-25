@@ -1,59 +1,41 @@
 import React, { useEffect, useState } from "react";
-import { motion, useAnimation } from "framer-motion";
-import { Axios } from "@/libs/axios";
+import { Fighter } from "@/components/module/Fighter";
+import { TestFighter } from "@/components/module/TestFighter";
+import { TestMatchComponent } from "@/components/module/TestMatchComponent";
+import { useFetchFighters } from "@/libs/hooks/useFighter";
+import { useFetchMatches } from "@/libs/hooks/useMatches";
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
+import { motion } from "framer-motion";
 
 export const Test2 = () => {
-  const [isActive, setIsActive] = useState(false);
-  useEffect(() => {
-    startAnimate();
-  }, [isActive]);
-
-  const controls: any = useAnimation();
-  const startAnimate = () => {
-    if (!isActive) {
-      controls.start((i: number) => i === 0 && { rotate: 45, y: 30 / 2 });
-      controls.start((i: number) => i === 1 && { width: "0%" });
-      controls.start((i: number) => i === 2 && { rotate: -45, y: -(30 / 2) + 3 });
-    }
-    if (isActive) {
-      controls.start((i: number) => i === 0 && { rotate: 0, y: 0 });
-      controls.start((i: number) => i === 1 && { width: "100%" });
-      controls.start((i: number) => i === 2 && { rotate: 0, y: 0 });
-    }
-  };
-
-  const mailSend = async () => {
-    const { data } = await Axios.get("api/mail");
-    console.log(data);
-  };
+  const { data } = useFetchFighters();
+  const { data: matches } = useFetchMatches();
+  const { width } = useGetWindowSize();
   return (
-    <div className="bg-blue-300 w-[100vw] min-h-[100vh]">
-      <div className="p-10">
-        <div
-          onClick={() => setIsActive((v) => !v)}
-          className={`relative w-[35px] h-[30px] cursor-pointer`}
-        >
-          <motion.span
-            className={`absolute top-0 left-0 inline-block w-full h-[3px] bg-gray-700`}
-            custom={0}
-            animate={controls}
-            transition={{ duration: 0.4 }}
-          ></motion.span>
-          <motion.span
-            className={`absolute top-[calc(50%-1.5px)] left-0 inline-block w-full h-[3px] bg-gray-700`}
-            custom={1}
-            animate={controls}
-            transition={{ duration: 0.4 }}
-          ></motion.span>
-          <motion.span
-            className={`absolute bottom-0 left-0 inline-block w-full h-[3px] bg-gray-700`}
-            custom={2}
-            animate={controls}
-            transition={{ duration: 0.4 }}
-          ></motion.span>
-        </div>
+    <>
+      {data &&
+        data.map(
+          (fighter, index) =>
+            index === 1 && (
+              <div key={fighter.id} className={` mt-3`}>
+                <Fighter fighter={fighter} windowWidth={width} />
+              </div>
+            )
+        )}
+
+      {matches &&
+        matches.map(
+          (match, index) =>
+            index === 1 && (
+              <div key={match.id}>
+                <TestMatchComponent match={match} />
+              </div>
+            )
+        )}
+      <div className="ml-5">
+        <span className="cursor-pointer">test</span>
       </div>
-      <button onClick={mailSend}>てすと</button>
-    </div>
+      {/* <motion.span whileHover={} >aaaaaaaaa</motion.span> */}
+    </>
   );
 };

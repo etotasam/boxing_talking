@@ -27,7 +27,9 @@ export const CommentsContainer = () => {
   const pending = isFetchingComments;
   return (
     <>
-      <ul className={`z-0 relative h-full min-h-[50px] md:overflow-y-auto px-4 md:px-10`}>
+      <ul
+        className={`z-0 relative h-full min-h-[50px] md:overflow-y-auto px-4 md:px-5 lg:pr-0 lg:pl-10`}
+      >
         {commentsData &&
           (commentsData.length ? (
             commentsData.map((comment) => (

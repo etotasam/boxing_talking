@@ -110,7 +110,7 @@ export const MatchEdit = () => {
                 />
                 <div className={"flex flex-row-reverse cursor-pointer relative"}>
                   <label className="w-[95%]" htmlFor={`match_${match.id}`}>
-                    <TestMatchComponent match={match} className={""} />
+                    <TestMatchComponent match={match} bgColorClassName={"bg-sotne-200"} />
                   </label>
                   {!match.id && <Spinner />}
                   {isUpdateingMatch && targetMatchState?.id === match.id && <Spinner />}

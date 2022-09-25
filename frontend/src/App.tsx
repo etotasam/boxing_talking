@@ -14,16 +14,18 @@ import { NotFound } from "@/pages/NotFound";
 import PrivateRoute from "./middleware/PrivateRoute";
 import AdminOnly from "./middleware/AdminOnly";
 import Container from "./middleware/Container";
+import MainLayout from "@/layout/MainLayout";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<Container />}>
-          <Route path="/" element={<Home />} />
-
-          <Route element={<PrivateRoute />}></Route>
-          <Route path="/match" element={<Match />} />
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route element={<PrivateRoute />}></Route>
+            <Route path="/match" element={<Match />} />
+          </Route>
 
           <Route element={<AdminOnly />}>
             {/* <Route path="/edit" element={<Edit />} /> */}

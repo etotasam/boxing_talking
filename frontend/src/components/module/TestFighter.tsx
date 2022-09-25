@@ -1,7 +1,6 @@
 import React from "react";
 import dayjs from "dayjs";
 import { FighterType, Stance, Nationality } from "@/libs/hooks/useFighter";
-import { WINDOW_WIDTH } from "@/libs/utils";
 //! hooks
 import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 
@@ -46,21 +45,6 @@ export const checkNationality = (countory: string) => {
 
 export const TestFighter = React.memo(
   ({ fighter, className, cornerColor, recordTextColor }: FighterProps) => {
-    const today = dayjs();
-    const birthday = fighter.birth;
-    const age = today.diff(birthday, "year");
-    const { width: windowWidth } = useGetWindowSize();
-
-    const boxingStyle = React.useCallback((stance: Stance) => {
-      switch (stance) {
-        case Stance.Southpaw:
-          return "サウスポー";
-        case Stance.Orthodox:
-          return "オーソドックス";
-      }
-    }, []);
-    const stance = boxingStyle(fighter.stance);
-
     const nationalFlag = checkNationality(fighter.country!);
     const textColor = recordTextColor ? recordTextColor : `text-stone-500`;
     return (
@@ -69,7 +53,7 @@ export const TestFighter = React.memo(
           <>
             {/* name */}
             <div
-              className={`flex justify-center items-center md:px-10  ${
+              className={`flex justify-center items-center ${
                 cornerColor === "red" ? `flex-row-reverse` : ``
               }`}
             >
@@ -81,27 +65,11 @@ export const TestFighter = React.memo(
                   backgroundRepeat: "no-repeat",
                 }}
               ></span>
-              <p className="p-2 text-base sm:text-lg font-thin">{fighter.name}</p>
+              <p className="p-2 text-xs sm:text-base md:text-lg lg:text-base font-thin">
+                {fighter.name}
+              </p>
             </div>
-
             <div className={`flex ${cornerColor === "red" && `flex-row-reverse`}`}>
-              {/* {windowWidth >= WINDOW_WIDTH.sm && (
-                <dl className="flex flex-col w-1/2 text-stone-600">
-                  <div className="flex w-2/3">
-                    <dt className="w-1/2">年齢</dt>
-                    <dd>{age}</dd>
-                  </div>
-                  <div className="flex w-2/3">
-                    <dt className="w-1/2">身長</dt>
-                    <dd>{fighter.height}cm</dd>
-                  </div>
-                  <div className="flex w-2/3">
-                    <dt className="w-1/2">スタイル</dt>
-                    <dd className="text-xs">{stance}</dd>
-                  </div>
-                </dl>
-              )} */}
-
               {/* 戦績 */}
               <div className="w-full">
                 <div className="w-full">

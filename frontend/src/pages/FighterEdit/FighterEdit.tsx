@@ -7,6 +7,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 import { MESSAGE } from "@/libs/utils";
 //! hooks
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import {
   useFetchFighters,
@@ -39,6 +40,7 @@ export const FighterEdit = () => {
   if (!paramPage) {
     navigate("/fighter/edit?page=1");
   }
+  const { width: windowWidth } = useGetWindowSize();
 
   type SubjectType = {
     name: string;
@@ -189,7 +191,7 @@ export const FighterEdit = () => {
                     className={"w-[90%] cursor-pointer"}
                     htmlFor={`${fighter.id}_${fighter.name}`}
                   >
-                    <Fighter fighter={fighter} />
+                    <Fighter fighter={fighter} windowWidth={windowWidth} />
                   </label>
                   {conditionVisibleSpinner(fighter) && <Spinner className="" />}
                 </div>
@@ -234,14 +236,19 @@ const Paginate = ({ pageCountArray, params, currentPage }: PaginatePropsType) =>
       <div className="flex justify-center">
         {pageCountArray.length >= 2 &&
           pageCountArray.map((page) => (
-            <div
-              className={`ml-3 px-2 ${
-                page === currentPage ? `bg-green-500 text-white` : `bg-stone-200`
-              }`}
+            <Link
               key={page}
+              onClick={() => window.scrollTo(0, 0)}
+              to={`/fighter/edit?page=${page}${params}`}
             >
-              <Link to={`/fighter/edit?page=${page}${params}`}>{page}</Link>
-            </div>
+              <div
+                className={`ml-3 px-2 ${
+                  page === currentPage ? `bg-green-500 text-white` : `bg-stone-200`
+                }`}
+              >
+                {page}
+              </div>
+            </Link>
           ))}
       </div>
     </div>

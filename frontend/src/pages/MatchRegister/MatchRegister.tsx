@@ -179,16 +179,16 @@ export const MatchRegister = () => {
           >
             {pageCountArray.length > 1 &&
               pageCountArray.map((page) => (
-                <div key={page} className="text-center flex justify-center items-center">
-                  <Link
-                    className={`ml-3 px-2 ${
-                      page === paramPage ? `bg-green-500 text-white` : `bg-stone-200`
-                    }`}
-                    to={`/match/register?page=${page}${params}`}
-                  >
-                    {page}
-                  </Link>
-                </div>
+                <Link
+                  key={page}
+                  className={`ml-3 px-2 ${
+                    page === paramPage ? `bg-green-500 text-white` : `bg-stone-200`
+                  }`}
+                  onClick={() => window.scrollTo(0, 0)}
+                  to={`/match/register?page=${page}${params}`}
+                >
+                  <div className="text-center flex justify-center items-center">{page}</div>
+                </Link>
               ))}
           </div>
           <div className="mt-3 mx-2">
@@ -205,7 +205,11 @@ export const MatchRegister = () => {
                     className={`absolute top-[50%] left-3 translate-y-[-50%] cursor-pointer`}
                   />
                   <label className="cursor-pointer" htmlFor={`fighter_${fighter.id}`}>
-                    <Fighter fighter={fighter} className={`bg-stone-200`} />
+                    <Fighter
+                      fighter={fighter}
+                      bgColorClassName={`bg-stone-200`}
+                      windowWidth={windowWidth}
+                    />
                   </label>
                 </div>
               ))
@@ -242,20 +246,26 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
     const result = !Object.values(matchData.fighters).some((faighter) => faighter === null);
     setIsSelectFighters(result);
   }, [matchData]);
+  const { width: windowWidth } = useGetWindowSize();
   return (
     <div className="z-10 w-[100vw] fixed top-[50px] left-0 bg-stone-600">
       <div className="flex w-full h-[150px] p-3">
         {matchData.fighters.red ? (
           <Fighter
-            className="w-1/2 bg-stone-100"
-            cornerColor="red"
+            bgColorClassName="w-1/2 bg-stone-100"
+            isReverse={true}
             fighter={matchData.fighters.red}
+            windowWidth={windowWidth}
           />
         ) : (
           <div className="w-1/2" />
         )}
         {matchData.fighters.blue && (
-          <Fighter className="w-1/2 bg-stone-100" fighter={matchData.fighters.blue} />
+          <Fighter
+            bgColorClassName="w-1/2 bg-stone-100"
+            fighter={matchData.fighters.blue}
+            windowWidth={windowWidth}
+          />
         )}
       </div>
       {isSelectFighters && matchData.matchDate && (

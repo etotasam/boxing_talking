@@ -141,7 +141,7 @@ export const MatchInfo = () => {
       <h1 className="text-center text-stone-600 font-thin text-xl">
         {thisMatch && dayjs(thisMatch.date).format("YYYY/M/D")}
       </h1>
-      <div className="pt-3 md:flex md:px-10 lg:px-0">
+      <div className="pt-3 md:flex md:px-5 lg:flex-col lg:px-0">
         <div className="px-5 flex justify-center items-center">
           {matchData && (
             <Chart
@@ -259,9 +259,9 @@ const FightersInfo = ({
   const { width: windowWidth } = useGetWindowSize();
   return (
     <div className="mt-3 sm:m-0 md:p-0 w-full flex items-center px-4">
-      <div className="w-full grid grid-rows-[32px_1fr] grid-cols-[1fr_1fr] md:grid-rows-[1fr_32px_1fr] md:grid-cols-1">
+      <div className="w-full grid grid-rows-[32px_1fr] grid-cols-[1fr_1fr] md:grid-rows-[1fr_32px_1fr] md:grid-cols-[1fr] lg:grid-rows-[32px_1fr] lg:grid-cols-[1fr_1fr]">
         {/* 投票ボタン */}
-        <div className="col-span-2 md:col-span-1 md:row-start-2">
+        <div className="col-span-2 md:row-start-2 lg:row-start-1">
           <VoteButton
             match={thisMatch}
             userVoteColor={userVoteColor}
@@ -270,12 +270,12 @@ const FightersInfo = ({
           />
         </div>
 
-        <div className={`w-full flex items-center py-2 col-span-1 md:row-start-1`}>
+        <div className={`w-full flex items-center py-2 col-span-1 md:row-start-1 lg:row-start-2`}>
           <div
             onClick={() => voteToFighter("red", thisMatch.red)}
             onMouseOver={() => setMouseOnColor(MouseOn.RED)}
             onMouseOut={() => setMouseOnColor(MouseOn.NULL)}
-            className={`w-full h-full rounded-l-xl md:rounded-xl cursor-pointer duration-500 ${
+            className={`w-full h-full rounded-l-xl md:rounded-xl lg:rounded-r-none cursor-pointer duration-500 ${
               mouseOnColor === MouseOn.RED ? `bg-red-700` : `bg-stone-800`
             }`}
           >
@@ -297,12 +297,12 @@ const FightersInfo = ({
           </div>
         </div>
 
-        <div className={`w-full flex items-center py-2 col-span-1 md:row-start-3`}>
+        <div className={`w-full flex items-center py-2 col-span-1 md:row-start-3 lg:row-start-2`}>
           <div
             onClick={() => voteToFighter("blue", thisMatch.blue)}
             onMouseOver={() => setMouseOnColor(MouseOn.BLUE)}
             onMouseOut={() => setMouseOnColor(MouseOn.NULL)}
-            className={`w-full h-full rounded-r-xl md:rounded-xl cursor-pointer duration-500 ${
+            className={`w-full h-full rounded-r-xl md:rounded-xl lg:rounded-l-none cursor-pointer duration-500 ${
               mouseOnColor === MouseOn.BLUE ? `bg-blue-800` : `bg-stone-800`
             }`}
           >

@@ -9,7 +9,7 @@ import { LoginForm } from "@/components/module/LoginForm";
 import { Hamburger } from "@/components/module/Hamburger";
 //! hooks
 // import { useAuth } from "@/libs/hooks/useAuth";
-import { useAuth } from "@/libs/hooks/useAuth";
+import { useAuth, useLogin, useLogout } from "@/libs/hooks/useAuth";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 
@@ -56,14 +56,20 @@ export const Header = React.memo(({ className }: Props) => {
     }
   };
 
+  useEffect(() => {
+    return () => {
+      document.body.style.overflowY = "scroll";
+    };
+  }, []);
+
   const startAnimate = () => {
     if (isOpenHamburgerMenu) {
       hamburgerControls.start(() => {
         return {
           zIndex: 999,
           position: "fixed",
-          top: "40px",
-          right: "20px",
+          // top: "40px",
+          // right: "20px",
         };
       });
       headerControls.start(() => {
@@ -115,32 +121,29 @@ export const Header = React.memo(({ className }: Props) => {
 
   return (
     <>
-      <motion.header
-        animate={headerControls}
-        className={`${className ? className : ""} bg-stone-900`}
-      >
-        <motion.h1
-          animate={h1Controls}
-          className="w-[150px] absolute left-[8px] md:left-[20px] bottom-[15px] text-3xl text-white"
-        >
-          BOXING TALKING
-        </motion.h1>
-        {windowWidth >= WINDOW_WIDTH.md && currentPage !== "" && (
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            initial={{ scale: 1 }}
-            transition={{ duration: 0.3 }}
-            className="text-white absolute bottom-[15px] left-[170px]"
+      <motion.header animate={headerControls} className={`bg-stone-900`}>
+        <div className="relative h-[100px] max-w-[1024px] lg:mx-auto">
+          <motion.h1
+            animate={h1Controls}
+            className="w-[150px] absolute left-[8px] md:left-[20px] lg:left-0 bottom-[15px] text-3xl text-white"
           >
-            <CustomLink to="/" className="">
-              Home
-            </CustomLink>
+            BOXING TALKING
+          </motion.h1>
+          {windowWidth >= WINDOW_WIDTH.md && currentPage !== "" && (
+            <div className="text-white absolute bottom-[15px] left-[170px]">
+              <CustomLink to="/" className="">
+                Home
+              </CustomLink>
+            </div>
+          )}
+          <motion.div
+            animate={hamburgerControls}
+            className="absolute top-[40px] right-[8px] md:right-[20px] lg:right-0"
+          >
+            <AuthControlComponent />
           </motion.div>
-        )}
-        <motion.div animate={hamburgerControls} className="top-[40px] right-[8px] md:right-[20px]">
-          <AuthControlComponent />
-        </motion.div>
-        <AnimatePresence>{isOpenHamburgerMenu && <ModalMenu />}</AnimatePresence>
+          <AnimatePresence>{isOpenHamburgerMenu && <ModalMenu />}</AnimatePresence>
+        </div>
       </motion.header>
     </>
   );
@@ -213,6 +216,13 @@ const ModalMenu = React.memo(() => {
       transition: { duration: 0.3 },
     },
   };
+
+  useEffect(() => {
+    return () => {
+      setIsOpenHamburgerMenu(false);
+      setIsOpenLoginModal(false);
+    };
+  }, []);
 
   const onclick = React.useCallback((e) => {
     e.preventDefault();
