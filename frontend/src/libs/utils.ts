@@ -30,6 +30,7 @@ export enum MESSAGE {
   VOTE_FAILD = `投票はできません \n すでに投票しています`,
   VOTE_SUCCESSFULLY = `投票しました`,
 
+  COMMENT_CANT_POST_WITH_UNAUTH = "コメント投稿にはログインが必要です",
   COMMENT_DELETING = `削除中です.... \n そのままお待ち下さい`,
   COMMENT_DELETE_CONFIRM = "※コメントを削除します",
   COMMENT_DELETED = "コメントを削除しました",

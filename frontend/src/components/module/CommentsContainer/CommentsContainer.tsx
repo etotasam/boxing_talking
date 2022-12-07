@@ -24,7 +24,7 @@ export const CommentsContainer = () => {
   } = useFetchCommentsOnMatch(matchId);
 
   //? コメント欄をloadingにする条件
-  const pending = isFetchingComments;
+  const pending = [isFetchingComments].includes(true);
   return (
     <>
       <ul

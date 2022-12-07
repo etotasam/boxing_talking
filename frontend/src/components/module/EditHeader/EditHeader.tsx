@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 
 //! components
-import { CustomButton } from "@/components/atomic/Button";
+// import { CustomButton } from "@/components/atomic/Button";
 import { LogoutBtn } from "@/components/module/LogoutBtn";
 
 type Props = {
@@ -10,10 +10,10 @@ type Props = {
   // actionBtns: ActionBtnsType[];
 };
 
-type ActionBtnsType = {
-  title: string;
-  form: string;
-};
+// type ActionBtnsType = {
+//   title: string;
+//   form: string;
+// };
 
 export const EditHeader = React.memo(({ className }: Props) => {
   const links = [

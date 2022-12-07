@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import dayjs from "dayjs";
 import { FighterType, Stance, Nationality } from "@/libs/hooks/useFighter";
 import { WINDOW_WIDTH } from "@/libs/utils";
@@ -56,15 +56,15 @@ export const Fighter = React.memo(
     const birthday = fighter.birth;
     const age = today.diff(birthday, "year");
 
-    const boxingStyle = React.useCallback((stance: Stance) => {
-      switch (stance) {
-        case Stance.Southpaw:
-          return "サウスポー";
-        case Stance.Orthodox:
-          return "オーソドックス";
-      }
-    }, []);
-    const stance = boxingStyle(fighter.stance);
+    // const boxingStyle = React.useCallback((stance: Stance) => {
+    //   switch (stance) {
+    //     case Stance.Southpaw:
+    //       return "サウスポー";
+    //     case Stance.Orthodox:
+    //       return "オーソドックス";
+    //   }
+    // }, []);
+    // const stance = boxingStyle(fighter.stance);
 
     const nationalFlag = checkNationality(fighter.country!);
     const textColor = recordTextColor ? recordTextColor : `text-stone-500`;

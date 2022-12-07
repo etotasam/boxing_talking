@@ -11,7 +11,7 @@ import { FighterType } from "@/libs/hooks/useFighter";
 import { UserType } from "@/libs/hooks/useAuth";
 //!component
 import { Chart } from "@/components/module/Chart";
-import { Fighter } from "../Fighter";
+// import { Fighter } from "../Fighter";
 import { TestFighter } from "../TestFighter";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
 import { Spinner } from "@/components/module/Spinner";

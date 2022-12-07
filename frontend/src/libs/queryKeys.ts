@@ -9,7 +9,7 @@ export const queryKeys = {
 
   comments: "api/comment",
 
-  auth: "/api/user",
+  auth: "api/user",
 
   fighterPaginate: "q/paginate",
   isSelectedFighter: "q/isSelectedFighter",

@@ -1,7 +1,6 @@
 import React, { DependencyList, useState, useEffect } from "react";
 
 export const useAdjustCommentsContainer = ([...ref]: (React.RefObject<HTMLDivElement> | null)[]): number | undefined => {
-
   const headerAndFooterHeight = 150
   const [allHeight, setAllHeight] = useState(0)
 
@@ -41,6 +40,6 @@ export const useAdjustCommentsContainer = ([...ref]: (React.RefObject<HTMLDivEle
       observer.disconnect()
       window.removeEventListener('resize', calcCommentComponentHeight, false)
     }
-  }, [])
+  }, [...ref])
   return commentsContainerHeight
 }
