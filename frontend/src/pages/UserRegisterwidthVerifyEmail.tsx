@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { Axios } from "@/libs/axios";
+// import { Axios } from "@/libs/axios";
 
 export const UserRegisterwidthVerifyEmail = () => {
   const { token, id } = useParams();

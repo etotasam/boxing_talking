@@ -1,6 +1,6 @@
 import { CustomButton } from "@/components/atomic/Button";
-import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 //! hooks
 import { useLogin } from "@/libs/hooks/useAuth";
@@ -14,7 +14,7 @@ export const LoginForm = () => {
   const [password, setPassword] = useState("");
   const location = useLocation();
   const locationState = location.state;
-  const [state, setState] = useState(locationState as { message: string } | null);
+  const [, setState] = useState(locationState as { message: string } | null);
   // const { login, loginState } = useLogin();
   const { login: loginApi, isLoading: isAuthChecking } = useLogin();
 

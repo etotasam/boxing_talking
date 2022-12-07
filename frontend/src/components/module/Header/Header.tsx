@@ -9,7 +9,7 @@ import { LoginForm } from "@/components/module/LoginForm";
 import { Hamburger } from "@/components/module/Hamburger";
 //! hooks
 // import { useAuth } from "@/libs/hooks/useAuth";
-import { useAuth, useLogin, useLogout } from "@/libs/hooks/useAuth";
+import { useAuth } from "@/libs/hooks/useAuth";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 
@@ -163,7 +163,7 @@ const AuthControlComponent = () => {
   const { width: windowWidth } = useGetWindowSize();
 
   //? loginモーダルの状態管理
-  const { setter: setIsOpenLoginModal } = useQueryState<boolean>("q/isOpenLoginModal");
+  // const { setter: setIsOpenLoginModal } = useQueryState<boolean>("q/isOpenLoginModal");
   return (
     <>
       {/* {windowWidth > WINDOW_WIDTH.lg ? ( */}

@@ -20,8 +20,8 @@ import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModa
 import { FighterSearchForm } from "@/components/module/FighterSearchForm";
 import { PendingModal } from "@/components/modal/PendingModal";
 //! message contoller
-import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
-import { MESSAGE } from "@/libs/utils";
+// import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+// import { MESSAGE } from "@/libs/utils";
 
 type MatchFightersDataType = {
   red: FighterType | null;
@@ -154,7 +154,7 @@ export const MatchRegister = () => {
   }, [fightersCount]);
 
   //? 試合の登録
-  const [postMatchPending, setPostMatchPending] = useState(false);
+  const [postMatchPending] = useState(false);
   const matchRegister = async (): Promise<void> => {
     if (!matchData.fighters.red || !matchData.fighters.blue || !matchData.matchDate) return;
 
@@ -173,7 +173,7 @@ export const MatchRegister = () => {
       <SelectFighters submit={matchRegister} />
       <div className="flex mt-[150px] w-full">
         <div className="w-full md:w-2/3">
-          {/* ページネーション */}
+          {/* //? ページネーション */}
           <div
             className={`z-50 flex justify-center items-center text-center sticky top-[200px] left-0 h-[35px] bg-black/50 w-full`}
           >

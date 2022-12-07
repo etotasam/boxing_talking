@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import { Axios } from "@/libs/axios";
+import { useState } from "react";
+// import { Axios } from "@/libs/axios";
 import { Nationality } from "@/libs/hooks/useFighter";
-import { useQueryState } from "@/libs/hooks/useQueryState";
+// import { useQueryState } from "@/libs/hooks/useQueryState";
 import { queryKeys } from "@/libs/queryKeys";
 import { useQueryClient } from "react-query";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 //! custom hooks
-import { useFetchFighters } from "@/libs/hooks/useFighter";
+// import { useFetchFighters } from "@/libs/hooks/useFighter";
 import { Button } from "@/components/atomic/Button";
 
 type Props = React.ComponentProps<"form">;
