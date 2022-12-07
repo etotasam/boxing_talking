@@ -1,16 +1,16 @@
 import { CommentsContainer } from ".";
 import { cleanup, render, screen } from "@testing-library/react";
 import { useLocation } from "react-router-dom";
-
+import { QueryClientProvider, QueryClient } from "react-query";
 //! components
-import { SpinnerModal } from "@/components/modal/SpinnerModal";
+import { Spinner } from "@/components/module/Spinner";
 
 //! hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-//! import { useFetchThisMatchComments } from "@/libs/hooks/useFetchThisMatchComments";
-import { usePostComment } from "@/libs/hooks/usePostComment";
-import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
-import { useCommentsOnMatch } from "@/libs/hooks/fetchers";
+import { useDeleteComment, usePostComment, useFetchCommentsOnMatch } from "@/libs/hooks/useComment";
+// import { usePostComment } from "@/libs/hooks/usePostComment";
+// import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
+// import { useCommentsOnMatch } from "@/libs/hooks/fetchers";
 
 //! test data
 import { authUser, comments, comment } from "@/libs/test-data";
@@ -19,17 +19,20 @@ jest.mock("react-router-dom");
 const useLocationMock = useLocation as jest.Mock;
 
 //?spinerのモック
-jest.mock("@/components/modal/SpinnerModal");
-const SpinnerModalMock = SpinnerModal as jest.Mock;
+jest.mock("@/components/module/Spinner");
+const SpinnerMock = Spinner as jest.Mock;
 
 //?ログインユーザーのモック
 jest.mock("@/libs/hooks/useAuth");
 const useAuthMock = useAuth as jest.Mock;
 
 //? コメントのモック
-jest.mock("@/libs/hooks/fetchers");
-const useCommentsOnMatchMock = useCommentsOnMatch as jest.Mock;
-const useCommentsOnMatchMockReturnValue = {
+jest.mock("@/libs/hooks/useComment");
+const usePostCommentMock = usePostComment as jest.Mock;
+const useDeleteCommentMock = useDeleteComment as jest.Mock;
+const useFetchCommentsOnMatchMock = useFetchCommentsOnMatch as jest.Mock;
+// const useCommentsOnMatchMock = useCommentsOnMatch as jest.Mock;
+const useFetchCommentsOnMatchMockReturnValue = {
   data: comments,
   error: jest.fn(),
   mutate: jest.fn(),
@@ -42,23 +45,23 @@ const useCommentsOnMatchMockReturnValue = {
 //   cancelFetchComments: jest.fn(),
 // };
 
-jest.mock("@/libs/hooks/usePostComment");
-const usePostCommentMock = usePostComment as jest.Mock;
-
-jest.mock("@/libs/hooks/useCommentDelete");
-const useCommentDeleteMock = useCommentDelete as jest.Mock;
-
+// jest.mock("@/libs/hooks/useCommentDelete");
+type wrapperType = { children: React.ReactNode };
 let data: typeof authUser;
 describe("CommentsContainerのテスト", () => {
+  const queryClient = new QueryClient();
+  const Wrapper = ({ children }: wrapperType) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
   beforeEach(() => {
     // const authState = authUser;
     useLocationMock.mockReturnValue(jest.fn());
     data = authUser;
     useAuthMock.mockReturnValue({ data });
-    useCommentsOnMatchMock.mockReturnValue(useCommentsOnMatchMockReturnValue);
+    useFetchCommentsOnMatchMock.mockReturnValue(useFetchCommentsOnMatchMockReturnValue);
     // useFetchThisMatchCommentsMock.mockReturnValue({ commentsState, ...useFetchThisMatchCommentsMockReturnValue });
     usePostCommentMock.mockReturnValue({ commentPosting: false });
-    useCommentDeleteMock.mockReturnValue({ deleteCommentsState: { pending: false } });
+    useDeleteCommentMock.mockReturnValue({ deleteCommentsState: { pending: false } });
   });
 
   afterEach(() => {
@@ -66,7 +69,11 @@ describe("CommentsContainerのテスト", () => {
   });
 
   it("投稿されたコメントが表示されている", () => {
-    render(<CommentsContainer />);
+    render(
+      <Wrapper>
+        <CommentsContainer />
+      </Wrapper>
+    );
     expect(screen.getByText(comment)).toBeInTheDocument();
   });
 
@@ -77,9 +84,13 @@ describe("CommentsContainerのテスト", () => {
       error: jest.fn(),
       mutate: jest.fn(),
     };
-    useCommentsOnMatchMock.mockReturnValue(useCommentsOnMatchMockReturnValue);
+    useFetchCommentsOnMatchMock.mockReturnValue(useCommentsOnMatchMockReturnValue);
     // useFetchThisMatchCommentsMock.mockReturnValue({ commentsState, ...useFetchThisMatchCommentsMockReturnValue });
-    render(<CommentsContainer />);
+    render(
+      <Wrapper>
+        <CommentsContainer />
+      </Wrapper>
+    );
     expect(screen.getByText("コメントはありません")).toBeInTheDocument();
   });
 
@@ -87,13 +98,17 @@ describe("CommentsContainerのテスト", () => {
     // const commentsState = { comments: [], pending: true, hasNotComments: true };
     const useCommentsOnMatchMockReturnValue = {
       data: undefined,
-      error: jest.fn(),
-      mutate: jest.fn(),
+      isLoading: true,
+      isFetching: false,
     };
-    useCommentsOnMatchMock.mockReturnValue(useCommentsOnMatchMockReturnValue);
+    useFetchCommentsOnMatchMock.mockReturnValue(useCommentsOnMatchMockReturnValue);
     // useFetchThisMatchCommentsMock.mockReturnValue({ commentsState, ...useFetchThisMatchCommentsMockReturnValue });
-    SpinnerModalMock.mockImplementation(jest.fn(() => <div>スピナー</div>));
-    render(<CommentsContainer />);
+    SpinnerMock.mockImplementation(jest.fn(() => <div>スピナー</div>));
+    render(
+      <Wrapper>
+        <CommentsContainer />
+      </Wrapper>
+    );
     expect(screen.getByText("スピナー")).toBeInTheDocument();
   });
 });

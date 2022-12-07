@@ -1,16 +1,12 @@
 import React from "react";
-
-// components
-import { SpinnerModal } from "@/components/modal/SpinnerModal";
+//! components
+import { Spinner } from "@/components/module/Spinner";
 import { CustomButton } from "@/components/atomic/Button";
-
-// hooks
-// import { useLogout } from "@/libs/hooks/useLogout";
+//! hooks
 import { useAuth, useLogout } from "@/libs/hooks/useAuth";
 
 export const LogoutBtn = React.memo(() => {
   const { data: authUser } = useAuth();
-  // const { logout, logoutState } = useLogout();
   const { logout, isLoading: isLogoutPending } = useLogout();
   const click = async () => {
     if (!authUser) return;
@@ -19,7 +15,7 @@ export const LogoutBtn = React.memo(() => {
 
   return (
     <div className="relative">
-      {isLogoutPending && <SpinnerModal />}
+      {isLogoutPending && <Spinner size={20} />}
       <CustomButton
         dataTestid={"logout-button"}
         className={`text-white ${
@@ -29,7 +25,7 @@ export const LogoutBtn = React.memo(() => {
         } duration-200`}
         onClick={click}
       >
-        Logout
+        ログアウト
       </CustomButton>
     </div>
   );

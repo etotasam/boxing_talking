@@ -4,6 +4,7 @@
 
 :root {
   --comment-el-height: 0px;
+  --textarea-height: 35px;
 }
 
 @layer base {
@@ -19,27 +20,7 @@
 }
 
 @layer utilities {
-  .t-bgcolor-opacity-1 {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-  .t-bgcolor-opacity-3 {
-    background-color: rgba(0, 0, 0, 0.3);
-  }
-  .t-bgcolor-opacity-5 {
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-  .t-bgcolor-white-opacity-5 {
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-  /*
-  .fighter-color-red {
-    background-color: rgb(252, 113, 113);
-  }
-  .fighter-color-blue {
-    background-color: rgb(86, 153, 254);
-  }
-  */
-  .t-comment-height {
+  .t-comment-container-height {
     height: var(--comment-el-height);
   }
 
@@ -73,4 +54,64 @@
   .t-flag-ua {
     background-image: url("./libs/images/flags/ukrine.svg");
   }
+
+  .t-bg-none {
+    background: none;
+  }
+
+  .t-textarea-height {
+    height: var(--textarea-height);
+  }
+
+  .t-hover-test {
+    position: relative;
+  }
+
+  .t-hover-test:hover::before {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
+
+  .t-hover-test::before {
+    content: "";
+    position: absolute;
+    display: block;
+    top: 0;
+    right: 0;
+    bottom: -10px;
+    left: 0;
+    background: hsl(200 100% 80%);
+    width: 120%;
+    z-index: -1;
+    transition: transform 0.3s;
+  }
+
+  .t-hover-test::before {
+    transform: scaleX(0);
+    transform-origin: bottom right;
+  }
+
+  /* .t-hover-test::before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 10px;
+    inset: 0 0 0 0;
+    background: hsl(200 100% 80%);
+    z-index: -1;
+    transition: transform 0.3s ease;
+  }
+  .t-hover-test:hover::before {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
+
+  .t-hover-test::before {
+    transform: scaleX(0);
+    transform-origin: bottom right;
+  } */
 }

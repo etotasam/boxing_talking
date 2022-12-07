@@ -1,73 +1,100 @@
 import React, { useEffect } from "react";
-import { Axios } from "@/libs/axios";
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
-import { MESSAGE } from "@/libs/utils";
 import { queryKeys } from "@/libs/queryKeys";
-
+import { NationaFlag, checkNationality } from "@/components/module/Fighter";
+// import { WINDOW_WIDTH } from "@/libs/utils";
 //! types
-import { FighterType } from "@/libs/hooks/useFighter";
 import { MatchesType } from "@/libs/hooks/useMatches";
 //! component
-import { MatchComponent } from "@/components/module/MatchComponent";
-import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
+import { TestMatchComponent } from "@/components/module/TestMatchComponent";
+// import { MatchComponent } from "@/components/module/MatchComponent";
 import { EditActionBtns } from "@/components/module/EditActionBtns";
 import { PendingModal } from "@/components/modal/PendingModal";
-import { SpinnerModal } from "@/components/modal/SpinnerModal";
-
+import { ConfirmModal } from "@/components/modal/ConfirmModal";
+import { Spinner } from "@/components/module/Spinner";
 //! hooks
+// import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 import { useQueryState } from "@/libs/hooks/useQueryState";
-import { useMessageController } from "@/libs/hooks/messageController";
-// import { useMatches } from "@/libs/hooks/fetchers";
 import { useFetchMatches, useDeleteMatch, useUpdateMatch } from "@/libs/hooks/useMatches";
-
 //! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
+//! message contoller
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { MESSAGE } from "@/libs/utils";
 
 export const MatchEdit = () => {
   // const [deleteMatchId, setDeleteMatchId] = React.useState<number | undefined>();
-  const { state: deleteMatchState, setter: setDeleteMatchState } = useQueryState<MatchesType | undefined>(
-    queryKeys.deleteMatchSub
-  );
+  const { state: targetMatchState, setter: setTargetMatchState } = useQueryState<
+    MatchesType | undefined
+  >(queryKeys.deleteMatchSub);
   const { data: matchesData } = useFetchMatches();
-  const { deleteMatch, isLoading: isDeletingMatch } = useDeleteMatch();
+  const { deleteMatch, isLoading: isDeletingMatch, isSuccess: isDeleteComplete } = useDeleteMatch();
   const { updateMatch, isLoading: isUpdateingMatch, isSuccess: isUpdatedMatch } = useUpdateMatch();
 
-  const { setMessageToModal } = useMessageController();
+  const { setToastModalMessage, clearToastModaleMessage } = useToastModal();
 
-  const matchDelete = async (e: React.FormEvent<HTMLFormElement>) => {
-    setMessageToModal(MESSAGE.NULL, ModalBgColorType.NULL);
+  // const { width: windowWidth } = useGetWindowSize();
+
+  //todo
+  const [isOpenConfirmModal, setIsOpenConfirmModal] = React.useState(false);
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (deleteMatchState === undefined) {
-      setMessageToModal(MESSAGE.NO_SELECT_DELETE_MATCH, ModalBgColorType.ERROR);
+    clearToastModaleMessage();
+    if (!isCheckedId) {
+      setToastModalMessage({
+        message: MESSAGE.MATCH_NOT_SELECTED,
+        bgColor: ModalBgColorType.NOTICE,
+      });
       return;
     }
-    deleteMatch(deleteMatchState.id);
-    setDeleteMatchState(undefined);
+    setIsOpenConfirmModal(true);
   };
 
+  //? 試合の削除
+  const matchDelete = () => {
+    if (!targetMatchState) {
+      console.error("targetMatchState is not set");
+      return;
+    }
+    setIsOpenConfirmModal(false);
+    deleteMatch(targetMatchState.id);
+  };
+
+  //? 試合の削除が成功したら
+  useEffect(() => {
+    setTargetMatchState(undefined);
+  }, [isDeleteComplete]);
+
+  //? 試合を選択しているかどうか
   const [isCheckedId, setIsCheckedId] = React.useState<number | null>();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>, match: MatchesType) => {
     if (isCheckedId === Number(e.target.value)) {
       setIsCheckedId(null);
-      setDeleteMatchState(undefined);
+      setTargetMatchState(undefined);
     } else {
       setIsCheckedId(Number(e.target.value));
-      setDeleteMatchState(match);
+      setTargetMatchState(match);
     }
   };
 
+  //? 更新が成功した時のエフェクト
   useEffect(() => {
+    if (!isUpdatedMatch) return;
     setIsCheckedId(null);
-    setDeleteMatchState(undefined);
+    setTargetMatchState(undefined);
   }, [isUpdatedMatch]);
 
   const actionBtns = [{ btnTitle: "試合の削除", form: "match-delete" }];
   return (
     <LayoutForEditPage>
       <EditActionBtns actionBtns={actionBtns} />
-      <div className="flex mt-[50px] w-[100vw]">
-        <form id={"match-delete"} className="w-2/3" onSubmit={matchDelete}>
+      <div className="flex flex-col md:flex-row-reverse mt-[50px] w-full">
+        <div className={`z-20 w-full md:w-1/3 sticky top-[100px] right-0`}>
+          <div className="md:sticky md:top-[100px] md:right-0 md:pt-2">
+            <MatchEditForm matchUpdate={(updateData: MatchesType) => updateMatch(updateData)} />
+          </div>
+        </div>
+        <form id={"match-delete"} className="w-full md:w-2/3" onSubmit={submit}>
           {matchesData &&
             matchesData.map((match) => (
               <div key={match.id} className={`relative bg-stone-200 m-2`}>
@@ -78,65 +105,115 @@ export const MatchEdit = () => {
                   name="match"
                   value={match.id}
                   checked={isCheckedId === match.id}
-                  // onChange={() => setDeleteMatchState(match)}
+                  // onChange={() => setTargetMatchState(match)}
                   onChange={(e) => onChange(e, match)}
                 />
                 <div className={"flex flex-row-reverse cursor-pointer relative"}>
                   <label className="w-[95%]" htmlFor={`match_${match.id}`}>
-                    <MatchComponent match={match} className={""} />
+                    <TestMatchComponent match={match} bgColorClassName={"bg-sotne-200"} />
                   </label>
-                  {!match.id && <SpinnerModal />}
-                  {isUpdateingMatch && deleteMatchState?.id === match.id && <SpinnerModal />}
+                  {!match.id && <Spinner />}
+                  {isUpdateingMatch && targetMatchState?.id === match.id && <Spinner />}
                 </div>
               </div>
             ))}
         </form>
-        <div className="w-1/3">
-          <MatchEditForm matchUpdate={(deleteData: MatchesType) => updateMatch(deleteData)} />
-        </div>
       </div>
       {isDeletingMatch && <PendingModal message="試合データの削除中です..." />}
+      {isOpenConfirmModal && (
+        <ConfirmModal
+          message={<Message MatchesData={targetMatchState} />}
+          okBtnString={"削除"}
+          execution={matchDelete}
+          cancel={() => setIsOpenConfirmModal(false)}
+        />
+      )}
     </LayoutForEditPage>
   );
 };
 
-type DeleteMatchState = {
+type MatchEditFormPropsType = {
   matchUpdate: (deleteMatchState: MatchesType) => void;
 };
 
-const MatchEditForm = ({ matchUpdate }: DeleteMatchState) => {
-  const { setMessageToModal } = useMessageController();
+const MatchEditForm = ({ matchUpdate }: MatchEditFormPropsType) => {
+  const { setToastModalMessage, clearToastModaleMessage } = useToastModal();
   const { data: matchesData } = useFetchMatches();
-  const { state: deleteMatchState, setter: setDeleteMatchState } = useQueryState<MatchesType>(queryKeys.deleteMatchSub);
+  const { state: targetMatchState, setter: setTargetMatchState } = useQueryState<MatchesType>(
+    queryKeys.deleteMatchSub
+  );
   const alterMatchDate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setMessageToModal(MESSAGE.NULL, ModalBgColorType.NULL);
-    if (!deleteMatchState) {
-      setMessageToModal(MESSAGE.MATCH_NOT_SELECTED, ModalBgColorType.NOTICE);
+    clearToastModaleMessage();
+    if (!targetMatchState) {
+      setToastModalMessage({
+        message: MESSAGE.MATCH_NOT_SELECTED,
+        bgColor: ModalBgColorType.NOTICE,
+      });
       return;
     }
-    const prevDeleteMatchState = matchesData?.find((match) => match.id === deleteMatchState.id);
-    if (prevDeleteMatchState?.date === deleteMatchState.date) {
-      setMessageToModal(MESSAGE.MATCH_NOT_ALTER, ModalBgColorType.NOTICE);
+    //? 編集対象に変更がない場合はトーストでお知らせ
+    const prevDeleteMatchState = matchesData?.find((match) => match.id === targetMatchState.id);
+    if (prevDeleteMatchState?.date === targetMatchState.date) {
+      setToastModalMessage({ message: MESSAGE.MATCH_NOT_ALTER, bgColor: ModalBgColorType.NOTICE });
       return;
     }
-    matchUpdate(deleteMatchState);
+    matchUpdate(targetMatchState);
     // updateMatch(deleteMatchState);
   };
 
+  //? 試合日を指定(編集)
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const date = e.target.value;
-    setDeleteMatchState((prev) => {
+    setTargetMatchState((prev) => {
       return { ...prev, date };
     });
   };
+
   return (
     <>
-      <form className="p-5 bg-stone-200" onSubmit={alterMatchDate}>
-        <label htmlFor="match-date">試合日の変更:</label>
-        <input id="match-date" type="date" value={(deleteMatchState?.date as string) || ""} onChange={onChange} />
-        <button className="bg-green-500 text-white py-1 px-5 rounded float-right">変更</button>
+      <form
+        className="p-5 bg-stone-200 flex justify-between md:flex-col lg:flex-row"
+        onSubmit={alterMatchDate}
+      >
+        <div>
+          <label htmlFor="match-date">試合日の変更:</label>
+          <input
+            id="match-date"
+            type="date"
+            value={(targetMatchState?.date as string) || ""}
+            onChange={onChange}
+          />
+        </div>
+        <button className="bg-green-500 text-white py-1 px-5 md:mt-3 lg:mt-0 rounded">変更</button>
       </form>
     </>
+  );
+};
+
+const Message = ({ MatchesData }: { MatchesData: MatchesType | undefined }) => {
+  const [redFlag, setRedFlag] = React.useState<NationaFlag | undefined>();
+  const [blueFlag, setBlueFlag] = React.useState<NationaFlag | undefined>();
+  useEffect(() => {
+    if (!MatchesData) return;
+    setRedFlag(checkNationality(MatchesData.red.country!));
+    setBlueFlag(checkNationality(MatchesData.blue.country!));
+  }, [MatchesData]);
+  return (
+    <div>
+      {MatchesData && (
+        <div className="flex justify-center w-full">
+          <div className="flex justify-center">
+            <div className={`${redFlag} t-flag w-[25px] h-[25px] mr-2`} />
+            <p>{MatchesData.red.name}</p>
+          </div>
+          <span className="mx-5">VS</span>
+          <div className="flex justify-center">
+            <p>{MatchesData.blue.name}</p>
+            <div className={`${blueFlag} t-flag w-[25px] h-[25px] ml-2`} />
+          </div>
+        </div>
+      )}
+    </div>
   );
 };

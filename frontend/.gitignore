@@ -10,6 +10,7 @@
 
 # pages
 src/pages/check/
+src/pages/Test
 
 # production
 /build

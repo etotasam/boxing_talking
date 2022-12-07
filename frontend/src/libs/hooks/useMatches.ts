@@ -3,10 +3,12 @@ import { useQuery, useMutation, useQueryClient } from "react-query"
 import { Axios } from "../axios"
 import { queryKeys } from "@/libs/queryKeys"
 import { useQueryState } from "./useQueryState"
-import { useMessageController } from "@/libs/hooks/messageController";
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
-import { MESSAGE } from "@/libs/utils";
 import dayjs from "dayjs"
+
+//! message contoller
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { MESSAGE } from "@/libs/utils";
+
 //! types
 import { FighterType } from "@/libs/hooks/useFighter"
 
@@ -43,7 +45,7 @@ type RegstarMatchAPIPropsType = {
 }
 
 export const useRegisterMatch = () => {
-  const { setMessageToModal } = useMessageController()
+  const { setToastModalMessage } = useToastModal()
   const queryClient = useQueryClient()
   const api = async ({ red_fighter, blue_fighter, match_date }: RegstarMatchPropsType) => {
     await Axios.post(queryKeys.match, { red_fighter_id: red_fighter.id, blue_fighter_id: blue_fighter.id, match_date })
@@ -64,11 +66,11 @@ export const useRegisterMatch = () => {
   const registerMatch = ({ red_fighter, blue_fighter, match_date }: RegstarMatchPropsType) => {
     mutate({ red_fighter, blue_fighter, match_date }, {
       onSuccess: () => {
-        setMessageToModal(MESSAGE.MATCH_REGISTER_SUCCESS, ModalBgColorType.SUCCESS)
+        setToastModalMessage({ message: MESSAGE.MATCH_REGISTER_SUCCESS, bgColor: ModalBgColorType.SUCCESS })
       },
       onError: (data, variables, context) => {
         queryClient.setQueryData(queryKeys.match, context?.snapshot)
-        setMessageToModal(MESSAGE.MATCH_REGISTER_FAILD, ModalBgColorType.ERROR)
+        setToastModalMessage({ message: MESSAGE.MATCH_REGISTER_FAILD, bgColor: ModalBgColorType.ERROR })
       }
     })
   }
@@ -78,13 +80,13 @@ export const useRegisterMatch = () => {
 
 //! 試合の削除
 export const useDeleteMatch = () => {
-  const { setMessageToModal } = useMessageController()
+  const { setToastModalMessage } = useToastModal()
   const { state: matchesState, setter: setMatchesState } = useQueryState<MatchesType[]>(queryKeys.match)
   const api = useCallback(async (matchId: number) => {
     await Axios.delete(queryKeys.match, { data: { matchId } })
   }, [])
 
-  const { mutate, isLoading } = useMutation(api, {
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
       const snapshot = matchesState
       return { snapshot }
@@ -94,24 +96,24 @@ export const useDeleteMatch = () => {
   const deleteMatch = (matchId: number) => {
     mutate(matchId, {
       onSuccess: (data, matchId, context) => {
-        setMessageToModal(MESSAGE.MATCH_DELETED, ModalBgColorType.DELETE)
+        setToastModalMessage({ message: MESSAGE.MATCH_DELETED, bgColor: ModalBgColorType.DELETE })
         const withoutDeleteMatchesState = context.snapshot.filter(match => match.id !== matchId)
         setMatchesState(withoutDeleteMatchesState)
       },
       onError: (error, matchId, context) => {
-        setMessageToModal(MESSAGE.MATCH_DELETE_FAILD, ModalBgColorType.ERROR)
+        setToastModalMessage({ message: MESSAGE.MATCH_DELETE_FAILD, bgColor: ModalBgColorType.ERROR })
         setMatchesState(context!.snapshot)
       }
     })
   }
 
-  return { deleteMatch, isLoading }
+  return { deleteMatch, isLoading, isSuccess }
 }
 
 //! 試合日の変更
 
 export const useUpdateMatch = () => {
-  const { setMessageToModal } = useMessageController()
+  const { setToastModalMessage } = useToastModal()
   const queryClient = useQueryClient()
   const api = useCallback(async (alterMatchData: MatchesType) => {
     const updateDeta = {
@@ -141,11 +143,11 @@ export const useUpdateMatch = () => {
   const updateMatch = (alterMatchData: MatchesType) => {
     mutate(alterMatchData, {
       onSuccess: (data) => {
-        setMessageToModal(MESSAGE.MATCH_UPDATE_SUCCESS, ModalBgColorType.SUCCESS)
+        setToastModalMessage({ message: MESSAGE.MATCH_UPDATE_SUCCESS, bgColor: ModalBgColorType.SUCCESS })
         queryClient.setQueryData(queryKeys.deleteMatchSub, undefined)
       },
       onError: (error, alterMatchData, context) => {
-        setMessageToModal(MESSAGE.MATCH_UPDATE_FAILD, ModalBgColorType.ERROR)
+        setToastModalMessage({ message: MESSAGE.MATCH_UPDATE_FAILD, bgColor: ModalBgColorType.ERROR })
         queryClient.setQueryData(queryKeys.match, context?.snapshot)
         queryClient.setQueryData(queryKeys.deleteMatchSub, undefined)
       }

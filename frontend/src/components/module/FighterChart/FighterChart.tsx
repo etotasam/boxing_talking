@@ -1,11 +1,9 @@
 import React from "react";
-// import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Chart as ChartJS, RadialLinearScale, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut, Pie, getElementAtEvent } from "react-chartjs-2";
 import { MouseOn } from "@/components/module/MatchInfo";
-
-// type
-import { FighterType } from "@/libs/hooks/fetchers";
+//! type
+import { FighterType } from "@/libs/hooks/useFighter";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 // ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);

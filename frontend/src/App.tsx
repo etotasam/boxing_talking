@@ -1,30 +1,32 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Home } from "@/pages/Home/Home";
+// import { Home } from "@/pages/Home";
+import { Home } from "./pages/Home/Home";
 import { Check } from "@/pages/check";
 import { Match } from "@/pages/Match";
 import { MatchRegister } from "@/pages/MatchRegister";
 import { FighterRegister } from "@/pages/FighterRegister";
 import { FighterEdit } from "@/pages/FighterEdit";
 import { MatchEdit } from "@/pages/MatchEdit";
-import { Edit } from "@/pages/Edit";
-import { Test } from "@/pages/Test";
+// import { Edit } from "@/pages/Edit";
+// import { Test } from "@/pages/Test";
+// import { Test2 } from "@/pages/Test2";
+import { UserRegisterwidthVerifyEmail } from "@/pages/UserRegisterwidthVerifyEmail";
 import { NotFound } from "@/pages/NotFound";
-import PrivateRoute from "./middleware/PrivateRoute";
+// import PrivateRoute from "./middleware/PrivateRoute";
 import AdminOnly from "./middleware/AdminOnly";
 import Container from "./middleware/Container";
+import MainLayout from "@/layout/MainLayout";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<Container />}>
-          <Route path="/" element={<Home />} />
-
-          <Route element={<PrivateRoute />}>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Home />} />
+            {/* <Route element={<PrivateRoute />}></Route> */}
             <Route path="/match" element={<Match />} />
           </Route>
-
-          <Route path="/*" element={<NotFound />} />
 
           <Route element={<AdminOnly />}>
             {/* <Route path="/edit" element={<Edit />} /> */}
@@ -36,7 +38,10 @@ function App() {
         </Route>
 
         <Route path="/check" element={<Check />} />
-        <Route path="/test" element={<Test />} />
+        {/* <Route path="/test" element={<Test />} />
+        <Route path="/test2" element={<Test2 />} /> */}
+        <Route path="/register/:token/:id" element={<UserRegisterwidthVerifyEmail />} />
+        <Route path="/*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

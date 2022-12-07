@@ -1,81 +1,103 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import { MessageModal } from "@/components/modal/MessageModal";
-import { useMessageController } from "@/libs/hooks/messageController";
-import { MESSAGE } from "@/libs/utils";
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
-import { AuthIs } from "@/store/slice/authUserSlice";
-
+// import { MessageModal } from "@/components/modal/MessageModal";
+import { ToastModal } from "@/components/modal/ToastModal";
+import { motion, AnimatePresence } from "framer-motion";
+import { useQueryClient } from "react-query";
 //! hooks
-// import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useAuth } from "@/libs/hooks/useAuth";
-// import { useAuth } from "@/libs/hooks/useAuth";
-import { useFetchUserVote } from "@/libs/hooks/useFetchUserVote";
-
+import { useToastModal } from "@/libs/hooks/useToastModal";
+import { queryKeys } from "@/libs/queryKeys";
+import { useQueryState } from "@/libs/hooks/useQueryState";
+import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 //! component
 import { LoadingModal } from "@/components/modal/LoadingModal";
+import { ClearModal } from "@/components/modal/ClearModal";
+import { SignUpModal } from "@/components/modal/SignUpModal";
+import { LoginModal } from "@/components/modal/LoginModal";
+import { Header } from "@/components/module/Header";
 
-const Container = () => {
-  const { message, setMessageToModal } = useMessageController();
-  const [msg, setMsg] = React.useState<MESSAGE>(MESSAGE.NULL);
+const Container = React.memo(() => {
+  const queryClient = useQueryClient();
+  const { clearToastModaleMessage, isOpenToastModal } = useToastModal();
+  // const { message, setMessageToModal } = useMessageController();
+  // const [msg, setMsg] = React.useState<MESSAGE>(MESSAGE.NULL);
   const [waitId, setWaitId] = React.useState<NodeJS.Timeout>();
 
-  // const { authState, authCheckAPI } = useAuth();
-  // const { matchesState, fetchAllMatches } = useFetchAllMatches();
-  const { data: authUser, isLoading: isCheckingAuth } = useAuth();
+  const { data: authUser, isLoading: isCheckingAuth, isError } = useAuth();
   const { isLoading: isFetchingMatches } = useFetchMatches();
-  const { userVoteState, fetchUserVoteWithUserId } = useFetchUserVote();
 
-  //? authチェックと試合情報の取得
-  // const [isDataLoading, setIsDataLoading] = useState(true);
-  // useEffect(() => {
-  //   let auth;
-  //   let matches;
-  //   if (authState.hasAuth === AuthIs.UNDEFINED) {
-  //     auth = authCheckAPI();
-  //   }
-  //   if (matchesState.matches === undefined) {
-  //     matches = fetchAllMatches();
-  //   }
-  //   (async () => {
-  //     await Promise.all([auth, matches]);
-  //     setIsDataLoading(false);
-  //   })();
-  // }, []);
+  //? アカウント作成モーダルの状態管理cache
+  const { state: isOpenSignUpModal } = useQueryState<boolean>("q/isOpenSignUpModal");
+  //? ログイン実行中...
+  const { state: isPendingLogin } = useQueryState<boolean>("q/isPendingLogin");
+  //? ログアウト実行中...
+  const { state: isPendingLogout } = useQueryState<boolean>("q/isPendingLogout");
+  //? 試合予想の投票実行中...
+  const { state: isPendingVote } = useQueryState<boolean>("q/isPendingVote");
+  //? loginモーダルの状態管理
+  const { state: isOpenLoginModal } = useQueryState<boolean>("q/isOpenLoginModal");
+  //? コメント削除のpending状態
+  const { state: isPendingCommentDelete } = useQueryState("q/isCommentDeleting");
+  //? コメント投稿中の状態
+  const { state: isCommentPosting } = useQueryState("q/isCommentPosting");
 
-  //? ログイン状態の場合はuserの選手への投票を取得する
+  //? ClearModalが表示される条件
+  // const pending =
+  //   isPendingVote ||
+  //   isPendingLogin ||
+  //   isPendingLogout ||
+  //   isPendingCommentDelete ||
+  //   isCommentPosting;
+
+  //? cookieでログインチェック。なければfalseを入れる
   useEffect(() => {
-    if (!authUser) return;
-    fetchUserVoteWithUserId(authUser.id);
-  }, [authUser]);
+    if (!isError) return;
+    queryClient.setQueryData(queryKeys.auth, false);
+  }, [isError]);
 
   //? メッセージモーダルのタイマーセット
-  useEffect(() => {
-    (async () => {
-      if (waitId) {
-        clearTimeout(waitId);
-      }
-      setMsg(message);
-      await wait(5000);
-      setMsg(MESSAGE.NULL);
-      setMessageToModal(MESSAGE.NULL, ModalBgColorType.NULL);
-    })();
-  }, [message]);
+  // useEffect(() => {
+  //   if (!isOpenToastModal) {
+  //     clearToastModaleMessage();
+  //   }
+  //   (async () => {
+  //     if (waitId) {
+  //       clearTimeout(waitId);
+  //     }
+  //     await wait(5000);
+  //     clearToastModaleMessage();
+  //   })();
+  // }, [isOpenToastModal]);
 
-  const wait = (ms: number) => {
-    return new Promise((resolve) => {
-      const id: NodeJS.Timeout = setTimeout(resolve, ms);
-      setWaitId(id);
-    });
-  };
+  // const wait = (ms: number) => {
+  //   return new Promise((resolve) => {
+  //     const id: NodeJS.Timeout = setTimeout(resolve, ms);
+  //     setWaitId(id);
+  //   });
+  // };
+
+  const { width: windowWidth } = useGetWindowSize();
+
   return (
-    <div className="w-full">
+    <>
+      {/* <Header /> */}
       <Outlet />
-      {msg !== MESSAGE.NULL && <MessageModal />}
+      {/* 以下 modal */}
+      {/* <AnimatePresence>
+        {isOpenToastModal && (
+          <motion.div>
+            <ToastModal windowWidth={windowWidth} />
+          </motion.div>
+        )}
+      </AnimatePresence> */}
       {(isCheckingAuth || isFetchingMatches) && <LoadingModal />}
-    </div>
+      {/* {isOpenSignUpModal && <SignUpModal />}
+      {isOpenLoginModal && <LoginModal />}
+      {pending && <ClearModal />} */}
+    </>
   );
-};
+});
 
 export default Container;

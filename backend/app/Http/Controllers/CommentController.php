@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\BoxingMatch;
 use App\Models\User;
 use App\Models\Comment;
+use App\Models\Vote;
 
 class CommentController extends Controller
 {
@@ -28,7 +29,13 @@ class CommentController extends Controller
             $user_id = $comment->user_id;
             $created_at = $comment->created_at;
             $user = User::find($user_id);
-            array_unshift($comments_array, ['id' => $comment->id, "user" => $user, "comment" => $comment->comment, "created_at" => $created_at]);
+            $vote = Vote::where([["user_id", $user_id], ["match_id", $match_id]])->first();
+            if(isset($vote)) {
+                $vote_color = $vote["vote_for"];
+            }else {
+                $vote_color = Null;
+            }
+            array_unshift($comments_array, ['id' => $comment->id, "user" => $user, "comment" => $comment->comment, "vote" => $vote_color, "created_at" => $created_at]);
         }
         return $comments_array;
     }
@@ -41,13 +48,17 @@ class CommentController extends Controller
      * @param string comment
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function post(Request $request)
     {
         try {
             // throw new Exception("post comment failed");
             $user_id = $request->user_id;
             $match_id = $request->match_id;
             $comment = $request->comment;
+            $has_match = BoxingMatch::find($match_id)->exists();
+            if(!$has_match) {
+                throw new Exception("the match not exist");
+            }
             Comment::create([
                 "user_id" => $user_id,
                 "match_id" => $match_id,

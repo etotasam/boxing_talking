@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Models\ProvisionalUser;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Vote;
-
+use \Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\DB;
+use Exception;
 
 class User extends Authenticatable
 {
@@ -32,7 +35,6 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
         'created_at',
         'updated_at'
     ];

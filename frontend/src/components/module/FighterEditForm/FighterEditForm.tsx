@@ -1,18 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { queryKeys } from "@/libs/queryKeys";
-import { Stance, Nationality, FighterType } from "@/libs/hooks/fetchers";
-import { useQueryClient, useQuery } from "react-query";
-import { useMessageController } from "@/libs/hooks/messageController";
-import { ModalBgColorType } from "@/store/slice/messageByPostCommentSlice";
-import { MESSAGE } from "@/libs/utils";
+import { Nationality } from "@/libs/hooks/useFighter";
+//! type
+import { FighterType } from "@/libs/hooks/useFighter";
 //! custom hook
 import { useQueryState } from "@/libs/hooks/useQueryState";
+//! message contoller
+import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { MESSAGE } from "@/libs/utils";
 
-type Props = {
+type PropsType = {
   onSubmit: () => void;
   className?: string;
-  isUpdatingFighterData?: boolean;
+  isPending?: boolean;
+  fighterData?: FighterType;
 };
+
+export enum Stance {
+  Southpaw = "southpaw",
+  Orthodox = "orthodox",
+}
 
 const countryUndefined = "国籍の選択";
 
@@ -29,56 +36,20 @@ export const initialFighterInfoState: any = {
   lose: "",
 };
 
-export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: Props) => {
-  const { setMessageToModal } = useMessageController();
-  const queryClient = useQueryClient();
+export const FighterEditForm = ({ onSubmit, className, isPending, fighterData }: PropsType) => {
+  const { setToastModalMessage } = useToastModal();
   //? ReactQueryでFighterEditとデータを共有
-  // const [fighterEditData, setFighterData] = useQueryState<any>(
-  //   queryKeys.fighterEditData,
-  //   initialFighterInfoState
-  // );
-  const fighterEditData = queryClient.getQueryData<any>(queryKeys.fighterEditData);
-
-  const [name, setName] = useState<string>(initialFighterInfoState.name);
-  const [country, setCountry] = useState<string | undefined>(initialFighterInfoState.country);
-  const [birth, setBirth] = useState<string>(initialFighterInfoState.birth);
-  const [height, setHeight] = useState<string>(initialFighterInfoState.height);
-  const [stance, setStance] = useState<string>(initialFighterInfoState.stance);
-  const [win, setWin] = useState<string>(initialFighterInfoState.win);
-  const [ko, setKo] = useState<string>(initialFighterInfoState.ko);
-  const [draw, setDraw] = useState<string>(initialFighterInfoState.draw);
-  const [lose, setLose] = useState<string>(initialFighterInfoState.lose);
-
-  useEffect(() => {
-    setName(fighterEditData?.name);
-    setCountry(fighterEditData?.country);
-    setBirth(fighterEditData?.birth);
-    setHeight(fighterEditData?.height);
-    setStance(fighterEditData?.stance);
-    setWin(fighterEditData?.win);
-    setKo(fighterEditData?.ko);
-    setDraw(fighterEditData?.draw);
-    setLose(fighterEditData?.lose);
-  }, [fighterEditData]);
+  const { state: fighterEditData, setter: setFighterEditData } = useQueryState<FighterType>(
+    queryKeys.fighterEditData,
+    initialFighterInfoState
+  );
 
   const sendData = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (country === undefined) {
-      setMessageToModal(MESSAGE.INVALID_COUNTRY, ModalBgColorType.NOTICE);
+    if (fighterEditData.country === undefined) {
+      setToastModalMessage({ message: MESSAGE.INVALID_COUNTRY, bgColor: ModalBgColorType.NOTICE });
       return;
     }
-    queryClient.setQueryData(queryKeys.fighterEditData, {
-      ...fighterEditData,
-      name,
-      stance,
-      country,
-      birth,
-      height,
-      win,
-      ko,
-      draw,
-      lose,
-    });
     onSubmit();
   };
 
@@ -92,23 +63,29 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
             type="text"
             placeholder="選手名"
             name="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            // onChange={(e) => setFighterData({ ...fighterEditData, name: e.target.value })}
+            value={fighterEditData?.name}
+            onChange={(e) =>
+              setFighterEditData((prev: any) => {
+                return { ...prev, name: e.target.value };
+              })
+            }
           />
           <div className="flex mt-3">
             <label htmlFor="countrys">国籍:</label>
             <select
               name="country"
-              value={country}
+              value={fighterEditData?.country}
               onChange={(e) => {
                 if (e.target.value === countryUndefined) {
-                  setCountry(undefined);
+                  setFighterEditData((prev: any) => {
+                    return { ...prev, country: undefined };
+                  });
                 } else {
-                  setCountry(e.target.value);
+                  setFighterEditData((prev: any) => {
+                    return { ...prev, country: e.target.value };
+                  });
                 }
               }}
-              // onChange={(e) => setFighterData({ ...fighterEditData, country: e.target.value })}
               id="countrys"
             >
               <option value={undefined}>{countryUndefined}</option>
@@ -127,9 +104,12 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
               type="date"
               id="birth"
               min="1970-01-01"
-              value={birth}
-              // onChange={(e) => setFighterData({ ...fighterEditData, birth: e.target.value })}
-              onChange={(e) => setBirth(e.target.value)}
+              value={fighterEditData?.birth}
+              onChange={(e) =>
+                setFighterEditData((prev: any) => {
+                  return { ...prev, birth: e.target.value };
+                })
+              }
             />
           </div>
 
@@ -140,9 +120,12 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
               className="px-1"
               type="number"
               min="0"
-              value={height}
-              // onChange={(e) => setFighterData({ ...fighterEditData, height: e.target.value })}
-              onChange={(e) => setHeight(e.target.value)}
+              value={fighterEditData?.height}
+              onChange={(e) =>
+                setFighterEditData((prev: any) => {
+                  return { ...prev, height: e.target.value };
+                })
+              }
             />
           </div>
 
@@ -150,9 +133,12 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
           <div className="mt-3 flex p-1">
             <label htmlFor="stance">スタイル:</label>
             <select
-              value={stance}
-              onChange={(e) => setStance(e.target.value)}
-              // onChange={(e) => setFighterData({ ...fighterEditData, stance: e.target.value })}
+              value={fighterEditData?.stance}
+              onChange={(e) =>
+                setFighterEditData((prev: any) => {
+                  return { ...prev, stance: e.target.value };
+                })
+              }
               name="boxing-style"
               id="stance"
             >
@@ -167,9 +153,12 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
               <label htmlFor="win">win</label>
               <input
                 className="w-full"
-                value={win}
-                // onChange={(e) => setFighterData({ ...fighterEditData, win: e.target.value })}
-                onChange={(e) => setWin(e.target.value)}
+                value={fighterEditData?.win}
+                onChange={(e) =>
+                  setFighterEditData((prev: any) => {
+                    return { ...prev, win: e.target.value };
+                  })
+                }
                 type="number"
                 min="0"
                 id="win"
@@ -180,8 +169,12 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
               <label htmlFor="ko">ko</label>
               <input
                 className="w-full"
-                value={ko}
-                onChange={(e) => setKo(e.target.value)}
+                value={fighterEditData?.ko}
+                onChange={(e) =>
+                  setFighterEditData((prev: any) => {
+                    return { ...prev, ko: e.target.value };
+                  })
+                }
                 type="number"
                 min="0"
                 id="ko"
@@ -192,8 +185,12 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
               <label htmlFor="draw">draw</label>
               <input
                 className="w-full"
-                value={draw}
-                onChange={(e) => setDraw(e.target.value)}
+                value={fighterEditData?.draw}
+                onChange={(e) =>
+                  setFighterEditData((prev: any) => {
+                    return { ...prev, draw: e.target.value };
+                  })
+                }
                 type="number"
                 min="0"
                 id="draw"
@@ -204,8 +201,12 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
               <label htmlFor="lose">lose</label>
               <input
                 className="w-full"
-                value={lose}
-                onChange={(e) => setLose(e.target.value)}
+                value={fighterEditData?.lose}
+                onChange={(e) =>
+                  setFighterEditData((prev: any) => {
+                    return { ...prev, lose: e.target.value };
+                  })
+                }
                 type="number"
                 min="0"
                 id="lose"
@@ -215,7 +216,7 @@ export const FighterEditForm = ({ onSubmit, className, isUpdatingFighterData }: 
           <div className="relative">
             <button
               className={`w-full duration-300 py-1 px-2 mt-3 rounded ${
-                isUpdatingFighterData
+                isPending
                   ? `bg-stone-700 select-none pointer-events-none text-stone-600`
                   : `bg-green-600 hover:bg-green-500 text-white`
               }`}
