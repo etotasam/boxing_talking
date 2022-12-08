@@ -1,8 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-// import { Home } from "@/pages/Home";
-import { Home } from "./pages/Home";
 // import { Check } from "@/pages/check";
 import { Match } from "@/pages/Match";
+import { Home } from "./pages/Home";
 import { MatchRegister } from "@/pages/MatchRegister";
 import { FighterRegister } from "@/pages/FighterRegister";
 import { FighterEdit } from "@/pages/FighterEdit";
