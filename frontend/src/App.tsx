@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 // import { Home } from "@/pages/Home";
-import { Home } from "./pages/Home/Home";
-import { Check } from "@/pages/check";
+import { Home } from "./pages/Home";
+// import { Check } from "@/pages/check";
 import { Match } from "@/pages/Match";
 import { MatchRegister } from "@/pages/MatchRegister";
 import { FighterRegister } from "@/pages/FighterRegister";
@@ -37,7 +37,7 @@ function App() {
           </Route>
         </Route>
 
-        <Route path="/check" element={<Check />} />
+        {/* <Route path="/check" element={<Check />} /> */}
         {/* <Route path="/test" element={<Test />} />
         <Route path="/test2" element={<Test2 />} /> */}
         <Route path="/register/:token/:id" element={<UserRegisterwidthVerifyEmail />} />
