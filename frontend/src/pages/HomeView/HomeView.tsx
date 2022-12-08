@@ -10,7 +10,7 @@ import { useAuth } from "@/libs/hooks/useAuth";
 // import { MatchComponent } from "@/components/module/MatchComponent";
 import { TestMatchComponent } from "@/components/module/TestMatchComponent";
 
-export const Home = React.memo(() => {
+export const HomeView = React.memo(() => {
   const navigate = useNavigate();
   const { data: authUser } = useAuth();
   const { data: matchesState, isError: isErrorOnFetchMatches } = useFetchMatches();
