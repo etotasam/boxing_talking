@@ -18,9 +18,11 @@ use App\Models\User;
 |
 */
 
+
 Route::get('/', function () {
+    $front_app_url = config('const.front_app_url');
     // return view('welcome');
-    return redirect()->to('http://localhost:3000/');
+    return redirect()->to($front_app_url);
 });
 
 Route::get('/create/{token}/{user_id}', function ($token, $user_id) {
