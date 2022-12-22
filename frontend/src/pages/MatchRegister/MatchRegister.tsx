@@ -19,9 +19,6 @@ import { Fighter } from "@/components/module/Fighter";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 import { FighterSearchForm } from "@/components/module/FighterSearchForm";
 import { PendingModal } from "@/components/modal/PendingModal";
-//! message contoller
-// import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
-// import { MESSAGE } from "@/libs/utils";
 
 type MatchFightersDataType = {
   red: FighterType | null;
@@ -253,7 +250,6 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
         {matchData.fighters.red ? (
           <Fighter
             bgColorClassName="w-1/2 bg-stone-100"
-            isReverse={true}
             fighter={matchData.fighters.red}
             windowWidth={windowWidth}
           />
@@ -262,6 +258,7 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
         )}
         {matchData.fighters.blue && (
           <Fighter
+            isReverse={true}
             bgColorClassName="w-1/2 bg-stone-100"
             fighter={matchData.fighters.blue}
             windowWidth={windowWidth}
