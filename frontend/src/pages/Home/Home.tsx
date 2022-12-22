@@ -1,24 +1,15 @@
 import React, { useCallback } from "react";
-// import { Axios } from "@/libs/axios";
 import { useNavigate } from "react-router-dom";
 //! hooks
 import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useAuth } from "@/libs/hooks/useAuth";
-// import { useQueryState } from "@/libs/hooks/useQueryState";
 //! components
-// import { LayoutDefault } from "@/layout/LayoutDefault";
-// import { MatchComponent } from "@/components/module/MatchComponent";
 import { TestMatchComponent } from "@/components/module/TestMatchComponent";
 
-export const HomeView = React.memo(() => {
+export const Home = React.memo(() => {
   const navigate = useNavigate();
   const { data: authUser } = useAuth();
   const { data: matchesState, isError: isErrorOnFetchMatches } = useFetchMatches();
-
-  // const queue = useCallback(async () => {
-  //   if (!authUser) return;
-  //   const { data } = await Axios.put(`api/${authUser.id}/test`);
-  // }, [authUser]);
 
   const click = useCallback(
     (id: number) => {
