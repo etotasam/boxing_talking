@@ -37,8 +37,16 @@ export const PostCommentForm = ({
 
   //? コメントの投稿
   const post = async () => {
-    const userId = authUser ? authUser.id : null;
     clearToastModaleMessage();
+    //? ログインしてない場合
+    if (!authUser) {
+      setToastModalMessage({
+        message: MESSAGE.COMMENT_CANT_POST_WITH_UNAUTH,
+        bgColor: ModalBgColorType.NOTICE,
+      });
+      return;
+    }
+    //? コメントが空の場合
     if (comment === "") {
       setToastModalMessage({
         message: MESSAGE.COMMENT_POST_NULL,
@@ -46,7 +54,7 @@ export const PostCommentForm = ({
       });
       return;
     }
-    postComment({ userId: userId, matchId, comment });
+    postComment({ userId: authUser.id, matchId, comment });
 
     //? コメント投稿時に投稿コメントが表示される位置までスクロールする
     if (windowWidth < WINDOW_WIDTH.lg) {

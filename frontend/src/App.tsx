@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 // import { Check } from "@/pages/check";
 import { Match } from "@/pages/Match";
-import { HomeView } from "./pages/HomeView";
+import { Home } from "@/pages/Home";
 import { MatchRegister } from "@/pages/MatchRegister";
 import { FighterRegister } from "@/pages/FighterRegister";
 import { FighterEdit } from "@/pages/FighterEdit";
@@ -22,7 +22,7 @@ function App() {
       <Routes>
         <Route element={<Container />}>
           <Route element={<MainLayout />}>
-            <Route path="/" element={<HomeView />} />
+            <Route path="/" element={<Home />} />
             {/* <Route element={<PrivateRoute />}></Route> */}
             <Route path="/match" element={<Match />} />
           </Route>
