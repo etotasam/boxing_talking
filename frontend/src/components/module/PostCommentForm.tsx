@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { WINDOW_WIDTH } from "@/libs/utils";
 //! message contoller
 import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
@@ -6,7 +6,7 @@ import { MESSAGE } from "@/libs/utils";
 //! components
 import { Spinner } from "@/components/module/Spinner";
 //! hooks
-import { useAuth, UserType } from "@/libs/hooks/useAuth";
+import { useAuth } from "@/libs/hooks/useAuth";
 import { usePostComment } from "@/libs/hooks/useComment";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";

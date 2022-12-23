@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Outlet } from "react-router-dom";
 //! hooks
 import { useFetchMatches } from "@/libs/hooks/useMatches";
-import { useToastModal } from "@/libs/hooks/useToastModal";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 //! component
 import { LoadingModal } from "@/components/modal/LoadingModal";

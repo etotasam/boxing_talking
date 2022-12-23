@@ -1,6 +1,6 @@
 import React from "react";
 import dayjs from "dayjs";
-import { FighterType, Stance, Nationality } from "@/libs/hooks/useFighter";
+import { FighterType, Nationality } from "@/libs/hooks/useFighter";
 import { WINDOW_WIDTH } from "@/libs/utils";
 
 type FighterProps = {
