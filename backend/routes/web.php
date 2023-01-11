@@ -20,9 +20,9 @@ use App\Models\User;
 
 
 Route::get('/', function () {
-    $front_app_url = config('const.front_app_url');
-    // return view('welcome');
-    return redirect()->to($front_app_url);
+    // $front_app_url = config('const.front_app_url');
+    return view('welcome');
+    // return redirect()->to($front_app_url);
 });
 
 Route::get('/create/{token}/{user_id}', function ($token, $user_id) {

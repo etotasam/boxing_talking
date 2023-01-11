@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { queryKeys } from "@/libs/queryKeys";
 import { WINDOW_WIDTH } from "@/libs/utils";
 //! type
-import { FighterType } from "@/libs/hooks/useFighter";
+import type { FighterType } from "@/libs/hooks/useFighter";
 //! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 //! hooks
@@ -16,7 +16,7 @@ import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 //! component
 import { Button } from "@/components/atomic/Button";
 import { Fighter } from "@/components/module/Fighter";
-import { TestFighter } from "@/components/module/TestFighter";
+import { SimpleFighterComponent } from "@/components/module/SimpleFighterComponent";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 import { FighterSearchForm } from "@/components/module/FighterSearchForm";
 import { PendingModal } from "@/components/modal/PendingModal";
@@ -249,7 +249,10 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
     <div className="z-10 w-[100vw] fixed top-[50px] left-0 bg-stone-600">
       <div className="flex w-full h-[150px] p-3">
         {matchData.fighters.red ? (
-          <TestFighter fighter={matchData.fighters.red} className={"w-1/2 bg-stone-100"} />
+          <SimpleFighterComponent
+            fighter={matchData.fighters.red}
+            className={"w-1/2 bg-stone-100"}
+          />
         ) : (
           // <Fighter
           //   bgColorClassName="w-1/2 bg-stone-100"
@@ -259,7 +262,10 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
           <div className="w-1/2" />
         )}
         {matchData.fighters.blue && (
-          <TestFighter fighter={matchData.fighters.blue} className={"w-1/2 bg-stone-100"} />
+          <SimpleFighterComponent
+            fighter={matchData.fighters.blue}
+            className={"w-1/2 bg-stone-100"}
+          />
           // <Fighter
           //   isReverse={true}
           //   bgColorClassName="w-1/2 bg-stone-100"
