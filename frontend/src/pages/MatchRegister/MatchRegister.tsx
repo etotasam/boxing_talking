@@ -16,12 +16,10 @@ import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 //! component
 import { Button } from "@/components/atomic/Button";
 import { Fighter } from "@/components/module/Fighter";
+import { TestFighter } from "@/components/module/TestFighter";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
 import { FighterSearchForm } from "@/components/module/FighterSearchForm";
 import { PendingModal } from "@/components/modal/PendingModal";
-//! message contoller
-// import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
-// import { MESSAGE } from "@/libs/utils";
 
 type MatchFightersDataType = {
   red: FighterType | null;
@@ -251,21 +249,23 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
     <div className="z-10 w-[100vw] fixed top-[50px] left-0 bg-stone-600">
       <div className="flex w-full h-[150px] p-3">
         {matchData.fighters.red ? (
-          <Fighter
-            bgColorClassName="w-1/2 bg-stone-100"
-            isReverse={true}
-            fighter={matchData.fighters.red}
-            windowWidth={windowWidth}
-          />
+          <TestFighter fighter={matchData.fighters.red} className={"w-1/2 bg-stone-100"} />
         ) : (
+          // <Fighter
+          //   bgColorClassName="w-1/2 bg-stone-100"
+          //   fighter={matchData.fighters.red}
+          //   windowWidth={windowWidth}
+          // />
           <div className="w-1/2" />
         )}
         {matchData.fighters.blue && (
-          <Fighter
-            bgColorClassName="w-1/2 bg-stone-100"
-            fighter={matchData.fighters.blue}
-            windowWidth={windowWidth}
-          />
+          <TestFighter fighter={matchData.fighters.blue} className={"w-1/2 bg-stone-100"} />
+          // <Fighter
+          //   isReverse={true}
+          //   bgColorClassName="w-1/2 bg-stone-100"
+          //   fighter={matchData.fighters.blue}
+          //   windowWidth={windowWidth}
+          // />
         )}
       </div>
       {isSelectFighters && matchData.matchDate && (
@@ -278,7 +278,7 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
       )}
       {isSelectFighters && (
         <div
-          className={`absolute top-[75%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-white px-3 py-1 ${
+          className={`absolute top-[20%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-white px-3 py-1 ${
             matchData.matchDate ? `bg-stone-600` : `bg-red-500`
           }`}
         >
