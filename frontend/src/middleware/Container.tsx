@@ -8,7 +8,6 @@ import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useAuth } from "@/libs/hooks/useAuth";
 import { useToastModal } from "@/libs/hooks/useToastModal";
 import { queryKeys } from "@/libs/queryKeys";
-import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 //! component
 import { LoadingModal } from "@/components/modal/LoadingModal";
 
@@ -42,8 +41,6 @@ const Container = React.memo(() => {
     queryClient.setQueryData(queryKeys.auth, false);
   }, [isError]);
 
-  const { width: windowWidth } = useGetWindowSize();
-
   return (
     <>
       {/* <Header /> */}
@@ -52,7 +49,7 @@ const Container = React.memo(() => {
       <AnimatePresence>
         {isOpenToastModal && (
           <motion.div>
-            <ToastModal windowWidth={windowWidth} />
+            <ToastModal />
           </motion.div>
         )}
       </AnimatePresence>
