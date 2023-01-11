@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useAuth } from "@/libs/hooks/useAuth";
 //! components
-import { TestMatchComponent } from "@/components/module/TestMatchComponent";
+import { MatchComponent } from "@/components/module/MatchComponent";
 
 export const Home = React.memo(() => {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ export const Home = React.memo(() => {
         {isErrorOnFetchMatches && <MatchesFetchErrorComponent />}
         {matchesState &&
           matchesState.map((match) => (
-            <TestMatchComponent
+            <MatchComponent
               key={match.id}
               onClick={(matchId: number) => click(matchId)}
               match={match}

@@ -9,11 +9,9 @@ import { ClearModal } from "@/components/modal/ClearModal";
 import { SignUpModal } from "@/components/modal/SignUpModal";
 import { LoginModal } from "@/components/modal/LoginModal";
 import { Header } from "@/components/module/Header";
+import { Footer } from "@/components/module/Footer";
 
 const MainLayout = React.memo(() => {
-  // const { clearToastModaleMessage, isOpenToastModal } = useToastModal();
-  // const [waitId, setWaitId] = React.useState<NodeJS.Timeout>();
-
   const { isLoading: isFetchingMatches } = useFetchMatches();
 
   //? アカウント作成モーダルの状態管理cache
@@ -39,36 +37,13 @@ const MainLayout = React.memo(() => {
     isPendingCommentDelete ||
     isCommentPosting;
 
-  //? メッセージモーダルのタイマーセット
-  // useEffect(() => {
-  //   if (!isOpenToastModal) {
-  //     clearToastModaleMessage();
-  //   }
-  //   (async () => {
-  //     if (waitId) {
-  //       clearTimeout(waitId);
-  //     }
-  //     await wait(5000);
-  //     clearToastModaleMessage();
-  //   })();
-  // }, [isOpenToastModal]);
-
-  // const wait = (ms: number) => {
-  //   return new Promise((resolve) => {
-  //     const id: NodeJS.Timeout = setTimeout(resolve, ms);
-  //     setWaitId(id);
-  //   });
-  // };
-
   return (
     <div className="bg-stone-200">
       <Header />
       <main className={`min-h-[calc(100vh-50px)] pt-[100px] mx-auto max-w-[1024px]`}>
         <Outlet />
       </main>
-      <footer className="h-[50px] bg-stone-200 border-t border-stone-300 text-center">
-        ©footer
-      </footer>
+      <Footer />
       {isFetchingMatches && <LoadingModal />}
       {isOpenSignUpModal && <SignUpModal />}
       {isOpenLoginModal && <LoginModal />}

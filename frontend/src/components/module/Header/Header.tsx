@@ -17,9 +17,10 @@ type Props = {
   className?: string;
 };
 
-export const Header = React.memo(({ className }: Props) => {
+export const Header = React.memo((props: Props) => {
   const { pathname } = useLocation();
   const currentPage = pathname.split("/")[1];
+  const { data: authUser } = useAuth();
 
   const { state: isOpenHamburgerMenu, setter: setIsOpenHamburgerMenu } =
     useQueryState<boolean>("q/isOpenHamburgerMenu");
@@ -129,11 +130,24 @@ export const Header = React.memo(({ className }: Props) => {
           >
             BOXING TALKING
           </motion.h1>
-          {windowWidth >= WINDOW_WIDTH.md && currentPage !== "" && (
+          {windowWidth >= WINDOW_WIDTH.md && (
             <div className="text-white absolute bottom-[15px] left-[170px]">
-              <CustomLink to="/" className="">
-                Home
-              </CustomLink>
+              <ul className="flex">
+                {currentPage !== "" && (
+                  <li>
+                    <CustomLink to="/" className="">
+                      Home
+                    </CustomLink>
+                  </li>
+                )}
+                {authUser && authUser?.administrator == true && (
+                  <li className="ml-2">
+                    <CustomLink to="/fighter/register" className="">
+                      Edit Page
+                    </CustomLink>
+                  </li>
+                )}
+              </ul>
             </div>
           )}
           <motion.div

@@ -11,8 +11,7 @@ import { FighterType } from "@/libs/hooks/useFighter";
 import { UserType } from "@/libs/hooks/useAuth";
 //!component
 import { Chart } from "@/components/module/Chart";
-// import { Fighter } from "../Fighter";
-import { TestFighter } from "../TestFighter";
+import { SimpleFighterComponent } from "../SimpleFighterComponent";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
 import { Spinner } from "@/components/module/Spinner";
 //! hooks
@@ -280,7 +279,7 @@ const FightersInfo = ({
             }`}
           >
             {/* {windowWidth > WINDOW_WIDTH.md ? ( */}
-            <TestFighter
+            <SimpleFighterComponent
               fighter={thisMatch.red}
               recordTextColor={`text-gray-200`}
               className={`w-full text-gray-200`}
@@ -307,7 +306,7 @@ const FightersInfo = ({
             }`}
           >
             {/* {windowWidth > WINDOW_WIDTH.md ? ( */}
-            <TestFighter
+            <SimpleFighterComponent
               fighter={thisMatch.blue}
               recordTextColor={`text-gray-200`}
               className={`w-full text-gray-200`}

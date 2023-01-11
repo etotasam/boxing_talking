@@ -1,6 +1,6 @@
 import React from "react";
 import dayjs from "dayjs";
-import { FighterType, Stance, Nationality } from "@/libs/hooks/useFighter";
+import { FighterType, Nationality } from "@/libs/hooks/useFighter";
 //! hooks
 import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 
@@ -43,7 +43,7 @@ export const checkNationality = (countory: string) => {
   }
 };
 
-export const TestFighter = React.memo(
+export const SimpleFighterComponent = React.memo(
   ({ fighter, className, cornerColor, recordTextColor }: FighterProps) => {
     const nationalFlag = checkNationality(fighter.country!);
     const textColor = recordTextColor ? recordTextColor : `text-stone-500`;
