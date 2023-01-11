@@ -5,8 +5,7 @@ import { NationaFlag, checkNationality } from "@/components/module/Fighter";
 //! types
 import { MatchesType } from "@/libs/hooks/useMatches";
 //! component
-import { TestMatchComponent } from "@/components/module/TestMatchComponent";
-// import { MatchComponent } from "@/components/module/MatchComponent";
+import { MatchComponent } from "@/components/module/MatchComponent";
 import { EditActionBtns } from "@/components/module/EditActionBtns";
 import { PendingModal } from "@/components/modal/PendingModal";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
@@ -110,7 +109,7 @@ export const MatchEdit = () => {
                 />
                 <div className={"flex flex-row-reverse cursor-pointer relative"}>
                   <label className="w-[95%]" htmlFor={`match_${match.id}`}>
-                    <TestMatchComponent match={match} bgColorClassName={"bg-sotne-200"} />
+                    <MatchComponent match={match} bgColorClassName={"bg-sotne-200"} />
                   </label>
                   {!match.id && <Spinner />}
                   {isUpdateingMatch && targetMatchState?.id === match.id && <Spinner />}

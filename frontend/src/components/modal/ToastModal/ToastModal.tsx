@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { WINDOW_WIDTH } from "@/libs/utils";
+import React from "react";
+import { motion } from "framer-motion";
 //! message contoller
 import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 
-export const ToastModal = ({ windowWidth }: { windowWidth: number }) => {
+export const ToastModal = () => {
   const { message, bgColor, clearToastModaleMessage } = useToastModal();
 
   const [color, setColor] = React.useState<string>();
@@ -30,25 +29,7 @@ export const ToastModal = ({ windowWidth }: { windowWidth: number }) => {
     }
   }, [bgColor]);
 
-  const mdVariant = {
-    hidden: {
-      y: 100,
-      x: "-50%",
-      transition: {
-        duration: 0.5,
-      },
-    },
-    visible: {
-      y: "-150%",
-      x: "-50%",
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-  };
-
-  const lgVariant = {
+  const variants = {
     hidden: {
       y: -100,
       x: "-50%",
@@ -67,18 +48,15 @@ export const ToastModal = ({ windowWidth }: { windowWidth: number }) => {
   };
 
   return (
-    // <AnimatePresence>
     <motion.div
       initial="hidden"
       animate="visible"
       exit="hidden"
-      variants={windowWidth > WINDOW_WIDTH.md ? lgVariant : mdVariant}
-      // variants={mdVariant}
+      variants={variants}
       onClick={clearToastModaleMessage}
-      className={`z-[999] fixed top-[100vh] md:top-0 left-[50%] py-2 px-5 min-w-[80%] md:min-w-[30%] text-center text-white rounded whitespace-pre-wrap select-none ${color}`}
+      className={`z-[999] fixed top-0 left-[50%] py-2 px-5 min-w-[80%] md:min-w-[30%] text-center text-white rounded whitespace-pre-wrap select-none ${color}`}
     >
       {message}
     </motion.div>
-    // </AnimatePresence>
   );
 };

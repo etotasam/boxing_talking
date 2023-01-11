@@ -11,10 +11,13 @@ import { MatchEdit } from "@/pages/MatchEdit";
 // import { Test2 } from "@/pages/Test2";
 import { UserRegisterwidthVerifyEmail } from "@/pages/UserRegisterwidthVerifyEmail";
 import { NotFound } from "@/pages/NotFound";
+//! middleware
 // import PrivateRoute from "./middleware/PrivateRoute";
 import AdminOnly from "./middleware/AdminOnly";
 import Container from "./middleware/Container";
+//! layout
 import MainLayout from "@/layout/MainLayout";
+import LayoutPlain from "./layout/LayoutPlain";
 
 function App() {
   return (
@@ -40,7 +43,9 @@ function App() {
         {/* <Route path="/test" element={<Test />} />
         <Route path="/test2" element={<Test2 />} /> */}
         <Route path="/register/:token/:id" element={<UserRegisterwidthVerifyEmail />} />
-        <Route path="/*" element={<NotFound />} />
+        <Route element={<LayoutPlain />}>
+          <Route path="/*" element={<NotFound />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
