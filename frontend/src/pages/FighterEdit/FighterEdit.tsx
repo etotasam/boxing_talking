@@ -56,23 +56,12 @@ export const FighterEdit = () => {
     return acc;
   }, "");
 
-  //? ReactQueryでFighterEditFormとデータを共有
-  const { state: fighterEditData, setter: setFighterEditData } = useQueryState<FighterType>(
-    queryKeys.fighterEditData,
-    initialFighterInfoState
-  );
-  //? testで使う為の変数
-  _selectFighter = fighterEditData;
-  //? unMount時にfighterEditDataを初期化
-  useEffect(() => {
-    return () => {
-      setFighterEditData(initialFighterInfoState);
-    };
-  }, []);
+  //? fighterデータ
+  const [editFighterData, setEditFighterData] = useState<FighterType>(initialFighterInfoState);
 
   const { setToastModalMessage, clearToastModaleMessage } = useToastModal();
 
-  //? 選手データの取得(react query)
+  //? 選手データの取得(api)
   const {
     data: fetchFightersData,
     count: fightersCount,
@@ -114,22 +103,34 @@ export const FighterEdit = () => {
     }
   };
 
-  //? 選手データの削除
-  const { deleteFighter, isLoading: isDeletingFighter } = useDeleteFighter();
+  //? 選手データの削除実行
+  const {
+    deleteFighter,
+    isLoading: isDeletingFighter,
+    isSuccess: isDeleteSuccess,
+  } = useDeleteFighter();
   const fighterDelete = async () => {
     setOpenConfirmModal(false);
-    deleteFighter(fighterEditData!);
+    deleteFighter(editFighterData!);
   };
+
+  //? ボクサーデータ削除成功時にeditFighterDataを空にする
+  useEffect(() => {
+    if (!isDeleteSuccess) return;
+    setEditFighterData(initialFighterInfoState);
+  }, [isDeleteSuccess]);
 
   const getFighterWithId = (fighterId: number) => {
     if (!fetchFightersData) return;
     return fetchFightersData.find((fighter) => fighter.id === fighterId);
   };
 
-  const tryFighterEdit = async () => {
-    if (!fighterEditData) return;
+  //? ボクサーの編集を実行
+  const tryFighterEdit = async (fighterData: FighterType) => {
+    // if (!fighterEditData) return;
+    if (!fighterData) return;
     clearToastModaleMessage();
-    //? 選手を選択していない場合return
+    //? ボクサーを選択していない場合return
     if (!isSelectedFighter) {
       setToastModalMessage({
         message: MESSAGE.NO_SELECT_EDIT_FIGHTER,
@@ -137,13 +138,13 @@ export const FighterEdit = () => {
       });
       return;
     }
-    //? 選手dataを編集していない場合return
-    if (isEqual(getFighterWithId(fighterEditData.id), fighterEditData)) {
+    //? ボクサーdataを編集していない場合return
+    if (isEqual(getFighterWithId(fighterData.id), fighterData)) {
       setToastModalMessage({ message: MESSAGE.NOT_EDIT_FIGHTER, bgColor: ModalBgColorType.NULL });
       return;
     }
-    //? 選手データ編集実行
-    updateFighter(fighterEditData);
+    //? ボクサーデータ編集実行
+    updateFighter(fighterData);
   };
 
   //? page数の計算
@@ -157,17 +158,16 @@ export const FighterEdit = () => {
 
   //? spinnerを出す条件
   const conditionVisibleSpinner = (fighter: FighterType) => {
-    if (!fighterEditData) return;
+    if (!editFighterData) return;
     const isLoading =
-      (isDeletingFighter && fighterEditData.id === fighter.id) ||
-      (isUpdatingFighter && fighterEditData.id === fighter.id) ||
+      (isDeletingFighter && editFighterData.id === fighter.id) ||
+      (isUpdatingFighter && editFighterData.id === fighter.id) ||
       !fighter.id;
     return isLoading;
   };
 
   const actionBtns = [{ btnTitle: "選手の削除", form: "fighter-edit" }];
 
-  //todo エラー時の画面を表示しよう(未作成)
   if (isErrorFetchFighters) return <p>error</p>;
   return (
     <LayoutForEditPage>
@@ -184,7 +184,7 @@ export const FighterEdit = () => {
                     id={`${fighter.id}_${fighter.name}`}
                     type="radio"
                     name="fighter"
-                    onChange={() => setFighterEditData(fighter)}
+                    onChange={() => setEditFighterData(fighter)}
                     data-testid={`input-${fighter.id}`}
                   />
                   <label
@@ -205,7 +205,7 @@ export const FighterEdit = () => {
               className="flex justify-center w-full"
               onSubmit={tryFighterEdit}
               isPending={isUpdatingFighter}
-              fighterData={fighterEditData}
+              fighterData={editFighterData}
             />
             <FighterSearchForm className="bg-stone-200 w-full mt-5" />
           </div>
@@ -215,7 +215,7 @@ export const FighterEdit = () => {
       {openConfirmModal && (
         <ConfirmModal
           execution={fighterDelete}
-          message={`${fighterEditData!.name}を削除しますか？`}
+          message={`${editFighterData!.name}を削除しますか？`}
           okBtnString="削除"
           cancel={() => setOpenConfirmModal(false)}
         />
