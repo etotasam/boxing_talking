@@ -21,6 +21,7 @@ export const EditHeader = React.memo(({ className }: Props) => {
     { title: "選手編集", link: "/fighter/edit?page=1" },
     { title: "試合登録", link: "/match/register" },
     { title: "試合編集", link: "/match/delete" },
+    { title: "Home", link: "/" },
   ];
   return (
     <>
