@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogoutBtn } from "@/components/module/LogoutBtn";
+import { DefaultLogoutBtn, PlainLogoutBtn } from "@/components/module/LogoutBtn";
 import { WINDOW_WIDTH } from "@/libs/utils";
 import { motion, useAnimation, AnimationControls, AnimatePresence } from "framer-motion";
+import { clsx } from "clsx";
 //! components
 import { CustomLink } from "@/components/module/CustomLink";
 import { LoginForm } from "@/components/module/LoginForm";
@@ -16,6 +17,8 @@ import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 type Props = {
   className?: string;
 };
+
+const animationDuration = 0.5;
 
 export const Header = React.memo((props: Props) => {
   const { pathname } = useLocation();
@@ -76,20 +79,20 @@ export const Header = React.memo((props: Props) => {
           height: "100vh",
           width: "100%",
           zIndex: 30,
-          transition: { duration: 0.3 },
+          transition: { duration: animationDuration },
         };
       });
       h1Controls.start(() => {
         return {
           bottom: "15px",
-          transition: { duration: 0.3 },
+          transition: { duration: animationDuration },
         };
       });
     }
     if (!isOpenHamburgerMenu) {
       hamburgerControls.start(() => {
         return {
-          transition: { duration: 0.3 },
+          transition: { duration: animationDuration },
           transitionEnd: {
             position: "absolute",
           },
@@ -99,12 +102,12 @@ export const Header = React.memo((props: Props) => {
         return {
           height: "100px",
           width: "100%",
-          transition: { duration: 0.3 },
+          transition: { duration: animationDuration },
         };
       });
       h1Controls.start(() => {
         return {
-          transition: { duration: 0.3 },
+          transition: { duration: animationDuration },
         };
       });
     }
@@ -171,10 +174,8 @@ const AuthControlComponent = () => {
   const { width: windowWidth } = useGetWindowSize();
 
   //? loginモーダルの状態管理
-  // const { setter: setIsOpenLoginModal } = useQueryState<boolean>("q/isOpenLoginModal");
   return (
     <>
-      {/* {windowWidth > WINDOW_WIDTH.lg ? ( */}
       <div className="relative col-span-1 flex items-center justify-end">
         <p className="whitespace-nowrap absolute top-[-30px] right-0 text-right font-extralight text-sm md:text-base text-white">{`${userName}さん`}</p>
         {windowWidth > WINDOW_WIDTH.md ? (
@@ -200,12 +201,18 @@ const AuthControlComponent = () => {
 
 const LoginOutComponent = () => {
   const { data: authState } = useAuth();
-  return authState ? <LogoutBtn /> : <LoginForm />;
+  return authState ? <DefaultLogoutBtn /> : <LoginForm />;
 };
 
 const ModalMenu = React.memo(() => {
   const { pathname } = useLocation();
-  const currentPage = pathname.split("/")[1];
+  // const currentPage = pathname.split("/")[1];
+  // const isCurrentPageHome = /^\/$/.test(pathname);
+
+  const [currentPage, setCurrentPage] = useState<string>();
+  useEffect(() => {
+    if (/^\/$/.test(pathname)) setCurrentPage("Home");
+  }, [pathname]);
 
   const { data: authState } = useAuth();
   const navigate = useNavigate();
@@ -217,11 +224,11 @@ const ModalMenu = React.memo(() => {
     },
     show: {
       y: 0,
-      transition: { duration: 0.3 },
+      transition: { duration: animationDuration },
     },
     hidden: {
       y: "-100vh",
-      transition: { duration: 0.3 },
+      transition: { duration: animationDuration },
     },
   };
 
@@ -251,14 +258,24 @@ const ModalMenu = React.memo(() => {
       className="absolute top-0 left-0 w-full h-[100vh] flex justify-center items-center"
     >
       <div className="flex flex-col last:border-2 border-white text-white p-10">
-        {currentPage !== "" && (
-          <CustomLink onClick={(e: any) => onclick(e)} className="text-white text-center">
-            Home
-          </CustomLink>
-        )}
-        <div className="mt-5">
-          {authState ? <LogoutBtn /> : <p onClick={() => setIsOpenLoginModal(true)}>ろぐいん</p>}
-        </div>
+        <CustomLink
+          onClick={(e) => onclick(e)}
+          className={clsx(
+            "text-center",
+            currentPage === "Home"
+              ? "text-stone-600 cursor-default pointer-events-none"
+              : "text-white"
+          )}
+        >
+          Home
+        </CustomLink>
+        <CustomLink className="mt-5">
+          {authState ? (
+            <PlainLogoutBtn />
+          ) : (
+            <p onClick={() => setIsOpenLoginModal(true)}>ログイン</p>
+          )}
+        </CustomLink>
       </div>
     </motion.div>
   );

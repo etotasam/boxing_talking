@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 
 //! components
 // import { CustomButton } from "@/components/atomic/Button";
-import { LogoutBtn } from "@/components/module/LogoutBtn";
+import { DefaultLogoutBtn } from "@/components/module/LogoutBtn";
 
 type Props = {
   className?: string;
@@ -43,7 +43,7 @@ export const EditHeader = React.memo(({ className }: Props) => {
             </NavLink>
           ))}
         </nav>
-        <LogoutBtn />
+        <DefaultLogoutBtn />
       </header>
     </>
   );

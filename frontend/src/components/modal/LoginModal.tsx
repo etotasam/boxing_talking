@@ -77,7 +77,7 @@ export const LoginModal = () => {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`mt-8 px-2 py-1 outline-none border-b duration-300 bg-transparent text-stone-600 focus:border-green-500 ${
+              className={`mt-8 px-2 py-1 outline-none border-b rounded-none duration-300 bg-transparent text-stone-600 focus:border-green-500 ${
                 email ? `border-green-500` : `border-stone-500`
               }`}
             />
@@ -86,7 +86,7 @@ export const LoginModal = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-8 px-2 py-1 outline-none border-b border-stone-500 text-stone-600 focus:border-green-500 duration-300 bg-transparent"
+              className="mt-8 px-2 py-1 outline-none border-b rounded-none border-stone-500 text-stone-600 focus:border-green-500 duration-300 bg-transparent"
             />
             <div className="relative mt-12 ">
               <button className="h-[30px] w-full bg-green-500 hover:bg-green-600 rounded duration-300 text-white">
