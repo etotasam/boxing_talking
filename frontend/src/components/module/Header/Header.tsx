@@ -69,15 +69,10 @@ export const Header = React.memo((props: Props) => {
         return {
           zIndex: 999,
           position: "fixed",
-          // top: "40px",
-          // right: "20px",
         };
       });
       headerControls.start(() => {
         return {
-          position: "fixed",
-          top: 0,
-          left: 0,
           height: "100vh",
           width: "100%",
           zIndex: 30,
@@ -105,11 +100,6 @@ export const Header = React.memo((props: Props) => {
           height: "100px",
           width: "100%",
           transition: { duration: 0.3 },
-          transitionEnd: {
-            position: "absolute",
-            top: 0,
-            left: 0,
-          },
         };
       });
       h1Controls.start(() => {
@@ -122,7 +112,11 @@ export const Header = React.memo((props: Props) => {
 
   return (
     <>
-      <motion.header animate={headerControls} className={`bg-stone-900`}>
+      <motion.header
+        animate={headerControls}
+        initial={{ height: "100px", width: "100%" }}
+        className={`bg-stone-900 fixed top-0 left-0`}
+      >
         <div className="relative h-[100px] max-w-[1024px] lg:mx-auto">
           <motion.h1
             animate={h1Controls}
