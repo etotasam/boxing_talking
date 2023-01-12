@@ -10,6 +10,7 @@ import { SignUpModal } from "@/components/modal/SignUpModal";
 import { LoginModal } from "@/components/modal/LoginModal";
 import { Header } from "@/components/module/Header";
 import { Footer } from "@/components/module/Footer";
+import { ShutterModal } from "@/components/modal/ShutterModal";
 
 const MainLayout = React.memo(() => {
   const { isLoading: isFetchingMatches } = useFetchMatches();
@@ -48,6 +49,7 @@ const MainLayout = React.memo(() => {
       {isOpenSignUpModal && <SignUpModal />}
       {isOpenLoginModal && <LoginModal />}
       {pending && <ClearModal />}
+      {/* <ShutterModal /> */}
     </div>
   );
 });

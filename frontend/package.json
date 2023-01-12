@@ -1,6 +1,7 @@
 {
   "name": "frontend",
   "version": "0.1.0",
+  "homepage": "./",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.2",
@@ -13,6 +14,7 @@
     "@types/react-router-dom": "^5.3.3",
     "chart.js": "^3.7.1",
     "chartjs-plugin-datalabels": "^2.0.0",
+    "clsx": "^1.2.1",
     "dayjs": "^1.10.8",
     "framer-motion": "^6.3.3",
     "lodash": "^4.17.21",
@@ -25,6 +27,7 @@
     "react-query": "^3.39.0",
     "react-router-dom": "^6.2.1",
     "react-scripts": "5.0.0",
+    "serve": "^14.1.2",
     "typescript": "^4.5.5",
     "web-vitals": "^2.1.4"
   },
