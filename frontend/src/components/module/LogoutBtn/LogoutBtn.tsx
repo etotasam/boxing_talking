@@ -1,32 +1,49 @@
-import React from "react";
+import React, { useRef } from "react";
+import { clsx } from "clsx";
 //! components
 import { Spinner } from "@/components/module/Spinner";
 import { CustomButton } from "@/components/atomic/Button";
 //! hooks
 import { useAuth, useLogout } from "@/libs/hooks/useAuth";
 
-export const LogoutBtn = React.memo(() => {
-  const { data: authUser } = useAuth();
-  const { logout, isLoading: isLogoutPending } = useLogout();
-  const click = async () => {
-    if (!authUser) return;
-    logout({ userId: authUser.id });
+const LogoutBtn = (type: string) =>
+  function InnerLogoutBtn() {
+    const { data: authUser } = useAuth();
+    const { logout, isLoading: isLogoutPending } = useLogout();
+    const click = async () => {
+      if (!authUser) return;
+      logout({ userId: authUser.id });
+    };
+
+    const atNormalState = useRef(["text-gray-600", "pointer-events-none", "select-none"]);
+    const atPendingState = useRef(["text-white"]);
+    switch (type) {
+      case "default":
+        atNormalState.current = [...atNormalState.current, "bg-green-900"];
+        atPendingState.current = [...atPendingState.current, "bg-green-600", "hover:bg-green-500"];
+        break;
+
+      case "plain":
+        atNormalState.current = [...atNormalState.current, "bg-stone-500"];
+        atPendingState.current = [...atPendingState.current, "bg-stone-600", "hover:bg-stone-500"];
+    }
+
+    return (
+      <div className="relative">
+        {isLogoutPending && <Spinner size={20} />}
+        <CustomButton
+          dataTestid={"logout-button"}
+          className={clsx(
+            "text-white duration-200",
+            isLogoutPending ? atNormalState.current : atPendingState.current
+          )}
+          onClick={click}
+        >
+          ログアウト
+        </CustomButton>
+      </div>
+    );
   };
 
-  return (
-    <div className="relative">
-      {isLogoutPending && <Spinner size={20} />}
-      <CustomButton
-        dataTestid={"logout-button"}
-        className={`text-white ${
-          isLogoutPending
-            ? `bg-green-900 text-gray-600 pointer-events-none select-none`
-            : `bg-green-600 hover:bg-green-500 text-white`
-        } duration-200`}
-        onClick={click}
-      >
-        ログアウト
-      </CustomButton>
-    </div>
-  );
-});
+export const DefaultLogoutBtn = LogoutBtn("default");
+export const PlainLogoutBtn = LogoutBtn("plain");
