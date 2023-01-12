@@ -19,8 +19,8 @@ return [
 
     'allowed_methods' => ['*'],
 
-    // 'allowed_origins' => [env('FRONT_APP_URL'), null],
-    'allowed_origins' => ['https://cf.boxtalk.xyz', null],
+    'allowed_origins' => [env('FRONT_APP_URL'), null],
+    // 'allowed_origins' => ['https://cf.boxtalk.xyz', null],
 
     'allowed_origins_patterns' => [],
 
