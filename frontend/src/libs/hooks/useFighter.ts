@@ -175,7 +175,7 @@ export const useDeleteFighter = () => {
   const paramPage = Number(query.get("page"));
 
   const api = async (fighterData: FighterType) => await Axios.delete(queryKeys.fighter, { data: { fighterId: fighterData.id } }).then(v => v.data)
-  const { mutate, isLoading, isError } = useMutation(api, {
+  const { mutate, isLoading, isError, isSuccess } = useMutation(api, {
     onMutate: (fighterData) => {
       const snapshotFighters = queryClient.getQueryData<FighterType[]>([queryKeys.fighter, { page: paramPage }])
       const widtoutDeleteFighters = queryClient.getQueryData<FighterType[]>([queryKeys.fighter, { page: paramPage }])!.filter(fighter => fighter.id !== fighterData.id)
@@ -212,5 +212,5 @@ export const useDeleteFighter = () => {
     })
   }
 
-  return { deleteFighter, isLoading, isError }
+  return { deleteFighter, isLoading, isError, isSuccess }
 }

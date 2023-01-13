@@ -118,7 +118,7 @@ export const Header = React.memo((props: Props) => {
       <motion.header
         animate={headerControls}
         initial={{ height: "100px", width: "100%" }}
-        className={`bg-stone-900 fixed top-0 left-0`}
+        className={`bg-stone-900 fixed top-0 left-0 z-30`}
       >
         <div className="relative h-[100px] max-w-[1024px] lg:mx-auto">
           <motion.h1
