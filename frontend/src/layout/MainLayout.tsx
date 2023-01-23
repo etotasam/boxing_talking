@@ -4,7 +4,6 @@ import { Outlet } from "react-router-dom";
 import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 //! component
-import { LoadingModal } from "@/components/modal/LoadingModal";
 import { ClearModal } from "@/components/modal/ClearModal";
 import { SignUpModal } from "@/components/modal/SignUpModal";
 import { LoginModal } from "@/components/modal/LoginModal";
@@ -44,7 +43,6 @@ const MainLayout = React.memo(() => {
         <Outlet />
       </main>
       <Footer />
-      {isFetchingMatches && <LoadingModal />}
       {isOpenSignUpModal && <SignUpModal />}
       {isOpenLoginModal && <LoginModal />}
       {pending && <ClearModal />}

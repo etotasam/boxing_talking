@@ -259,7 +259,7 @@ const FightersInfo = ({
   return (
     <div className="mt-3 sm:m-0 md:p-0 w-full flex items-center px-4">
       <div className="w-full grid grid-rows-[32px_1fr] grid-cols-[1fr_1fr] md:grid-rows-[1fr_32px_1fr] md:grid-cols-[1fr] lg:grid-rows-[32px_1fr] lg:grid-cols-[1fr_1fr]">
-        {/* 投票ボタン */}
+        {/* //? 投票ボタン */}
         <div className="col-span-2 md:row-start-2 lg:row-start-1">
           <VoteButton
             match={thisMatch}
@@ -278,21 +278,12 @@ const FightersInfo = ({
               mouseOnColor === MouseOn.RED ? `bg-red-700` : `bg-stone-800`
             }`}
           >
-            {/* {windowWidth > WINDOW_WIDTH.md ? ( */}
             <SimpleFighterComponent
               fighter={thisMatch.red}
               recordTextColor={`text-gray-200`}
               className={`w-full text-gray-200`}
               cornerColor={windowWidth < WINDOW_WIDTH.md ? "red" : undefined}
             />
-            {/* ) : (
-              <FighterMin
-                fighter={thisMatch.red}
-                recordTextColor={`text-gray-200`}
-                className={`w-full text-gray-200`}
-                cornerColor={`${windowWidth < WINDOW_WIDTH.md ? `red` : undefined}`}
-              />
-            )} */}
           </div>
         </div>
 
@@ -305,19 +296,11 @@ const FightersInfo = ({
               mouseOnColor === MouseOn.BLUE ? `bg-blue-800` : `bg-stone-800`
             }`}
           >
-            {/* {windowWidth > WINDOW_WIDTH.md ? ( */}
             <SimpleFighterComponent
               fighter={thisMatch.blue}
               recordTextColor={`text-gray-200`}
               className={`w-full text-gray-200`}
             />
-            {/* // ) : (
-            //   <FighterMin
-            //     fighter={thisMatch.blue}
-            //     recordTextColor={`text-gray-200`}
-            //     className={`w-full text-gray-200`}
-            //   />
-            // )} */}
           </div>
         </div>
       </div>
