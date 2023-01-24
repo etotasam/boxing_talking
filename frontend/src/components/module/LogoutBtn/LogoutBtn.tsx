@@ -1,19 +1,30 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { clsx } from "clsx";
 //! components
 import { Spinner } from "@/components/module/Spinner";
 import { CustomButton } from "@/components/atomic/Button";
 //! hooks
 import { useAuth, useLogout } from "@/libs/hooks/useAuth";
+import { useQueryState } from "@/libs/hooks/useQueryState";
 
 const LogoutBtn = (type: string) =>
   function InnerLogoutBtn() {
+    const { state: isOpenHamburgerMenu, setter: setIsOpenHamburgerMenu } =
+      useQueryState<boolean>("q/isOpenHamburgerMenu");
     const { data: authUser } = useAuth();
     const { logout, isLoading: isLogoutPending } = useLogout();
-    const click = async () => {
+    const handleClickButton = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      e.preventDefault();
       if (!authUser) return;
       logout({ userId: authUser.id });
     };
+
+    //? logout時にHamburgerModalがopenの時は閉じる
+    useEffect(() => {
+      return () => {
+        if (isOpenHamburgerMenu) setIsOpenHamburgerMenu(false);
+      };
+    }, []);
 
     const atNormalState = useRef(["text-gray-600", "pointer-events-none", "select-none"]);
     const atPendingState = useRef(["text-white"]);
@@ -37,7 +48,7 @@ const LogoutBtn = (type: string) =>
             "text-white duration-200",
             isLogoutPending ? atNormalState.current : atPendingState.current
           )}
-          onClick={click}
+          onClick={(e) => handleClickButton(e)}
         >
           ログアウト
         </CustomButton>

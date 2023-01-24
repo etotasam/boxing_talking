@@ -91,6 +91,7 @@ export const useCreateUser = () => {
           setToastModalMessage({ message: MESSAGE.USER_NAME_ALREADY_USE, bgColor: ModalBgColorType.NOTICE })
           return
         }
+        setToastModalMessage({ message: MESSAGE.USER_REGISTER_FAILED, bgColor: ModalBgColorType.ERROR })
       }
     })
   }

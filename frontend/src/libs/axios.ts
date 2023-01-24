@@ -11,7 +11,7 @@ Axios.interceptors.response.use(
   (response) => {
     return Promise.resolve(response)
   },
-  async (error) => {
+  (error) => {
     return Promise.reject(error.response)
   }
 )
