@@ -49,7 +49,7 @@ class FighterControllerTest extends TestCase
      */
     public function fetch_ファイターの取得()
     {
-        $response = $this->get(route('fighter.fetch'));
+        $response = $this->get(route('fighter.fetch', ['limit' => 10, 'page' => 1]));
 
         $response->assertOk()
             ->assertJsonCount(1)

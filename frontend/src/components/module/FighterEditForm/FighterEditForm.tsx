@@ -11,7 +11,7 @@ type PropsType = {
   className?: string;
   isPending?: boolean;
   fighterData?: FighterType;
-  isRegisteredFighter?: boolean;
+  isSuccessRegisterFighter?: boolean;
 };
 
 export enum Stance {
@@ -58,9 +58,9 @@ export const FighterEditForm = (props: PropsType) => {
 
   //? formのデータを初期化
   useEffect(() => {
-    if (!props.isRegisteredFighter) return;
+    if (!props.isSuccessRegisterFighter) return;
     setEditFighterData(initialFighterInfoState);
-  }, [props.isRegisteredFighter]);
+  }, [props.isSuccessRegisterFighter]);
 
   return (
     <div className={props.className}>

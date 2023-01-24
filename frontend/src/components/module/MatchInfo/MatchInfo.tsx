@@ -69,6 +69,12 @@ export const MatchInfo = () => {
   const [voteFighter, setVoteFighter] = useState<FighterType & { voteColor: "red" | "blue" }>();
   //? 投票先をstateにセット&フロント側だけで表示を反映
   const voteToFighter = async (vote: "red" | "blue", fighter: FighterType) => {
+    //? 試合当日以降は投票できないようにする
+    if (thisMatch) {
+      const nowDate = dayjs().unix();
+      const matchDate = dayjs(thisMatch.date).unix();
+      if (nowDate >= matchDate) return;
+    }
     if (userVoteFighterColor) return;
     setVoteFighter({ ...fighter, voteColor: vote });
     let tempGameData: MatchesType = { ...thisMatch! };
@@ -246,15 +252,7 @@ type FighterInfoPropsType = {
   voteFighter: (FighterType & { voteColor: "red" | "blue" }) | undefined;
 };
 
-const FightersInfo = ({
-  thisMatch,
-  mouseOnColor,
-  setMouseOnColor,
-  voteToFighter,
-  myVote,
-  userVoteColor,
-  voteFighter,
-}: FighterInfoPropsType) => {
+const FightersInfo = (props: FighterInfoPropsType) => {
   const { width: windowWidth } = useGetWindowSize();
   return (
     <div className="mt-3 sm:m-0 md:p-0 w-full flex items-center px-4">
@@ -262,24 +260,24 @@ const FightersInfo = ({
         {/* //? 投票ボタン */}
         <div className="col-span-2 md:row-start-2 lg:row-start-1">
           <VoteButton
-            match={thisMatch}
-            userVoteColor={userVoteColor}
-            voteFighter={voteFighter}
-            myVote={myVote}
+            match={props.thisMatch}
+            userVoteColor={props.userVoteColor}
+            voteFighter={props.voteFighter}
+            myVote={props.myVote}
           />
         </div>
 
         <div className={`w-full flex items-center py-2 col-span-1 md:row-start-1 lg:row-start-2`}>
           <div
-            onClick={() => voteToFighter("red", thisMatch.red)}
-            onMouseOver={() => setMouseOnColor(MouseOn.RED)}
-            onMouseOut={() => setMouseOnColor(MouseOn.NULL)}
+            onClick={() => props.voteToFighter("red", props.thisMatch.red)}
+            onMouseOver={() => props.setMouseOnColor(MouseOn.RED)}
+            onMouseOut={() => props.setMouseOnColor(MouseOn.NULL)}
             className={`w-full h-full rounded-l-xl md:rounded-xl lg:rounded-r-none cursor-pointer duration-500 ${
-              mouseOnColor === MouseOn.RED ? `bg-red-700` : `bg-stone-800`
+              props.mouseOnColor === MouseOn.RED ? `bg-red-700` : `bg-stone-800`
             }`}
           >
             <SimpleFighterComponent
-              fighter={thisMatch.red}
+              fighter={props.thisMatch.red}
               recordTextColor={`text-gray-200`}
               className={`w-full text-gray-200`}
               cornerColor={windowWidth < WINDOW_WIDTH.md ? "red" : undefined}
@@ -289,15 +287,15 @@ const FightersInfo = ({
 
         <div className={`w-full flex items-center py-2 col-span-1 md:row-start-3 lg:row-start-2`}>
           <div
-            onClick={() => voteToFighter("blue", thisMatch.blue)}
-            onMouseOver={() => setMouseOnColor(MouseOn.BLUE)}
-            onMouseOut={() => setMouseOnColor(MouseOn.NULL)}
+            onClick={() => props.voteToFighter("blue", props.thisMatch.blue)}
+            onMouseOver={() => props.setMouseOnColor(MouseOn.BLUE)}
+            onMouseOut={() => props.setMouseOnColor(MouseOn.NULL)}
             className={`w-full h-full rounded-r-xl md:rounded-xl lg:rounded-l-none cursor-pointer duration-500 ${
-              mouseOnColor === MouseOn.BLUE ? `bg-blue-800` : `bg-stone-800`
+              props.mouseOnColor === MouseOn.BLUE ? `bg-blue-800` : `bg-stone-800`
             }`}
           >
             <SimpleFighterComponent
-              fighter={thisMatch.blue}
+              fighter={props.thisMatch.blue}
               recordTextColor={`text-gray-200`}
               className={`w-full text-gray-200`}
             />
