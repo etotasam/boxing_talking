@@ -19,7 +19,7 @@ export enum MESSAGE {
 
   USER_REGISTER_SUCCESSFULLY = "登録が完了しました",
   USER_ALREADY_EXIST = "すでに登録されているEmailです",
-  USER_NAME_ALREADY_USE = "その名前はすでに使われています \n 別の名前を検討してください",
+  USER_NAME_ALREADY_USE = "すでに使われている名前です \n 別の名前を検討してください",
 
   INVALID_COUNTRY = "国籍が無効です",
   COMMENT_POST_SUCCESSFULLY = "コメントを投稿しました",
@@ -27,7 +27,7 @@ export enum MESSAGE {
   COMMENT_POST_NULL = `コメントを入力してください`,
 
   VOTE_FAILED_WITH_NO_AUTH = '勝敗予想を投票するにはログインが必要です',
-  VOTE_FAILD = `投票はできません \n すでに投票しています`,
+  VOTE_FAILD = `投票に失敗しました`,
   VOTE_SUCCESSFULLY = `投票しました`,
 
   COMMENT_CANT_POST_WITH_UNAUTH = "コメント投稿にはログインが必要です",

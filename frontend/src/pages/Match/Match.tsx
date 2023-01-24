@@ -5,27 +5,17 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 //! components
-// import { LayoutDefault } from "@/layout/LayoutDefault";
 import { PostCommentForm } from "@/components/module/PostCommentForm";
 import { MatchInfo } from "@/components/module/MatchInfo";
 import { CommentsContainer } from "@/components/module/CommentsContainer";
-// import { DataFetchErrorComponent } from "@/components/module/DataFetchErrorComponent";
-//! modal
-// import { Spinner } from "@/components/module/Spinner";
 //! api
 import { MatchesType } from "@/libs/hooks/useMatches";
 //! custom hooks
 import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
-// import { useAuth } from "@/libs/hooks/useAuth";
-// import { useCommentDelete } from "@/libs/hooks/useCommentDelete";
-// import { useDeleteComment } from "@/libs/hooks/useComment";
 import { useAdjustCommentsContainer } from "@/libs/hooks/useAdjustCommentsContainer";
-// import { useFetchAllMatches } from "@/libs/hooks/useFetchAllMatches";
 import { useFetchMatches } from "@/libs/hooks/useMatches";
-// import { useQueryState } from "@/libs/hooks/useQueryState";
 
 export const Match = () => {
-  // window.scroll({ top: 0 });
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get("id"));

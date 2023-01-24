@@ -3,14 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
-class ProvisionalUser extends Model
+class ProvisionalUser extends UuidModel
 {
     use HasFactory;
-
-    public $inplementing = false;
-    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -18,7 +14,6 @@ class ProvisionalUser extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'id',
         'name',
         'email',
         'token',

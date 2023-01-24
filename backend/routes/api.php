@@ -42,8 +42,8 @@ Route::middleware('auth:sanctum')->group(function() {
         return Auth::check();
     })->name('auth.check');
 });
-Route::post('/user/create', [AuthController::class, 'test_create'])->name('auth.create');
-// Route::post('/user/create', [AuthController::class, 'create'])->name('auth.create');
+// Route::post('/user/create', [AuthController::class, 'test_create'])->name('auth.create');
+Route::post('/user/create', [AuthController::class, 'create'])->name('auth.create');
 
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
