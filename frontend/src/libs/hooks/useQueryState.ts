@@ -1,5 +1,6 @@
-import React from "react"
-import { useQuery, QueryKey, useQueryClient } from "react-query"
+import React, { useRef } from "react"
+import { useQuery, useQueryClient } from "react-query"
+import type { QueryKey } from "react-query"
 
 export const useQueryState = <T>(key: QueryKey, initialState?: T): { state: T, setter: React.Dispatch<React.SetStateAction<T>>, getLatestState: () => T | undefined } => {
   const state = useQuery(key, {

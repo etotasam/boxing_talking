@@ -13,6 +13,7 @@ import { Hamburger } from "@/components/module/Hamburger";
 import { useAuth } from "@/libs/hooks/useAuth";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
+import axios from "axios";
 
 type Props = {
   className?: string;
@@ -239,11 +240,42 @@ const ModalMenu = React.memo(() => {
     };
   }, []);
 
-  const onclick = React.useCallback((e) => {
+  //todo
+  // const testclick = async () => {
+  //   try {
+  //     const res = await axios
+  //       .post(
+  //         "http://localhost:8080/api/user/create",
+  //         {
+  //           name: "test",
+  //           email: "test@test.com",
+  //           password: "test",
+  //         },
+  //         { withCredentials: true }
+  //       )
+  //       .then((res) => res.data);
+  //     console.log("aaaaaaaaa", res);
+  //   } catch (error) {}
+  // };
+
+  const handleClickCustomLink = (e: React.MouseEvent<HTMLParagraphElement, MouseEvent>) => {
     e.preventDefault();
-    setIsOpenHamburgerMenu(false);
-    navigate("/");
-  }, []);
+    const text = (e.target as HTMLElement).innerText;
+    switch (text) {
+      case "ログイン":
+        setIsOpenLoginModal(true);
+        break;
+      case "Home":
+        setIsOpenHamburgerMenu(false);
+        navigate("/");
+        break;
+      default:
+        if (process.env.REACT_APP_NODE_ENV === "development") {
+          console.error("error on handleClickCustomLink");
+        }
+        return;
+    }
+  };
 
   //? loginモーダルの状態管理
   const { setter: setIsOpenLoginModal } = useQueryState<boolean>("q/isOpenLoginModal");
@@ -259,7 +291,7 @@ const ModalMenu = React.memo(() => {
     >
       <div className="flex flex-col last:border-2 border-white text-white p-10">
         <CustomLink
-          onClick={(e) => onclick(e)}
+          onClick={(e) => handleClickCustomLink(e)}
           className={clsx(
             "text-center",
             currentPage === "Home"
@@ -273,9 +305,10 @@ const ModalMenu = React.memo(() => {
           {authState ? (
             <PlainLogoutBtn />
           ) : (
-            <p onClick={() => setIsOpenLoginModal(true)}>ログイン</p>
+            <p onClick={(e) => handleClickCustomLink(e)}>ログイン</p>
           )}
         </CustomLink>
+        {/* <p onClick={testclick}>てすと</p> */}
       </div>
     </motion.div>
   );

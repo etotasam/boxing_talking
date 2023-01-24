@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 
 type ButtonType = React.ComponentProps<"button"> & {
   data_testid?: string;
@@ -23,13 +24,14 @@ type CustomButtonType = React.ComponentProps<"button"> & { dataTestid?: string }
 
 export const CustomButton = React.memo(
   ({ onClick, form, children, className, dataTestid }: CustomButtonType) => {
-    const baseStyle = `rounded-sm px-4 py-1`;
-    const createStyle = () => {
-      if (!className) return baseStyle;
-      return baseStyle + ` ${className}`;
-    };
+    // const baseStyle = `rounded-sm px-4 py-1`;
     return (
-      <button data-testid={dataTestid} form={form} onClick={onClick} className={createStyle()}>
+      <button
+        data-testid={dataTestid}
+        form={form}
+        onClick={onClick}
+        className={clsx(`rounded-sm px-4 py-1`, className)}
+      >
         {children}
       </button>
     );
