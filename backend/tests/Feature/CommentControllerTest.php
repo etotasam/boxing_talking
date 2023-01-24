@@ -69,9 +69,9 @@ class CommentControllerTest extends TestCase
     /**
      * @test
      */
-    public function store_コメントの投稿():void
+    public function post_コメントの投稿():void
     {
-        $response = $this->post(route('comment.store', ['user_id' => $this->user->id ,'match_id' => $this->matches->id, 'comment' => 'new comment']));
+        $response = $this->post(route('comment.post', ['user_id' => $this->user->id ,'match_id' => $this->matches->id, 'comment' => 'new comment']));
         $response->assertStatus(200);
         $this->assertDatabaseHas('comments',['user_id' => $this->user->id]);
         $this->assertDatabaseHas('comments',['comment' => 'new comment']);
@@ -82,10 +82,10 @@ class CommentControllerTest extends TestCase
      */
     public function delete_コメントの削除():void
     {
-        // 削除対象コメントが存在している
+        //? 削除対象コメントが存在している
         $this->assertDatabaseHas('comments',['comment' => 'user_1_of_comment_on_match_of_1']);
 
-        // 削除対象コメントの削除実行
+        //? 削除対象コメントの削除実行
         $this->actingAs($this->user);
         $response = $this->delete(route('comment.delete', ['user_id' => $this->user->id ,'comment_id' => $this->comments->id]));
         $response->assertStatus(200);

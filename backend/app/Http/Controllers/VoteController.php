@@ -55,14 +55,25 @@ class VoteController extends Controller
             $vote = $request->vote;
             $match_id = intval($match_id);
             DB::beginTransaction();
+            //? 試合が見つからない場合は投票不可 throw error
             $is_match = BoxingMatch::find($match_id)->exists();
             if(!$is_match) {
                 throw new Exception('the match not exist');
             }
+            //? 試合当日以降は試合予想の投票不可 throw error
+            $data = BoxingMatch::select('match_date')->where('id', $match_id)->first();
+            $match_data = strtotime($data['match_date']);
+            $now_date = strtotime('now');
+            if($now_date > $match_data) {
+                throw new Exception('can not vote after match date');
+            }
+
+            //? すでに投票済みの場合は投票不可 throw error
             $has_vote = Vote::where([["user_id", $user_id],["match_id", $match_id]])->first();
             if($has_vote) {
                 throw new Exception("Voting is not allowed. You already voted.");
             }
+
             Vote::create([
                 "user_id" => Auth::user()->id,
                 "match_id" => intval($match_id),
@@ -76,14 +87,14 @@ class VoteController extends Controller
             }
             $matches->save();
             DB::commit();
-            // return ["message" => "voted successfully"];
-            return response()->json(["message" => "success vote"],Response::HTTP_OK);
+            return response()->json(["message" => "vote success"],Response::HTTP_OK);
         }catch (Exception $e) {
             DB::rollBack();
             if($e->getCode() == Response::HTTP_UNAUTHORIZED) {
                 return response()->json($e->getMessage(), Response::HTTP_UNAUTHORIZED);
             }
-            return response()->json(["message" => 'vote failed'],Response::HTTP_INTERNAL_SERVER_ERROR);
+            $error_message = $e->getMessage() ? $e->getMessage() : 'vote failed';
+            return response()->json(["message" => $error_message],Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

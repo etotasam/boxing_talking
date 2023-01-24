@@ -20,7 +20,7 @@ export const MatchComponent = ({ match, bgColorClassName, onClick = () => null }
     PAST = "text-gray-400",
     FUTURE = "text-stone-600",
   }
-  const { width: windowWidth } = useGetWindowSize();
+  // const { width: windowWidth } = useGetWindowSize();
   const bgColor = bgColorClassName ? bgColorClassName : `bg-white`;
   const matchDayStyle = (subjectDate: Date): MatchIs | undefined => {
     const today = dayjs().format("YYYY/MM/DD");

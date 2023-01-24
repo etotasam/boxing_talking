@@ -12,7 +12,7 @@ export const FighterRegister = () => {
   const {
     registerFighter,
     isLoading: isRegisterFighterPending,
-    isSuccess: isRegisteredFighter,
+    isSuccess: isSuccessRegisterFighter,
   } = useRegisterFighter();
 
   //? 新しいボクサーの登録実行
@@ -23,7 +23,7 @@ export const FighterRegister = () => {
   return (
     <LayoutForEditPage>
       <div className="min-h-[calc(100vh-50px)] bg-stone-50 flex justify-center items-center">
-        <FighterEditForm isRegisteredFighter={isRegisteredFighter} onSubmit={register} />
+        <FighterEditForm isSuccessRegisterFighter={isSuccessRegisterFighter} onSubmit={register} />
         {isRegisterFighterPending && <FullScreenSpinnerModal />}
       </div>
     </LayoutForEditPage>

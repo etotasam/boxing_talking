@@ -30,29 +30,29 @@ class AuthController extends Controller
     {
         // throw new Exception();
         try {
-            $id = (string) Str::uuid();
+            // $id = (string) Str::uuid();
             $name = $request->name;
             $email = $request->email;
             $token = Str::random(60);
             $password = Hash::make($request->password);
-            // $is_name_exist = User::where("name", $name)->exists();
-            // $is_email_exist = User::where("email", $email)->exists();
-            // if($is_email_exist) {
-            //     throw new Exception('user already exists', Response::HTTP_FORBIDDEN);
-            // }
-            // if($is_name_exist) {
-            //     throw new Exception('name already use', Response::HTTP_FORBIDDEN);
-            // }
-            $user = ["id" => $id, "name" => $name, "email" => $email, "password" => $password, "token" => $token];
+            $is_name_exist = User::where("name", $name)->exists();
+            $is_email_exist = User::where("email", $email)->exists();
+            if($is_email_exist) {
+                throw new Exception('user already exists', Response::HTTP_FORBIDDEN);
+            }
+            if($is_name_exist) {
+                throw new Exception('name already use', Response::HTTP_FORBIDDEN);
+            }
+            $user = ["name" => $name, "email" => $email, "password" => $password, "token" => $token];
             // \Log::debug($user);
             // User::create($user);
             ProvisionalUser::create($user);
-            $data = ["token" => $token, "id" => $id];
-            Mail::send('email.test', $data, function($message) {
-                $message->to("cye_ma_kun245@yahoo.co.jp", "Test")
-                ->from("from@test.com", "Boxing Talking")
-                ->subject('Boxint Taking Email確認');
-            });
+            // $data = ["token" => $token];
+            // Mail::send('email.test', $data, function($message) {
+            //     $message->to("cye_ma_kun245@yahoo.co.jp", "Test")
+            //     ->from("from@test.com", "Boxing Talking")
+            //     ->subject('Boxint Taking Email確認');
+            // });
             return response()->json(["message" => "created user"], Response::HTTP_CREATED);
         }catch(Exception $e) {
             if($e->getCode() === Response::HTTP_FORBIDDEN) {

@@ -15,7 +15,6 @@ class ExampleTest extends TestCase
     public function test_example()
     {
         $a = 2;
-        $b = 2;
         $this->assertTrue($a === 2);
     }
 }
