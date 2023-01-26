@@ -54,6 +54,9 @@
   .t-flag-ua {
     background-image: url("./libs/images/flags/ukrine.svg");
   }
+  .t-flag-canada {
+    background-image: url("./libs/images/flags/canada.svg");
+  }
 
   .t-bg-none {
     background: none;

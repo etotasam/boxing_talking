@@ -8,7 +8,7 @@ import { WINDOW_WIDTH } from "@/libs/utils";
 //!types
 import { MatchesType } from "@/libs/hooks/useMatches";
 import { FighterType } from "@/libs/hooks/useFighter";
-import { UserType } from "@/libs/hooks/useAuth";
+import type { UserType } from "@/types/user";
 //!component
 import { Chart } from "@/components/module/Chart";
 import { SimpleFighterComponent } from "../SimpleFighterComponent";
@@ -198,7 +198,7 @@ const VoteButton = ({ match, userVoteColor, voteFighter, myVote }: VoteButtonPro
             userVoteColor === "red" ? `bg-red-700` : `bg-blue-700`
           }`}
         >
-          {`あなたの予想: ${match[userVoteColor].name}`}
+          {`${match[userVoteColor].name}の勝利に投票済`}
         </p>
       ) : voteFighter ? (
         <button
@@ -211,7 +211,7 @@ const VoteButton = ({ match, userVoteColor, voteFighter, myVote }: VoteButtonPro
         >{`${voteFighter.name}の勝利に投票する`}</button>
       ) : (
         <div className="w-full text-stone-600 rounded px-2 py-1 border border-stone-600 text-center">
-          勝者を予想しましょう
+          勝敗未投票
         </div>
       )}
       {isVoting && <Spinner />}

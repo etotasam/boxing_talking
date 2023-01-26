@@ -12,7 +12,7 @@ import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 import { MESSAGE } from "@/libs/utils";
 
 //! types
-import { UserType } from "@/libs/hooks/useAuth"
+import type { UserType } from "@/types/user";
 import dayjs from "dayjs";
 import { useQueryState } from "./useQueryState";
 
@@ -47,7 +47,7 @@ export const useFetchCommentsOnMatch = (matchId: number) => {
 
 export const usePostComment = () => {
   type ApiPropsType = {
-    userId: number | null,
+    userId: string | null,
     matchId: number,
     comment: string
   }
@@ -101,7 +101,7 @@ export const useDeleteComment = () => {
   const query = new URLSearchParams(search);
   let matchIdOnParam = Number(query.get("id"));
 
-  type ApiPropsType = { userId: number, commentId: number }
+  type ApiPropsType = { userId: string, commentId: number }
   // const { setMessageToModal } = useMessageController()
   const { setToastModalMessage } = useToastModal()
   const queryClient = useQueryClient()
