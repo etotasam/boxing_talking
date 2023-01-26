@@ -4,6 +4,8 @@ import { queryKeys } from "@/libs/queryKeys"
 import { Axios, isAxiosError } from "../axios"
 import { useNavigate } from "react-router-dom";
 
+//! types
+import type { UserType } from "@/types/user"
 //! message contoller
 import { useToastModal, ModalBgColorType } from "./useToastModal";
 import { MESSAGE } from "@/libs/utils";
@@ -12,13 +14,6 @@ import { MESSAGE } from "@/libs/utils";
 //! custom hooks
 import { useFetchMatchPredictVote } from "@/libs/hooks/useMatchPredict"
 import { useQueryState } from "@/libs/hooks/useQueryState"
-
-export type UserType = {
-  id: number,
-  name: string,
-  email: string,
-  administrator?: boolean
-}
 
 export enum AuthIs {
   TRUE = "TRUE",
@@ -137,7 +132,7 @@ export const useLogout = () => {
   const { setter: setIsPendingLogout } = useQueryState<boolean>("q/isPendingLogout", false)
   const queryClient = useQueryClient()
   const { setToastModalMessage } = useToastModal()
-  const api = useCallback(async ({ userId }: { userId: number }) => {
+  const api = useCallback(async ({ userId }: { userId: string }) => {
     await Axios.post<void>("api/logout", { user_id: userId }).then(value => value.data)
   }, [])
 
@@ -146,7 +141,7 @@ export const useLogout = () => {
       setIsPendingLogout(true)
     }
   })
-  const logout = useCallback(({ userId }: { userId: number }) => {
+  const logout = useCallback(({ userId }: { userId: string }) => {
     mutate({ userId }, {
       onSuccess: () => {
         setIsPendingLogout(false)

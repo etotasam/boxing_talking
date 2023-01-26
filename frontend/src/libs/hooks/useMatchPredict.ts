@@ -7,7 +7,7 @@ import { useQueryState } from "@/libs/hooks/useQueryState"
 import { useToastModal, ModalBgColorType } from "./useToastModal";
 import { MESSAGE } from "@/libs/utils";
 //! hooks
-import { useAuth, UserType } from "@/libs/hooks/useAuth"
+import { useAuth } from "@/libs/hooks/useAuth"
 
 export type VoteType = {
   id: number,

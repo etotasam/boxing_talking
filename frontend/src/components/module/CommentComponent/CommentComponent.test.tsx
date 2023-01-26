@@ -8,7 +8,7 @@ import { useAuth } from "@/libs/hooks/useAuth";
 
 // コメント投稿ユーザー & ログインユーザー
 const user = {
-  id: 1,
+  id: "1",
   name: "ログインユーザー",
   email: "authUser@test.com",
 };
@@ -63,7 +63,7 @@ describe("CommentComponentのテスト", () => {
   });
 
   it("not auth user のコメントにはゴミ箱は表示されない", () => {
-    data = { id: 2, name: "ユーザー", email: "notAuthUser@test.com" };
+    data = { id: "2", name: "ユーザー", email: "notAuthUser@test.com" };
     useAuthMock.mockReturnValue({ data });
     render(
       <Wrapper>

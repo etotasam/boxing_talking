@@ -20,6 +20,7 @@ export enum NationaFlag {
   Rusia = "t-flag-ru",
   Philpin = "t-flag-ph",
   Ukrine = "t-flag-ua",
+  Canada = "t-flag-canada",
 }
 
 export const checkNationality = (countory: string) => {

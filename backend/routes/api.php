@@ -48,6 +48,7 @@ Route::post('/user/create', [AuthController::class, 'create'])->name('auth.creat
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
+//! ボクサー
 Route::get('/fighter/count', [FighterController::class, 'count'])->name('fighter.count');
 Route::get('/fighter/search', [FighterController::class, 'search'])->name('fighter.search');
 Route::get('/fighter',[FighterController::class, 'fetch'])->name('fighter.fetch');
@@ -55,6 +56,7 @@ Route::post('/fighter',[FighterController::class, 'register'])->name('fighter.re
 Route::put('/fighter', [FighterController::class, 'update'])->name('fighter.update');
 Route::delete('/fighter',[FighterController::class, 'delete'])->name('fighter.delete');
 
+//! 試合
 Route::get('/match', [MatchController::class, 'fetch'])->name('match.fetch');
 Route::post('/match', [MatchController::class, 'register'])->name('match.register');
 Route::delete('/match', [MatchController::class, 'delete'])->name('match.delete');
@@ -64,9 +66,11 @@ Route::get('/comment', [CommentController::class, 'fetch'])->name('comment.fetch
 Route::post('/comment', [CommentController::class, 'post'])->name('comment.post');
 Route::delete('/comment', [CommentController::class, 'delete'])->name('comment.delete');
 
+//! 勝利予想
 Route::get('/vote', [VoteController::class, 'fetch'])->name('vote.fetch');
 Route::put('/vote', [VoteController::class, 'vote'])->name('vote');
 
+//! メールテスト
 Route::get('/mail', [MailController::class, 'send'])->name('mail.send');
 
 
