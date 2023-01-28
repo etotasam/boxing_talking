@@ -37,6 +37,8 @@ export const PostCommentForm = ({
 
   //? コメントの投稿
   const post = async () => {
+    //? コメントpost中は無効にする
+    if (isPostingComment) return;
     clearToastModaleMessage();
     //? ログインしてない場合
     if (!authUser) {

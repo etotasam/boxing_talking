@@ -41,6 +41,8 @@ export const checkNationality = (countory: string) => {
       return NationaFlag.Philpin;
     case Nationality.Ukrine:
       return NationaFlag.Ukrine;
+    case Nationality.Canada:
+      return NationaFlag.Canada;
   }
 };
 
