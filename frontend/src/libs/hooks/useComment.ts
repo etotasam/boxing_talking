@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import { useCallback } from "react"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { queryKeys } from "@/libs/queryKeys"
 import { Axios } from "../axios"
@@ -67,10 +67,12 @@ export const usePostComment = () => {
     onMutate: ({ matchId, comment }) => {
       setIsCommentPosting(true)
       const nowDate = dayjs().format('YYYY/MM/DD H:mm')
+      //? 疑似id (backendでdatabaseにコメントが登録されるまでの間、frontendで使用するid)
+      const temporaryId = Number(`${Math.floor(Math.random() * 1000) + dayjs().format(`HHmmSSS`)}`)
       //? userのこの試合のvote
       const vote = queryClient.getQueryData<VoteType[]>(queryKeys.vote)?.find(v => v.match_id === matchId)
       const snapshot = queryClient.getQueryData<CommentType[]>([queryKeys.comments, { id: matchId }])
-      queryClient.setQueryData([queryKeys.comments, { id: matchId }], [{ id: NaN, user, comment, vote: vote?.vote_for, created_at: nowDate }, ...snapshot!])
+      queryClient.setQueryData([queryKeys.comments, { id: matchId }], [{ id: temporaryId, user, comment, vote: vote?.vote_for, created_at: nowDate }, ...snapshot!])
       return { snapshot }
     }
   })
@@ -102,7 +104,6 @@ export const useDeleteComment = () => {
   let matchIdOnParam = Number(query.get("id"));
 
   type ApiPropsType = { userId: string, commentId: number }
-  // const { setMessageToModal } = useMessageController()
   const { setToastModalMessage } = useToastModal()
   const queryClient = useQueryClient()
 
