@@ -1,4 +1,3 @@
-import React from "react";
 //! component
 import { CommentComponent } from "@/components/module/CommentComponent";
 import { Spinner } from "@/components/module/Spinner";
@@ -13,7 +12,7 @@ export const CommentsContainer = () => {
   const matchId = Number(query.get("id"));
 
   //? この試合へのコメントを取得
-  const { data: commentsData, isLoading: isFetchingComments } = useFetchCommentsOnMatch(matchId);
+  const { data: commentsData } = useFetchCommentsOnMatch(matchId);
 
   //? コメント欄をloadingにする条件
   if (!commentsData) return <Spinner />;
@@ -32,7 +31,6 @@ export const CommentsContainer = () => {
       ) : (
         <div className="text-center">コメントはありません</div>
       )}
-      {/* {isFetchingComments && <Spinner />} */}
     </>
   );
 };

@@ -1,13 +1,11 @@
-import React, { useEffect } from "react";
 import dayjs from "dayjs";
 import { FaTrashAlt } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 //! components
 import { Spinner } from "@/components/module/Spinner";
-import { ConfirmModal } from "@/components/modal/ConfirmModal";
 //! custom hooks
 import { useAuth } from "@/libs/hooks/useAuth";
-import { useDeleteComment, CommentType } from "@/libs/hooks/useComment";
+import { CommentType } from "@/libs/hooks/useComment";
 //! types
 import { useQueryState } from "@/libs/hooks/useQueryState";
 //! toast message contoller
@@ -25,38 +23,21 @@ const dateFormat = (date: Date) => {
 export const CommentComponent = ({ commentData, className }: PropsType) => {
   const { data: authUser } = useAuth();
   const { id: commentId, comment, user: postUser, created_at, vote } = commentData;
-  // const { id: userId } = useUser();
   const classname = className || "";
 
   const { clearToastModaleMessage } = useToastModal();
 
-  const {
-    deleteComment,
-    isLoading: isCommentDeleting,
-    isSuccess: isCommentDeleted,
-  } = useDeleteComment();
+  const { state: isCommentDeleting } = useQueryState("q/isCommentDeleting");
 
   //? delete対象コメントのidを共有
   const { state: deleteTargetId, setter: setDeleteTargetId } = useQueryState<number | undefined>(
     "q/deleteTargetCommentId"
   );
 
-  //? コメントの削除
-  const commentDelete = () => {
-    if (!authUser || !deleteTargetId) return;
-    setOpenDeleteConfirmModal(false);
-    deleteComment({ userId: authUser.id, commentId: deleteTargetId });
-  };
-
-  //? コメントの削除が成功したらモーダルを閉じて、対象IDをundefinedにする
-  useEffect(() => {
-    if (!isCommentDeleted) return;
-    setOpenDeleteConfirmModal(false);
-    setDeleteTargetId(undefined);
-  }, [isCommentDeleted]);
-
-  const { state: openDeleteConfirmModal, setter: setOpenDeleteConfirmModal } =
-    useQueryState<boolean>("q/openDeleteConfirmModal", false);
+  const { setter: setOpenDeleteConfirmModal } = useQueryState<boolean>(
+    "q/openDeleteConfirmModal",
+    false
+  );
 
   const clickTrashBtn = (commentId: number) => {
     clearToastModaleMessage();
@@ -97,6 +78,7 @@ export const CommentComponent = ({ commentData, className }: PropsType) => {
           </div>
         </div>
 
+        {/* //? ゴミ箱ボタン */}
         {postUser && !isNaN(commentId) && postUser.id === authUser?.id && (
           <motion.button
             whileHover={{ scale: 1.3, color: "black" }}
@@ -109,24 +91,11 @@ export const CommentComponent = ({ commentData, className }: PropsType) => {
             <FaTrashAlt />
           </motion.button>
         )}
-        {isPostingComment && isNaN(commentData.id) && (
-          <Spinner className="rounded-xl bg-black/20" />
-        )}
-        {isCommentDeleting && commentData.id === deleteTargetId && (
+        {isPostingComment && isNaN(commentId) && <Spinner className="rounded-xl bg-black/20" />}
+        {isCommentDeleting && commentId === deleteTargetId && (
           <Spinner className="rounded-xl bg-black/20" />
         )}
       </motion.div>
-      <AnimatePresence>
-        {openDeleteConfirmModal && deleteTargetId === commentData.id && (
-          <ConfirmModal
-            message={"コメントを削除しますか？"}
-            okBtnString={"削除"}
-            cancel={() => setOpenDeleteConfirmModal(false)}
-            execution={commentDelete}
-          />
-        )}
-      </AnimatePresence>
-      {/* <CommentDeleteConfirmModal isDeleting={true} commentDelete={commentDelete} /> */}
     </>
   );
 };
