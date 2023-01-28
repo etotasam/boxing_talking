@@ -20,7 +20,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('delete_matches:info')->cron('0 0 * * 0');
+        $schedule->command('delete_matches:info')->cron('0 0 * * 0');
     }
 
     /**
