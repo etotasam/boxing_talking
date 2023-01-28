@@ -7,7 +7,7 @@ import { useQueryState } from "@/libs/hooks/useQueryState"
 import { useToastModal, ModalBgColorType } from "./useToastModal";
 import { MESSAGE } from "@/libs/utils";
 //! hooks
-import { useAuth, UserType } from "@/libs/hooks/useAuth"
+import { useAuth } from "@/libs/hooks/useAuth"
 
 export type VoteType = {
   id: number,
@@ -18,6 +18,8 @@ export type VoteType = {
 
 //! ユーザの試合予想を取得(fetch user vote for predict of a match)
 export const useFetchMatchPredictVote = () => {
+  const { data: authUser } = useAuth()
+  const isAuth = Boolean(authUser)
   const queryClient = useQueryClient()
   const api = useCallback(async () => {
     const res = await Axios.get<VoteType[]>(queryKeys.vote).then(v => v.data)
@@ -25,6 +27,7 @@ export const useFetchMatchPredictVote = () => {
   }, [])
   const { data, isLoading, isRefetching } = useQuery(queryKeys.vote, api, {
     staleTime: Infinity,
+    enabled: isAuth,
     onError: () => {
       queryClient.setQueryData(queryKeys.vote, [])
     }
@@ -32,10 +35,6 @@ export const useFetchMatchPredictVote = () => {
   return { data, isLoading, isRefetching }
 }
 
-export const feetchUserVote = async () => {
-  const { data } = await Axios.get<VoteType[]>(queryKeys.vote)
-  return data
-}
 
 //! 試合予想の投票
 export const useMatchPredictVote = () => {

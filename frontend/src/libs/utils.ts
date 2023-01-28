@@ -18,6 +18,7 @@ export enum MESSAGE {
   SIGNUP_LACK_INPUT = "入力情報が不足しています",
 
   USER_REGISTER_SUCCESSFULLY = "登録が完了しました",
+  USER_REGISTER_FAILED = "登録に失敗しました",
   USER_ALREADY_EXIST = "すでに登録されているEmailです",
   USER_NAME_ALREADY_USE = "すでに使われている名前です \n 別の名前を検討してください",
 

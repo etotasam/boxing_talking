@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { WINDOW_WIDTH } from "@/libs/utils";
 //! custom hooks
 import { useQueryState } from "@/libs/hooks/useQueryState";
-import { useCreateUser } from "@/libs/hooks/useAuth";
 import { useLogin } from "@/libs/hooks/useAuth";
 import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 //! components
@@ -14,6 +13,8 @@ import { MESSAGE } from "@/libs/utils";
 export const LoginModal = () => {
   const { setter: setIsOpenLoginModal } = useQueryState<boolean>("q/isOpenLoginModal");
   const { setter: setIsOpenSignUpModal } = useQueryState<boolean>("q/isOpenSignUpModal");
+  //? HeaderのHamburgerモーダルのコントロール
+  const { setter: setIsOpenHamburgerMenu } = useQueryState<boolean>("q/isOpenHamburgerMenu");
 
   // const { createUser, isLoading: isCreatingUser, isSuccess: isSuccessCreateUser } = useCreateUser();
   const { login, isSuccess: isSuccessfullyLogin, isLoading: isLoadingLogin } = useLogin();
@@ -47,6 +48,7 @@ export const LoginModal = () => {
   useEffect(() => {
     if (!isSuccessfullyLogin) return;
     setIsOpenLoginModal(false);
+    setIsOpenHamburgerMenu(false);
     setEmail("");
     setPassword("");
   }, [isSuccessfullyLogin]);

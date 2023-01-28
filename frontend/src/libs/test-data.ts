@@ -1,6 +1,6 @@
 
-import { UserType } from "@/libs/hooks/useAuth"
 import { FighterType, Nationality, Stance } from "@/libs/hooks/useFighter"
+import type { UserType } from "@/types/user";
 
 export const test_data_fighter_1: FighterType = {
   id: 1,
@@ -30,7 +30,7 @@ export const test_data_fighter_2: FighterType = {
 export const test_data_fighters = [test_data_fighter_1, test_data_fighter_2]
 
 export const authUser: UserType = {
-  id: 1,
+  id: "1",
   name: "auth user",
   email: "authUser@test.com"
 }

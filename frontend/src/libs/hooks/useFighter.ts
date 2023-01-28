@@ -22,7 +22,8 @@ export enum Nationality {
   UK = "UK",
   Rusia = "Rusia",
   Philpin = "Philpin",
-  Ukrine = "Ukrine"
+  Ukrine = "Ukrine",
+  Canada = "Canada"
 }
 export type FighterType = {
   id: number,
@@ -116,15 +117,14 @@ export const useRegisterFighter = () => {
   const { mutate, isLoading, isError, isSuccess } = useMutation(api, {
     onMutate: async () => {
       clearToastModaleMessage()
-      if (!fightersCount) return
-      const isLeeway = !!(fightersCount % limit)
-      const pageCount = Math.ceil(fightersCount / limit)
+      const isLeeway = fightersCount ? !!(fightersCount % limit) : false
+      const pageCount = fightersCount ? Math.ceil(fightersCount / limit) : 1
       return { isLeeway, pageCount }
     }
   })
   const registerFighter = (newFighterData: FighterType) => {
     mutate(newFighterData, {
-      onSuccess: (data, newFighterData, context) => {
+      onSuccess: (_, newFighterData, context) => {
         setToastModalMessage({ message: MESSAGE.FIGHTER_REGISTER_SUCCESS, bgColor: ModalBgColorType.SUCCESS })
         queryClient.setQueryData<number>(queryKeys.countFighter, (prev) => prev! + 1)
         if (context.isLeeway) {
