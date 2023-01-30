@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { NationaFlag, checkNationality } from "@/components/module/Fighter";
+// import { NationaFlag, checkNationality } from "@/components/module/Fighter";
 import { useQueryClient } from "react-query";
 import { queryKeys } from "@/libs/queryKeys";
 import dayjs from "dayjs";
 import { WINDOW_WIDTH } from "@/libs/utils";
+//! logic
+import { getNationalFlagCssClass } from "@/libs/logic/getNationalFlagCssClass";
 //!types
 import { MatchesType } from "@/libs/hooks/useMatches";
-import { FighterType } from "@/libs/hooks/useFighter";
-import type { UserType } from "@/types/user";
+import { FighterType } from "@/libs/types";
+import { UserType } from "@/libs/types/user";
+import { NationalFlagCssClassType } from "@/libs/logic/getNationalFlagCssClass";
 //!component
 import { Chart } from "@/components/module/Chart";
 import { SimpleFighterComponent } from "../SimpleFighterComponent";
@@ -190,6 +193,8 @@ type VoteButtonPropsType = {
 const VoteButton = ({ match, userVoteColor, voteFighter, myVote }: VoteButtonPropsType) => {
   const { isLoading: isFetchingVote, isRefetching: isRefetchingVote } = useFetchMatchPredictVote();
   const { isLoading: isVoting } = useMatchPredictVote();
+
+  const isPastMatch: boolean = dayjs(match?.date).isBefore(dayjs());
   return (
     <div className="relative w-full">
       {match && userVoteColor ? (
@@ -211,7 +216,7 @@ const VoteButton = ({ match, userVoteColor, voteFighter, myVote }: VoteButtonPro
         >{`${voteFighter.name}の勝利に投票する`}</button>
       ) : (
         <div className="w-full text-stone-600 rounded px-2 py-1 border border-stone-600 text-center">
-          勝敗未投票
+          {isPastMatch ? `勝敗予想の投票期限は過ぎました` : `勝敗予想を投票しましょう`}
         </div>
       )}
       {isVoting && <Spinner />}
@@ -229,10 +234,10 @@ type MessagePropsType = {
 };
 
 const Message = ({ fighter }: MessagePropsType) => {
-  const [flag, setFlag] = useState<NationaFlag | undefined>();
+  const [flag, setFlag] = useState<NationalFlagCssClassType | undefined>();
   useEffect(() => {
     if (!fighter) return;
-    setFlag(checkNationality(fighter.country!));
+    setFlag(getNationalFlagCssClass(fighter.country!));
   }, [fighter]);
   return (
     <div className="w-full flex justify-center">
@@ -280,7 +285,7 @@ const FightersInfo = (props: FighterInfoPropsType) => {
               fighter={props.thisMatch.red}
               recordTextColor={`text-gray-200`}
               className={`w-full text-gray-200`}
-              cornerColor={windowWidth < WINDOW_WIDTH.md ? "red" : undefined}
+              cornerColor={windowWidth && windowWidth < WINDOW_WIDTH.md ? "red" : undefined}
             />
           </div>
         </div>

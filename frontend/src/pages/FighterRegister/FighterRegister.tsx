@@ -1,5 +1,5 @@
 //! type
-import { FighterType } from "@/libs/hooks/useFighter";
+import { FighterType } from "@/libs/types";
 //! component
 import { FighterEditForm } from "@/components/module/FighterEditForm";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";

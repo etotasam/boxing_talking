@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Nationality } from "@/libs/hooks/useFighter";
 //! type
-import { FighterType } from "@/libs/hooks/useFighter";
+import { FighterType } from "@/libs/types";
 //! message contoller
 import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 import { MESSAGE } from "@/libs/utils";

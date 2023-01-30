@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { queryKeys } from "@/libs/queryKeys";
 import { WINDOW_WIDTH } from "@/libs/utils";
 //! type
-import type { FighterType } from "@/libs/hooks/useFighter";
+import { FighterType } from "@/libs/types";
 //! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 //! hooks
@@ -217,7 +217,7 @@ export const MatchRegister = () => {
             {isPreviousFightersData && <PendingModal />}
           </div>
         </div>
-        {windowWidth > WINDOW_WIDTH.md && (
+        {windowWidth && windowWidth > WINDOW_WIDTH.md && (
           <div className="w-1/3 max-w-[500px]">
             <div className="flex flex-col sticky top-[200px]">
               <FighterSearchForm className="bg-stone-200" />
@@ -244,7 +244,6 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
     const result = !Object.values(matchData.fighters).some((faighter) => faighter === null);
     setIsSelectFighters(result);
   }, [matchData]);
-  const { width: windowWidth } = useGetWindowSize();
   return (
     <div className="z-10 w-[100vw] fixed top-[50px] left-0 bg-stone-600">
       <div className="flex w-full h-[150px] p-3">
@@ -254,11 +253,6 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
             className={"w-1/2 bg-stone-100"}
           />
         ) : (
-          // <Fighter
-          //   bgColorClassName="w-1/2 bg-stone-100"
-          //   fighter={matchData.fighters.red}
-          //   windowWidth={windowWidth}
-          // />
           <div className="w-1/2" />
         )}
         {matchData.fighters.blue && (
@@ -266,12 +260,6 @@ const SelectFighters = ({ submit }: SelectFightersProps) => {
             fighter={matchData.fighters.blue}
             className={"w-1/2 bg-stone-100"}
           />
-          // <Fighter
-          //   isReverse={true}
-          //   bgColorClassName="w-1/2 bg-stone-100"
-          //   fighter={matchData.fighters.blue}
-          //   windowWidth={windowWidth}
-          // />
         )}
       </div>
       {isSelectFighters && matchData.matchDate && (

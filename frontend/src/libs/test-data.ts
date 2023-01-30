@@ -1,6 +1,7 @@
 
-import { FighterType, Nationality, Stance } from "@/libs/hooks/useFighter"
-import type { UserType } from "@/types/user";
+import { Nationality, Stance } from "@/libs/hooks/useFighter"
+import { FighterType } from "@/libs/types"
+import { UserType } from "@/libs/types/user";
 
 export const test_data_fighter_1: FighterType = {
   id: 1,

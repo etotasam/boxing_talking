@@ -59,7 +59,7 @@ export const PostCommentForm = ({
     postComment({ userId: authUser.id, matchId, comment });
 
     //? コメント投稿時に投稿コメントが表示される位置までスクロールする
-    if (windowWidth < WINDOW_WIDTH.lg) {
+    if (windowWidth && windowWidth < WINDOW_WIDTH.lg) {
       const el = matchInfoRef.current?.getBoundingClientRect();
       if (!el) {
         console.error("matchInfoRefが取得できてない");

@@ -93,7 +93,7 @@ export const SignUpModal = () => {
               </button>
               {isCreatingUser && <Spinner size={20} />}
             </div>
-            {windowWidth < WINDOW_WIDTH.lg && (
+            {windowWidth && windowWidth < WINDOW_WIDTH.lg && (
               <div className="text-right mt-5">
                 <button
                   onClick={openLoginModal}

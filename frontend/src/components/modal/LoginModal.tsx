@@ -39,7 +39,7 @@ export const LoginModal = () => {
   //? window widthが指定のサイズ以上になったら閉じる
   const { width: windowWidth } = useGetWindowSize();
   useEffect(() => {
-    if (windowWidth > WINDOW_WIDTH.lg) {
+    if (windowWidth && windowWidth > WINDOW_WIDTH.lg) {
       setIsOpenLoginModal(false);
     }
   }, [windowWidth]);
