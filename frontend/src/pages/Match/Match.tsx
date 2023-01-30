@@ -29,7 +29,6 @@ export const Match = () => {
 
   //? 試合情報
   const { data: matchesData, isError: isErrorOnFetchMatches } = useFetchMatches();
-
   //? エラー情報
   const [, setHasAnyError] = useState(false);
   const errors = [isErrorOnFetchMatches];
@@ -111,7 +110,11 @@ export const Match = () => {
         {thisMatch && (
           <div
             className={`relative lg:row-start-1 lg:row-span-3 lg:col-start-2`}
-            style={windowWidth > WINDOW_WIDTH.lg ? { height: `${commentContainerHeight}px` } : {}}
+            style={
+              windowWidth && windowWidth > WINDOW_WIDTH.lg
+                ? { height: `${commentContainerHeight}px` }
+                : {}
+            }
           >
             <CommentsContainer />
           </div>

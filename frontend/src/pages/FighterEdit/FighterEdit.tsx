@@ -14,8 +14,9 @@ import {
   useUpdateFighter,
   useDeleteFighter,
   limit,
-  FighterType,
 } from "@/libs/hooks/useFighter";
+//! types
+import { FighterType } from "@/libs/types";
 //! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 //! component

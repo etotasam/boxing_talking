@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
 import { queryKeys } from "@/libs/queryKeys";
-import { NationaFlag, checkNationality } from "@/components/module/Fighter";
-// import { WINDOW_WIDTH } from "@/libs/utils";
 //! types
 import { MatchesType } from "@/libs/hooks/useMatches";
 //! component
@@ -11,9 +9,13 @@ import { PendingModal } from "@/components/modal/PendingModal";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
 import { Spinner } from "@/components/module/Spinner";
 //! hooks
-// import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useFetchMatches, useDeleteMatch, useUpdateMatch } from "@/libs/hooks/useMatches";
+//! logic
+import {
+  getNationalFlagCssClass,
+  NationalFlagCssClassType,
+} from "@/libs/logic/getNationalFlagCssClass";
 //! layout
 import { LayoutForEditPage } from "@/layout/LayoutForEditPage";
 //! message contoller
@@ -21,7 +23,6 @@ import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 import { MESSAGE } from "@/libs/utils";
 
 export const MatchEdit = () => {
-  // const [deleteMatchId, setDeleteMatchId] = React.useState<number | undefined>();
   const { state: targetMatchState, setter: setTargetMatchState } = useQueryState<
     MatchesType | undefined
   >(queryKeys.deleteMatchSub);
@@ -31,9 +32,6 @@ export const MatchEdit = () => {
 
   const { setToastModalMessage, clearToastModaleMessage } = useToastModal();
 
-  // const { width: windowWidth } = useGetWindowSize();
-
-  //todo
   const [isOpenConfirmModal, setIsOpenConfirmModal] = React.useState(false);
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -104,7 +102,6 @@ export const MatchEdit = () => {
                   name="match"
                   value={match.id}
                   checked={isCheckedId === match.id}
-                  // onChange={() => setTargetMatchState(match)}
                   onChange={(e) => onChange(e, match)}
                 />
                 <div className={"flex flex-row-reverse cursor-pointer relative"}>
@@ -158,7 +155,6 @@ const MatchEditForm = ({ matchUpdate }: MatchEditFormPropsType) => {
       return;
     }
     matchUpdate(targetMatchState);
-    // updateMatch(deleteMatchState);
   };
 
   //? 試合日を指定(編集)
@@ -191,12 +187,13 @@ const MatchEditForm = ({ matchUpdate }: MatchEditFormPropsType) => {
 };
 
 const Message = ({ MatchesData }: { MatchesData: MatchesType | undefined }) => {
-  const [redFlag, setRedFlag] = React.useState<NationaFlag | undefined>();
-  const [blueFlag, setBlueFlag] = React.useState<NationaFlag | undefined>();
+  const [redFlag, setRedFlag] = React.useState<NationalFlagCssClassType>();
+  console.log(redFlag);
+  const [blueFlag, setBlueFlag] = React.useState<NationalFlagCssClassType>();
   useEffect(() => {
     if (!MatchesData) return;
-    setRedFlag(checkNationality(MatchesData.red.country!));
-    setBlueFlag(checkNationality(MatchesData.blue.country!));
+    setRedFlag(getNationalFlagCssClass(MatchesData.red.country!));
+    setBlueFlag(getNationalFlagCssClass(MatchesData.blue.country!));
   }, [MatchesData]);
   return (
     <div>

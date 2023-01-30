@@ -10,7 +10,7 @@ import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 import { MESSAGE } from "@/libs/utils";
 
 //! types
-import { FighterType } from "@/libs/hooks/useFighter"
+import { FighterType } from "@/libs/types"
 
 //? 試合データ
 export type MatchesType = {
@@ -35,12 +35,6 @@ export const useFetchMatches = () => {
 type RegstarMatchPropsType = {
   red_fighter: FighterType,
   blue_fighter: FighterType,
-  match_date: string
-}
-
-type RegstarMatchAPIPropsType = {
-  red_fighter_id: number,
-  blue_fighter_id: number,
   match_date: string
 }
 

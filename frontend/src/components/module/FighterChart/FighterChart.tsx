@@ -3,10 +3,9 @@ import { Chart as ChartJS, RadialLinearScale, ArcElement, Tooltip, Legend } from
 import { Doughnut, Pie, getElementAtEvent } from "react-chartjs-2";
 import { MouseOn } from "@/components/module/MatchInfo";
 //! type
-import { FighterType } from "@/libs/hooks/useFighter";
+import { FighterType } from "@/libs/types";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
-// ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
 
 type Props = {
   fighterData: FighterType | undefined;

@@ -7,36 +7,26 @@ import { useLocation, useNavigate } from "react-router-dom";
 //! message contoller
 import { useToastModal, ModalBgColorType } from "./useToastModal";
 import { MESSAGE, STATUS } from "@/libs/utils";
-
+//! types
+import type { NationalityType, FighterType } from "@/libs/types"
 
 //! 選手データ
-export enum Stance {
-  Southpaw = "southpaw",
-  Orthodox = "orthodox",
-}
-export enum Nationality {
-  Japan = "Japan",
-  Mexico = "Mexico",
-  USA = "USA",
-  Kazakhstan = "Kazakhstan",
-  UK = "UK",
-  Rusia = "Rusia",
-  Philpin = "Philpin",
-  Ukrine = "Ukrine",
-  Canada = "Canada"
-}
-export type FighterType = {
-  id: number,
-  name: string,
-  country: Nationality | undefined,
-  birth: string;
-  height: number | undefined,
-  stance: Stance,
-  ko: number,
-  win: number,
-  lose: number,
-  draw: number
-}
+export const Stance = {
+  Southpaw: "southpaw",
+  Orthodox: "orthodox",
+} as const
+
+export const Nationality = {
+  Japan: "Japan",
+  Mexico: "Mexico",
+  USA: "USA",
+  Kazakhstan: "Kazakhstan",
+  UK: "UK",
+  Rusia: "Rusia",
+  Philpin: "Philpin",
+  Ukrine: "Ukrine",
+  Canada: "Canada"
+} as const
 
 //! 選手データ取得 and 登録済み選手の数を取得
 export const limit = 10
@@ -44,7 +34,7 @@ export const useFetchFighters = () => {
 
   type SearchWordType = {
     name?: string | undefined | null,
-    country?: Nationality | undefined | null
+    country?: NationalityType | undefined | null
   }
   type FetcherPropsType = {
     page: number,
@@ -57,7 +47,7 @@ export const useFetchFighters = () => {
   const query = new URLSearchParams(search);
   let paramPage = Number(query.get("page"));
   const paramName = (query.get("name"));
-  const paramCountry = (query.get("country")) as Nationality | null;
+  const paramCountry = (query.get("country")) as NationalityType | null;
   if (!paramPage) {
     paramPage = 1
   }

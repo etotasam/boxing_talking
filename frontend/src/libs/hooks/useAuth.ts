@@ -5,7 +5,7 @@ import { Axios, isAxiosError } from "../axios"
 import { useNavigate } from "react-router-dom";
 
 //! types
-import type { UserType } from "@/types/user"
+import type { UserType } from "@/libs/types/user"
 //! message contoller
 import { useToastModal, ModalBgColorType } from "./useToastModal";
 import { MESSAGE } from "@/libs/utils";
