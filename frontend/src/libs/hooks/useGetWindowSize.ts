@@ -1,8 +1,8 @@
 import React from "react"
+import { useQueryState } from "./useQueryState"
 
-export const useGetWindowSize = (): { width: number, height: number } => {
-  const [size, setSize] = React.useState<{ width: number, height: number }>({ width: 0, height: 0 })
-  // const { state: windowWidth, setter } = useQueryState<number>("q/windowWidth", 0)
+export const useGetWindowSize = (): { width: number | undefined, height: number | undefined } => {
+  const { state: size, setter: setSize } = useQueryState<{ width: number | undefined, height: number | undefined }>(`q/windowWidth`, { width: undefined, height: undefined })
 
   const getWindowSize = () => {
     const width = window.innerWidth

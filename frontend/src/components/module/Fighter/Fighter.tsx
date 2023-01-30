@@ -1,49 +1,16 @@
 import React from "react";
 import dayjs from "dayjs";
-import { FighterType, Nationality } from "@/libs/hooks/useFighter";
+import { FighterType } from "@/libs/types";
 import { WINDOW_WIDTH } from "@/libs/utils";
+//! logic
+import { getNationalFlagCssClass } from "@/libs/logic/getNationalFlagCssClass";
 
 type FighterProps = {
   fighter: FighterType;
   bgColorClassName?: string;
-  windowWidth: number;
+  windowWidth: number | undefined;
   recordTextColor?: string;
   isReverse?: boolean;
-};
-
-export enum NationaFlag {
-  Japan = "t-flag-jp",
-  Mexico = "t-flag-mx",
-  USA = "t-flag-us",
-  Kazakhstan = "t-flag-kz",
-  UK = "t-flag-uk",
-  Rusia = "t-flag-ru",
-  Philpin = "t-flag-ph",
-  Ukrine = "t-flag-ua",
-  Canada = "t-flag-canada",
-}
-
-export const checkNationality = (countory: string) => {
-  switch (countory) {
-    case Nationality.Japan:
-      return NationaFlag.Japan;
-    case Nationality.Mexico:
-      return NationaFlag.Mexico;
-    case Nationality.USA:
-      return NationaFlag.USA;
-    case Nationality.Kazakhstan:
-      return NationaFlag.Kazakhstan;
-    case Nationality.UK:
-      return NationaFlag.UK;
-    case Nationality.Rusia:
-      return NationaFlag.Rusia;
-    case Nationality.Philpin:
-      return NationaFlag.Philpin;
-    case Nationality.Ukrine:
-      return NationaFlag.Ukrine;
-    case Nationality.Canada:
-      return NationaFlag.Canada;
-  }
 };
 
 export const Fighter = React.memo(
@@ -59,13 +26,13 @@ export const Fighter = React.memo(
     const birthday = fighter.birth;
     const age = today.diff(birthday, "year");
 
-    const nationalFlag = checkNationality(fighter.country!);
+    const nationalFlag = getNationalFlagCssClass(fighter.country!);
     const textColor = recordTextColor ? recordTextColor : `text-stone-500`;
     return (
       <div className={`flex flex-col p-3 ${bgColor}`}>
-        {fighter && (
+        {fighter && windowWidth && (
           <>
-            {/* name */}
+            {/* //? name */}
             <div
               className={`flex justify-center items-center md:px-10 ${
                 isReverse && `flex-row-reverse`
@@ -97,8 +64,7 @@ export const Fighter = React.memo(
                 </div>
               )}
 
-              {/* 戦績 */}
-              {/* <div className="w-full sm:w-3/5 md:w-1/2"> */}
+              {/* //? 戦績 */}
               <div className="w-full sm:w-3/5 md:w-1/2">
                 <div className="flex">
                   <div className={`flex-1 text-xs text-center ${textColor}`}>WIN</div>
@@ -117,7 +83,6 @@ export const Fighter = React.memo(
                 <div className={`w-1/3 text-center text-xs ${textColor}`}>{`${fighter.ko} KO`}</div>
               </div>
             </div>
-            {/* </div> */}
           </>
         )}
       </div>

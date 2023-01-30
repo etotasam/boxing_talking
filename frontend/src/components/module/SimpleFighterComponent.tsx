@@ -1,8 +1,7 @@
 import React from "react";
-import dayjs from "dayjs";
-import { FighterType, Nationality } from "@/libs/hooks/useFighter";
-//! hooks
-import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
+import { FighterType } from "@/libs/types";
+//! logic
+import { getNationalFlagCssClass } from "@/libs/logic/getNationalFlagCssClass";
 
 type FighterProps = {
   fighter: FighterType;
@@ -11,43 +10,8 @@ type FighterProps = {
   cornerColor?: "red" | "blue" | `undefined`;
 };
 
-export enum NationaFlag {
-  Japan = "t-flag-jp",
-  Mexico = "t-flag-mx",
-  USA = "t-flag-us",
-  Kazakhstan = "t-flag-kz",
-  UK = "t-flag-uk",
-  Rusia = "t-flag-ru",
-  Philpin = "t-flag-ph",
-  Ukrine = "t-flag-ua",
-  Canada = "t-flag-canada",
-}
-
-export const checkNationality = (countory: string) => {
-  switch (countory) {
-    case Nationality.Japan:
-      return NationaFlag.Japan;
-    case Nationality.Mexico:
-      return NationaFlag.Mexico;
-    case Nationality.USA:
-      return NationaFlag.USA;
-    case Nationality.Kazakhstan:
-      return NationaFlag.Kazakhstan;
-    case Nationality.UK:
-      return NationaFlag.UK;
-    case Nationality.Rusia:
-      return NationaFlag.Rusia;
-    case Nationality.Philpin:
-      return NationaFlag.Philpin;
-    case Nationality.Ukrine:
-      return NationaFlag.Ukrine;
-    case Nationality.Canada:
-      return NationaFlag.Canada;
-  }
-};
-
 export const SimpleFighterComponent = (props: FighterProps) => {
-  const nationalFlag = checkNationality(props.fighter.country!);
+  const nationalFlag = getNationalFlagCssClass(props.fighter.country!);
   const textColor = props.recordTextColor ? props.recordTextColor : `text-stone-500`;
   return (
     <div className={`flex flex-col py-2 px-2 sm:px-10 ${props.className}`}>

@@ -12,7 +12,7 @@ import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
 import { MESSAGE } from "@/libs/utils";
 
 //! types
-import type { UserType } from "@/types/user";
+import type { UserType } from "@/libs/types/user";
 import dayjs from "dayjs";
 import { useQueryState } from "./useQueryState";
 

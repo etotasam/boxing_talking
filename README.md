@@ -2,7 +2,7 @@
 
 [Boxing Talking](https://www.boxtalk.xyz/)
 
-## 以下、使用言語 フレームワーク ライブラリ等
+## 使用言語 フレームワーク ライブラリ等
 
 ### Docker
 
@@ -13,10 +13,6 @@
 
 vue.js と比べて使い慣れている React を使用しています。
 型等でエラーを事前に察知してスムーズに開発できるように TypeScript を使用しています。
-
-### Framer Motion
-
-アニメーションは Framer Motion を使用しています。
 
 ### Tailwind CSS
 

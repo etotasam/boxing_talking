@@ -5,8 +5,6 @@ import { motion } from "framer-motion";
 //! component
 import { SimpleFighterComponent } from "@/components/module/SimpleFighterComponent";
 import { useEffect } from "react";
-//! hooks
-import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 
 type Props = {
   match: MatchesType;
@@ -18,17 +16,17 @@ export const MatchComponent = ({ match, bgColorClassName, onClick = () => null }
   enum MatchIs {
     TODAY = "text-red-600",
     PAST = "text-gray-400",
-    FUTURE = "text-stone-600",
+    FUTURE = "text-stone-800",
   }
-  // const { width: windowWidth } = useGetWindowSize();
   const bgColor = bgColorClassName ? bgColorClassName : `bg-white`;
   const matchDayStyle = (subjectDate: Date): MatchIs | undefined => {
-    const today = dayjs().format("YYYY/MM/DD");
-    const subDate = dayjs(subjectDate).format("YYYY/MM/DD");
-    if (today === subDate) return MatchIs.TODAY;
-    if (today > subDate) return MatchIs.PAST;
-    if (today < subDate) return MatchIs.FUTURE;
+    const today = dayjs();
+    const matchDate = dayjs(subjectDate);
+    if (matchDate.isSame(today)) return MatchIs.TODAY;
+    if (matchDate.isAfter(today)) return MatchIs.FUTURE;
+    if (matchDate.isBefore(today)) return MatchIs.PAST;
   };
+  const matchDayColor = matchDayStyle(match.date as Date);
 
   const [ratioRed, setRatioRed] = useState<string>("");
   const [ratioBlue, setRatioBlue] = useState<string>("");
@@ -72,12 +70,11 @@ export const MatchComponent = ({ match, bgColorClassName, onClick = () => null }
 
   return (
     <div
-      // onClick={() => console.log("test")}
       key={match.id}
       className={`px-1 md:px-4 rounded-xl mt-5 first:mt-0 cursor-pointer drop-shadow-sm duration-300 ${bgColor}`}
     >
       {/* //? 試合日 */}
-      <h1 className={`text-center font-thin text-lg pt-2 ${matchDayStyle(match.date as Date)}`}>
+      <h1 className={`text-center font-thin text-lg pt-2 ${matchDayColor}`}>
         {dayjs(match.date).format("YYYY/M/D")}
       </h1>
       {/* //? 勝利予想の比率 */}

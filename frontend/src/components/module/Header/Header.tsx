@@ -13,7 +13,6 @@ import { Hamburger } from "@/components/module/Hamburger";
 import { useAuth } from "@/libs/hooks/useAuth";
 import { useQueryState } from "@/libs/hooks/useQueryState";
 import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
-import axios from "axios";
 
 type Props = {
   className?: string;
@@ -33,7 +32,7 @@ export const Header = React.memo((props: Props) => {
 
   //? window widthが md より大きくなったらhamburger menu modal は閉じる
   useEffect(() => {
-    if (windowWidth >= WINDOW_WIDTH.md) {
+    if (windowWidth && windowWidth >= WINDOW_WIDTH.md) {
       setIsOpenHamburgerMenu(false);
     }
   }, [windowWidth]);
@@ -128,7 +127,7 @@ export const Header = React.memo((props: Props) => {
           >
             BOXING TALKING
           </motion.h1>
-          {windowWidth >= WINDOW_WIDTH.md && (
+          {windowWidth && windowWidth >= WINDOW_WIDTH.md && (
             <div className="text-white absolute bottom-[15px] left-[170px]">
               <ul className="flex">
                 {currentPage !== "" && (
@@ -138,7 +137,7 @@ export const Header = React.memo((props: Props) => {
                     </CustomLink>
                   </li>
                 )}
-                {authUser && authUser?.administrator == true && (
+                {authUser && authUser?.administrator === true && (
                   <li className="ml-2">
                     <CustomLink to="/fighter/register" className="">
                       Edit Page
@@ -174,12 +173,11 @@ const AuthControlComponent = () => {
 
   const { width: windowWidth } = useGetWindowSize();
 
-  //? loginモーダルの状態管理
   return (
     <>
       <div className="relative col-span-1 flex items-center justify-end">
         <p className="whitespace-nowrap absolute top-[-30px] right-0 text-right font-extralight text-sm md:text-base text-white">{`${userName}さん`}</p>
-        {windowWidth > WINDOW_WIDTH.md ? (
+        {windowWidth && windowWidth > WINDOW_WIDTH.md ? (
           <>
             <LoginOutComponent />
             {!authState && (
