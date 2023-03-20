@@ -21,8 +21,8 @@ export const LoginModal = () => {
   const { setToastModalMessage } = useToastModal();
 
   //? アカウント作成
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("test@test.com");
+  const [password, setPassword] = useState<string>("test");
 
   //? Email検証
   const emailPattern = /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
