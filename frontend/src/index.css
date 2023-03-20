@@ -57,6 +57,9 @@
   .t-flag-canada {
     background-image: url("./libs/images/flags/canada.svg");
   }
+  .t-flag-venez {
+    background-image: url("./libs/images/flags/venez.svg");
+  }
 
   .t-bg-none {
     background: none;

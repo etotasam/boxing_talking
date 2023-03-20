@@ -9,6 +9,7 @@ export const NationaFlag = {
   Philpin: "t-flag-ph",
   Ukrine: "t-flag-ua",
   Canada: "t-flag-canada",
+  Venezuela: "t-flag-venez",
 } as const;
 
 export type NationalFlagCssClassType = typeof NationaFlag[keyof typeof NationaFlag]

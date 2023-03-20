@@ -10,8 +10,8 @@ import { Spinner } from "@/components/module/Spinner";
 
 export const LoginForm = () => {
   const emailPattern = /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("test@test.com");
+  const [password, setPassword] = useState("test");
   const location = useLocation();
   const locationState = location.state;
   const [, setState] = useState(locationState as { message: string } | null);
