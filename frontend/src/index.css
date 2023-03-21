@@ -60,6 +60,9 @@
   .t-flag-venez {
     background-image: url("./libs/images/flags/venez.svg");
   }
+  .t-flag-puerto_rico {
+    background-image: url("./libs/images/flags/puerto_rico.svg");
+  }
 
   .t-bg-none {
     background: none;
