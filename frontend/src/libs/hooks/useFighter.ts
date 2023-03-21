@@ -26,7 +26,8 @@ export const Nationality = {
   Philpin: "Philpin",
   Ukrine: "Ukrine",
   Canada: "Canada",
-  Venezuela: "Venezuela"
+  Venezuela: "Venezuela",
+  Puerto_rico: "Puerto_rico"
 } as const
 
 //! 選手データ取得 and 登録済み選手の数を取得
