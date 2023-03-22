@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 // Models
 use App\Models\BoxingMatch;
@@ -21,10 +22,17 @@ class MatchController extends Controller
     public function fetch()
     {
         // throw new Exception();
-        $today = date('Y-m-d',strtotime('-2 week'));
-        $all_match = BoxingMatch::where('match_date','>',$today)->orderBy('match_date')->get();
 
-        $matches = $all_match->map(function($item, $key) {
+        // \Log::debug();
+        //? 管理者の場合のみ過去の試合を含めすべての試合を取得する
+        if (Auth::user() && Auth::user()->administrator) {
+            $all_match = BoxingMatch::orderBy('match_date')->get();
+        } else {
+            $today = date('Y-m-d', strtotime('-2 week'));
+            $all_match = BoxingMatch::where('match_date', '>', $today)->orderBy('match_date')->get();
+        }
+
+        $matches = $all_match->map(function ($item, $key) {
             $red_id = $item->red_fighter_id;
             $blue_id = $item->blue_fighter_id;
             $red_fighter = Fighter::find($red_id);
@@ -38,7 +46,7 @@ class MatchController extends Controller
                 "count_blue" => $item->count_blue
             ];
         });
-    return response()->json($matches);
+        return response()->json($matches);
     }
 
     /**
@@ -48,11 +56,11 @@ class MatchController extends Controller
      */
     public function register(Request $request)
     {
-        try{
+        try {
             $match = $request->toArray();
             BoxingMatch::create($match);
             return response()->json(["message" => "success"], 200);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return response()->json(["message" => "faild match register"], 500);
         }
     }
@@ -66,23 +74,26 @@ class MatchController extends Controller
     public function delete(Request $request)
     {
         $match_id = $request->matchId;
-        try{
+        try {
             DB::beginTransaction();
+            //? 削除対象の試合に付いているコメントを削除する
             Comment::where("match_id", $match_id)->delete();
+            //? 削除対象の試合に付いている勝敗予想を削除する
             Vote::where("match_id", $match_id)->delete();
+
             $match = BoxingMatch::find($match_id);
-            if(!isset($match)) {
+            if (!isset($match)) {
                 throw new Exception("not exit match");
             }
             $match->delete();
             DB::commit();
-            return response()->json(["message" => "match deleted"],200);
-        }catch(Exception $e){
+            return response()->json(["message" => "match deleted"], 200);
+        } catch (Exception $e) {
             DB::rollBack();
-            if($e->getMessage()) {
-                return response()->json(["message" => $e->getMessage()],500);
+            if ($e->getMessage()) {
+                return response()->json(["message" => $e->getMessage()], 500);
             }
-            return response()->json(["message" => "faild while match delete"],500);
+            return response()->json(["message" => "faild while match delete"], 500);
         }
     }
 
@@ -99,9 +110,7 @@ class MatchController extends Controller
         // \Log::debug($alter_match_data);
         try {
             BoxingMatch::find($id)->update($alter_match_data);
-        }catch(Exception $e) {
-
+        } catch (Exception $e) {
         }
     }
-
 }
