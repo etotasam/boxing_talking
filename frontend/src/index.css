@@ -24,6 +24,11 @@
     height: var(--comment-el-height);
   }
 
+  .t-champion {
+    background-image: url("./libs/images/etc/champion.svg");
+    /* background-color: red; */
+  }
+
   .t-flag {
     background-size: contain;
     background-position: center;

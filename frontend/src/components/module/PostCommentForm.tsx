@@ -37,7 +37,7 @@ export const PostCommentForm = ({
 
   //? コメントの投稿
   const post = async () => {
-    //? コメントpost中は無効にする
+    //? コメント投稿中は無効にする(連続送信回避)
     if (isPostingComment) return;
     clearToastModaleMessage();
     //? ログインしてない場合
@@ -56,6 +56,7 @@ export const PostCommentForm = ({
       });
       return;
     }
+    // ? コメントapi実行
     postComment({ userId: authUser.id, matchId, comment });
 
     //? コメント投稿時に投稿コメントが表示される位置までスクロールする
