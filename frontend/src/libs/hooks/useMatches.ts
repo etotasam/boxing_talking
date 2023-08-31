@@ -22,6 +22,14 @@ export type MatchesType = {
   count_blue: number;
 };
 
+export const useFetchMatchesTest = () => {
+  const fetcher = useCallback(async () => {
+    return await Axios.get("api/match").then(value => value.data)
+  }, [])
+  const { data, isLoading, isError, isRefetching } = useQuery<MatchesType[]>(queryKeys.match, fetcher, { suspense: true })
+  return { data, isLoading, isError, isRefetching }
+}
+
 //! 試合情報の取得
 export const useFetchMatches = () => {
   const fetcher = useCallback(async () => {

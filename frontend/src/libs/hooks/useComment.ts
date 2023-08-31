@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { queryKeys } from "@/libs/queryKeys"
 import { Axios } from "../axios"
@@ -28,13 +28,13 @@ export type CommentType = {
 };
 
 export const useFetchCommentsOnMatch = (matchId: number) => {
-  const api = useCallback(async () => {
+  const api = async () => {
     return await Axios.get(queryKeys.comments, {
       params: {
         match_id: matchId,
       },
     }).then(v => v.data)
-  }, [])
+  }
 
   const { data, isLoading, isFetching } = useQuery<CommentType[]>([queryKeys.comments, { id: matchId }], api)
 
@@ -68,11 +68,12 @@ export const usePostComment = () => {
       setIsCommentPosting(true)
       const nowDate = dayjs().format('YYYY/MM/DD H:mm')
       //? 疑似id (backendでdatabaseにコメントが登録されるまでの間、frontendで使用するid)
+      // ! 疑似idを使うとフロント側でちょっとした不具合発生。コメントのゴミ箱アイコンはcommentIdがNaNの時は表示されない様にしている。
       const temporaryId = Number(`${Math.floor(Math.random() * 1000) + dayjs().format(`HHmmSSS`)}`)
       //? userのこの試合のvote
       const vote = queryClient.getQueryData<VoteType[]>(queryKeys.vote)?.find(v => v.match_id === matchId)
       const snapshot = queryClient.getQueryData<CommentType[]>([queryKeys.comments, { id: matchId }])
-      queryClient.setQueryData([queryKeys.comments, { id: matchId }], [{ id: temporaryId, user, comment, vote: vote?.vote_for, created_at: nowDate }, ...snapshot!])
+      queryClient.setQueryData([queryKeys.comments, { id: matchId }], [{ id: NaN, user, comment, vote: vote?.vote_for, created_at: nowDate }, ...snapshot!])
       return { snapshot }
     }
   })
@@ -108,12 +109,17 @@ export const useDeleteComment = () => {
   const queryClient = useQueryClient()
 
   const api = useCallback(async ({ userId, commentId }: ApiPropsType) => {
-    await Axios.delete(queryKeys.comments, {
-      data: {
-        user_id: userId,
-        comment_id: commentId
-      },
-    })
+    try {
+      await Axios.delete(queryKeys.comments, {
+        data: {
+          user_id: userId,
+          comment_id: commentId
+        },
+      })
+    } catch (e) {
+      console.error(`■■■■■■ failed comment delete api:${e}`);
+      throw e
+    }
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {

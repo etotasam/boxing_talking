@@ -1,11 +1,11 @@
-import React from "react";
+import React, { MemoExoticComponent } from "react";
 import dayjs from "dayjs";
 import { FighterType } from "@/libs/types";
 import { WINDOW_WIDTH } from "@/libs/utils";
 //! logic
 import { getNationalFlagCssClass } from "@/libs/logic/getNationalFlagCssClass";
 
-type FighterProps = {
+export type FighterProps = {
   fighter: FighterType;
   bgColorClassName?: string;
   windowWidth: number | undefined;
@@ -38,6 +38,9 @@ export const Fighter = React.memo(
                 isReverse && `flex-row-reverse`
               }`}
             >
+              <div>
+                <span className={"t-champion t-flag block w-[25px] h-[25px]"}></span>
+              </div>
               <p className="p-2 text-base sm:text-lg font-thin text-center">{fighter.name}</p>
               <span className={`${nationalFlag} block t-flag w-[25px] h-[25px]`} />
             </div>

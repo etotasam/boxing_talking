@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-// import { Check } from "@/pages/check";
+import { Check } from "@/pages/check";
 import { Match } from "@/pages/Match";
 import { Home } from "@/pages/Home";
 import { MatchRegister } from "@/pages/MatchRegister";
@@ -18,6 +18,7 @@ import Container from "./middleware/Container";
 //! layout
 import MainLayout from "@/layout/MainLayout";
 import LayoutPlain from "./layout/LayoutPlain";
+//! lazy component
 
 function App() {
   return (
@@ -39,7 +40,7 @@ function App() {
           </Route>
         </Route>
 
-        {/* <Route path="/check" element={<Check />} /> */}
+        <Route path="/check" element={<Check />} />
         {/* <Route path="/test" element={<Test />} />
         <Route path="/test2" element={<Test2 />} /> */}
         <Route path="/register/:token/:id" element={<UserRegisterwidthVerifyEmail />} />
