@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Home } from "@/page/Home";
 // ! middleware
 import Container from "./middleware/Container";
-import "./App.css";
+import "./App.scss";
 
 function App() {
   return (

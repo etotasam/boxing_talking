@@ -3,7 +3,7 @@ import axios from "axios"
 export const { isAxiosError, CancelToken } = axios
 
 export const Axios = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: import.meta.env.VITE_APP_API_URL,
   withCredentials: true,
 })
 
