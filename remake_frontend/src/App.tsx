@@ -4,14 +4,18 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Home } from "@/page/Home";
 // ! middleware
 import Container from "./middleware/Container";
-import "./App.scss";
+import "./App.css";
+//! layout
+import MainLayout from "@/layout/MainLayout";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<Container />}>
-          <Route path="/" element={<Home />} />
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Home />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
