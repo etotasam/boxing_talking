@@ -45,8 +45,11 @@ services:
     build: ./docker/node/
     container_name: node
     volumes:
-      - "./frontend/:/usr/src/app"
-    command: npm run start
+      - "./remake_frontend/:/usr/src/app"
+    command: sh -c "yarn install && yarn dev"
+    # volumes:
+    #   - "./frontend/:/usr/src/app"
+    # command: npm run start
     ports:
       - "3000:3000"
     tty: true
