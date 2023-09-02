@@ -9,6 +9,7 @@ use App\Models\ProvisionalUser;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Vote;
+use Illuminate\Support\Str;
 use \Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\DB;
 use Exception;
@@ -52,6 +53,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(Vote::class);
     }
+
+    protected static function booted()
+    {
+        static::creating(function (User $model) {
+            empty($model->id) && $model->id = Str::uuid();
+        });
+    }
+
+    public $incrementing = false; // 自動インクリメントを無効化
+    protected $keyType = 'string'; // 主キーのデータ型をUUIDに設定
 
     public function getAdministratorAttribute($value)
     {

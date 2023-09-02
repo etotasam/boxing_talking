@@ -2,20 +2,29 @@ import React from "react";
 // ! modules
 import { Button } from "@/components/atomc/Button";
 import { DivVerticalCenter } from "@/components/atomc/DivVerticalCenter";
-import { LoginFormModal } from "@/components/modal/LoginFormModal";
+
 import { useSetRecoilState } from "recoil";
 import { loginModalSelector } from "@/store/loginModalState";
+// ! types
+import { UserType } from "@/assets/types";
 
-type Props = {
-  isShowLoginModal: boolean;
+import { useLogout } from "@/hooks/useAuth";
+// ! hooks
+import { useAuth } from "@/hooks/useAuth";
+
+type PropsType = {
+  userData: UserType;
 };
 
-export const Header = ({ isShowLoginModal }: Props) => {
+export const Header = (porps: PropsType) => {
+  const { userData } = porps;
   // ! loginモーダルの表示のOn/Offメソッド
   const setLoginModalState = useSetRecoilState(loginModalSelector);
   const toggleToLoginModal = () => {
-    setLoginModalState(!isShowLoginModal);
+    setLoginModalState(true);
   };
+
+  const { logout } = useLogout();
 
   return (
     <>
@@ -24,11 +33,16 @@ export const Header = ({ isShowLoginModal }: Props) => {
           <h1 className="text-[75px] font-thin">BOXING TALKING</h1>
         </DivVerticalCenter>
         <div className="absolute right-[50px] top-0 h-full flex justify-center items-center">
-          <Button onClick={() => toggleToLoginModal()}>ログイン</Button>
+          {userData ? (
+            <Button onClick={() => logout({ userId: userData.id! })}>
+              ログアウト
+            </Button>
+          ) : (
+            <Button onClick={() => toggleToLoginModal()}>ログイン</Button>
+          )}
         </div>
         {/* <p className="bg-red-500">test</p> */}
       </header>
-      {isShowLoginModal && <LoginFormModal />}
     </>
   );
 };

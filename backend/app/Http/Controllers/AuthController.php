@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -37,10 +38,10 @@ class AuthController extends Controller
             $password = Hash::make($request->password);
             $is_name_exist = User::where("name", $name)->exists();
             $is_email_exist = User::where("email", $email)->exists();
-            if($is_email_exist) {
+            if ($is_email_exist) {
                 throw new Exception('user already exists', Response::HTTP_FORBIDDEN);
             }
-            if($is_name_exist) {
+            if ($is_name_exist) {
                 throw new Exception('name already use', Response::HTTP_FORBIDDEN);
             }
             $user = ["name" => $name, "email" => $email, "password" => $password, "token" => $token];
@@ -54,8 +55,8 @@ class AuthController extends Controller
             //     ->subject('Boxint Taking Email確認');
             // });
             return response()->json(["message" => "created user"], Response::HTTP_CREATED);
-        }catch(Exception $e) {
-            if($e->getCode() === Response::HTTP_FORBIDDEN) {
+        } catch (Exception $e) {
+            if ($e->getCode() === Response::HTTP_FORBIDDEN) {
                 return response()->json(['message' => $e->getMessage()], Response::HTTP_FORBIDDEN);
             }
             return response()->json(['message' => "create user faild"], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -83,20 +84,20 @@ class AuthController extends Controller
             $password = Hash::make($request->password);
             $is_name_exist = User::where("name", $name)->exists();
             $is_email_exist = User::where("email", $email)->exists();
-            if($is_email_exist) {
+            if ($is_email_exist) {
                 throw new Exception('user already exists', Response::HTTP_FORBIDDEN);
             }
-            if($is_name_exist) {
+            if ($is_name_exist) {
                 throw new Exception('name already use', Response::HTTP_FORBIDDEN);
             }
             $user = ["name" => $name, "email" => $email, "password" => $password];
             User::create($user);
             return response()->json(["message" => "created user"], Response::HTTP_CREATED);
-        }catch(Exception $e) {
-            if($e->getCode() === Response::HTTP_FORBIDDEN) {
+        } catch (Exception $e) {
+            if ($e->getCode() === Response::HTTP_FORBIDDEN) {
                 return response()->json(['message' => $e->getMessage()], Response::HTTP_FORBIDDEN);
             }
-            return response()->json(['message' => "create user faild"], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['message' => "create user faild : " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         // if(Auth::attempt(['email' => $email, 'password' => $password])) {
         //     return Auth::user();
@@ -116,7 +117,7 @@ class AuthController extends Controller
         // throw new Exception();
         $email = $request->email;
         $password = $request->password;
-        if(Auth::attempt(['email' => $email, 'password' => $password])) {
+        if (Auth::attempt(['email' => $email, 'password' => $password])) {
             return Auth::user();
         }
         return response()->json(["message" => "401"], 401);
@@ -133,17 +134,16 @@ class AuthController extends Controller
         // throw new Exception();
         $user_id = $request->user_id;
         $auth_user_id = Auth::User()->id;
-        try{
-            if($user_id != $auth_user_id) {
+        try {
+            if ($user_id != $auth_user_id) {
                 throw new Exception("forbidden");
             }
             return Auth::logout();
-        }catch(Exception $e){
-            if($e->getMessage()) {
+        } catch (Exception $e) {
+            if ($e->getMessage()) {
                 return response()->json(["message" => $e->getMessage()], 403);
             }
             return response()->json(["message" => "faild whild logout"], 500);
         }
     }
-
 }
