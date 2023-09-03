@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ModifyCommentsTable extends Migration
+class DropColumnAdministrator extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class ModifyCommentsTable extends Migration
      */
     public function up()
     {
-        Schema::table('comments', function (Blueprint $table) {
-            $table->uuid('user_id')->change();
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('administrator');
         });
     }
 
@@ -25,8 +25,8 @@ class ModifyCommentsTable extends Migration
      */
     public function down()
     {
-        Schema::table('comments', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->change();
+        Schema::table('users', function (Blueprint $table) {
+            $table->boolean("administrator")->after("password")->default(0);
         });
     }
 }

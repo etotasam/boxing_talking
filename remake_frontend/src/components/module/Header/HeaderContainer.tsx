@@ -1,15 +1,14 @@
 import React from "react";
-import { useRecoilValue } from "recoil";
-import { loginModalSelector } from "@/store/loginModalState";
+// ! hooks
+import { useAuth } from "@/hooks/useAuth";
 // ! modules
 import { Header } from "./Header";
 
 export const HeaderContainer = () => {
-  const isShowLoginModal = useRecoilValue(loginModalSelector);
-
+  const { data: userData } = useAuth();
   return (
     <>
-      <Header isShowLoginModal={isShowLoginModal} />
+      <Header userData={userData} />
     </>
   );
 };

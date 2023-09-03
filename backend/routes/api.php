@@ -33,15 +33,19 @@ use App\Http\Controllers\MailController;
 /**
  * ログイン情報のチェック
  */
-Route::middleware('auth:sanctum')->group(function() {
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
+        $user = $request->user();
+        // \Log::debug($user);
         return $request->user();
     })->name('auth.user');
 
-    Route::get('/check', function() {
+    Route::get('/check', function () {
         return Auth::check();
     })->name('auth.check');
 });
+
+Route::post('/admin', [AuthController::class, 'admin'])->name('auth.admin');
 // Route::post('/user/create', [AuthController::class, 'test_create'])->name('auth.create');
 Route::post('/user/create', [AuthController::class, 'create'])->name('auth.create');
 
@@ -51,10 +55,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 //! ボクサー
 Route::get('/fighter/count', [FighterController::class, 'count'])->name('fighter.count');
 Route::get('/fighter/search', [FighterController::class, 'search'])->name('fighter.search');
-Route::get('/fighter',[FighterController::class, 'fetch'])->name('fighter.fetch');
-Route::post('/fighter',[FighterController::class, 'register'])->name('fighter.register');
+Route::get('/fighter', [FighterController::class, 'fetch'])->name('fighter.fetch');
+Route::post('/fighter', [FighterController::class, 'register'])->name('fighter.register');
 Route::put('/fighter', [FighterController::class, 'update'])->name('fighter.update');
-Route::delete('/fighter',[FighterController::class, 'delete'])->name('fighter.delete');
+Route::delete('/fighter', [FighterController::class, 'delete'])->name('fighter.delete');
 
 //! 試合
 Route::get('/match', [MatchController::class, 'fetch'])->name('match.fetch');
@@ -74,21 +78,21 @@ Route::put('/vote', [VoteController::class, 'vote'])->name('vote');
 Route::get('/mail', [MailController::class, 'send'])->name('mail.send');
 
 
-Route::get("/{match_id}/check_vote", function(string $match_id) {
+Route::get("/{match_id}/check_vote", function (string $match_id) {
     $user_id = Auth::user()->id;
     $match_id = intval($match_id);
-    $has_vote = Vote::where([["user_id", $user_id],["match_id", $match_id]])->first();
+    $has_vote = Vote::where([["user_id", $user_id], ["match_id", $match_id]])->first();
     $test = Auth::user()->votes;
     return $test;
 });
 
 
 
-Route::put("/{id}/test", function($id = null) {
+Route::put("/{id}/test", function ($id = null) {
     $data = "";
-    if($id !== null) {
+    if ($id !== null) {
         $user = User::find($id);
-    }else {
+    } else {
         $user = null;
     }
 
@@ -96,19 +100,19 @@ Route::put("/{id}/test", function($id = null) {
         // SampleJob::dispatch($user)->delay(now()->addMinutes(1));
         SampleJob::dispatch($user)->onQueue('name');
         $data = User::all();
-    }else {
+    } else {
         $data = "ログインしてね";
     }
 
     return response()->json($data);
 });
 
-Route::get('/test', function() {
+Route::get('/test', function () {
 
-    try{
+    try {
         // throw new Exception("エラーです");
         return "fetch data complete";
-    }catch(Exception $e){
-        return response()->json(["message" => $e->getMessage()],500);
+    } catch (Exception $e) {
+        return response()->json(["message" => $e->getMessage()], 500);
     }
 });
