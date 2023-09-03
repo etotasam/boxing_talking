@@ -8,7 +8,7 @@ export const Button = ({ children, className, onClick }: ButtonType) => {
     <button
       onClick={onClick}
       className={clsx(
-        `bg-black/80 hover:bg-black/60 duration-300 text-white text-sm rounded-md px-6 py-2`,
+        `bg-black/80 md:hover:bg-black/60 duration-300 text-white text-sm rounded-md px-6 py-2`,
         className
       )}
     >

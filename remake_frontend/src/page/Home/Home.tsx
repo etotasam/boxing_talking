@@ -16,7 +16,6 @@ export const Home = () => {
   };
   return (
     <>
-      <div>Home</div>
       {/* <button onClick={click}>admin check</button> */}
       <FightBox />
     </>
