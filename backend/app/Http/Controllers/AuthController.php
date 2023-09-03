@@ -13,6 +13,7 @@ use Mail;
 // models
 use App\Models\User;
 use App\Models\ProvisionalUser;
+use App\Models\Administrator;
 
 
 use \Symfony\Component\HttpFoundation\Response;
@@ -67,6 +68,7 @@ class AuthController extends Controller
         // return response()->json(["message" => "401"], 401);
     }
 
+
     /**
      * create
      *
@@ -92,6 +94,9 @@ class AuthController extends Controller
             }
             $user = ["name" => $name, "email" => $email, "password" => $password];
             User::create($user);
+            if (Auth::attempt(['email' => $email, 'password' => $request->password])) {
+                return Auth::user();
+            }
             return response()->json(["message" => "created user"], Response::HTTP_CREATED);
         } catch (Exception $e) {
             if ($e->getCode() === Response::HTTP_FORBIDDEN) {
@@ -99,10 +104,6 @@ class AuthController extends Controller
             }
             return response()->json(['message' => "create user faild : " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        // if(Auth::attempt(['email' => $email, 'password' => $password])) {
-        //     return Auth::user();
-        // }
-        // return response()->json(["message" => "401"], 401);
     }
 
     /**
@@ -144,6 +145,36 @@ class AuthController extends Controller
                 return response()->json(["message" => $e->getMessage()], 403);
             }
             return response()->json(["message" => "faild whild logout"], 500);
+        }
+    }
+
+
+
+    /**
+     * admin check
+     *
+     * @param str $user_id
+     * @return \Illuminate\Http\Response
+     */
+    public function admin(Request $request)
+    {
+        try {
+            if (!Auth::User()) {
+                throw new Exception("no auth user");
+            }
+            $req_user_id = $request->user_id;
+            $auth_id = Auth::User()->id;
+            if ($req_user_id != $auth_id) {
+                throw new Exception("illegal user");
+            }
+            $is_admin = Administrator::where("user_id", $auth_id)->exists();
+            if ($is_admin) {
+                return true;
+            } else {
+                throw false;
+            }
+        } catch (Exception $e) {
+            throw new Exception("No Admin:" . $e);
         }
     }
 }
