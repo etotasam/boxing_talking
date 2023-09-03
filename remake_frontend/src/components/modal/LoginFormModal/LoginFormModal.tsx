@@ -1,8 +1,12 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { ClearFullScreenDiv } from "@/components/atomc/ClearFullScreenDiv";
-import { useSetRecoilState } from "recoil";
 import { loginModalSelector } from "@/store/loginModalState";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+// ! recoil
+import { useSetRecoilState, useRecoilValue } from "recoil";
+import { formTypeSelector, FORM_TYPE } from "@/store/formTypeState";
+// ! components
+import { SignUpForm } from "../SignUpForm";
 // ! hooks
 import { useLogin } from "@/hooks/useAuth";
 import { useToastModal } from "@/hooks/useToastModal";
@@ -13,6 +17,8 @@ import {
 } from "@/assets/statusesOnToastModal";
 
 export const LoginFormModal = () => {
+  // ! recoil
+  const formType = useRecoilValue(formTypeSelector);
   // !loginモーダルを閉じるメソッド
   const setState = useSetRecoilState(loginModalSelector);
   const loginModalHide = () => {
@@ -24,36 +30,11 @@ export const LoginFormModal = () => {
         className="bg-stone-500/70 flex justify-center items-center"
         onClick={() => loginModalHide()}
       >
-        <PreviousOne />
-        {/* <LoginForm /> */}
+        <AnimatePresence>
+          {formType === FORM_TYPE.LOGIN_FORM && <PreviousOne />}
+          {formType === FORM_TYPE.SIGN_ON_FORM && <SignUpForm />}
+        </AnimatePresence>
       </ClearFullScreenDiv>
-    </>
-  );
-};
-
-/**
- * Login Form
- * @returns ReactNode
- */
-const LoginForm = (): ReactNode => {
-  return (
-    <>
-      <div className="w-[50%] h-[70%] min-w-[300px] min-h-[500px] max-w-[650px] max-h-[800px] rounded-lg bg-white flex justify-center items-center">
-        <div className="w-[70%] h-[70%] bg-red-500">
-          <h2 className="text-4xl text-center">ログイン</h2>
-          <form className="flex flex-col w-full h-full">
-            <input
-              className="border-[1px] border-black p-1 mt-[25px]"
-              type="text"
-            />
-            <input
-              className="border-[1px] border-black p-1 mt-[25px]"
-              type="password"
-            />
-            <button>test</button>
-          </form>
-        </div>
-      </div>
     </>
   );
 };
@@ -64,6 +45,9 @@ const PreviousOne = () => {
   const [defaultEmail, setDefaultEmail] = React.useState<string>("");
   const password = React.useRef<string>("");
   const [defaultPassword, setDefaultPassword] = React.useState<string>("");
+
+  // ! recoil
+  const setFormType = useSetRecoilState(formTypeSelector);
 
   // ! hooks
   const { showToastModal, setToastModal } = useToastModal();
@@ -115,17 +99,33 @@ const PreviousOne = () => {
         duration: 0.3,
       },
     },
+    hide: {
+      opacity: 0,
+      taransition: {
+        duration: 0.3,
+      },
+    },
+  };
+
+  const toCreateAcountForm = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setFormType(FORM_TYPE.SIGN_ON_FORM);
   };
 
   return (
-    <motion.div
-      initial="initial"
-      animate="show"
-      variants={variants}
+    <div
       onClick={(e) => e.stopPropagation()}
       className="w-1/2 min-w-[350px] max-w-[500px] h-3/5 min-h-[450px] bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
     >
-      <div className="relative w-[70%]">
+      <motion.div
+        initial="initial"
+        animate="show"
+        exit="hide"
+        variants={variants}
+        className="relative w-[70%]"
+      >
         <h1 className="absolute top-[-60px] left-0 w-full text-center text-stone-500 font-light text-xl">
           ログイン
         </h1>
@@ -135,7 +135,7 @@ const PreviousOne = () => {
             placeholder="Email"
             defaultValue={defaultEmail}
             onChange={(e) => (email.current = e.target.value)}
-            className={`mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 border-stone-400 focus:border-green-500 duration-300 bg-transparent}`}
+            className={`mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 border-stone-400 focus:border-green-500 duration-300 bg-transparent`}
           />
           <input
             type="password"
@@ -150,12 +150,15 @@ const PreviousOne = () => {
             </button>
           </div>
           <div className="text-right mt-5">
-            <button className="hover:border-b hover:border-blue-600 text-blue-600 text-sm cursor-pointer">
+            <button
+              onClick={toCreateAcountForm}
+              className="hover:border-b hover:border-blue-600 text-blue-600 text-sm cursor-pointer"
+            >
               アカウント作成
             </button>
           </div>
         </form>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };

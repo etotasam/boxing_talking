@@ -1,27 +1,22 @@
 import { useCallback } from "react"
-import { queryKeys } from "@/assets/queryKeys"
+import { QUERY_KEY } from "@/assets/queryKeys"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal"
 // import { useNavigate } from "react-router-dom";
-// ! recoil
-import { useRecoilState, useSetRecoilState } from "recoil"
-import { loadingState, loadingSelector } from "@/store/loadingState"
-import { userSelector } from "@/store/userState"
+
 // !hooks
 import { useToastModal } from "./useToastModal"
 import { useLoading } from "./useLoading"
+import { useLoginModal } from "./useLoginModal"
 //! types
 import type { UserType } from "@/assets/types"
-import { loginModalSelector } from "@/store/loginModalState"
 // //! message contoller
 // import { useToastModal, ModalBgColorType } from "./useToastModal";
 // import { MESSAGE } from "@/libs/utils";
 
 
-//! custom hooks
-// import { useFetchMatchPredictVote } from "@/libs/hooks/useMatchPredict"
-// import { useQueryState } from "@/libs/hooks/useQueryState"
+
 
 // export enum AuthIs {
 //   TRUE = "TRUE",
@@ -63,7 +58,7 @@ export const useAuth = () => {
       return null
     }
   }, [])
-  const { data, isLoading, isError } = useQuery<UserType>(queryKeys.auth, api, {
+  const { data, isLoading, isError } = useQuery<UserType>(QUERY_KEY.auth, api, {
     retry: false,
     staleTime: Infinity
   })
@@ -72,58 +67,61 @@ export const useAuth = () => {
 }
 
 //! ユーザ作成
-// export const useCreateUser = () => {
+export const useCreateUser = () => {
 
-//   type ApiPropsType = {
-//     name: string,
-//     email: string,
-//     password: string
-//   }
-//   const { setter: setIsOpenSignUpModal } = useQueryState<boolean>("q/isOpenSignUpModal")
-//   const { setToastModalMessage } = useToastModal()
-//   const api = useCallback(async ({ name, email, password }: ApiPropsType) => {
-//     return await Axios.post(`/api/user/create`, { name, email, password }).then(value => value.data)
-//   }, [])
-//   const { mutate, isLoading, isSuccess } = useMutation(api)
-//   const createUser = ({ name, email, password }: ApiPropsType) => {
-//     mutate({ name, email, password }, {
-//       onSuccess: () => {
-//         setToastModalMessage({ message: MESSAGE.USER_REGISTER_SUCCESSFULLY, bgColor: ModalBgColorType.SUCCESS })
-//         setIsOpenSignUpModal(false)
-//       },
-//       onError: (error: any) => {
-//         if (error.data.message === 'user already exists') {
-//           setToastModalMessage({ message: MESSAGE.USER_ALREADY_EXIST, bgColor: ModalBgColorType.NOTICE })
-//           return
-//         }
-//         if (error.data.message === 'name already use') {
-//           setToastModalMessage({ message: MESSAGE.USER_NAME_ALREADY_USE, bgColor: ModalBgColorType.NOTICE })
-//           return
-//         }
-//         setToastModalMessage({ message: MESSAGE.USER_REGISTER_FAILED, bgColor: ModalBgColorType.ERROR })
-//       }
-//     })
-//   }
-//   return { createUser, isLoading, isSuccess }
-// }
+  // ? react query
+  const queryClient = useQueryClient()
+  // ? toast modal
+  const { setToastModal, showToastModal } = useToastModal()
+  // ? Loading state (hook)
+  const { resetLoadingState, startLoading, hasError, successful, endLoading } = useLoading()
+  // ? login modal (hook)
+  const { hideLoginModal } = useLoginModal()
+
+  type ApiPropsType = {
+    name: string,
+    email: string,
+    password: string
+  }
+  const api = useCallback(async ({ name, email, password }: ApiPropsType) => {
+    const res = await Axios.post<UserType>(`/api/user/create`, { name, email, password }).then(value => value.data)
+    return res
+  }, [])
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
+    onMutate: () => {
+      startLoading()
+    }
+  })
+  const createUser = ({ name, email, password }: ApiPropsType) => {
+    mutate({ name, email, password }, {
+      onSuccess: (registerUserData) => {
+        queryClient.setQueryData<UserType>(QUERY_KEY.auth, registerUserData)
+        successful()
+        setToastModal({ message: MESSAGE.USER_REGISTER_SUCCESSFULLY, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+        showToastModal()
+        hideLoginModal()
+      },
+
+      onError: (error: any) => {
+        hasError()
+        setToastModal({ message: MESSAGE.USER_REGISTER_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showToastModal()
+      }
+    })
+  }
+  return { createUser, isLoading, isSuccess }
+}
 
 //! ログイン
 export const useLogin = () => {
-
+  // ? react query
+  const queryClient = useQueryClient()
+  // ? toast modal
   const { setToastModal, showToastModal } = useToastModal()
-
+  // ? Loading state
   const { resetLoadingState, startLoading, hasError, successful, endLoading } = useLoading()
-  const [, setLoginModalState] = useRecoilState(loginModalSelector)
-  const [, setUserState] = useRecoilState(userSelector)
-
-  /**
-   * ! Recoil
-   * ? login modal を非表示にする
-   * @returns {void}
-   */
-  const hideLoginModal = () => {
-    setLoginModalState(false)
-  }
+  // ? login modal (hook)
+  const { hideLoginModal } = useLoginModal()
 
   const api = useCallback(async (props: { email: string, password: string }) => {
     const res = await Axios.post<UserType>("api/login", { ...props }).then(value => value.data)
@@ -141,7 +139,8 @@ export const useLogin = () => {
       // ! ログイン成功時
       onSuccess: (userData) => {
         console.log("ログイン成功");
-        setUserState(userData)
+        // ? ログインユーザーをreact query内でキャッシュする
+        queryClient.setQueryData<UserType>(QUERY_KEY.auth, userData)
         successful()
         setToastModal({ message: MESSAGE.LOGIN_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
@@ -160,9 +159,13 @@ export const useLogin = () => {
 }
 //! ログアウト
 export const useLogout = () => {
+  // ? react query
+  const queryClient = useQueryClient()
+  // ? toast message modal
   const { setToastModal, showToastModal } = useToastModal()
+  // ? Loading state
   const { resetLoadingState, startLoading, hasError, successful, endLoading } = useLoading()
-
+  // ? api
   const api = useCallback(async ({ userId }: { userId: string }) => {
     await Axios.post<void>("api/logout", { user_id: userId }).then(value => value.data)
   }, [])
@@ -175,14 +178,15 @@ export const useLogout = () => {
   const logout = useCallback(({ userId }: { userId: string }) => {
     mutate({ userId }, {
       onSuccess: () => {
-        console.log("logoug error");
+        // ? ユーザー情報のキャッシュをclear
+        queryClient.setQueryData(QUERY_KEY.auth, undefined)
         successful()
         setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
         showToastModal()
         // //? ユーザの勝敗予想データのキャッシュを削除
-        // queryClient.setQueryData(queryKeys.vote, [])
+        // queryClient.setQueryData(QUERY_KEY.vote, [])
         // //? auth を削除
-        // queryClient.setQueryData<boolean>(queryKeys.auth, false)
+        // queryClient.setQueryData<boolean>(QUERY_KEY.auth, false)
         // navigate("/")
         resetLoadingState()
       },
@@ -196,4 +200,43 @@ export const useLogout = () => {
     })
   }, [])
   return { logout, isLoading, isSuccess }
+}
+
+
+// ! 管理者判定
+export const useAdmin = () => {
+  // ? react query
+  const queryClient = useQueryClient()
+  // ? Loading state
+  const { resetLoadingState, startLoading, hasError, successful, endLoading } = useLoading()
+  // ? api
+  const api = useCallback(async ({ userId }: { userId: string | undefined }) => {
+    try {
+      const res = await Axios.post<boolean>("api/admin", { user_id: userId }).then(value => value.data)
+      return res
+    } catch (error) {
+      return
+    }
+  }, [])
+
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
+    onMutate: () => {
+      startLoading()
+    }
+  })
+
+  const isAdmin = useCallback(({ userId }: { userId: string | undefined }) => {
+    mutate({ userId }, {
+      onSuccess: (isAdmin) => {
+        queryClient.setQueryData<boolean | undefined>(QUERY_KEY.admin, isAdmin)
+        console.log(`is admin: ${isAdmin}`);
+        resetLoadingState()
+      },
+      onError: () => {
+        console.log("has error on validat admin");
+        resetLoadingState()
+      }
+    })
+  }, [])
+  return { isAdmin }
 }

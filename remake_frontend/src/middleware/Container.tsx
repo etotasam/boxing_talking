@@ -8,6 +8,7 @@ import { useToastModal } from "@/hooks/useToastModal";
 import { ToastModalContainer } from "@/components/modal/ToastModal";
 import { LoginFormModal } from "@/components/modal/LoginFormModal";
 import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
+import { FirstLoadinModal } from "@/components/modal/FirstLoadinModal";
 // ! recoil
 import { useRecoilValue } from "recoil";
 import { loginModalSelector } from "@/store/loginModalState";
@@ -18,7 +19,7 @@ const Container = () => {
   const isShowLoginModal = useRecoilValue(loginModalSelector);
   const { isLoading: isAttemptingLogin } = useRecoilValue(loadingSelector);
 
-  const { data: userData, isError } = useAuth();
+  const { data: userData, isError, isLoading: isFirstCheckingAuth } = useAuth();
 
   //? cookieでログインチェック。なければfalseを入れる
   React.useEffect(() => {
@@ -52,6 +53,7 @@ const Container = () => {
         isShowToastModal={isShowToastModal}
         isShowLoginModal={isShowLoginModal}
         isAttemptingLogin={isAttemptingLogin}
+        isFirstCheckingAuth={isFirstCheckingAuth}
       />
     </>
   );
@@ -63,6 +65,7 @@ type ModalesData = {
   isShowToastModal: boolean;
   isShowLoginModal: boolean;
   isAttemptingLogin: boolean | undefined;
+  isFirstCheckingAuth: boolean;
 };
 
 /**
@@ -75,6 +78,7 @@ const Modales = (props: ModalesData) => {
     <>
       <AnimatePresence>
         {props.isShowToastModal && <ToastModalContainer />}
+        {props.isFirstCheckingAuth && <FirstLoadinModal />}
       </AnimatePresence>
       {props.isShowLoginModal && <LoginFormModal />}
       {props.isAttemptingLogin && <FullScreenSpinnerModal />}

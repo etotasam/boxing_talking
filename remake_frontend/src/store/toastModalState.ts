@@ -1,5 +1,5 @@
 import { atom, selector } from "recoil";
-import { MessageType, BgColorType } from "@/assets/statusesOnToastModal";
+import { MessageType, BgColorType } from "@/assets/types"
 
 
 type StateType = {
