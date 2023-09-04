@@ -118,10 +118,14 @@ class AuthController extends Controller
         // throw new Exception();
         $email = $request->email;
         $password = $request->password;
-        if (Auth::attempt(['email' => $email, 'password' => $password])) {
-            return Auth::user();
+        try {
+            if (Auth::attempt(['email' => $email, 'password' => $password])) {
+                return Auth::user();
+            }
+            return new Exception("Failed Login 401");
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage(), 401]);
         }
-        return response()->json(["message" => "401"], 401);
     }
 
     /**
@@ -171,10 +175,13 @@ class AuthController extends Controller
             if ($is_admin) {
                 return true;
             } else {
-                throw false;
+                return response()->json(["message" => "failed", 401]);
             }
         } catch (Exception $e) {
-            throw new Exception("No Admin:" . $e);
+            if ($e->getMessage() == "no auth user") {
+                return response()->json(["message" => $e->getMessage(), 401]);
+            }
+            return response()->json(["message" => $e->getMessage(), 500]);
         }
     }
 }

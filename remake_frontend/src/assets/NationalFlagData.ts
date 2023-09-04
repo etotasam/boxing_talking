@@ -28,8 +28,8 @@ export const NationaFlag = {
   Puerto_rico: "t-flag-puerto_rico",
 } as const;
 
-export type NationalFlagCssClassType = typeof NationaFlag[keyof typeof NationaFlag]
 
-export const getNationalFlagCssClass = (country: NationalityType): NationalFlagCssClassType => {
-  return NationaFlag[country]
-}
+
+// export const getNationalFlagCssClass = (country: NationalityType): NationalFlagCssClassType => {
+//   return NationaFlag[country]
+// }

@@ -6,33 +6,35 @@ import crown from "@/assets/images/etc/champion.svg";
 import { Nationality } from "@/assets/NationalFlagData";
 // ! types
 import { BoxerType, NationalityType, FightInfoType } from "@/assets/types";
+// ! data
+import { Stance } from "@/assets/boxerData";
 
 const boxer_1: BoxerType = {
   name: "井上 尚弥",
   engName: "Naoya Inoue",
-  age: 30,
+  birth: "30",
   height: 165,
   reach: 171,
-  style: "オーソドックス",
+  style: Stance.Orthodox,
   country: Nationality.Japan,
   haveTitle: ["WBO世界Sバンタム級王者", "WBC世界Sバンタム級王者"],
   win: 25,
   ko: 23,
-  drwa: 0,
+  draw: 0,
   lose: 0,
 };
 const boxer_2: BoxerType = {
   name: "タパレス",
   engName: "Marlon Tapales",
-  age: 31,
+  birth: "31",
   height: 163,
   reach: 165,
-  style: "サウスポー",
+  style: Stance.Southpaw,
   country: Nationality.Philpin,
   haveTitle: [],
   win: 37,
   ko: 19,
-  drwa: 0,
+  draw: 0,
   lose: 3,
 };
 
@@ -96,8 +98,8 @@ const BoxerInfo = ({ boxer }: { boxer: BoxerType }) => {
                   {boxer.ko}
                 </span>
               </li>
-              <li className="relative flex-1 bg-gray-500 before:content-['DRWA'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm before:text-gray-600">
-                {boxer.drwa}
+              <li className="relative flex-1 bg-gray-500 before:content-['DRAW'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm before:text-gray-600">
+                {boxer.draw}
               </li>
               <li className="relative flex-1 bg-stone-800 before:content-['LOSE'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm before:text-gray-600">
                 {boxer.lose}
@@ -111,7 +113,7 @@ const BoxerInfo = ({ boxer }: { boxer: BoxerType }) => {
                 <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">
                   年齢
                 </p>
-                <p className="flex-1">{boxer.age}</p>
+                <p className="flex-1">{boxer.birth}</p>
               </li>
               <li className="flex justify-between mt-2">
                 <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">
