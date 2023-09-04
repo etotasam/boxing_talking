@@ -13,7 +13,8 @@ const generateQueryKey = (key: string) => {
 
 export const QUERY_KEY = {
   auth: generateQueryKey('auto'),
-  admin: generateQueryKey('admin')
+  admin: generateQueryKey('admin'),
+  boxer: generateQueryKey('boxer'),
 } as const
 
 

@@ -16,7 +16,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\VoteController;
-use App\Http\Controllers\FighterController;
+use App\Http\Controllers\BoxerController;
 use App\Http\Controllers\MailController;
 
 /*
@@ -54,12 +54,12 @@ Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
 //! ボクサー
-Route::get('/fighter/count', [FighterController::class, 'count'])->name('fighter.count');
-Route::get('/fighter/search', [FighterController::class, 'search'])->name('fighter.search');
-Route::get('/fighter', [FighterController::class, 'fetch'])->name('fighter.fetch');
-Route::post('/fighter', [FighterController::class, 'register'])->name('fighter.register');
-Route::put('/fighter', [FighterController::class, 'update'])->name('fighter.update');
-Route::delete('/fighter', [FighterController::class, 'delete'])->name('fighter.delete');
+Route::get('/boxer/count', [BoxerController::class, 'count'])->name('boxer.count');
+Route::get('/boxer/search', [BoxerController::class, 'search'])->name('boxer.search');
+Route::get('/boxer', [BoxerController::class, 'fetch'])->name('boxer.fetch');
+Route::post('/boxer', [BoxerController::class, 'register'])->name('boxer.register');
+Route::put('/boxer', [BoxerController::class, 'update'])->name('boxer.update');
+Route::delete('/boxer', [BoxerController::class, 'delete'])->name('boxer.delete');
 
 //! 試合
 Route::get('/match', [MatchController::class, 'fetch'])->name('match.fetch');
@@ -77,6 +77,9 @@ Route::put('/vote', [VoteController::class, 'vote'])->name('vote');
 
 //! メールテスト
 Route::get('/mail', [MailController::class, 'send'])->name('mail.send');
+
+//! テストapi
+Route::post('/testtest', [BoxerController::class, 'testtest'])->name('mail.testtest');
 
 
 Route::get("/{match_id}/check_vote", function (string $match_id) {

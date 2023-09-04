@@ -1,5 +1,5 @@
 // ! data
-import { Stance } from "@/assets/boxerData";
+import { Stance, ORGANIZATIONS, WEIGHT_CLASS } from "@/assets/boxerData";
 import { Nationality } from "@/assets/NationalFlagData"
 
 export type UserType = {
@@ -17,18 +17,26 @@ export type NationalityType = typeof Nationality[keyof typeof Nationality]
 // ? ボクサー情報
 export type BoxerType = {
   name: string;
-  engName: string;
+  eng_name: string;
   birth: string;
   height: number;
   reach: number;
   style: StanceType;
   country: NationalityType;
-  haveTitle: string[];
+  title_hold: string[];
   win: number;
   ko: number;
   draw: number;
   lose: number;
 };
+
+export type TitleType = {
+  organization:
+  | (typeof ORGANIZATIONS)[keyof typeof ORGANIZATIONS]
+  | undefined;
+  weightClass: (typeof WEIGHT_CLASS)[keyof typeof WEIGHT_CLASS] | undefined;
+};
+
 
 export type StanceType = typeof Stance[keyof typeof Stance]
 
