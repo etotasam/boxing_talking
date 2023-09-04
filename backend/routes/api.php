@@ -34,11 +34,12 @@ use App\Http\Controllers\MailController;
  * ログイン情報のチェック
  */
 Route::middleware('auth:sanctum')->group(function () {
+
     Route::get('/user', function (Request $request) {
-        $user = $request->user();
-        // \Log::debug($user);
+        // \Log::debug("てすと");
         return $request->user();
     })->name('auth.user');
+
 
     Route::get('/check', function () {
         return Auth::check();

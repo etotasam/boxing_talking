@@ -3,6 +3,7 @@ import { useAdmin } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "react-query";
 import { QUERY_KEY } from "@/assets/queryKeys";
 import { UserType } from "@/assets/types";
+import { Link } from "react-router-dom";
 // ! components
 import { FightBox } from "@/components/module/FightBox";
 
@@ -16,8 +17,8 @@ export const Home = () => {
   };
   return (
     <>
-      <div>Home</div>
       {/* <button onClick={click}>admin check</button> */}
+      <Link to="/admini/boxer_register">admini</Link>
       <FightBox />
     </>
   );

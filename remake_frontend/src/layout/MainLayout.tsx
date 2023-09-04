@@ -40,7 +40,7 @@ const MainLayout = React.memo(() => {
   //   isCommentPosting;
 
   return (
-    <div className="">
+    <div className="text-stone-700">
       <HeaderContainer />
       <main
       // className={`min-h-[calc(100vh-50px)] pt-[100px] mx-auto max-w-[1024px]`}
