@@ -1,3 +1,4 @@
+import _ from "lodash";
 // ! data
 import {
   BG_COLOR_ON_TOAST_MODAL,
@@ -12,7 +13,7 @@ import AdminiLayout from "@/layout/AdminiLayout";
 import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
 import { useToastModal } from "@/hooks/useToastModal";
 import { useRegisterBoxer } from "@/hooks/useBoxer";
-import { BoxerDataOnFormType, BoxerType } from "@/assets/types";
+import { BoxerType } from "@/assets/types";
 
 export const BoxerRegister = () => {
   // ! use hook

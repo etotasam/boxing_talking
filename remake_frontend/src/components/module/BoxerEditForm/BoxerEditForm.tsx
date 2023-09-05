@@ -6,9 +6,9 @@ import { ORGANIZATIONS, WEIGHT_CLASS } from "@/assets/boxerData";
 //! type
 import {
   BoxerType,
-  BoxerDataOnFormType,
   StanceType,
   TitleType,
+  BoxerDataOnFormType,
 } from "@/assets/types";
 // ! hooks
 import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
@@ -19,7 +19,7 @@ type PropsType = {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   className?: string;
   isPending?: boolean;
-  editTargetBoxerData?: BoxerType;
+  editTargetBoxerData?: BoxerType | BoxerDataOnFormType;
   isSuccessRegisterFighter?: boolean;
 };
 
@@ -149,7 +149,7 @@ export const BoxerEditForm = (props: PropsType) => {
               min="1970-01-01"
               value={boxerDataOnForm?.birth}
               onChange={(e) =>
-                setBoxerDataToForm((prev: BoxerDataOnFormType) => {
+                setBoxerDataToForm((prev: any) => {
                   return { ...prev, birth: e.target.value };
                 })
               }

@@ -170,7 +170,7 @@ export const BoxerEdit = () => {
     //   return;
     // }
     //? ボクサーデータ編集実行
-    updateFighter(editTargetBoxerData);
+    // updateFighter(editTargetBoxerData);
   };
 
   //? page数の計算
