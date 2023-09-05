@@ -23,6 +23,7 @@ const Header = () => {
     { pathName: "Home", path: "/" },
     { pathName: "ボクサー登録", path: "/admini/boxer_register" },
     { pathName: "ボクサー編集", path: "/admini/boxer_edit" },
+    { pathName: "試合登録", path: "/admini/match_register" },
   ];
 
   return (
