@@ -29,6 +29,7 @@ export const BoxerEditForm = (props: PropsType) => {
   // ! use hook
   const { state: boxerDataOnForm, setter: setBoxerDataToForm } =
     useBoxerDataOnForm();
+  console.log(boxerDataOnForm);
 
   // const decomposeTitleHole = () => {
   //   const belts = boxerDataOnForm.title_hold;
@@ -276,7 +277,7 @@ export const BoxerEditForm = (props: PropsType) => {
 
           {/* //! ベルト */}
           <div className="mt-3">
-            <TitleSelector titles={titles} setTitles={setTitles} />
+            <TitleSelector />
           </div>
 
           <div className="relative mt-10">

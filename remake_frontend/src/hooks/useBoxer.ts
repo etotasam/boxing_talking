@@ -14,7 +14,9 @@ import { useLoading } from "./useLoading"
 import { useToastModal } from "./useToastModal";
 import { MESSAGE, STATUS, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal";
 // //! types
-import type { BgColorType, BoxerType, NationalityType } from "@/assets/types"
+import type { BgColorType, BoxerDataOnFormType, BoxerType, NationalityType } from "@/assets/types"
+// ! functions
+import { convertToBoxerData } from "@/assets/functions";
 
 
 //! 選手データ取得 and 登録済み選手の数を取得
@@ -92,8 +94,9 @@ export const useUpdateBoxerData = () => {
       // return { isLeeway, pageCount }
     }
   })
-  const updateFighter = (updateFighterData: BoxerType) => {
-    mutate(updateFighterData, {
+  const updateFighter = (updateFighterData: BoxerDataOnFormType) => {
+    const convertedBoxerData = convertToBoxerData(updateFighterData)
+    mutate(convertedBoxerData, {
       onSuccess: () => {
         refetchReactQueryData(QUERY_KEY.boxer)
         resetLoadingState()

@@ -1,7 +1,7 @@
 // ! types
 import _ from "lodash"
 // ! recoil
-import { useRecoilState, useSetRecoilState, useRecoilValue } from "recoil"
+import { useSetRecoilState, useRecoilValue } from "recoil"
 import { boxerDataOnFormSelector } from "@/store/boxerDataOnFormState";
 import { useEffect } from "react";
 // ! data
@@ -17,7 +17,7 @@ export const useBoxerDataOnForm = () => {
 
   const isBoxerDataOnFormType = (data: BoxerDataOnFormType | BoxerType | typeof innerSetter): data is BoxerDataOnFormType => {
     if (typeof data !== "function") {
-      return _.isObject(data.title_hold)
+      return _.every(data.title_hold, _.isObject)
     }
     return false
   }
@@ -26,7 +26,7 @@ export const useBoxerDataOnForm = () => {
   const convertBoxerDataToFormData = (boxerData: BoxerDataOnFormType | BoxerType): BoxerDataOnFormType => {
     const cloneData = _.cloneDeep(boxerData)
 
-    if (boxerData.title_hold.length) {
+    if (!boxerData.title_hold.length) {
       return cloneData as BoxerDataOnFormType
     }
 
@@ -54,11 +54,9 @@ export const useBoxerDataOnForm = () => {
     }
   }
 
-  const setter = (argData: ((arg: BoxerDataOnFormType | BoxerType) => void) | BoxerDataOnFormType | BoxerType) => {
-    // let newValue
+  const setter = (argData: ((arg: BoxerDataOnFormType) => void) | BoxerDataOnFormType | BoxerType) => {
     if (typeof argData === "function") {
-      // const nowValue = state
-      innerSetter(arg => arg)
+      innerSetter(argData as any)
     } else {
       const data = convertBoxerDataToFormData(argData)
       innerSetter(data)
