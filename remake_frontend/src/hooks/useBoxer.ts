@@ -1,109 +1,122 @@
 import { useCallback, useState, useEffect } from "react"
+import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { Axios } from "@/assets/axios"
 // ! data
 import { QUERY_KEY } from "@/assets/queryKeys"
 // import {  } from "@/components/module/BoxerEditForm";
-// import { useLocation, useNavigate } from "react-router-dom";
-// //! message contoller
-// // import { useToastModal, ModalBgColorType } from "./useToastModal";
-// // import { MESSAGE, STATUS } from "@/libs/utils";
+// ! recoil
+// import { useSetRecoilState } from "recoil"
+// import {loadingSelector} from "@/store/loadingState"
+// //! hooks
+import { useReactQuery } from "./useReactQuery";
+import { useLoading } from "./useLoading"
+import { useToastModal } from "./useToastModal";
+import { MESSAGE, STATUS, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal";
 // //! types
-import type { NationalityType, BoxerType } from "@/assets/types"
+import type { BgColorType, BoxerType, NationalityType } from "@/assets/types"
 
-// //! 選手データ
-// export const Stance = {
-//   Southpaw: "southpaw",
-//   Orthodox: "orthodox",
-// } as const
 
-// export const Nationality = {
-//   Japan: "Japan",
-//   Mexico: "Mexico",
-//   USA: "USA",
-//   Kazakhstan: "Kazakhstan",
-//   UK: "UK",
-//   Rusia: "Rusia",
-//   Philpin: "Philpin",
-//   Ukrine: "Ukrine",
-//   Canada: "Canada",
-//   Venezuela: "Venezuela",
-//   Puerto_rico: "Puerto_rico"
-// } as const
+//! 選手データ取得 and 登録済み選手の数を取得
+export const limit = 10
+export const useFetchBoxer = () => {
 
-// //! 選手データ取得 and 登録済み選手の数を取得
-// export const limit = 10
-// export const useFetchFighters = () => {
+  type SearchWordType = {
+    name?: string | null
+    country?: NationalityType | null
+  }
+  type FetcherPropsType = {
+    page: number,
+    limit: number,
+    searchWords: SearchWordType | undefined
+  }
 
-//   type SearchWordType = {
-//     name?: string | undefined | null,
-//     country?: NationalityType | undefined | null
-//   }
-//   type FetcherPropsType = {
-//     page: number,
-//     limit: number,
-//     searchWords: SearchWordType | undefined
-//   }
+  //? params の取得
+  const { search } = useLocation();
+  const query = new URLSearchParams(search);
+  let paramPage = Number(query.get("page"));
+  const paramName = (query.get("name"));
+  const paramCountry = (query.get("country")) as NationalityType | null;
+  if (!paramPage) {
+    paramPage = 1
+  }
+  const fetchBoxerApi = async ({ page, limit, searchWords }: FetcherPropsType) => {
+    const res = await Axios.get<BoxerType[]>("/api/boxer", { params: { page, limit, ...searchWords } }).then(value => value.data)
+    return res
+  }
+  const { data: boxersData, isLoading, isError, isPreviousData, refetch, isRefetching } = useQuery<BoxerType[]>([QUERY_KEY.boxer, { page: paramPage }], () => fetchBoxerApi({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), { keepPreviousData: true, staleTime: Infinity })
 
-//   //? params の取得
-//   const { search } = useLocation();
-//   const query = new URLSearchParams(search);
-//   let paramPage = Number(query.get("page"));
-//   const paramName = (query.get("name"));
-//   const paramCountry = (query.get("country")) as NationalityType | null;
-//   if (!paramPage) {
-//     paramPage = 1
-//   }
-//   const fetchFightersApi = async ({ page, limit, searchWords }: FetcherPropsType) => {
-//     const res = await Axios.get<BoxerType[]>(QUERY_KEY.boxer, { params: { page, limit, ...searchWords } }).then(value => value.data)
-//     return res
-//   }
-//   const { data, isLoading, isError, isPreviousData, refetch, isRefetching } = useQuery<BoxerType[]>([QUERY_KEY.boxer, { page: paramPage }], () => fetchFightersApi({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), { keepPreviousData: true, staleTime: Infinity })
-
-//   const fetchFightersCount = async (searchWords: SearchWordType) => await Axios.get<number>(queryKeys.countFighter, { params: { ...searchWords } }).then(v => v.data)
-//   const { data: count } = useQuery<number>(queryKeys.countFighter, () => fetchFightersCount({ name: paramName, country: paramCountry }), { staleTime: Infinity })
-//   return { data, count, isLoading, isError, isPreviousData, refetch, isRefetching }
-// }
+  const fetchCountBoxer = async (searchWords: SearchWordType) => await Axios.get<number>("/api/boxer/count", { params: { ...searchWords } }).then(v => v.data)
+  const { data: boxersCount } = useQuery<number>(QUERY_KEY.countBoxer, () => fetchCountBoxer({ name: paramName, country: paramCountry }), { staleTime: Infinity })
+  return { boxersData, boxersCount, isLoading, isError, isPreviousData, refetch, isRefetching }
+}
 
 // //! 選手データ更新
-// export const useUpdateFighter = () => {
-//   const queryClient = useQueryClient()
-//   //? params page の取得
-//   const { search } = useLocation();
-//   const query = new URLSearchParams(search);
-//   let paramPage = Number(query.get("page"));
-//   const { setToastModalMessage } = useToastModal()
-//   const snapshotFighters = queryClient.getQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: paramPage }])
-//   const api = async (updateFighterData: BoxerType): Promise<Record<string, string> | void> => {
-//     try {
-//       //? 編集した選手データを含めた全選手データ
-//       const updateFightersData = snapshotFighters?.reduce((acc: BoxerType[], curr: BoxerType) => {
-//         if (curr.id === updateFighterData.id) {
-//           return [...acc, updateFighterData];
-//         }
-//         return [...acc, curr];
-//       }, []);
-//       await Axios.put(QUERY_KEY.boxer, updateFighterData);
-//       queryClient.setQueryData([QUERY_KEY.boxer, { page: paramPage }], updateFightersData)
-//       setToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: ModalBgColorType.SUCCESS });
-//     } catch (error) {
-//       console.error("選手データ更新:", error);
-//       queryClient.setQueryData([QUERY_KEY.boxer, { page: paramPage }], snapshotFighters)
-//       setToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_FAILD, bgColor: ModalBgColorType.ERROR });
-//     }
-//   }
-//   const { mutate, isLoading, isSuccess } = useMutation(api)
-//   const updateFighter = (updateFighterdata: BoxerType) => {
-//     mutate(updateFighterdata)
-//   }
-//   return { updateFighter, isLoading, isSuccess }
-// }
+export const useUpdateBoxerData = () => {
+  const { startLoading, resetLoadingState, successful, hasError } = useLoading()
+  const { refetchReactQueryData } = useReactQuery()
+  // const queryClient = useQueryClient()
+  //? params page の取得
+  const { search } = useLocation();
+  const query = new URLSearchParams(search);
+  const paramPage = Number(query.get("page"));
+  const { setToastModal, showToastModal } = useToastModal()
+  // const snapshotFighters = queryClient.getQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: paramPage }])
+  const api = async (updateFighterData: BoxerType): Promise<Record<string, string> | void> => {
+    // try {
+    //? 編集した選手データを含めた全選手データ
+    // const updateFightersData = snapshotFighters?.reduce((acc: BoxerType[], curr: BoxerType) => {
+    //   if (curr.id === updateFighterData.id) {
+    //     return [...acc, updateFighterData];
+    //   }
+    //   return [...acc, curr];
+    // }, []);
+    await Axios.put("/api/boxer", updateFighterData);
+    // queryClient.setQueryData([QUERY_KEY.boxer, { page: paramPage }], updateFightersData)
+    //   setToastModal({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS });
+    //   showToastModal()
+    // } catch (error) {
+    //   console.error("選手データ更新:", error);
+    // queryClient.setQueryData([QUERY_KEY.boxer, { page: paramPage }], snapshotFighters)
+    //   setToastModal({ message: MESSAGE.FIGHTER_EDIT_FAILD, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR });
+    //   showToastModal()
+    // }
+  }
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
+    onMutate: async () => {
+      console.log("選手データ更新");
+      startLoading()
+      // clearToastModaleMessage()
+      // const isLeeway = fightersCount ? !!(fightersCount % limit) : false
+      // const pageCount = fightersCount ? Math.ceil(fightersCount / limit) : 1
+      // return { isLeeway, pageCount }
+    }
+  })
+  const updateFighter = (updateFighterData: BoxerType) => {
+    mutate(updateFighterData, {
+      onSuccess: () => {
+        refetchReactQueryData(QUERY_KEY.boxer)
+        resetLoadingState()
+        setToastModal({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS });
+        showToastModal()
+      },
+      onError: () => {
+        resetLoadingState()
+        setToastModal({ message: MESSAGE.FIGHTER_EDIT_FAILD, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR });
+        showToastModal()
+      }
+    })
+  }
+  return { updateFighter, isLoading, isSuccess }
+}
 
 // //! 選手登録
 export const useRegisterBoxer = () => {
-  const queryClient = useQueryClient()
-  // const { count: fightersCount } = useFetchFighters()
-  // const { setToastModalMessage, clearToastModaleMessage } = useToastModal()
+  const { refetchReactQueryData } = useReactQuery()
+  const { startLoading, resetLoadingState, successful, hasError } = useLoading()
+  const { showToastModal } = useToastModal()
+  // const { count: fightersCount } = useFetchBoxer()
+  const { setToastModal, resetToastModalToDefault } = useToastModal()
   const api = useCallback(async (newBoxerData: BoxerType) => {
     const res = await Axios.post("/api/boxer", newBoxerData).then(v => v.data)
     return res
@@ -111,6 +124,7 @@ export const useRegisterBoxer = () => {
   const { mutate, isLoading, isError, isSuccess } = useMutation(api, {
     onMutate: async () => {
       console.log("onMutate");
+      startLoading()
       // clearToastModaleMessage()
       // const isLeeway = fightersCount ? !!(fightersCount % limit) : false
       // const pageCount = fightersCount ? Math.ceil(fightersCount / limit) : 1
@@ -121,7 +135,11 @@ export const useRegisterBoxer = () => {
     mutate(newBoxerData, {
       onSuccess: (__, newBoxerData, context) => {
         console.log("onSuccess");
-        // setToastModalMessage({ message: MESSAGE.FIGHTER_REGISTER_SUCCESS, bgColor: ModalBgColorType.SUCCESS })
+        successful()
+        resetLoadingState()
+        setToastModal({ message: MESSAGE.FIGHTER_REGISTER_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+        showToastModal()
+        refetchReactQueryData(QUERY_KEY.boxer)
         // queryClient.setQueryData<number>(queryKeys.countFighter, (prev) => prev! + 1)
         // if (context.isLeeway) {
         //   const fightersData = queryClient.getQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: context.pageCount }])
@@ -139,11 +157,15 @@ export const useRegisterBoxer = () => {
       },
       onError: (error: any) => {
         console.log("onError");
-        // if (error.status === STATUS.NOT_ACCEPTABLE) {
-        //   setToastModalMessage({ message: MESSAGE.FIGHTER_NOT_ABLE_TO_REGISTER, bgColor: ModalBgColorType.ERROR })
-        //   return
-        // }
-        // setToastModalMessage({ message: MESSAGE.FIGHTER_REGISTER_FAILD, bgColor: ModalBgColorType.ERROR })
+        hasError()
+        resetLoadingState()
+        if (error.status === STATUS.NOT_ACCEPTABLE) {
+          setToastModal({ message: MESSAGE.FIGHTER_NOT_ABLE_TO_REGISTER, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showToastModal()
+          return
+        }
+        setToastModal({ message: MESSAGE.FIGHTER_REGISTER_FAILD, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showToastModal()
       }
     })
   }
@@ -155,9 +177,9 @@ export const useRegisterBoxer = () => {
 //   const queryClient = useQueryClient()
 
 //   const navigate = useNavigate()
-//   const { setToastModalMessage } = useToastModal()
+//   const { setToastModal } = useToastModal()
 //   //? 選手の数を取得
-//   const { count: fightersCount } = useFetchFighters()
+//   const { count: fightersCount } = useFetchBoxer()
 //   //? page数を計算
 //   const [pageCount, setPageCount] = useState<number>(0)
 //   useEffect(() => {
@@ -182,7 +204,7 @@ export const useRegisterBoxer = () => {
 //   const deleteFighter = (fighterData: BoxerType) => {
 //     mutate(fighterData, {
 //       onSuccess: async (data, fighterData, context) => {
-//         setToastModalMessage({ message: MESSAGE.FIGHTER_DELETED, bgColor: ModalBgColorType.SUCCESS })
+//         setToastModal({ message: MESSAGE.FIGHTER_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
 //         queryClient.setQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: paramPage }], context.widtoutDeleteFighters)
 //         if (!context.widtoutDeleteFighters.length) {
 //           if (paramPage > 1) {
@@ -201,10 +223,10 @@ export const useRegisterBoxer = () => {
 //       },
 //       onError: (error: any) => {
 //         if (error.status === STATUS.NOT_ACCEPTABLE) {
-//           setToastModalMessage({ message: MESSAGE.FIGHTER_CAN_NOT_DELETE, bgColor: ModalBgColorType.ERROR })
+//           setToastModal({ message: MESSAGE.FIGHTER_CAN_NOT_DELETE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
 //           return
 //         }
-//         setToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_FAILD, bgColor: ModalBgColorType.ERROR })
+//         setToastModal({ message: MESSAGE.FIGHTER_EDIT_FAILD, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
 //       }
 //     })
 //   }

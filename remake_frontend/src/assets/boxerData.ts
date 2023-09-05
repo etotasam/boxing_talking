@@ -1,4 +1,5 @@
-import { BoxerType } from "./types";
+import { BoxerType, BoxerDataOnFormType } from "./types";
+import { Nationality } from "./NationalFlagData";
 
 export const Stance = {
   Southpaw: "southpaw",
@@ -32,3 +33,35 @@ export const WEIGHT_CLASS = {
   Light_Fly: "Lフライ",
   Minimum: "ミニマム",
 } as const;
+
+export const initialBoxerData: BoxerType = {
+  id: NaN,
+  name: "",
+  eng_name: "",
+  country: Nationality.Japan,
+  birth: "1990-01-01",
+  height: 165,
+  reach: 165,
+  title_hold: [],
+  style: Stance.Orthodox,
+  win: 0,
+  ko: 0,
+  draw: 0,
+  lose: 0,
+};
+
+export const initialBoxerDataOnForm: BoxerDataOnFormType = {
+  id: NaN,
+  name: "",
+  eng_name: "",
+  country: Nationality.Japan,
+  birth: "1990-01-01",
+  height: 165,
+  reach: 165,
+  title_hold: [],
+  style: Stance.Orthodox,
+  win: 0,
+  ko: 0,
+  draw: 0,
+  lose: 0,
+};

@@ -15,7 +15,7 @@ const toastModalState = atom<StateType>({
 
 export const toastModalSelector = selector({
   key: "toastModalSelector",
-  // getは以下のように値を加工したりして返す事もできる
+
   get: ({ get }) => {
     const state = get(toastModalState)
     return state

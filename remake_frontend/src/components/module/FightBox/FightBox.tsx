@@ -10,28 +10,30 @@ import { BoxerType, NationalityType, FightInfoType } from "@/assets/types";
 import { Stance } from "@/assets/boxerData";
 
 const boxer_1: BoxerType = {
+  id: 1,
   name: "井上 尚弥",
-  engName: "Naoya Inoue",
+  eng_name: "Naoya Inoue",
   birth: "30",
   height: 165,
   reach: 171,
   style: Stance.Orthodox,
   country: Nationality.Japan,
-  haveTitle: ["WBO世界Sバンタム級王者", "WBC世界Sバンタム級王者"],
+  title_hold: ["WBO世界Sバンタム級王者", "WBC世界Sバンタム級王者"],
   win: 25,
   ko: 23,
   draw: 0,
   lose: 0,
 };
 const boxer_2: BoxerType = {
+  id: 2,
   name: "タパレス",
-  engName: "Marlon Tapales",
+  eng_name: "Marlon Tapales",
   birth: "31",
   height: 163,
   reach: 165,
   style: Stance.Southpaw,
   country: Nationality.Philpin,
-  haveTitle: [],
+  title_hold: [],
   win: 37,
   ko: 19,
   draw: 0,
@@ -79,7 +81,7 @@ const BoxerInfo = ({ boxer }: { boxer: BoxerType }) => {
         <div>
           <div className="relative flex items-center justify-center">
             <span className="absolute top-[-25px] left-[50%] translate-x-[-50%] text-sm text-gray-600">
-              {boxer.engName}
+              {boxer.eng_name}
             </span>
             <h2 className="relative">
               {/* 国旗 */}
@@ -141,9 +143,9 @@ const BoxerInfo = ({ boxer }: { boxer: BoxerType }) => {
           </div>
           {/* タイトル */}
           <div className="mt-5">
-            {boxer.haveTitle && (
+            {boxer.title_hold && (
               <ul>
-                {boxer.haveTitle.map((belt: string) => (
+                {boxer.title_hold.map((belt: string) => (
                   <li key={belt} className="mt-2">
                     <p className="relative inline-block">
                       <span className="absolute top-[2px] left-[-23px] w-[18px] h-[18px] mr-2">

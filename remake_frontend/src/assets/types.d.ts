@@ -16,6 +16,7 @@ export type NationalityType = typeof Nationality[keyof typeof Nationality]
 
 // ? ボクサー情報
 export type BoxerType = {
+  id: number,
   name: string;
   eng_name: string;
   birth: string;
@@ -24,6 +25,22 @@ export type BoxerType = {
   style: StanceType;
   country: NationalityType;
   title_hold: string[];
+  win: number;
+  ko: number;
+  draw: number;
+  lose: number;
+};
+
+export type BoxerDataOnFormType = {
+  id: number,
+  name: string;
+  eng_name: string;
+  birth: string;
+  height: number;
+  reach: number;
+  style: StanceType;
+  country: NationalityType;
+  title_hold: TitleType[];
   win: number;
   ko: number;
   draw: number;

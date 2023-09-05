@@ -47,11 +47,25 @@ class BoxerController extends Controller
                 }
             });
 
-            $fighters = Boxer::where($like_querys)->offset($under)->limit($limit)->get();
+            try {
+                $boxers = Boxer::where($like_querys)->offset($under)->limit($limit)->get();
+            } catch (Exception $e) {
+                return response()->json(["message" => "get PDOException error!:" . $e], 500);
+            }
+            // ! 保有タイトルを配列にして返す
+            $new_boxers = $boxers->map(function ($boxer) {
+                if (empty($boxer->title_hold)) {
+                    $boxer->title_hold = [];
+                } else {
+                    $boxer->title_hold = explode('/', $boxer->title_hold);
+                };
+                return $boxer;
+            });
 
-            return response()->json($fighters, 200);
+
+            return response()->json($new_boxers, 200);
         } catch (Exception $e) {
-            return response()->json(["message" => "faild fetch Fighters"], 500);
+            return response()->json(["message" => "faild fetch Boxers:" . $e], 500);
         }
     }
 
@@ -101,15 +115,24 @@ class BoxerController extends Controller
         try {
             // throw new Exception();
             // すでに存在してるかをチェック(名前だけで判断してる...)
-            $name = $request->name;
-            $eng_name = $request->eng_name;
+            $boxer = $request->all();
+            $name = $boxer["name"];
+            $eng_name = $boxer["eng_name"];
             $is_exist = Boxer::where("name", $name)->orWhere("eng_name", $eng_name)->exists();
             if ($is_exist) {
                 throw new Exception("the fighter alrady exist", 406);
             }
             // 選手の登録
-            $boxer = $request->toArray();
-            $boxer['title_hold'] = json_encode($boxer['title_hold']);
+            // $boxer = $request->toArray();
+            $string_title_hold = implode('/', $boxer['title_hold']);
+
+            // ! 配列で受けた保有タイトルを文字列に変換する
+            if (empty($string_title_hold)) {
+                $boxer['title_hold'] = null;
+            } else {
+                $boxer['title_hold'] = $string_title_hold;
+            }
+            // $boxer['title_hold'] = json_encode($boxer['title_hold']);
             // \Log::debug($boxer);
             Boxer::create($boxer);
             return response()->json(["message" => "created fighter"], 200);
@@ -152,16 +175,28 @@ class BoxerController extends Controller
      *
      * @param
      */
-    public function update(Request $request): void
+    public function update(Request $request)
     {
         // throw new Exception();
         try {
             $id = $request->id;
-            $update_fighter_data = $request->toArray();
-            Boxer::find($id)->update($update_fighter_data);
-            // return response()->json(["message" => "fighter updated"], 200);
+            // $boxer = $request->toArray();
+            $boxer = $request->all();
+            $title_hold = implode('/', $boxer['title_hold']);
+
+            if (empty($title_hold)) {
+                $boxer['title_hold'] = null;
+            } else {
+                $boxer['title_hold'] = $title_hold;
+            }
+
+            Boxer::find($id)->update($boxer);
+
+            // \Log::debug($boxer);
+
+            return response()->json(["message" => "boxer updated"], 200);
         } catch (Exception $e) {
-            // return response()->json(["message" => "faild fighter update"], 500);
+            return response()->json(["message" => "faild fighter update"], 500);
         }
     }
 

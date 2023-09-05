@@ -11,7 +11,7 @@ type PropsType = {
 
 export const TitleSelector = ({ titles, setTitles }: PropsType) => {
   // ? タイトル保持かどうかチェックボックスの値 useState
-  const [hasBelt, setHasBelt] = useState(false);
+  const [hasBelt, setHasBelt] = useState(true);
   // ? タイトル入力欄(<input> <select>)の数を決める useState
   const [countHasBelt, setCountHasBelt] = useState(1);
 
@@ -27,17 +27,17 @@ export const TitleSelector = ({ titles, setTitles }: PropsType) => {
   }, [titles]);
 
   // ? タイトル保持のチェックボックがoffの時、タイトル情報の配列をリセット
-  useEffect(() => {
-    if (!hasBelt) {
-      setTitles([]);
-    }
-  }, [hasBelt]);
+  // useEffect(() => {
+  //   if (!hasBelt) {
+  //     setTitles([]);
+  //   }
+  // }, [hasBelt]);
 
   return (
     <>
       <section className="">
         {/* //? 保持タイトル */}
-        <div className="mt-3">
+        {/* <div className="mt-3">
           <label>
             <input
               className="mr-2"
@@ -47,7 +47,8 @@ export const TitleSelector = ({ titles, setTitles }: PropsType) => {
             />
             タイトル保持
           </label>
-        </div>
+        </div> */}
+        <p>保有タイトル</p>
         {hasBelt &&
           Array.from({ length: countHasBelt }, (_, index) => index).map(
             (key, i) => (

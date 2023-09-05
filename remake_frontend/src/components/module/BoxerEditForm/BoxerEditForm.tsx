@@ -1,120 +1,102 @@
 import React, { useEffect, useState } from "react";
 // ! data
-import { Stance } from "@/assets/boxerData";
+import { Stance, initialBoxerDataOnForm } from "@/assets/boxerData";
 import { Nationality } from "@/assets/NationalFlagData";
+import { ORGANIZATIONS, WEIGHT_CLASS } from "@/assets/boxerData";
 //! type
-import { BoxerType, StanceType, TitleType } from "@/assets/types";
-//! message contoller
 import {
-  BG_COLOR_ON_TOAST_MODAL,
-  MESSAGE,
-} from "@/assets/statusesOnToastModal";
+  BoxerType,
+  BoxerDataOnFormType,
+  StanceType,
+  TitleType,
+} from "@/assets/types";
 // ! hooks
-import { useToastModal } from "@/hooks/useToastModal";
-import { useRegisterBoxer } from "@/hooks/useBoxer";
+import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
 // ! component
 import { TitleSelector } from "./TitleSelector";
 
 type PropsType = {
-  onSubmit: (fighterData: BoxerType) => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   className?: string;
   isPending?: boolean;
-  fighterData?: BoxerType;
+  editTargetBoxerData?: BoxerType;
   isSuccessRegisterFighter?: boolean;
 };
 
 const countryUndefined = "国籍の選択";
 
-export const initialBoxerData: BoxerType = {
-  name: "",
-  eng_name: "",
-  country: Nationality.Japan,
-  birth: "1990-01-01",
-  height: 165,
-  reach: 165,
-  title_hold: [],
-  style: Stance.Orthodox,
-  win: 0,
-  ko: 0,
-  draw: 0,
-  lose: 0,
-};
-
 export const BoxerEditForm = (props: PropsType) => {
-  const { setToastModal } = useToastModal();
+  // ! use hook
+  const { state: boxerDataOnForm, setter: setBoxerDataToForm } =
+    useBoxerDataOnForm();
 
-  //? Boxerデータ useState
-  const [editBoxerData, setEditBoxerData] =
-    useState<BoxerType>(initialBoxerData);
-  // ! 保持タイトル useState
+  // const decomposeTitleHole = () => {
+  //   const belts = boxerDataOnForm.title_hold;
+  //   const data = belts.reduce((accumurator, current): any => {
+  //     for (const word of Object.values(ORGANIZATIONS)) {
+  //       if (current.includes(word)) {
+  //         for (const weight of Object.values(WEIGHT_CLASS)) {
+  //           if (current.includes(weight)) {
+  //             return [
+  //               ...accumurator,
+  //               { organization: word, weightClass: weight },
+  //             ];
+  //           }
+  //         }
+  //       }
+  //     }
+  //     return [...accumurator];
+  //   }, []);
+  //   return data as TitleType[];
+  // };
+
+  // useEffect(() => {
+  //   const tesnt = decomposeTitleHole();
+  //   console.log(tesnt);
+  //   setTitles(tesnt);
+  // }, [boxerDataOnForm]);
+
+  // ? 保持タイトル useState
   const [titles, setTitles] = useState<TitleType[]>([]);
 
-  // ! hook
-  const { registerBoxer } = useRegisterBoxer();
-
-  //? props等、外部からBoxerDataを受け取った時
-  useEffect(() => {
-    if (!props.fighterData) return;
-    setEditBoxerData(props.fighterData);
-  }, [props.fighterData]);
-
-  //? formデータのsubmit
-  /**
-   * sendData
-   * @param e Event
-   * @returns void
-   */
-  const sendData = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // ? 国の選択なしの場合
-    if (editBoxerData.country === undefined) {
-      setToastModal({
-        message: MESSAGE.INVALID_COUNTRY,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      return;
-    }
-    registerBoxer(editBoxerData);
-  };
-
   //? タイトル入力変更時にデータを配列に整理
-  useEffect(() => {
-    if (titles.length) {
-      const titlesArray = titles
-        .filter((obj) => {
-          return (
-            obj?.organization !== undefined && obj?.weightClass !== undefined
-          );
-        })
-        .map((titleData) => {
-          return `${titleData.organization}世界${titleData.weightClass}級王者`;
-        });
+  // useEffect(() => {
+  //   if (titles.length) {
+  //     const titlesArray = titles
+  //       .filter((obj) => {
+  //         return (
+  //           obj?.organization !== undefined && obj?.weightClass !== undefined
+  //         );
+  //       })
+  //       .map((titleData) => {
+  //         return `${titleData.organization}世界${titleData.weightClass}級王者`;
+  //       });
 
-      setEditBoxerData((curr) => {
-        return { ...curr, title_hold: titlesArray };
-      });
-    }
-  }, [titles]);
+  //     setBoxerDataToForm((curr) => {
+  //       return { ...curr, title_hold: titlesArray };
+  //     });
+  //   }
+  // }, [titles]);
 
-  //? formのデータを初期化
+  //? 登録が完了したらformのデータを初期化
   useEffect(() => {
     if (!props.isSuccessRegisterFighter) return;
-    setEditBoxerData(initialBoxerData);
+    setBoxerDataToForm(initialBoxerDataOnForm);
   }, [props.isSuccessRegisterFighter]);
 
   return (
     <div className={props.className}>
       <div className="p-10 bg-stone-200">
         <h1 className="text-3xl text-center">選手情報</h1>
-        <form className="flex flex-col" onSubmit={sendData}>
+        <form className="flex flex-col" onSubmit={props.onSubmit}>
           <input
             className="mt-3 px-1 bourder rounded border-black"
             type="text"
             placeholder="名前(英字表示)"
             name="eng_name"
-            value={editBoxerData?.eng_name}
+            value={boxerDataOnForm?.eng_name}
             onChange={(e) =>
-              setEditBoxerData((prev: any) => {
+              setBoxerDataToForm((prev: any) => {
                 return { ...prev, eng_name: e.target.value };
               })
             }
@@ -124,9 +106,9 @@ export const BoxerEditForm = (props: PropsType) => {
             type="text"
             placeholder="選手名"
             name="name"
-            value={editBoxerData?.name}
+            value={boxerDataOnForm?.name}
             onChange={(e) =>
-              setEditBoxerData((prev: any) => {
+              setBoxerDataToForm((prev: any) => {
                 return { ...prev, name: e.target.value };
               })
             }
@@ -135,14 +117,14 @@ export const BoxerEditForm = (props: PropsType) => {
             <label htmlFor="countrys">国籍:</label>
             <select
               name="country"
-              value={editBoxerData?.country}
+              value={boxerDataOnForm?.country}
               onChange={(e) => {
                 if (e.target.value === countryUndefined) {
-                  setEditBoxerData((prev: any) => {
+                  setBoxerDataToForm((prev: any) => {
                     return { ...prev, country: undefined };
                   });
                 } else {
-                  setEditBoxerData((prev: any) => {
+                  setBoxerDataToForm((prev: any) => {
                     return { ...prev, country: e.target.value };
                   });
                 }
@@ -165,9 +147,9 @@ export const BoxerEditForm = (props: PropsType) => {
               type="date"
               id="birth"
               min="1970-01-01"
-              value={editBoxerData?.birth}
+              value={boxerDataOnForm?.birth}
               onChange={(e) =>
-                setEditBoxerData((prev: BoxerType) => {
+                setBoxerDataToForm((prev: BoxerDataOnFormType) => {
                   return { ...prev, birth: e.target.value };
                 })
               }
@@ -181,9 +163,9 @@ export const BoxerEditForm = (props: PropsType) => {
               className="px-1"
               type="number"
               min="0"
-              value={editBoxerData?.height}
+              value={boxerDataOnForm?.height}
               onChange={(e) =>
-                setEditBoxerData((prev: any) => {
+                setBoxerDataToForm((prev: any) => {
                   return { ...prev, height: e.target.value };
                 })
               }
@@ -198,9 +180,9 @@ export const BoxerEditForm = (props: PropsType) => {
               className="px-1"
               type="number"
               min="0"
-              value={editBoxerData?.reach}
+              value={boxerDataOnForm?.reach}
               onChange={(e) =>
-                setEditBoxerData((prev: any) => {
+                setBoxerDataToForm((prev: any) => {
                   return { ...prev, reach: e.target.value };
                 })
               }
@@ -211,10 +193,10 @@ export const BoxerEditForm = (props: PropsType) => {
           <div className="mt-3 flex p-1">
             <label htmlFor="stance">スタイル:</label>
             <select
-              value={editBoxerData?.style}
+              value={boxerDataOnForm?.style}
               onChange={(e) =>
-                setEditBoxerData((prev: any) => {
-                  return { ...prev, stance: e.target.value };
+                setBoxerDataToForm((prev: any) => {
+                  return { ...prev, style: e.target.value };
                 })
               }
               name="boxing-style"
@@ -231,9 +213,9 @@ export const BoxerEditForm = (props: PropsType) => {
               <label htmlFor="win">win</label>
               <input
                 className="w-full"
-                value={editBoxerData?.win}
+                value={boxerDataOnForm?.win}
                 onChange={(e) =>
-                  setEditBoxerData((prev: any) => {
+                  setBoxerDataToForm((prev: any) => {
                     return { ...prev, win: e.target.value };
                   })
                 }
@@ -247,9 +229,9 @@ export const BoxerEditForm = (props: PropsType) => {
               <label htmlFor="ko">ko</label>
               <input
                 className="w-full"
-                value={editBoxerData?.ko}
+                value={boxerDataOnForm?.ko}
                 onChange={(e) =>
-                  setEditBoxerData((prev: any) => {
+                  setBoxerDataToForm((prev: any) => {
                     return { ...prev, ko: e.target.value };
                   })
                 }
@@ -263,9 +245,9 @@ export const BoxerEditForm = (props: PropsType) => {
               <label htmlFor="draw">draw</label>
               <input
                 className="w-full"
-                value={editBoxerData?.draw}
+                value={boxerDataOnForm?.draw}
                 onChange={(e) =>
-                  setEditBoxerData((prev: any) => {
+                  setBoxerDataToForm((prev: any) => {
                     return { ...prev, draw: e.target.value };
                   })
                 }
@@ -279,9 +261,9 @@ export const BoxerEditForm = (props: PropsType) => {
               <label htmlFor="lose">lose</label>
               <input
                 className="w-full"
-                value={editBoxerData?.lose}
+                value={boxerDataOnForm?.lose}
                 onChange={(e) =>
-                  setEditBoxerData((prev: any) => {
+                  setBoxerDataToForm((prev: any) => {
                     return { ...prev, lose: e.target.value };
                   })
                 }
