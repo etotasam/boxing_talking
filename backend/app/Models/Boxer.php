@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Fighter extends Model
+class Boxer extends Model
 {
     use HasFactory;
 
@@ -16,10 +16,12 @@ class Fighter extends Model
      */
     protected $fillable = [
         'name',
+        'eng_name',
         'country',
         'height',
         'birth',
         'style',
+        'reach',
         'win',
         'draw',
         'lose',

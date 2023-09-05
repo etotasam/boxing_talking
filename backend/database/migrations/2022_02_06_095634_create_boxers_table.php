@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFightersTable extends Migration
+class CreateBoxersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,16 @@ class CreateFightersTable extends Migration
      */
     public function up()
     {
-        Schema::create('fighters', function (Blueprint $table) {
+        Schema::create('boxers', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name',50)->charset('utf8');
-            $table->string('country',100);
+            $table->string('name', 50)->charset('utf8');
+            $table->string('eng_name', 50)->charset('utf8');
+            $table->string('country', 100);
+            $table->date('birth')->default('1970-01-01');
+            $table->integer('height')->default(170);
+            $table->integer('reach')->default(170);
+            $table->string('style', 20)->charset('utf8');
+            $table->text('title_hold');
             $table->integer('ko');
             $table->integer('win');
             $table->integer('draw');
@@ -32,6 +38,6 @@ class CreateFightersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('fighters');
+        Schema::dropIfExists('boxers');
     }
 }

@@ -16,7 +16,6 @@ const formTypeState = atom<StateType>({
 
 export const formTypeSelector = selector({
   key: "formTypeSelector",
-  // getは以下のように値を加工したりして返す事もできる
   get: ({ get }) => {
     const state = get(formTypeState)
     return state

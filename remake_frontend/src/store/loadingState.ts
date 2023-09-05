@@ -20,7 +20,6 @@ const loadingState = atom<LoadingStateType>({
 
 export const loadingSelector = selector({
   key: "loadingSelector",
-  // getは以下のように値を加工したりして返す事もできる
   get: ({ get }) => {
     const state = get(loadingState)
     return state

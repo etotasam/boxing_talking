@@ -11,7 +11,6 @@ export const loginModalState = atom<boolean>({
 
 export const loginModalSelector = selector({
   key: "loginModalSelector",
-  // getは以下のように値を加工したりして返す事もできる
   get: ({ get }) => {
     const state = get(loginModalState)
     return state
