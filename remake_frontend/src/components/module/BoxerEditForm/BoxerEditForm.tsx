@@ -20,7 +20,7 @@ type PropsType = {
   className?: string;
   isPending?: boolean;
   editTargetBoxerData?: BoxerType | BoxerDataOnFormType;
-  isSuccessRegisterFighter?: boolean;
+  isSuccess?: boolean;
 };
 
 const countryUndefined = "国籍の選択";
@@ -29,61 +29,12 @@ export const BoxerEditForm = (props: PropsType) => {
   // ! use hook
   const { state: boxerDataOnForm, setter: setBoxerDataToForm } =
     useBoxerDataOnForm();
-  console.log(boxerDataOnForm);
-
-  // const decomposeTitleHole = () => {
-  //   const belts = boxerDataOnForm.title_hold;
-  //   const data = belts.reduce((accumurator, current): any => {
-  //     for (const word of Object.values(ORGANIZATIONS)) {
-  //       if (current.includes(word)) {
-  //         for (const weight of Object.values(WEIGHT_CLASS)) {
-  //           if (current.includes(weight)) {
-  //             return [
-  //               ...accumurator,
-  //               { organization: word, weightClass: weight },
-  //             ];
-  //           }
-  //         }
-  //       }
-  //     }
-  //     return [...accumurator];
-  //   }, []);
-  //   return data as TitleType[];
-  // };
-
-  // useEffect(() => {
-  //   const tesnt = decomposeTitleHole();
-  //   console.log(tesnt);
-  //   setTitles(tesnt);
-  // }, [boxerDataOnForm]);
-
-  // ? 保持タイトル useState
-  const [titles, setTitles] = useState<TitleType[]>([]);
-
-  //? タイトル入力変更時にデータを配列に整理
-  // useEffect(() => {
-  //   if (titles.length) {
-  //     const titlesArray = titles
-  //       .filter((obj) => {
-  //         return (
-  //           obj?.organization !== undefined && obj?.weightClass !== undefined
-  //         );
-  //       })
-  //       .map((titleData) => {
-  //         return `${titleData.organization}世界${titleData.weightClass}級王者`;
-  //       });
-
-  //     setBoxerDataToForm((curr) => {
-  //       return { ...curr, title_hold: titlesArray };
-  //     });
-  //   }
-  // }, [titles]);
 
   //? 登録が完了したらformのデータを初期化
   useEffect(() => {
-    if (!props.isSuccessRegisterFighter) return;
+    if (!props.isSuccess) return;
     setBoxerDataToForm(initialBoxerDataOnForm);
-  }, [props.isSuccessRegisterFighter]);
+  }, [props.isSuccess]);
 
   return (
     <div className={props.className}>

@@ -3,10 +3,8 @@ import _ from "lodash"
 import { BoxerType, BoxerDataOnFormType } from "@/assets/types"
 
 
-
-
 // ? boxerDataOnFormのtitle_holeプロパティをstring[]型に変形してデータベースに保存する為の関数
-export const convertToBoxerData = (boxerDataOnForm: BoxerDataOnFormType): BoxerType => {
+export const convertToBoxerDataFromFromData = (boxerDataOnForm: BoxerDataOnFormType): BoxerType => {
 
   const cloneData = _.cloneDeep(boxerDataOnForm)
 

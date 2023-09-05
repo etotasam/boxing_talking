@@ -55,3 +55,6 @@ yarn-error.log*
 
 
 docker/db/
+
+
+wiki.md

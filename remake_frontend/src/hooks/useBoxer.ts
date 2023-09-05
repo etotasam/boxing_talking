@@ -16,7 +16,7 @@ import { MESSAGE, STATUS, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToa
 // //! types
 import type { BgColorType, BoxerDataOnFormType, BoxerType, NationalityType } from "@/assets/types"
 // ! functions
-import { convertToBoxerData } from "@/assets/functions";
+import { convertToBoxerDataFromFromData } from "@/assets/functions";
 
 
 //! 選手データ取得 and 登録済み選手の数を取得
@@ -50,7 +50,8 @@ export const useFetchBoxer = () => {
 
   const fetchCountBoxer = async (searchWords: SearchWordType) => await Axios.get<number>("/api/boxer/count", { params: { ...searchWords } }).then(v => v.data)
   const { data: boxersCount } = useQuery<number>(QUERY_KEY.countBoxer, () => fetchCountBoxer({ name: paramName, country: paramCountry }), { staleTime: Infinity })
-  return { boxersData, boxersCount, isLoading, isError, isPreviousData, refetch, isRefetching }
+  const pageCount = boxersCount ? Math.ceil(boxersCount / limit) : 0
+  return { boxersData, boxersCount, pageCount, isLoading, isError, isPreviousData, refetch, isRefetching }
 }
 
 // //! 選手データ更新
@@ -95,7 +96,7 @@ export const useUpdateBoxerData = () => {
     }
   })
   const updateFighter = (updateFighterData: BoxerDataOnFormType) => {
-    const convertedBoxerData = convertToBoxerData(updateFighterData)
+    const convertedBoxerData = convertToBoxerDataFromFromData(updateFighterData)
     mutate(convertedBoxerData, {
       onSuccess: () => {
         refetchReactQueryData(QUERY_KEY.boxer)
@@ -134,8 +135,9 @@ export const useRegisterBoxer = () => {
       // return { isLeeway, pageCount }
     }
   })
-  const registerBoxer = (newBoxerData: BoxerType) => {
-    mutate(newBoxerData, {
+  const registerBoxer = (newBoxerData: BoxerDataOnFormType) => {
+    const convetedBoxerData = convertToBoxerDataFromFromData(newBoxerData)
+    mutate(convetedBoxerData, {
       onSuccess: (__, newBoxerData, context) => {
         console.log("onSuccess");
         successful()

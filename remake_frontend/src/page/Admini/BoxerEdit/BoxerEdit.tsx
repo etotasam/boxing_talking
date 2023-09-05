@@ -42,7 +42,7 @@ export const BoxerEdit = () => {
     useBoxerDataOnForm();
   const { updateFighter } = useUpdateBoxerData();
   //? 選手データの取得(api)
-  const { boxersData } = useFetchBoxer();
+  const { boxersData, pageCount } = useFetchBoxer();
 
   //? paramsの取得
   const { search } = useLocation();
@@ -199,6 +199,13 @@ export const BoxerEdit = () => {
     <AdminiLayout>
       <div className="container w-screen flex justify-center">
         <div className="flex w-[95%]">
+          <ul>
+            {Array.from({ length: pageCount }, (_, index) => (
+              <Link key={index} to={`/admini/boxer_edit?page=${index + 1}`}>
+                <li>{index + 1}</li>
+              </Link>
+            ))}
+          </ul>
           <section className="w-[40%] flex justify-center items-start mb-10">
             <BoxersList
               boxersData={boxersData}
@@ -226,6 +233,8 @@ const BoxersList = ({
   boxersData,
   setEditTargetBoxerData,
 }: BoxerListPropsType) => {
+  const [checked, setChecked] = useState<number>();
+
   return (
     <>
       {boxersData && (
@@ -237,7 +246,11 @@ const BoxersList = ({
                 id={`${boxer.id}_${boxer.name}`}
                 type="radio"
                 name="boxer"
-                onChange={() => setEditTargetBoxerData(boxer)}
+                checked={boxer.id === checked}
+                onChange={(e) => {
+                  setChecked(boxer.id ? boxer.id : undefined);
+                  setEditTargetBoxerData(boxer);
+                }}
                 data-testid={`input-${boxer.id}`}
               />
               <label
