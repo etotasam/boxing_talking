@@ -1,22 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { isEqual } from "lodash";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-// ! react query
-import { useQueryClient } from "react-query";
 // ! data
 import { Stance, initialBoxerData } from "@/assets/boxerData";
-import {
-  MESSAGE,
-  BG_COLOR_ON_TOAST_MODAL,
-} from "@/assets/statusesOnToastModal";
+
 import { QUERY_KEY } from "@/assets/queryKeys";
 //! hooks
 import { useToastModal } from "@/hooks/useToastModal";
 import { useReactQuery } from "@/hooks/useReactQuery";
 import { useFetchBoxer, useUpdateBoxerData } from "@/hooks/useBoxer";
 import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
-// import { useGetWindowSize } from "@/hooks/useGetWindowSize";
-// import { useQueryState } from "@/hooks/useQueryState";
+import { useLoading } from "@/hooks/useLoading";
+
 //! types
 import { BoxerType } from "@/assets/types";
 //! layout
@@ -25,16 +19,6 @@ import AdminiLayout from "@/layout/AdminiLayout";
 import { FlagImage } from "@/components/atomc/FlagImage";
 import { BoxerEditForm } from "@/components/module/BoxerEditForm";
 
-// import { Fighter } from "@/components/module/Fighter";
-// import { FighterEditForm } from "@/components/module/FighterEditForm";
-// import { Spinner } from "@/components/module/Spinner";
-// import { EditActionBtns } from "@/components/module/EditActionBtns";
-// import { PendingModal } from "@/components/modal/PendingModal";
-// import { ConfirmModal } from "@/components/modal/ConfirmModal";
-// import { FighterSearchForm } from "@/components/module/FighterSearchForm";
-//! data for test
-// export let _selectFighter: BoxerType | undefined;
-
 export const BoxerEdit = () => {
   // ! use hook
   const { getReactQueryData, setReactQueryData } = useReactQuery();
@@ -42,7 +26,7 @@ export const BoxerEdit = () => {
     useBoxerDataOnForm();
   const { updateFighter } = useUpdateBoxerData();
   //? 選手データの取得(api)
-  const { boxersData, pageCount } = useFetchBoxer();
+  const { boxersData, pageCount, isError } = useFetchBoxer();
 
   //? paramsの取得
   const { search } = useLocation();

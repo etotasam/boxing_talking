@@ -86,7 +86,7 @@ export const BoxerInfo = ({ boxer, className }: PropsType) => {
           <div className="mt-5">
             {boxer.title_hold && (
               <ul>
-                {boxer.title_hold.map((belt: string) => (
+                {boxer.title_hold.sort().map((belt: string) => (
                   <li key={belt} className="mt-2">
                     <p className="relative inline-block">
                       <span className="absolute top-[2px] left-[-23px] w-[18px] h-[18px] mr-2">

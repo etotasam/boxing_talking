@@ -51,6 +51,7 @@ export const useFetchBoxer = () => {
   const fetchCountBoxer = async (searchWords: SearchWordType) => await Axios.get<number>("/api/boxer/count", { params: { ...searchWords } }).then(v => v.data)
   const { data: boxersCount } = useQuery<number>(QUERY_KEY.countBoxer, () => fetchCountBoxer({ name: paramName, country: paramCountry }), { staleTime: Infinity })
   const pageCount = boxersCount ? Math.ceil(boxersCount / limit) : 0
+
   return { boxersData, boxersCount, pageCount, isLoading, isError, isPreviousData, refetch, isRefetching }
 }
 

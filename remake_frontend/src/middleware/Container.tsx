@@ -13,14 +13,15 @@ import { FirstLoadinModal } from "@/components/modal/FirstLoadinModal";
 import { useRecoilValue } from "recoil";
 import { loginModalSelector } from "@/store/loginModalState";
 import { loadingSelector } from "@/store/loadingState";
+import { useFetchBoxer } from "@/hooks/useBoxer";
 
 const Container = () => {
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
   const isShowLoginModal = useRecoilValue(loginModalSelector);
-  const { isLoading: isAttemptingLogin } = useRecoilValue(loadingSelector);
+  const { isLoading: isLoadingByRecoil } = useRecoilValue(loadingSelector);
 
   const { data: userData, isError, isLoading: isFirstCheckingAuth } = useAuth();
-
+  const { isLoading: fetchingBoxerData } = useFetchBoxer();
   //? cookieでログインチェック。なければfalseを入れる
   React.useEffect(() => {
     if (!isError) return;
@@ -52,8 +53,9 @@ const Container = () => {
       <Modales
         isShowToastModal={isShowToastModal}
         isShowLoginModal={isShowLoginModal}
-        isAttemptingLogin={isAttemptingLogin}
+        isLoadingByRecoil={isLoadingByRecoil}
         isFirstCheckingAuth={isFirstCheckingAuth}
+        fetchingBoxerData={fetchingBoxerData}
       />
     </>
   );
@@ -64,8 +66,9 @@ export default Container;
 type ModalesData = {
   isShowToastModal: boolean;
   isShowLoginModal: boolean;
-  isAttemptingLogin: boolean | undefined;
+  isLoadingByRecoil: boolean | undefined;
   isFirstCheckingAuth: boolean;
+  fetchingBoxerData: boolean;
 };
 
 /**
@@ -78,10 +81,12 @@ const Modales = (props: ModalesData) => {
     <>
       <AnimatePresence>
         {props.isShowToastModal && <ToastModalContainer />}
-        {props.isFirstCheckingAuth && <FirstLoadinModal />}
+        {props.isLoadingByRecoil && <FullScreenSpinnerModal />}
+        {(props.isFirstCheckingAuth || props.fetchingBoxerData) && (
+          <FirstLoadinModal />
+        )}
       </AnimatePresence>
       {props.isShowLoginModal && <LoginFormModal />}
-      {props.isAttemptingLogin && <FullScreenSpinnerModal />}
     </>
   );
 };

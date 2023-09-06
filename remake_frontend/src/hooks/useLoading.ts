@@ -18,7 +18,7 @@ export const useLoading = () => {
    */
   const resetLoadingState = () => {
     loadingStateSetter(() => {
-      return { isError: undefined, isLoading: undefined, isSuccess: undefined }
+      return { isError: false, isLoading: false, isSuccess: false }
     })
   }
   /**
