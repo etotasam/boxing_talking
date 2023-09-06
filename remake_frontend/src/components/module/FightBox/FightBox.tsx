@@ -67,12 +67,12 @@ const MatchInfo = ({ matchInfo }: { matchInfo: MatchInfoType }) => {
             <ul className="flex flex-col">
               {matchInfo.titleMatch.map((title) => (
                 <li key={title} className="mt-3">
-                  <p className="relative inline-block">
+                  <div className="relative inline-block">
                     <span className="absolute top-[4px] right-[-28px] w-[18px] h-[18px] mr-2">
                       <img src={crown} alt="" />
                     </span>
                     {title}
-                  </p>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -83,12 +83,12 @@ const MatchInfo = ({ matchInfo }: { matchInfo: MatchInfoType }) => {
 
         {/* 会場 */}
         <div className="mt-[50px] text-center">
-          <p className="relative inline-block text-lg before:content-['会場'] before:absolute before:top-[-23px] before:left-[50%] before:translate-x-[-50%] before:text-[16px] before:text-stone-500">
+          <div className="relative inline-block text-lg before:content-['会場'] before:absolute before:top-[-23px] before:left-[50%] before:translate-x-[-50%] before:text-[16px] before:text-stone-500">
             {matchInfo.place}
             <span className="w-[32px] h-[24px] border-[1px] overflow-hidden absolute top-[1px] left-[-40px]">
               <FlagImage nationaly={matchInfo.country} />
             </span>
-          </p>
+          </div>
         </div>
 
         <div className="mt-10 text-center">
