@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import _ from "lodash";
+import { cloneDeep } from "lodash";
 // ! data
 import { ORGANIZATIONS, WEIGHT_CLASS } from "@/assets/boxerData";
 // ! types
@@ -49,7 +49,7 @@ export const TitleSelector = () => {
                   }
                   onChange={(e) =>
                     setBoxerDataToForm((boxerDataOnForm) => {
-                      const copyTitles = _.cloneDeep(boxerDataOnForm);
+                      const copyTitles = cloneDeep(boxerDataOnForm);
                       if (!e.target.value) {
                         // delete copyTitles.title_hold[i];
                         copyTitles.title_hold[i] = {
@@ -95,7 +95,7 @@ export const TitleSelector = () => {
                   }
                   onChange={(e) =>
                     setBoxerDataToForm((boxerDataOnForm) => {
-                      const copyTitles = _.cloneDeep(boxerDataOnForm);
+                      const copyTitles = cloneDeep(boxerDataOnForm);
                       if (!e.target.value) {
                         copyTitles.title_hold[i] = {
                           ...copyTitles.title_hold[i],

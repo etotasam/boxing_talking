@@ -21,6 +21,7 @@ type PropsType = {
   isPending?: boolean;
   editTargetBoxerData?: BoxerType | BoxerDataOnFormType;
   isSuccess?: boolean;
+  isGuard?: boolean;
 };
 
 const countryUndefined = "国籍の選択";
@@ -30,6 +31,9 @@ export const BoxerEditForm = (props: PropsType) => {
   const { state: boxerDataOnForm, setter: setBoxerDataToForm } =
     useBoxerDataOnForm();
 
+  // ? 入力させない様にするガードモーダル
+  const { isGuard = false } = props;
+
   //? 登録が完了したらformのデータを初期化
   useEffect(() => {
     if (!props.isSuccess) return;
@@ -38,7 +42,10 @@ export const BoxerEditForm = (props: PropsType) => {
 
   return (
     <div className={props.className}>
-      <div className="p-10 bg-stone-200">
+      <div className="p-10 bg-stone-200 relative">
+        {isGuard && (
+          <div className="bg-stone-500/70 absolute top-0 left-0 w-full h-full z-10" />
+        )}
         <h1 className="text-3xl text-center">選手情報</h1>
         <form className="flex flex-col" onSubmit={props.onSubmit}>
           <input

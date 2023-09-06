@@ -12,6 +12,7 @@ import mexicoFlag from "@/assets/images/flags/mexico.svg";
 import kazakhstanFlag from "@/assets/images/flags/kz.svg";
 import ukFlag from "@/assets/images/flags/uk.svg";
 import rusiaFlag from "@/assets/images/flags/rusia.svg";
+import ukrineFlag from "@/assets/images/flags/ukrine.svg";
 
 type PropsType = React.ComponentProps<"div"> & { nationaly: NationalityType };
 
@@ -24,6 +25,7 @@ export const FlagImage = ({ nationaly, className }: PropsType) => {
     if (country == Nationality.Kazakhstan) return kazakhstanFlag;
     if (country == Nationality.UK) return ukFlag;
     if (country == Nationality.Rusia) return rusiaFlag;
+    if (country == Nationality.Ukrine) return ukrineFlag;
   };
 
   return (
