@@ -124,9 +124,9 @@ class BoxerController extends Controller
             }
             // 選手の登録
             // $boxer = $request->toArray();
-            $string_title_hold = implode('/', $boxer['title_hold']);
 
             // ! 配列で受けた保有タイトルを文字列に変換する
+            $string_title_hold = implode('/', $boxer['title_hold']);
             if (empty($string_title_hold)) {
                 $boxer['title_hold'] = null;
             } else {

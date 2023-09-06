@@ -57,8 +57,18 @@ class MatchController extends Controller
     public function register(Request $request)
     {
         try {
-            $match = $request->toArray();
-            BoxingMatch::create($match);
+            $match = $request->all();
+            // $match = $request->all();
+            // ! 配列で受けた保有タイトルを文字列に変換する
+            $titles = implode('/', $match["titles"]);
+            if (empty($titles)) {
+                $match['titles'] = null;
+            } else {
+                $match['titles'] = $titles;
+            }
+            \Log::info($match);
+            $query = BoxingMatch::create($match);
+            \Log::debug($query->toSql());
             return response()->json(["message" => "success"], 200);
         } catch (Exception $e) {
             return response()->json(["message" => "faild match register"], 500);

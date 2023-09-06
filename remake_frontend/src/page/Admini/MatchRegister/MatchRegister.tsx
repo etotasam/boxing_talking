@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
+import { cloneDeep } from "lodash";
 // ! types
 import { NationalityType } from "@/assets/types";
 // ! data
@@ -10,6 +11,7 @@ import AdminiLayout from "@/layout/AdminiLayout";
 // ! hooks
 import { useFetchBoxer } from "@/hooks/useBoxer";
 import { BoxerType } from "@/assets/types";
+import { useRegisterMatch } from "@/hooks/useMatch";
 //! component
 import { FlagImage } from "@/components/atomc/FlagImage";
 
@@ -25,8 +27,8 @@ export const MatchRegister = () => {
       <div className="w-full flex">
         <section className="w-[70%] bg-cyan-100">
           <div>試合情報</div>
-          <MatchSetter boxers={matchBoxers} />
-          <MatchDataSetter onClick={() => {}} />
+          <MatchSetUpBox boxers={matchBoxers} />
+          <MatchDataSetter matchBoxers={matchBoxers} onClick={() => {}} />
         </section>
         <section className="w-[30%] min-w-[300px] bg-red-100 flex justify-center">
           <BoxersList
@@ -41,7 +43,7 @@ export const MatchRegister = () => {
 };
 
 // ! 対戦相手
-const MatchSetter = ({ boxers }: { boxers: MatchBoxersType }) => {
+const MatchSetUpBox = ({ boxers }: { boxers: MatchBoxersType }) => {
   return (
     <div className="flex items-center h-[150px] bg-gray-50">
       <div className="flex justify-between w-full">
@@ -158,12 +160,6 @@ const BoxersList = ({
                   checked={isChecked(boxer.id)}
                   disabled={canCheck(boxer.id)}
                   onChange={(e) => handleCheckboxChange(e, boxer)}
-                  // checked={boxer.id === checked}
-                  // onChange={(e) => {
-                  //   setChecked(boxer.id ? boxer.id : undefined);
-                  //   setEditTargetBoxerData(boxer);
-                  // }}
-                  data-testid={`input-${boxer.id}`}
                 />
                 <label
                   className={"w-[90%] cursor-pointer"}
@@ -194,6 +190,7 @@ const BoxersList = ({
 // ! 試合情報セッター
 type MatchDataSetterPropsType = {
   onClick: () => void;
+  matchBoxers: MatchBoxersType;
 };
 
 const GRADE = {
@@ -208,20 +205,39 @@ type GRADE_Type = (typeof GRADE)[keyof typeof GRADE];
 type WEIGHT_CLASS_Type = (typeof WEIGHT_CLASS)[keyof typeof WEIGHT_CLASS];
 type ORGANIZATIONS_Type = (typeof ORGANIZATIONS)[keyof typeof ORGANIZATIONS];
 
-const MatchDataSetter = ({ onClick }: MatchDataSetterPropsType) => {
+const MatchDataSetter = ({
+  onClick,
+  matchBoxers,
+}: MatchDataSetterPropsType) => {
+  const { registerMatch } = useRegisterMatch();
   // const [matchDate, setMatchDate] = useState<string>();
   const matchDate = useRef("");
   const [matchGrade, setMatchGrade] = useState<GRADE_Type>();
   // const matchGrade = useRef<GRADE_Type>();
   // const [matchPlaceCountry, setMatchPlaceCountry] = useState<NationalityType>();
   const matchPlaceCountry = useRef<NationalityType>();
-  console.log(matchPlaceCountry);
-  const matachCountry = useRef("");
+  const matchVenue = useRef("");
   // const { setter: setMatchData } = useQueryState<MatchDataType>(queryKeys.registerMatchData);
   const matchWeight = useRef<WEIGHT_CLASS_Type>();
   const [belt, setBelt] = useState<ORGANIZATIONS_Type[]>([]);
   const [title, setTitle] = useState(false);
   const [counter, setCounter] = useState(1);
+
+  // ? gradeがタイトルマッチ以外の時は belt (WBA WBCとか...)を空にする
+  useEffect(() => {
+    if (!title) return setBelt([]);
+  }, [title]);
+
+  // ? WBA WBC WBO IBFを選ぶ<select>の数を管理
+  useEffect(() => {
+    if (belt.length > 3) return;
+    if (!belt.length) {
+      setCounter(1);
+    } else {
+      setCounter(belt.length + 1);
+    }
+  }, [belt]);
+
   useEffect(() => {
     if (matchGrade === GRADE.TITLE_MATCH) {
       setTitle(true);
@@ -230,16 +246,45 @@ const MatchDataSetter = ({ onClick }: MatchDataSetterPropsType) => {
     }
   }, [matchGrade]);
 
-  const testclick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  type RegstarMatchPropsType = {
+    red_boxer_id: number | any;
+    blue_boxer_id: number | any;
+    match_date: string;
+    grade: string;
+    country: string;
+    venue: string;
+    weight: string;
+    titles: string[];
+  };
+
+  const testclick = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(matchDate.current);
-    console.log(matchGrade);
-    console.log(matchPlaceCountry.current);
-    console.log(matachCountry.current);
+
+    let formattedBelt;
+    if (belt.length) {
+      formattedBelt = belt.map((title) => {
+        return `${title}世界${matchWeight.current!}級`;
+      });
+    } else {
+      formattedBelt = cloneDeep(belt);
+    }
+
+    const matchData: RegstarMatchPropsType = {
+      red_boxer_id: matchBoxers.red_boxer!.id!,
+      blue_boxer_id: matchBoxers.blue_boxer!.id!,
+      match_date: matchDate.current,
+      grade: matchGrade!,
+      country: matchPlaceCountry.current!,
+      venue: matchVenue.current,
+      weight: matchWeight.current!,
+      titles: formattedBelt,
+    };
+    // console.log(matchData);
+    registerMatch(matchData);
   };
   return (
     <div className="bg-stone-200 flex justify-center items-center py-5 mt-5">
-      <div className="w-[80%]">
+      <form className="w-[80%]" onSubmit={testclick}>
         {/* //? Match Date */}
         <div>
           <label htmlFor="match-date">試合日</label>
@@ -284,10 +329,9 @@ const MatchDataSetter = ({ onClick }: MatchDataSetterPropsType) => {
                     value={belt[i]}
                     onChange={(e) => {
                       setBelt((current) => {
-                        return [
-                          ...current,
-                          e.target.value as ORGANIZATIONS_Type,
-                        ];
+                        const clone = cloneDeep(current);
+                        clone[i] = e.target.value as ORGANIZATIONS_Type;
+                        return clone;
                       });
                     }}
                     id="matchBelt"
@@ -332,7 +376,7 @@ const MatchDataSetter = ({ onClick }: MatchDataSetterPropsType) => {
           placeholder="試合会場"
           name="matachCountry"
           // value={matachCountry.current}
-          onChange={(e) => (matachCountry.current = e.target.value)}
+          onChange={(e) => (matchVenue.current = e.target.value)}
         />
 
         {/* //? Weight */}
@@ -355,14 +399,12 @@ const MatchDataSetter = ({ onClick }: MatchDataSetterPropsType) => {
           </select>
         </div>
 
-        <button onClick={testclick}>テスト</button>
+        <button>テスト</button>
 
         <div className="mt-3">
-          <button className="bg-red-600 text-white" onClick={onClick}>
-            選手クリア
-          </button>
+          <button className="bg-red-600 text-white">登録</button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };
