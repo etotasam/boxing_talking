@@ -5,23 +5,25 @@ import { useQuery, useMutation, useQueryClient } from "react-query"
 // ! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 // ! types
-import { BoxerType } from "@/assets/types"
+import { BoxerType, MatchesData, RegstarMatchPropsType } from "@/assets/types"
 // ! hook
 import { useToastModal } from "./useToastModal"
 import { useLoading } from "./useLoading"
+import { QUERY_KEY } from "@/assets/queryKeys"
 
-//! 試合の登録
-type RegstarMatchPropsType = {
-  red_boxer_id: number,
-  blue_boxer_id: number,
-  match_date: string,
-  grade: string,
-  country: string,
-  venue: string,
-  weight: string,
-  titles: string[],
+
+//! 試合情報の取得
+export const useFetchMatches = () => {
+  const fetcher = useCallback(async () => {
+    return await Axios.get("api/match").then(value => value.data)
+  }, [])
+  const { data, isLoading, isError, isRefetching } = useQuery<MatchesData[]>(QUERY_KEY.matchesFetch, fetcher)
+  return { data, isLoading, isError, isRefetching }
 }
 
+
+
+//! 試合の登録
 export const useRegisterMatch = () => {
   const { setToastModal, showToastModal } = useToastModal()
   const queryClient = useQueryClient()

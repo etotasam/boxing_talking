@@ -8,7 +8,11 @@ export const FirstLoadinModal = () => {
       exit={{ opacity: 0, transition: { duration: 0.5 } }}
       className="z-[999] fixed top-0 left-0 bg-white flex justify-center items-center w-[100vw] min-h-[100vh]"
     >
-      <div className="bg-white">
+      <motion.div
+        initial={{ opacity: 1 }}
+        exit={{ opacity: 0, translateY: -30, transition: { duration: 0.3 } }}
+        className="bg-white"
+      >
         <h1 className="text-[50px] font-thin text-center select-none">
           BOXING TALKING
         </h1>
@@ -20,7 +24,7 @@ export const FirstLoadinModal = () => {
             ariaLabel="loading"
           />
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 };

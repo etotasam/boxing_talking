@@ -41,11 +41,8 @@ export const BoxerEditForm = (props: PropsType) => {
   }, [props.isSuccess]);
 
   return (
-    <div className={props.className}>
-      <div className="p-10 bg-stone-200 relative">
-        {isGuard && (
-          <div className="bg-stone-500/70 absolute top-0 left-0 w-full h-full z-10" />
-        )}
+    <div className={`${props.className}`}>
+      <div className="p-10 bg-stone-200 sticky top-[calc(100px+20px)]">
         <h1 className="text-3xl text-center">選手情報</h1>
         <form className="flex flex-col" onSubmit={props.onSubmit}>
           <input
