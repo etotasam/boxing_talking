@@ -16,11 +16,11 @@ import { MESSAGE, STATUS, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToa
 // //! types
 import type { BgColorType, BoxerDataOnFormType, BoxerType, NationalityType } from "@/assets/types"
 // ! functions
-import { convertToBoxerDataFromFromData } from "@/assets/functions";
+import { convertToBoxerData } from "@/assets/functions";
 
 
 //! 選手データ取得 and 登録済み選手の数を取得
-export const limit = 10
+export const limit = 20
 export const useFetchBoxer = () => {
 
   type SearchWordType = {
@@ -97,7 +97,7 @@ export const useUpdateBoxerData = () => {
     }
   })
   const updateFighter = (updateFighterData: BoxerDataOnFormType) => {
-    const convertedBoxerData = convertToBoxerDataFromFromData(updateFighterData)
+    const convertedBoxerData = convertToBoxerData(updateFighterData)
     mutate(convertedBoxerData, {
       onSuccess: () => {
         refetchReactQueryData(QUERY_KEY.boxer)
@@ -137,7 +137,7 @@ export const useRegisterBoxer = () => {
     }
   })
   const registerBoxer = (newBoxerData: BoxerDataOnFormType) => {
-    const convetedBoxerData = convertToBoxerDataFromFromData(newBoxerData)
+    const convetedBoxerData = convertToBoxerData(newBoxerData)
     mutate(convetedBoxerData, {
       onSuccess: (__, newBoxerData, context) => {
         console.log("onSuccess");

@@ -8,12 +8,27 @@ use Illuminate\Support\Facades\Auth;
 
 // Models
 use App\Models\BoxingMatch;
-use App\Models\Fighter;
+use App\Models\Boxer;
 use App\Models\Comment;
 use App\Models\Vote;
 
+
 class MatchController extends Controller
 {
+
+
+
+    // ! 保有タイトルを配列にして返す
+    protected function toArrayTitles($boxer)
+    {
+        if (empty($boxer->title_hold)) {
+            $boxer->title_hold = [];
+        } else {
+            $boxer->title_hold = explode('/', $boxer->title_hold);
+        };
+        return $boxer;
+    }
+
     /**
      * fetch all matches from DB
      *
@@ -33,15 +48,32 @@ class MatchController extends Controller
         }
 
         $matches = $all_match->map(function ($item, $key) {
-            $red_id = $item->red_fighter_id;
-            $blue_id = $item->blue_fighter_id;
-            $red_fighter = Fighter::find($red_id);
-            $blue_fighter = Fighter::find($blue_id);
+            $red_id = $item->red_boxer_id;
+            $blue_id = $item->blue_boxer_id;
+            $red_boxer = Boxer::find($red_id);
+            $blue_boxer = Boxer::find($blue_id);
+            $titles = $item->titles;
+
+            $formatted_red_boxer = $this->toArrayTitles($red_boxer);
+            $formatted_blue_boxer = $this->toArrayTitles($blue_boxer);
+
+
+            if (empty($titles)) {
+                $formatted_titles = [];
+            } else {
+                $formatted_titles = explode('/', $titles);
+            };
+
             return  [
                 "id" => $item->id,
-                "red" => $red_fighter,
-                "blue" => $blue_fighter,
-                "date" => $item->match_date,
+                "red_boxer" => $formatted_red_boxer,
+                "blue_boxer" => $formatted_blue_boxer,
+                "country" => $item->country,
+                "venue" => $item->venue,
+                "grade" => $item->grade,
+                "titles" => $formatted_titles,
+                "weight" => $item->weight,
+                "match_date" => $item->match_date,
                 "count_red" => $item->count_red,
                 "count_blue" => $item->count_blue
             ];

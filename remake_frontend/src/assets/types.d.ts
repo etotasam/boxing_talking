@@ -1,6 +1,8 @@
 // ! data
 import { Stance, ORGANIZATIONS, WEIGHT_CLASS } from "@/assets/boxerData";
 import { Nationality } from "@/assets/NationalFlagData"
+import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "./statusesOnToastModal";
+
 
 export type UserType = {
   id: string | undefined,
@@ -57,11 +59,36 @@ export type TitleType = {
 
 export type StanceType = typeof Stance[keyof typeof Stance]
 
-// ? 試合情報
+////////// ? 試合情報
+
 export type FightInfoType = {
   date: string,
   place: string,
   matchGrade: string[],
   class: string,
 }
+//? 登録用 matchデータ
+export type RegstarMatchPropsType = {
+  red_boxer_id: number,
+  blue_boxer_id: number,
+  match_date: string,
+  grade: string,
+  country: NationalityType,
+  venue: string,
+  weight: string,
+  titles: string[],
+}
 
+export type MatchesData = {
+  id: id,
+  red_boxer: BoxerType,
+  blue_boxer: BoxerType,
+  country: NationalityType,
+  venue: string,
+  grade: string,
+  titles: string[],
+  weight: string,
+  match_date: string,
+  count_red: number,
+  count_blue: number,
+}

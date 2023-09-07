@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { isEqual } from "lodash";
 // ! data
 import { Stance, initialBoxerData } from "@/assets/boxerData";
-
 import { QUERY_KEY } from "@/assets/queryKeys";
+// ! functions
+import { getBoxerDataWithID, convertToBoxerData } from "@/assets/functions";
 //! hooks
 import { useToastModal } from "@/hooks/useToastModal";
 import { useReactQuery } from "@/hooks/useReactQuery";
@@ -18,6 +20,10 @@ import AdminiLayout from "@/layout/AdminiLayout";
 //! component
 import { FlagImage } from "@/components/atomc/FlagImage";
 import { BoxerEditForm } from "@/components/module/BoxerEditForm";
+import {
+  BG_COLOR_ON_TOAST_MODAL,
+  MESSAGE,
+} from "@/assets/statusesOnToastModal";
 
 export const BoxerEdit = () => {
   // ! use hook
@@ -25,8 +31,9 @@ export const BoxerEdit = () => {
   const { state: editTargetBoxerData, setter: setEditTargetBoxerData } =
     useBoxerDataOnForm();
   const { updateFighter } = useUpdateBoxerData();
-  //? 選手データの取得(api)
+  //? データ
   const { boxersData, pageCount, isError } = useFetchBoxer();
+  const [checked, setChecked] = useState<number>();
 
   //? paramsの取得
   const { search } = useLocation();
@@ -43,32 +50,24 @@ export const BoxerEdit = () => {
   }, []);
   // const { width: windowWidth } = useGetWindowSize();
 
-  type SubjectType = {
-    name: string;
-    country: string;
-  };
+  // type SubjectType = {
+  //   name: string;
+  //   country: string;
+  // };
 
   //? Link先の作成
-  const searchSub = { name: paramName, country: paramCountry };
-  const params = (Object.keys(searchSub) as Array<keyof SubjectType>).reduce(
-    (acc, key) => {
-      if (searchSub[key]) {
-        return acc + `&${key}=${searchSub[key]}`;
-      }
-      return acc;
-    },
-    ""
-  );
+  // const searchSub = { name: paramName, country: paramCountry };
+  // const params = (Object.keys(searchSub) as Array<keyof SubjectType>).reduce(
+  //   (acc, key) => {
+  //     if (searchSub[key]) {
+  //       return acc + `&${key}=${searchSub[key]}`;
+  //     }
+  //     return acc;
+  //   },
+  //   ""
+  // );
 
-  //? fighterデータ
-  const [editFighterData, setEditFighterData] =
-    useState<BoxerType>(initialBoxerData);
-
-  const { resetToastModalToDefault, setToastModal, showToastModal } =
-    useToastModal();
-
-  //? 選手データの更新のフック
-  // const { updateFighter, isLoading: isUpdatingFighter } = useUpdateFighter();
+  const { setToastModal, showToastModal } = useToastModal();
 
   //? 選手を選択しているかどうか
   const inputEl = document.getElementsByName(
@@ -79,19 +78,14 @@ export const BoxerEdit = () => {
     .includes(true);
 
   //? 対象の選手を選択しているかどうかをreact queryで共有
-  // const { state: isSelectedFighter, setter: setIsSelectedFighter } =
-  //   useQueryState<boolean>(queryKeys.isSelectedFighter, isChecked);
   setReactQueryData<boolean>(QUERY_KEY.isBoxerSelected, false);
   const isSelectedFighter = getReactQueryData<boolean>(
     QUERY_KEY.isBoxerSelected
   );
 
-  useEffect(() => {
-    setReactQueryData<boolean>(QUERY_KEY.isBoxerSelected, isChecked);
-  }, [isChecked]);
-
-  //? 削除確認のモーダル visible/invisible
-  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+  // useEffect(() => {
+  //   setReactQueryData<boolean>(QUERY_KEY.isBoxerSelected, isChecked);
+  // }, [isChecked]);
 
   // const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   //   e.preventDefault();
@@ -132,27 +126,32 @@ export const BoxerEdit = () => {
   // todo ボクサーの編集を実行
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // if (!fighterEditData) return;
+    // ? 選手が選択されていない
+    if (!checked) {
+      setToastModal({
+        message: MESSAGE.BOXER_NO_SELECTED,
+        bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
+      });
+      showToastModal();
+      return;
+    }
     if (!editTargetBoxerData) return;
-    console.log(editTargetBoxerData);
-    resetToastModalToDefault();
-    //? ボクサーを選択していない場合return
-    // if (!isSelectedFighter) {
-    //   setToastModal({
-    //     message: MESSAGE.NO_SELECT_EDIT_FIGHTER,
-    //     bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-    //   });
-    //   showToastModal();
-    //   return;
-    // }
-    //? ボクサーdataを編集していない場合return
-    // if (isEqual(getFighterWithId(fighterData.id), fighterData)) {
-    //   setToastModal({
-    //     message: MESSAGE.NOT_EDIT_FIGHTER,
-    //     bgColor: BG_COLOR_ON_TOAST_MODAL.NULL,
-    //   });
-    //   return;
-    // }
+    if (!boxersData) return console.error("Not have boxers data");
+    //? データ変更がされていない時
+    const boxer = getBoxerDataWithID({
+      boxerID: editTargetBoxerData.id,
+      boxersData: boxersData,
+    });
+    const convertedData = convertToBoxerData(editTargetBoxerData);
+    if (isEqual(boxer, convertedData)) {
+      setToastModal({
+        message: MESSAGE.BOXER_NOT_EDIT,
+        bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
+      });
+      showToastModal();
+      return;
+    }
+
     //? ボクサーデータ編集実行
     updateFighter(editTargetBoxerData);
   };
@@ -181,8 +180,8 @@ export const BoxerEdit = () => {
   // if (isErrorFetchFighters) return <p>error</p>;
   return (
     <AdminiLayout>
-      <div className="container w-screen flex justify-center">
-        <div className="flex w-[95%]">
+      <div className="w-full flex justify-center">
+        <div className="flex">
           <ul>
             {Array.from({ length: pageCount }, (_, index) => (
               <Link key={index} to={`/admini/boxer_edit?page=${index + 1}`}>
@@ -192,6 +191,8 @@ export const BoxerEdit = () => {
           </ul>
           <section className="w-[40%] flex justify-center items-start mb-10">
             <BoxersList
+              checked={checked}
+              setChecked={setChecked}
               boxersData={boxersData}
               setEditTargetBoxerData={setEditTargetBoxerData}
             />
@@ -211,14 +212,16 @@ export const BoxerEdit = () => {
 type BoxerListPropsType = {
   boxersData: BoxerType[] | undefined;
   setEditTargetBoxerData: (boxer: BoxerType) => void;
+  checked: number | undefined;
+  setChecked: React.Dispatch<React.SetStateAction<number | undefined>>;
 };
 
 const BoxersList = ({
+  checked,
+  setChecked,
   boxersData,
   setEditTargetBoxerData,
 }: BoxerListPropsType) => {
-  const [checked, setChecked] = useState<number>();
-
   return (
     <>
       {boxersData && (

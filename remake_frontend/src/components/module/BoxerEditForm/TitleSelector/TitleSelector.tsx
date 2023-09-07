@@ -38,7 +38,7 @@ export const TitleSelector = () => {
         <p>保有タイトル</p>
         {Array.from({ length: countHasBelt }, (_, index) => index).map(
           (key, i) => (
-            <div key={key} className="flex">
+            <div key={i} className="flex">
               {/* //? 団体選択 */}
               <div className="mt-3 flex p-1">
                 <select

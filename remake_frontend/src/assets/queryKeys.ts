@@ -17,6 +17,7 @@ export const QUERY_KEY = {
   boxer: generateQueryKey('boxer'),
   countBoxer: generateQueryKey('boxer/count'),
   isBoxerSelected: generateQueryKey('boxer/select'),
+  matchesFetch: generateQueryKey('match/fetch'),
 } as const
 
 

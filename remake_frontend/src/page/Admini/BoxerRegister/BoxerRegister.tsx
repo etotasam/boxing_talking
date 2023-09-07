@@ -65,7 +65,6 @@ export const BoxerRegister = () => {
     <AdminiLayout>
       <div className="min-h-[calc(100vh-100px)] flex justify-center items-center">
         <BoxerEditForm isSuccess={successRegisterBoxer} onSubmit={onSubmit} />
-        {/* {isRegisterFighterPending && <FullScreenSpinnerModal />} */}
       </div>
     </AdminiLayout>
   );

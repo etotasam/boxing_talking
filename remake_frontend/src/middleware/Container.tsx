@@ -4,6 +4,7 @@ import { AnimatePresence } from "framer-motion";
 // ! hooks
 import { useAuth } from "@/hooks/useAuth";
 import { useToastModal } from "@/hooks/useToastModal";
+import { useFetchMatches } from "@/hooks/useMatch";
 // ! modal
 import { ToastModalContainer } from "@/components/modal/ToastModal";
 import { LoginFormModal } from "@/components/modal/LoginFormModal";
@@ -21,7 +22,8 @@ const Container = () => {
   const { isLoading: isLoadingByRecoil } = useRecoilValue(loadingSelector);
 
   const { data: userData, isError, isLoading: isFirstCheckingAuth } = useAuth();
-  const { isLoading: fetchingBoxerData } = useFetchBoxer();
+  const { isLoading: isBoxersFetching } = useFetchBoxer();
+  const { isLoading: isMatchesFetching } = useFetchMatches();
   //? cookieでログインチェック。なければfalseを入れる
   React.useEffect(() => {
     if (!isError) return;
@@ -55,7 +57,8 @@ const Container = () => {
         isShowLoginModal={isShowLoginModal}
         isLoadingByRecoil={isLoadingByRecoil}
         isFirstCheckingAuth={isFirstCheckingAuth}
-        fetchingBoxerData={fetchingBoxerData}
+        isBoxersFetching={isBoxersFetching}
+        isMatchesFetching={isMatchesFetching}
       />
     </>
   );
@@ -68,7 +71,8 @@ type ModalesData = {
   isShowLoginModal: boolean;
   isLoadingByRecoil: boolean | undefined;
   isFirstCheckingAuth: boolean;
-  fetchingBoxerData: boolean;
+  isBoxersFetching: boolean;
+  isMatchesFetching: boolean;
 };
 
 /**
@@ -82,9 +86,9 @@ const Modales = (props: ModalesData) => {
       <AnimatePresence>
         {props.isShowToastModal && <ToastModalContainer />}
         {props.isLoadingByRecoil && <FullScreenSpinnerModal />}
-        {(props.isFirstCheckingAuth || props.fetchingBoxerData) && (
-          <FirstLoadinModal />
-        )}
+        {(props.isFirstCheckingAuth ||
+          props.isBoxersFetching ||
+          props.isMatchesFetching) && <FirstLoadinModal />}
       </AnimatePresence>
       {props.isShowLoginModal && <LoginFormModal />}
     </>

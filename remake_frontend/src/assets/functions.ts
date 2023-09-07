@@ -4,7 +4,7 @@ import { BoxerType, BoxerDataOnFormType } from "@/assets/types"
 
 
 // ? boxerDataOnFormのtitle_holeプロパティをstring[]型に変形してデータベースに保存する為の関数
-export const convertToBoxerDataFromFromData = (boxerDataOnForm: BoxerDataOnFormType): BoxerType => {
+export const convertToBoxerData = (boxerDataOnForm: BoxerDataOnFormType): BoxerType => {
 
   const cloneData = _.cloneDeep(boxerDataOnForm)
 
@@ -25,4 +25,10 @@ export const convertToBoxerDataFromFromData = (boxerDataOnForm: BoxerDataOnFormT
     return cloneData as unknown as BoxerType
   }
   return cloneData as unknown as BoxerType
+}
+
+
+
+export const getBoxerDataWithID = ({ boxerID, boxersData }: { boxerID: number, boxersData: BoxerType[] }): BoxerType | undefined => {
+  return boxersData.find(boxer => boxer.id === boxerID)
 }
