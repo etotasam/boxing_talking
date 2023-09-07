@@ -20,7 +20,7 @@ import { convertToBoxerData } from "@/assets/functions";
 
 
 //! 選手データ取得 and 登録済み選手の数を取得
-export const limit = 20
+export const limit = 10
 export const useFetchBoxer = () => {
 
   type SearchWordType = {
@@ -36,20 +36,32 @@ export const useFetchBoxer = () => {
   //? params の取得
   const { search } = useLocation();
   const query = new URLSearchParams(search);
-  let paramPage = Number(query.get("page"));
   const paramName = (query.get("name"));
   const paramCountry = (query.get("country")) as NationalityType | null;
+  let paramPage = Number(query.get("page"));
+
   if (!paramPage) {
     paramPage = 1
   }
+  let queryKey: Record<string, string | number> = { page: paramPage }
+
+  if (paramName) {
+    queryKey = { ...queryKey, name: paramName }
+  }
+  if (paramCountry) {
+    queryKey = { ...queryKey, country: paramCountry }
+  }
+
+
+
   const fetchBoxerApi = async ({ page, limit, searchWords }: FetcherPropsType) => {
     const res = await Axios.get<BoxerType[]>("/api/boxer", { params: { page, limit, ...searchWords } }).then(value => value.data)
     return res
   }
-  const { data: boxersData, isLoading, isError, isPreviousData, refetch, isRefetching } = useQuery<BoxerType[]>([QUERY_KEY.boxer, { page: paramPage }], () => fetchBoxerApi({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), { keepPreviousData: true, staleTime: Infinity })
+  const { data: boxersData, isLoading, isError, isPreviousData, refetch, isRefetching, } = useQuery<BoxerType[]>([QUERY_KEY.boxer, { ...queryKey }], () => fetchBoxerApi({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), { keepPreviousData: true, staleTime: Infinity })
 
   const fetchCountBoxer = async (searchWords: SearchWordType) => await Axios.get<number>("/api/boxer/count", { params: { ...searchWords } }).then(v => v.data)
-  const { data: boxersCount } = useQuery<number>(QUERY_KEY.countBoxer, () => fetchCountBoxer({ name: paramName, country: paramCountry }), { staleTime: Infinity })
+  const { data: boxersCount } = useQuery<number>([QUERY_KEY.countBoxer, { name: paramName, country: paramCountry }], () => fetchCountBoxer({ name: paramName, country: paramCountry }), { staleTime: Infinity })
   const pageCount = boxersCount ? Math.ceil(boxersCount / limit) : 0
 
   return { boxersData, boxersCount, pageCount, isLoading, isError, isPreviousData, refetch, isRefetching }
@@ -166,7 +178,7 @@ export const useRegisterBoxer = () => {
         hasError()
         resetLoadingState()
         if (error.status === STATUS.NOT_ACCEPTABLE) {
-          setToastModal({ message: MESSAGE.FIGHTER_NOT_ABLE_TO_REGISTER, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          setToastModal({ message: MESSAGE.BOXER_IS_ALRADY_EXISTS, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
           showToastModal()
           return
         }
