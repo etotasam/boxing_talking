@@ -21,6 +21,7 @@ import AdminiLayout from "@/layout/AdminiLayout";
 import { FlagImage } from "@/components/atomc/FlagImage";
 import { BoxerEditForm } from "@/components/module/BoxerEditForm";
 import { SearchBoxer } from "@/components/module/SearchBoxer";
+import { Confirm } from "@/components/modal/Confirm";
 
 export const BoxerEdit = () => {
   // ! use hook
@@ -128,6 +129,17 @@ export const BoxerEdit = () => {
   //   return isLoading;
   // };
 
+  const [isDeleteConfirmm, setIsDeleteConfirm] = useState(false);
+
+  const cancel = () => {
+    setIsDeleteConfirm(false);
+  };
+
+  const execution = () => {
+    console.log("実行");
+    setIsDeleteConfirm(false);
+  };
+
   return (
     <AdminiLayout>
       <div className="w-full flex">
@@ -146,6 +158,15 @@ export const BoxerEdit = () => {
             <div className="w-[50%] flex justify-center">
               <div className="w-[95%]">
                 <SearchBoxer />
+                {/* //? delete */}
+                <div className="mt-10">
+                  <button
+                    onClick={() => setIsDeleteConfirm(true)}
+                    className="bg-red-600 text-white rounded py-2 px-10"
+                  >
+                    削除
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -159,6 +180,11 @@ export const BoxerEdit = () => {
           />
         </section>
       </div>
+      {isDeleteConfirmm && (
+        <Confirm execution={execution} cancel={cancel}>
+          削除しますか？
+        </Confirm>
+      )}
     </AdminiLayout>
   );
 };

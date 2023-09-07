@@ -14,6 +14,8 @@ import { useLogout } from "@/hooks/useAuth";
 // ! icons
 import { IconContext } from "react-icons";
 import { BiUserCircle } from "react-icons/bi";
+//! component
+import { LinkList } from "../LinkList";
 
 type PropsType = {
   userData: UserType | undefined;
@@ -39,6 +41,10 @@ export const Header = (porps: PropsType) => {
         <DivVerticalCenter>
           <h1 className="text-[75px] font-thin">BOXING TALKING</h1>
         </DivVerticalCenter>
+        <div className="absolute right-[170px] top-4">
+          <LinkList />
+        </div>
+        {/* <LinkList /> */}
         <DivVerticalCenter className="absolute right-[50px] top-0">
           <AuthControlComponent
             userData={userData}

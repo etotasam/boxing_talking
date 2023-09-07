@@ -23,6 +23,11 @@ export const TitleSelector = () => {
 
   // ? 団体と階級を選択した場合入力欄を追加
   useEffect(() => {
+    console.log(boxerDataOnForm.title_hold.length);
+    if (boxerDataOnForm.title_hold.length >= 4) {
+      setCountHasBelt(4);
+      return;
+    }
     if (!boxerDataOnForm.title_hold.length) {
       setCountHasBelt(1);
       return;
