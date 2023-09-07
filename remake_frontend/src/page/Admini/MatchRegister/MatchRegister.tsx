@@ -218,8 +218,7 @@ const MatchDataSetter = ({
   matchBoxers,
 }: MatchDataSetterPropsType) => {
   //? use hook
-  const { showToastModal, setToastModal } = useToastModal();
-
+  const { showToastModal, setToastModal, hideToastModal } = useToastModal();
   const { registerMatch } = useRegisterMatch();
   const matchDate = useRef("");
   const [matchGrade, setMatchGrade] = useState<GRADE_Type>();
@@ -230,6 +229,12 @@ const MatchDataSetter = ({
   const [title, setTitle] = useState(false);
   const [counter, setCounter] = useState(1);
 
+  // ? アンマウント時にはトーストモーダルを隠す
+  useEffect(() => {
+    return () => {
+      hideToastModal();
+    };
+  }, []);
   // ? gradeがタイトルマッチ以外の時は belt (WBA WBCとか...)を空にする
   useEffect(() => {
     if (!title) return setBelt([]);

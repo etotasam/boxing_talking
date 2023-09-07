@@ -16,7 +16,7 @@ export const ToastModal = () => {
   React.useEffect(() => {
     switch (bgColor) {
       case BG_COLOR_ON_TOAST_MODAL.ERROR:
-        setColor("bg-rose-500");
+        setColor("bg-red-700");
         break;
       case BG_COLOR_ON_TOAST_MODAL.SUCCESS:
         setColor("bg-emerald-600");

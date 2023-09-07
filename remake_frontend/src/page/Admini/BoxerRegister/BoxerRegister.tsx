@@ -13,14 +13,21 @@ import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
 import { useToastModal } from "@/hooks/useToastModal";
 import { useRegisterBoxer } from "@/hooks/useBoxer";
 import { BoxerType } from "@/assets/types";
+import { useEffect } from "react";
 
 export const BoxerRegister = () => {
   // ! use hook
   const { state: boxerDataOnForm, setter: setBoxerDataToForm } =
     useBoxerDataOnForm();
-  const { setToastModal } = useToastModal();
+  const { setToastModal, showToastModal, hideToastModal } = useToastModal();
   const { registerBoxer, isSuccess: successRegisterBoxer } = useRegisterBoxer();
 
+  // ? アンマウント時にはトーストモーダルを隠す
+  useEffect(() => {
+    return () => {
+      hideToastModal();
+    };
+  }, []);
   //! formデータのsubmit
   /**
    * sendData
@@ -35,28 +42,18 @@ export const BoxerRegister = () => {
         message: MESSAGE.INVALID_COUNTRY,
         bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
       });
+      showToastModal();
       return;
     }
-
-    // const copy_boxerDataOnForm = JSON.parse(JSON.stringify(boxerDataOnForm));
-    // const { title_hold } = boxerDataOnForm;
-    // if (title_hold.length) {
-    //   const titlesArray = title_hold
-    //     .filter((obj) => {
-    //       return (
-    //         obj?.organization !== undefined && obj?.weightClass !== undefined
-    //       );
-    //     })
-    //     .map((titleData) => {
-    //       return `${titleData.organization}世界${titleData.weightClass}級王者`;
-    //     });
-
-    //   copy_boxerDataOnForm.title_hold = titlesArray;
-
-    // setBoxerDataToForm((curr) => {
-    //   return { ...curr, title_hold: titlesArray };
-    // });
-    // }
+    //? 名前が未入力
+    if (!boxerDataOnForm.name || !boxerDataOnForm.eng_name) {
+      setToastModal({
+        message: MESSAGE.BOXER_NAME_UNDEFINED,
+        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
+      });
+      showToastModal();
+      return;
+    }
 
     registerBoxer(boxerDataOnForm);
   };

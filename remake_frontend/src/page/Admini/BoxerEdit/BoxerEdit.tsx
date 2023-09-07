@@ -4,6 +4,7 @@ import { isEqual } from "lodash";
 // ! data
 import { Stance, initialBoxerData } from "@/assets/boxerData";
 import { QUERY_KEY } from "@/assets/queryKeys";
+import { Nationality } from "@/assets/NationalFlagData";
 // ! functions
 import { getBoxerDataWithID, convertToBoxerData } from "@/assets/functions";
 //! hooks
@@ -12,7 +13,6 @@ import { useReactQuery } from "@/hooks/useReactQuery";
 import { useFetchBoxer, useUpdateBoxerData } from "@/hooks/useBoxer";
 import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
 import { useLoading } from "@/hooks/useLoading";
-
 //! types
 import { BoxerType } from "@/assets/types";
 //! layout
@@ -27,16 +27,15 @@ import {
 
 export const BoxerEdit = () => {
   // ! use hook
-  const { getReactQueryData, setReactQueryData } = useReactQuery();
   const { state: editTargetBoxerData, setter: setEditTargetBoxerData } =
     useBoxerDataOnForm();
   const { updateFighter } = useUpdateBoxerData();
   //? データ
-  const { boxersData, pageCount, isError } = useFetchBoxer();
+  const { boxersData, pageCount } = useFetchBoxer();
   const [checked, setChecked] = useState<number>();
 
   //? paramsの取得
-  const { search } = useLocation();
+  const { search, pathname } = useLocation();
   const query = new URLSearchParams(search);
   const paramPage = Number(query.get("page"));
   const paramName = query.get("name");
@@ -44,61 +43,19 @@ export const BoxerEdit = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!paramPage) {
-      navigate("/admini/boxer_edit");
-    }
+    // if (!paramPage) {
+    //   navigate("/admini/boxer_edit");
+    // }
   }, []);
-  // const { width: windowWidth } = useGetWindowSize();
 
-  // type SubjectType = {
-  //   name: string;
-  //   country: string;
-  // };
+  const { setToastModal, showToastModal, hideToastModal } = useToastModal();
 
-  //? Link先の作成
-  // const searchSub = { name: paramName, country: paramCountry };
-  // const params = (Object.keys(searchSub) as Array<keyof SubjectType>).reduce(
-  //   (acc, key) => {
-  //     if (searchSub[key]) {
-  //       return acc + `&${key}=${searchSub[key]}`;
-  //     }
-  //     return acc;
-  //   },
-  //   ""
-  // );
-
-  const { setToastModal, showToastModal } = useToastModal();
-
-  //? 選手を選択しているかどうか
-  const inputEl = document.getElementsByName(
-    "boxer_element"
-  ) as NodeListOf<HTMLInputElement>;
-  const isChecked = Array.from(inputEl)
-    .map((e) => e.checked)
-    .includes(true);
-
-  //? 対象の選手を選択しているかどうかをreact queryで共有
-  setReactQueryData<boolean>(QUERY_KEY.isBoxerSelected, false);
-  const isSelectedFighter = getReactQueryData<boolean>(
-    QUERY_KEY.isBoxerSelected
-  );
-
-  // useEffect(() => {
-  //   setReactQueryData<boolean>(QUERY_KEY.isBoxerSelected, isChecked);
-  // }, [isChecked]);
-
-  // const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   resetToastModalToDefault();
-  //   if (isSelectedFighter) {
-  //     setOpenConfirmModal(true);
-  //   } else {
-  //     setToastModal({
-  //       message: MESSAGE.NO_SELECT_EDIT_FIGHTER,
-  //       bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-  //     });
-  //   }
-  // };
+  // ? アンマウント時にはトーストモーダルを隠す
+  useEffect(() => {
+    return () => {
+      hideToastModal();
+    };
+  }, []);
 
   //? 選手データの削除実行
   // const {
@@ -112,18 +69,7 @@ export const BoxerEdit = () => {
   //   deleteFighter(editFighterData!);
   // };
 
-  //? ボクサーデータ削除成功時にeditFighterDataを空にする
-  // useEffect(() => {
-  //   if (!isDeleteSuccess) return;
-  //   setEditFighterData(initialBoxerData);
-  // }, [isDeleteSuccess]);
-
-  // const getFighterWithId = (fighterId: number) => {
-  //   if (!fetchFightersData) return;
-  //   return fetchFightersData.find((boxer) => boxer.id === fighterId);
-  // };
-
-  // todo ボクサーの編集を実行
+  // ! ボクサーの編集を実行
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // ? 選手が選択されていない
@@ -135,7 +81,15 @@ export const BoxerEdit = () => {
       showToastModal();
       return;
     }
-    if (!editTargetBoxerData) return;
+    //? 名前が空
+    if (!editTargetBoxerData.name || !editTargetBoxerData.eng_name) {
+      setToastModal({
+        message: MESSAGE.BOXER_NAME_UNDEFINED,
+        bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
+      });
+      showToastModal();
+      return;
+    }
     if (!boxersData) return console.error("Not have boxers data");
     //? データ変更がされていない時
     const boxer = getBoxerDataWithID({
@@ -178,6 +132,23 @@ export const BoxerEdit = () => {
   // };
 
   // if (isErrorFetchFighters) return <p>error</p>;
+
+  const searchName = React.useRef("");
+  const country = React.useRef("");
+  const sendData = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (country.current && searchName.current) {
+      navigate(
+        `/admini/boxer_edit?name=${searchName.current}&country=${country}`
+      );
+    } else if (country.current) {
+      navigate(`/admini/boxer_edit?country=${country.current}`);
+    } else if (searchName.current) {
+      navigate(`/admini/boxer_edit?name=${searchName.current}`);
+    }
+    // refetch()
+  };
+
   return (
     <AdminiLayout>
       <div className="w-full flex justify-center">
@@ -197,11 +168,46 @@ export const BoxerEdit = () => {
               setEditTargetBoxerData={setEditTargetBoxerData}
             />
           </section>
-          <section className="w-[60%] flex justify-center">
-            <BoxerEditForm
-              editTargetBoxerData={editTargetBoxerData}
-              onSubmit={onSubmit}
-            />
+          <section className="w-[60%] flexjustify-center">
+            <div className="sticky top-[calc(100px+20px)]">
+              <BoxerEditForm
+                editTargetBoxerData={editTargetBoxerData}
+                onSubmit={onSubmit}
+              />
+              <div>
+                <h2>test</h2>
+                <form onSubmit={sendData} className="bg-stone-200">
+                  <input
+                    type="text"
+                    onChange={(e) => {
+                      searchName.current = e.target.value;
+                    }}
+                  />
+                  <div className="flex mt-3">
+                    <label className="w-[100px] text-center" htmlFor="countrys">
+                      国籍
+                    </label>
+                    <select
+                      className="w-[150px]"
+                      name="country"
+                      // value={boxerDataOnForm?.country}
+                      onChange={(e) => {
+                        country.current = e.target.value;
+                      }}
+                      id="countrys"
+                    >
+                      <option value={undefined}></option>
+                      {Object.values(Nationality).map((nationalName) => (
+                        <option key={nationalName} value={nationalName}>
+                          {nationalName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <button className="p-5 bg-red-300">テスト</button>
+                </form>
+              </div>
+            </div>
           </section>
         </div>
       </div>

@@ -22,12 +22,9 @@ const Container = () => {
   const { isLoading: isLoadingByRecoil } = useRecoilValue(loadingSelector);
 
   const { data: userData, isError, isLoading: isFirstCheckingAuth } = useAuth();
-  const { isLoading: isBoxersFetching } = useFetchBoxer();
+  const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } =
+    useFetchBoxer();
   const { isLoading: isMatchesFetching } = useFetchMatches();
-  //? cookieでログインチェック。なければfalseを入れる
-  React.useEffect(() => {
-    if (!isError) return;
-  }, [isError]);
 
   // ! Toast Modalの表示時間等の設定
   const waitTime = 5000;
@@ -59,6 +56,7 @@ const Container = () => {
         isFirstCheckingAuth={isFirstCheckingAuth}
         isBoxersFetching={isBoxersFetching}
         isMatchesFetching={isMatchesFetching}
+        isRefetchingBoxers={isRefetchingBoxers}
       />
     </>
   );
@@ -73,6 +71,7 @@ type ModalesData = {
   isFirstCheckingAuth: boolean;
   isBoxersFetching: boolean;
   isMatchesFetching: boolean;
+  isRefetchingBoxers: boolean;
 };
 
 /**
@@ -85,7 +84,9 @@ const Modales = (props: ModalesData) => {
     <>
       <AnimatePresence>
         {props.isShowToastModal && <ToastModalContainer />}
-        {props.isLoadingByRecoil && <FullScreenSpinnerModal />}
+        {(props.isLoadingByRecoil || props.isRefetchingBoxers) && (
+          <FullScreenSpinnerModal />
+        )}
         {(props.isFirstCheckingAuth ||
           props.isBoxersFetching ||
           props.isMatchesFetching) && <FirstLoadinModal />}
