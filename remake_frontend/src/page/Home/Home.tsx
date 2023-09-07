@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet";
 // ! components
 import { FightBox } from "@/components/module/FightBox";
 import { LinkList } from "@/components/module/LinkList";
@@ -10,7 +11,9 @@ export const Home = () => {
 
   return (
     <>
-      <LinkList />
+      <Helmet>
+        <title>Home</title>
+      </Helmet>
       <div className="my-10">
         <ul>
           {matchesData &&

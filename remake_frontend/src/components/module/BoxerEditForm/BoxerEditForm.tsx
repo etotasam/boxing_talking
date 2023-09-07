@@ -246,9 +246,9 @@ export const BoxerEditForm = (props: PropsType) => {
           <TitleSelector />
         </div>
 
-        <div className="relative mt-10">
+        <div className="relative mt-5">
           <button
-            className={`w-full duration-300 py-2 px-2 mt-3 tracking-[0.5em] rounded bg-stone-600 hover:bg-stone-700 text-white`}
+            className={`w-full duration-300 py-2 px-2 tracking-[0.5em] rounded bg-stone-600 hover:bg-stone-700 text-white`}
           >
             登録
           </button>

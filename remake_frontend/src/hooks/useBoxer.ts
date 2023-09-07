@@ -20,7 +20,7 @@ import { convertToBoxerData } from "@/assets/functions";
 
 
 //! 選手データ取得 and 登録済み選手の数を取得
-export const limit = 20
+export const limit = 10
 export const useFetchBoxer = () => {
 
   type SearchWordType = {
