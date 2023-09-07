@@ -19,6 +19,7 @@ import { useRegisterMatch } from "@/hooks/useMatch";
 import { useToastModal } from "@/hooks/useToastModal";
 //! component
 import { FlagImage } from "@/components/atomc/FlagImage";
+import { SearchBoxer } from "@/components/module/SearchBoxer";
 
 export const MatchRegister = () => {
   const { boxersData } = useFetchBoxer();
@@ -30,10 +31,17 @@ export const MatchRegister = () => {
     <AdminiLayout>
       <div className="w-full flex">
         <section className="w-[70%]">
-          <div className="sticky top-[calc(100px+20px)]">
+          <div className="sticky top-[calc(100px+20px)] mt-[20px]">
             <MatchSetUpBox boxers={matchBoxers} />
-            <div className="ml-10 mt-5">
-              <MatchDataSetter matchBoxers={matchBoxers} onClick={() => {}} />
+            <div className="flex mt-5">
+              <div className="w-[50%] flex justify-center">
+                <MatchDataSetter matchBoxers={matchBoxers} />
+              </div>
+              <div className="w-[50%] flex justify-center">
+                <div className="w-[90%]">
+                  <SearchBoxer />
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -196,7 +204,6 @@ const BoxersList = ({
 
 // ! 試合情報セッター
 type MatchDataSetterPropsType = {
-  onClick: () => void;
   matchBoxers: MatchBoxersType;
 };
 
@@ -213,10 +220,7 @@ type WEIGHT_CLASS_Type = (typeof WEIGHT_CLASS)[keyof typeof WEIGHT_CLASS];
 type ORGANIZATIONS_Type = (typeof ORGANIZATIONS)[keyof typeof ORGANIZATIONS];
 
 // ! 試合データ入力
-const MatchDataSetter = ({
-  onClick,
-  matchBoxers,
-}: MatchDataSetterPropsType) => {
+const MatchDataSetter = ({ matchBoxers }: MatchDataSetterPropsType) => {
   //? use hook
   const { showToastModal, setToastModal, hideToastModal } = useToastModal();
   const { registerMatch } = useRegisterMatch();
@@ -320,6 +324,9 @@ const MatchDataSetter = ({
       className="w-[400px] bg-stone-200 border-[1px] border-stone-400 p-5"
       onSubmit={onSubmit}
     >
+      <h2 className="text-center my-5 text-[26px] tracking-[0.1em]">
+        試合情報
+      </h2>
       {/* //? Match Date */}
       <div className="flex">
         {/* <div className="w-[100px] text-right"> */}
@@ -455,7 +462,7 @@ const MatchDataSetter = ({
       </div>
 
       <div className="w-full flex justify-center">
-        <button className="bg-stone-600 text-white py-1 px-5 rounded mt-10 w-[80%]">
+        <button className="bg-stone-600 tracking-[0.5em] text-white py-2 px-5 rounded mt-10 w-full">
           登録
         </button>
       </div>
