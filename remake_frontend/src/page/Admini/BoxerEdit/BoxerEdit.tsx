@@ -2,17 +2,17 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { isEqual } from "lodash";
 // ! data
-import { Stance, initialBoxerData } from "@/assets/boxerData";
-import { QUERY_KEY } from "@/assets/queryKeys";
-import { Nationality } from "@/assets/NationalFlagData";
+//! data
+import {
+  BG_COLOR_ON_TOAST_MODAL,
+  MESSAGE,
+} from "@/assets/statusesOnToastModal";
 // ! functions
 import { getBoxerDataWithID, convertToBoxerData } from "@/assets/functions";
 //! hooks
 import { useToastModal } from "@/hooks/useToastModal";
-import { useReactQuery } from "@/hooks/useReactQuery";
 import { useFetchBoxer, useUpdateBoxerData } from "@/hooks/useBoxer";
 import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
-import { useLoading } from "@/hooks/useLoading";
 //! types
 import { BoxerType } from "@/assets/types";
 //! layout
@@ -20,10 +20,7 @@ import AdminiLayout from "@/layout/AdminiLayout";
 //! component
 import { FlagImage } from "@/components/atomc/FlagImage";
 import { BoxerEditForm } from "@/components/module/BoxerEditForm";
-import {
-  BG_COLOR_ON_TOAST_MODAL,
-  MESSAGE,
-} from "@/assets/statusesOnToastModal";
+import { SearchBoxer } from "@/components/module/SearchBoxer";
 
 export const BoxerEdit = () => {
   // ! use hook
@@ -131,85 +128,36 @@ export const BoxerEdit = () => {
   //   return isLoading;
   // };
 
-  // if (isErrorFetchFighters) return <p>error</p>;
-
-  const searchName = React.useRef("");
-  const country = React.useRef("");
-  const sendData = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (country.current && searchName.current) {
-      navigate(
-        `/admini/boxer_edit?name=${searchName.current}&country=${country}`
-      );
-    } else if (country.current) {
-      navigate(`/admini/boxer_edit?country=${country.current}`);
-    } else if (searchName.current) {
-      navigate(`/admini/boxer_edit?name=${searchName.current}`);
-    }
-    // refetch()
-  };
-
   return (
     <AdminiLayout>
-      <div className="w-full flex justify-center">
-        <div className="flex">
-          <ul>
-            {Array.from({ length: pageCount }, (_, index) => (
-              <Link key={index} to={`/admini/boxer_edit?page=${index + 1}`}>
-                <li>{index + 1}</li>
-              </Link>
-            ))}
-          </ul>
-          <section className="w-[40%] flex justify-center items-start mb-10">
-            <BoxersList
-              checked={checked}
-              setChecked={setChecked}
-              boxersData={boxersData}
-              setEditTargetBoxerData={setEditTargetBoxerData}
-            />
-          </section>
-          <section className="w-[60%] flexjustify-center">
-            <div className="sticky top-[calc(100px+20px)]">
-              <BoxerEditForm
-                editTargetBoxerData={editTargetBoxerData}
-                onSubmit={onSubmit}
-              />
-              <div>
-                <h2>test</h2>
-                <form onSubmit={sendData} className="bg-stone-200">
-                  <input
-                    type="text"
-                    onChange={(e) => {
-                      searchName.current = e.target.value;
-                    }}
-                  />
-                  <div className="flex mt-3">
-                    <label className="w-[100px] text-center" htmlFor="countrys">
-                      国籍
-                    </label>
-                    <select
-                      className="w-[150px]"
-                      name="country"
-                      // value={boxerDataOnForm?.country}
-                      onChange={(e) => {
-                        country.current = e.target.value;
-                      }}
-                      id="countrys"
-                    >
-                      <option value={undefined}></option>
-                      {Object.values(Nationality).map((nationalName) => (
-                        <option key={nationalName} value={nationalName}>
-                          {nationalName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <button className="p-5 bg-red-300">テスト</button>
-                </form>
+      <div className="w-full flex">
+        <section className="w-[70%]">
+          <div className="flex sticky top-[calc(100px+30px)] mt-[30px]">
+            {/* //? edit  */}
+            <div className="w-[50%] flex justify-center">
+              <div className="w-[95%] border-[1px]">
+                <BoxerEditForm
+                  editTargetBoxerData={editTargetBoxerData}
+                  onSubmit={onSubmit}
+                />
               </div>
             </div>
-          </section>
-        </div>
+            {/* //? search */}
+            <div className="w-[50%] flex justify-center">
+              <div className="w-[95%]">
+                <SearchBoxer />
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="w-[30%] min-w-[300px] border-l-[1px] border-stone-200 flex justify-center">
+          <BoxersList
+            checked={checked}
+            setChecked={setChecked}
+            boxersData={boxersData}
+            setEditTargetBoxerData={setEditTargetBoxerData}
+          />
+        </section>
       </div>
     </AdminiLayout>
   );
@@ -231,7 +179,7 @@ const BoxersList = ({
   return (
     <>
       {boxersData && (
-        <ul className="flex justify-center flex-col">
+        <ul className="my-5">
           {boxersData.map((boxer) => (
             <div className="relative" key={boxer.eng_name}>
               <input

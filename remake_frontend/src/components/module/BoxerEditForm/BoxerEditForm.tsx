@@ -41,7 +41,7 @@ export const BoxerEditForm = (props: PropsType) => {
 
   return (
     // <div className={`${props.className}`}>
-    <div className="p-10 bg-stone-200">
+    <div className="p-10 bg-stone-200 border-stone-400 border-[1px]">
       <h1 className="text-3xl text-center">選手情報</h1>
       <form className="flex flex-col" onSubmit={props.onSubmit}>
         <input
@@ -248,7 +248,7 @@ export const BoxerEditForm = (props: PropsType) => {
 
         <div className="relative mt-10">
           <button
-            className={`w-full duration-300 py-2 px-2 mt-3 rounded bg-stone-600 hover:bg-stone-700 text-white`}
+            className={`w-full duration-300 py-2 px-2 mt-3 tracking-[0.5em] rounded bg-stone-600 hover:bg-stone-700 text-white`}
           >
             登録
           </button>
