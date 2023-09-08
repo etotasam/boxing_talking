@@ -11,9 +11,9 @@ export const Home = () => {
 
   return (
     <>
-      <Helmet>
+      {/* <Helmet>
         <title>Home</title>
-      </Helmet>
+      </Helmet> */}
       <div className="my-10">
         <ul>
           {matchesData &&

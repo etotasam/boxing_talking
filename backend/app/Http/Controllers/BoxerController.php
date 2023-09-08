@@ -10,6 +10,28 @@ use App\Models\BoxingMatch;
 
 class BoxerController extends Controller
 {
+
+    //? name eng_name countryで検索出来るqueryを作る
+    protected function create_query($arr_word): array
+    {
+        $arr_query = array_map(function ($key, $value) {
+            if (isset($value)) {
+                if ($key == 'name' || $key == "eng_name") {
+                    return [$key, 'like', "%" . addcslashes($value, '%_\\') . "%"];
+                } else {
+                    return [$key, 'like', $value];
+                }
+            }
+        }, array_keys($arr_word), array_values($arr_word));
+
+        $arr_querys = array_filter($arr_query, function ($el) {
+            if (isset($el)) {
+                return $el;
+            }
+        });
+
+        return $arr_querys;
+    }
     /**
      * fetch fighters data from DB
      *
@@ -25,35 +47,33 @@ class BoxerController extends Controller
             $limit = $request->limit;
             $page = $request->page;
             $name = $request->name;
+            $eng_name = $request->name;
             $country = $request->country;
 
             if (!isset($page)) $page = 1;
             $under = ($page - 1) * $limit;
 
-            $arr_word = compact("name", "country");
-            $arr_query = array_map(function ($key, $value) {
-                if (isset($value)) {
-                    if ($key == 'name') {
-                        return [$key, 'like', "%" . addcslashes($value, '%_\\') . "%"];
-                    } else {
-                        return [$key, 'like', $value];
-                    }
-                }
-            }, array_keys($arr_word), array_values($arr_word));
-
-            $like_querys = array_filter($arr_query, function ($el) {
-                if (isset($el)) {
-                    return $el;
-                }
-            });
+            //? name eng_name countryで検索出来る様に設定
+            $arr_word_with_name = compact("name", "country");
+            $arr_word_with_eng_name = compact("eng_name", "country");
+            $query_with_name = $this->create_query($arr_word_with_name);
+            $query_with_eng_name = $this->create_query($arr_word_with_eng_name);
 
             try {
-                $boxers = Boxer::where($like_querys)->offset($under)->limit($limit)->get();
+                $boxers_data_with_name = Boxer::where($query_with_name)->offset($under)->limit($limit)->get();
+                $boxers_data_with_eng_name = Boxer::where($query_with_eng_name)->offset($under)->limit($limit)->get();
+
+                //? データの保存の性質上基本的には片方のqueryでしかヒットしないはずだけど、eng_nameが優先されるように設定(返り値がある場合)
+                if (!empty($boxers_data_with_eng_name->toArray())) {
+                    $boxers = $boxers_data_with_eng_name;
+                } else {
+                    $boxers = $boxers_data_with_name;
+                };
             } catch (Exception $e) {
                 return response()->json(["message" => "get PDOException error!:" . $e], 500);
             }
-            // ! 保有タイトルを配列にして返す
-            $new_boxers = $boxers->map(function ($boxer) {
+            // ? 保有タイトルを配列にして返す
+            $formatted_boxers = $boxers->map(function ($boxer) {
                 if (empty($boxer->title_hold)) {
                     $boxer->title_hold = [];
                 } else {
@@ -63,7 +83,7 @@ class BoxerController extends Controller
             });
 
 
-            return response()->json($new_boxers, 200);
+            return response()->json($formatted_boxers, 200);
         } catch (Exception $e) {
             return response()->json(["message" => "faild fetch Boxers:" . $e], 500);
         }
@@ -145,23 +165,38 @@ class BoxerController extends Controller
     }
 
     /**
-     * delete fighter in DB
+     * delete boxer in DB
      *
      * @param
      */
     public function delete(Request $request)
     {
-        // throw new Exception();
         try {
-            $id = $request->fighterId;
-            $fighter = Boxer::find($id);
-            $red_exist = BoxingMatch::where("red_fighter_id", $id)->exists();
-            $blue_exist = BoxingMatch::where("blue_fighter_id", $id)->exists();
+            // throw new Exception("@@@@@@エラー", 406);
+            $id = $request->boxer_id;
+            $req_boxer_eng_name = $request->eng_name;
+            try {
+                $boxer = Boxer::findOrFail($id);
+                \Log::info($boxer->eng_name);
+                \Log::info($req_boxer_eng_name);
+            } catch (Exception $e) {
+                return response()->json(["message" => "Boxer is not exist in DB"], 406);
+            };
+            //? データの整合性をチェック
+            if ($boxer->eng_name != $req_boxer_eng_name) {
+                throw new Exception("Request data is dose not match boxer in database", 406);
+            };
+            //? 試合が組まれているかどうかをチェックする
+            $red_exist = BoxingMatch::where("red_boxer_id", $id)->exists();
+            $blue_exist = BoxingMatch::where("blue_boxer_id", $id)->exists();
             if ($red_exist or $blue_exist) {
-                throw new Exception("that fighter has match", 406);
-            }
-            $fighter->delete();
-            return response()->json(["message" => "fighter deleted"], 200);
+                throw new Exception("Boxer has alrady setup match", 406);
+            };
+            // // ? テスト用にここで終了させる
+            // return response()->json(["message" => "Boxer is deleted"], 200);
+
+            $boxer->delete();
+            return response()->json(["message" => "Boxer is deleted"], 200);
         } catch (Exception $e) {
             if ($e->getCode() === 406) {
                 return response()->json(["message" => $e->getMessage()], 406);
