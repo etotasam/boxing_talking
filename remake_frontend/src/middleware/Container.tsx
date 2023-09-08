@@ -83,15 +83,19 @@ const Modales = (props: ModalesData) => {
   return (
     <>
       <AnimatePresence>
-        {props.isShowToastModal && <ToastModalContainer />}
+        {props.isShowToastModal && (
+          <ToastModalContainer key={"ToastModalContainer"} />
+        )}
         {(props.isLoadingByRecoil || props.isRefetchingBoxers) && (
-          <FullScreenSpinnerModal />
+          <FullScreenSpinnerModal key={"FullScreenSpinnerModal"} />
         )}
         {(props.isFirstCheckingAuth ||
           props.isBoxersFetching ||
-          props.isMatchesFetching) && <FirstLoadinModal />}
+          props.isMatchesFetching) && (
+          <FirstLoadinModal key={"FirstLoadinModal"} />
+        )}
       </AnimatePresence>
-      {props.isShowLoginModal && <LoginFormModal />}
+      {props.isShowLoginModal && <LoginFormModal key={"LoginFormModal"} />}
     </>
   );
 };

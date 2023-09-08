@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { isEqual } from "lodash";
-// ! data
 //! data
 import {
   BG_COLOR_ON_TOAST_MODAL,
   MESSAGE,
 } from "@/assets/statusesOnToastModal";
+import { initialBoxerDataOnForm } from "@/assets/boxerData";
 // ! functions
 import { getBoxerDataWithID, convertToBoxerData } from "@/assets/functions";
 //! hooks
 import { useToastModal } from "@/hooks/useToastModal";
-import { useFetchBoxer, useUpdateBoxerData } from "@/hooks/useBoxer";
+import {
+  useFetchBoxer,
+  useUpdateBoxerData,
+  useDeleteBoxer,
+} from "@/hooks/useBoxer";
 import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
 //! types
 import { BoxerType } from "@/assets/types";
@@ -27,11 +31,17 @@ export const BoxerEdit = () => {
   // ! use hook
   const { state: editTargetBoxerData, setter: setEditTargetBoxerData } =
     useBoxerDataOnForm();
-  const { updateFighter } = useUpdateBoxerData();
+  const { updateFighter, isSuccess: isUpdateBoxerSuccess } =
+    useUpdateBoxerData();
   //? データ
-  const { boxersData, pageCount } = useFetchBoxer();
+  const {
+    boxersData,
+    pageCount,
+    isRefetching: isRefechingBoxerData,
+  } = useFetchBoxer();
+  //? 選択したボクサーのidが入る(選手が選択されているかの判断に使用)
   const [checked, setChecked] = useState<number>();
-
+  const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
   //? paramsの取得
   const { search, pathname } = useLocation();
   const query = new URLSearchParams(search);
@@ -40,11 +50,13 @@ export const BoxerEdit = () => {
   const paramCountry = query.get("country");
   const navigate = useNavigate();
 
+  //? boxerの削除に成功したらformデータを初期化
   useEffect(() => {
-    // if (!paramPage) {
-    //   navigate("/admini/boxer_edit");
-    // }
-  }, []);
+    if (isDeleteBoxerSuccess) {
+      setEditTargetBoxerData(initialBoxerDataOnForm);
+      setChecked(undefined);
+    }
+  }, [isDeleteBoxerSuccess]);
 
   const { setToastModal, showToastModal, hideToastModal } = useToastModal();
 
@@ -109,7 +121,7 @@ export const BoxerEdit = () => {
   };
 
   //? page数の計算
-  const [pageCountArray, setPageCountArray] = useState<number[]>([]);
+  // const [pageCountArray, setPageCountArray] = useState<number[]>([]);
   // useEffect(() => {
   //   if (fightersCount === undefined) return;
   //   const pagesCount = Math.ceil(fightersCount / limit);
@@ -135,8 +147,18 @@ export const BoxerEdit = () => {
     setIsDeleteConfirm(false);
   };
 
+  //?削除データの実行
   const execution = () => {
-    console.log("実行");
+    setIsDeleteConfirm(false);
+    if (!checked) {
+      setToastModal({
+        message: MESSAGE.BOXER_NO_SELECTED,
+        bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR,
+      });
+      showToastModal();
+      return;
+    }
+    deleteBoxer(editTargetBoxerData);
     setIsDeleteConfirm(false);
   };
 
@@ -161,7 +183,17 @@ export const BoxerEdit = () => {
                 {/* //? delete */}
                 <div className="mt-10">
                   <button
-                    onClick={() => setIsDeleteConfirm(true)}
+                    onClick={() => {
+                      if (!checked) {
+                        setToastModal({
+                          message: MESSAGE.BOXER_NO_SELECTED,
+                          bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
+                        });
+                        showToastModal();
+                        return;
+                      }
+                      setIsDeleteConfirm(true);
+                    }}
                     className="bg-red-600 text-white rounded py-2 px-10"
                   >
                     削除

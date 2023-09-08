@@ -73,16 +73,17 @@ export const MESSAGE = {
   FIGHTER_REGISTER_SUCCESS: "選手を登録しました",
   FIGHTER_REGISTER_FAILD: "選手の登録に失敗しました",
   //? 選手編/選手登録
-  FIGHTER_EDIT_SUCCESS: "選手情報が更新されました",
-  FIGHTER_EDIT_FAILD: "選手情報の編集に失敗しました \n 再度行ってください",
-  FIGHTER_CAN_NOT_DELETE: "試合が登録されている選手情報は削除できません",
+  BOXER_DELETED: "選手を削除しました",
   BOXER_NOT_EDIT: "選手データに変更がありません",
   BOXER_NO_SELECTED: "対象選手を選択してください",
   BOXER_NAME_UNDEFINED: "名前の入力が必要です",
   BOXER_IS_ALRADY_EXISTS: "同じ名前の選手がすでに存在しています",
+  BOXER_IS_ALRADY_SETUP_MATCH: "選手は試合が組まれています。削除出来ません",
+  ILLEGAL_DATA: "不正なデータです",
 
+  FIGHTER_EDIT_SUCCESS: "選手情報が更新されました",
+  FIGHTER_EDIT_FAILD: "選手情報の編集に失敗しました \n 再度行ってください",
   FIGHTER_DELETING: "選手情報を削除中...",
-  FIGHTER_DELETED: "選手を削除しました",
   FAILD_FIGHTER_DELETE: "選手削除に失敗しました",
 
   NO_SELECT_DELETE_MATCH: "削除する試合を選択してください",
