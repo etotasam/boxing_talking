@@ -15,6 +15,7 @@ import {
   useFetchBoxer,
   useUpdateBoxerData,
   useDeleteBoxer,
+  limit,
 } from "@/hooks/useBoxer";
 import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
 //! types
@@ -28,12 +29,13 @@ import { SearchBoxer } from "@/components/module/SearchBoxer";
 import { Confirm } from "@/components/modal/Confirm";
 
 export const BoxerEdit = () => {
-  // ! use hook
+  // ? use hook
+  const { setToastModal, showToastModal, hideToastModal } = useToastModal();
   const { state: editTargetBoxerData, setter: setEditTargetBoxerData } =
     useBoxerDataOnForm();
   const { updateFighter, isSuccess: isUpdateBoxerSuccess } =
     useUpdateBoxerData();
-  //? データ
+  const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
   const {
     boxersData,
     pageCount,
@@ -41,7 +43,6 @@ export const BoxerEdit = () => {
   } = useFetchBoxer();
   //? 選択したボクサーのidが入る(選手が選択されているかの判断に使用)
   const [checked, setChecked] = useState<number>();
-  const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
   //? paramsの取得
   const { search, pathname } = useLocation();
   const query = new URLSearchParams(search);
@@ -50,6 +51,21 @@ export const BoxerEdit = () => {
   const paramCountry = query.get("country");
   const navigate = useNavigate();
 
+  // const formattedParamPage = React.useRef("")
+  // const formattedParamName = React.useRef("")
+  // const formattedParames = React.useRef("");
+  const [formattedParames, setFormattedParames] = useState("");
+  useEffect(() => {
+    let pageURL: string[] = [];
+    if (paramName) pageURL = [...pageURL, `name=${paramName}`];
+    if (paramCountry) pageURL = [...pageURL, `country=${paramCountry}`];
+    setFormattedParames(pageURL.length ? `&${pageURL.join("&")}` : "");
+  }, [search]);
+
+  // console.log("paramPage", paramPage);
+  // console.log("paramName", paramName);
+  // console.log("paramCountry", paramCountry);
+
   //? boxerの削除に成功したらformデータを初期化
   useEffect(() => {
     if (isDeleteBoxerSuccess) {
@@ -57,8 +73,6 @@ export const BoxerEdit = () => {
       setChecked(undefined);
     }
   }, [isDeleteBoxerSuccess]);
-
-  const { setToastModal, showToastModal, hideToastModal } = useToastModal();
 
   // ? アンマウント時にはトーストモーダルを隠す
   useEffect(() => {
@@ -78,6 +92,10 @@ export const BoxerEdit = () => {
   //   setOpenConfirmModal(false);
   //   deleteFighter(editFighterData!);
   // };
+
+  const pagesArray = (): number[] => {
+    return Array.from({ length: pageCount }, (_, index) => index + 1);
+  };
 
   // ! ボクサーの編集を実行
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -119,17 +137,6 @@ export const BoxerEdit = () => {
     //? ボクサーデータ編集実行
     updateFighter(editTargetBoxerData);
   };
-
-  //? page数の計算
-  // const [pageCountArray, setPageCountArray] = useState<number[]>([]);
-  // useEffect(() => {
-  //   if (fightersCount === undefined) return;
-  //   const pagesCount = Math.ceil(fightersCount / limit);
-  //   const pagesLength = [...Array(pagesCount + 1)]
-  //     .map((_, num) => num)
-  //     .filter((n) => n >= 1);
-  //   setPageCountArray(pagesLength);
-  // }, [fightersCount]);
 
   //? spinnerを出す条件
   // const conditionVisibleSpinner = (boxer: BoxerType) => {
@@ -203,7 +210,30 @@ export const BoxerEdit = () => {
             </div>
           </div>
         </section>
-        <section className="w-[30%] min-w-[300px] border-l-[1px] border-stone-200 flex justify-center">
+        <section className="w-[30%] min-w-[300px] border-l-[1px] border-stone-200 mb-5">
+          {pagesArray().length > 1 && (
+            <ul className="w-full py-3 flex justify-center sticky top-[105px] right-[100px] bg-white/80 border-b-[1px] border-stone-300 z-10">
+              {pagesArray().map((page) =>
+                paramPage === page ? (
+                  <li
+                    key={page}
+                    className="px-2 bg-stone-400 text-white rounded-sm mr-2"
+                  >
+                    {page}
+                  </li>
+                ) : (
+                  <Link to={`${pathname}?page=${page}${formattedParames}`}>
+                    <li
+                      key={page}
+                      className="px-2 bg-stone-700 text-white rounded-sm mr-2"
+                    >
+                      {page}
+                    </li>
+                  </Link>
+                )
+              )}
+            </ul>
+          )}
           <BoxersList
             checked={checked}
             setChecked={setChecked}
@@ -234,12 +264,13 @@ const BoxersList = ({
   boxersData,
   setEditTargetBoxerData,
 }: BoxerListPropsType) => {
+  //? page数の計算
   return (
     <>
       {boxersData && (
-        <ul className="my-5">
+        <ul className="flex justify-center flex-col items-center">
           {boxersData.map((boxer) => (
-            <div className="relative" key={boxer.eng_name}>
+            <div className="w-[300px] relative" key={boxer.eng_name}>
               <input
                 className="absolute top-[50%] left-5 translate-y-[-50%] cursor-pointer"
                 id={`${boxer.id}_${boxer.name}`}
