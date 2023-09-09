@@ -7,6 +7,7 @@ import { Admini } from "@/page/Admini";
 import { BoxerRegister } from "@/page/Admini/BoxerRegister";
 import { BoxerEdit } from "@/page/Admini/BoxerEdit";
 import { MatchRegister } from "@/page/Admini/MatchRegister";
+import { MatchEdit } from "@/page/Admini/MatchEdit";
 // ! middleware
 import Container from "./middleware/Container";
 import "./App.css";
@@ -30,6 +31,7 @@ function App() {
           <Route path="/admini/boxer_register" element={<BoxerRegister />} />
           <Route path="/admini/boxer_edit" element={<BoxerEdit />} />
           <Route path="/admini/match_register" element={<MatchRegister />} />
+          <Route path="/admini/match_edit" element={<MatchEdit />} />
           {/* //! </adminページ> */}
           {/* </container> */}
         </Route>

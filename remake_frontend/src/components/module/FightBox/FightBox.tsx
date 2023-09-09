@@ -1,20 +1,21 @@
-import crown from "@/assets/images/etc/champion.svg";
 import dayjs from "dayjs";
 // ! types
 import {
   BoxerType,
   NationalityType,
   FightInfoType,
-  MatchesData,
+  MatchesDataType,
 } from "@/assets/types";
 // ! hook
 import { useFetchBoxer } from "@/hooks/useBoxer";
 // ! components
 import { BoxerInfo } from "../BoxerInfo";
 import { FlagImage } from "@/components/atomc/FlagImage";
+// ! image
+import crown from "@/assets/images/etc/champion.svg";
 
 type PropsType = {
-  matchData: MatchesData;
+  matchData: MatchesDataType;
   className?: string;
 };
 
@@ -40,7 +41,7 @@ export const FightBox = ({ matchData, className }: PropsType) => {
   );
 };
 
-const MatchInfo = ({ matchData }: { matchData: MatchesData }) => {
+const MatchInfo = ({ matchData }: { matchData: MatchesDataType }) => {
   return (
     <>
       {/* 日時 */}

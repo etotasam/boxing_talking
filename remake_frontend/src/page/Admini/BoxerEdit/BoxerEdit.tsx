@@ -15,6 +15,7 @@ import {
   useFetchBoxer,
   useUpdateBoxerData,
   useDeleteBoxer,
+  limit,
 } from "@/hooks/useBoxer";
 import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
 //! types
@@ -26,14 +27,16 @@ import { FlagImage } from "@/components/atomc/FlagImage";
 import { BoxerEditForm } from "@/components/module/BoxerEditForm";
 import { SearchBoxer } from "@/components/module/SearchBoxer";
 import { Confirm } from "@/components/modal/Confirm";
+import { PaginationBoxerList } from "@/components/module/PaginationBoxerList";
 
 export const BoxerEdit = () => {
-  // ! use hook
+  // ? use hook
+  const { setToastModal, showToastModal, hideToastModal } = useToastModal();
   const { state: editTargetBoxerData, setter: setEditTargetBoxerData } =
     useBoxerDataOnForm();
   const { updateFighter, isSuccess: isUpdateBoxerSuccess } =
     useUpdateBoxerData();
-  //? データ
+  const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
   const {
     boxersData,
     pageCount,
@@ -41,7 +44,6 @@ export const BoxerEdit = () => {
   } = useFetchBoxer();
   //? 選択したボクサーのidが入る(選手が選択されているかの判断に使用)
   const [checked, setChecked] = useState<number>();
-  const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
   //? paramsの取得
   const { search, pathname } = useLocation();
   const query = new URLSearchParams(search);
@@ -57,8 +59,6 @@ export const BoxerEdit = () => {
       setChecked(undefined);
     }
   }, [isDeleteBoxerSuccess]);
-
-  const { setToastModal, showToastModal, hideToastModal } = useToastModal();
 
   // ? アンマウント時にはトーストモーダルを隠す
   useEffect(() => {
@@ -119,17 +119,6 @@ export const BoxerEdit = () => {
     //? ボクサーデータ編集実行
     updateFighter(editTargetBoxerData);
   };
-
-  //? page数の計算
-  // const [pageCountArray, setPageCountArray] = useState<number[]>([]);
-  // useEffect(() => {
-  //   if (fightersCount === undefined) return;
-  //   const pagesCount = Math.ceil(fightersCount / limit);
-  //   const pagesLength = [...Array(pagesCount + 1)]
-  //     .map((_, num) => num)
-  //     .filter((n) => n >= 1);
-  //   setPageCountArray(pagesLength);
-  // }, [fightersCount]);
 
   //? spinnerを出す条件
   // const conditionVisibleSpinner = (boxer: BoxerType) => {
@@ -203,7 +192,8 @@ export const BoxerEdit = () => {
             </div>
           </div>
         </section>
-        <section className="w-[30%] min-w-[300px] border-l-[1px] border-stone-200 flex justify-center">
+        <section className="w-[30%] min-w-[300px] border-l-[1px] border-stone-200 mb-5">
+          <PaginationBoxerList pageCount={pageCount} />
           <BoxersList
             checked={checked}
             setChecked={setChecked}
@@ -234,12 +224,13 @@ const BoxersList = ({
   boxersData,
   setEditTargetBoxerData,
 }: BoxerListPropsType) => {
+  //? page数の計算
   return (
     <>
       {boxersData && (
-        <ul className="my-5">
+        <ul className="flex justify-center flex-col items-center">
           {boxersData.map((boxer) => (
-            <div className="relative" key={boxer.eng_name}>
+            <div className="w-[300px] relative" key={boxer.eng_name}>
               <input
                 className="absolute top-[50%] left-5 translate-y-[-50%] cursor-pointer"
                 id={`${boxer.id}_${boxer.name}`}

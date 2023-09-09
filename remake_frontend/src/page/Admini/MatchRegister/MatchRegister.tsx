@@ -2,10 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import { cloneDeep } from "lodash";
 // ! types
-import { NationalityType, RegstarMatchPropsType } from "@/assets/types";
+import {
+  NationalityType,
+  RegstarMatchPropsType,
+  GRADE_Type,
+  WEIGHT_CLASS_Type,
+  ORGANIZATIONS_Type,
+} from "@/assets/types";
 // ! data
 import { Nationality } from "@/assets/NationalFlagData";
-import { WEIGHT_CLASS, ORGANIZATIONS } from "@/assets/boxerData";
+import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from "@/assets/boxerData";
 import {
   MESSAGE,
   BG_COLOR_ON_TOAST_MODAL,
@@ -20,9 +26,10 @@ import { useToastModal } from "@/hooks/useToastModal";
 //! component
 import { FlagImage } from "@/components/atomc/FlagImage";
 import { SearchBoxer } from "@/components/module/SearchBoxer";
+import { PaginationBoxerList } from "@/components/module/PaginationBoxerList";
 
 export const MatchRegister = () => {
-  const { boxersData } = useFetchBoxer();
+  const { boxersData, pageCount } = useFetchBoxer();
   const [matchBoxers, setMatchBoxers] = useState<MatchBoxersType>({
     red_boxer: undefined,
     blue_boxer: undefined,
@@ -45,7 +52,8 @@ export const MatchRegister = () => {
             </div>
           </div>
         </section>
-        <section className="w-[30%] min-w-[300px] border-l-[1px] border-stone-200 flex justify-center">
+        <section className="w-[30%] min-w-[300px] border-l-[1px] border-stone-200">
+          <PaginationBoxerList pageCount={pageCount} />
           <BoxersList
             boxersData={boxersData}
             matchBoxers={matchBoxers}
@@ -161,43 +169,43 @@ const BoxersList = ({
 
   return (
     <>
-      <div className="my-5">
-        {boxersData && (
-          <ul className="flex justify-center flex-col">
-            {boxersData.map((boxer) => (
-              <div className="relative" key={boxer.eng_name}>
-                <input
-                  className="absolute top-[50%] left-5 translate-y-[-50%] cursor-pointer"
-                  id={`${boxer.id}_${boxer.name}`}
-                  type="checkbox"
-                  name="boxer"
-                  value={boxer.id}
-                  checked={isChecked(boxer.id)}
-                  disabled={canCheck(boxer.id)}
-                  onChange={(e) => handleCheckboxChange(e, boxer)}
-                />
-                <label
-                  className={"w-[90%] cursor-pointer"}
-                  htmlFor={`${boxer.id}_${boxer.name}`}
-                >
-                  <li className="w-[300px] mt-3 border-[1px] border-stone-300 rounded-md p-3">
-                    <div className="text-center">
-                      <p className="">{boxer.eng_name}</p>
-                      <h2 className="relative inline-block">
-                        {boxer.name}
-                        <FlagImage
-                          nationaly={boxer.country}
-                          className="absolute top-0 right-[-45px]"
-                        />
-                      </h2>
-                    </div>
-                  </li>
-                </label>
-              </div>
-            ))}
-          </ul>
-        )}
-      </div>
+      {/* <div className="my-5"> */}
+      {boxersData && (
+        <ul className="flex justify-center flex-col items-center">
+          {boxersData.map((boxer) => (
+            <div className="relative" key={boxer.eng_name}>
+              <input
+                className="absolute top-[50%] left-5 translate-y-[-50%] cursor-pointer"
+                id={`${boxer.id}_${boxer.name}`}
+                type="checkbox"
+                name="boxer"
+                value={boxer.id}
+                checked={isChecked(boxer.id)}
+                disabled={canCheck(boxer.id)}
+                onChange={(e) => handleCheckboxChange(e, boxer)}
+              />
+              <label
+                className={"w-[90%] cursor-pointer"}
+                htmlFor={`${boxer.id}_${boxer.name}`}
+              >
+                <li className="w-[300px] mt-3 border-[1px] border-stone-300 rounded-md p-3">
+                  <div className="text-center">
+                    <p className="">{boxer.eng_name}</p>
+                    <h2 className="relative inline-block">
+                      {boxer.name}
+                      <FlagImage
+                        nationaly={boxer.country}
+                        className="absolute top-0 right-[-45px]"
+                      />
+                    </h2>
+                  </div>
+                </li>
+              </label>
+            </div>
+          ))}
+        </ul>
+      )}
+      {/* </div> */}
     </>
   );
 };
@@ -206,18 +214,6 @@ const BoxersList = ({
 type MatchDataSetterPropsType = {
   matchBoxers: MatchBoxersType;
 };
-
-const GRADE = {
-  TITLE_MATCH: "タイトルマッチ",
-  R10: "10R",
-  R8: "8R",
-  R6: "6R",
-  R4: "4R",
-} as const;
-
-type GRADE_Type = (typeof GRADE)[keyof typeof GRADE];
-type WEIGHT_CLASS_Type = (typeof WEIGHT_CLASS)[keyof typeof WEIGHT_CLASS];
-type ORGANIZATIONS_Type = (typeof ORGANIZATIONS)[keyof typeof ORGANIZATIONS];
 
 // ! 試合データ入力
 const MatchDataSetter = ({ matchBoxers }: MatchDataSetterPropsType) => {

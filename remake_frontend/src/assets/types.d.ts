@@ -79,16 +79,20 @@ export type RegstarMatchPropsType = {
   titles: string[],
 }
 
-export type MatchesData = {
-  id: id,
+export type MatchesDataType = {
+  id: number,
   red_boxer: BoxerType,
   blue_boxer: BoxerType,
   country: NationalityType,
   venue: string,
   grade: string,
   titles: string[],
-  weight: string,
+  weight: WEIGHT_CLASS_Type,
   match_date: string,
   count_red: number,
   count_blue: number,
 }
+
+export type GRADE_Type = (typeof GRADE)[keyof typeof GRADE];
+export type WEIGHT_CLASS_Type = (typeof WEIGHT_CLASS)[keyof typeof WEIGHT_CLASS];
+export type ORGANIZATIONS_Type = (typeof ORGANIZATIONS)[keyof typeof ORGANIZATIONS];

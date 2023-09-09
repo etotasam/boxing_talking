@@ -65,3 +65,11 @@ export const initialBoxerDataOnForm: BoxerDataOnFormType = {
   draw: 0,
   lose: 0,
 };
+
+export const GRADE = {
+  TITLE_MATCH: "タイトルマッチ",
+  R10: "10R",
+  R8: "8R",
+  R6: "6R",
+  R4: "4R",
+} as const;

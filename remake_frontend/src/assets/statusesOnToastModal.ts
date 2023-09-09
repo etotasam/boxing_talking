@@ -55,8 +55,12 @@ export const MESSAGE = {
   NOT_AUTHORIZED: 'ログインが必要です',
   NULL: "",
 
-  // ?試合登録
-  MATCH_BOXER_NOT_SELECTED: "選手を選択してください",
+  //? 試合の登録・試合の編集
+  MATCH_IS_NOT_MODIFIED: "試合情報の変更がありません",
+  MATCH_IS_NOT_SELECTED: "対象の試合を選択してください",
+  MATCH_UPDATE_FAILED: "試合情報の更新に失敗しました",
+  MATCH_UPDATE_SUCCESS: "試合情報を更新しました",
+
   MATCH_HAS_NOT_ENTRIES: "未入力・未選択の項目があります",
   MATCH_NOT_SELECTED: "対象の試合を選択してください",
   MATCH_NOT_ALTER: "試合情報に変更がありません",
@@ -64,7 +68,6 @@ export const MESSAGE = {
   MATCH_REGISTER_FAILD: "試合情報の登録に失敗しました \n 再度登録してください",
   MATCH_DELETED: "試合情報を削除しました",
   MATCH_DELETE_FAILD: "試合情報の削除に失敗しました \n 一度画面を更新し、再度削除の実行を行ってください",
-  MATCH_UPDATE_SUCCESS: "試合情報を更新しました",
   MATCH_UPDATE_FAILD: "試合情報の更新に失敗しました \n 一度画面を更新し、再度更新の実行を行ってください",
 
 
@@ -86,7 +89,6 @@ export const MESSAGE = {
   FIGHTER_DELETING: "選手情報を削除中...",
   FAILD_FIGHTER_DELETE: "選手削除に失敗しました",
 
-  NO_SELECT_DELETE_MATCH: "削除する試合を選択してください",
 } as const
 
 
