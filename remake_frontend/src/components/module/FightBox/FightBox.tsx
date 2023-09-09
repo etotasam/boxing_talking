@@ -44,7 +44,7 @@ export const FightBox = ({ matchData, className }: PropsType) => {
 const MatchInfo = ({ matchData }: { matchData: MatchesDataType }) => {
   return (
     <>
-      {/* 日時 */}
+      {/* //? 日時 */}
       <div className="p-5 text-stone-600">
         <div className="text-center relative mt-5">
           <h2 className="text-2xl after:content-['(日本時間)'] after:absolute after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] after:text-sm">
@@ -57,7 +57,7 @@ const MatchInfo = ({ matchData }: { matchData: MatchesDataType }) => {
           )}
         </div>
 
-        {/* グレード */}
+        {/* //? グレード */}
         <div className="text-center text-xl mt-5">
           {matchData.grade === "タイトルマッチ" ? (
             <ul className="flex flex-col">
@@ -73,17 +73,20 @@ const MatchInfo = ({ matchData }: { matchData: MatchesDataType }) => {
               ))}
             </ul>
           ) : (
-            <p className="text-[30px] mt-10">{matchData.grade}</p>
+            <p className="text-[30px] mt-7">{matchData.grade}</p>
           )}
         </div>
 
-        {/* 会場 */}
+        {/* //?会場 */}
         <div className="mt-[35px] text-center">
-          <div className="relative inline-block text-lg before:content-['会場'] before:absolute before:top-[-25px] before:left-[50%] before:translate-x-[-50%] before:text-[14px] before:text-stone-500">
+          <div className="relative flex items-center justify-center text-lg before:content-['会場'] before:absolute before:top-[-25px] before:left-[50%] before:translate-x-[-50%] before:text-[14px] before:text-stone-500">
+            <FlagImage
+              className="inline-block border-[1px] w-[32px] h-[24px] mr-3"
+              nationaly={matchData.country}
+            />
             {matchData.venue}
-            <span className="w-[32px] h-[24px] border-[1px] overflow-hidden absolute top-[1px] left-[-40px]">
-              <FlagImage nationaly={matchData.country} />
-            </span>
+            {/* <span className="w-[32px] h-[24px] border-[1px] overflow-hidden absolute top-[1px] left-[-40px]"> */}
+            {/* </span> */}
           </div>
         </div>
 

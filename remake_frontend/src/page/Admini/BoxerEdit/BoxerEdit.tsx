@@ -28,6 +28,7 @@ import { BoxerEditForm } from "@/components/module/BoxerEditForm";
 import { SearchBoxer } from "@/components/module/SearchBoxer";
 import { Confirm } from "@/components/modal/Confirm";
 import { PaginationBoxerList } from "@/components/module/PaginationBoxerList";
+import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
 
 export const BoxerEdit = () => {
   // ? use hook
@@ -249,14 +250,11 @@ const BoxersList = ({
               >
                 <li className="w-[300px] mt-3 border-[1px] border-stone-300 rounded-md p-3">
                   <div className="text-center">
-                    <p className="">{boxer.eng_name}</p>
-                    <h2 className="relative inline-block">
-                      {boxer.name}
-                      <FlagImage
-                        nationaly={boxer.country}
-                        className="absolute top-0 right-[-45px]"
-                      />
-                    </h2>
+                    <EngNameWithFlag
+                      boxerCountry={boxer.country}
+                      boxerEngName={boxer.eng_name}
+                    />
+                    <h2 className="text-lg mt-2">{boxer.name}</h2>
                   </div>
                 </li>
               </label>

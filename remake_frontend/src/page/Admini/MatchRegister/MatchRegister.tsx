@@ -27,6 +27,7 @@ import { useToastModal } from "@/hooks/useToastModal";
 import { FlagImage } from "@/components/atomc/FlagImage";
 import { SearchBoxer } from "@/components/module/SearchBoxer";
 import { PaginationBoxerList } from "@/components/module/PaginationBoxerList";
+import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
 
 export const MatchRegister = () => {
   const { boxersData, pageCount } = useFetchBoxer();
@@ -87,14 +88,11 @@ const BoxerBox = ({ boxerData }: { boxerData: BoxerType }) => {
     <>
       <div className="w-[300px] mt-3 border-[1px] border-stone-300 rounded-md p-3">
         <div className="text-center">
-          <p className="">{boxerData.eng_name}</p>
-          <h2 className="relative inline-block">
-            {boxerData.name}
-            <FlagImage
-              nationaly={boxerData.country}
-              className="absolute top-0 right-[-45px]"
-            />
-          </h2>
+          <EngNameWithFlag
+            boxerCountry={boxerData.country}
+            boxerEngName={boxerData.eng_name}
+          />
+          <h2 className="relative inline-block">{boxerData.name}</h2>
         </div>
       </div>
     </>
@@ -190,14 +188,11 @@ const BoxersList = ({
               >
                 <li className="w-[300px] mt-3 border-[1px] border-stone-300 rounded-md p-3">
                   <div className="text-center">
-                    <p className="">{boxer.eng_name}</p>
-                    <h2 className="relative inline-block">
-                      {boxer.name}
-                      <FlagImage
-                        nationaly={boxer.country}
-                        className="absolute top-0 right-[-45px]"
-                      />
-                    </h2>
+                    <EngNameWithFlag
+                      boxerCountry={boxer.country}
+                      boxerEngName={boxer.eng_name}
+                    />
+                    <h2 className="relative inline-block">{boxer.name}</h2>
                   </div>
                 </li>
               </label>
@@ -264,7 +259,7 @@ const MatchDataSetter = ({ matchBoxers }: MatchDataSetterPropsType) => {
     // ? 選手を選択していない場合モーダルでNOTICE
     if (Object.values(matchBoxers).includes(undefined)) {
       setToastModal({
-        message: MESSAGE.MATCH_BOXER_NOT_SELECTED,
+        message: MESSAGE.MATCH_NOT_SELECTED_BOXER,
         bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
       });
       showToastModal();

@@ -9,6 +9,7 @@ import AdminiLayout from "@/layout/AdminiLayout";
 import { FightBox } from "@/components/module/FightBox";
 import { FlagImage } from "@/components/atomc/FlagImage";
 import { MatchSetter } from "@/components/module/MatchSetter/MatchSetter";
+import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
 // ! hooks
 import { useFetchMatches } from "@/hooks/useMatch";
 //! types
@@ -94,7 +95,10 @@ export const MatchListComponent = ({
                 <div className="flex-1">
                   {/* //? 国旗 */}
                   <div className="flex justify-center">
-                    <FlagImage nationaly={match.red_boxer.country} />
+                    <EngNameWithFlag
+                      boxerCountry={match.red_boxer.country}
+                      boxerEngName={match.red_boxer.eng_name}
+                    />
                   </div>
                   {/* //? 名前 */}
                   <p className="">{match.red_boxer.name}</p>
@@ -103,7 +107,10 @@ export const MatchListComponent = ({
                 <div className="flex-1">
                   {/* //? 国旗 */}
                   <div className="flex justify-center">
-                    <FlagImage nationaly={match.blue_boxer.country} />
+                    <EngNameWithFlag
+                      boxerCountry={match.blue_boxer.country}
+                      boxerEngName={match.blue_boxer.eng_name}
+                    />
                   </div>
                   {/* //? 名前 */}
                   <p className="">{match.blue_boxer.name}</p>

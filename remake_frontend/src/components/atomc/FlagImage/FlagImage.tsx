@@ -30,13 +30,12 @@ export const FlagImage = ({ nationaly, className }: PropsType) => {
 
   return (
     <>
-      <div
-        className={clsx(
-          "w-[32px] h-[24px] border-[1px] overflow-hidden",
-          className
-        )}
-      >
-        <img src={getNatinalFlag(nationaly)} alt={nationaly} />
+      <div className={clsx(className)}>
+        <img
+          className="w-full h-full object-cover"
+          src={getNatinalFlag(nationaly)}
+          alt={nationaly}
+        />
       </div>
     </>
   );

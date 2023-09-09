@@ -63,6 +63,7 @@ export const MESSAGE = {
 
   MATCH_HAS_NOT_ENTRIES: "未入力・未選択の項目があります",
   MATCH_NOT_SELECTED: "対象の試合を選択してください",
+  MATCH_NOT_SELECTED_BOXER: "試合を組む選手を選択してください",
   MATCH_NOT_ALTER: "試合情報に変更がありません",
   MATCH_REGISTER_SUCCESS: "試合情報の登録が完了しました",
   MATCH_REGISTER_FAILD: "試合情報の登録に失敗しました \n 再度登録してください",
