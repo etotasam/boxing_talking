@@ -53,24 +53,34 @@ export const BoxerInfo = ({ boxer, className }: PropsType) => {
               <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">
                 身長
               </p>
-              <p className="flex-1 after:content-['cm'] after:ml-1">
-                {boxer.height}
-              </p>
+              {boxer.height ? (
+                <p className="flex-1 after:content-['cm'] after:ml-1">
+                  {boxer.height}
+                </p>
+              ) : (
+                <p className="flex-1">-</p>
+              )}
             </li>
             <li className="flex justify-between mt-1">
               <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">
                 リーチ
               </p>
-              <p className="flex-1 after:content-['cm'] after:ml-1">
-                {boxer.reach}
-              </p>
+              {boxer.reach ? (
+                <p className="flex-1 after:content-['cm'] after:ml-1">
+                  {boxer.reach}
+                </p>
+              ) : (
+                <p className="flex-1">-</p>
+              )}
             </li>
             <li className="flex justify-between mt-1">
               <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">
                 スタイル
               </p>
               <p className="flex-1">
-                {boxer.style === "orthodox" ? "オーソドックス" : "サウスポー"}
+                {boxer.style === "orthodox" && "オーソドックス"}
+                {boxer.style === "southpaw" && "サウスポー"}
+                {boxer.style === "unknown" && "-"}
               </p>
             </li>
           </ul>

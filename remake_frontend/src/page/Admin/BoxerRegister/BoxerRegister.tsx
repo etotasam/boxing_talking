@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { useLocation } from "react-router-dom";
 // ! data
 import {
   BG_COLOR_ON_TOAST_MODAL,
@@ -9,6 +10,7 @@ import { BoxerEditForm } from "@/components/module/BoxerEditForm";
 //! layout
 import AdminiLayout from "@/layout/AdminiLayout";
 //! hooks
+import { usePagePath } from "@/hooks/usePagePath";
 import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
 import { useToastModal } from "@/hooks/useToastModal";
 import { useRegisterBoxer } from "@/hooks/useBoxer";
@@ -17,10 +19,17 @@ import { useEffect } from "react";
 
 export const BoxerRegister = () => {
   // ! use hook
+  const { setter: setPagePath } = usePagePath();
+  const { pathname } = useLocation();
   const { state: boxerDataOnForm, setter: setBoxerDataToForm } =
     useBoxerDataOnForm();
   const { setToastModal, showToastModal, hideToastModal } = useToastModal();
   const { registerBoxer, isSuccess: successRegisterBoxer } = useRegisterBoxer();
+
+  //? ページpathをRecoilに保存
+  useEffect(() => {
+    setPagePath(pathname);
+  }, []);
 
   // ? アンマウント時にはトーストモーダルを隠す
   useEffect(() => {

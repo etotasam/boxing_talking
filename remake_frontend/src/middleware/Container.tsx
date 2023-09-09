@@ -20,7 +20,6 @@ const Container = () => {
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
   const isShowLoginModal = useRecoilValue(loginModalSelector);
   const { isLoading: isLoadingByRecoil } = useRecoilValue(loadingSelector);
-
   const { data: userData, isError, isLoading: isFirstCheckingAuth } = useAuth();
   const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } =
     useFetchBoxer();

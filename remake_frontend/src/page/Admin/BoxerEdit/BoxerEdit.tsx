@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { isEqual } from "lodash";
 //! data
 import {
@@ -11,6 +11,7 @@ import { initialBoxerDataOnForm } from "@/assets/boxerData";
 import { getBoxerDataWithID, convertToBoxerData } from "@/assets/functions";
 //! hooks
 import { useToastModal } from "@/hooks/useToastModal";
+import { usePagePath } from "@/hooks/usePagePath";
 import {
   useFetchBoxer,
   useUpdateBoxerData,
@@ -32,6 +33,7 @@ import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
 
 export const BoxerEdit = () => {
   // ? use hook
+  const { setter: setPagePath } = usePagePath();
   const { setToastModal, showToastModal, hideToastModal } = useToastModal();
   const { state: editTargetBoxerData, setter: setEditTargetBoxerData } =
     useBoxerDataOnForm();
@@ -66,6 +68,11 @@ export const BoxerEdit = () => {
     return () => {
       hideToastModal();
     };
+  }, []);
+
+  //? ページpathをRecoilに保存
+  useEffect(() => {
+    setPagePath(pathname);
   }, []);
 
   //? 選手データの削除実行

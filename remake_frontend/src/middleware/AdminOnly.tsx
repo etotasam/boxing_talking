@@ -2,23 +2,25 @@ import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 //! hooks
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, useAdmin } from "@/hooks/useAuth";
 import { useLogout } from "@/hooks/useAuth";
 
 const AdminOnly = () => {
   const navigate = useNavigate();
-  const { data: authUser, isLoading } = useAuth();
-  const { isSuccess: isLogout } = useLogout();
-  // const { setter: setIsOpenHamburgerMenu } = useQueryState<boolean>("q/isOpenHamburgerMenu");
-  // useEffect(() => {
-  //   setIsOpenHamburgerMenu(false);
-  // }, [isLogout]);
+  const { isAdmin, isLoading } = useAdmin();
 
   useEffect(() => {
     if (isLoading) return;
-    if (!authUser) return navigate("/");
-    // if (!authUser.administrator) return navigate("/");
-  }, [isLoading, authUser]);
+    if (!isAdmin) return navigate("/");
+  }, [isAdmin, isLoading]);
+
+  if (isLoading)
+    return (
+      <div className="w-[100vw] h-[100vh] flex justify-center items-center">
+        <div>Loding...</div>
+      </div>
+    );
+
   return <Outlet />;
 };
 

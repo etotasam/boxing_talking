@@ -20,12 +20,14 @@ import {
 import { Nationality } from "@/assets/NationalFlagData";
 //! hook
 import { useToastModal } from "@/hooks/useToastModal";
-import { useUpdateMatch } from "@/hooks/useMatch";
+import { useUpdateMatch, useDeleteMatch } from "@/hooks/useMatch";
 
 export const MatchSetter = ({
   selectMatch,
+  isSuccessDeleteMatch,
 }: {
   selectMatch: MatchesDataType | undefined;
+  isSuccessDeleteMatch?: boolean;
 }) => {
   //? use hook
   const { showToastModal, setToastModal, hideToastModal } = useToastModal();
@@ -34,12 +36,25 @@ export const MatchSetter = ({
   // const matchDate = useRef("");
   const [matchDate, setMatchDate] = useState("");
   const [matchGrade, setMatchGrade] = useState<GRADE_Type>();
-  const [matchPlaceCountry, setMatchPlaceCountry] = useState<NationalityType>();
+  const [matchPlaceCountry, setMatchPlaceCountry] = useState<
+    NationalityType | ""
+  >();
   const [matchVenue, setMatchVenue] = useState("");
-  const [matchWeight, setMatchWeight] = useState<WEIGHT_CLASS_Type>();
+  const [matchWeight, setMatchWeight] = useState<WEIGHT_CLASS_Type | "">();
   const [belt, setBelt] = useState<ORGANIZATIONS_Type[] | []>([]);
   const [title, setTitle] = useState(false);
   const [counter, setCounter] = useState(1);
+
+  //? 試合の削除が成功した時…
+  useEffect(() => {
+    if (!isSuccessDeleteMatch) return;
+    setMatchDate("");
+    setMatchGrade("");
+    setMatchPlaceCountry("");
+    setMatchVenue("");
+    setMatchWeight("");
+    setBelt([]);
+  }, [isSuccessDeleteMatch]);
 
   //? 試合データを選択(props selectMatch)した時に各値を表示出来る様にフォーマットしてセットする
   useEffect(() => {
