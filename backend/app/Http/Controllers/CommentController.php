@@ -25,14 +25,14 @@ class CommentController extends Controller
         $match_id = $request->match_id;
         $comments_array = [];
         $comments = BoxingMatch::find($match_id)->comments;
-        foreach($comments as $comment) {
+        foreach ($comments as $comment) {
             $user_id = $comment->user_id;
             $created_at = $comment->created_at;
             $user = User::find($user_id);
             $vote = Vote::where([["user_id", $user_id], ["match_id", $match_id]])->first();
-            if(isset($vote)) {
+            if (isset($vote)) {
                 $vote_color = $vote["vote_for"];
-            }else {
+            } else {
                 $vote_color = Null;
             }
             array_unshift($comments_array, ['id' => $comment->id, "user" => $user, "comment" => $comment->comment, "vote" => $vote_color, "created_at" => $created_at]);
@@ -52,11 +52,12 @@ class CommentController extends Controller
     {
         try {
             // throw new Exception("post comment failed");
-            $user_id = $request->user_id;
+            // $user_id = $request->user_id;
+            $user_id = Auth::user()->id;
             $match_id = $request->match_id;
             $comment = $request->comment;
             $has_match = BoxingMatch::find($match_id)->exists();
-            if(!$has_match) {
+            if (!$has_match) {
                 throw new Exception("the match not exist");
             }
             Comment::create([
@@ -65,7 +66,7 @@ class CommentController extends Controller
                 "comment" => $comment,
             ]);
             return response()->json(["message" => "posted comment successfully"], 200);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             return response()->json(["message" => $e->getMessage()], 500);
         }
     }
@@ -82,7 +83,7 @@ class CommentController extends Controller
         $user_id = $request->user_id;
         $comment_id = $request->comment_id;
         $user = Auth::user();
-        if($user->id == $user_id) {
+        if ($user->id == $user_id) {
             $comment = Comment::find($comment_id);
             $comment->delete();
             return response()->json(["message" => "comment deleted"], 200);

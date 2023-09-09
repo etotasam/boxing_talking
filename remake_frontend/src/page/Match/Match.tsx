@@ -5,21 +5,26 @@ import { MatchesDataType } from "@/assets/types";
 // ! hook
 import { useFetchMatches } from "@/hooks/useMatch";
 import { usePagePath } from "@/hooks/usePagePath";
+import { usePostComment, useFetchComments } from "@/hooks/useComment";
 //! component
 import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
 
 export const Match = () => {
   const { pathname, search } = useLocation();
   const { data: matches } = useFetchMatches();
+  const { postComment } = usePostComment();
+  const [comment, setComment] = useState<string>();
+
   const query = new URLSearchParams(search);
   const paramsMatchID = Number(query.get("match_id"));
+  const { data: comments } = useFetchComments(paramsMatchID);
 
   const [selectedMatch, setSelectedMatch] = useState<MatchesDataType>();
   useEffect(() => {
-    if (!matches) return;
+    if (!matches || !paramsMatchID) return;
     const match = matches?.find((match) => match.id === paramsMatchID);
     setSelectedMatch(match);
-  }, [paramsMatchID]);
+  }, [paramsMatchID, matches]);
   // ! use hook
   const { setter: setPagePath } = usePagePath();
 
@@ -27,6 +32,11 @@ export const Match = () => {
   useEffect(() => {
     setPagePath(pathname);
   }, []);
+
+  const sendComment = () => {
+    if (!comment) return;
+    postComment({ userId: null, matchId: paramsMatchID, comment });
+  };
 
   return (
     <>
@@ -53,25 +63,46 @@ export const Match = () => {
           </div>
         </section>
       )}
+      {/* //? comments */}
+      {comments && comments.length >= 1 && (
+        <section>
+          {comments.map((comment) => (
+            <p key={comment.id}>{comment.comment}</p>
+          ))}
+        </section>
+      )}
 
       <section className="fixed bottom-0 w-full flex justify-center py-8 border-t-[1px] border-stone-200">
         <div className="w-[70%] max-w-[800px]">
-          <PostCommentTextarea />
+          <PostCommentTextarea
+            setComment={setComment}
+            sendComment={sendComment}
+          />
         </div>
       </section>
     </>
   );
 };
 
-const PostCommentTextarea = () => {
+type PostCommentTextareaType = {
+  setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
+  sendComment: () => void;
+};
+
+// ! post commnet textarea
+const PostCommentTextarea = ({
+  setComment,
+  sendComment,
+}: PostCommentTextareaType) => {
   const textareaRef = useRef(null);
 
-  const autoExpandTextarea = () => {
+  const autoExpandTextarea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = textareaRef.current as unknown as HTMLTextAreaElement;
     if (!textarea) return;
     if (textarea.scrollHeight > 250) return;
-    textarea.style.height = "auto"; // 高さを一時的にautoに設定
+    textarea.style.height = "auto";
     textarea.style.height = `${textarea.scrollHeight}px`;
+    setComment(e.target.value);
   };
 
   return (
@@ -86,7 +117,10 @@ const PostCommentTextarea = () => {
         rows={1}
         onChange={autoExpandTextarea}
       ></textarea>
-      <button className="absolute bottom-[7px] text-[14px] right-[10px] border-[1px] bg-stone-600 py-1 text-white pl-4 pr-3 tracking-[0.4em]">
+      <button
+        onClick={sendComment}
+        className="absolute bottom-[7px] text-[14px] right-[10px] border-[1px] bg-stone-600 py-1 text-white pl-4 pr-3 tracking-[0.4em]"
+      >
         送信
       </button>
     </div>
