@@ -10,6 +10,15 @@ import { ORGANIZATIONS, WEIGHT_CLASS } from "@/assets/boxerData";
 // ! types
 import { BoxerType, BoxerDataOnFormType } from "@/assets/types";
 
+
+
+/**
+ * state BoxerDataOnFormTypeの値を返す。BoxerEditコンポーネントで扱うデータタイプ
+ *
+ * setter 基本的にはRecoilのboxerDataOnFormStateに保存
+ *        BoxerTypeの値を渡す事も出来て、その場合BoxerDataOnFormTypeのフォーマットして保存してくれる
+ * @returns {state, setter}
+ */
 export const useBoxerDataOnForm = () => {
 
   const innerSetter = useSetRecoilState(boxerDataOnFormSelector)

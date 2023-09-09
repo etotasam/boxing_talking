@@ -4,12 +4,12 @@ import dayjs from "dayjs"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 // ! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
+import { QUERY_KEY } from "@/assets/queryKeys"
 // ! types
-import { BoxerType, MatchesData, RegstarMatchPropsType } from "@/assets/types"
+import { BoxerType, MatchesDataType, RegstarMatchPropsType } from "@/assets/types"
 // ! hook
 import { useToastModal } from "./useToastModal"
 import { useLoading } from "./useLoading"
-import { QUERY_KEY } from "@/assets/queryKeys"
 
 
 //! 試合情報の取得
@@ -17,8 +17,8 @@ export const useFetchMatches = () => {
   const fetcher = useCallback(async () => {
     return await Axios.get("api/match").then(value => value.data)
   }, [])
-  const { data, isLoading, isError, isRefetching } = useQuery<MatchesData[]>(QUERY_KEY.matchesFetch, fetcher)
-  return { data, isLoading, isError, isRefetching }
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchesDataType[]>(QUERY_KEY.matchesFetch, fetcher)
+  return { data, isLoading, isError, isRefetching, refetch }
 }
 
 
@@ -64,4 +64,63 @@ export const useRegisterMatch = () => {
   }
 
   return { registerMatch, isLoading }
+}
+
+
+//! 試合の変更
+
+type ArgumentType = {
+  matchId: number,
+  updateMatchData: Record<string, string | string[]>
+}
+
+export const useUpdateMatch = () => {
+  const { setToastModal, showToastModal } = useToastModal()
+  const { resetLoadingState, startLoading } = useLoading()
+  const { refetch } = useFetchMatches()
+  const queryClient = useQueryClient()
+  const api = useCallback(async (arg: ArgumentType) => {
+    const updateDeta = {
+      match_id: arg.matchId,
+      update_match_data: arg.updateMatchData
+    }
+    await Axios.put("/api/match", updateDeta)
+  }, [])
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
+    onMutate: () => {
+      startLoading()
+      // const snapshot = queryClient.getQueryData<MatchesType[]>(queryKeys.match)
+      // if (!snapshot) return
+      // const newMathcesState = snapshot.map(match => {
+      //   if (match.id === .id) {
+
+      //     return alterMatchData
+      //   }
+      //   return match
+      // })
+      // queryClient.setQueryData(queryKeys.match, newMathcesState)
+      // return { snapshot }
+    }
+  })
+  const updateMatch = (updateMatchData: ArgumentType) => {
+    mutate(updateMatchData, {
+      onSuccess: (data) => {
+        refetch()
+        resetLoadingState()
+        setToastModal({ message: MESSAGE.MATCH_UPDATE_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+        showToastModal()
+        // setToastModalMessage({ message: MESSAGE.MATCH_UPDATE_SUCCESS, bgColor: ModalBgColorType.SUCCESS })
+        // queryClient.setQueryData(queryKeys.deleteMatchSub, undefined)
+      },
+      onError: (error, alterMatchData, context) => {
+        resetLoadingState()
+        setToastModal({ message: MESSAGE.MATCH_UPDATE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showToastModal()
+        // queryClient.setQueryData(queryKeys.match, context?.snapshot)
+        // queryClient.setQueryData(queryKeys.deleteMatchSub, undefined)
+      }
+    })
+  }
+
+  return { updateMatch, isLoading, isSuccess }
 }

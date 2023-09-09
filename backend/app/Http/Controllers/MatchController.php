@@ -11,7 +11,7 @@ use App\Models\BoxingMatch;
 use App\Models\Boxer;
 use App\Models\Comment;
 use App\Models\Vote;
-
+use Exception;
 
 class MatchController extends Controller
 {
@@ -147,12 +147,13 @@ class MatchController extends Controller
      */
     public function update(Request $request)
     {
-        $id = $request->id;
-        $alter_match_data = $request->toArray();
-        // \Log::debug($alter_match_data);
+        $id = $request->match_id;
+        $update_match_data = $request->update_match_data;
+        // throw new Exception();
         try {
-            BoxingMatch::find($id)->update($alter_match_data);
+            BoxingMatch::find($id)->update($update_match_data);
         } catch (Exception $e) {
+            return response()->json(["message" => "failed update match"], 500);
         }
     }
 }

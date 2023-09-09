@@ -29,7 +29,7 @@ export const SearchBoxer = () => {
       onSubmit={searchExecution}
       className="bg-stone-200 border-stone-400 border-[1px] p-5"
     >
-      <h2 className="text-center text-[26px]">検索</h2>
+      <h2 className="text-center text-[26px] tracking-[0.2em]">選手検索</h2>
       <div className="flex mt-3">
         <label className="w-[50px] text-center" htmlFor="countrys">
           国籍

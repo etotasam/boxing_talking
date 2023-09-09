@@ -27,6 +27,7 @@ import { FlagImage } from "@/components/atomc/FlagImage";
 import { BoxerEditForm } from "@/components/module/BoxerEditForm";
 import { SearchBoxer } from "@/components/module/SearchBoxer";
 import { Confirm } from "@/components/modal/Confirm";
+import { PaginationBoxerList } from "@/components/module/PaginationBoxerList";
 
 export const BoxerEdit = () => {
   // ? use hook
@@ -50,21 +51,6 @@ export const BoxerEdit = () => {
   const paramName = query.get("name");
   const paramCountry = query.get("country");
   const navigate = useNavigate();
-
-  // const formattedParamPage = React.useRef("")
-  // const formattedParamName = React.useRef("")
-  // const formattedParames = React.useRef("");
-  const [formattedParames, setFormattedParames] = useState("");
-  useEffect(() => {
-    let pageURL: string[] = [];
-    if (paramName) pageURL = [...pageURL, `name=${paramName}`];
-    if (paramCountry) pageURL = [...pageURL, `country=${paramCountry}`];
-    setFormattedParames(pageURL.length ? `&${pageURL.join("&")}` : "");
-  }, [search]);
-
-  // console.log("paramPage", paramPage);
-  // console.log("paramName", paramName);
-  // console.log("paramCountry", paramCountry);
 
   //? boxerの削除に成功したらformデータを初期化
   useEffect(() => {
@@ -92,10 +78,6 @@ export const BoxerEdit = () => {
   //   setOpenConfirmModal(false);
   //   deleteFighter(editFighterData!);
   // };
-
-  const pagesArray = (): number[] => {
-    return Array.from({ length: pageCount }, (_, index) => index + 1);
-  };
 
   // ! ボクサーの編集を実行
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -211,29 +193,7 @@ export const BoxerEdit = () => {
           </div>
         </section>
         <section className="w-[30%] min-w-[300px] border-l-[1px] border-stone-200 mb-5">
-          {pagesArray().length > 1 && (
-            <ul className="w-full py-3 flex justify-center sticky top-[105px] right-[100px] bg-white/80 border-b-[1px] border-stone-300 z-10">
-              {pagesArray().map((page) =>
-                paramPage === page ? (
-                  <li
-                    key={page}
-                    className="px-2 bg-stone-400 text-white rounded-sm mr-2"
-                  >
-                    {page}
-                  </li>
-                ) : (
-                  <Link to={`${pathname}?page=${page}${formattedParames}`}>
-                    <li
-                      key={page}
-                      className="px-2 bg-stone-700 text-white rounded-sm mr-2"
-                    >
-                      {page}
-                    </li>
-                  </Link>
-                )
-              )}
-            </ul>
-          )}
+          <PaginationBoxerList pageCount={pageCount} />
           <BoxersList
             checked={checked}
             setChecked={setChecked}

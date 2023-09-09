@@ -36,7 +36,7 @@ export const FlagImage = ({ nationaly, className }: PropsType) => {
           className
         )}
       >
-        <img src={getNatinalFlag(nationaly)} alt="japan" />
+        <img src={getNatinalFlag(nationaly)} alt={nationaly} />
       </div>
     </>
   );
