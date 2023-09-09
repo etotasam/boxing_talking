@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { isEqual } from "lodash";
 //! data
 import {
@@ -11,6 +11,7 @@ import { initialBoxerDataOnForm } from "@/assets/boxerData";
 import { getBoxerDataWithID, convertToBoxerData } from "@/assets/functions";
 //! hooks
 import { useToastModal } from "@/hooks/useToastModal";
+import { usePagePath } from "@/hooks/usePagePath";
 import {
   useFetchBoxer,
   useUpdateBoxerData,
@@ -28,9 +29,11 @@ import { BoxerEditForm } from "@/components/module/BoxerEditForm";
 import { SearchBoxer } from "@/components/module/SearchBoxer";
 import { Confirm } from "@/components/modal/Confirm";
 import { PaginationBoxerList } from "@/components/module/PaginationBoxerList";
+import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
 
 export const BoxerEdit = () => {
   // ? use hook
+  const { setter: setPagePath } = usePagePath();
   const { setToastModal, showToastModal, hideToastModal } = useToastModal();
   const { state: editTargetBoxerData, setter: setEditTargetBoxerData } =
     useBoxerDataOnForm();
@@ -65,6 +68,11 @@ export const BoxerEdit = () => {
     return () => {
       hideToastModal();
     };
+  }, []);
+
+  //? ページpathをRecoilに保存
+  useEffect(() => {
+    setPagePath(pathname);
   }, []);
 
   //? 選手データの削除実行
@@ -249,14 +257,11 @@ const BoxersList = ({
               >
                 <li className="w-[300px] mt-3 border-[1px] border-stone-300 rounded-md p-3">
                   <div className="text-center">
-                    <p className="">{boxer.eng_name}</p>
-                    <h2 className="relative inline-block">
-                      {boxer.name}
-                      <FlagImage
-                        nationaly={boxer.country}
-                        className="absolute top-0 right-[-45px]"
-                      />
-                    </h2>
+                    <EngNameWithFlag
+                      boxerCountry={boxer.country}
+                      boxerEngName={boxer.eng_name}
+                    />
+                    <h2 className="text-lg mt-2">{boxer.name}</h2>
                   </div>
                 </li>
               </label>

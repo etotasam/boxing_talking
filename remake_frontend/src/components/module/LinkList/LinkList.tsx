@@ -1,22 +1,20 @@
-import React, { ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
-// ? リンク先
-const linksArray = [
-  { pathName: "Home", path: "/" },
-  { pathName: "ボクサー登録", path: "/admini/boxer_register" },
-  { pathName: "ボクサー編集", path: "/admini/boxer_edit" },
-  { pathName: "試合登録", path: "/admini/match_register" },
-  { pathName: "試合編集", path: "/admini/match_edit" },
-];
+import React, { ReactNode, useEffect } from "react";
+import { Link } from "react-router-dom";
+//! data
+import { linksArray } from "@/assets/pathLinks";
+//! hooks
+import { usePagePath } from "@/hooks/usePagePath";
 
 export const LinkList = () => {
-  const currentPage = location.pathname;
+  const { state: pagePath } = usePagePath();
+  // const currentPage = location.pathname;
+
   return (
     <div className="flex justify-center items-center h-[100px] w-full">
       <ul className="flex">
         {linksArray.map((link) => (
           <li key={`${link.pathName}_${link.path}`} className="mr-5">
-            {currentPage === link.path ? (
+            {pagePath === link.path ? (
               <button className="bg-black/60 duration-300 text-white text-sm rounded-md px-6 py-2 cursor-auto">
                 {link.pathName}
               </button>

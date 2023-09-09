@@ -114,6 +114,7 @@ export const useCreateUser = () => {
 
 //! ログイン
 export const useLogin = () => {
+  const { refetch: refetchAdmin } = useAdmin()
   // ? react query
   const queryClient = useQueryClient()
   // ? toast modal
@@ -130,7 +131,6 @@ export const useLogin = () => {
   const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
     onMutate: () => {
       startLoading()
-      console.log("loading");
     }
   })
   const login = (props: { email: string, password: string }) => {
@@ -138,13 +138,14 @@ export const useLogin = () => {
     mutate({ ...props }, {
       // ! ログイン成功時
       onSuccess: (userData) => {
-        console.log("ログイン成功");
+        refetchAdmin()
         // ? ログインユーザーをreact query内でキャッシュする
         queryClient.setQueryData<UserType>(QUERY_KEY.auth, userData)
         successful()
         setToastModal({ message: MESSAGE.LOGIN_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
         hideLoginModal()
+
       },
       // ! ログイン失敗時
       onError: () => {
@@ -179,7 +180,8 @@ export const useLogout = () => {
     mutate({ userId }, {
       onSuccess: () => {
         // ? ユーザー情報のキャッシュをclear
-        queryClient.setQueryData(QUERY_KEY.auth, undefined)
+        queryClient.setQueryData(QUERY_KEY.auth, null)
+        queryClient.invalidateQueries(QUERY_KEY.admin)
         successful()
         setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
         showToastModal()
@@ -205,38 +207,47 @@ export const useLogout = () => {
 
 // ! 管理者判定
 export const useAdmin = () => {
-  // ? react query
-  const queryClient = useQueryClient()
-  // ? Loading state
-  const { resetLoadingState, startLoading, hasError, successful, endLoading } = useLoading()
-  // ? api
-  const api = useCallback(async ({ userId }: { userId: string | undefined }) => {
+  const api = useCallback(async () => {
     try {
-      const res = await Axios.post<boolean>("api/admin", { user_id: userId }).then(value => value.data)
+      const res = await Axios.get(`/api/admin`).then(value => value.data)
       return res
     } catch (error) {
-      return
+      return null
     }
   }, [])
-
-  const { mutate, isLoading, isSuccess } = useMutation(api, {
-    onMutate: () => {
-      startLoading()
-    }
+  const { data: isAdmin, isLoading, isError, refetch } = useQuery<boolean>(QUERY_KEY.admin, api, {
+    retry: false,
+    staleTime: Infinity
   })
 
-  const isAdmin = useCallback(({ userId }: { userId: string | undefined }) => {
-    mutate({ userId }, {
-      onSuccess: (isAdmin) => {
-        queryClient.setQueryData<boolean | undefined>(QUERY_KEY.admin, isAdmin)
-        console.log(`is admin: ${isAdmin}`);
-        resetLoadingState()
-      },
-      onError: () => {
-        console.log("has error on validat admin");
-        resetLoadingState()
-      }
-    })
-  }, [])
-  return { isAdmin }
+  return { isAdmin, isLoading, isError, refetch }
+  // // ? react query
+  // const queryClient = useQueryClient()
+  // // ? Loading state
+  // const { resetLoadingState, startLoading, hasError, successful, endLoading } = useLoading()
+  // // ? api
+  // const api = useCallback(async ({ userId }: { userId: string | undefined }) => {
+  //   const res = await Axios.post<boolean>("api/admin", { user_id: userId }).then(value => value.data)
+  //   return res
+  // }, [])
+
+  // const { mutate, isLoading, isSuccess } = useMutation(api, {
+  //   onMutate: () => {
+  //     startLoading()
+  //   }
+  // })
+
+  // const isAdmin = useCallback(({ userId }: { userId: string | undefined }) => {
+  //   mutate({ userId }, {
+  //     onSuccess: (isAdmin) => {
+  //       queryClient.setQueryData<boolean | undefined>(QUERY_KEY.admin, isAdmin)
+  //       resetLoadingState()
+  //     },
+  //     onError: () => {
+  //       console.log("has error on validat admin");
+  //       resetLoadingState()
+  //     }
+  //   })
+  // }, [])  
+  // return { admin, isLoading, isSuccess }
 }

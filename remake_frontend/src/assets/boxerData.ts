@@ -4,6 +4,7 @@ import { Nationality } from "./NationalFlagData";
 export const Stance = {
   Southpaw: "southpaw",
   Orthodox: "orthodox",
+  Unknown: "unknown"
 } as const
 
 
@@ -59,7 +60,7 @@ export const initialBoxerDataOnForm: BoxerDataOnFormType = {
   height: 165,
   reach: 165,
   title_hold: [],
-  style: Stance.Orthodox,
+  style: Stance.Unknown,
   win: 0,
   ko: 0,
   draw: 0,

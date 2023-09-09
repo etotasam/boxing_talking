@@ -44,6 +44,7 @@ export const BoxerEditForm = (props: PropsType) => {
     <div className="p-10 bg-stone-200 border-stone-400 border-[1px]">
       <h1 className="text-3xl text-center">選手情報</h1>
       <form className="flex flex-col" onSubmit={props.onSubmit}>
+        {/* //? name */}
         <input
           className="mt-3 px-1 bourder rounded border-black"
           type="text"
@@ -68,6 +69,7 @@ export const BoxerEditForm = (props: PropsType) => {
             })
           }
         />
+        {/* //? country */}
         <div className="flex mt-3">
           <label className="w-[100px] text-center" htmlFor="countrys">
             国籍
@@ -97,7 +99,7 @@ export const BoxerEditForm = (props: PropsType) => {
             ))}
           </select>
         </div>
-
+        {/* //? birth */}
         <div className="flex mt-3">
           <label className="w-[100px] text-center" htmlFor="birth">
             生年月日
@@ -115,7 +117,7 @@ export const BoxerEditForm = (props: PropsType) => {
             }
           />
         </div>
-
+        {/* //? height */}
         <div className="mt-3 flex p-1">
           <label className="w-[100px] text-center" htmlFor="height">
             身長
@@ -133,8 +135,7 @@ export const BoxerEditForm = (props: PropsType) => {
             }
           />
         </div>
-
-        {/* リーチ */}
+        {/* //? reach */}
         <div className="mt-3 flex p-1">
           <label className="w-[100px] text-center" htmlFor="height">
             リーチ
@@ -153,7 +154,7 @@ export const BoxerEditForm = (props: PropsType) => {
           />
         </div>
 
-        {/* stance */}
+        {/* //? stance */}
         <div className="mt-3 flex p-1">
           <label className="w-[100px] text-center" htmlFor="stance">
             スタイル:
@@ -171,10 +172,11 @@ export const BoxerEditForm = (props: PropsType) => {
           >
             <option value={Stance.Orthodox}>{Stance.Orthodox}</option>
             <option value={Stance.Southpaw}>{Stance.Southpaw}</option>
+            <option value={Stance.Unknown}>{Stance.Unknown}</option>
           </select>
         </div>
 
-        {/* 戦績 */}
+        {/* //? 戦績 */}
         <div className="flex w-full">
           <div className="mt-3 flex p-1">
             <label htmlFor="win">win</label>
@@ -241,7 +243,7 @@ export const BoxerEditForm = (props: PropsType) => {
           </div>
         </div>
 
-        {/* //! ベルト */}
+        {/* //? ベルト */}
         <div className="mt-3">
           <TitleSelector />
         </div>

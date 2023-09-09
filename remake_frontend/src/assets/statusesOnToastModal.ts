@@ -60,14 +60,15 @@ export const MESSAGE = {
   MATCH_IS_NOT_SELECTED: "対象の試合を選択してください",
   MATCH_UPDATE_FAILED: "試合情報の更新に失敗しました",
   MATCH_UPDATE_SUCCESS: "試合情報を更新しました",
+  MATCH_DELETED: "試合情報を削除しました",
+  MATCH_DELETE_FAILD: "試合情報の削除に失敗しました \n 一度画面を更新し、再度削除の実行を行ってください",
 
   MATCH_HAS_NOT_ENTRIES: "未入力・未選択の項目があります",
   MATCH_NOT_SELECTED: "対象の試合を選択してください",
+  MATCH_NOT_SELECTED_BOXER: "試合を組む選手を選択してください",
   MATCH_NOT_ALTER: "試合情報に変更がありません",
   MATCH_REGISTER_SUCCESS: "試合情報の登録が完了しました",
   MATCH_REGISTER_FAILD: "試合情報の登録に失敗しました \n 再度登録してください",
-  MATCH_DELETED: "試合情報を削除しました",
-  MATCH_DELETE_FAILD: "試合情報の削除に失敗しました \n 一度画面を更新し、再度削除の実行を行ってください",
   MATCH_UPDATE_FAILD: "試合情報の更新に失敗しました \n 一度画面を更新し、再度更新の実行を行ってください",
 
 

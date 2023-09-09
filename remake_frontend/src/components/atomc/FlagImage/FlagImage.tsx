@@ -13,6 +13,7 @@ import kazakhstanFlag from "@/assets/images/flags/kz.svg";
 import ukFlag from "@/assets/images/flags/uk.svg";
 import rusiaFlag from "@/assets/images/flags/rusia.svg";
 import ukrineFlag from "@/assets/images/flags/ukrine.svg";
+import southAfricaFlag from "@/assets/images/flags/southafrica.svg";
 
 type PropsType = React.ComponentProps<"div"> & { nationaly: NationalityType };
 
@@ -26,17 +27,17 @@ export const FlagImage = ({ nationaly, className }: PropsType) => {
     if (country == Nationality.UK) return ukFlag;
     if (country == Nationality.Rusia) return rusiaFlag;
     if (country == Nationality.Ukrine) return ukrineFlag;
+    if (country == Nationality.SouthAfrica) return southAfricaFlag;
   };
 
   return (
     <>
-      <div
-        className={clsx(
-          "w-[32px] h-[24px] border-[1px] overflow-hidden",
-          className
-        )}
-      >
-        <img src={getNatinalFlag(nationaly)} alt={nationaly} />
+      <div className={clsx(className)}>
+        <img
+          className="w-full h-full object-cover"
+          src={getNatinalFlag(nationaly)}
+          alt={nationaly}
+        />
       </div>
     </>
   );

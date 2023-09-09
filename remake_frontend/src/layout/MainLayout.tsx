@@ -2,8 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 //! component
 import { HeaderContainer } from "@/components/module/Header";
-
-const MainLayout = React.memo(() => {
+const MainLayout = () => {
   return (
     <div className="text-stone-700">
       <HeaderContainer />
@@ -12,6 +11,6 @@ const MainLayout = React.memo(() => {
       </main>
     </div>
   );
-});
+};
 
 export default MainLayout;

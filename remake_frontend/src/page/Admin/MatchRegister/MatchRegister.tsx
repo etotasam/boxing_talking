@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import { cloneDeep } from "lodash";
+import { useLocation } from "react-router-dom";
 // ! types
 import {
   NationalityType,
@@ -23,17 +24,35 @@ import { useFetchBoxer } from "@/hooks/useBoxer";
 import { BoxerType } from "@/assets/types";
 import { useRegisterMatch } from "@/hooks/useMatch";
 import { useToastModal } from "@/hooks/useToastModal";
+import { usePagePath } from "@/hooks/usePagePath";
 //! component
 import { FlagImage } from "@/components/atomc/FlagImage";
 import { SearchBoxer } from "@/components/module/SearchBoxer";
 import { PaginationBoxerList } from "@/components/module/PaginationBoxerList";
+import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
 
 export const MatchRegister = () => {
+  //! hooks
+  const { setter: setPagePath } = usePagePath();
   const { boxersData, pageCount } = useFetchBoxer();
+  const { isSuccess: isSuccessRegisterMatch } = useRegisterMatch();
   const [matchBoxers, setMatchBoxers] = useState<MatchBoxersType>({
     red_boxer: undefined,
     blue_boxer: undefined,
   });
+
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    if (!isSuccessRegisterMatch) return;
+    // setMatchBoxers()
+  }, [isSuccessRegisterMatch]);
+
+  //? ページpathをRecoilに保存
+  useEffect(() => {
+    setPagePath(pathname);
+  }, []);
+
   return (
     <AdminiLayout>
       <div className="w-full flex">
@@ -42,7 +61,10 @@ export const MatchRegister = () => {
             <MatchSetUpBox boxers={matchBoxers} />
             <div className="flex mt-5">
               <div className="w-[50%] flex justify-center">
-                <MatchDataSetter matchBoxers={matchBoxers} />
+                <MatchDataSetter
+                  matchBoxers={matchBoxers}
+                  setMatchBoxers={setMatchBoxers}
+                />
               </div>
               <div className="w-[50%] flex justify-center">
                 <div className="w-[90%]">
@@ -87,14 +109,11 @@ const BoxerBox = ({ boxerData }: { boxerData: BoxerType }) => {
     <>
       <div className="w-[300px] mt-3 border-[1px] border-stone-300 rounded-md p-3">
         <div className="text-center">
-          <p className="">{boxerData.eng_name}</p>
-          <h2 className="relative inline-block">
-            {boxerData.name}
-            <FlagImage
-              nationaly={boxerData.country}
-              className="absolute top-0 right-[-45px]"
-            />
-          </h2>
+          <EngNameWithFlag
+            boxerCountry={boxerData.country}
+            boxerEngName={boxerData.eng_name}
+          />
+          <h2 className="relative inline-block">{boxerData.name}</h2>
         </div>
       </div>
     </>
@@ -190,14 +209,11 @@ const BoxersList = ({
               >
                 <li className="w-[300px] mt-3 border-[1px] border-stone-300 rounded-md p-3">
                   <div className="text-center">
-                    <p className="">{boxer.eng_name}</p>
-                    <h2 className="relative inline-block">
-                      {boxer.name}
-                      <FlagImage
-                        nationaly={boxer.country}
-                        className="absolute top-0 right-[-45px]"
-                      />
-                    </h2>
+                    <EngNameWithFlag
+                      boxerCountry={boxer.country}
+                      boxerEngName={boxer.eng_name}
+                    />
+                    <h2 className="relative inline-block">{boxer.name}</h2>
                   </div>
                 </li>
               </label>
@@ -213,21 +229,45 @@ const BoxersList = ({
 // ! 試合情報セッター
 type MatchDataSetterPropsType = {
   matchBoxers: MatchBoxersType;
+  setMatchBoxers: React.Dispatch<React.SetStateAction<MatchBoxersType>>;
 };
 
 // ! 試合データ入力
-const MatchDataSetter = ({ matchBoxers }: MatchDataSetterPropsType) => {
+const MatchDataSetter = ({
+  matchBoxers,
+  setMatchBoxers,
+}: MatchDataSetterPropsType) => {
   //? use hook
   const { showToastModal, setToastModal, hideToastModal } = useToastModal();
-  const { registerMatch } = useRegisterMatch();
-  const matchDate = useRef("");
-  const [matchGrade, setMatchGrade] = useState<GRADE_Type>();
-  const matchPlaceCountry = useRef<NationalityType>();
-  const matchVenue = useRef("");
-  const matchWeight = useRef<WEIGHT_CLASS_Type>();
+  const { registerMatch, isSuccess: isSuccessRegisterMatch } =
+    useRegisterMatch();
+  // const matchDate = useRef("");
+  const [matchDate, setMatchDate] = useState<string>(
+    dayjs().format("YYYY-MM-DD")
+  );
+  const [matchGrade, setMatchGrade] = useState<GRADE_Type>("");
+  const [matchPlaceCountry, setMatchPlaceCountry] = useState<
+    NationalityType | ""
+  >();
+  const [matchVenue, setMatchVenue] = useState<string>("");
+  const [matchWeight, setMatchWeght] = useState<WEIGHT_CLASS_Type | "">();
   const [belt, setBelt] = useState<ORGANIZATIONS_Type[]>([]);
   const [title, setTitle] = useState(false);
   const [counter, setCounter] = useState(1);
+
+  useEffect(() => {
+    if (!isSuccessRegisterMatch) return;
+    setMatchDate(dayjs().format("YYYY-MM-DD"));
+    setMatchGrade("");
+    setMatchPlaceCountry("");
+    setMatchVenue("");
+    setMatchWeght("");
+    setBelt([]);
+    setTitle(false);
+    setCounter(1);
+
+    setMatchBoxers({ red_boxer: undefined, blue_boxer: undefined });
+  }, [isSuccessRegisterMatch]);
 
   // ? アンマウント時にはトーストモーダルを隠す
   useEffect(() => {
@@ -264,7 +304,7 @@ const MatchDataSetter = ({ matchBoxers }: MatchDataSetterPropsType) => {
     // ? 選手を選択していない場合モーダルでNOTICE
     if (Object.values(matchBoxers).includes(undefined)) {
       setToastModal({
-        message: MESSAGE.MATCH_BOXER_NOT_SELECTED,
+        message: MESSAGE.MATCH_NOT_SELECTED_BOXER,
         bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
       });
       showToastModal();
@@ -273,11 +313,11 @@ const MatchDataSetter = ({ matchBoxers }: MatchDataSetterPropsType) => {
 
     // ? 他、未入力がある場合はモーダルでNOTICE
     if (
-      !matchDate.current ||
+      !matchDate ||
       !matchGrade ||
-      !matchPlaceCountry.current ||
-      !matchVenue.current ||
-      !matchWeight.current
+      !matchPlaceCountry ||
+      !matchVenue ||
+      !matchWeight
     ) {
       setToastModal({
         message: MESSAGE.MATCH_HAS_NOT_ENTRIES,
@@ -291,12 +331,13 @@ const MatchDataSetter = ({ matchBoxers }: MatchDataSetterPropsType) => {
         bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
       });
       showToastModal();
+      return;
     }
 
     let formattedBelt;
     if (belt.length) {
       formattedBelt = belt.map((title) => {
-        return `${title}世界${matchWeight.current!}級`;
+        return `${title}世界${matchWeight}級`;
       });
     } else {
       formattedBelt = cloneDeep(belt);
@@ -305,11 +346,11 @@ const MatchDataSetter = ({ matchBoxers }: MatchDataSetterPropsType) => {
     const matchData: RegstarMatchPropsType = {
       red_boxer_id: matchBoxers.red_boxer!.id!,
       blue_boxer_id: matchBoxers.blue_boxer!.id!,
-      match_date: matchDate.current,
+      match_date: matchDate,
       grade: matchGrade!,
-      country: matchPlaceCountry.current!,
-      venue: matchVenue.current,
-      weight: matchWeight.current!,
+      country: matchPlaceCountry,
+      venue: matchVenue,
+      weight: matchWeight!,
       titles: formattedBelt,
     };
     registerMatch(matchData);
@@ -335,8 +376,9 @@ const MatchDataSetter = ({ matchBoxers }: MatchDataSetterPropsType) => {
           id="match-date"
           type="date"
           min={dayjs().format("YYYY-MM-DD")}
+          value={matchDate}
           onChange={(e) => {
-            matchDate.current = e.target.value;
+            setMatchDate(e.target.value);
           }}
         />
       </div>
@@ -349,7 +391,7 @@ const MatchDataSetter = ({ matchBoxers }: MatchDataSetterPropsType) => {
         <select
           className="w-[150px]"
           name="matchGrade"
-          // value={matchGrade}
+          value={matchGrade}
           onChange={(e) => {
             setMatchGrade(e.target.value as GRADE_Type);
           }}
@@ -404,9 +446,9 @@ const MatchDataSetter = ({ matchBoxers }: MatchDataSetterPropsType) => {
         <select
           className="w-[150px]"
           name="matchWeight"
-          // value={matachCountry.current}
+          value={matchWeight}
           onChange={(e) => {
-            matchWeight.current = e.target.value as WEIGHT_CLASS_Type;
+            setMatchWeght(e.target.value as WEIGHT_CLASS_Type);
           }}
           id="matchWeight"
         >
@@ -431,9 +473,9 @@ const MatchDataSetter = ({ matchBoxers }: MatchDataSetterPropsType) => {
         <select
           className="w-[150px]"
           name="matchPlaceCountry"
-          // value={matachCountry.current}
+          value={matchPlaceCountry}
           onChange={(e) => {
-            matchPlaceCountry.current = e.target.value as NationalityType;
+            setMatchPlaceCountry(e.target.value as NationalityType);
           }}
           id="matchPlaceCountry"
         >
@@ -452,8 +494,8 @@ const MatchDataSetter = ({ matchBoxers }: MatchDataSetterPropsType) => {
           type="text"
           placeholder="試合会場入力"
           name="matachCountry"
-          // value={matachCountry.current}
-          onChange={(e) => (matchVenue.current = e.target.value)}
+          value={matchVenue}
+          onChange={(e) => setMatchVenue(e.target.value)}
         />
       </div>
 

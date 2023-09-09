@@ -16,6 +16,7 @@ import { IconContext } from "react-icons";
 import { BiUserCircle } from "react-icons/bi";
 //! component
 import { LinkList } from "../LinkList";
+import { useAdmin } from "@/hooks/useAuth";
 
 type PropsType = {
   userData: UserType | undefined;
@@ -23,6 +24,7 @@ type PropsType = {
 
 export const Header = (porps: PropsType) => {
   const { userData } = porps;
+  const { isAdmin } = useAdmin();
 
   const setFormType = useSetRecoilState(formTypeSelector);
 
@@ -37,21 +39,34 @@ export const Header = (porps: PropsType) => {
 
   return (
     <>
-      <header className="h-[130px] relative after:w-full after:absolute after:bottom-[-5px] after:left-0 after:h-[5px] after:bg-red-500">
-        <DivVerticalCenter>
-          <h1 className="text-[75px] font-thin">BOXING TALKING</h1>
-        </DivVerticalCenter>
-        <div className="absolute right-[170px] top-4">
-          <LinkList />
-        </div>
+      <header className="h-[80px] felx relative after:w-full after:absolute after:bottom-[-3px] after:left-0 after:h-[3px] after:bg-red-500">
+        {/* <DivVerticalCenter> */}
+        <h1 className="text-[64px] font-thin">BOXING TALKING</h1>
+        {/* </DivVerticalCenter> */}
+        {isAdmin && (
+          <div className="absolute right-[200px] top-0">
+            <LinkList />
+          </div>
+        )}
         {/* <LinkList /> */}
-        <DivVerticalCenter className="absolute right-[50px] top-0">
-          <AuthControlComponent
-            userData={userData}
-            logout={logout}
-            openLoginForm={openLoginForm}
-          />
-        </DivVerticalCenter>
+        {/* <DivVerticalCenter className="absolute right-[50px] top-0"> */}
+
+        {userData && (
+          <div className="absolute top-0 right-[30px] flex">
+            <IconContext.Provider value={{ color: "#1e1e1e", size: "25px" }}>
+              <span className="mr-1">
+                <BiUserCircle />
+              </span>
+            </IconContext.Provider>
+            {userData.name}
+          </div>
+        )}
+        <AuthControlComponent
+          userData={userData}
+          logout={logout}
+          openLoginForm={openLoginForm}
+        />
+        {/* </DivVerticalCenter> */}
       </header>
     </>
   );
@@ -70,23 +85,17 @@ const AuthControlComponent = ({
 }: AuthControlComponentPropsType) => {
   return (
     <>
-      {userData ? (
-        <div className="relative h-full flex justify-center items-center">
-          <div className="fixed top-3 right-[50px] flex justify-start">
-            <IconContext.Provider value={{ color: "#1e1e1e", size: "25px" }}>
-              <span className="mr-1">
-                <BiUserCircle />
-              </span>
-            </IconContext.Provider>
-            {userData.name}
-          </div>
-          <Button onClick={() => logout({ userId: userData.id! })}>
-            ログアウト
-          </Button>
+      <div className="absolute top-0 right-0 w-[200px] h-full flex justify-center">
+        <div className="absolute bottom-3 flex justify-center">
+          {userData ? (
+            <Button onClick={() => logout({ userId: userData.id! })}>
+              ログアウト
+            </Button>
+          ) : (
+            <Button onClick={() => openLoginForm()}>ログイン</Button>
+          )}
         </div>
-      ) : (
-        <Button onClick={() => openLoginForm()}>ログイン</Button>
-      )}
+      </div>
     </>
   );
 };

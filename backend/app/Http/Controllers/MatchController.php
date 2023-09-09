@@ -11,6 +11,7 @@ use App\Models\BoxingMatch;
 use App\Models\Boxer;
 use App\Models\Comment;
 use App\Models\Vote;
+use App\Models\Administrator;
 use Exception;
 
 class MatchController extends Controller
@@ -110,13 +111,22 @@ class MatchController extends Controller
     /**
      * Delete resource from DB
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  matchId number
      * @return \Illuminate\Http\Response
      */
     public function delete(Request $request)
     {
-        $match_id = $request->matchId;
+
         try {
+            // ? まず管理者かどうかを確認する
+            $auth_user_id = Auth::User()->id;
+            $is_admin = Administrator::where("user_id", $auth_user_id)->exists();
+            if (!$is_admin) {
+                throw new Exception("unauthorize", 406);
+            }
+
+
+            $match_id = $request->matchId;
             DB::beginTransaction();
             //? 削除対象の試合に付いているコメントを削除する
             Comment::where("match_id", $match_id)->delete();

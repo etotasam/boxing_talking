@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import dayjs from "dayjs";
 import clsx from "clsx";
+import { useLocation } from "react-router-dom";
 //! data
 import { GRADE } from "@/assets/boxerData";
 //! layout
@@ -9,8 +10,12 @@ import AdminiLayout from "@/layout/AdminiLayout";
 import { FightBox } from "@/components/module/FightBox";
 import { FlagImage } from "@/components/atomc/FlagImage";
 import { MatchSetter } from "@/components/module/MatchSetter/MatchSetter";
+import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
+import { Confirm } from "@/components/modal/Confirm";
 // ! hooks
-import { useFetchMatches } from "@/hooks/useMatch";
+import { useFetchMatches, useDeleteMatch } from "@/hooks/useMatch";
+import { useToastModal } from "@/hooks/useToastModal";
+import { usePagePath } from "@/hooks/usePagePath";
 //! types
 import {
   MatchesDataType,
@@ -22,12 +27,51 @@ import {
 
 // ! image
 import crown from "@/assets/images/etc/champion.svg";
+import {
+  BG_COLOR_ON_TOAST_MODAL,
+  MESSAGE,
+} from "@/assets/statusesOnToastModal";
 
 export const MatchEdit = () => {
   // ! use hook
+  const { pathname } = useLocation();
   const { data: matchesData } = useFetchMatches();
+  const { setToastModal, showToastModal } = useToastModal();
+  const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
+  const { setter: setPagePath } = usePagePath();
 
   const [selectMatch, setSelectMatch] = useState<MatchesDataType>();
+  const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
+
+  //? ページpathをRecoilに保存
+  useEffect(() => {
+    setPagePath(pathname);
+  }, []);
+
+  //? 試合の削除に成功した時…
+  useEffect(() => {
+    if (!isSuccessDeleteMatch) return;
+    setSelectMatch(undefined);
+  }, [isSuccessDeleteMatch]);
+
+  const handleClickDeleteButton = () => {
+    if (!selectMatch) {
+      setToastModal({
+        message: MESSAGE.MATCH_IS_NOT_SELECTED,
+        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
+      });
+      showToastModal();
+      return;
+    }
+    setIsDeleteConfirm(true);
+  };
+
+  const deleteExecution = () => {
+    if (!selectMatch) return;
+    setIsDeleteConfirm(false);
+    deleteMatch(selectMatch.id);
+  };
+
   return (
     <AdminiLayout>
       <div className="mt-[120px] flex w-full">
@@ -43,8 +87,29 @@ export const MatchEdit = () => {
           )}
         </section>
 
-        <section className="w-[40%] flex justify-center">
-          <MatchSetter selectMatch={selectMatch} />
+        <section className="w-[40%] flex ite justify-center">
+          <div className="w-[80%]">
+            <MatchSetter
+              selectMatch={selectMatch}
+              isSuccessDeleteMatch={isSuccessDeleteMatch}
+            />
+            <div className="mt-5">
+              <button
+                onClick={handleClickDeleteButton}
+                className="py-2 w-[150px] bg-red-700 text-white rounded-sm"
+              >
+                削除
+              </button>
+              {isDeleteConfirm && (
+                <Confirm
+                  execution={deleteExecution}
+                  cancel={() => setIsDeleteConfirm(false)}
+                >
+                  削除しますか？
+                </Confirm>
+              )}
+            </div>
+          </div>
         </section>
 
         <section className="w-[30%] flex justify-center">
@@ -94,7 +159,10 @@ export const MatchListComponent = ({
                 <div className="flex-1">
                   {/* //? 国旗 */}
                   <div className="flex justify-center">
-                    <FlagImage nationaly={match.red_boxer.country} />
+                    <EngNameWithFlag
+                      boxerCountry={match.red_boxer.country}
+                      boxerEngName={match.red_boxer.eng_name}
+                    />
                   </div>
                   {/* //? 名前 */}
                   <p className="">{match.red_boxer.name}</p>
@@ -103,7 +171,10 @@ export const MatchListComponent = ({
                 <div className="flex-1">
                   {/* //? 国旗 */}
                   <div className="flex justify-center">
-                    <FlagImage nationaly={match.blue_boxer.country} />
+                    <EngNameWithFlag
+                      boxerCountry={match.blue_boxer.country}
+                      boxerEngName={match.blue_boxer.eng_name}
+                    />
                   </div>
                   {/* //? 名前 */}
                   <p className="">{match.blue_boxer.name}</p>

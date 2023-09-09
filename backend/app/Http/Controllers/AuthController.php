@@ -164,22 +164,20 @@ class AuthController extends Controller
     {
         try {
             if (!Auth::User()) {
-                throw new Exception("no auth user");
+                return false;
+                // throw new Exception("no auth user", 401);
+                // return response()->json(["message" => "no auth user", 401]);
             }
-            $req_user_id = $request->user_id;
-            $auth_id = Auth::User()->id;
-            if ($req_user_id != $auth_id) {
-                throw new Exception("illegal user");
-            }
-            $is_admin = Administrator::where("user_id", $auth_id)->exists();
-            if ($is_admin) {
-                return true;
-            } else {
-                return response()->json(["message" => "failed", 401]);
-            }
+            // $req_user_id = $request->user_id;
+            $auth_user_id = Auth::User()->id;
+            // if ($req_user_id != $auth_user_id) {
+            //     return response()->json(["message" => "illegal user", 406]);
+            // }
+            $is_admin = Administrator::where("user_id", $auth_user_id)->exists();
+            return $is_admin;
         } catch (Exception $e) {
-            if ($e->getMessage() == "no auth user") {
-                return response()->json(["message" => $e->getMessage(), 401]);
+            if ($e->getMessage()) {
+                return response()->json(["message" => $e->getMessage(), $e->getCode()]);
             }
             return response()->json(["message" => $e->getMessage(), 500]);
         }

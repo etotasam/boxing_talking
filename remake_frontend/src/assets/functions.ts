@@ -1,6 +1,6 @@
 import _ from "lodash"
 // ! types
-import { BoxerType, BoxerDataOnFormType } from "@/assets/types"
+import { BoxerType, BoxerDataOnFormType, MatchesDataType } from "@/assets/types"
 
 
 // ? boxerDataOnFormのtitle_holeプロパティをstring[]型に変形してデータベースに保存する為の関数

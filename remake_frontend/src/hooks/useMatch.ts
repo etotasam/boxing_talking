@@ -17,7 +17,7 @@ export const useFetchMatches = () => {
   const fetcher = useCallback(async () => {
     return await Axios.get("api/match").then(value => value.data)
   }, [])
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchesDataType[]>(QUERY_KEY.matchesFetch, fetcher)
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchesDataType[]>(QUERY_KEY.matchesFetch, fetcher, { keepPreviousData: true, staleTime: Infinity })
   return { data, isLoading, isError, isRefetching, refetch }
 }
 
@@ -33,7 +33,7 @@ export const useRegisterMatch = () => {
   const api = async ({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }: RegstarMatchPropsType) => {
     await Axios.post("/api/match", { match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles })
   }
-  const { mutate, isLoading } = useMutation(api, {
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: (variables) => {
       startLoading()
       // const snapshot = queryClient.getQueryData<MatchesType[]>(queryKeys.match)
@@ -63,7 +63,7 @@ export const useRegisterMatch = () => {
     })
   }
 
-  return { registerMatch, isLoading }
+  return { registerMatch, isLoading, isSuccess }
 }
 
 
@@ -123,4 +123,46 @@ export const useUpdateMatch = () => {
   }
 
   return { updateMatch, isLoading, isSuccess }
+}
+
+//! 試合の削除
+export const useDeleteMatch = () => {
+  const { setToastModal, showToastModal } = useToastModal()
+  const { resetLoadingState, startLoading } = useLoading()
+  const { refetch: refetchMatches } = useFetchMatches()
+  // const { state: matchesState, setter: setMatchesState } = useQueryState<MatchesType[]>(queryKeys.match)
+  const api = useCallback(async (matchId: number) => {
+    await Axios.delete("/api/match", { data: { matchId } })
+  }, [])
+
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
+    onMutate: () => {
+      startLoading()
+      // const snapshot = matchesState
+      // return { snapshot }
+    }
+  })
+
+  const deleteMatch = (matchId: number) => {
+    mutate(matchId, {
+      onSuccess: (data, matchId, context) => {
+        refetchMatches()
+        resetLoadingState()
+        setToastModal({ message: MESSAGE.MATCH_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+        showToastModal()
+        // setToastModalMessage({ message: MESSAGE.MATCH_DELETED, bgColor: ModalBgColorType.DELETE })
+        // const withoutDeleteMatchesState = context.snapshot.filter(match => match.id !== matchId)
+        // setMatchesState(withoutDeleteMatchesState)
+      },
+      onError: (error, matchId, context) => {
+        resetLoadingState()
+        setToastModal({ message: MESSAGE.MATCH_DELETE_FAILD, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showToastModal()
+        // setToastModalMessage({ message: MESSAGE.MATCH_DELETE_FAILD, bgColor: ModalBgColorType.ERROR })
+        // setMatchesState(context!.snapshot)
+      }
+    })
+  }
+
+  return { deleteMatch, isLoading, isSuccess }
 }
