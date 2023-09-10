@@ -5,7 +5,7 @@ import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "./statusesOnToastModal";
 import { linksArray } from "@/assets/pathLinks";
 
 export type UserType = {
-  id: string | undefined,
+  // id: string | undefined,
   name: string | undefined,
   // email: string | undefined,
 }

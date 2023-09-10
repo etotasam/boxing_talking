@@ -127,6 +127,7 @@ export const SignUpForm = () => {
           <input
             type={"password"}
             placeholder="Create Password"
+            autoComplete="off"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className={clsx(

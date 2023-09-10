@@ -214,7 +214,7 @@ class BoxerController extends Controller
     {
         // throw new Exception();
         try {
-            $id = $request->id;
+            $boxer_id = $request->id;
             // $boxer = $request->toArray();
             $boxer = $request->all();
             $title_hold = implode('/', $boxer['title_hold']);
@@ -225,26 +225,13 @@ class BoxerController extends Controller
                 $boxer['title_hold'] = $title_hold;
             }
 
-            Boxer::find($id)->update($boxer);
+            Boxer::find($boxer_id)->update($boxer);
 
             // \Log::debug($boxer);
 
             return response()->json(["message" => "boxer updated"], 200);
         } catch (Exception $e) {
             return response()->json(["message" => "faild fighter update"], 500);
-        }
-    }
-
-
-    public function testtest(Request $request)
-    {
-        try {
-            $title_hold = $request->title_hold;
-            $json = json_encode($title_hold);
-            // \Log::debug($json);
-            return $json;
-        } catch (Exception $e) {
-            return response()->json(["message" => "failed test api"], 500);
         }
     }
 }

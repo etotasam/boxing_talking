@@ -99,10 +99,7 @@ class AuthController extends Controller
             }
             return response()->json(["message" => "created user"], Response::HTTP_CREATED);
         } catch (Exception $e) {
-            if ($e->getCode() === Response::HTTP_FORBIDDEN) {
-                return response()->json(['message' => $e->getMessage()], Response::HTTP_FORBIDDEN);
-            }
-            return response()->json(['message' => "create user faild : " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(["message" => $e->getMessage()], $e->getCode());
         }
     }
 
@@ -115,16 +112,16 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        // throw new Exception();
         $email = $request->email;
         $password = $request->password;
         try {
+            // throw new Exception();
             if (Auth::attempt(['email' => $email, 'password' => $password])) {
                 return Auth::user();
             }
-            return new Exception("Failed Login 401");
+            throw new Exception("Failed Login", Response::HTTP_UNAUTHORIZED);
         } catch (Exception $e) {
-            return response()->json(["message" => $e->getMessage(), 401]);
+            return response()->json(["message" => $e->getMessage()], $e->getCode());
         }
     }
 
@@ -137,18 +134,13 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         // throw new Exception();
-        $user_id = $request->user_id;
-        $auth_user_id = Auth::User()->id;
         try {
-            if ($user_id != $auth_user_id) {
-                throw new Exception("forbidden");
-            }
+            if (!Auth::User()) {
+                throw new Exception('Forbidden', Response::HTTP_FORBIDDEN);
+            };
             return Auth::logout();
         } catch (Exception $e) {
-            if ($e->getMessage()) {
-                return response()->json(["message" => $e->getMessage()], 403);
-            }
-            return response()->json(["message" => "faild whild logout"], 500);
+            return response()->json(["message" => $e->getMessage()], $e->getCode());
         }
     }
 
@@ -176,10 +168,7 @@ class AuthController extends Controller
             $is_admin = Administrator::where("user_id", $auth_user_id)->exists();
             return $is_admin;
         } catch (Exception $e) {
-            if ($e->getMessage()) {
-                return response()->json(["message" => $e->getMessage(), $e->getCode()]);
-            }
-            return response()->json(["message" => $e->getMessage(), 500]);
+            return response()->json(["message" => $e->getMessage()], $e->getCode());
         }
     }
 }
