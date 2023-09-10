@@ -26,6 +26,7 @@ export const useFetchMatches = () => {
 //! 試合の登録
 export const useRegisterMatch = () => {
   const { setToastModal, showToastModal } = useToastModal()
+  const { refetch: refetchMatches } = useFetchMatches()
   const queryClient = useQueryClient()
   const { resetLoadingState, startLoading } = useLoading()
 
@@ -50,6 +51,7 @@ export const useRegisterMatch = () => {
   const registerMatch = ({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }: RegstarMatchPropsType) => {
     mutate({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }, {
       onSuccess: () => {
+        refetchMatches()
         resetLoadingState()
         setToastModal({ message: MESSAGE.MATCH_REGISTER_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()

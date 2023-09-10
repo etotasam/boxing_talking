@@ -26,7 +26,7 @@ export const FightBox = ({ matchData, className, onClick }: PropsType) => {
       {matchData && (
         <div
           onClick={() => onClick(matchData.id)}
-          className="flex justify-between w-[80%] max-w-[1024px] min-w-[900px] cursor-pointer border-[1px] border-stone-400 rounded-md md:hover:bg-neutral-100 md:hover:border-white md:duration-300"
+          className="flex justify-between w-[80%] max-w-[1024px] min-w-[900px] cursor-pointer border-[1px] border-stone-400 rounded-md md:hover:bg-yellow-100 md:hover:border-white md:duration-300"
         >
           <div className="w-[300px]">
             <BoxerInfo boxer={matchData.red_boxer} />

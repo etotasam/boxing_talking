@@ -16,6 +16,7 @@ import { Confirm } from "@/components/modal/Confirm";
 import { useFetchMatches, useDeleteMatch } from "@/hooks/useMatch";
 import { useToastModal } from "@/hooks/useToastModal";
 import { usePagePath } from "@/hooks/usePagePath";
+import { useLoading } from "@/hooks/useLoading";
 //! types
 import {
   MatchesDataType,
@@ -34,6 +35,7 @@ import {
 
 export const MatchEdit = () => {
   // ! use hook
+  const { resetLoadingState } = useLoading();
   const { pathname } = useLocation();
   const { data: matchesData } = useFetchMatches();
   const { setToastModal, showToastModal } = useToastModal();
@@ -43,9 +45,13 @@ export const MatchEdit = () => {
   const [selectMatch, setSelectMatch] = useState<MatchesDataType>();
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
 
-  //? ページpathをRecoilに保存
+  //? 初期設定(クリーンアップとか)
   useEffect(() => {
+    //? ページpathをRecoilに保存
     setPagePath(pathname);
+    return () => {
+      resetLoadingState();
+    };
   }, []);
 
   //? 試合の削除に成功した時…

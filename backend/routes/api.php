@@ -15,7 +15,7 @@ use GuzzleHttp\Psr7\Message;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\CommentController;
-use App\Http\Controllers\VoteController;
+use App\Http\Controllers\WinLossPredictionController;
 use App\Http\Controllers\BoxerController;
 use App\Http\Controllers\MailController;
 
@@ -72,8 +72,8 @@ Route::post('/comment', [CommentController::class, 'post'])->name('comment.post'
 Route::delete('/comment', [CommentController::class, 'delete'])->name('comment.delete');
 
 //! 勝利予想
-Route::get('/vote', [VoteController::class, 'fetch'])->name('vote.fetch');
-Route::put('/vote', [VoteController::class, 'vote'])->name('vote');
+Route::get('/prediction', [WinLossPredictionController::class, 'fetch'])->name('vote.fetch');
+Route::put('/prediction', [WinLossPredictionController::class, 'win_loss_prediction'])->name('vote');
 
 //! メールテスト
 Route::get('/mail', [MailController::class, 'send'])->name('mail.send');

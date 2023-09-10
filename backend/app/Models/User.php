@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\ProvisionalUser;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Models\Vote;
+use App\Models\WinLossPrediction;
 use Illuminate\Support\Str;
 use \Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +35,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
+        'id',
         'email',
         'password',
         'created_at',
@@ -50,9 +51,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function votes()
+    public function prediction()
     {
-        return $this->hasMany(Vote::class);
+        return $this->hasMany(WinLossPrediction::class);
     }
 
     protected static function booted()

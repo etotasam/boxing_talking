@@ -39,8 +39,10 @@ function App() {
           {/* //? </container> */}
         </Route>
         {/* //! テスト用 */}
-        <Route element={<MainLayout />}>{/* //? </MainLayout> */}</Route>
-        <Route path="/test_module" element={<TestModule />} />
+        <Route element={<MainLayout />}>
+          <Route path="/test_module" element={<TestModule />} />
+          {/* //? </MainLayout> */}
+        </Route>
       </Routes>
     </BrowserRouter>
   );

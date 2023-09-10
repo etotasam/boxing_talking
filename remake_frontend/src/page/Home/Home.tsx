@@ -7,9 +7,11 @@ import { LinkList } from "@/components/module/LinkList";
 // ! hooks
 import { useFetchMatches } from "@/hooks/useMatch";
 import { usePagePath } from "@/hooks/usePagePath";
+import { useLoading } from "@/hooks/useLoading";
 
 export const Home = () => {
   // ! use hook
+  const { resetLoadingState } = useLoading();
   const { data: matchesData } = useFetchMatches();
   const { setter: setPagePath } = usePagePath();
   const navigate = useNavigate();
@@ -18,10 +20,13 @@ export const Home = () => {
   const testClick = (matchId: number) => {
     navigate(`/match?match_id=${matchId}`);
   };
-
-  //? ページpathをRecoilに保存
+  //? 初期設定(クリーンアップとか)
   useEffect(() => {
+    //? ページpathをRecoilに保存
     setPagePath(pathname);
+    return () => {
+      resetLoadingState();
+    };
   }, []);
 
   return (

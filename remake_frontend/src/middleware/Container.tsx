@@ -5,6 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useToastModal } from "@/hooks/useToastModal";
 import { useFetchMatches } from "@/hooks/useMatch";
+import { useLoading } from "@/hooks/useLoading";
 // ! modal
 import { ToastModalContainer } from "@/components/modal/ToastModal";
 import { LoginFormModal } from "@/components/modal/LoginFormModal";
@@ -20,7 +21,7 @@ const Container = () => {
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
   const isShowLoginModal = useRecoilValue(loginModalSelector);
   const { isLoading: isLoadingByRecoil } = useRecoilValue(loadingSelector);
-  const { data: userData, isError, isLoading: isFirstCheckingAuth } = useAuth();
+  const { isLoading: isFirstCheckingAuth } = useAuth();
   const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } =
     useFetchBoxer();
   const { isLoading: isMatchesFetching } = useFetchMatches();
@@ -48,53 +49,20 @@ const Container = () => {
   return (
     <>
       <Outlet />
-      <Modales
-        isShowToastModal={isShowToastModal}
-        isShowLoginModal={isShowLoginModal}
-        isLoadingByRecoil={isLoadingByRecoil}
-        isFirstCheckingAuth={isFirstCheckingAuth}
-        isBoxersFetching={isBoxersFetching}
-        isMatchesFetching={isMatchesFetching}
-        isRefetchingBoxers={isRefetchingBoxers}
-      />
+      <AnimatePresence>
+        {isShowToastModal && (
+          <ToastModalContainer key={"ToastModalContainer"} />
+        )}
+        {(isLoadingByRecoil || isRefetchingBoxers) && (
+          <FullScreenSpinnerModal key={"FullScreenSpinnerModal"} />
+        )}
+        {(isFirstCheckingAuth || isBoxersFetching || isMatchesFetching) && (
+          <FirstLoadinModal key={"FirstLoadinModal"} />
+        )}
+      </AnimatePresence>
+      {isShowLoginModal && <LoginFormModal key={"LoginFormModal"} />}
     </>
   );
 };
 
 export default Container;
-
-type ModalesData = {
-  isShowToastModal: boolean;
-  isShowLoginModal: boolean;
-  isLoadingByRecoil: boolean | undefined;
-  isFirstCheckingAuth: boolean;
-  isBoxersFetching: boolean;
-  isMatchesFetching: boolean;
-  isRefetchingBoxers: boolean;
-};
-
-/**
- *  モーダル
- *  @param {modaleData} 必要データ
- *  @returns {ReactNode}
- */
-const Modales = (props: ModalesData) => {
-  return (
-    <>
-      <AnimatePresence>
-        {props.isShowToastModal && (
-          <ToastModalContainer key={"ToastModalContainer"} />
-        )}
-        {(props.isLoadingByRecoil || props.isRefetchingBoxers) && (
-          <FullScreenSpinnerModal key={"FullScreenSpinnerModal"} />
-        )}
-        {(props.isFirstCheckingAuth ||
-          props.isBoxersFetching ||
-          props.isMatchesFetching) && (
-          <FirstLoadinModal key={"FirstLoadinModal"} />
-        )}
-      </AnimatePresence>
-      {props.isShowLoginModal && <LoginFormModal key={"LoginFormModal"} />}
-    </>
-  );
-};

@@ -142,6 +142,7 @@ const PreviousOne = () => {
             placeholder="Password"
             defaultValue={defaultPassword}
             onChange={(e) => (password.current = e.target.value)}
+            autoComplete="off"
             className="mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 border-stone-400 focus:border-green-500 duration-300 bg-transparent"
           />
           <div className="relative mt-12 ">

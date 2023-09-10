@@ -12,6 +12,7 @@ import { getBoxerDataWithID, convertToBoxerData } from "@/assets/functions";
 //! hooks
 import { useToastModal } from "@/hooks/useToastModal";
 import { usePagePath } from "@/hooks/usePagePath";
+import { useLoading } from "@/hooks/useLoading";
 import {
   useFetchBoxer,
   useUpdateBoxerData,
@@ -33,6 +34,7 @@ import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
 
 export const BoxerEdit = () => {
   // ? use hook
+  const { resetLoadingState } = useLoading();
   const { setter: setPagePath } = usePagePath();
   const { setToastModal, showToastModal, hideToastModal } = useToastModal();
   const { state: editTargetBoxerData, setter: setEditTargetBoxerData } =
@@ -55,6 +57,15 @@ export const BoxerEdit = () => {
   const paramCountry = query.get("country");
   const navigate = useNavigate();
 
+  //? 初期設定(クリーンアップとか)
+  useEffect(() => {
+    //? ページpathをRecoilに保存
+    setPagePath(pathname);
+    return () => {
+      resetLoadingState();
+    };
+  }, []);
+
   //? boxerの削除に成功したらformデータを初期化
   useEffect(() => {
     if (isDeleteBoxerSuccess) {
@@ -68,11 +79,6 @@ export const BoxerEdit = () => {
     return () => {
       hideToastModal();
     };
-  }, []);
-
-  //? ページpathをRecoilに保存
-  useEffect(() => {
-    setPagePath(pathname);
   }, []);
 
   //? 選手データの削除実行

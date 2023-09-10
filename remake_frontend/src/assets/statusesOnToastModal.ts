@@ -39,11 +39,7 @@ export const MESSAGE = {
   VOTE_FAILD: `投票に失敗しました`,
   VOTE_SUCCESSFULLY: `投票しました`,
 
-  COMMENT_CANT_POST_WITH_UNAUTH: "コメント投稿にはログインが必要です",
-  COMMENT_DELETING: `削除中です.... \n そのままお待ち下さい`,
-  COMMENT_DELETE_CONFIRM: "※コメントを削除します",
-  COMMENT_DELETED: "コメントを削除しました",
-  COMMENT_DELETE_FAILED: `コメントの削除に失敗しました \n 一度更新して、再度削除を実行してください`,
+
   // ! login form
   EMAIL_OR_PASSWORD_NO_INPUT: "Email・Passwordの入力が必要です",
   EMAIL_FAILED_VALIDATE: "Emailが正しくありません",
@@ -89,6 +85,14 @@ export const MESSAGE = {
   FIGHTER_EDIT_FAILD: "選手情報の編集に失敗しました \n 再度行ってください",
   FIGHTER_DELETING: "選手情報を削除中...",
   FAILD_FIGHTER_DELETE: "選手削除に失敗しました",
+  //? コメント
+  COMMENT_IS_EMPTY: 'コメントを入力してください',
+  COMMENT_POST_SUCCESS: 'コメントを投稿しました',
+  COMMENT_DELETE_FAILED: `コメントの削除に失敗しました \n 一度更新して、再度削除を実行してください`,
+  COMMENT_DELETED: 'コメントを削除しました',
+  COMMENT_CANT_POST_WITH_UNAUTH: "コメント投稿にはログインが必要です",
+  // COMMENT_DELETING: `削除中です.... \n そのままお待ち下さい`,
+  COMMENT_DELETE_CONFIRM: "※コメントを削除します",
 
 } as const
 
