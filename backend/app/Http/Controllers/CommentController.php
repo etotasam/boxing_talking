@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\BoxingMatch;
 use App\Models\User;
 use App\Models\Comment;
-use App\Models\Vote;
+use App\Models\WinLossPrediction;
 use Exception;
 
 use \Symfony\Component\HttpFoundation\Response;
@@ -42,14 +42,14 @@ class CommentController extends Controller
                 $created_at = $comment->created_at;
                 $user = User::find($user_id);
                 $post_user_name = $user->name;
-                $vote = Vote::where([["user_id", $user_id], ["match_id", $match_id]])->first();
+                $prediction = WinLossPrediction::where([["user_id", $user_id], ["match_id", $match_id]])->first();
                 if (isset($vote)) {
-                    $vote_color = $vote["vote_for"];
+                    $prediction_color = $prediction["prediction"];
                 } else {
-                    $vote_color = Null;
+                    $prediction_color = Null;
                 }
                 $formatted_comment = nl2br(htmlspecialchars($comment->comment));
-                array_unshift($comments_array, ['id' => $comment->id, "post_user_name" => $post_user_name, "comment" => $formatted_comment, "vote" => $vote_color, "created_at" => $created_at]);
+                array_unshift($comments_array, ['id' => $comment->id, "post_user_name" => $post_user_name, "comment" => $formatted_comment, "prediction" => $prediction_color, "created_at" => $created_at]);
             }
             return $comments_array;
         } catch (Exception $e) {

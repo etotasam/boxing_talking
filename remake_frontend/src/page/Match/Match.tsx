@@ -16,6 +16,7 @@ import { useToastModal } from "@/hooks/useToastModal";
 import { useLoading } from "@/hooks/useLoading";
 import { useFetchMatches } from "@/hooks/useMatch";
 import { usePagePath } from "@/hooks/usePagePath";
+import { useMatchPrediction } from "@/hooks/uesWinLossPredition";
 import {
   usePostComment,
   useFetchComments,
@@ -31,6 +32,7 @@ import {
 export const Match = () => {
   const { pathname, search } = useLocation();
   const { data: matches } = useFetchMatches();
+  const { matchPrediction } = useMatchPrediction();
 
   const [comment, setComment] = useState<string>();
   const [commentPostComponentHeight, setCommentPostComponentHeight] =
@@ -162,6 +164,17 @@ export const Match = () => {
   const red = Math.ceil((red_vote / total) * 100);
   const blue = Math.ceil((blue_vote / total) * 100);
 
+  const sendPrediction = ({
+    matchID,
+    prediction,
+  }: {
+    matchID: number;
+    prediction: "red" | "blue";
+  }) => {
+    if (!prediction) return;
+    matchPrediction({ matchID, prediction });
+  };
+
   return (
     <>
       {/* //? boxer */}
@@ -185,7 +198,12 @@ export const Match = () => {
             </>
           )}
           <div className="flex-1 py-5">
-            <div className="flex flex-col justify-center items-center">
+            <div
+              onClick={() =>
+                sendPrediction({ matchID: selectedMatch.id, prediction: "red" })
+              }
+              className="flex flex-col justify-center items-center"
+            >
               <EngNameWithFlag
                 boxerCountry={selectedMatch.red_boxer.country}
                 boxerEngName={selectedMatch.red_boxer.eng_name}

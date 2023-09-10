@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Auth;
 use Exception;
 // models
 use App\Models\User;
-use App\Models\Vote;
+use App\Models\WinLossPrediction;
 use App\Models\BoxingMatch;
 
 use \Symfony\Component\HttpFoundation\Response;
 
-class VoteController extends Controller
+class WinLossPredictionController extends Controller
 {
     /**
      * fetch vote by auth user
@@ -23,14 +23,14 @@ class VoteController extends Controller
     public function fetch()
     {
         try {
-            if(!Auth::user()) {
+            if (!Auth::user()) {
                 throw new Exception('no auth', Response::HTTP_UNAUTHORIZED);
             }
             $user_id = Auth::user()->id;
-            $votes =User::find($user_id)->votes;
+            $votes = User::find($user_id)->votes;
             return $votes;
-        }catch(Exception $e) {
-            if($e->getCode() == Response::HTTP_UNAUTHORIZED) {
+        } catch (Exception $e) {
+            if ($e->getCode() == Response::HTTP_UNAUTHORIZED) {
                 return response()->json(["message" => $e->getMessage()], Response::HTTP_UNAUTHORIZED);
             }
             return response()->json(["message" => "get user vote faild"], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -41,60 +41,61 @@ class VoteController extends Controller
      * fetch vote by auth user
      *
      * @param int match_id
-     * @param string Request->vote
+     * @param string("red" | "blue") prediction
      * @return \Illuminate\Http\Response
      */
-    public function vote(Request $request)
+    public function win_loss_prediction(Request $request)
     {
-        try{
-            if(!Auth::user()) {
+
+        try {
+            if (!Auth::user()) {
                 throw new Exception('no auth', Response::HTTP_UNAUTHORIZED);
             }
             $user_id = Auth::user()->id;
             $match_id = $request->match_id;
-            $vote = $request->vote;
+            $prediction = $request->prediction;
             $match_id = intval($match_id);
-            DB::beginTransaction();
             //? 試合が見つからない場合は投票不可 throw error
             $is_match = BoxingMatch::find($match_id)->exists();
-            if(!$is_match) {
-                throw new Exception('the match not exist');
+            if (!$is_match) {
+                throw new Exception('the match not exist', Response::HTTP_NOT_FOUND);
             }
             //? 試合当日以降は試合予想の投票不可 throw error
             $data = BoxingMatch::select('match_date')->where('id', $match_id)->first();
             $match_data = strtotime($data['match_date']);
             $now_date = strtotime('now');
-            if($now_date > $match_data) {
-                throw new Exception('can not vote after match date');
+            if ($now_date > $match_data) {
+                throw new Exception('Cannot win-loss prediction after match date', Response::HTTP_BAD_REQUEST);
             }
 
             //? すでに投票済みの場合は投票不可 throw error
-            $has_vote = Vote::where([["user_id", $user_id],["match_id", $match_id]])->first();
-            if($has_vote) {
-                throw new Exception("Voting is not allowed. You already voted.");
+            $has_vote = WinLossPrediction::where([["user_id", $user_id], ["match_id", $match_id]])->first();
+            if ($has_vote) {
+                throw new Exception("Cannot win-loss prediction. You have already done.", Response::HTTP_BAD_REQUEST);
             }
-
-            Vote::create([
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage()], $e->getCode());
+        }
+        //? ここからDBに挿入
+        try {
+            DB::beginTransaction();
+            WinLossPrediction::create([
                 "user_id" => Auth::user()->id,
                 "match_id" => intval($match_id),
-                "vote_for" => $vote
+                "prediction" => $prediction
             ]);
             $matches = BoxingMatch::where("id", intval($match_id))->first();
-            if($vote == "red") {
+            if ($prediction == "red") {
                 $matches->increment("count_red");
-            }else if($vote == "blue") {
+            } else if ($prediction == "blue") {
                 $matches->increment("count_blue");
             }
             $matches->save();
             DB::commit();
-            return response()->json(["message" => "vote success"],Response::HTTP_OK);
-        }catch (Exception $e) {
+            return response()->json(["message" => "Win-Loss prediction success"], Response::HTTP_OK);
+        } catch (Exception $e) {
             DB::rollBack();
-            if($e->getCode() == Response::HTTP_UNAUTHORIZED) {
-                return response()->json($e->getMessage(), Response::HTTP_UNAUTHORIZED);
-            }
-            $error_message = $e->getMessage() ? $e->getMessage() : 'vote failed';
-            return response()->json(["message" => $error_message],Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(["message" => "Faild save to prediction" . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

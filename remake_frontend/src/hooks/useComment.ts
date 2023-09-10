@@ -17,7 +17,7 @@ type CommentType = {
   post_user_name: string;
   // match_id: number,
   comment: string;
-  vote: string | undefined;
+  prediction: "red" | "blue" | undefined;
   created_at: string;
 }
 

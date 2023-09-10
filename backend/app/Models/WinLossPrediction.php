@@ -4,9 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
 
-class Vote extends Model
+class WinLossPrediction extends Model
 {
     use HasFactory;
 
@@ -18,7 +17,7 @@ class Vote extends Model
     protected $fillable = [
         'user_id',
         'match_id',
-        'vote_for'
+        'prediction'
     ];
 
     /**
@@ -30,9 +29,4 @@ class Vote extends Model
         'created_at',
         'updated_at'
     ];
-
-    // public function votes()
-    // {
-    //     return $this->hasMany(User::class);
-    // }
 }
