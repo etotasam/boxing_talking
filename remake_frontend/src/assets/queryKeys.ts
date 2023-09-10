@@ -20,6 +20,7 @@ export const QUERY_KEY = {
   matchesFetch: generateQueryKey('match/fetch'),
   matchDelete: generateQueryKey('match/delete'),
   comment: generateQueryKey('comment'),
+  prediction: generateQueryKey('prediction'),
 } as const
 
 
