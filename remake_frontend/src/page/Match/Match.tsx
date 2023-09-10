@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import clsx from "clsx";
 import dayjs from "dayjs";
-
 import { useRecoilValue } from "recoil";
 import { loginModalSelector } from "@/store/loginModalState";
 import { loadingSelector } from "@/store/loadingState";
@@ -17,7 +16,10 @@ import { useToastModal } from "@/hooks/useToastModal";
 import { useLoading } from "@/hooks/useLoading";
 import { useFetchMatches } from "@/hooks/useMatch";
 import { usePagePath } from "@/hooks/usePagePath";
-import { useMatchPrediction } from "@/hooks/uesWinLossPredition";
+import {
+  useVoteMatchPrediction,
+  useFetchMatchPredictVote,
+} from "@/hooks/uesWinLossPredition";
 import {
   usePostComment,
   useFetchComments,
@@ -33,7 +35,9 @@ import {
 export const Match = () => {
   const { pathname, search } = useLocation();
   const { data: matches } = useFetchMatches();
-  const { matchPrediction } = useMatchPrediction();
+  const { matchPrediction } = useVoteMatchPrediction();
+  const { data: predictionData } = useFetchMatchPredictVote();
+  console.log(predictionData);
 
   const [comment, setComment] = useState<string>();
   const [commentPostComponentHeight, setCommentPostComponentHeight] =
@@ -175,7 +179,7 @@ export const Match = () => {
   //? 勝敗予想の投票
   const sendPrecition = () => {
     if (!selectpredictionBoxer) return;
-    matchPrediction({
+    matchVotePrediction({
       matchID: paramsMatchID,
       prediction: selectpredictionBoxer.color,
     });
@@ -266,7 +270,7 @@ export const Match = () => {
         </section>
       )}
       {/* //? comments */}
-      {comments && comments.length >= 1 ? (
+      {comments && Boolean(comments.length) ? (
         <section style={{ marginBottom: `${commentPostComponentHeight}px` }}>
           <AnimatePresence>
             {comments.map((commentData) => (

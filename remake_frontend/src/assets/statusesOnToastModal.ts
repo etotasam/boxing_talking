@@ -96,8 +96,8 @@ export const MESSAGE = {
 
   //? コメント
   SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION: '投票が完了しました',
-  FAILED_VOTE_WIN_LOSS_PREDICTION: '投票に失敗しました。\n ページの更新後再度実行してください'
-
+  FAILED_VOTE_WIN_LOSS_PREDICTION: '投票に失敗しました。\n ページの更新後再度実行してください',
+  ALREADY_HAVE_DONE_VOTE: "勝敗予想はすでに投票しています"
 } as const
 
 
