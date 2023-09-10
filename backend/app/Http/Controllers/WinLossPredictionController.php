@@ -27,8 +27,8 @@ class WinLossPredictionController extends Controller
                 throw new Exception('no auth', Response::HTTP_UNAUTHORIZED);
             }
             $user_id = Auth::user()->id;
-            $votes = User::find($user_id)->votes;
-            return $votes;
+            $prediction = User::find($user_id)->prediction;
+            return $prediction;
         } catch (Exception $e) {
             if ($e->getCode() == Response::HTTP_UNAUTHORIZED) {
                 return response()->json(["message" => $e->getMessage()], Response::HTTP_UNAUTHORIZED);
