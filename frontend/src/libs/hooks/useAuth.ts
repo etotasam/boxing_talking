@@ -47,7 +47,12 @@ type LoginPropsType = {
 export const useAuth = () => {
 
   const api = useCallback(async () => {
-    return await Axios.get(`/api/user`).then(value => value.data)
+    try {
+      const res = await Axios.get(`/api/user`).then(value => value.data)
+      return res
+    } catch (error) {
+      return null
+    }
   }, [])
   const { data, isLoading, isError } = useQuery<UserType>(queryKeys.auth, api, {
     retry: false,

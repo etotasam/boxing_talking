@@ -28,7 +28,8 @@ export const Match = () => {
   const { data: authUser } = useAuth();
 
   //? 試合情報
-  const { data: matchesData, isError: isErrorOnFetchMatches } = useFetchMatches();
+  const { data: matchesData, isError: isErrorOnFetchMatches } =
+    useFetchMatches();
   //? エラー情報
   const [, setHasAnyError] = useState(false);
   const errors = [isErrorOnFetchMatches];
@@ -59,9 +60,9 @@ export const Match = () => {
   }, [matchesData, matchId]);
 
   //? delete対象コメントのidを共有
-  const { state: deleteTargetId, setter: setDeleteTargetId } = useQueryState<number | undefined>(
-    "q/deleteTargetCommentId"
-  );
+  const { state: deleteTargetId, setter: setDeleteTargetId } = useQueryState<
+    number | undefined
+  >("q/deleteTargetCommentId");
 
   const { state: openDeleteConfirmModal, setter: setOpenDeleteConfirmModal } =
     useQueryState<boolean>("q/openDeleteConfirmModal", false);
@@ -90,7 +91,10 @@ export const Match = () => {
   //? 2.commentContainerの高さがcommentFormの高さの変化に対応する為のhook、その為のref
   const matchInfoRef = useRef<HTMLDivElement>(null);
   const commentFormRef = useRef<HTMLDivElement>(null);
-  const commentContainerHeight = useAdjustCommentsContainer([matchInfoRef, commentFormRef]);
+  const commentContainerHeight = useAdjustCommentsContainer([
+    matchInfoRef,
+    commentFormRef,
+  ]);
   const { width: windowWidth } = useGetWindowSize();
 
   return (
@@ -104,7 +108,12 @@ export const Match = () => {
           ref={commentFormRef}
           className="z-20 lg:col-span-1 sticky top-[100px] py-5 flex items-center bg-stone-200"
         >
-          {thisMatch && <PostCommentForm matchId={thisMatch.id} matchInfoRef={matchInfoRef} />}
+          {thisMatch && (
+            <PostCommentForm
+              matchId={thisMatch.id}
+              matchInfoRef={matchInfoRef}
+            />
+          )}
         </div>
 
         {thisMatch && (

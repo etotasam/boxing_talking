@@ -17,6 +17,18 @@ backend/.idea
 backend/.vscode
 
 
+# remake_frontend
+# dependencies
+remake_frontend/node_modules
+remake_frontend/.env
+remake_frontend/.env.production
+# production
+remake_frontend/build
+
+
+
+
+
 # frontend
 # dependencies
 frontend/node_modules
@@ -43,3 +55,6 @@ yarn-error.log*
 
 
 docker/db/
+
+
+wiki.md

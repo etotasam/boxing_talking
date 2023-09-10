@@ -18,7 +18,10 @@ import { SimpleFighterComponent } from "../SimpleFighterComponent";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
 import { Spinner } from "@/components/module/Spinner";
 //! hooks
-import { useMatchPredictVote, useFetchMatchPredictVote } from "@/libs/hooks/useMatchPredict";
+import {
+  useMatchPredictVote,
+  useFetchMatchPredictVote,
+} from "@/libs/hooks/useMatchPredict";
 import { useFetchMatches } from "@/libs/hooks/useMatches";
 import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
 //! message
@@ -37,7 +40,10 @@ export const MatchInfo = () => {
   const query = new URLSearchParams(search);
   const matchId = Number(query.get("id"));
   const { data: matchesData } = useFetchMatches();
-  const getThisMatch = (matches: MatchesType[], id: number): MatchesType | undefined => {
+  const getThisMatch = (
+    matches: MatchesType[],
+    id: number
+  ): MatchesType | undefined => {
     return matches?.find((match) => match.id === id);
   };
   const [thisMatch, setThisMatch] = React.useState<MatchesType>();
@@ -46,11 +52,14 @@ export const MatchInfo = () => {
 
   const { data: userVotes } = useFetchMatchPredictVote();
 
-  const [userVoteFighterColor, setUserVoteFighterColor] = useState<"red" | "blue">();
+  const [userVoteFighterColor, setUserVoteFighterColor] =
+    useState<"red" | "blue">();
   useEffect(() => {
     if (!userVotes) return;
     //? この試合のユーザーの投票結果を取得
-    const votedResultOnThisMatch = userVotes.find((el) => el.match_id === matchId);
+    const votedResultOnThisMatch = userVotes.find(
+      (el) => el.match_id === matchId
+    );
     if (votedResultOnThisMatch) {
       setUserVoteFighterColor(votedResultOnThisMatch.vote_for);
     } else {
@@ -69,7 +78,8 @@ export const MatchInfo = () => {
     if (!match) return;
   }, [matchesData]);
 
-  const [voteFighter, setVoteFighter] = useState<FighterType & { voteColor: "red" | "blue" }>();
+  const [voteFighter, setVoteFighter] =
+    useState<FighterType & { voteColor: "red" | "blue" }>();
   //? 投票先をstateにセット&フロント側だけで表示を反映
   const voteToFighter = async (vote: "red" | "blue", fighter: FighterType) => {
     //? 試合当日以降は投票できないようにする
@@ -190,8 +200,14 @@ type VoteButtonPropsType = {
   myVote: () => void;
 };
 
-const VoteButton = ({ match, userVoteColor, voteFighter, myVote }: VoteButtonPropsType) => {
-  const { isLoading: isFetchingVote, isRefetching: isRefetchingVote } = useFetchMatchPredictVote();
+const VoteButton = ({
+  match,
+  userVoteColor,
+  voteFighter,
+  myVote,
+}: VoteButtonPropsType) => {
+  const { isLoading: isFetchingVote, isRefetching: isRefetchingVote } =
+    useFetchMatchPredictVote();
   const { isLoading: isVoting } = useMatchPredictVote();
 
   const isPastMatch: boolean = dayjs(match?.date).isBefore(dayjs());
@@ -216,7 +232,9 @@ const VoteButton = ({ match, userVoteColor, voteFighter, myVote }: VoteButtonPro
         >{`${voteFighter.name}の勝利に投票する`}</button>
       ) : (
         <div className="w-full text-stone-600 rounded px-2 py-1 border border-stone-600 text-center">
-          {isPastMatch ? `勝敗予想の投票期限は過ぎました` : `勝敗予想を投票しましょう`}
+          {isPastMatch
+            ? `勝敗予想の投票期限は過ぎました`
+            : `勝敗予想を投票しましょう`}
         </div>
       )}
       {isVoting && <Spinner />}
@@ -272,7 +290,9 @@ const FightersInfo = (props: FighterInfoPropsType) => {
           />
         </div>
 
-        <div className={`w-full flex items-center py-2 col-span-1 md:row-start-1 lg:row-start-2`}>
+        <div
+          className={`w-full flex items-center py-2 col-span-1 md:row-start-1 lg:row-start-2`}
+        >
           <div
             onClick={() => props.voteToFighter("red", props.thisMatch.red)}
             onMouseOver={() => props.setMouseOnColor(MouseOn.RED)}
@@ -285,18 +305,24 @@ const FightersInfo = (props: FighterInfoPropsType) => {
               fighter={props.thisMatch.red}
               recordTextColor={`text-gray-200`}
               className={`w-full text-gray-200`}
-              cornerColor={windowWidth && windowWidth < WINDOW_WIDTH.md ? "red" : undefined}
+              cornerColor={
+                windowWidth && windowWidth < WINDOW_WIDTH.md ? "red" : undefined
+              }
             />
           </div>
         </div>
 
-        <div className={`w-full flex items-center py-2 col-span-1 md:row-start-3 lg:row-start-2`}>
+        <div
+          className={`w-full flex items-center py-2 col-span-1 md:row-start-3 lg:row-start-2`}
+        >
           <div
             onClick={() => props.voteToFighter("blue", props.thisMatch.blue)}
             onMouseOver={() => props.setMouseOnColor(MouseOn.BLUE)}
             onMouseOut={() => props.setMouseOnColor(MouseOn.NULL)}
             className={`w-full h-full rounded-r-xl md:rounded-xl lg:rounded-l-none cursor-pointer duration-500 ${
-              props.mouseOnColor === MouseOn.BLUE ? `bg-blue-800` : `bg-stone-800`
+              props.mouseOnColor === MouseOn.BLUE
+                ? `bg-blue-800`
+                : `bg-stone-800`
             }`}
           >
             <SimpleFighterComponent

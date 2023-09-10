@@ -15,10 +15,10 @@ class CreateBoxingMatchesTable extends Migration
     {
         Schema::create('boxing_matches', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('red_fighter_id');
-            $table->foreign('red_fighter_id')->references('id')->on('fighters');
-            $table->unsignedBigInteger('blue_fighter_id');
-            $table->foreign('blue_fighter_id')->references('id')->on('fighters');
+            $table->unsignedBigInteger('red_boxer_id');
+            $table->foreign('red_boxer_id')->references('id')->on('boxers');
+            $table->unsignedBigInteger('blue_boxer_id');
+            $table->foreign('blue_boxer_id')->references('id')->on('boxers');
             $table->date('match_date');
             $table->timestamps();
         });

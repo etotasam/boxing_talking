@@ -17,9 +17,14 @@ class BoxingMatch extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'red_fighter_id',
-        'blue_fighter_id',
+        'red_boxer_id',
+        'blue_boxer_id',
         'match_date',
+        'grade',
+        'country',
+        'venue',
+        'weight',
+        'titles',
         'count_red',
         'count_blue',
     ];

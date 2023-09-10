@@ -19,11 +19,12 @@ class Fighter extends Model
         'country',
         'height',
         'birth',
-        'stance',
+        'style',
         'win',
         'draw',
         'lose',
         'ko',
+        'title_hold',
     ];
 
     protected $hidden = [
