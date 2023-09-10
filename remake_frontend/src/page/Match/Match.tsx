@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { AiOutlineClose } from "react-icons/ai";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import clsx from "clsx";
@@ -164,15 +165,32 @@ export const Match = () => {
   const red = Math.ceil((red_vote / total) * 100);
   const blue = Math.ceil((blue_vote / total) * 100);
 
-  const sendPrediction = ({
-    matchID,
-    prediction,
+  const [isPrectionModal, setIsPredictionModal] = useState(true);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const [selectpredictionBoxer, setSelectPredictionBoxer] = useState<{
+    name: string;
+    color: "red" | "blue";
+  }>();
+  //? 勝敗予想の投票
+  const sendPrecition = () => {
+    if (!selectpredictionBoxer) return;
+    matchPrediction({
+      matchID: paramsMatchID,
+      prediction: selectpredictionBoxer.color,
+    });
+    setShowConfirmModal(false);
+  };
+
+  const prediction = ({
+    name,
+    color,
   }: {
-    matchID: number;
-    prediction: "red" | "blue";
+    name: string;
+    color: "red" | "blue";
   }) => {
-    if (!prediction) return;
-    matchPrediction({ matchID, prediction });
+    setSelectPredictionBoxer({ name, color });
+    setShowConfirmModal(true);
   };
 
   return (
@@ -180,6 +198,16 @@ export const Match = () => {
       {/* //? boxer */}
       {selectedMatch && (
         <section className="flex border-b-[1px] relative">
+          {isPrectionModal && (
+            <BalloonModal setIsPredictionModal={setIsPredictionModal} />
+          )}
+          {showConfirmModal && (
+            <PredictionConfirmModal
+              boxerName={selectpredictionBoxer!.name!}
+              execution={sendPrecition}
+              cancel={() => setShowConfirmModal(false)}
+            />
+          )}
           {!isFetchingComments && (
             <>
               <motion.span
@@ -198,26 +226,41 @@ export const Match = () => {
             </>
           )}
           <div className="flex-1 py-5">
-            <div
-              onClick={() =>
-                sendPrediction({ matchID: selectedMatch.id, prediction: "red" })
-              }
-              className="flex flex-col justify-center items-center"
-            >
-              <EngNameWithFlag
-                boxerCountry={selectedMatch.red_boxer.country}
-                boxerEngName={selectedMatch.red_boxer.eng_name}
-              />
-              <h2 className="text-[20px]">{selectedMatch.red_boxer.name}</h2>
+            <div className="flex flex-col justify-center items-center">
+              <div
+                onClick={() =>
+                  prediction({
+                    name: selectedMatch.red_boxer.name,
+                    color: "red",
+                  })
+                }
+                className="flex flex-col justify-center items-center px-5 py-1 rounded-md border-[1px] border-stone-300 hover:bg-stone-200 cursor-pointer"
+              >
+                <EngNameWithFlag
+                  boxerCountry={selectedMatch.red_boxer.country}
+                  boxerEngName={selectedMatch.red_boxer.eng_name}
+                />
+                <h2 className="text-[20px]">{selectedMatch.red_boxer.name}</h2>
+              </div>
             </div>
           </div>
           <div className="flex-1 py-5">
             <div className="flex flex-col justify-center items-center">
-              <EngNameWithFlag
-                boxerCountry={selectedMatch.blue_boxer.country}
-                boxerEngName={selectedMatch.blue_boxer.eng_name}
-              />
-              <h2 className="text-[20px]">{selectedMatch.blue_boxer.name}</h2>
+              <div
+                onClick={() =>
+                  prediction({
+                    name: selectedMatch.blue_boxer.name,
+                    color: "blue",
+                  })
+                }
+                className="flex flex-col justify-center items-center px-5 py-1 rounded-md border-[1px] border-stone-300 hover:bg-stone-200 cursor-pointer"
+              >
+                <EngNameWithFlag
+                  boxerCountry={selectedMatch.blue_boxer.country}
+                  boxerEngName={selectedMatch.blue_boxer.eng_name}
+                />
+                <h2 className="text-[20px]">{selectedMatch.blue_boxer.name}</h2>
+              </div>
             </div>
           </div>
         </section>
@@ -289,6 +332,7 @@ export const Match = () => {
   );
 };
 
+// ! post commnet textarea
 type PostCommentTextareaType = {
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
   sendComment: () => void;
@@ -299,7 +343,6 @@ type PostCommentTextareaType = {
   ) => void;
 };
 
-// ! post commnet textarea
 const PostCommentTextarea = ({
   sendComment,
   textareaRef,
@@ -324,5 +367,81 @@ const PostCommentTextarea = ({
         送信
       </button>
     </div>
+  );
+};
+
+const BalloonModal = ({
+  setIsPredictionModal,
+}: {
+  setIsPredictionModal: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  return (
+    <>
+      <motion.div
+        animate={{ y: 10 }}
+        initial={{ x: -10 }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          repeatType: "mirror",
+          // type: "spring",
+          stiffness: 50,
+        }}
+        className="z-10 absolute top-[-60px] left-[calc(50%-150px)] bg-white shadow-lg shadow-stone-600/30 rounded-[25px] text-stone-700"
+      >
+        <button
+          onClick={() => setIsPredictionModal(false)}
+          className="text-stone-800 text-[20px] absolute top-4 right-4"
+        >
+          <AiOutlineClose />
+        </button>
+        <div className="bg-cyan-200/80 select-none w-full h-full p-10 rounded-[25px]">
+          <p>
+            勝利すると思う選手名をクリックして
+            <br />
+            勝敗予想を投票してください。
+          </p>
+        </div>
+      </motion.div>
+    </>
+  );
+};
+
+type PredictionConfirmModalType = {
+  boxerName: string;
+  execution: () => void;
+  cancel: () => void;
+};
+
+const PredictionConfirmModal = ({
+  boxerName,
+  execution,
+  cancel,
+}: PredictionConfirmModalType) => {
+  return (
+    <>
+      <div className="fixed top-0 left-0 w-full h-[100vh] flex justify-center items-center">
+        <div className="px-10 py-5 rounded-lg bg-white shadow-lg shadow-stone-500/50">
+          <p>
+            <span className="text-[18px] mx-2">{boxerName}</span>
+            が勝つと思いますか？
+          </p>
+          <div className="flex justify-between mt-5">
+            <button
+              onClick={execution}
+              className="bg-red-500 text-white py-1 px-5 rounded-md"
+            >
+              はい
+            </button>
+            <button
+              onClick={cancel}
+              className="bg-stone-500 text-white py-1 px-5 rounded-md"
+            >
+              わからない
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };

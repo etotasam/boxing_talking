@@ -1,11 +1,19 @@
 import React, { useCallback } from "react"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { Axios } from "@/assets/axios"
+//! data
+import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal";
+//! hook
+import { useLoading } from "./useLoading"
+import { useToastModal } from "./useToastModal";
+
 
 
 //! 試合予想の投票
 export const useMatchPrediction = () => {
   const queryClient = useQueryClient()
+  const { setToastModal, showToastModal } = useToastModal()
+  const { startLoading, resetLoadingState } = useLoading()
   //? pending時にcontainerでモーダルを使う為のbool
   // const { setter: setIsPendingVote } = useQueryState<boolean>("q/isPendingVote", false)
   // const { data: authUser } = useAuth()
@@ -23,6 +31,7 @@ export const useMatchPrediction = () => {
   }, [])
   const { mutate, isLoading } = useMutation(api, {
     onMutate: () => {
+      startLoading()
       // setIsPendingVote(true)
       // const snapshot = queryClient.getQueryData<VoteType[]>(queryKeys.vote)
       // if (!authUser) return
@@ -36,6 +45,9 @@ export const useMatchPrediction = () => {
   const matchPrediction = ({ matchID, prediction }: ApiPropsType) => {
     mutate({ matchID, prediction }, {
       onSuccess: () => {
+        resetLoadingState()
+        setToastModal({ message: MESSAGE.SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+        showToastModal()
         // setIsPendingVote(false)
         // queryClient.invalidateQueries(queryKeys.vote)
         // //? コメントの再取得(投票によるchartデータを更新させる為)
@@ -45,6 +57,9 @@ export const useMatchPrediction = () => {
         // setToastModalMessage({ message: MESSAGE.VOTE_SUCCESSFULLY, bgColor: ModalBgColorType.SUCCESS })
       },
       onError: (error: any, variables, context) => {
+        resetLoadingState()
+        setToastModal({ message: MESSAGE.FAILED_VOTE_WIN_LOSS_PREDICTION, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showToastModal()
         // setIsPendingVote(false)
         // queryClient.setQueryData(queryKeys.vote, context?.snapshot)
         // if (error.status === 401) {
