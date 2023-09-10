@@ -3,6 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import clsx from "clsx";
 import dayjs from "dayjs";
+
+import { useRecoilValue } from "recoil";
+import { loginModalSelector } from "@/store/loginModalState";
+import { loadingSelector } from "@/store/loadingState";
+
 //! types
 import { MatchesDataType } from "@/assets/types";
 // ! hook
@@ -11,8 +16,11 @@ import { useToastModal } from "@/hooks/useToastModal";
 import { useLoading } from "@/hooks/useLoading";
 import { useFetchMatches } from "@/hooks/useMatch";
 import { usePagePath } from "@/hooks/usePagePath";
-import { useDeleteComment } from "@/hooks/useComment";
-import { usePostComment, useFetchComments } from "@/hooks/useComment";
+import {
+  usePostComment,
+  useFetchComments,
+  useDeleteComment,
+} from "@/hooks/useComment";
 //! component
 import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
 import {
@@ -40,7 +48,8 @@ export const Match = () => {
   // ! use hook
   const { setToastModal, showToastModal } = useToastModal();
   const { startLoading, resetLoadingState } = useLoading();
-  const { data: comments } = useFetchComments(paramsMatchID);
+  const { data: comments, isLoading: isFetchingComments } =
+    useFetchComments(paramsMatchID);
   const { setter: setPagePath } = usePagePath();
   const { data: authUser } = useAuth();
   const { deleteComment } = useDeleteComment();
@@ -52,9 +61,13 @@ export const Match = () => {
   } = usePostComment();
   const commentPostRef = useRef(null);
 
-  //? ページpathをRecoilに保存
+  //? 初期設定(クリーンアップとか)
   useEffect(() => {
+    //? ページpathをRecoilに保存
     setPagePath(pathname);
+    return () => {
+      resetLoadingState();
+    };
   }, []);
 
   //? コメント投稿失敗時
@@ -104,8 +117,24 @@ export const Match = () => {
     }
   }, [isSuccessPostComment]);
 
+  //? コメント取得中にLoadingモーダル表示
+  useEffect(() => {
+    if (isFetchingComments) {
+      startLoading();
+    } else {
+      resetLoadingState();
+    }
+  }, [isFetchingComments]);
+
   const sendComment = () => {
-    if (!comment) return;
+    if (!comment) {
+      setToastModal({
+        message: MESSAGE.COMMENT_IS_EMPTY,
+        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
+      });
+      showToastModal();
+      return;
+    }
     postComment({ matchId: paramsMatchID, comment });
   };
   const commentDelete = (commentID: number) => {
@@ -125,11 +154,36 @@ export const Match = () => {
     setComment(e.target.value);
   };
 
+  //! テストデータ
+
+  const red_vote = 5;
+  const blue_vote = 2;
+  const total = red_vote + blue_vote;
+  const red = Math.ceil((red_vote / total) * 100);
+  const blue = Math.ceil((blue_vote / total) * 100);
+
   return (
     <>
-      {/* <div>Match</div> */}
+      {/* //? boxer */}
       {selectedMatch && (
-        <section className="flex border-b-[1px]">
+        <section className="flex border-b-[1px] relative">
+          {!isFetchingComments && (
+            <>
+              <motion.span
+                initial={{ width: 0 }}
+                animate={{ width: `${red}%` }}
+                transition={{ duration: 1 }}
+                // style={{ width: `${red}%` }}
+                className="bolck absolute bottom-0 left-0 bg-red-400 h-[5px]"
+              />
+              <motion.span
+                initial={{ width: 0 }}
+                animate={{ width: `${blue}%` }}
+                transition={{ duration: 1 }}
+                className="bolck absolute bottom-0 right-0 bg-blue-400 h-[5px]"
+              />
+            </>
+          )}
           <div className="flex-1 py-5">
             <div className="flex flex-col justify-center items-center">
               <EngNameWithFlag
@@ -151,28 +205,33 @@ export const Match = () => {
         </section>
       )}
       {/* //? comments */}
-      {comments && comments.length >= 1 && (
+      {comments && comments.length >= 1 ? (
         <section style={{ marginBottom: `${commentPostComponentHeight}px` }}>
           <AnimatePresence>
             {comments.map((commentData) => (
               <motion.div
-                layout
+                // layout
                 exit={{ opacity: 0 }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.2 }}
                 key={commentData.id}
                 className={clsx("p-5 border-b-[1px] border-stone-200")}
               >
-                <p>投稿者:{commentData.post_user_name}</p>
                 <p
+                  className="text-[18px] text-stone-600"
                   dangerouslySetInnerHTML={{
                     __html: commentData.comment,
                   }}
                 />
-                <time className="text-sm text-stone-400">
-                  {dayjs(commentData.created_at).format("YYYY/M/D H:mm")}
-                </time>
+                <div className="flex mt-3">
+                  <time className="text-sm leading-[24px] text-stone-500">
+                    {dayjs(commentData.created_at).format("YYYY/MM/DD HH:mm")}
+                  </time>
+                  <p className="text-ms ml-3 text-stone-600">
+                    {commentData.post_user_name}
+                  </p>
+                </div>
                 {/* //? ゴミ箱 */}
                 {authUser && authUser.name === commentData.post_user_name && (
                   <button
@@ -186,11 +245,17 @@ export const Match = () => {
             ))}
           </AnimatePresence>
         </section>
+      ) : (
+        !isFetchingComments && (
+          <div className="w-full text-center mt-[50px] text-[18px]">
+            まだコメントはありません
+          </div>
+        )
       )}
 
       <section
         ref={commentPostRef}
-        className="fixed bottom-0 w-full flex bg-white/90 justify-center py-8 border-t-[1px] border-stone-200"
+        className="fixed bottom-0 w-full flex bg-white/60 justify-center py-8 border-t-[1px] border-stone-200"
       >
         <div className="w-[70%] max-w-[800px]">
           <PostCommentTextarea

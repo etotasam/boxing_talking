@@ -25,6 +25,7 @@ import { BoxerType } from "@/assets/types";
 import { useRegisterMatch } from "@/hooks/useMatch";
 import { useToastModal } from "@/hooks/useToastModal";
 import { usePagePath } from "@/hooks/usePagePath";
+import { useLoading } from "@/hooks/useLoading";
 //! component
 import { FlagImage } from "@/components/atomc/FlagImage";
 import { SearchBoxer } from "@/components/module/SearchBoxer";
@@ -35,22 +36,22 @@ export const MatchRegister = () => {
   //! hooks
   const { setter: setPagePath } = usePagePath();
   const { boxersData, pageCount } = useFetchBoxer();
-  const { isSuccess: isSuccessRegisterMatch } = useRegisterMatch();
+  // const { isSuccess: isSuccessRegisterMatch } = useRegisterMatch();
   const [matchBoxers, setMatchBoxers] = useState<MatchBoxersType>({
     red_boxer: undefined,
     blue_boxer: undefined,
   });
+  const { resetLoadingState } = useLoading();
 
   const { pathname } = useLocation();
 
+  //? 初期設定(クリーンアップとか)
   useEffect(() => {
-    if (!isSuccessRegisterMatch) return;
-    // setMatchBoxers()
-  }, [isSuccessRegisterMatch]);
-
-  //? ページpathをRecoilに保存
-  useEffect(() => {
+    //? ページpathをRecoilに保存
     setPagePath(pathname);
+    return () => {
+      resetLoadingState();
+    };
   }, []);
 
   return (

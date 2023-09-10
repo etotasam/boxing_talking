@@ -86,6 +86,7 @@ export const MESSAGE = {
   FIGHTER_DELETING: "選手情報を削除中...",
   FAILD_FIGHTER_DELETE: "選手削除に失敗しました",
   //? コメント
+  COMMENT_IS_EMPTY: 'コメントを入力してください',
   COMMENT_POST_SUCCESS: 'コメントを投稿しました',
   COMMENT_DELETE_FAILED: `コメントの削除に失敗しました \n 一度更新して、再度削除を実行してください`,
   COMMENT_DELETED: 'コメントを削除しました',

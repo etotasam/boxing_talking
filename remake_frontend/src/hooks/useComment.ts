@@ -37,7 +37,7 @@ export const useFetchComments = (matchId: number) => {
     }
   }
 
-  const { data, isLoading, isFetching, refetch } = useQuery<CommentType[]>([QUERY_KEY.comment, { id: matchId }], api)
+  const { data, isLoading, isFetching, refetch } = useQuery<CommentType[]>([QUERY_KEY.comment, { id: matchId }], api, { staleTime: 60000 })
 
   return { data, isLoading, isFetching, refetch }
 }

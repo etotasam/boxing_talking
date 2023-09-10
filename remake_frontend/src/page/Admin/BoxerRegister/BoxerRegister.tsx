@@ -1,5 +1,8 @@
+import { useEffect } from "react";
 import _ from "lodash";
 import { useLocation } from "react-router-dom";
+// ! types
+import { BoxerType } from "@/assets/types";
 // ! data
 import {
   BG_COLOR_ON_TOAST_MODAL,
@@ -14,21 +17,25 @@ import { usePagePath } from "@/hooks/usePagePath";
 import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
 import { useToastModal } from "@/hooks/useToastModal";
 import { useRegisterBoxer } from "@/hooks/useBoxer";
-import { BoxerType } from "@/assets/types";
-import { useEffect } from "react";
+import { useLoading } from "@/hooks/useLoading";
 
 export const BoxerRegister = () => {
   // ! use hook
   const { setter: setPagePath } = usePagePath();
+  const { resetLoadingState } = useLoading();
   const { pathname } = useLocation();
   const { state: boxerDataOnForm, setter: setBoxerDataToForm } =
     useBoxerDataOnForm();
   const { setToastModal, showToastModal, hideToastModal } = useToastModal();
   const { registerBoxer, isSuccess: successRegisterBoxer } = useRegisterBoxer();
 
-  //? ページpathをRecoilに保存
+  //? 初期設定(クリーンアップとか)
   useEffect(() => {
+    //? ページpathをRecoilに保存
     setPagePath(pathname);
+    return () => {
+      resetLoadingState();
+    };
   }, []);
 
   // ? アンマウント時にはトーストモーダルを隠す
