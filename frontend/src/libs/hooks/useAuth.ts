@@ -56,7 +56,10 @@ export const useAuth = () => {
   }, [])
   const { data, isLoading, isError } = useQuery<UserType>(queryKeys.auth, api, {
     retry: false,
-    staleTime: Infinity
+    staleTime: Infinity,
+    onSuccess: () => {
+
+    }
   })
 
   return { data, isLoading, isError }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 // ! modules
 import { Button } from "@/components/atomc/Button";
 import { DivVerticalCenter } from "@/components/atomc/DivVerticalCenter";
@@ -10,7 +10,7 @@ import { loginModalSelector } from "@/store/loginModalState";
 import { UserType } from "@/assets/types";
 // ! hooks
 import { useLogout } from "@/hooks/useAuth";
-// import { useAuth } from "@/hooks/useAuth";
+import { useHeaderAndBottomHeight } from "@/hooks/useHeaderAndBottomHeightState";
 // ! icons
 import { IconContext } from "react-icons";
 import { BiUserCircle } from "react-icons/bi";
@@ -25,6 +25,14 @@ type PropsType = {
 export const Header = (porps: PropsType) => {
   const { userData } = porps;
   const { isAdmin } = useAdmin();
+  const { setHeaderHeight } = useHeaderAndBottomHeight();
+
+  const headerRef = useRef(null);
+  useEffect(() => {
+    if (!headerRef.current) return;
+    const height = (headerRef.current as HTMLHeadElement).clientHeight;
+    setHeaderHeight(height);
+  }, [headerRef.current]);
 
   const setFormType = useSetRecoilState(formTypeSelector);
 
@@ -39,7 +47,10 @@ export const Header = (porps: PropsType) => {
 
   return (
     <>
-      <header className="h-[80px] felx relative after:w-full after:absolute after:bottom-[-3px] after:left-0 after:h-[3px] after:bg-red-500">
+      <header
+        ref={headerRef}
+        className="h-[80px] felx relative after:w-full after:absolute after:bottom-[-3px] after:left-0 after:h-[3px] after:bg-red-500"
+      >
         {/* <DivVerticalCenter> */}
         <h1 className="text-[64px] font-thin">BOXING TALKING</h1>
         {/* </DivVerticalCenter> */}
@@ -74,7 +85,7 @@ export const Header = (porps: PropsType) => {
 
 type AuthControlComponentPropsType = {
   userData: UserType | undefined;
-  logout: ({ userId }: { userId: string }) => void;
+  logout: ({ userName }: { userName: string }) => void;
   openLoginForm: () => void;
 };
 // ! ログイン/ログアウトのボタン
@@ -88,7 +99,7 @@ const AuthControlComponent = ({
       <div className="absolute top-0 right-0 w-[200px] h-full flex justify-center">
         <div className="absolute bottom-3 flex justify-center">
           {userData ? (
-            <Button onClick={() => logout({ userId: userData.id! })}>
+            <Button onClick={() => logout({ userName: userData.name! })}>
               ログアウト
             </Button>
           ) : (

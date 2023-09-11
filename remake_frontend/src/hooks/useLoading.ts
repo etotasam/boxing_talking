@@ -1,5 +1,5 @@
 // !Recoil
-import { useSetRecoilState, } from "recoil"
+import { useSetRecoilState, useRecoilValue } from "recoil"
 import { loadingSelector } from "@/store/loadingState"
 // !types
 
@@ -10,6 +10,7 @@ export const useLoading = () => {
   //? ToastModalの状態(show/hide)
   // const { isShow: isShowToastModal, message: messageOnToast, bgColor } = useRecoilValue(toastModalSelector)
   const loadingStateSetter = useSetRecoilState(loadingSelector)
+  const { isLoading } = useRecoilValue(loadingSelector)
 
   /**
    * !Recoil
@@ -63,5 +64,5 @@ export const useLoading = () => {
   }
 
 
-  return { resetLoadingState, startLoading, hasError, successful, endLoading }
+  return { isLoading, resetLoadingState, startLoading, hasError, successful, endLoading }
 }

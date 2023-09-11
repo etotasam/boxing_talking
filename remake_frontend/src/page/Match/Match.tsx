@@ -16,6 +16,7 @@ import { useToastModal } from "@/hooks/useToastModal";
 import { useLoading } from "@/hooks/useLoading";
 import { useFetchMatches } from "@/hooks/useMatch";
 import { usePagePath } from "@/hooks/usePagePath";
+import { useHeaderAndBottomHeight } from "@/hooks/useHeaderAndBottomHeightState";
 import {
   useVoteMatchPrediction,
   useFetchMatchPredictVote,
@@ -33,28 +34,15 @@ import {
 } from "@/assets/statusesOnToastModal";
 
 export const Match = () => {
+  // ? use hook
   const { pathname, search } = useLocation();
+  const query = new URLSearchParams(search);
+  const paramsMatchID = Number(query.get("match_id"));
   const { data: matches } = useFetchMatches();
   const { matchPrediction } = useVoteMatchPrediction();
   const { data: predictionData } = useFetchMatchPredictVote();
-  console.log(predictionData);
-
-  const [comment, setComment] = useState<string>();
-  const [commentPostComponentHeight, setCommentPostComponentHeight] =
-    useState<number>();
-
-  const query = new URLSearchParams(search);
-  const paramsMatchID = Number(query.get("match_id"));
-
-  const [selectedMatch, setSelectedMatch] = useState<MatchesDataType>();
-  useEffect(() => {
-    if (!matches || !paramsMatchID) return;
-    const match = matches?.find((match) => match.id === paramsMatchID);
-    setSelectedMatch(match);
-  }, [paramsMatchID, matches]);
-  // ! use hook
   const { setToastModal, showToastModal } = useToastModal();
-  const { startLoading, resetLoadingState } = useLoading();
+  const { startLoading, resetLoadingState, isLoading } = useLoading();
   const { data: comments, isLoading: isFetchingComments } =
     useFetchComments(paramsMatchID);
   const { setter: setPagePath } = usePagePath();
@@ -66,7 +54,30 @@ export const Match = () => {
     isLoading: isPostingComment,
     isError: isErrorPostComment,
   } = usePostComment();
+  const {
+    setMiddleContentHeight,
+    setBottomHeight,
+    state: excludeHeight,
+  } = useHeaderAndBottomHeight();
+  // console.log(excludeHeight);
+
+  //? useState
+  const [comment, setComment] = useState<string>();
+  const [commentPostComponentHeight, setCommentPostComponentHeight] =
+    useState<number>();
+  const [selectedMatch, setSelectedMatch] = useState<MatchesDataType>();
+  useEffect(() => {
+    if (!matches || !paramsMatchID) return;
+    const match = matches?.find((match) => match.id === paramsMatchID);
+    setSelectedMatch(match);
+  }, [paramsMatchID, matches]);
+  const [thisMatchPrediction, setThisMatchPrediction] = useState<
+    "red" | "blue"
+  >();
+  //? useRef
   const commentPostRef = useRef(null);
+  const textareaRef = useRef(null);
+  const boxerSectionRef = useRef(null);
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -76,6 +87,24 @@ export const Match = () => {
       resetLoadingState();
     };
   }, []);
+
+  //? boxer sectionの高さを取得
+  useEffect(() => {
+    if (!boxerSectionRef.current) return;
+    const height = (boxerSectionRef.current as HTMLElement).clientHeight;
+    setMiddleContentHeight(height);
+  }, [boxerSectionRef.current]);
+
+  //? この試合の勝敗予想の有無とその投票
+  useEffect(() => {
+    if (predictionData) {
+      const matchPrediction = predictionData.find(
+        (data) => data.match_id === Number(paramsMatchID)
+      );
+      if (!matchPrediction) return;
+      setThisMatchPrediction(matchPrediction?.prediction);
+    }
+  }, [predictionData]);
 
   //? コメント投稿失敗時
   useEffect(() => {
@@ -148,8 +177,6 @@ export const Match = () => {
     deleteComment({ commentID, matchID: paramsMatchID });
   };
 
-  const textareaRef = useRef(null);
-
   const autoExpandTextareaAndSetComment = (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -179,7 +206,8 @@ export const Match = () => {
   //? 勝敗予想の投票
   const sendPrecition = () => {
     if (!selectpredictionBoxer) return;
-    matchVotePrediction({
+    if (thisMatchPrediction) return;
+    matchPrediction({
       matchID: paramsMatchID,
       prediction: selectpredictionBoxer.color,
     });
@@ -193,6 +221,7 @@ export const Match = () => {
     name: string;
     color: "red" | "blue";
   }) => {
+    if (thisMatchPrediction) return;
     setSelectPredictionBoxer({ name, color });
     setShowConfirmModal(true);
   };
@@ -201,8 +230,8 @@ export const Match = () => {
     <>
       {/* //? boxer */}
       {selectedMatch && (
-        <section className="flex border-b-[1px] relative">
-          {isPrectionModal && (
+        <section ref={boxerSectionRef} className="flex border-b-[1px] relative">
+          {isPrectionModal && !thisMatchPrediction && !isLoading && (
             <BalloonModal setIsPredictionModal={setIsPredictionModal} />
           )}
           {showConfirmModal && (
@@ -231,92 +260,131 @@ export const Match = () => {
           )}
           <div className="flex-1 py-5">
             <div className="flex flex-col justify-center items-center">
-              <div
-                onClick={() =>
-                  prediction({
-                    name: selectedMatch.red_boxer.name,
-                    color: "red",
-                  })
-                }
-                className="flex flex-col justify-center items-center px-5 py-1 rounded-md border-[1px] border-stone-300 hover:bg-stone-200 cursor-pointer"
-              >
-                <EngNameWithFlag
-                  boxerCountry={selectedMatch.red_boxer.country}
-                  boxerEngName={selectedMatch.red_boxer.eng_name}
-                />
-                <h2 className="text-[20px]">{selectedMatch.red_boxer.name}</h2>
-              </div>
+              {thisMatchPrediction ? (
+                <>
+                  <EngNameWithFlag
+                    boxerCountry={selectedMatch.red_boxer.country}
+                    boxerEngName={selectedMatch.red_boxer.eng_name}
+                  />
+                  <h2 className="text-[20px]">
+                    {selectedMatch.red_boxer.name}
+                  </h2>
+                </>
+              ) : (
+                <div
+                  onClick={() =>
+                    prediction({
+                      name: selectedMatch.red_boxer.name,
+                      color: "red",
+                    })
+                  }
+                  className="flex flex-col justify-center items-center px-5 py-1 rounded-md border-[1px] border-stone-300 hover:bg-stone-200 cursor-pointer"
+                >
+                  <EngNameWithFlag
+                    boxerCountry={selectedMatch.red_boxer.country}
+                    boxerEngName={selectedMatch.red_boxer.eng_name}
+                  />
+                  <h2 className="text-[20px]">
+                    {selectedMatch.red_boxer.name}
+                  </h2>
+                </div>
+              )}
             </div>
           </div>
           <div className="flex-1 py-5">
             <div className="flex flex-col justify-center items-center">
-              <div
-                onClick={() =>
-                  prediction({
-                    name: selectedMatch.blue_boxer.name,
-                    color: "blue",
-                  })
-                }
-                className="flex flex-col justify-center items-center px-5 py-1 rounded-md border-[1px] border-stone-300 hover:bg-stone-200 cursor-pointer"
-              >
-                <EngNameWithFlag
-                  boxerCountry={selectedMatch.blue_boxer.country}
-                  boxerEngName={selectedMatch.blue_boxer.eng_name}
-                />
-                <h2 className="text-[20px]">{selectedMatch.blue_boxer.name}</h2>
-              </div>
+              {thisMatchPrediction ? (
+                <>
+                  <EngNameWithFlag
+                    boxerCountry={selectedMatch.blue_boxer.country}
+                    boxerEngName={selectedMatch.blue_boxer.eng_name}
+                  />
+                  <h2 className="text-[20px]">
+                    {selectedMatch.blue_boxer.name}
+                  </h2>
+                </>
+              ) : (
+                <div
+                  onClick={() =>
+                    prediction({
+                      name: selectedMatch.blue_boxer.name,
+                      color: "blue",
+                    })
+                  }
+                  className="flex flex-col justify-center items-center px-5 py-1 rounded-md border-[1px] border-stone-300 hover:bg-stone-200 cursor-pointer"
+                >
+                  <EngNameWithFlag
+                    boxerCountry={selectedMatch.blue_boxer.country}
+                    boxerEngName={selectedMatch.blue_boxer.eng_name}
+                  />
+                  <h2 className="text-[20px]">
+                    {selectedMatch.blue_boxer.name}
+                  </h2>
+                </div>
+              )}
             </div>
           </div>
         </section>
       )}
-      {/* //? comments */}
-      {comments && Boolean(comments.length) ? (
-        <section style={{ marginBottom: `${commentPostComponentHeight}px` }}>
-          <AnimatePresence>
-            {comments.map((commentData) => (
-              <motion.div
-                // layout
-                exit={{ opacity: 0 }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.2 }}
-                key={commentData.id}
-                className={clsx("p-5 border-b-[1px] border-stone-200")}
-              >
-                <p
-                  className="text-[18px] text-stone-600"
-                  dangerouslySetInnerHTML={{
-                    __html: commentData.comment,
-                  }}
-                />
-                <div className="flex mt-3">
-                  <time className="text-sm leading-[24px] text-stone-500">
-                    {dayjs(commentData.created_at).format("YYYY/MM/DD HH:mm")}
-                  </time>
-                  <p className="text-ms ml-3 text-stone-600">
-                    {commentData.post_user_name}
-                  </p>
-                </div>
-                {/* //? ゴミ箱 */}
-                {authUser && authUser.name === commentData.post_user_name && (
+      <div className="flex w-full">
+        <div className="w-[30%]">
+          <h2 className="sticky top-0">てすと</h2>
+        </div>
+        {/* //? comments */}
+        {comments && Boolean(comments.length) ? (
+          <section
+            className="w-[70%] border-l-[1px] border-stone-200"
+            style={{
+              marginBottom: `${commentPostComponentHeight}px`,
+              minHeight: `calc(100vh - (${excludeHeight}px + ${commentPostComponentHeight}px) - 1px)`,
+            }}
+          >
+            <AnimatePresence>
+              {comments.map((commentData) => (
+                <motion.div
+                  // layout
+                  exit={{ opacity: 0 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                  key={commentData.id}
+                  className={clsx("p-5 border-b-[1px] border-stone-200")}
+                >
+                  <p
+                    className="text-[20px] text-stone-800"
+                    dangerouslySetInnerHTML={{
+                      __html: commentData.comment,
+                    }}
+                  />
+                  <div className="flex mt-3">
+                    <time className="text-sm text-stone-400">
+                      {dayjs(commentData.created_at).format("YYYY/MM/DD HH:mm")}
+                    </time>
+                    <p className="text-sm ml-3 text-stone-600">
+                      {commentData.post_user_name}
+                    </p>
+                  </div>
+                  {/* //? ゴミ箱 */}
+                  {/* {authUser && authUser.name === commentData.post_user_name && (
                   <button
                     onClick={() => commentDelete(commentData.id)}
                     className="bg-blue-300 px-3 py-1"
                   >
                     ゴミ箱
                   </button>
-                )}
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </section>
-      ) : (
-        !isFetchingComments && (
-          <div className="w-full text-center mt-[50px] text-[18px]">
-            まだコメントはありません
-          </div>
-        )
-      )}
+                )} */}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </section>
+        ) : (
+          !isFetchingComments && (
+            <div className="w-full text-center mt-[50px] text-[18px]">
+              まだコメントはありません
+            </div>
+          )
+        )}
+      </div>
 
       <section
         ref={commentPostRef}

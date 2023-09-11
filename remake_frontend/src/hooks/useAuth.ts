@@ -166,8 +166,8 @@ export const useLogout = () => {
   // ? Loading state
   const { resetLoadingState, startLoading, hasError, successful, endLoading } = useLoading()
   // ? api
-  const api = useCallback(async ({ userId }: { userId: string }) => {
-    await Axios.post<void>("api/logout", { user_id: userId }).then(value => value.data)
+  const api = useCallback(async ({ userName }: { userName: string }) => {
+    await Axios.post<void>("api/logout", { user_name: userName }).then(value => value.data)
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -175,12 +175,14 @@ export const useLogout = () => {
       startLoading()
     }
   })
-  const logout = useCallback(({ userId }: { userId: string }) => {
-    mutate({ userId }, {
+  const logout = useCallback(({ userName }: { userName: string }) => {
+    mutate({ userName }, {
       onSuccess: () => {
         // ? ユーザー情報のキャッシュをclear
         queryClient.setQueryData(QUERY_KEY.auth, null)
         queryClient.invalidateQueries(QUERY_KEY.admin)
+        //? 勝敗予想のキャッシュをclear
+        queryClient.setQueryData(QUERY_KEY.prediction, null)
         successful()
         setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
         showToastModal()

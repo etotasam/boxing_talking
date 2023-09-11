@@ -15,7 +15,7 @@ export type PredictionType = {
   id: number,
   match_id: number,
   // user_id: number,
-  vote_for: "red" | "blue"
+  prediction: "red" | "blue"
 }
 //! ユーザーの勝敗予想の取得
 export const useFetchMatchPredictVote = () => {
