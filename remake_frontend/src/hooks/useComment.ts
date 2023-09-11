@@ -1,14 +1,14 @@
-import React, { useCallback } from "react"
-import { useLocation } from "react-router-dom"
+import { useCallback } from "react"
+// import { useLocation } from "react-router-dom"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { QUERY_KEY } from "@/assets/queryKeys"
 //! hook
-import { useAuth } from "@/hooks/useAuth"
+// import { useAuth } from "@/hooks/useAuth"
 import { useLoading } from "@/hooks/useLoading"
 import { useToastModal } from "@/hooks/useToastModal"
 //! types
-import { UserType } from "@/assets/types"
+// import { UserType } from "@/assets/types"
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 
 
@@ -51,12 +51,12 @@ export const usePostComment = () => {
     comment: string
   }
   // const { setter: setIsCommentPosting } = useQueryState("q/isCommentPosting", false)
-  const { search } = useLocation();
-  const query = new URLSearchParams(search);
-  const matchIdOnParam = Number(query.get("id"));
+  // const { search } = useLocation();
+  // const query = new URLSearchParams(search);
+  // const matchIdOnParam = Number(query.get("id"));
   const queryClient = useQueryClient()
-  const { data: user } = useAuth()
-  const { setToastModal } = useToastModal()
+  // const { data: user } = useAuth()
+  // const { setToastModal } = useToastModal()
   const api = useCallback(async ({ matchId, comment }: ApiPropsType) => {
     await Axios.post("/api/comment", {
       // user_id: userId,
@@ -89,7 +89,7 @@ export const usePostComment = () => {
         // queryClient.invalidateQueries([queryKeys.comments, { id: matchId }])
         // setToastModalMessage({ message: MESSAGE.COMMENT_POST_SUCCESSFULLY, bgColor: ModalBgColorType.SUCCESS })
       },
-      onError: (error, variables, context) => {
+      onError: () => {
         // setIsCommentPosting(false)
         // queryClient.setQueryData([queryKeys.comments, { id: matchId }], context?.snapshot)
         // setToastModalMessage({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: ModalBgColorType.ERROR })
@@ -104,16 +104,16 @@ export const usePostComment = () => {
 
 export const useDeleteComment = () => {
   // const { setter: setIsCommentDeleting } = useQueryState("q/isCommentDeleting", false)
-  const { search } = useLocation();
-  const query = new URLSearchParams(search);
-  const matchIdOnParam = Number(query.get("id"));
+  // const { search } = useLocation();
+  // const query = new URLSearchParams(search);
+  // const matchIdOnParam = Number(query.get("id"));
 
   type ApiPropsType = { commentID: number, matchID: number }
   const { setToastModal, showToastModal } = useToastModal()
   const { startLoading, resetLoadingState } = useLoading()
   const queryClient = useQueryClient()
 
-  const api = useCallback(async ({ commentID, matchID }: ApiPropsType) => {
+  const api = useCallback(async ({ commentID }: ApiPropsType) => {
 
     await Axios.delete('/api/comment', {
       data: {
@@ -131,7 +131,7 @@ export const useDeleteComment = () => {
   })
   const deleteComment = ({ commentID, matchID }: ApiPropsType) => {
     mutate({ commentID, matchID }, {
-      onSuccess: (data, { commentID }) => {
+      onSuccess: () => {
         //? コメントの再取得。※refetch()を使うとmatchID=0での呼び出しが1回入るのでうざい
         queryClient.invalidateQueries([QUERY_KEY.comment, { id: matchID }]);
         resetLoadingState()

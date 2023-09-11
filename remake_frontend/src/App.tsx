@@ -14,7 +14,7 @@ import Container from "./middleware/Container";
 import "./App.css";
 //! layout
 import MainLayout from "@/layout/MainLayout";
-import AdminiLayout from "@/layout/AdminiLayout";
+// import AdminiLayout from "@/layout/AdminiLayout";
 
 import { TestModule } from "./components/module/TestModule";
 

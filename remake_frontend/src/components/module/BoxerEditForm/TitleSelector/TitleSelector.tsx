@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { cloneDeep } from "lodash";
 // ! data
 import { ORGANIZATIONS, WEIGHT_CLASS } from "@/assets/boxerData";
 // ! types
-import { TitleType } from "@/assets/types";
+// import { TitleType } from "@/assets/types";
 // ! hooks
 import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
 
-type PropsType = {
-  setTitles: React.Dispatch<React.SetStateAction<TitleType[]>>;
-  titles: TitleType[];
-};
+// type PropsType = {
+//   setTitles: React.Dispatch<React.SetStateAction<TitleType[]>>;
+//   titles: TitleType[];
+// };
 
 export const TitleSelector = () => {
   // ! use hook
   const { state: boxerDataOnForm, setter: setBoxerDataToForm } =
     useBoxerDataOnForm();
   // ? タイトル保持かどうかチェックボックスの値 useState
-  const [hasBelt, setHasBelt] = useState(true);
+  // const [hasBelt, setHasBelt] = useState(true);
   // ? タイトル入力欄(<input> <select>)の数を決める useState
   const [countHasBelt, setCountHasBelt] = useState(1);
 
@@ -41,7 +41,7 @@ export const TitleSelector = () => {
       <section className="">
         <p>保有タイトル</p>
         {Array.from({ length: countHasBelt }, (_, index) => index).map(
-          (key, i) => (
+          (_, i) => (
             <div key={i} className="flex">
               {/* //? 団体選択 */}
               <div className="mt-3 flex p-1">

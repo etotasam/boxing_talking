@@ -1,7 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 // ! modules
 import { Button } from "@/components/atomc/Button";
-import { DivVerticalCenter } from "@/components/atomc/DivVerticalCenter";
 // ! recoil
 import { useSetRecoilState } from "recoil";
 import { formTypeSelector, FORM_TYPE } from "@/store/formTypeState";
@@ -17,6 +16,8 @@ import { BiUserCircle } from "react-icons/bi";
 //! component
 import { LinkList } from "../LinkList";
 import { useAdmin } from "@/hooks/useAuth";
+//! env
+const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 type PropsType = {
   userData: UserType | undefined;
@@ -49,10 +50,12 @@ export const Header = (porps: PropsType) => {
     <>
       <header
         ref={headerRef}
-        className="h-[80px] felx relative after:w-full after:absolute after:bottom-[-3px] after:left-0 after:h-[3px] after:bg-red-500"
+        className="sm:h-[80px] h-[70px] felx relative after:w-full after:absolute after:z-10 after:bottom-[-3px] after:left-0 after:h-[3px] after:bg-red-500"
       >
         {/* <DivVerticalCenter> */}
-        <h1 className="text-[64px] font-thin">BOXING TALKING</h1>
+        <h1 className="md:text-[64px] sm:text-[54px] text-[36px] absolute md:top-0 sm:top-2 top-5 left-0 font-thin">
+          {siteTitle}
+        </h1>
         {/* </DivVerticalCenter> */}
         {isAdmin && (
           <div className="absolute right-[200px] top-0">
@@ -96,7 +99,7 @@ const AuthControlComponent = ({
 }: AuthControlComponentPropsType) => {
   return (
     <>
-      <div className="absolute top-0 right-0 w-[200px] h-full flex justify-center">
+      <div className="absolute top-0 right-0 md:w-[200px] w-[130px] h-full flex justify-center">
         <div className="absolute bottom-3 flex justify-center">
           {userData ? (
             <Button onClick={() => logout({ userName: userData.name! })}>

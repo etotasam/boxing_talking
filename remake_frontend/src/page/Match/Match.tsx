@@ -4,14 +4,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import clsx from "clsx";
 import dayjs from "dayjs";
-import { useRecoilValue } from "recoil";
-import { loginModalSelector } from "@/store/loginModalState";
-import { loadingSelector } from "@/store/loadingState";
-
+// import { useRecoilValue } from "recoil";
+// import { loginModalSelector } from "@/store/loginModalState";
+// import { loadingSelector } from "@/store/loadingState";
+import japanFlag from "@/assets/images/flags/japan.svg";
 //! types
-import { MatchesDataType } from "@/assets/types";
+import { BoxerType, MatchesDataType } from "@/assets/types";
 // ! hook
-import { useAuth } from "@/hooks/useAuth";
+// import { useAuth } from "@/hooks/useAuth";
 import { useToastModal } from "@/hooks/useToastModal";
 import { useLoading } from "@/hooks/useLoading";
 import { useFetchMatches } from "@/hooks/useMatch";
@@ -21,12 +21,10 @@ import {
   useVoteMatchPrediction,
   useFetchMatchPredictVote,
 } from "@/hooks/uesWinLossPredition";
-import {
-  usePostComment,
-  useFetchComments,
-  useDeleteComment,
-} from "@/hooks/useComment";
+import { usePostComment, useFetchComments } from "@/hooks/useComment";
 //! component
+import { BackgroundFlag } from "@/components/atomc/BackgroundFlag";
+import { SelectedMatchInfo } from "@/page/Admin/MatchEdit";
 import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
 import {
   BG_COLOR_ON_TOAST_MODAL,
@@ -39,15 +37,17 @@ export const Match = () => {
   const query = new URLSearchParams(search);
   const paramsMatchID = Number(query.get("match_id"));
   const { data: matches } = useFetchMatches();
-  const { matchPrediction } = useVoteMatchPrediction();
-  const { data: predictionData } = useFetchMatchPredictVote();
+  const { matchPrediction, isSuccess: isSuccessVoteMatchPrediction } =
+    useVoteMatchPrediction();
+  const { data: allPredictionDataOfUsers, refetch: refetchAllPredictionData } =
+    useFetchMatchPredictVote();
   const { setToastModal, showToastModal } = useToastModal();
   const { startLoading, resetLoadingState, isLoading } = useLoading();
   const { data: comments, isLoading: isFetchingComments } =
     useFetchComments(paramsMatchID);
   const { setter: setPagePath } = usePagePath();
-  const { data: authUser } = useAuth();
-  const { deleteComment } = useDeleteComment();
+  // const { data: authUser } = useAuth();
+  // const { deleteComment } = useDeleteComment();
   const {
     postComment,
     isSuccess: isSuccessPostComment,
@@ -56,7 +56,7 @@ export const Match = () => {
   } = usePostComment();
   const {
     setMiddleContentHeight,
-    setBottomHeight,
+    // setBottomHeight,
     state: excludeHeight,
   } = useHeaderAndBottomHeight();
   // console.log(excludeHeight);
@@ -65,15 +65,28 @@ export const Match = () => {
   const [comment, setComment] = useState<string>();
   const [commentPostComponentHeight, setCommentPostComponentHeight] =
     useState<number>();
-  const [selectedMatch, setSelectedMatch] = useState<MatchesDataType>();
+  const [thisMatch, setThisMatch] = useState<MatchesDataType>();
+  const [thisMatchPredictionCount, setThisMatchPredictionCount] = useState<
+    Record<"redCount" | "blueCount" | "totalCount", number>
+  >({ redCount: 0, blueCount: 0, totalCount: 0 });
+
+  //? set data of this match(この試合の各データをuseState等にセット)
   useEffect(() => {
     if (!matches || !paramsMatchID) return;
     const match = matches?.find((match) => match.id === paramsMatchID);
-    setSelectedMatch(match);
+    if (!match) return;
+    setThisMatch(match);
+    setThisMatchPredictionCount({
+      redCount: match.count_red,
+      blueCount: match.count_blue,
+      totalCount: match.count_red + match.count_blue,
+    });
   }, [paramsMatchID, matches]);
-  const [thisMatchPrediction, setThisMatchPrediction] = useState<
+
+  const [thisMatchPredictionOfUsers, setThisMatchPredictionOfUsers] = useState<
     "red" | "blue"
   >();
+
   //? useRef
   const commentPostRef = useRef(null);
   const textareaRef = useRef(null);
@@ -90,22 +103,33 @@ export const Match = () => {
 
   //? boxer sectionの高さを取得
   useEffect(() => {
-    if (!boxerSectionRef.current) return;
-    const height = (boxerSectionRef.current as HTMLElement).clientHeight;
-    setMiddleContentHeight(height);
+    if (boxerSectionRef.current) {
+      const height = (boxerSectionRef?.current as unknown as HTMLElement)
+        .clientHeight;
+      setMiddleContentHeight(height);
+    }
   }, [boxerSectionRef.current]);
 
   //? この試合の勝敗予想の有無とその投票
   useEffect(() => {
-    if (predictionData) {
-      const matchPrediction = predictionData.find(
+    if (allPredictionDataOfUsers) {
+      const matchPrediction = allPredictionDataOfUsers.find(
         (data) => data.match_id === Number(paramsMatchID)
       );
       if (!matchPrediction) return;
-      setThisMatchPrediction(matchPrediction?.prediction);
+      setThisMatchPredictionOfUsers(matchPrediction?.prediction);
+    } else {
+      setThisMatchPredictionOfUsers(undefined);
     }
-  }, [predictionData]);
+  }, [allPredictionDataOfUsers, paramsMatchID]);
 
+  //? コメント投稿に成功したら投票してねモーダルを消す&勝敗予想を再取得
+  useEffect(() => {
+    if (isSuccessVoteMatchPrediction) {
+      refetchAllPredictionData();
+      setIsPredictionModal(false);
+    }
+  }, [isSuccessVoteMatchPrediction]);
   //? コメント投稿失敗時
   useEffect(() => {
     if (isErrorPostComment) {
@@ -173,9 +197,9 @@ export const Match = () => {
     }
     postComment({ matchId: paramsMatchID, comment });
   };
-  const commentDelete = (commentID: number) => {
-    deleteComment({ commentID, matchID: paramsMatchID });
-  };
+  // const commentDelete = (commentID: number) => {
+  //   deleteComment({ commentID, matchID: paramsMatchID });
+  // };
 
   const autoExpandTextareaAndSetComment = (
     e: React.ChangeEvent<HTMLTextAreaElement>
@@ -188,14 +212,6 @@ export const Match = () => {
     setComment(e.target.value);
   };
 
-  //! テストデータ
-
-  const red_vote = 5;
-  const blue_vote = 2;
-  const total = red_vote + blue_vote;
-  const red = Math.ceil((red_vote / total) * 100);
-  const blue = Math.ceil((blue_vote / total) * 100);
-
   const [isPrectionModal, setIsPredictionModal] = useState(true);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -206,7 +222,7 @@ export const Match = () => {
   //? 勝敗予想の投票
   const sendPrecition = () => {
     if (!selectpredictionBoxer) return;
-    if (thisMatchPrediction) return;
+    if (thisMatchPredictionOfUsers) return;
     matchPrediction({
       matchID: paramsMatchID,
       prediction: selectpredictionBoxer.color,
@@ -221,19 +237,33 @@ export const Match = () => {
     name: string;
     color: "red" | "blue";
   }) => {
-    if (thisMatchPrediction) return;
+    if (thisMatchPredictionOfUsers) return;
     setSelectPredictionBoxer({ name, color });
     setShowConfirmModal(true);
+  };
+
+  const getPredictionCountPercent = (predictionCoount: number) => {
+    const percent = Math.ceil(
+      (predictionCoount / thisMatchPredictionCount.totalCount) * 100
+    );
+    if (percent) {
+      return percent;
+    } else {
+      return 0;
+    }
   };
 
   return (
     <>
       {/* //? boxer */}
-      {selectedMatch && (
-        <section ref={boxerSectionRef} className="flex border-b-[1px] relative">
-          {isPrectionModal && !thisMatchPrediction && !isLoading && (
+      {thisMatch && (
+        <section
+          ref={boxerSectionRef}
+          className="flex border-b-[1px] h-[100px] relative"
+        >
+          {/* {isPrectionModal && !thisMatchPredictionOfUsers && !isLoading && (
             <BalloonModal setIsPredictionModal={setIsPredictionModal} />
-          )}
+          )} */}
           {showConfirmModal && (
             <PredictionConfirmModal
               boxerName={selectpredictionBoxer!.name!}
@@ -245,90 +275,84 @@ export const Match = () => {
             <>
               <motion.span
                 initial={{ width: 0 }}
-                animate={{ width: `${red}%` }}
-                transition={{ duration: 1 }}
+                animate={{
+                  width: `${getPredictionCountPercent(
+                    thisMatchPredictionCount.redCount
+                  )}%`,
+                }}
+                transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
                 // style={{ width: `${red}%` }}
-                className="bolck absolute bottom-0 left-0 bg-red-400 h-[5px]"
+                className="z-10 bolck absolute bottom-0 left-0 bg-red-600 h-2"
               />
               <motion.span
                 initial={{ width: 0 }}
-                animate={{ width: `${blue}%` }}
-                transition={{ duration: 1 }}
-                className="bolck absolute bottom-0 right-0 bg-blue-400 h-[5px]"
+                animate={{
+                  width: `${getPredictionCountPercent(
+                    thisMatchPredictionCount.blueCount
+                  )}%`,
+                }}
+                transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
+                className="z-10 bolck absolute bottom-0 right-0 bg-blue-600 h-2"
               />
             </>
           )}
-          <div className="flex-1 py-5">
-            <div className="flex flex-col justify-center items-center">
-              {thisMatchPrediction ? (
-                <>
-                  <EngNameWithFlag
-                    boxerCountry={selectedMatch.red_boxer.country}
-                    boxerEngName={selectedMatch.red_boxer.eng_name}
-                  />
-                  <h2 className="text-[20px]">
-                    {selectedMatch.red_boxer.name}
-                  </h2>
-                </>
-              ) : (
-                <div
-                  onClick={() =>
-                    prediction({
-                      name: selectedMatch.red_boxer.name,
-                      color: "red",
-                    })
-                  }
-                  className="flex flex-col justify-center items-center px-5 py-1 rounded-md border-[1px] border-stone-300 hover:bg-stone-200 cursor-pointer"
-                >
-                  <EngNameWithFlag
-                    boxerCountry={selectedMatch.red_boxer.country}
-                    boxerEngName={selectedMatch.red_boxer.eng_name}
-                  />
-                  <h2 className="text-[20px]">
-                    {selectedMatch.red_boxer.name}
-                  </h2>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="flex-1 py-5">
-            <div className="flex flex-col justify-center items-center">
-              {thisMatchPrediction ? (
-                <>
-                  <EngNameWithFlag
-                    boxerCountry={selectedMatch.blue_boxer.country}
-                    boxerEngName={selectedMatch.blue_boxer.eng_name}
-                  />
-                  <h2 className="text-[20px]">
-                    {selectedMatch.blue_boxer.name}
-                  </h2>
-                </>
-              ) : (
-                <div
-                  onClick={() =>
-                    prediction({
-                      name: selectedMatch.blue_boxer.name,
-                      color: "blue",
-                    })
-                  }
-                  className="flex flex-col justify-center items-center px-5 py-1 rounded-md border-[1px] border-stone-300 hover:bg-stone-200 cursor-pointer"
-                >
-                  <EngNameWithFlag
-                    boxerCountry={selectedMatch.blue_boxer.country}
-                    boxerEngName={selectedMatch.blue_boxer.eng_name}
-                  />
-                  <h2 className="text-[20px]">
-                    {selectedMatch.blue_boxer.name}
-                  </h2>
-                </div>
-              )}
-            </div>
-          </div>
+          <BoxerBox
+            boxerColor={thisMatch.red_boxer}
+            color="red"
+            thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
+            prediction={prediction}
+          />
+          <BoxerBox
+            boxerColor={thisMatch.blue_boxer}
+            color="blue"
+            thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
+            prediction={prediction}
+          />
         </section>
       )}
       <div className="flex w-full">
+        {/* //? match info */}
         <div className="w-[30%]">
-          <h2 className="sticky top-0">てすと</h2>
+          <div className="sticky top-5">
+            <div className="w-full">
+              <div className="flex justify-center mt-5">
+                <SelectedMatchInfo matchData={thisMatch} />
+              </div>
+              {/* //? 自身の投票と投票数 */}
+              {thisMatchPredictionOfUsers && (
+                <div className="flex justify-center mt-5">
+                  <div className="w-[80%]">
+                    {thisMatchPredictionOfUsers === "red" && (
+                      <p className="text-center">
+                        {thisMatch?.red_boxer.name}の勝利を予想しました
+                      </p>
+                    )}
+                    {thisMatchPredictionOfUsers === "blue" && (
+                      <p className="text-center">
+                        {thisMatch?.blue_boxer.name}の勝利を予想しました
+                      </p>
+                    )}
+                    <div className="flex">
+                      <div className="flex-1 flex justify-center">
+                        <div className="rounded-[50%] w-[60px] h-[60px] flex justify-center items-center bg-red-500">
+                          <p className="text-white text-[24px]">
+                            {thisMatch?.count_red}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex-1 flex justify-center">
+                        <div className="rounded-[50%] w-[60px] h-[60px] flex justify-center items-center bg-blue-500">
+                          <p className="text-white text-[24px]">
+                            {thisMatch?.count_blue}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
         {/* //? comments */}
         {comments && Boolean(comments.length) ? (
@@ -351,7 +375,7 @@ export const Match = () => {
                   className={clsx("p-5 border-b-[1px] border-stone-200")}
                 >
                   <p
-                    className="text-[20px] text-stone-800"
+                    className="text-[20px] font-light text-stone-800"
                     dangerouslySetInnerHTML={{
                       __html: commentData.comment,
                     }}
@@ -379,8 +403,14 @@ export const Match = () => {
           </section>
         ) : (
           !isFetchingComments && (
-            <div className="w-full text-center mt-[50px] text-[18px]">
-              まだコメントはありません
+            <div
+              className="flex justify-center items-center text-[18px] border-l-[1px] w-[70%]"
+              style={{
+                // marginBottom: `${commentPostComponentHeight}px`,
+                minHeight: `calc(100vh - (${excludeHeight}px + ${commentPostComponentHeight}px) - 1px)`,
+              }}
+            >
+              <p>まだコメントがありません…</p>
             </div>
           )
         )}
@@ -515,5 +545,59 @@ const PredictionConfirmModal = ({
         </div>
       </div>
     </>
+  );
+};
+
+type BoxerBoxType = {
+  boxerColor: BoxerType;
+  color: "red" | "blue";
+  thisMatchPredictionOfUsers: "red" | "blue" | undefined;
+  prediction: ({
+    name,
+    color,
+  }: {
+    name: string;
+    color: "red" | "blue";
+  }) => void;
+};
+
+const BoxerBox = ({
+  boxerColor,
+  color,
+  thisMatchPredictionOfUsers,
+  prediction,
+}: BoxerBoxType) => {
+  return (
+    <div className="flex-1 py-5 relative">
+      <BackgroundFlag nationaly={boxerColor.country} />
+
+      <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col justify-center items-center">
+        {thisMatchPredictionOfUsers ? (
+          <>
+            <EngNameWithFlag
+              boxerCountry={boxerColor.country}
+              boxerEngName={boxerColor.eng_name}
+            />
+            <h2 className="text-[20px]">{boxerColor.name}</h2>
+          </>
+        ) : (
+          <div
+            onClick={() =>
+              prediction({
+                name: boxerColor.name,
+                color,
+              })
+            }
+            className="flex flex-col justify-center items-center min-w-[250px] px-5 py-1 rounded-md border-[1px] border-stone-300 md:hover:bg-stone-300/80 cursor-pointer"
+          >
+            <EngNameWithFlag
+              boxerCountry={boxerColor.country}
+              boxerEngName={boxerColor.eng_name}
+            />
+            <h2 className="lg:text-[20px] text-[16px]">{boxerColor.name}</h2>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 
 // ! components
 import { LinkList } from "@/components/module/LinkList";

@@ -1,5 +1,5 @@
-import React, { useCallback } from "react"
-import { useQuery, useMutation, useQueryClient } from "react-query"
+import { useCallback } from "react"
+import { useQuery, useMutation } from "react-query"
 import { Axios } from "@/assets/axios"
 //! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal";
@@ -8,6 +8,7 @@ import { QUERY_KEY } from "@/assets/queryKeys";
 import { useLoading } from "./useLoading"
 import { useToastModal } from "./useToastModal";
 import { useAuth } from "./useAuth";
+import { useFetchMatches } from "./useMatch";
 
 
 
@@ -22,12 +23,12 @@ export const useFetchMatchPredictVote = () => {
   const { data: authUser } = useAuth()
   // const { setToastModal, showToastModal } = useToastModal()
   const isAuth = Boolean(authUser)
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
   const api = useCallback(async () => {
     const res = await Axios.get<PredictionType[]>('/api/prediction').then(v => v.data)
     return res
   }, [])
-  const { data, isLoading, isRefetching } = useQuery(QUERY_KEY.prediction, api, {
+  const { data, isLoading, isRefetching, refetch } = useQuery(QUERY_KEY.prediction, api, {
     staleTime: Infinity,
     enabled: isAuth,
     onError: () => {
@@ -37,13 +38,14 @@ export const useFetchMatchPredictVote = () => {
 
     }
   })
-  return { data, isLoading, isRefetching }
+  return { data, isLoading, isRefetching, refetch }
 }
 
 
 //! 試合予想の投票
 export const useVoteMatchPrediction = () => {
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
+  const { refetch } = useFetchMatches()
   const { setToastModal, showToastModal } = useToastModal()
   const { startLoading, resetLoadingState } = useLoading()
   //? pending時にcontainerでモーダルを使う為のbool
@@ -61,7 +63,7 @@ export const useVoteMatchPrediction = () => {
       prediction
     })
   }, [])
-  const { mutate, isLoading } = useMutation(api, {
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
       startLoading()
       // setIsPendingVote(true)
@@ -77,6 +79,7 @@ export const useVoteMatchPrediction = () => {
   const matchPrediction = ({ matchID, prediction }: ApiPropsType) => {
     mutate({ matchID, prediction }, {
       onSuccess: () => {
+        refetch()
         resetLoadingState()
         setToastModal({ message: MESSAGE.SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
@@ -88,7 +91,7 @@ export const useVoteMatchPrediction = () => {
         // queryClient.invalidateQueries([queryKeys.comments, { id: matchID }])
         // setToastModalMessage({ message: MESSAGE.VOTE_SUCCESSFULLY, bgColor: ModalBgColorType.SUCCESS })
       },
-      onError: (error: any, variables, context) => {
+      onError: (error: any) => {
         resetLoadingState()
         if (error.data.message === "Cannot win-loss prediction. You have already done.") {
           setToastModal({ message: MESSAGE.ALREADY_HAVE_DONE_VOTE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
@@ -108,5 +111,5 @@ export const useVoteMatchPrediction = () => {
     })
   }
 
-  return { matchPrediction, isLoading }
+  return { matchPrediction, isLoading, isSuccess }
 }

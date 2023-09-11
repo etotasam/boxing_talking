@@ -1,13 +1,8 @@
 import dayjs from "dayjs";
 // ! types
-import {
-  BoxerType,
-  NationalityType,
-  FightInfoType,
-  MatchesDataType,
-} from "@/assets/types";
+import { MatchesDataType } from "@/assets/types";
 // ! hook
-import { useFetchBoxer } from "@/hooks/useBoxer";
+// import { useFetchBoxer } from "@/hooks/useBoxer";
 // ! components
 import { BoxerInfo } from "../BoxerInfo";
 import { FlagImage } from "@/components/atomc/FlagImage";
@@ -20,7 +15,7 @@ type PropsType = {
   className?: string;
 };
 
-export const FightBox = ({ matchData, className, onClick }: PropsType) => {
+export const FightBox = ({ matchData, onClick }: PropsType) => {
   return (
     <>
       {matchData && (

@@ -1,6 +1,6 @@
-import { useCallback, useState, useEffect } from "react"
-import { useLocation, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "react-query"
+import { useCallback } from "react"
+import { useLocation } from "react-router-dom";
+import { useQuery, useMutation } from "react-query"
 import { Axios } from "@/assets/axios"
 // ! data
 import { QUERY_KEY } from "@/assets/queryKeys"
@@ -15,7 +15,7 @@ import { useLoading } from "./useLoading"
 import { useToastModal } from "./useToastModal";
 import { MESSAGE, STATUS, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal";
 // //! types
-import type { BgColorType, BoxerDataOnFormType, BoxerType, NationalityType } from "@/assets/types"
+import type { BoxerDataOnFormType, BoxerType, NationalityType } from "@/assets/types"
 // ! functions
 import { convertToBoxerData } from "@/assets/functions";
 
@@ -72,13 +72,13 @@ export const useFetchBoxer = () => {
 
 // //! 選手データ更新
 export const useUpdateBoxerData = () => {
-  const { startLoading, resetLoadingState, successful, hasError } = useLoading()
+  const { startLoading, resetLoadingState } = useLoading()
   const { refetchReactQueryData } = useReactQuery()
   // const queryClient = useQueryClient()
   //? params page の取得
-  const { search } = useLocation();
-  const query = new URLSearchParams(search);
-  const paramPage = Number(query.get("page"));
+  // const { search } = useLocation();
+  // const query = new URLSearchParams(search);
+  // const paramPage = Number(query.get("page"));
   const { setToastModal, showToastModal } = useToastModal()
   // const snapshotFighters = queryClient.getQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: paramPage }])
   const api = async (updateFighterData: BoxerType): Promise<Record<string, string> | void> => {
@@ -136,7 +136,7 @@ export const useRegisterBoxer = () => {
   const { startLoading, resetLoadingState, successful, hasError } = useLoading()
   const { showToastModal } = useToastModal()
   // const { count: fightersCount } = useFetchBoxer()
-  const { setToastModal, resetToastModalToDefault } = useToastModal()
+  const { setToastModal } = useToastModal()
   const api = useCallback(async (newBoxerData: BoxerType) => {
     const res = await Axios.post("/api/boxer", newBoxerData).then(v => v.data)
     return res
@@ -153,7 +153,7 @@ export const useRegisterBoxer = () => {
   const registerBoxer = (newBoxerData: BoxerDataOnFormType) => {
     const convetedBoxerData = convertToBoxerData(newBoxerData)
     mutate(convetedBoxerData, {
-      onSuccess: (__, newBoxerData, context) => {
+      onSuccess: () => {
         successful()
         resetLoadingState()
         setToastModal({ message: MESSAGE.FIGHTER_REGISTER_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
@@ -193,20 +193,20 @@ export const useRegisterBoxer = () => {
 
 // //! 選手データ削除
 export const useDeleteBoxer = () => {
-  const queryClient = useQueryClient()
-  const { refetch: RefetchBoxerData, isRefetching } = useFetchBoxer()
-  const { startLoading, resetLoadingState, successful, hasError } = useLoading()
-  const { setToastModal, showToastModal, resetToastModalToDefault } = useToastModal()
+  // const queryClient = useQueryClient()
+  const { refetch: RefetchBoxerData } = useFetchBoxer()
+  const { startLoading, resetLoadingState } = useLoading()
+  const { setToastModal, showToastModal } = useToastModal()
 
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
   //? 選手の数を取得
-  const { pageCount } = useFetchBoxer()
+  // const { pageCount } = useFetchBoxer()
   //? page数を計算
 
   //? paramsを取得
-  const { search } = useLocation();
-  const query = new URLSearchParams(search);
-  const paramPage = Number(query.get("page"));
+  // const { search } = useLocation();
+  // const query = new URLSearchParams(search);
+  // const paramPage = Number(query.get("page"));
   //? api
   const api = async (boxerData: BoxerType | BoxerDataOnFormType) => {
     // try {
@@ -228,9 +228,8 @@ export const useDeleteBoxer = () => {
   }
 
   const { mutate, isLoading, isError, isSuccess } = useMutation(api, {
-    onMutate: (boxerData) => {
+    onMutate: () => {
       startLoading()
-      console.log("削除中");
       // const snapshotFighters = queryClient.getQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: paramPage }])
       // const widtoutDeleteFighters = queryClient.getQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: paramPage }])!.filter(fighter => fighter.id !== boxerData.id)
       // return { snapshotFighters, widtoutDeleteFighters }
@@ -238,7 +237,7 @@ export const useDeleteBoxer = () => {
   })
   const deleteBoxer = (boxerData: BoxerType | BoxerDataOnFormType) => {
     mutate(boxerData, {
-      onSuccess: async (data, boxerData, context) => {
+      onSuccess: async () => {
         resetLoadingState()
         setToastModal({ message: MESSAGE.BOXER_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()

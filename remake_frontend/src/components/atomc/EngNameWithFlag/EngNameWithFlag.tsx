@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { FlagImage } from "@/components/atomc/FlagImage";
 
 import { NationalityType } from "@/assets/types";
@@ -11,12 +11,14 @@ export const EngNameWithFlag = ({
   boxerEngName: string;
 }) => {
   return (
-    <div className="flex items-center justify-center w-full text-sm text-gray-600">
-      <FlagImage
-        className="w-[24px] h-[16px] border-[1px] mr-2"
-        nationaly={boxerCountry}
-      />
-      <p>{boxerEngName}</p>
+    <div className="sm:flex sm:items-center sm:justify-center w-full sm:text-sm text-[12px] text-gray-600">
+      <div className="flex justify-center">
+        <FlagImage
+          className="w-[24px] h-[16px] border-[1px] sm:mr-2 mb-1"
+          nationaly={boxerCountry}
+        />
+      </div>
+      <p className="text-center">{boxerEngName}</p>
     </div>
   );
 };

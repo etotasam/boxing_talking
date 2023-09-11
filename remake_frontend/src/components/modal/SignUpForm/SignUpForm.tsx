@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { clsx } from "clsx";
 // ! recoil
 import { useSetRecoilState } from "recoil";
 import { formTypeSelector, FORM_TYPE } from "@/store/formTypeState";
 //! hooks
-import { useAuth, useCreateUser } from "@/hooks/useAuth";
+import { useCreateUser } from "@/hooks/useAuth";
 // import { useQueryState } from "@/libs/hooks/useQueryState";
 // import { useCreateUser } from "@/libs/hooks/useAuth";
 // import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
@@ -28,8 +28,8 @@ export const SignUpForm = () => {
     /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
   const [isInvalidEmail, setIsInvalidEmail] = useState(false);
   // const isInvalidEmail = validationEmail.test(email);
-  const [isFocusOnEmailInput, setIsFocusOnEmailInput] = useState(false);
-  const hasNoteOnEmail = !isFocusOnEmailInput && isInvalidEmail && !!email;
+  const [_, setIsFocusOnEmailInput] = useState(false);
+  // const hasNoteOnEmail = !isFocusOnEmailInput && isInvalidEmail && !!email;
 
   //? passwordに大文字が含まれてるか
   const validationUppercase = /[A-Z]+/;

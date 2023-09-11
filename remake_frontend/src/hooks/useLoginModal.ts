@@ -1,5 +1,5 @@
 // ! recoil
-import { useRecoilState, useSetRecoilState } from "recoil"
+import { useRecoilState } from "recoil"
 import { loginModalSelector } from "@/store/loginModalState"
 
 export const useLoginModal = () => {
