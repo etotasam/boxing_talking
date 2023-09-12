@@ -24,6 +24,11 @@
     height: var(--comment-el-height);
   }
 
+  .t-champion {
+    background-image: url("./libs/images/etc/champion.svg");
+    /* background-color: red; */
+  }
+
   .t-flag {
     background-size: contain;
     background-position: center;
@@ -56,6 +61,12 @@
   }
   .t-flag-canada {
     background-image: url("./libs/images/flags/canada.svg");
+  }
+  .t-flag-venez {
+    background-image: url("./libs/images/flags/venez.svg");
+  }
+  .t-flag-puerto_rico {
+    background-image: url("./libs/images/flags/puerto_rico.svg");
   }
 
   .t-bg-none {

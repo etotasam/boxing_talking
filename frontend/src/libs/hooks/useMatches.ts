@@ -22,6 +22,14 @@ export type MatchesType = {
   count_blue: number;
 };
 
+export const useFetchMatchesTest = () => {
+  const fetcher = useCallback(async () => {
+    return await Axios.get("api/match").then(value => value.data)
+  }, [])
+  const { data, isLoading, isError, isRefetching } = useQuery<MatchesType[]>(queryKeys.match, fetcher, { suspense: true })
+  return { data, isLoading, isError, isRefetching }
+}
+
 //! 試合情報の取得
 export const useFetchMatches = () => {
   const fetcher = useCallback(async () => {
@@ -32,7 +40,7 @@ export const useFetchMatches = () => {
 }
 
 //! 試合の登録
-type RegstarMatchPropsType = {
+type MatchPropsType = {
   red_fighter: FighterType,
   blue_fighter: FighterType,
   match_date: string
@@ -41,7 +49,7 @@ type RegstarMatchPropsType = {
 export const useRegisterMatch = () => {
   const { setToastModalMessage } = useToastModal()
   const queryClient = useQueryClient()
-  const api = async ({ red_fighter, blue_fighter, match_date }: RegstarMatchPropsType) => {
+  const api = async ({ red_fighter, blue_fighter, match_date }: MatchPropsType) => {
     await Axios.post(queryKeys.match, { red_fighter_id: red_fighter.id, blue_fighter_id: blue_fighter.id, match_date })
   }
   const { mutate, isLoading } = useMutation(api, {
@@ -57,7 +65,7 @@ export const useRegisterMatch = () => {
     }
   })
 
-  const registerMatch = ({ red_fighter, blue_fighter, match_date }: RegstarMatchPropsType) => {
+  const registerMatch = ({ red_fighter, blue_fighter, match_date }: MatchPropsType) => {
     mutate({ red_fighter, blue_fighter, match_date }, {
       onSuccess: () => {
         setToastModalMessage({ message: MESSAGE.MATCH_REGISTER_SUCCESS, bgColor: ModalBgColorType.SUCCESS })

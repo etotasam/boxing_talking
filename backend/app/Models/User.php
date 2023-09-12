@@ -8,7 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\ProvisionalUser;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Models\Vote;
+use App\Models\WinLossPrediction;
+use Illuminate\Support\Str;
 use \Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\DB;
 use Exception;
@@ -34,6 +35,8 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
+        'id',
+        'email',
         'password',
         'created_at',
         'updated_at'
@@ -48,10 +51,20 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function votes()
+    public function prediction()
     {
-        return $this->hasMany(Vote::class);
+        return $this->hasMany(WinLossPrediction::class);
     }
+
+    protected static function booted()
+    {
+        static::creating(function (User $model) {
+            empty($model->id) && $model->id = Str::uuid();
+        });
+    }
+
+    public $incrementing = false; // 自動インクリメントを無効化
+    protected $keyType = 'string'; // 主キーのデータ型をUUIDに設定
 
     public function getAdministratorAttribute($value)
     {

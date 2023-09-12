@@ -188,7 +188,6 @@ const MatchEditForm = ({ matchUpdate }: MatchEditFormPropsType) => {
 
 const Message = ({ MatchesData }: { MatchesData: MatchesType | undefined }) => {
   const [redFlag, setRedFlag] = React.useState<NationalFlagCssClassType>();
-  console.log(redFlag);
   const [blueFlag, setBlueFlag] = React.useState<NationalFlagCssClassType>();
   useEffect(() => {
     if (!MatchesData) return;

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,6 +13,7 @@ use Mail;
 // models
 use App\Models\User;
 use App\Models\ProvisionalUser;
+use App\Models\Administrator;
 
 
 use \Symfony\Component\HttpFoundation\Response;
@@ -37,10 +39,10 @@ class AuthController extends Controller
             $password = Hash::make($request->password);
             $is_name_exist = User::where("name", $name)->exists();
             $is_email_exist = User::where("email", $email)->exists();
-            if($is_email_exist) {
+            if ($is_email_exist) {
                 throw new Exception('user already exists', Response::HTTP_FORBIDDEN);
             }
-            if($is_name_exist) {
+            if ($is_name_exist) {
                 throw new Exception('name already use', Response::HTTP_FORBIDDEN);
             }
             $user = ["name" => $name, "email" => $email, "password" => $password, "token" => $token];
@@ -54,8 +56,8 @@ class AuthController extends Controller
             //     ->subject('Boxint Taking Email確認');
             // });
             return response()->json(["message" => "created user"], Response::HTTP_CREATED);
-        }catch(Exception $e) {
-            if($e->getCode() === Response::HTTP_FORBIDDEN) {
+        } catch (Exception $e) {
+            if ($e->getCode() === Response::HTTP_FORBIDDEN) {
                 return response()->json(['message' => $e->getMessage()], Response::HTTP_FORBIDDEN);
             }
             return response()->json(['message' => "create user faild"], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -65,6 +67,7 @@ class AuthController extends Controller
         // }
         // return response()->json(["message" => "401"], 401);
     }
+
 
     /**
      * create
@@ -83,25 +86,21 @@ class AuthController extends Controller
             $password = Hash::make($request->password);
             $is_name_exist = User::where("name", $name)->exists();
             $is_email_exist = User::where("email", $email)->exists();
-            if($is_email_exist) {
+            if ($is_email_exist) {
                 throw new Exception('user already exists', Response::HTTP_FORBIDDEN);
             }
-            if($is_name_exist) {
+            if ($is_name_exist) {
                 throw new Exception('name already use', Response::HTTP_FORBIDDEN);
             }
             $user = ["name" => $name, "email" => $email, "password" => $password];
             User::create($user);
-            return response()->json(["message" => "created user"], Response::HTTP_CREATED);
-        }catch(Exception $e) {
-            if($e->getCode() === Response::HTTP_FORBIDDEN) {
-                return response()->json(['message' => $e->getMessage()], Response::HTTP_FORBIDDEN);
+            if (Auth::attempt(['email' => $email, 'password' => $request->password])) {
+                return Auth::user();
             }
-            return response()->json(['message' => "create user faild"], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(["message" => "created user"], Response::HTTP_CREATED);
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage()], $e->getCode());
         }
-        // if(Auth::attempt(['email' => $email, 'password' => $password])) {
-        //     return Auth::user();
-        // }
-        // return response()->json(["message" => "401"], 401);
     }
 
     /**
@@ -113,37 +112,68 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        // throw new Exception();
         $email = $request->email;
         $password = $request->password;
-        if(Auth::attempt(['email' => $email, 'password' => $password])) {
-            return Auth::user();
+        try {
+            // throw new Exception();
+            if (Auth::attempt(['email' => $email, 'password' => $password])) {
+                return Auth::user();
+            }
+            throw new Exception("Failed Login", Response::HTTP_UNAUTHORIZED);
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage()], $e->getCode());
         }
-        return response()->json(["message" => "401"], 401);
     }
 
     /**
      * logout
      *
-     * @param int $user_id
+     * @param string $user_name
      * @return \Illuminate\Http\Response
      */
     public function logout(Request $request)
     {
         // throw new Exception();
-        $user_id = $request->user_id;
-        $auth_user_id = Auth::User()->id;
-        try{
-            if($user_id != $auth_user_id) {
-                throw new Exception("forbidden");
-            }
-            return Auth::logout();
-        }catch(Exception $e){
-            if($e->getMessage()) {
-                return response()->json(["message" => $e->getMessage()], 403);
-            }
-            return response()->json(["message" => "faild whild logout"], 500);
+        $name = $request->user_name;
+        try {
+            if (!Auth::User()) {
+                throw new Exception('Forbidden', Response::HTTP_FORBIDDEN);
+            };
+            if ($name == Auth::User()->name) {
+                return Auth::logout();
+            } else {
+                throw new Exception('dose not logout...', Response::HTTP_BAD_REQUEST);
+            };
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage()], $e->getCode());
         }
     }
 
+
+
+    /**
+     * admin check
+     *
+     * @param str $user_id
+     * @return \Illuminate\Http\Response
+     */
+    public function admin(Request $request)
+    {
+        try {
+            if (!Auth::User()) {
+                return false;
+                // throw new Exception("no auth user", 401);
+                // return response()->json(["message" => "no auth user", 401]);
+            }
+            // $req_user_id = $request->user_id;
+            $auth_user_id = Auth::User()->id;
+            // if ($req_user_id != $auth_user_id) {
+            //     return response()->json(["message" => "illegal user", 406]);
+            // }
+            $is_admin = Administrator::where("user_id", $auth_user_id)->exists();
+            return $is_admin;
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage()], $e->getCode());
+        }
+    }
 }

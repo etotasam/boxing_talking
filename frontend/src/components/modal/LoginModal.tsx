@@ -21,8 +21,13 @@ export const LoginModal = () => {
   const { setToastModalMessage } = useToastModal();
 
   //? アカウント作成
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("test@test.com");
+  const [password, setPassword] = useState<string>("test");
+
+  //? Email検証
+  const emailPattern = /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
+  const [isInvalidEmail, setIsInvalidEmail] = useState(false);
+
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!email || !password) {
@@ -30,6 +35,10 @@ export const LoginModal = () => {
         message: MESSAGE.SIGNUP_LACK_INPUT,
         bgColor: ModalBgColorType.NOTICE,
       });
+      return;
+    }
+    if (!emailPattern.test(email)) {
+      setIsInvalidEmail(true);
       return;
     }
     login({ email, password });
@@ -74,15 +83,20 @@ export const LoginModal = () => {
             ログイン
           </h1>
           <form onSubmit={submit} className=" flex flex-col w-full">
-            <input
-              type="text"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={`mt-8 px-2 py-1 outline-none border-b rounded-none duration-300 bg-transparent text-stone-600 focus:border-green-500 ${
-                email ? `border-green-500` : `border-stone-500`
-              }`}
-            />
+            <div className="relative">
+              {isInvalidEmail && (
+                <span className="absolute bottom-[30px] left-2 text-red-500 before:content-['※有効なEmailではありません']" />
+              )}
+              <input
+                type="text"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={`mt-8 px-2 py-1 outline-none border-b w-full rounded-none duration-300 bg-transparent text-stone-600 focus:border-green-500 ${
+                  email ? `border-green-500` : `border-stone-500`
+                }`}
+              />
+            </div>
             <input
               type="password"
               placeholder="Password"
