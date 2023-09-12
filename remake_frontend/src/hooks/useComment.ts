@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import dayjs from "dayjs";
+// import dayjs from "dayjs";
 // import { useLocation } from "react-router-dom"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
@@ -57,7 +57,7 @@ export const usePostComment = () => {
     matchId: number,
     comment: string
   }
-  const nowDate = dayjs().format('YYYY/MM/DD H:mm')
+  // const nowDate = dayjs().format('YYYY/MM/DD H:mm')
 
   const queryClient = useQueryClient()
   const api = useCallback(async ({ matchId, comment }: ApiPropsType) => {
@@ -91,7 +91,7 @@ export const usePostComment = () => {
         queryClient.invalidateQueries([QUERY_KEY.comment, { id: matchId }]);
         return
       },
-      onError: (error: any, _, context) => {
+      onError: (error: any) => {
         // queryClient.setQueryData([QUERY_KEY.comment, { id: matchId }], context?.snapshot)
         if (error.status === 401) {
           resetLoadingState()

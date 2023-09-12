@@ -55,7 +55,7 @@ export const Match = () => {
   const {
     postComment,
     isSuccess: isSuccessPostComment,
-    isLoading: isPostingComment,
+    // isLoading: isPostingComment,
     // isError: isErrorPostComment,
   } = usePostComment();
   const {
