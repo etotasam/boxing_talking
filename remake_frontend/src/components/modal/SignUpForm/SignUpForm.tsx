@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
-import { motion } from "framer-motion";
-import { clsx } from "clsx";
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { clsx } from 'clsx';
 // ! recoil
-import { useSetRecoilState } from "recoil";
-import { formTypeSelector, FORM_TYPE } from "@/store/formTypeState";
+import { useSetRecoilState } from 'recoil';
+import { formTypeSelector, FORM_TYPE } from '@/store/formTypeState';
 //! hooks
-import { useAuth, useCreateUser } from "@/hooks/useAuth";
+import { useCreateUser } from '@/hooks/useAuth';
 // import { useQueryState } from "@/libs/hooks/useQueryState";
 // import { useCreateUser } from "@/libs/hooks/useAuth";
 // import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
@@ -19,17 +19,17 @@ export const SignUpForm = () => {
   const { createUser } = useCreateUser();
 
   //? アカウント作成
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
 
   //? Email検証
   const validationEmail =
     /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
   const [isInvalidEmail, setIsInvalidEmail] = useState(false);
   // const isInvalidEmail = validationEmail.test(email);
-  const [isFocusOnEmailInput, setIsFocusOnEmailInput] = useState(false);
-  const hasNoteOnEmail = !isFocusOnEmailInput && isInvalidEmail && !!email;
+  const [_, setIsFocusOnEmailInput] = useState(false);
+  // const hasNoteOnEmail = !isFocusOnEmailInput && isInvalidEmail && !!email;
 
   //? passwordに大文字が含まれてるか
   const validationUppercase = /[A-Z]+/;
@@ -87,7 +87,7 @@ export const SignUpForm = () => {
 
   return (
     <div
-      onClick={(e) => {
+      onMouseDown={(e) => {
         e.stopPropagation();
       }}
       className="w-1/2 min-w-[350px] max-w-[500px] min-h-[450px] bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
@@ -125,13 +125,13 @@ export const SignUpForm = () => {
           {/* </div> */}
 
           <input
-            type={"password"}
+            type={'password'}
             placeholder="Create Password"
             autoComplete="off"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className={clsx(
-              "mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 border-stone-400 focus:border-green-500 duration-300 bg-transparent"
+              'mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 border-stone-400 focus:border-green-500 duration-300 bg-transparent'
             )}
           />
           <div className="mt-3 p-3 border-[1px] border-stone-300 text-stone-500">

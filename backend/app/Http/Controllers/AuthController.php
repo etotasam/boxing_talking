@@ -128,17 +128,22 @@ class AuthController extends Controller
     /**
      * logout
      *
-     * @param int $user_id
+     * @param string $user_name
      * @return \Illuminate\Http\Response
      */
     public function logout(Request $request)
     {
         // throw new Exception();
+        $name = $request->user_name;
         try {
             if (!Auth::User()) {
                 throw new Exception('Forbidden', Response::HTTP_FORBIDDEN);
             };
-            return Auth::logout();
+            if ($name == Auth::User()->name) {
+                return Auth::logout();
+            } else {
+                throw new Exception('dose not logout...', Response::HTTP_BAD_REQUEST);
+            };
         } catch (Exception $e) {
             return response()->json(["message" => $e->getMessage()], $e->getCode());
         }

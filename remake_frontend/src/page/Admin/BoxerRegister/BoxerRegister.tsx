@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import _ from "lodash";
 import { useLocation } from "react-router-dom";
 // ! types
-import { BoxerType } from "@/assets/types";
+// import { BoxerType } from "@/assets/types";
 // ! data
 import {
   BG_COLOR_ON_TOAST_MODAL,
@@ -24,8 +24,7 @@ export const BoxerRegister = () => {
   const { setter: setPagePath } = usePagePath();
   const { resetLoadingState } = useLoading();
   const { pathname } = useLocation();
-  const { state: boxerDataOnForm, setter: setBoxerDataToForm } =
-    useBoxerDataOnForm();
+  const { state: boxerDataOnForm } = useBoxerDataOnForm();
   const { setToastModal, showToastModal, hideToastModal } = useToastModal();
   const { registerBoxer, isSuccess: successRegisterBoxer } = useRegisterBoxer();
 

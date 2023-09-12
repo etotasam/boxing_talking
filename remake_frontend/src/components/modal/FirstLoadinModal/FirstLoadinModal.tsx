@@ -1,5 +1,6 @@
 import { TailSpin } from "react-loader-spinner";
 import { motion } from "framer-motion";
+const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const FirstLoadinModal = () => {
   return (
@@ -14,7 +15,7 @@ export const FirstLoadinModal = () => {
         className="bg-white"
       >
         <h1 className="text-[50px] font-thin text-center select-none">
-          BOXING TALKING
+          {siteTitle}
         </h1>
         <div className="flex justify-center items-center mt-8">
           <TailSpin

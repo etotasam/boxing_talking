@@ -66,7 +66,7 @@ Route::get('/match', [MatchController::class, 'fetch'])->name('match.fetch');
 Route::post('/match', [MatchController::class, 'register'])->name('match.register');
 Route::delete('/match', [MatchController::class, 'delete'])->name('match.delete');
 Route::put('/match', [MatchController::class, 'update'])->name('match.delete');
-
+//! コメント
 Route::get('/comment', [CommentController::class, 'fetch'])->name('comment.fetch');
 Route::post('/comment', [CommentController::class, 'post'])->name('comment.post');
 Route::delete('/comment', [CommentController::class, 'delete'])->name('comment.delete');

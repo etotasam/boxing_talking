@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\BoxingMatch;
 use App\Models\Boxer;
 use App\Models\Comment;
-use App\Models\Vote;
+use App\Models\WinLossPrediction;
 use App\Models\Administrator;
 use Exception;
 
@@ -131,7 +131,7 @@ class MatchController extends Controller
             //? 削除対象の試合に付いているコメントを削除する
             Comment::where("match_id", $match_id)->delete();
             //? 削除対象の試合に付いている勝敗予想を削除する
-            Vote::where("match_id", $match_id)->delete();
+            WinLossPrediction::where("match_id", $match_id)->delete();
 
             $match = BoxingMatch::find($match_id);
             if (!isset($match)) {

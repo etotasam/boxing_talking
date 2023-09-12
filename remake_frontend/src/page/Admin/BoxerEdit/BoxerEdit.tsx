@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { isEqual } from "lodash";
 //! data
 import {
@@ -17,7 +17,7 @@ import {
   useFetchBoxer,
   useUpdateBoxerData,
   useDeleteBoxer,
-  limit,
+  // limit,
 } from "@/hooks/useBoxer";
 import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
 //! types
@@ -25,7 +25,7 @@ import { BoxerType } from "@/assets/types";
 //! layout
 import AdminiLayout from "@/layout/AdminiLayout";
 //! component
-import { FlagImage } from "@/components/atomc/FlagImage";
+// import { FlagImage } from "@/components/atomc/FlagImage";
 import { BoxerEditForm } from "@/components/module/BoxerEditForm";
 import { SearchBoxer } from "@/components/module/SearchBoxer";
 import { Confirm } from "@/components/modal/Confirm";
@@ -39,23 +39,22 @@ export const BoxerEdit = () => {
   const { setToastModal, showToastModal, hideToastModal } = useToastModal();
   const { state: editTargetBoxerData, setter: setEditTargetBoxerData } =
     useBoxerDataOnForm();
-  const { updateFighter, isSuccess: isUpdateBoxerSuccess } =
-    useUpdateBoxerData();
+  const { updateFighter } = useUpdateBoxerData();
   const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
   const {
     boxersData,
     pageCount,
-    isRefetching: isRefechingBoxerData,
+    // isRefetching: isRefechingBoxerData,
   } = useFetchBoxer();
   //? 選択したボクサーのidが入る(選手が選択されているかの判断に使用)
   const [checked, setChecked] = useState<number>();
   //? paramsの取得
-  const { search, pathname } = useLocation();
-  const query = new URLSearchParams(search);
-  const paramPage = Number(query.get("page"));
-  const paramName = query.get("name");
-  const paramCountry = query.get("country");
-  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  // const query = new URLSearchParams(search);
+  // const paramPage = Number(query.get("page"));
+  // const paramName = query.get("name");
+  // const paramCountry = query.get("country");
+  // const navigate = useNavigate();
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -251,7 +250,7 @@ const BoxersList = ({
                 type="radio"
                 name="boxer"
                 checked={boxer.id === checked}
-                onChange={(e) => {
+                onChange={() => {
                   setChecked(boxer.id ? boxer.id : undefined);
                   setEditTargetBoxerData(boxer);
                 }}

@@ -25,11 +25,12 @@ class CommentController extends Controller
      */
     public function fetch(Request $request)
     {
-        $match_id = $request->match_id;
-        $comments_array = [];
         try {
+            // throw new Exception("fetch comment failed");
+            $match_id = $request->match_id;
+            $comments_array = [];
             if (!$match_id) {
-                return $comments_array;
+                throw new Exception('Failed fetch comments', Response::HTTP_BAD_REQUEST);
             }
             $match = BoxingMatch::find($match_id);
             if ($match) {
@@ -53,6 +54,9 @@ class CommentController extends Controller
             }
             return $comments_array;
         } catch (Exception $e) {
+            if ($e->getCode()) {
+                return response()->json(["message" => $e->getMessage()], $e->getCode());
+            }
             return response()->json(["message" => $e->getMessage()], 500);
         }
     }
@@ -68,14 +72,16 @@ class CommentController extends Controller
     public function post(Request $request)
     {
         try {
-            // throw new Exception("post comment failed");
-            // $user_id = $request->user_id;
+            $is_auth = Auth::user();
+            if (!$is_auth) {
+                throw new Exception("Posting comments require Login", Response::HTTP_UNAUTHORIZED);
+            }
             $user_id = Auth::user()->id;
             $match_id = $request->match_id;
             $comment = $request->comment;
             $has_match = BoxingMatch::find($match_id)->exists();
             if (!$has_match) {
-                throw new Exception("the match not exist");
+                throw new Exception("The match is not exist", Response::HTTP_FORBIDDEN);
             }
             Comment::create([
                 "user_id" => $user_id,
@@ -84,7 +90,10 @@ class CommentController extends Controller
             ]);
             return response()->json(["message" => "posted comment successfully"], 200);
         } catch (Exception $e) {
-            return response()->json(["message" => $e->getMessage()], 500);
+            if ($e->getCode()) {
+                return response()->json(["message" => $e->getMessage()], $e->getCode());
+            }
+            return response()->json(["message" => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

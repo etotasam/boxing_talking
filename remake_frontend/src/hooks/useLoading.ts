@@ -1,5 +1,6 @@
+import { useCallback } from "react"
 // !Recoil
-import { useSetRecoilState, } from "recoil"
+import { useSetRecoilState, useRecoilValue } from "recoil"
 import { loadingSelector } from "@/store/loadingState"
 // !types
 
@@ -10,58 +11,59 @@ export const useLoading = () => {
   //? ToastModalの状態(show/hide)
   // const { isShow: isShowToastModal, message: messageOnToast, bgColor } = useRecoilValue(toastModalSelector)
   const loadingStateSetter = useSetRecoilState(loadingSelector)
+  const { isLoading } = useRecoilValue(loadingSelector)
 
   /**
    * !Recoil
    * ?loadingStateをリセット
    * @returns {void}
    */
-  const resetLoadingState = () => {
+  const resetLoadingState = useCallback(() => {
     loadingStateSetter(() => {
       return { isError: false, isLoading: false, isSuccess: false }
     })
-  }
+  }, [])
   /**
    * ! Recoil
    * ? isLoadingをtrueにセット
    * @returns {void}
    */
-  const startLoading = () => {
+  const startLoading = useCallback(() => {
     loadingStateSetter((curr) => {
       return { ...curr, isLoading: true }
     })
-  }
+  }, [])
   /**
    * ! Recoil
    * ? isLoadingをfalseにセット
    * @returns {void}
    */
-  const endLoading = () => {
+  const endLoading = useCallback(() => {
     loadingStateSetter(curr => {
       return { ...curr, isLoading: false }
     })
-  }
+  }, [])
   /**
    * ! Recoil
    * ? isSuccessをtrueにセット
    * @returns {void}
    */
-  const successful = () => {
+  const successful = useCallback(() => {
     loadingStateSetter(curr => {
       return { ...curr, isLoading: false, isSuccess: true, isError: false }
     })
-  }
+  }, [])
   /**
    * ! Recoil
    * ? isErrorをtrueにセット
    * @returns {void}
    */
-  const hasError = () => {
+  const hasError = useCallback(() => {
     loadingStateSetter(curr => {
       return { ...curr, isLoading: false, isSuccess: false, isError: true }
     })
-  }
+  }, [])
 
 
-  return { resetLoadingState, startLoading, hasError, successful, endLoading }
+  return { isLoading, resetLoadingState, startLoading, hasError, successful, endLoading }
 }
