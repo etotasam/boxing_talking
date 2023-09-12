@@ -31,10 +31,6 @@ export const MESSAGE = {
   USER_NAME_ALREADY_USE: "すでに使われている名前です \n 別の名前を検討してください",
 
   INVALID_COUNTRY: "国籍が無効です",
-  COMMENT_POST_SUCCESSFULLY: "コメントを投稿しました",
-  COMMENT_POST_FAILED: `コメント投稿に失敗しました \n お手数ですが、時間を空けて再度投稿してください`,
-  COMMENT_POST_NULL: `コメントを入力してください`,
-
   VOTE_FAILED_WITH_NO_AUTH: '勝敗予想を投票するにはログインが必要です',
   VOTE_FAILD: `投票に失敗しました`,
   VOTE_SUCCESSFULLY: `投票しました`,
@@ -86,6 +82,7 @@ export const MESSAGE = {
   FIGHTER_DELETING: "選手情報を削除中...",
   FAILD_FIGHTER_DELETE: "選手削除に失敗しました",
   //? コメント
+  FAILED_POST_COMMENT_WITHOUT_AUTH: 'コメント投稿にはログインが必要です',
   COMMENT_IS_EMPTY: 'コメントを入力してください',
   COMMENT_POST_SUCCESS: 'コメントを投稿しました',
   COMMENT_DELETE_FAILED: `コメントの削除に失敗しました \n 一度更新して、再度削除を実行してください`,
@@ -93,11 +90,13 @@ export const MESSAGE = {
   COMMENT_CANT_POST_WITH_UNAUTH: "コメント投稿にはログインが必要です",
   // COMMENT_DELETING: `削除中です.... \n そのままお待ち下さい`,
   COMMENT_DELETE_CONFIRM: "※コメントを削除します",
+  COMMENT_POST_FAILED: `コメント投稿に失敗しました \n お手数ですが、時間を空けて再度投稿してください`,
+  COMMENT_POST_NULL: `コメントを入力してください`,
 
-  //? コメント
+  //? 投票
   SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION: '投票が完了しました',
   FAILED_VOTE_WIN_LOSS_PREDICTION: '投票に失敗しました。\n ページの更新後再度実行してください',
-  ALREADY_HAVE_DONE_VOTE: "勝敗予想はすでに投票しています"
+  ALREADY_HAVE_DONE_VOTE: "勝敗予想はすでに投票しています",
 } as const
 
 

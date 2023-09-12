@@ -1,15 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 // ! data
 import { Stance, initialBoxerDataOnForm } from "@/assets/boxerData";
 import { Nationality } from "@/assets/NationalFlagData";
-import { ORGANIZATIONS, WEIGHT_CLASS } from "@/assets/boxerData";
 //! type
-import {
-  BoxerType,
-  StanceType,
-  TitleType,
-  BoxerDataOnFormType,
-} from "@/assets/types";
+import { BoxerType, BoxerDataOnFormType } from "@/assets/types";
 // ! hooks
 import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
 // ! component
@@ -31,7 +25,7 @@ export const BoxerEditForm = (props: PropsType) => {
     useBoxerDataOnForm();
 
   // ? 入力させない様にするガードモーダル
-  const { isGuard = false } = props;
+  // const { isGuard = false } = props;
 
   //? 登録が完了したらformのデータを初期化
   useEffect(() => {

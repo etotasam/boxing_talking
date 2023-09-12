@@ -1,21 +1,21 @@
-import React from "react";
-import { Outlet } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 // ! hooks
-import { useAuth } from "@/hooks/useAuth";
-import { useToastModal } from "@/hooks/useToastModal";
-import { useFetchMatches } from "@/hooks/useMatch";
-import { useLoading } from "@/hooks/useLoading";
+import { useAuth } from '@/hooks/useAuth';
+import { useToastModal } from '@/hooks/useToastModal';
+import { useFetchMatches } from '@/hooks/useMatch';
+// import { useLoading } from "@/hooks/useLoading";
 // ! modal
-import { ToastModalContainer } from "@/components/modal/ToastModal";
-import { LoginFormModal } from "@/components/modal/LoginFormModal";
-import { FullScreenSpinnerModal } from "@/components/modal/FullScreenSpinnerModal";
-import { FirstLoadinModal } from "@/components/modal/FirstLoadinModal";
+import { ToastModalContainer } from '@/components/modal/ToastModal';
+import { LoginFormModal } from '@/components/modal/LoginFormModal';
+import { FullScreenSpinnerModal } from '@/components/modal/FullScreenSpinnerModal';
+import { FirstLoadinModal } from '@/components/modal/FirstLoadinModal';
 // ! recoil
-import { useRecoilValue } from "recoil";
-import { loginModalSelector } from "@/store/loginModalState";
-import { loadingSelector } from "@/store/loadingState";
-import { useFetchBoxer } from "@/hooks/useBoxer";
+import { useRecoilValue } from 'recoil';
+import { loginModalSelector } from '@/store/loginModalState';
+import { loadingSelector } from '@/store/loadingState';
+import { useFetchBoxer } from '@/hooks/useBoxer';
 
 const Container = () => {
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
@@ -51,16 +51,16 @@ const Container = () => {
       <Outlet />
       <AnimatePresence>
         {isShowToastModal && (
-          <ToastModalContainer key={"ToastModalContainer"} />
+          <ToastModalContainer key={'ToastModalContainer'} />
         )}
         {(isLoadingByRecoil || isRefetchingBoxers) && (
-          <FullScreenSpinnerModal key={"FullScreenSpinnerModal"} />
+          <FullScreenSpinnerModal key={'FullScreenSpinnerModal'} />
         )}
         {(isFirstCheckingAuth || isBoxersFetching || isMatchesFetching) && (
-          <FirstLoadinModal key={"FirstLoadinModal"} />
+          <FirstLoadinModal key={'FirstLoadinModal'} />
         )}
       </AnimatePresence>
-      {isShowLoginModal && <LoginFormModal key={"LoginFormModal"} />}
+      {isShowLoginModal && <LoginFormModal key={'LoginFormModal'} />}
     </>
   );
 };

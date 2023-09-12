@@ -1,11 +1,11 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { cloneDeep } from "lodash";
 import dayjs from "dayjs";
 import _ from "lodash";
 // ! types
 import {
   NationalityType,
-  RegstarMatchPropsType,
+  // RegstarMatchPropsType,
   GRADE_Type,
   WEIGHT_CLASS_Type,
   ORGANIZATIONS_Type,
@@ -20,7 +20,7 @@ import {
 import { Nationality } from "@/assets/NationalFlagData";
 //! hook
 import { useToastModal } from "@/hooks/useToastModal";
-import { useUpdateMatch, useDeleteMatch } from "@/hooks/useMatch";
+import { useUpdateMatch } from "@/hooks/useMatch";
 
 export const MatchSetter = ({
   selectMatch,
@@ -253,7 +253,7 @@ export const MatchSetter = ({
           <ul className="ml-[140px]">
             {/* //? タイトル */}
             {Array.from({ length: counter }, (_, index) => index).map(
-              (key, i) => (
+              (_, i) => (
                 <li className="mt-1" key={i}>
                   <select
                     className="w-[150px]"
@@ -269,7 +269,7 @@ export const MatchSetter = ({
                     id="matchBelt"
                   >
                     <option value={undefined}></option>
-                    {Object.values(ORGANIZATIONS).map((v, index) => (
+                    {Object.values(ORGANIZATIONS).map((v) => (
                       <option key={v} value={v}>
                         {v}
                       </option>

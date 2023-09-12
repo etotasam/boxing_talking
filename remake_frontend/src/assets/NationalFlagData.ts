@@ -1,4 +1,4 @@
-import { NationalityType } from "@/assets/types";
+// import { NationalityType } from "@/assets/types";
 
 export const Nationality = {
   Japan: "Japan",

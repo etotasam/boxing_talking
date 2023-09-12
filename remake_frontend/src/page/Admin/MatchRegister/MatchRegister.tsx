@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { cloneDeep } from "lodash";
 import { useLocation } from "react-router-dom";
@@ -27,7 +27,7 @@ import { useToastModal } from "@/hooks/useToastModal";
 import { usePagePath } from "@/hooks/usePagePath";
 import { useLoading } from "@/hooks/useLoading";
 //! component
-import { FlagImage } from "@/components/atomc/FlagImage";
+// import { FlagImage } from "@/components/atomc/FlagImage";
 import { SearchBoxer } from "@/components/module/SearchBoxer";
 import { PaginationBoxerList } from "@/components/module/PaginationBoxerList";
 import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
@@ -410,32 +410,30 @@ const MatchDataSetter = ({
       {title && (
         <ul className="ml-[140px]">
           {/* //? タイトル */}
-          {Array.from({ length: counter }, (_, index) => index).map(
-            (key, i) => (
-              <li className="mt-1" key={i}>
-                <select
-                  className="w-[150px]"
-                  name="matchBelt"
-                  value={belt[i]}
-                  onChange={(e) => {
-                    setBelt((current) => {
-                      const clone = cloneDeep(current);
-                      clone[i] = e.target.value as ORGANIZATIONS_Type;
-                      return clone;
-                    });
-                  }}
-                  id="matchBelt"
-                >
-                  <option value={undefined}></option>
-                  {Object.values(ORGANIZATIONS).map((v, index) => (
-                    <option key={v} value={v}>
-                      {v}
-                    </option>
-                  ))}
-                </select>
-              </li>
-            )
-          )}
+          {Array.from({ length: counter }, (_, index) => index).map((_, i) => (
+            <li className="mt-1" key={i}>
+              <select
+                className="w-[150px]"
+                name="matchBelt"
+                value={belt[i]}
+                onChange={(e) => {
+                  setBelt((current) => {
+                    const clone = cloneDeep(current);
+                    clone[i] = e.target.value as ORGANIZATIONS_Type;
+                    return clone;
+                  });
+                }}
+                id="matchBelt"
+              >
+                <option value={undefined}></option>
+                {Object.values(ORGANIZATIONS).map((v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </select>
+            </li>
+          ))}
         </ul>
       )}
 

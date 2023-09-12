@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import clsx from "clsx";
 import { useLocation } from "react-router-dom";
 //! data
-import { GRADE } from "@/assets/boxerData";
+// import { GRADE } from "@/assets/boxerData";
 //! layout
 import AdminiLayout from "@/layout/AdminiLayout";
 //! components
-import { FightBox } from "@/components/module/FightBox";
+// import { FightBox } from "@/components/module/FightBox";
 import { FlagImage } from "@/components/atomc/FlagImage";
 import { MatchSetter } from "@/components/module/MatchSetter/MatchSetter";
 import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
@@ -18,13 +18,7 @@ import { useToastModal } from "@/hooks/useToastModal";
 import { usePagePath } from "@/hooks/usePagePath";
 import { useLoading } from "@/hooks/useLoading";
 //! types
-import {
-  MatchesDataType,
-  GRADE_Type,
-  NationalityType,
-  ORGANIZATIONS_Type,
-  WEIGHT_CLASS_Type,
-} from "@/assets/types";
+import { MatchesDataType } from "@/assets/types";
 
 // ! image
 import crown from "@/assets/images/etc/champion.svg";
@@ -83,7 +77,7 @@ export const MatchEdit = () => {
       <div className="mt-[120px] flex w-full">
         <section className="w-[30%] flex justify-center">
           {selectMatch ? (
-            <SelectoMatchComponent matchData={selectMatch} />
+            <SelectedMatchInfo matchData={selectMatch} />
           ) : (
             <div className="w-[80%]">
               <div className="border-[1px] rounded-md border-stone-400 w-full min-h-[300px] flex justify-center items-center">
@@ -193,7 +187,7 @@ export const MatchListComponent = ({
   );
 };
 
-const SelectoMatchComponent = ({
+export const SelectedMatchInfo = ({
   matchData,
 }: {
   matchData: MatchesDataType | undefined;
@@ -204,7 +198,7 @@ const SelectoMatchComponent = ({
       {/* 日時 */}
       <div className="p-5 text-stone-600 border-[1px] rounded-md border-stone-400 w-full">
         <div className="text-center relative mt-5">
-          <h2 className="text-2xl after:content-['(日本時間)'] after:absolute after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] after:text-sm">
+          <h2 className="lg:text-2xl text-lg after:content-['(日本時間)'] after:absolute after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] after:text-sm">
             {dayjs(matchData.match_date).format("YYYY年M月D日")}
           </h2>
           {matchData.titles.length > 0 && (
@@ -220,7 +214,7 @@ const SelectoMatchComponent = ({
             <ul className="flex flex-col">
               {matchData.titles.sort().map((title) => (
                 <li key={title} className="mt-1">
-                  <div className="relative inline-block text-[18px]">
+                  <div className="relative inline-block lg:text-[18px] text-[16px]">
                     <span className="absolute top-[4px] right-[-28px] w-[18px] h-[18px] mr-2">
                       <img src={crown} alt="" />
                     </span>
@@ -230,22 +224,24 @@ const SelectoMatchComponent = ({
               ))}
             </ul>
           ) : (
-            <p className="text-[30px] mt-10">{matchData.grade}</p>
+            <p className="lg:text-[30px] text-[24px] lg:mt-10 mt-5">
+              {matchData.grade}
+            </p>
           )}
         </div>
 
         {/* 会場 */}
         <div className="mt-[35px] text-center">
-          <div className="relative inline-block text-lg before:content-['会場'] before:absolute before:top-[-25px] before:left-[50%] before:translate-x-[-50%] before:text-[14px] before:text-stone-500">
+          <div className="relative inline-block lg:text-lg text-sm before:content-['会場'] before:w-full before:absolute before:top-[-25px] before:left-[50%] before:translate-x-[-50%] before:text-[14px] before:text-stone-500">
             {matchData.venue}
-            <span className="w-[32px] h-[24px] border-[1px] overflow-hidden absolute top-[1px] left-[-40px]">
+            <span className="lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] border-[1px] overflow-hidden absolute top-[1px] lg:left-[-40px] left-[-30px]">
               <FlagImage nationaly={matchData.country} />
             </span>
           </div>
         </div>
 
         <div className="mt-10 text-center">
-          <p className="relative inline-block text-lg before:content-['階級'] before:absolute before:top-[-25px] before:min-w-[100px] before:left-[50%] before:translate-x-[-50%] before:text-[14px] before:text-stone-500">
+          <p className="relative inline-block lg:text-lg text-sm before:content-['階級'] before:w-full before:absolute before:top-[-25px] before:min-w-[100px] before:left-[50%] before:translate-x-[-50%] before:text-[14px] before:text-stone-500">
             {`${matchData.weight.replace("S", "スーパー")}級`}
           </p>
         </div>

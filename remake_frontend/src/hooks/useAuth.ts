@@ -9,42 +9,9 @@ import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal"
 import { useToastModal } from "./useToastModal"
 import { useLoading } from "./useLoading"
 import { useLoginModal } from "./useLoginModal"
+import { useFetchMatchPredictVote } from "./uesWinLossPredition"
 //! types
 import type { UserType } from "@/assets/types"
-// //! message contoller
-// import { useToastModal, ModalBgColorType } from "./useToastModal";
-// import { MESSAGE } from "@/libs/utils";
-
-
-
-
-// export enum AuthIs {
-//   TRUE = "TRUE",
-//   FALSE = "FALSE",
-//   UNDEFINED = "UNDEFINED"
-// }
-
-// export type AuthUserStateType = {
-//   auth: {
-//     user: UserType,
-//     hasAuth: AuthIs,
-//     pending: boolean,
-//     error: boolean
-//   }
-//   login: {
-//     pending: boolean,
-//     error: boolean
-//   }
-//   logout: {
-//     pending: boolean,
-//     error: boolean
-//   }
-// }
-
-// type LoginPropsType = {
-//   email: string,
-//   password: string
-// }
 
 
 //! authチェック
@@ -68,13 +35,12 @@ export const useAuth = () => {
 
 //! ユーザ作成
 export const useCreateUser = () => {
-
   // ? react query
   const queryClient = useQueryClient()
   // ? toast modal
   const { setToastModal, showToastModal } = useToastModal()
   // ? Loading state (hook)
-  const { resetLoadingState, startLoading, hasError, successful, endLoading } = useLoading()
+  const { startLoading, hasError, successful } = useLoading()
   // ? login modal (hook)
   const { hideLoginModal } = useLoginModal()
 
@@ -102,7 +68,7 @@ export const useCreateUser = () => {
         hideLoginModal()
       },
 
-      onError: (error: any) => {
+      onError: () => {
         hasError()
         setToastModal({ message: MESSAGE.USER_REGISTER_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
@@ -120,35 +86,38 @@ export const useLogin = () => {
   // ? toast modal
   const { setToastModal, showToastModal } = useToastModal()
   // ? Loading state
-  const { resetLoadingState, startLoading, hasError, successful, endLoading } = useLoading()
+  const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? login modal (hook)
   const { hideLoginModal } = useLoginModal()
+  const { refetch: refetchMatchPrediction } = useFetchMatchPredictVote()
 
   const api = useCallback(async (props: { email: string, password: string }) => {
     const res = await Axios.post<UserType>("api/login", { ...props }).then(value => value.data)
     return res
   }, [])
-  const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
       startLoading()
     }
   })
   const login = (props: { email: string, password: string }) => {
-    resetLoadingState()
     mutate({ ...props }, {
       // ! ログイン成功時
       onSuccess: (userData) => {
+        refetchMatchPrediction()
+        hideLoginModal()
+        resetLoadingState()
         refetchAdmin()
         // ? ログインユーザーをreact query内でキャッシュする
         queryClient.setQueryData<UserType>(QUERY_KEY.auth, userData)
         successful()
         setToastModal({ message: MESSAGE.LOGIN_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
-        hideLoginModal()
 
       },
       // ! ログイン失敗時
       onError: () => {
+        resetLoadingState()
         hasError()
         setToastModal({ message: MESSAGE.LOGIN_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
@@ -159,15 +128,16 @@ export const useLogin = () => {
 }
 //! ログアウト
 export const useLogout = () => {
+  const { refetch: refetchMatchPrediction } = useFetchMatchPredictVote()
   // ? react query
   const queryClient = useQueryClient()
   // ? toast message modal
   const { setToastModal, showToastModal } = useToastModal()
   // ? Loading state
-  const { resetLoadingState, startLoading, hasError, successful, endLoading } = useLoading()
+  const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? api
-  const api = useCallback(async ({ userId }: { userId: string }) => {
-    await Axios.post<void>("api/logout", { user_id: userId }).then(value => value.data)
+  const api = useCallback(async ({ userName }: { userName: string }) => {
+    await Axios.post<void>("api/logout", { user_name: userName }).then(value => value.data)
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -175,12 +145,15 @@ export const useLogout = () => {
       startLoading()
     }
   })
-  const logout = useCallback(({ userId }: { userId: string }) => {
-    mutate({ userId }, {
+  const logout = useCallback(({ userName }: { userName: string }) => {
+    mutate({ userName }, {
       onSuccess: () => {
         // ? ユーザー情報のキャッシュをclear
         queryClient.setQueryData(QUERY_KEY.auth, null)
         queryClient.invalidateQueries(QUERY_KEY.admin)
+        //? 勝敗予想のキャッシュをclearしてリフェッチ
+        queryClient.setQueryData(QUERY_KEY.prediction, undefined)
+        refetchMatchPrediction()
         successful()
         setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
         showToastModal()
@@ -192,7 +165,6 @@ export const useLogout = () => {
         resetLoadingState()
       },
       onError: () => {
-        console.log("logoug error");
         hasError()
         setToastModal({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
