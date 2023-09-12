@@ -57,7 +57,6 @@ const MatchInfo = ({ matchData }: { matchData: MatchesDataType }) => {
 };
 
 const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
-  console.log(boxer.name, ":", boxer.name.length);
   return (
     <div className="md:w-[300px] flex justify-center items-center flex-1">
       {/* //? 名前 */}

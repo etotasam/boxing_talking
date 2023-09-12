@@ -12,40 +12,6 @@ import { useLoginModal } from "./useLoginModal"
 import { useFetchMatchPredictVote } from "./uesWinLossPredition"
 //! types
 import type { UserType } from "@/assets/types"
-// //! message contoller
-// import { useToastModal, ModalBgColorType } from "./useToastModal";
-// import { MESSAGE } from "@/libs/utils";
-
-
-
-
-// export enum AuthIs {
-//   TRUE = "TRUE",
-//   FALSE = "FALSE",
-//   UNDEFINED = "UNDEFINED"
-// }
-
-// export type AuthUserStateType = {
-//   auth: {
-//     user: UserType,
-//     hasAuth: AuthIs,
-//     pending: boolean,
-//     error: boolean
-//   }
-//   login: {
-//     pending: boolean,
-//     error: boolean
-//   }
-//   logout: {
-//     pending: boolean,
-//     error: boolean
-//   }
-// }
-
-// type LoginPropsType = {
-//   email: string,
-//   password: string
-// }
 
 
 //! authチェック
@@ -186,7 +152,7 @@ export const useLogout = () => {
         queryClient.setQueryData(QUERY_KEY.auth, null)
         queryClient.invalidateQueries(QUERY_KEY.admin)
         //? 勝敗予想のキャッシュをclearしてリフェッチ
-        queryClient.setQueryData(QUERY_KEY.prediction, null)
+        queryClient.setQueryData(QUERY_KEY.prediction, undefined)
         refetchMatchPrediction()
         successful()
         setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
@@ -199,7 +165,6 @@ export const useLogout = () => {
         resetLoadingState()
       },
       onError: () => {
-        console.log("logoug error");
         hasError()
         setToastModal({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()

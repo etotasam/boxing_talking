@@ -1,21 +1,21 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 // ! modules
-import { Button } from "@/components/atomc/Button";
+import { Button } from '@/components/atomc/Button';
 // ! recoil
-import { useSetRecoilState } from "recoil";
-import { formTypeSelector, FORM_TYPE } from "@/store/formTypeState";
-import { loginModalSelector } from "@/store/loginModalState";
+import { useSetRecoilState } from 'recoil';
+import { formTypeSelector, FORM_TYPE } from '@/store/formTypeState';
+import { loginModalSelector } from '@/store/loginModalState';
 // ! types
-import { UserType } from "@/assets/types";
+import { UserType } from '@/assets/types';
 // ! hooks
-import { useLogout } from "@/hooks/useAuth";
-import { useHeaderAndBottomHeight } from "@/hooks/useHeaderAndBottomHeightState";
+import { useLogout } from '@/hooks/useAuth';
+import { useHeaderAndBottomHeight } from '@/hooks/useHeaderAndBottomHeightState';
 // ! icons
-import { IconContext } from "react-icons";
-import { BiUserCircle } from "react-icons/bi";
+import { IconContext } from 'react-icons';
+import { BiUserCircle } from 'react-icons/bi';
 //! component
-import { LinkList } from "../LinkList";
-import { useAdmin } from "@/hooks/useAuth";
+import { LinkList } from '../LinkList';
+import { useAdmin } from '@/hooks/useAuth';
 //! env
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -50,10 +50,10 @@ export const Header = (porps: PropsType) => {
     <>
       <header
         ref={headerRef}
-        className="sm:h-[80px] h-[70px] felx relative after:w-full after:absolute after:z-10 after:bottom-[-3px] after:left-0 after:h-[3px] after:bg-red-500"
+        className="sm:h-[80px] h-[70px] felx relative after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
       >
         {/* <DivVerticalCenter> */}
-        <h1 className="md:text-[64px] sm:text-[54px] text-[36px] absolute md:top-0 sm:top-2 top-5 left-0 font-thin">
+        <h1 className="md:text-[64px] sm:text-[54px] text-[36px] select-none absolute md:top-0 sm:top-2 top-5 left-0 font-thin">
           {siteTitle}
         </h1>
         {/* </DivVerticalCenter> */}
@@ -67,7 +67,7 @@ export const Header = (porps: PropsType) => {
 
         {userData && (
           <div className="absolute top-0 right-[30px] flex">
-            <IconContext.Provider value={{ color: "#1e1e1e", size: "25px" }}>
+            <IconContext.Provider value={{ color: '#1e1e1e', size: '25px' }}>
               <span className="mr-1">
                 <BiUserCircle />
               </span>

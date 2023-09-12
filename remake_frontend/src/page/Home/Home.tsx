@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 // ! components
-import { FightBox } from "@/components/module/FightBox";
-import { SimpleFightBox } from "@/components/module/SimpleFightBox";
+import { FightBox } from '@/components/module/FightBox';
+import { SimpleFightBox } from '@/components/module/SimpleFightBox';
+import { Footer } from '@/components/module/Footer';
 // ! hooks
-import { useFetchMatches } from "@/hooks/useMatch";
-import { usePagePath } from "@/hooks/usePagePath";
-import { useLoading } from "@/hooks/useLoading";
-import { useGetDevice } from "@/hooks/useGetDevice";
+import { useFetchMatches } from '@/hooks/useMatch';
+import { usePagePath } from '@/hooks/usePagePath';
+import { useLoading } from '@/hooks/useLoading';
+import { useWindowSize } from '@/hooks/useWindowSize';
+//! types
+import { MatchesDataType } from '@/assets/types';
 
 export const Home = () => {
   // ! use hook
@@ -16,9 +19,9 @@ export const Home = () => {
   const { setter: setPagePath } = usePagePath();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { device } = useGetDevice();
+  const { windowSize } = useWindowSize();
 
-  const testClick = (matchId: number) => {
+  const matchSelect = (matchId: number) => {
     navigate(`/match?match_id=${matchId}`);
   };
   //? 初期設定(クリーンアップとか)
@@ -30,9 +33,16 @@ export const Home = () => {
     };
   }, []);
 
+  const [isSimple, setIsSimple] = useState(false);
+
   return (
     <>
       <div className="md:my-10 mb-5">
+        {windowSize === 'PC' && (
+          <button onClick={() => setIsSimple((curr) => !curr)}>
+            {isSimple ? `詳細モードへ` : `シンプルモードへ`}
+          </button>
+        )}
         <ul>
           {matchesData &&
             matchesData.map((match) => (
@@ -40,19 +50,38 @@ export const Home = () => {
                 key={match.id}
                 className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5"
               >
-                {device === "PC" ? (
-                  <FightBox onClick={testClick} matchData={match} />
-                ) : (
-                  <SimpleFightBox
-                    onClick={testClick}
-                    matchData={match}
-                    // className="border-[1px] border-stone-300 rounded-md"
-                  />
-                )}
+                <MatchesView
+                  isSimple={isSimple}
+                  match={match}
+                  matchSelect={matchSelect}
+                />
               </li>
             ))}
         </ul>
       </div>
+
+      <Footer />
     </>
   );
+};
+
+type MatchesViewPropsType = {
+  match: MatchesDataType;
+  matchSelect: (matchId: number) => void;
+  isSimple: boolean;
+};
+
+const MatchesView = ({
+  match,
+  matchSelect,
+  isSimple,
+}: MatchesViewPropsType) => {
+  const { windowSize } = useWindowSize();
+
+  if (windowSize === 'SP')
+    return <SimpleFightBox onClick={matchSelect} matchData={match} />;
+  if (isSimple)
+    return <SimpleFightBox onClick={matchSelect} matchData={match} />;
+  if (windowSize === 'PC')
+    return <FightBox onClick={matchSelect} matchData={match} />;
 };

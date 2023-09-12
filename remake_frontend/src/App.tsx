@@ -1,22 +1,23 @@
 // import { useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 // ! page
-import { Home } from "@/page/Home";
-import { Match } from "@/page/Match";
-import { Admin } from "@/page/Admin";
-import { BoxerRegister } from "@/page/Admin/BoxerRegister";
-import { BoxerEdit } from "@/page/Admin/BoxerEdit";
-import { MatchRegister } from "@/page/Admin/MatchRegister";
-import { MatchEdit } from "@/page/Admin/MatchEdit";
+import { Home } from '@/page/Home';
+import { Match } from '@/page/Match';
+import { Admin } from '@/page/Admin';
+import { BoxerRegister } from '@/page/Admin/BoxerRegister';
+import { BoxerEdit } from '@/page/Admin/BoxerEdit';
+import { MatchRegister } from '@/page/Admin/MatchRegister';
+import { MatchEdit } from '@/page/Admin/MatchEdit';
+import { Terms } from './page/Terms/Terms';
 // ! middleware
-import AdminOnly from "./middleware/AdminOnly";
-import Container from "./middleware/Container";
-import "./App.css";
+import AdminOnly from './middleware/AdminOnly';
+import Container from './middleware/Container';
+import './App.css';
 //! layout
-import MainLayout from "@/layout/MainLayout";
+import MainLayout from '@/layout/MainLayout';
 // import AdminiLayout from "@/layout/AdminiLayout";
 
-import { TestModule } from "./components/module/TestModule";
+import { TestModule } from './components/module/TestModule';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
           <Route path="/test_module" element={<TestModule />} />
           {/* //? </MainLayout> */}
         </Route>
+        <Route path="/terms" element={<Terms />} />
       </Routes>
     </BrowserRouter>
   );

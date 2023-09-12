@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+// import clsx from "clsx";
 // ! types
 import { NationalityType } from "@/assets/types";
 // ! Nationaly
@@ -19,7 +19,7 @@ type PropsType = React.ComponentProps<"div"> & {
   nationaly: NationalityType;
 };
 
-export const BackgroundFlag = ({ nationaly, className }: PropsType) => {
+export const BackgroundFlag = ({ nationaly }: PropsType) => {
   const getNatinalFlag = (country: NationalityType) => {
     if (country == Nationality.Japan) return japanFlag;
     if (country == Nationality.Philpin) return philpinFlag;
