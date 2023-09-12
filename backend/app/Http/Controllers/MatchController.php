@@ -14,6 +14,8 @@ use App\Models\WinLossPrediction;
 use App\Models\Administrator;
 use Exception;
 
+use \Symfony\Component\HttpFoundation\Response;
+
 class MatchController extends Controller
 {
 
@@ -91,21 +93,25 @@ class MatchController extends Controller
     {
         try {
             $match = $request->all();
-            // $match = $request->all();
             // ! 配列で受けた保有タイトルを文字列に変換する
             $titles = implode('/', $match["titles"]);
             if (empty($titles)) {
                 $match['titles'] = null;
             } else {
                 $match['titles'] = $titles;
+            };
+            try {
+                BoxingMatch::create($match);
+            } catch (Exception $e) {
+                throw new Exception("Catch error when register");
             }
-            \Log::info($match);
-            $query = BoxingMatch::create($match);
-            \Log::debug($query->toSql());
             return response()->json(["message" => "success"], 200);
         } catch (Exception $e) {
-            return response()->json(["message" => "faild match register"], 500);
-        }
+            if ($e->getCode()) {
+                return response()->json(["message" => $e->getMessage()], Response::HTTP_NOT_IMPLEMENTED);
+            }
+        };
+        return response()->json(["message" => "faild match register"], 500);
     }
 
     /**
