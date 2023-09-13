@@ -19,7 +19,7 @@ export type PredictionType = {
   prediction: "red" | "blue"
 }
 //! ユーザーの勝敗予想の取得
-export const useFetchMatchPredictVote = () => {
+export const useAllFetchMatchPredictionOfAuthUser = () => {
   const { data: authUser } = useAuth()
   // const { setToastModal, showToastModal } = useToastModal()
   const isAuth = Boolean(authUser)

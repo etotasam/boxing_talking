@@ -1,35 +1,42 @@
-import dayjs from "dayjs";
-import clsx from "clsx";
+import dayjs from 'dayjs';
+import clsx from 'clsx';
 // ! types
-import { MatchesDataType } from "@/assets/types";
+import { MatchesDataType } from '@/assets/types';
 // ! hook
 // import { useFetchBoxer } from "@/hooks/useBoxer";
 // ! components
-import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
+import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
+import { NotPredictionVote } from '@/components/atomc/NotPredictionVote';
 // ! image
-import crown from "@/assets/images/etc/champion.svg";
+import crown from '@/assets/images/etc/champion.svg';
 // ! type
-import { BoxerType } from "@/assets/types";
+import { BoxerType } from '@/assets/types';
 
 type PropsType = {
   matchData: MatchesDataType;
   onClick: (matchId: number) => void;
   className?: string;
+  isPredictionVote: boolean | undefined;
 };
 
-export const SimpleFightBox = ({ matchData, onClick }: PropsType) => {
+export const SimpleFightBox = ({
+  matchData,
+  onClick,
+  isPredictionVote,
+}: PropsType) => {
   return (
     <>
       {matchData && (
         <div
           onClick={() => onClick(matchData.id)}
-          className="flex justify-between md:w-[80%] w-full max-w-[1024px] cursor-pointer md:py-4 py-8 md:border-[1px] border-b-[1px] border-stone-400 md:rounded-md md:hover:bg-yellow-100 md:hover:border-white md:duration-300"
+          className="relative flex justify-between md:w-[80%] w-full max-w-[1024px] cursor-pointer md:py-4 py-8 md:border-[1px] border-b-[1px] border-stone-400 md:rounded-md md:hover:bg-yellow-100 md:hover:border-white md:duration-300"
         >
           <BoxerBox boxer={matchData.red_boxer} />
 
           <MatchInfo matchData={matchData} />
 
           <BoxerBox boxer={matchData.blue_boxer} />
+          <NotPredictionVote isPredictionVote={isPredictionVote} />
         </div>
       )}
     </>
@@ -43,7 +50,7 @@ const MatchInfo = ({ matchData }: { matchData: MatchesDataType }) => {
       <div className="py-5 text-stone-600 flex-1">
         <div className="text-center relative">
           <h2 className="xl:text-xl lg:text-lg text-md after:content-['(日本時間)'] after:w-full after:absolute md:after:bottom-[-60%] after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] xl:after:text-sm after:text-[12px]">
-            {dayjs(matchData.match_date).format("YYYY年M月D日")}
+            {dayjs(matchData.match_date).format('YYYY年M月D日')}
           </h2>
           {matchData.titles.length > 0 && (
             <span className="absolute top-[-24px] left-[50%] translate-x-[-50%] w-[24px] h-[24px] mr-2">
@@ -67,7 +74,7 @@ const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
         />
         <h2
           className={clsx(
-            "lg:text-[20px] sm:text-[16px] mt-1",
+            'lg:text-[20px] sm:text-[16px] mt-1',
             boxer.name.length > 7 ? `text-[12px]` : `text-[16px]`
           )}
         >

@@ -11,7 +11,7 @@ import { useFetchMatches } from '@/hooks/useMatch';
 import { usePagePath } from '@/hooks/usePagePath';
 import {
   useVoteMatchPrediction,
-  useFetchMatchPredictVote,
+  useAllFetchMatchPredictionOfAuthUser,
 } from '@/hooks/uesWinLossPredition';
 import { usePostComment, useFetchComments } from '@/hooks/useComment';
 //! component
@@ -32,7 +32,7 @@ export const Match = () => {
   const { matchPrediction, isSuccess: isSuccessVoteMatchPrediction } =
     useVoteMatchPrediction();
   const { data: allPredictionVoteOfUsers, refetch: refetchAllPredictionData } =
-    useFetchMatchPredictVote();
+    useAllFetchMatchPredictionOfAuthUser();
   const { setToastModal, showToastModal } = useToastModal();
   const { startLoading, resetLoadingState } = useLoading();
   const { isLoading: isFetchingComments } = useFetchComments(paramsMatchID);

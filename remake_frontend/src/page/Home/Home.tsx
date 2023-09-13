@@ -11,6 +11,7 @@ import { useLoading } from '@/hooks/useLoading';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useFooterHeight } from '@/hooks/useFooterHeight';
+import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/uesWinLossPredition';
 //! types
 import { MatchesDataType } from '@/assets/types';
 
@@ -58,7 +59,7 @@ export const Home = () => {
                 key={match.id}
                 className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5"
               >
-                <MatchesView
+                <MatchCard
                   isSimple={isSimple}
                   match={match}
                   matchSelect={matchSelect}
@@ -79,17 +80,42 @@ type MatchesViewPropsType = {
   isSimple: boolean;
 };
 
-const MatchesView = ({
-  match,
-  matchSelect,
-  isSimple,
-}: MatchesViewPropsType) => {
+const MatchCard = ({ match, matchSelect, isSimple }: MatchesViewPropsType) => {
+  const { data: myAllPredictionVote } = useAllFetchMatchPredictionOfAuthUser();
+
+  const [isPredictionVote, setIsPredictionVote] = useState<boolean>();
+
+  useEffect(() => {
+    if (myAllPredictionVote) {
+      const bool = myAllPredictionVote.some((ob) => ob.match_id === match.id);
+      setIsPredictionVote(bool);
+    }
+  }, [myAllPredictionVote]);
+  // console.log(myAllPredictionVote);
   const { windowSize } = useWindowSize();
 
   if (windowSize === 'SP')
-    return <SimpleFightBox onClick={matchSelect} matchData={match} />;
+    return (
+      <SimpleFightBox
+        isPredictionVote={isPredictionVote}
+        onClick={matchSelect}
+        matchData={match}
+      />
+    );
   if (isSimple)
-    return <SimpleFightBox onClick={matchSelect} matchData={match} />;
+    return (
+      <SimpleFightBox
+        isPredictionVote={isPredictionVote}
+        onClick={matchSelect}
+        matchData={match}
+      />
+    );
   if (windowSize === 'PC')
-    return <FightBox onClick={matchSelect} matchData={match} />;
+    return (
+      <FightBox
+        onClick={matchSelect}
+        matchData={match}
+        isPredictionVote={isPredictionVote}
+      />
+    );
 };

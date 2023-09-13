@@ -9,7 +9,7 @@ import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal"
 import { useToastModal } from "./useToastModal"
 import { useLoading } from "./useLoading"
 import { useLoginModal } from "./useLoginModal"
-import { useFetchMatchPredictVote } from "./uesWinLossPredition"
+import { useAllFetchMatchPredictionOfAuthUser } from "./uesWinLossPredition"
 //! types
 import type { UserType } from "@/assets/types"
 
@@ -89,7 +89,7 @@ export const useLogin = () => {
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? login modal (hook)
   const { hideLoginModal } = useLoginModal()
-  const { refetch: refetchMatchPrediction } = useFetchMatchPredictVote()
+  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
 
   const api = useCallback(async (props: { email: string, password: string }) => {
     const res = await Axios.post<UserType>("api/login", { ...props }).then(value => value.data)
@@ -128,7 +128,7 @@ export const useLogin = () => {
 }
 //! ログアウト
 export const useLogout = () => {
-  const { refetch: refetchMatchPrediction } = useFetchMatchPredictVote()
+  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
   // ? react query
   const queryClient = useQueryClient()
   // ? toast message modal
