@@ -72,6 +72,7 @@ class CommentController extends Controller
     public function post(Request $request)
     {
         try {
+            // throw new Exception("throw error");
             $is_auth = Auth::user();
             if (!$is_auth) {
                 throw new Exception("Posting comments require Login", Response::HTTP_UNAUTHORIZED);

@@ -19,15 +19,20 @@ export const NotPredictionVote = ({
           animate={{
             width: '40px',
             height: '40px',
-            translateX: 0,
-            translateY: 0,
+            translateX: '0px',
+            translateY: '0px',
           }}
-          transition={{ duration: 0.5 }}
-          className="absolute top-[-15px] left-[-15px] flex justify-center items-center w-[40px] h-[40px] rounded-[50%] text-white bg-green-600"
+          transition={{ duration: 0.3 }}
+          className="absolute top-[-15px] left-[-15px] flex justify-center items-center rounded-[50%] text-white bg-green-600"
         >
-          <div className="text-[20px]">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="text-[20px]"
+          >
             <MdHowToVote />
-          </div>
+          </motion.div>
         </motion.div>
       )}
     </>

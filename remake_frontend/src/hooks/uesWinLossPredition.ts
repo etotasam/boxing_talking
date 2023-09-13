@@ -9,15 +9,10 @@ import { useLoading } from "./useLoading"
 import { useToastModal } from "./useToastModal";
 import { useAuth } from "./useAuth";
 import { useFetchMatches } from "./useMatch";
+//! types
+import { PredictionType } from "@/assets/types"
 
 
-
-export type PredictionType = {
-  id: number,
-  match_id: number,
-  // user_id: number,
-  prediction: "red" | "blue"
-}
 //! ユーザーの勝敗予想の取得
 export const useAllFetchMatchPredictionOfAuthUser = () => {
   const { data: authUser } = useAuth()
@@ -45,7 +40,8 @@ export const useAllFetchMatchPredictionOfAuthUser = () => {
 //! 試合予想の投票
 export const useVoteMatchPrediction = () => {
   // const queryClient = useQueryClient()
-  const { refetch } = useFetchMatches()
+  const { refetch: refetchAllFetchMatchPredictionOfAuthUser } = useAllFetchMatchPredictionOfAuthUser()
+  const { refetch: refetchMatches } = useFetchMatches()
   const { setToastModal, showToastModal } = useToastModal()
   const { startLoading, resetLoadingState } = useLoading()
   //? pending時にcontainerでモーダルを使う為のbool
@@ -76,10 +72,11 @@ export const useVoteMatchPrediction = () => {
       // return { snapshot }
     }
   })
-  const matchPrediction = ({ matchID, prediction }: ApiPropsType) => {
+  const matchVotePrediction = ({ matchID, prediction }: ApiPropsType) => {
     mutate({ matchID, prediction }, {
       onSuccess: () => {
-        refetch()
+        refetchAllFetchMatchPredictionOfAuthUser()
+        refetchMatches()
         resetLoadingState()
         setToastModal({ message: MESSAGE.SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
@@ -111,5 +108,5 @@ export const useVoteMatchPrediction = () => {
     })
   }
 
-  return { matchPrediction, isLoading, isSuccess }
+  return { matchVotePrediction, isLoading, isSuccess }
 }

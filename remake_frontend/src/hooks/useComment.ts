@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-// import dayjs from "dayjs";
+import dayjs from "dayjs";
 // import { useLocation } from "react-router-dom"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
@@ -57,7 +57,7 @@ export const usePostComment = () => {
     matchId: number,
     comment: string
   }
-  // const nowDate = dayjs().format('YYYY/MM/DD H:mm')
+  const nowDate = dayjs().format('YYYY/MM/DD H:mm')
 
   const queryClient = useQueryClient()
   const api = useCallback(async ({ matchId, comment }: ApiPropsType) => {
@@ -72,11 +72,11 @@ export const usePostComment = () => {
   }, [])
 
   const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
-    onMutate: () => {
-      startLoading()
-      // const snapshot = queryClient.getQueryData<CommentType[]>([QUERY_KEY.comment, { id: matchId }])
-      // queryClient.setQueryData([QUERY_KEY.comment, { id: matchId }], [{ id: NaN, post_user_name: "name", comment, created_at: nowDate }, ...snapshot!])
-      // return { snapshot }
+    onMutate: ({ matchId, comment }) => {
+      // startLoading()
+      const snapshot = queryClient.getQueryData<CommentType[]>([QUERY_KEY.comment, { id: matchId }])
+      queryClient.setQueryData([QUERY_KEY.comment, { id: matchId }], [{ id: NaN, post_user_name: "name", comment, created_at: nowDate }, ...snapshot!])
+      return { snapshot }
     }
   })
   const postComment = ({ matchId, comment }: ApiPropsType) => {
@@ -84,15 +84,15 @@ export const usePostComment = () => {
     mutate({ matchId, comment: trimmedComment }, {
       onSuccess: () => {
         // console.log(data);
-        resetLoadingState()
-        setToastModal({ message: MESSAGE.COMMENT_POST_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        // resetLoadingState()
+        // setToastModal({ message: MESSAGE.COMMENT_POST_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+        // showToastModal()
         // ? match_idを指定してコメントを再取得
         queryClient.invalidateQueries([QUERY_KEY.comment, { id: matchId }]);
         return
       },
-      onError: (error: any) => {
-        // queryClient.setQueryData([QUERY_KEY.comment, { id: matchId }], context?.snapshot)
+      onError: (error: any, _, context) => {
+        queryClient.setQueryData([QUERY_KEY.comment, { id: matchId }], context?.snapshot)
         if (error.status === 401) {
           resetLoadingState()
           setToastModal({ message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })

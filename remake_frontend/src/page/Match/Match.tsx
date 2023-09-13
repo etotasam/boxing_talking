@@ -22,6 +22,7 @@ import {
   BG_COLOR_ON_TOAST_MODAL,
   MESSAGE,
 } from '@/assets/statusesOnToastModal';
+import clsx from 'clsx';
 
 export const Match = () => {
   // ? use hook
@@ -29,7 +30,7 @@ export const Match = () => {
   const query = new URLSearchParams(search);
   const paramsMatchID = Number(query.get('match_id'));
   const { data: matches } = useFetchMatches();
-  const { matchPrediction, isSuccess: isSuccessVoteMatchPrediction } =
+  const { matchVotePrediction, isSuccess: isSuccessVoteMatchPrediction } =
     useVoteMatchPrediction();
   const { data: allPredictionVoteOfUsers, refetch: refetchAllPredictionData } =
     useAllFetchMatchPredictionOfAuthUser();
@@ -40,7 +41,11 @@ export const Match = () => {
   const { setter: setPagePath } = usePagePath();
   const { data: authUser } = useAuth();
 
-  const { postComment, isSuccess: isSuccessPostComment } = usePostComment();
+  const {
+    postComment,
+    isSuccess: isSuccessPostComment,
+    isLoading: isPostingComment,
+  } = usePostComment();
   //? useState
   const [comment, setComment] = useState<string>();
   const [commentPostTextareaHeight, setCommentPostComponentHeight] =
@@ -167,6 +172,7 @@ export const Match = () => {
 
   //? コメント投稿
   const sendComment = () => {
+    if (isPostingComment) return;
     if (!authUser) {
       setToastModal({
         message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH,
@@ -209,42 +215,43 @@ export const Match = () => {
     color: 'red' | 'blue';
   }>();
   //? 勝敗予想の投票
-  const sendPrecition = () => {
-    if (!selectPredictionBoxer) return;
-    if (
-      thisMatchPredictionOfUsers === 'red' ||
-      thisMatchPredictionOfUsers === 'blue'
-    )
-      return;
-    matchPrediction({
-      matchID: paramsMatchID,
-      prediction: selectPredictionBoxer.color,
-    });
-    setShowConfirmModal(false);
-  };
+  // const sendPrecition = () => {
+  //   if (!selectPredictionBoxer) return;
+  //   if (
+  //     thisMatchPredictionOfUsers === 'red' ||
+  //     thisMatchPredictionOfUsers === 'blue'
+  //   )
+  //     return;
+  //   matchVotePrediction({
+  //     matchID: paramsMatchID,
+  //     prediction: selectPredictionBoxer.color,
+  //   });
+  //   setShowConfirmModal(false);
+  // };
 
-  const predictionVote = ({
-    name,
-    color,
-  }: {
-    name: string;
-    color: 'red' | 'blue';
-  }) => {
-    if (thisMatchPredictionOfUsers !== 'No prediction vote') return;
-    setSelectPredictionBoxer({ name, color });
-    setShowConfirmModal(true);
-  };
+  // const predictionVote = ({
+  //   name,
+  //   color,
+  // }: {
+  //   name: string;
+  //   color: 'red' | 'blue';
+  // }) => {
+  //   if (thisMatchPredictionOfUsers !== 'No prediction vote') return;
+  //   setSelectPredictionBoxer({ name, color });
+  //   setShowConfirmModal(true);
+  // };
 
   return (
     <>
       {/* //? Boxer */}
       <SetUpBoxers
-        predictionVote={predictionVote}
+        paramsMatchID={paramsMatchID}
+        // predictionVote={predictionVote}
         thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
-        sendPrecition={sendPrecition}
-        selectPredictionBoxer={selectPredictionBoxer}
-        setShowConfirmModal={setShowConfirmModal}
-        showConfirmModal={showConfirmModal}
+        // sendPrecition={sendPrecition}
+        // selectPredictionBoxer={selectPredictionBoxer}
+        // setShowConfirmModal={setShowConfirmModal}
+        // showConfirmModal={showConfirmModal}
         thisMatch={thisMatch}
         thisMatchPredictionCount={thisMatchPredictionCount}
         isFetchingComments={isFetchingComments}
@@ -268,6 +275,7 @@ export const Match = () => {
       >
         <div className="w-[70%] max-w-[800px]">
           <PostCommentTextarea
+            isPostingComment={isPostingComment}
             setComment={setComment}
             comment={comment}
             sendComment={sendComment}
@@ -282,6 +290,7 @@ export const Match = () => {
 
 // ! post commnet textarea
 type PostCommentTextareaType = {
+  isPostingComment: boolean;
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
   sendComment: () => void;
   comment: string | undefined;
@@ -295,6 +304,7 @@ const PostCommentTextarea = ({
   sendComment,
   textareaRef,
   autoExpandTextareaAndSetComment,
+  isPostingComment,
 }: PostCommentTextareaType) => {
   return (
     <div className="border-stone-400 bg-white relative border-[1px] pl-3 py-2 rounded-sm flex justify-center items-center">
@@ -310,7 +320,10 @@ const PostCommentTextarea = ({
       ></textarea>
       <button
         onClick={sendComment}
-        className="absolute bottom-[7px] text-[14px] right-[10px] border-[1px] bg-stone-600 py-1 text-white pl-4 pr-3 tracking-[0.4em]"
+        className={clsx(
+          'absolute bottom-[7px] text-[14px] right-[10px] border-[1px] bg-stone-600 hover:bg-stone-800 duration-300 py-1 text-white pl-4 pr-3 tracking-[0.4em]',
+          isPostingComment && 'text-white/50 select-none'
+        )}
       >
         送信
       </button>

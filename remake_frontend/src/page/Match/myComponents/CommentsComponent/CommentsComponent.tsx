@@ -1,8 +1,7 @@
-import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 //! hooks
-import { useFetchComments } from '@/hooks/useComment';
+import { useFetchComments, usePostComment } from '@/hooks/useComment';
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useMatchBoxerSectionHeight } from '@/hooks/useMatchBoxerSectionHeight';
 
@@ -51,33 +50,33 @@ export const CommentsComponent = ({
         minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
       }}
     >
-      <AnimatePresence>
-        {commentsOfThisMatches.map((commentData) => (
-          <motion.div
-            // layout
-            // exit={{ opacity: 0 }}
-            // initial={{ opacity: 0 }}
-            // animate={{ opacity: 1 }}
-            // transition={{ duration: 0.2 }}
-            key={commentData.id}
-            className={clsx('p-5 border-b-[1px] border-stone-200')}
-          >
-            <p
-              className="text-[20px] font-light text-stone-800"
-              dangerouslySetInnerHTML={{
-                __html: commentData.comment,
-              }}
-            />
-            <div className="flex mt-3">
-              <time className="text-sm text-stone-400">
-                {dateFormatter(commentData.created_at)}
-              </time>
-              <p className="text-sm ml-3 text-stone-600">
-                {commentData.post_user_name}
-              </p>
-            </div>
-            {/* //? ゴミ箱 */}
-            {/* {authUser && authUser.name === commentData.post_user_name && (
+      {commentsOfThisMatches.map((commentData) => (
+        <div
+          key={commentData.id}
+          className={clsx('p-5 border-b-[1px] border-stone-200')}
+        >
+          <p
+            className="text-[20px] font-light text-stone-800"
+            dangerouslySetInnerHTML={{
+              __html: commentData.comment,
+            }}
+          />
+          <div className="flex mt-3">
+            {!Number.isNaN(commentData.id) ? (
+              <>
+                <time className="text-sm text-stone-400">
+                  {dateFormatter(commentData.created_at)}
+                </time>
+                <p className="text-sm ml-3 text-stone-600">
+                  {commentData.post_user_name}
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-stone-400">投稿中...</p>
+            )}
+          </div>
+          {/* //? ゴミ箱 */}
+          {/* {authUser && authUser.name === commentData.post_user_name && (
                   <button
                     onClick={() => commentDelete(commentData.id)}
                     className="bg-blue-300 px-3 py-1"
@@ -85,9 +84,8 @@ export const CommentsComponent = ({
                     ゴミ箱
                   </button>
                 )} */}
-          </motion.div>
-        ))}
-      </AnimatePresence>
+        </div>
+      ))}
     </section>
   ) : !isFetchingComments && !isErrorFetchComments ? (
     <section
