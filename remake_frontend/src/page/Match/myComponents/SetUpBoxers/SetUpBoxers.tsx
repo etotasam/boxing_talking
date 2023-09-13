@@ -5,6 +5,8 @@ import { BoxerType, MatchesDataType } from '@/assets/types';
 //! components
 import { BackgroundFlag } from './BackgroundFlag';
 import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
+import { useEffect, useRef } from 'react';
+import { useMatchBoxerSectionHeight } from '@/hooks/useMatchBoxerSectionHeight';
 
 type SetUpBoxersType = {
   predictionVote: ({
@@ -18,7 +20,6 @@ type SetUpBoxersType = {
   sendPrecition: () => void;
   selectPredictionBoxer: { name: string; color: 'red' | 'blue' } | undefined;
   thisMatch: MatchesDataType | undefined;
-  boxerSectionRef: React.MutableRefObject<null>;
   showConfirmModal: boolean;
   setShowConfirmModal: React.Dispatch<React.SetStateAction<boolean>>;
   thisMatchPredictionCount: Record<
@@ -30,7 +31,6 @@ type SetUpBoxersType = {
 
 export const SetUpBoxers = ({
   thisMatch,
-  boxerSectionRef,
   showConfirmModal,
   setShowConfirmModal,
   selectPredictionBoxer,
@@ -40,6 +40,14 @@ export const SetUpBoxers = ({
   thisMatchPredictionCount,
   isFetchingComments,
 }: SetUpBoxersType) => {
+  const { setter: setMatchBoxerSectionHeight } = useMatchBoxerSectionHeight();
+  const boxerSectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (boxerSectionRef.current)
+      setMatchBoxerSectionHeight(boxerSectionRef.current.clientHeight);
+  }, [boxerSectionRef.current]);
+
   const getPredictionCountPercent = (predictionCoount: number) => {
     const percent = Math.ceil(
       (predictionCoount / thisMatchPredictionCount.totalCount) * 100

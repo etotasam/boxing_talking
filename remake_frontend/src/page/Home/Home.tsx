@@ -9,6 +9,8 @@ import { useFetchMatches } from '@/hooks/useMatch';
 import { usePagePath } from '@/hooks/usePagePath';
 import { useLoading } from '@/hooks/useLoading';
 import { useWindowSize } from '@/hooks/useWindowSize';
+import { useHeaderHeight } from '@/hooks/useHeaderHeight';
+import { useFooterHeight } from '@/hooks/useFooterHeight';
 //! types
 import { MatchesDataType } from '@/assets/types';
 
@@ -20,6 +22,8 @@ export const Home = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { windowSize } = useWindowSize();
+  const { state: headerHeight } = useHeaderHeight();
+  const { state: footerHeight } = useFooterHeight();
 
   const matchSelect = (matchId: number) => {
     navigate(`/match?match_id=${matchId}`);
@@ -34,10 +38,14 @@ export const Home = () => {
   }, []);
 
   const [isSimple, setIsSimple] = useState(false);
-
   return (
     <>
-      <div className="md:my-10 mb-5">
+      <div
+        className="md:py-10 pb-5"
+        style={{
+          minHeight: `calc(100vh - (${headerHeight}px + ${footerHeight}px) - 1px)`,
+        }}
+      >
         {windowSize === 'PC' && (
           <button onClick={() => setIsSimple((curr) => !curr)}>
             {isSimple ? `詳細モードへ` : `シンプルモードへ`}

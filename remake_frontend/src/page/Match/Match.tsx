@@ -9,7 +9,6 @@ import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useFetchMatches } from '@/hooks/useMatch';
 import { usePagePath } from '@/hooks/usePagePath';
-import { useHeaderAndBottomHeight } from '@/hooks/useHeaderAndBottomHeightState';
 import {
   useVoteMatchPrediction,
   useFetchMatchPredictVote,
@@ -42,20 +41,17 @@ export const Match = () => {
   const { data: authUser } = useAuth();
 
   const { postComment, isSuccess: isSuccessPostComment } = usePostComment();
-  const {
-    setMiddleContentHeight,
-
-    state: excludeHeight,
-  } = useHeaderAndBottomHeight();
-
   //? useState
   const [comment, setComment] = useState<string>();
-  const [commentPostComponentHeight, setCommentPostComponentHeight] =
+  const [commentPostTextareaHeight, setCommentPostComponentHeight] =
     useState<number>();
   const [thisMatch, setThisMatch] = useState<MatchesDataType>();
   const [thisMatchPredictionCount, setThisMatchPredictionCount] = useState<
     Record<'redCount' | 'blueCount' | 'totalCount', number>
   >({ redCount: 0, blueCount: 0, totalCount: 0 });
+  const [boxerSectionElHeight, setBoxerSectionRef] = useState<
+    number | undefined
+  >();
 
   //? set data of this match(この試合の各データをuseState等にセット)
   useEffect(() => {
@@ -81,7 +77,6 @@ export const Match = () => {
   //? useRef
   const commentPostRef = useRef(null);
   const textareaRef = useRef(null);
-  const boxerSectionRef = useRef(null);
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -91,15 +86,6 @@ export const Match = () => {
       resetLoadingState();
     };
   }, []);
-
-  //? boxer sectionの高さを取得
-  useEffect(() => {
-    if (boxerSectionRef.current) {
-      const height = (boxerSectionRef?.current as unknown as HTMLElement)
-        .clientHeight;
-      setMiddleContentHeight(height);
-    }
-  }, [boxerSectionRef.current]);
 
   //? この試合の勝敗予想の有無とその投票
   useEffect(() => {
@@ -260,7 +246,6 @@ export const Match = () => {
         setShowConfirmModal={setShowConfirmModal}
         showConfirmModal={showConfirmModal}
         thisMatch={thisMatch}
-        boxerSectionRef={boxerSectionRef}
         thisMatchPredictionCount={thisMatchPredictionCount}
         isFetchingComments={isFetchingComments}
       />
@@ -273,8 +258,7 @@ export const Match = () => {
         {/* //? Comments */}
         <CommentsComponent
           paramsMatchID={paramsMatchID}
-          excludeHeight={excludeHeight}
-          commentPostComponentHeight={commentPostComponentHeight}
+          commentPostTextareaHeight={commentPostTextareaHeight}
         />
       </div>
 

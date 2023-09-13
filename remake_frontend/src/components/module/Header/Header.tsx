@@ -9,7 +9,7 @@ import { loginModalSelector } from '@/store/loginModalState';
 import { UserType } from '@/assets/types';
 // ! hooks
 import { useLogout } from '@/hooks/useAuth';
-import { useHeaderAndBottomHeight } from '@/hooks/useHeaderAndBottomHeightState';
+import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 // ! icons
 import { IconContext } from 'react-icons';
 import { BiUserCircle } from 'react-icons/bi';
@@ -26,13 +26,14 @@ type PropsType = {
 export const Header = (porps: PropsType) => {
   const { userData } = porps;
   const { isAdmin } = useAdmin();
-  const { setHeaderHeight } = useHeaderAndBottomHeight();
+
+  const { setter: setHeader } = useHeaderHeight();
 
   const headerRef = useRef(null);
   useEffect(() => {
     if (!headerRef.current) return;
     const height = (headerRef.current as HTMLHeadElement).clientHeight;
-    setHeaderHeight(height);
+    setHeader(height);
   }, [headerRef.current]);
 
   const setFormType = useSetRecoilState(formTypeSelector);

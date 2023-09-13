@@ -3,18 +3,21 @@ import clsx from 'clsx';
 import dayjs from 'dayjs';
 //! hooks
 import { useFetchComments } from '@/hooks/useComment';
+import { useHeaderHeight } from '@/hooks/useHeaderHeight';
+import { useMatchBoxerSectionHeight } from '@/hooks/useMatchBoxerSectionHeight';
 
 type CommentsSectionType = {
   paramsMatchID: number;
-  commentPostComponentHeight: number | undefined;
-  excludeHeight: number | undefined;
+  commentPostTextareaHeight: number | undefined;
 };
 
 export const CommentsComponent = ({
   paramsMatchID,
-  commentPostComponentHeight,
-  excludeHeight,
+  commentPostTextareaHeight,
 }: CommentsSectionType) => {
+  // ? use hook
+  const { state: headerHeight } = useHeaderHeight();
+  const { state: matchBoxerSectionHeight } = useMatchBoxerSectionHeight();
   const {
     data: commentsOfThisMatches,
     isLoading: isFetchingComments,
@@ -44,8 +47,8 @@ export const CommentsComponent = ({
     <section
       className="w-[70%] border-l-[1px] border-stone-200"
       style={{
-        marginBottom: `${commentPostComponentHeight}px`,
-        minHeight: `calc(100vh - (${excludeHeight}px + ${commentPostComponentHeight}px) - 1px)`,
+        marginBottom: `${commentPostTextareaHeight}px`,
+        minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
       }}
     >
       <AnimatePresence>
@@ -90,8 +93,8 @@ export const CommentsComponent = ({
     <section
       className="flex justify-center items-center text-[18px] border-l-[1px] w-[70%]"
       style={{
-        // marginBottom: `${commentPostComponentHeight}px`,
-        minHeight: `calc(100vh - (${excludeHeight}px + ${commentPostComponentHeight}px) - 1px)`,
+        // marginBottom: `${commentPostTextareaHeight}px`,
+        minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
       }}
     >
       <p>まだコメントがありません…</p>

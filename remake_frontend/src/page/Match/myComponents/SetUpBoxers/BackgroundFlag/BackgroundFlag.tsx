@@ -41,9 +41,9 @@ export const BackgroundFlag = ({
     if (country == Nationality.SouthAfrica) return southAfricaFlag;
   };
 
-  const fomatPosition = (country: NationalityType) => {
+  const formatPosition = (country: NationalityType) => {
     if (country == Nationality.UK) return '25% 30%';
-    if (country == Nationality.Rusia) return '25% 70%';
+    if (country == Nationality.Rusia) return '25% 75%';
     if (country == Nationality.SouthAfrica) return '25% 30%';
     if (country == Nationality.Mexico) return '25% 40%';
     return 'center';
@@ -56,12 +56,12 @@ export const BackgroundFlag = ({
         style={{
           backgroundImage: `url(${getNatinalFlag(nationaly)})`,
           backgroundSize: 'cover',
-          backgroundPosition: `${fomatPosition(nationaly)}`,
+          backgroundPosition: `${formatPosition(nationaly)}`,
         }}
       >
         <div
           className={clsx(
-            'absolute top-0 left-0 w-full h-full duration-500',
+            'absolute top-0 left-0 w-full h-full bg-white duration-500',
             thisMatchPredictionOfUsers === 'No prediction vote' &&
               'bg-white/100 hover:bg-white/80',
             (thisMatchPredictionOfUsers === 'red' ||
