@@ -1,8 +1,8 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 // ! hooks
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth, useGuest } from '@/hooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useFetchMatches } from '@/hooks/useMatch';
 // import { useLoading } from "@/hooks/useLoading";
@@ -11,6 +11,7 @@ import { ToastModalContainer } from '@/components/modal/ToastModal';
 import { LoginFormModal } from '@/components/modal/LoginFormModal';
 import { FullScreenSpinnerModal } from '@/components/modal/FullScreenSpinnerModal';
 import { FirstLoadinModal } from '@/components/modal/FirstLoadinModal';
+import { useLoginModal } from '@/hooks/useLoginModal';
 // ! recoil
 import { useRecoilValue } from 'recoil';
 import { loginModalSelector } from '@/store/loginModalState';
@@ -21,10 +22,14 @@ const Container = () => {
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
   const isShowLoginModal = useRecoilValue(loginModalSelector);
   const { isLoading: isLoadingByRecoil } = useRecoilValue(loadingSelector);
-  const { isLoading: isFirstCheckingAuth } = useAuth();
+  const { isLoading: isFirstCheckingAuth, data: authUser } = useAuth();
+  const { data: guestUser } = useGuest();
+  // console.log(data);
   const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } =
     useFetchBoxer();
   const { isLoading: isMatchesFetching } = useFetchMatches();
+  const navigate = useNavigate();
+  const { showLoginModal } = useLoginModal();
 
   // ! Toast Modalの表示時間等の設定
   const waitTime = 5000;
@@ -45,6 +50,14 @@ const Container = () => {
       waitId.current = id;
     });
   };
+
+  useEffect(() => {
+    if (authUser === undefined || guestUser === undefined) return;
+    if (authUser && guestUser) {
+      showLoginModal();
+      navigate('/');
+    }
+  }, [authUser, guestUser]);
 
   return (
     <>

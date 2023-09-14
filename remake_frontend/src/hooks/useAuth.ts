@@ -14,6 +14,65 @@ import { useAllFetchMatchPredictionOfAuthUser } from "./uesWinLossPredition"
 import type { UserType } from "@/assets/types"
 
 
+//! ゲストauthチェック
+export const useGuest = () => {
+
+  const api = useCallback(async () => {
+    try {
+      const res = await Axios.get(`/api/guest_user`).then(value => value.data)
+      return res
+    } catch (error) {
+      return null
+    }
+  }, [])
+  const { data, isLoading, isError } = useQuery<UserType>(QUERY_KEY.guest, api, {
+    retry: false,
+    staleTime: Infinity
+  })
+
+  return { data, isLoading, isError }
+}
+
+//! ゲストログイン
+export const useGuestLogin = () => {
+  // ? react query
+  const queryClient = useQueryClient()
+  // ? toast modal
+  // const { setToastModal, showToastModal } = useToastModal()
+  // ? Loading state
+  const { resetLoadingState, startLoading, hasError, successful } = useLoading()
+  // ? login modal (hook)
+  const { hideLoginModal } = useLoginModal()
+  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+
+  const api = useCallback(async (props: any) => {
+    const res = await Axios.post('/api/guest').then(value => value.data)
+    return res
+  }, [])
+
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
+    onMutate: (props) => {
+      startLoading()
+    }
+  })
+
+  const guestLogin = (props: any) => {
+    mutate((props), {
+
+      onSuccess: () => {
+        // hideLoginModal()
+        resetLoadingState()
+      },
+
+      onError: () => {
+        resetLoadingState()
+        // hasError()
+      }
+    })
+  }
+  return { guestLogin, isLoading, isSuccess }
+}
+
 //! authチェック
 export const useAuth = () => {
 

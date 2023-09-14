@@ -13,15 +13,62 @@ use Illuminate\Support\Facades\DB;
 use Mail;
 // models
 use App\Models\User;
+use App\Models\GuestUser;
 use App\Models\ProvisionalUser;
 use App\Models\Administrator;
 
 use App\Http\Requests\CreateAuthRequest;
-
+use Laravel\Sanctum\PersonalAccessTokenResult;
 use \Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
+
+    // private function createGuestToken(): PersonalAccessTokenResult
+    // {
+    //     $guest_user = GuestUser::find(1);
+    //     $token = $guest_user->createToken('guest-access');
+
+    //     $minutes = 60; // トークンの有効期限を設定
+    //     $response = response('Guest user authenticated successfully.');
+    //     $response->cookie(
+    //         'guest_token',
+    //         $token->accessToken,
+    //         $minutes,
+    //         '/',
+    //         true,
+    //         true
+    //     );
+
+    //     return $token;
+    // }
+
+    /**
+     * guest_login
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function guest_login(Request $request)
+    {
+        $guest_user = GuestUser::firstOrFail(); // 最初のゲストユーザーを取得
+        $token = $guest_user->createGuestToken();
+
+        $minutes = 60; // トークンの有効期限を設定
+        $response = response('Guest user authenticated successfully.');
+        $response->cookie(
+            'guest_token',
+            $token->plainTextToken, // accessTokenではなくplainTextTokenを使用
+            $minutes,
+            '/',
+            true,
+            true
+        );
+
+        return $response;
+
+        return $token;
+    }
+
 
     /**
      * create

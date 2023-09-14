@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Vote;
 use App\Jobs\SampleJob;
 use GuzzleHttp\Psr7\Message;
+use App\Models\GuestUser;
 
 // controller
 use App\Http\Controllers\AuthController;
@@ -36,22 +37,30 @@ use App\Http\Controllers\MailController;
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/user', function (Request $request) {
-        // \Log::debug("てすと");
         return $request->user();
     })->name('auth.user');
-
 
     Route::get('/check', function () {
         return Auth::check();
     })->name('auth.check');
 });
 
+Route::middleware('auth.guest:sanctum')->group(function () {
+    Route::get('/guest_user', function () {
+        $gust = GuestUser::find(1);
+        return $gust;
+    })->name('auth.guest_user');
+});
+
+//! auth
 Route::get('/admin', [AuthController::class, 'admin'])->name('auth.admin');
 // Route::post('/user/create', [AuthController::class, 'test_create'])->name('auth.create');
 Route::post('/user/create', [AuthController::class, 'create'])->name('auth.create');
 
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+Route::post('/guest', [AuthController::class, 'guest_login'])->name('auth.guest_login');
+Route::post('/guest_auth', [AuthController::class, 'guest_auth'])->name('auth.guest_login');
 
 //! ボクサー
 Route::get('/boxer/count', [BoxerController::class, 'count'])->name('boxer.count');

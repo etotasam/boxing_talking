@@ -13,6 +13,7 @@ const generateQueryKey = (key: string) => {
 
 export const QUERY_KEY = {
   auth: generateQueryKey('auth'),
+  guest: generateQueryKey('guest'),
   admin: generateQueryKey('admin'),
   boxer: generateQueryKey('boxer'),
   countBoxer: generateQueryKey('boxer/count'),
