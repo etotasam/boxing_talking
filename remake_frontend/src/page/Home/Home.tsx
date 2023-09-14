@@ -4,6 +4,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { FightBox } from '@/components/module/FightBox';
 import { SimpleFightBox } from '@/components/module/SimpleFightBox';
 import { Footer } from '@/components/module/Footer';
+//! icon
+import { VisualModeChangeIcon } from '@/components/atomc/VisualModeChangeIcon';
 // ! hooks
 import { useFetchMatches } from '@/hooks/useMatch';
 import { usePagePath } from '@/hooks/usePagePath';
@@ -12,6 +14,7 @@ import { useWindowSize } from '@/hooks/useWindowSize';
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useFooterHeight } from '@/hooks/useFooterHeight';
 import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/uesWinLossPredition';
+import { useVisualModeController } from '@/hooks/useVisualModeController';
 //! types
 import { MatchesDataType } from '@/assets/types';
 
@@ -23,8 +26,10 @@ export const Home = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { windowSize } = useWindowSize();
+
   const { state: headerHeight } = useHeaderHeight();
   const { state: footerHeight } = useFooterHeight();
+  const { visualModeToggleSwitch } = useVisualModeController();
 
   const matchSelect = (matchId: number) => {
     navigate(`/match?match_id=${matchId}`);
@@ -38,20 +43,20 @@ export const Home = () => {
     };
   }, []);
 
-  const [isSimple, setIsSimple] = useState(false);
   return (
     <>
       <div
-        className="md:py-10 pb-5"
+        className="md:py-10 pb-5 relative"
         style={{
           minHeight: `calc(100vh - (${headerHeight}px + ${footerHeight}px) - 1px)`,
         }}
       >
-        {windowSize === 'PC' && (
-          <button onClick={() => setIsSimple((curr) => !curr)}>
-            {isSimple ? `詳細モードへ` : `シンプルモードへ`}
-          </button>
+        {windowSize == 'PC' && (
+          <div className="absolute top-0 left-[50%] translate-x-[-50%] lg:mt-3 mt-1">
+            <VisualModeChangeIcon onClick={() => visualModeToggleSwitch()} />
+          </div>
         )}
+
         <ul>
           {matchesData &&
             matchesData.map((match) => (
@@ -59,11 +64,7 @@ export const Home = () => {
                 key={match.id}
                 className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5"
               >
-                <MatchCard
-                  isSimple={isSimple}
-                  match={match}
-                  matchSelect={matchSelect}
-                />
+                <MatchCard match={match} matchSelect={matchSelect} />
               </li>
             ))}
         </ul>
@@ -77,11 +78,11 @@ export const Home = () => {
 type MatchesViewPropsType = {
   match: MatchesDataType;
   matchSelect: (matchId: number) => void;
-  isSimple: boolean;
 };
 
-const MatchCard = ({ match, matchSelect, isSimple }: MatchesViewPropsType) => {
+const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
   const { data: myAllPredictionVote } = useAllFetchMatchPredictionOfAuthUser();
+  const { state: visualMode } = useVisualModeController();
 
   const [isPredictionVote, setIsPredictionVote] = useState<boolean>();
 
@@ -102,7 +103,7 @@ const MatchCard = ({ match, matchSelect, isSimple }: MatchesViewPropsType) => {
         matchData={match}
       />
     );
-  if (isSimple)
+  if (visualMode === 'simple')
     return (
       <SimpleFightBox
         isPredictionVote={isPredictionVote}

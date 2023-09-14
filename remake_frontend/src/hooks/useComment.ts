@@ -21,8 +21,31 @@ type CommentType = {
   prediction: "red" | "blue" | undefined;
   created_at: string;
 }
+//! テストコメント取得
 
+export const useTestFetchComments = (matchId: number, offset: number, limit: number) => {
+  const api = async () => {
+    try {
+      return await Axios.get("/api/comment/test", {
+        params: {
+          match_id: matchId,
+          offset,
+          limit
+        },
+      }).then(v => v.data)
+    } catch (error) {
+      return null
+    }
+  }
 
+  const { data, isLoading, isFetching, refetch, isError } = useQuery<CommentType[]>([QUERY_KEY.comment, { id: matchId }], api, {
+    staleTime: 60000, onError: () => {
+
+    }
+  })
+
+  return { data, isLoading, isFetching, refetch, isError }
+}
 
 //! コメント取得
 export const useFetchComments = (matchId: number) => {
@@ -58,6 +81,14 @@ export const usePostComment = () => {
     comment: string
   }
   const nowDate = dayjs().format('YYYY/MM/DD H:mm')
+  //? コメントの改行は5行までに書き換える
+  const sanitizeComment = (commentText: string) => {
+    commentText = commentText.trim();
+
+    commentText = commentText.replace(/\n{4,}/g, '\n\n\n');
+
+    return commentText;
+  }
 
   const queryClient = useQueryClient()
   const api = useCallback(async ({ matchId, comment }: ApiPropsType) => {
@@ -72,33 +103,60 @@ export const usePostComment = () => {
   }, [])
 
   const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
-    onMutate: ({ matchId, comment }) => {
-      // startLoading()
-      const snapshot = queryClient.getQueryData<CommentType[]>([QUERY_KEY.comment, { id: matchId }])
-      queryClient.setQueryData([QUERY_KEY.comment, { id: matchId }], [{ id: NaN, post_user_name: "name", comment, created_at: nowDate }, ...snapshot!])
-      return { snapshot }
+    onMutate: () => {
+      startLoading()
+      // const snapshot = queryClient.getQueryData<CommentType[]>([QUERY_KEY.comment, { id: matchId }])
+      // queryClient.setQueryData([QUERY_KEY.comment, { id: matchId }], [{ id: NaN, post_user_name: "name", comment, created_at: nowDate }, ...snapshot!])
+      // return { snapshot }
     }
   })
   const postComment = ({ matchId, comment }: ApiPropsType) => {
-    const trimmedComment = comment.trim()
-    mutate({ matchId, comment: trimmedComment }, {
+    const sanitizedComment = sanitizeComment(comment)
+    mutate({ matchId, comment: sanitizedComment }, {
       onSuccess: () => {
         // console.log(data);
-        // resetLoadingState()
-        // setToastModal({ message: MESSAGE.COMMENT_POST_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        // showToastModal()
+        resetLoadingState()
+        setToastModal({ message: MESSAGE.COMMENT_POST_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+        showToastModal()
         // ? match_idを指定してコメントを再取得
         queryClient.invalidateQueries([QUERY_KEY.comment, { id: matchId }]);
         return
       },
       onError: (error: any, _, context) => {
-        queryClient.setQueryData([QUERY_KEY.comment, { id: matchId }], context?.snapshot)
+        // queryClient.setQueryData([QUERY_KEY.comment, { id: matchId }], context?.snapshot)
+        resetLoadingState()
         if (error.status === 401) {
-          resetLoadingState()
           setToastModal({ message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
           showToastModal()
           return
         }
+        //? 入力エラー
+        if (error.status === 422) {
+          const errors = error.data.errors as any
+          if (errors.comment) {
+            //? コメントが長すぎる(1000文字以内)
+            if ((errors.comment as string[]).includes('comment is too long')) {
+              setToastModal({ message: MESSAGE.COMMENT_IS_TOO_LONG, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showToastModal()
+              return
+            }
+            //? 空のコメント
+            if ((errors.comment as string[]).includes('comment is require')) {
+              setToastModal({ message: MESSAGE.COMMENT_IS_NOT_ENTER, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showToastModal()
+              return
+            }
+          }
+          //? 試合が存在しない
+          if (errors.match_id) {
+            if ((errors.match_id as string[]).includes('match_id is require')) {
+              setToastModal({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showToastModal()
+              return
+            }
+          }
+        }
+        //? コメント投稿失敗
         setToastModal({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
         return

@@ -173,6 +173,13 @@ export const Match = () => {
   //? コメント投稿
   const sendComment = () => {
     if (isPostingComment) return;
+    // try {
+    //   console.log(comment);
+    //   throw new Error('throw error');
+    // } catch (error) {
+    //   console.log(error);
+    //   return;
+    // }
     if (!authUser) {
       setToastModal({
         message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH,
@@ -189,7 +196,7 @@ export const Match = () => {
       showToastModal();
       return;
     }
-    postComment({ matchId: paramsMatchID, comment });
+    postComment({ matchId: paramsMatchID, comment: comment });
     return;
   };
   // const commentDelete = (commentID: number) => {
@@ -199,12 +206,12 @@ export const Match = () => {
   const autoExpandTextareaAndSetComment = (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
+    setComment(e.target.value);
     const textarea = textareaRef.current as unknown as HTMLTextAreaElement;
     if (!textarea) return;
     if (textarea.scrollHeight > 250) return;
     textarea.style.height = 'auto';
     textarea.style.height = `${textarea.scrollHeight}px`;
-    setComment(e.target.value);
   };
 
   const [_, setIsPredictionModal] = useState(true);

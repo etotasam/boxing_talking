@@ -103,7 +103,6 @@ export const useUpdateBoxerData = () => {
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: async () => {
-      console.log("選手データ更新");
       startLoading()
       // clearToastModaleMessage()
       // const isLeeway = fightersCount ? !!(fightersCount % limit) : false
@@ -175,7 +174,6 @@ export const useRegisterBoxer = () => {
         // queryClient.invalidateQueries(QUERY_KEY.boxer)
       },
       onError: (error: any) => {
-        console.log("onError");
         hasError()
         resetLoadingState()
         if (error.status === STATUS.NOT_ACCEPTABLE) {

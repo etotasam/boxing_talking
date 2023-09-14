@@ -68,6 +68,7 @@ Route::delete('/match', [MatchController::class, 'delete'])->name('match.delete'
 Route::put('/match', [MatchController::class, 'update'])->name('match.delete');
 //! コメント
 Route::get('/comment', [CommentController::class, 'fetch'])->name('comment.fetch');
+Route::get('/comment/test', [CommentController::class, 'test_fetch'])->name('comment.fetch');
 Route::post('/comment', [CommentController::class, 'post'])->name('comment.post');
 Route::delete('/comment', [CommentController::class, 'delete'])->name('comment.delete');
 

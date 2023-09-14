@@ -6,7 +6,7 @@ import { MatchesDataType } from '@/assets/types';
 // import { useFetchBoxer } from "@/hooks/useBoxer";
 // ! components
 import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
-import { NotPredictionVote } from '@/components/atomc/NotPredictionVote';
+import { PredictionVoteIcon } from '@/components/atomc/PredictionVoteIcon';
 // ! image
 import crown from '@/assets/images/etc/champion.svg';
 // ! type
@@ -36,7 +36,7 @@ export const SimpleFightBox = ({
           <MatchInfo matchData={matchData} />
 
           <BoxerBox boxer={matchData.blue_boxer} />
-          <NotPredictionVote isPredictionVote={isPredictionVote} />
+          <PredictionVoteIcon isPredictionVote={isPredictionVote} />
         </div>
       )}
     </>

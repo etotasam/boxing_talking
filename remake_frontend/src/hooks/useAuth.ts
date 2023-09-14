@@ -68,8 +68,40 @@ export const useCreateUser = () => {
         hideLoginModal()
       },
 
-      onError: () => {
+      onError: (error: any) => {
         hasError()
+        if (error.status === 422) {
+          const errorMessages = error.data.errors as any
+          if (errorMessages.name) {
+            if ((errorMessages.name as string[]).includes('name is required')) {
+              setToastModal({ message: MESSAGE.NAME_IS_REQUIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showToastModal()
+              return
+            }
+          }
+          if (errorMessages.email) {
+            if (errorMessages.email.includes('email is alredy registered')) {
+              setToastModal({ message: MESSAGE.NAME_IS_REQUIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showToastModal()
+              return
+            }
+          }
+          setToastModal({ message: MESSAGE.SIGNUP_LACK_INPUT, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showToastModal()
+          return
+        }
+        //? すでに使われている名前
+        if (error.message === "The name is alredy in use") {
+          setToastModal({ message: MESSAGE.USER_NAME_ALREADY_USE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showToastModal()
+          return
+        }
+        //? すでに登録されているメールアドレス
+        if (error.message === "The name is alredy in use") {
+          setToastModal({ message: MESSAGE.USER_ALREADY_EXIST, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showToastModal()
+          return
+        }
         setToastModal({ message: MESSAGE.USER_REGISTER_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
       }

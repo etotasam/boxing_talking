@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ErrorHelper;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -15,11 +16,13 @@ use App\Models\User;
 use App\Models\ProvisionalUser;
 use App\Models\Administrator;
 
+use App\Http\Requests\CreateAuthRequest;
 
 use \Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
+
     /**
      * create
      *
@@ -77,20 +80,21 @@ class AuthController extends Controller
      * @param string $password
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create(CreateAuthRequest $request)
     {
-        // throw new Exception();
         try {
+            // throw new Exception("えらー", 500);
             $name = $request->name;
             $email = $request->email;
             $password = Hash::make($request->password);
-            $is_name_exist = User::where("name", $name)->exists();
             $is_email_exist = User::where("email", $email)->exists();
             if ($is_email_exist) {
-                throw new Exception('user already exists', Response::HTTP_FORBIDDEN);
+                // return ErrorHelper::createErrorResponse('email', 'email is alredy registered', Response::HTTP_FORBIDDEN);
+                return ErrorHelper::throwError('email is alredy registered', Response::HTTP_FORBIDDEN);
             }
+            $is_name_exist = User::where("name", $name)->exists();
             if ($is_name_exist) {
-                throw new Exception('name already use', Response::HTTP_FORBIDDEN);
+                return ErrorHelper::throwError('The name is alredy in use', Response::HTTP_FORBIDDEN);
             }
             $user = ["name" => $name, "email" => $email, "password" => $password];
             User::create($user);

@@ -1,7 +1,7 @@
 import { MdHowToVote } from 'react-icons/md';
 import { motion } from 'framer-motion';
 
-export const NotPredictionVote = ({
+export const PredictionVoteIcon = ({
   isPredictionVote,
 }: {
   isPredictionVote: boolean | undefined;

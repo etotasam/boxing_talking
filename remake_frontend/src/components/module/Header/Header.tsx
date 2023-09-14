@@ -7,7 +7,8 @@ import { formTypeSelector, FORM_TYPE } from '@/store/formTypeState';
 import { loginModalSelector } from '@/store/loginModalState';
 // ! types
 import { UserType } from '@/assets/types';
-// ! hooks
+//! hooks
+import { usePagePath } from '@/hooks/usePagePath';
 import { useLogout } from '@/hooks/useAuth';
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 // ! icons
@@ -16,6 +17,7 @@ import { BiUserCircle } from 'react-icons/bi';
 //! component
 import { LinkList } from '../LinkList';
 import { useAdmin } from '@/hooks/useAuth';
+import { Link } from 'react-router-dom';
 //! env
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -26,6 +28,7 @@ type PropsType = {
 export const Header = (porps: PropsType) => {
   const { userData } = porps;
   const { isAdmin } = useAdmin();
+  const { state: pagePath } = usePagePath();
 
   const { setter: setHeader } = useHeaderHeight();
 
@@ -51,21 +54,25 @@ export const Header = (porps: PropsType) => {
     <>
       <header
         ref={headerRef}
-        className="sm:h-[80px] h-[70px] felx relative after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
+        className="sm:h-[80px] h-[70px] flex relative after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
       >
-        {/* <DivVerticalCenter> */}
-        <h1 className="md:text-[64px] sm:text-[54px] text-[36px] select-none absolute md:top-0 sm:top-2 top-5 left-0 font-thin">
+        <h1 className="md:text-[64px] sm:text-[54px] text-[36px] select-none font-thin">
+          {/* <h1 className="md:text-[64px] sm:text-[54px] text-[36px] select-none absolute md:top-0 sm:top-2 top-5 left-0 font-thin"> */}
           {siteTitle}
         </h1>
-        {/* </DivVerticalCenter> */}
+        {pagePath !== '/' && (
+          <div className="flex items-end mb-3 ml-10">
+            <Link to={'/'}>
+              <Button>試合一覧</Button>
+            </Link>
+          </div>
+        )}
         {isAdmin && (
+          // ? 管理者用
           <div className="absolute right-[200px] top-0">
             <LinkList />
           </div>
         )}
-        {/* <LinkList /> */}
-        {/* <DivVerticalCenter className="absolute right-[50px] top-0"> */}
-
         {userData && (
           <div className="absolute top-0 right-[30px] flex">
             <IconContext.Provider value={{ color: '#1e1e1e', size: '25px' }}>
@@ -107,7 +114,12 @@ const AuthControlComponent = ({
               ログアウト
             </Button>
           ) : (
-            <Button onClick={() => openLoginForm()}>ログイン</Button>
+            <Button
+              bgColor="bg-green-600 hover:bg-green-800"
+              onClick={() => openLoginForm()}
+            >
+              ログイン
+            </Button>
           )}
         </div>
       </div>

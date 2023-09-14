@@ -6,7 +6,7 @@ import { MatchesDataType } from '@/assets/types';
 // ! components
 import { BoxerInfo } from '../BoxerInfo';
 import { FlagImage } from '@/components/atomc/FlagImage';
-import { NotPredictionVote } from '@/components/atomc/NotPredictionVote';
+import { PredictionVoteIcon } from '@/components/atomc/PredictionVoteIcon';
 // ! image
 import crown from '@/assets/images/etc/champion.svg';
 
@@ -38,7 +38,7 @@ export const FightBox = ({
           <div className="w-[300px]">
             <BoxerInfo boxer={matchData.blue_boxer} />
           </div>
-          <NotPredictionVote isPredictionVote={isPredictionVote} />
+          <PredictionVoteIcon isPredictionVote={isPredictionVote} />
         </div>
       )}
     </>

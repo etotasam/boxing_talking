@@ -24,22 +24,42 @@ export const CommentsComponent = ({
   } = useFetchComments(paramsMatchID);
 
   const dateFormatter = (postDate: string): string => {
+    const todayRaw = dayjs();
+    const targetRaw = dayjs(postDate);
+    //? 1分以内かどうか
+    const secondsDiff = todayRaw.diff(targetRaw, 'second');
+    if (secondsDiff < 60) return `今`;
+    //? 何分前か
+    const minutesDiff = todayRaw.diff(targetRaw, 'minute');
+    if (minutesDiff < 60) return `${minutesDiff}分前`;
+    //? 何時間前か
+    const hoursDiff = todayRaw.diff(targetRaw, 'hour');
+    if (hoursDiff < 24) return `${hoursDiff}時間前`;
+
     const today = dayjs().startOf('day');
     const targetDate = dayjs(postDate).startOf('day');
-    const hourTime = dayjs(postDate).format('H:mm');
+    // const hourTime = dayjs(postDate).format('H:mm');
 
     const differenceInDays = today.diff(targetDate, 'day');
 
-    if (differenceInDays === 0) return `今日 ${hourTime}`;
-    if (differenceInDays === 1) return `1日前 ${hourTime}`;
-    if (differenceInDays === 2) return `2日前 ${hourTime}`;
-    if (differenceInDays === 3) return `3日前 ${hourTime}`;
-    if (differenceInDays === 4) return `4日前 ${hourTime}`;
-    if (differenceInDays === 5) return `5日前 ${hourTime}`;
-    if (differenceInDays === 6) return `6日前 ${hourTime}`;
-    if (differenceInDays === 7) return `1週間前 ${hourTime}`;
-
-    return dayjs(postDate).format('YYYY/M/D H:mm');
+    // if (differenceInDays === 0) return `今日 ${hourTime}`;
+    if (differenceInDays === 1) return `1日前`;
+    if (differenceInDays === 2) return `2日前`;
+    if (differenceInDays === 3) return `3日前`;
+    if (differenceInDays === 4) return `4日前`;
+    if (differenceInDays === 5) return `5日前`;
+    if (differenceInDays === 6) return `6日前`;
+    const monthDiff = today.diff(targetDate, 'month');
+    if (monthDiff === 0) {
+      const weekDiff = today.diff(targetDate, 'week');
+      return `${weekDiff}週間前`;
+    } else if (monthDiff < 12) {
+      return `${monthDiff}ヵ月前`;
+    } else {
+      const yearDiff = today.diff(targetDate, 'year');
+      return `${yearDiff}年前`;
+    }
+    // return dayjs(postDate).format('YYYY年M月D日 H:mm');
   };
 
   return commentsOfThisMatches && Boolean(commentsOfThisMatches.length) ? (

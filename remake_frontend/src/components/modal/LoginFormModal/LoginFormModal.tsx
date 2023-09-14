@@ -144,7 +144,7 @@ const LoginForm = () => {
             className="mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 border-stone-400 focus:border-green-500 duration-300 bg-transparent"
           />
           <div className="relative mt-12 ">
-            <button className="h-[30px] w-full bg-stone-700 hover:bg-stone-600 rounded duration-300 text-white">
+            <button className="h-[30px] w-full bg-green-600 hover:bg-green-700 rounded duration-300 text-white">
               ログイン
             </button>
           </div>
