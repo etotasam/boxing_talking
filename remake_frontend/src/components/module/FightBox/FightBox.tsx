@@ -1,8 +1,6 @@
 import dayjs from 'dayjs';
 // ! types
 import { MatchesDataType } from '@/assets/types';
-// ! hook
-// import { useFetchBoxer } from "@/hooks/useBoxer";
 // ! components
 import { BoxerInfo } from '../BoxerInfo';
 import { FlagImage } from '@/components/atomc/FlagImage';

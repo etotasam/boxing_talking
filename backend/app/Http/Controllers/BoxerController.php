@@ -7,6 +7,7 @@ use Exception;
 // Models
 use App\Models\Boxer;
 use App\Models\BoxingMatch;
+use Illuminate\Support\Facades\Auth;
 
 class BoxerController extends Controller
 {
@@ -232,6 +233,18 @@ class BoxerController extends Controller
             return response()->json(["message" => "boxer updated"], 200);
         } catch (Exception $e) {
             return response()->json(["message" => "faild fighter update"], 500);
+        }
+    }
+
+    public function testtest()
+    {
+        $guestGuard = Auth::guard('guest');
+        $guestUser = $guestGuard->user();
+
+        if (!$guestUser) {
+            return response()->json(['message' => 'Unauthorized Guest'], 401);
+        } else {
+            return response()->json(['message' => 'Guest is'], 401);
         }
     }
 }

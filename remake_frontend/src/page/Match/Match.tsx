@@ -9,6 +9,7 @@ import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useFetchMatches } from '@/hooks/useMatch';
 import { usePagePath } from '@/hooks/usePagePath';
+import { useEitherAuth } from '@/hooks/useEitherAuth';
 import {
   useVoteMatchPrediction,
   useAllFetchMatchPredictionOfAuthUser,
@@ -40,6 +41,7 @@ export const Match = () => {
 
   const { setter: setPagePath } = usePagePath();
   const { data: authUser } = useAuth();
+  const { isEitherAuth } = useEitherAuth();
 
   const {
     postComment,
@@ -180,7 +182,7 @@ export const Match = () => {
     //   console.log(error);
     //   return;
     // }
-    if (!authUser) {
+    if (!isEitherAuth) {
       setToastModal({
         message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH,
         bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
@@ -337,40 +339,3 @@ const PostCommentTextarea = ({
     </div>
   );
 };
-
-// const BalloonModal = ({
-//   setIsPredictionModal,
-// }: {
-//   setIsPredictionModal: React.Dispatch<React.SetStateAction<boolean>>;
-// }) => {
-//   return (
-//     <>
-//       <motion.div
-//         animate={{ y: 10 }}
-//         initial={{ x: -10 }}
-//         transition={{
-//           duration: 3,
-//           repeat: Infinity,
-//           repeatType: "mirror",
-//           // type: "spring",
-//           stiffness: 50,
-//         }}
-//         className="z-10 absolute top-[-60px] left-[calc(50%-150px)] bg-white shadow-lg shadow-stone-600/30 rounded-[25px] text-stone-700"
-//       >
-//         <button
-//           onClick={() => setIsPredictionModal(false)}
-//           className="text-stone-800 text-[20px] absolute top-4 right-4"
-//         >
-//           <AiOutlineClose />
-//         </button>
-//         <div className="bg-cyan-200/80 select-none w-full h-full p-10 rounded-[25px]">
-//           <p>
-//             勝利すると思う選手名をクリックして
-//             <br />
-//             勝敗予想を投票してください。
-//           </p>
-//         </div>
-//       </motion.div>
-//     </>
-//   );
-// };

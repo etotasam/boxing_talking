@@ -2,8 +2,6 @@ import dayjs from 'dayjs';
 import clsx from 'clsx';
 // ! types
 import { MatchesDataType } from '@/assets/types';
-// ! hook
-// import { useFetchBoxer } from "@/hooks/useBoxer";
 // ! components
 import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
 import { PredictionVoteIcon } from '@/components/atomc/PredictionVoteIcon';

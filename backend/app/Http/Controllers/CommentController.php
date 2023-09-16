@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 // Models
 use App\Models\BoxingMatch;
 use App\Models\User;
+use App\Models\GuestUser;
 use App\Models\Comment;
 use App\Models\WinLossPrediction;
 use Exception;
@@ -78,7 +79,11 @@ class CommentController extends Controller
                 $user_id = $comment->user_id;
                 $created_at = $comment->created_at;
                 $user = User::find($user_id);
-                $post_user_name = $user->name;
+                if ($user) {
+                    $post_user_name = $user->name;
+                } else {
+                    $post_user_name = null;
+                }
                 // $prediction = WinLossPrediction::where([["user_id", $user_id], ["match_id", $match_id]])->first();
                 // if (isset($vote)) {
                 //     $prediction_color = $prediction["prediction"];
@@ -107,16 +112,17 @@ class CommentController extends Controller
     public function post(CommentRequest $request)
     {
         try {
-            // if ($request->fails()) {
-            //     $errors = $request->errors()->all();
-            //     throw new Exception($errors);
+            // $is_auth = Auth::user();
+            // if (!$is_auth) {
+            //     throw new Exception("Posting comments require Login", Response::HTTP_UNAUTHORIZED);
             // }
-
-            $is_auth = Auth::user();
-            if (!$is_auth) {
+            if (Auth::check()) {
+                $user_id = Auth::user()->id;
+            } else if (Auth::guard('guest')->check()) {
+                $user_id = (string)Auth::guard('guest')->user()->id;
+            } else {
                 throw new Exception("Posting comments require Login", Response::HTTP_UNAUTHORIZED);
             }
-            $user_id = Auth::user()->id;
             $match_id = $request->match_id;
             //? 試合は存在しているか
             $has_match = BoxingMatch::find($match_id);

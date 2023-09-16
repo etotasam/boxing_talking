@@ -50,20 +50,16 @@ export const useTestFetchComments = (matchId: number, offset: number, limit: num
 //! コメント取得
 export const useFetchComments = (matchId: number) => {
   const api = async () => {
-    try {
-      return await Axios.get("/api/comment", {
-        params: {
-          match_id: matchId,
-        },
-      }).then(v => v.data)
-    } catch (error) {
-      return null
-    }
+    return await Axios.get("/api/comment", {
+      params: {
+        match_id: matchId,
+      },
+    }).then(v => v.data)
   }
 
   const { data, isLoading, isFetching, refetch, isError } = useQuery<CommentType[]>([QUERY_KEY.comment, { id: matchId }], api, {
-    staleTime: 60000, onError: () => {
-
+    staleTime: 60000, onError: (error) => {
+      // console.error(error);
     }
   })
 

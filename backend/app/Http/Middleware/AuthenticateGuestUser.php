@@ -11,21 +11,11 @@ class AuthenticateGuestUser
 {
   public function handle(Request $request, Closure $next)
   {
-    $cookie_token = $request->cookie('guest_token');
-    $request_token = $request->header('Authorization');
 
-    if ($cookie_token === $request_token) {
-      $guest_user = GuestUser::find(1);
+    if (Auth::guard('guest')->check()) {
+      return $next($request);
     } else {
-      $guest_user = false;
+      return response()->json(["message" => "Guest auth require for access"]);
     }
-
-    if (!$guest_user) {
-      return response()->json(['message' => 'Unauthorized Guest'], 401);
-    }
-
-    Auth::guard('guest')->setUser($guest_user);
-
-    return $next($request);
   }
 }

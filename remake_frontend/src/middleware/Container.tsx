@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 // ! hooks
-import { useAuth, useGuest } from '@/hooks/useAuth';
+import { useAuth, useGuest, useAuthCheck } from '@/hooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useFetchMatches } from '@/hooks/useMatch';
 // import { useLoading } from "@/hooks/useLoading";
@@ -22,14 +22,14 @@ const Container = () => {
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
   const isShowLoginModal = useRecoilValue(loginModalSelector);
   const { isLoading: isLoadingByRecoil } = useRecoilValue(loadingSelector);
-  const { isLoading: isFirstCheckingAuth, data: authUser } = useAuth();
+  const { data: isAuth, isLoading: isFirstCheckingAuth } = useAuthCheck();
   const { data: guestUser } = useGuest();
   // console.log(data);
   const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } =
     useFetchBoxer();
   const { isLoading: isMatchesFetching } = useFetchMatches();
   const navigate = useNavigate();
-  const { showLoginModal } = useLoginModal();
+  const { showLoginModal, hideLoginModal } = useLoginModal();
 
   // ! Toast Modalの表示時間等の設定
   const waitTime = 5000;
@@ -52,12 +52,14 @@ const Container = () => {
   };
 
   useEffect(() => {
-    if (authUser === undefined || guestUser === undefined) return;
-    if (authUser && guestUser) {
+    if (isAuth === undefined || guestUser === undefined) return;
+    if (!isAuth && !guestUser) {
       showLoginModal();
       navigate('/');
+    } else {
+      hideLoginModal();
     }
-  }, [authUser, guestUser]);
+  }, [isAuth, guestUser]);
 
   return (
     <>

@@ -9,20 +9,19 @@ import { loginModalSelector } from '@/store/loginModalState';
 import { UserType } from '@/assets/types';
 //! hooks
 import { usePagePath } from '@/hooks/usePagePath';
-import { useLogout } from '@/hooks/useAuth';
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
+import { useGuest, useGuestLogout, useLogout, useAdmin } from '@/hooks/useAuth';
 // ! icons
 import { IconContext } from 'react-icons';
 import { BiUserCircle } from 'react-icons/bi';
 //! component
 import { LinkList } from '../LinkList';
-import { useAdmin } from '@/hooks/useAuth';
 import { Link } from 'react-router-dom';
 //! env
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 type PropsType = {
-  userData: UserType | undefined;
+  userData: UserType | undefined | null;
 };
 
 export const Header = (porps: PropsType) => {
@@ -95,32 +94,28 @@ export const Header = (porps: PropsType) => {
 };
 
 type AuthControlComponentPropsType = {
-  userData: UserType | undefined;
+  userData: UserType | undefined | null;
   logout: ({ userName }: { userName: string }) => void;
   openLoginForm: () => void;
 };
-// ! ログイン/ログアウトのボタン
+// ! ログアウトのボタン
 const AuthControlComponent = ({
   userData,
   logout,
   openLoginForm,
 }: AuthControlComponentPropsType) => {
+  const { data: guetUser } = useGuest();
+  const { guestLogout } = useGuestLogout();
   return (
     <>
       <div className="absolute top-0 right-0 md:w-[200px] w-[130px] h-full flex justify-center">
         <div className="absolute bottom-3 flex justify-center">
-          {userData ? (
+          {userData && (
             <Button onClick={() => logout({ userName: userData.name! })}>
               ログアウト
             </Button>
-          ) : (
-            <Button
-              bgColor="bg-green-600 hover:bg-green-800"
-              onClick={() => openLoginForm()}
-            >
-              ログイン
-            </Button>
           )}
+          {guetUser && <Button onClick={guestLogout}>ログアウト</Button>}
         </div>
       </div>
     </>

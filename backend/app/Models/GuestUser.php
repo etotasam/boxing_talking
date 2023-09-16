@@ -3,22 +3,27 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Support\Facades\Auth;
-use Laravel\Sanctum\NewAccessToken;
+use Illuminate\Support\Str;
 
-class GuestUser extends Authenticatable implements AuthenticatableContract
+class GuestUser extends Authenticatable
 {
     use HasFactory;
     use HasApiTokens;
 
-    public static function createGuestToken(): NewAccessToken
-    {
-        $guest_user = GuestUser::find(1);
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
 
-        return $guest_user->createToken('guest-access');
+    protected static function booted()
+    {
+        static::creating(function (self $model) {
+            empty($model->id) && $model->id = Str::uuid();
+        });
     }
+
+    public $incrementing = false; // 自動インクリメントを無効化
+    protected $keyType = 'string'; // 主キーのデータ型をUUIDに設定
 }

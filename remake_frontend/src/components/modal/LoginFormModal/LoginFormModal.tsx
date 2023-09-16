@@ -115,7 +115,7 @@ const LoginForm = () => {
 
   //? ゲストログイン
   const gustLogin = () => {
-    guestLogin({ test: 'guest' });
+    guestLogin();
   };
 
   return (

@@ -10,6 +10,7 @@ import { useToastModal } from "./useToastModal"
 import { useLoading } from "./useLoading"
 import { useLoginModal } from "./useLoginModal"
 import { useAllFetchMatchPredictionOfAuthUser } from "./uesWinLossPredition"
+import { useReactQuery } from "./useReactQuery"
 //! types
 import type { UserType } from "@/assets/types"
 
@@ -19,13 +20,13 @@ export const useGuest = () => {
 
   const api = useCallback(async () => {
     try {
-      const res = await Axios.get(`/api/guest_user`).then(value => value.data)
-      return res
+      const res = await Axios.get(`/api/guest_user`).then(value => value.data);
+      return Boolean(res);
     } catch (error) {
       return null
     }
   }, [])
-  const { data, isLoading, isError } = useQuery<UserType>(QUERY_KEY.guest, api, {
+  const { data, isLoading, isError } = useQuery<boolean | null>(QUERY_KEY.guest, api, {
     retry: false,
     staleTime: Infinity
   })
@@ -45,48 +46,124 @@ export const useGuestLogin = () => {
   const { hideLoginModal } = useLoginModal()
   const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
 
-  const api = useCallback(async (props: any) => {
-    const res = await Axios.post('/api/guest').then(value => value.data)
+  //? ReactQuery controller
+  const { setReactQueryData } = useReactQuery()
+
+  const api = useCallback(async ({ dummy }: { dummy?: unknown }) => {
+    const res = await Axios.post('/api/guest_login').then(value => value.data)
     return res
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
-    onMutate: (props) => {
+    onMutate: () => {
       startLoading()
     }
   })
 
-  const guestLogin = (props: any) => {
-    mutate((props), {
-
-      onSuccess: () => {
-        // hideLoginModal()
+  const guestLogin = () => {
+    mutate(({}), {
+      onSuccess: (data) => {
         resetLoadingState()
+        setReactQueryData<boolean>(QUERY_KEY.guest, Boolean(data))
       },
-
       onError: () => {
         resetLoadingState()
-        // hasError()
       }
     })
   }
   return { guestLogin, isLoading, isSuccess }
 }
 
-//! authチェック
-export const useAuth = () => {
+//! ゲストログアウト
+export const useGuestLogout = () => {
+  // const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+  // ? react query
+  const queryClient = useQueryClient()
+  // ? toast message modal
+  const { setToastModal, showToastModal } = useToastModal()
+  // ? Loading state
+  const { resetLoadingState, startLoading, hasError, successful } = useLoading()
+  // ? api
+  const api = useCallback(async ({ dummy }: { dummy?: any }) => {
+    await Axios.post<void>("api/guest_logout").then(value => value.data)
+  }, [])
+
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
+    onMutate: () => {
+      startLoading()
+    }
+  })
+  const guestLogout = useCallback(() => {
+    mutate({}, {
+      onSuccess: () => {
+        // ? ユーザー情報のキャッシュをclear
+        queryClient.setQueryData<boolean>(QUERY_KEY.guest, false)
+        // queryClient.invalidateQueries(QUERY_KEY.admin)
+        //? 勝敗予想のキャッシュをclearしてリフェッチ
+        // queryClient.setQueryData(QUERY_KEY.prediction, undefined)
+        // refetchMatchPrediction()
+        successful()
+        setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
+        showToastModal()
+        // //? ユーザの勝敗予想データのキャッシュを削除
+        // queryClient.setQueryData(QUERY_KEY.vote, [])
+        // //? auth を削除
+        // queryClient.setQueryData<boolean>(QUERY_KEY.auth, false)
+        // navigate("/")
+        resetLoadingState()
+      },
+      onError: () => {
+        hasError()
+        setToastModal({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showToastModal()
+        resetLoadingState()
+      }
+    })
+  }, [])
+  return { guestLogout, isLoading, isSuccess }
+}
+
+
+//! auth check
+
+export const useAuthCheck = () => {
 
   const api = useCallback(async () => {
     try {
-      const res = await Axios.get(`/api/user`).then(value => value.data)
-      return res
+      const res = await Axios.get(`/api/auth/user`).then(value => value.data)
+      return Boolean(res)
     } catch (error) {
       return null
     }
   }, [])
-  const { data, isLoading, isError } = useQuery<UserType>(QUERY_KEY.auth, api, {
+  const { data, isLoading, isError } = useQuery<boolean | null>(QUERY_KEY.auth, api, {
     retry: false,
     staleTime: Infinity
+  })
+
+  return { data, isLoading, isError }
+}
+
+
+//! auth user
+export const useAuth = () => {
+  // const { setToastModal, showToastModal } = useToastModal()
+  const queryClient = useQueryClient()
+
+  const api = useCallback(async () => {
+    const res = await Axios.get(`/api/user`).then(value => value.data)
+    return res
+  }, [])
+  const { data, isLoading, isError } = useQuery<UserType | null>(QUERY_KEY.auth, api, {
+    retry: false,
+    staleTime: Infinity,
+    onSuccess: (data) => {
+      if (!data) {
+        queryClient.setQueryData<UserType | null>(QUERY_KEY.auth, null)
+      }
+    },
+    onError: () => {
+    }
   })
 
   return { data, isLoading, isError }

@@ -88,7 +88,9 @@ export const CommentsComponent = ({
                   {dateFormatter(commentData.created_at)}
                 </time>
                 <p className="text-sm ml-3 text-stone-600">
-                  {commentData.post_user_name}
+                  {commentData.post_user_name
+                    ? commentData.post_user_name
+                    : 'ゲスト投稿'}
                 </p>
               </>
             ) : (
