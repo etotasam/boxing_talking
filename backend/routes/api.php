@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Vote;
 use App\Jobs\SampleJob;
 use GuzzleHttp\Psr7\Message;
+use App\Models\GuestUser;
 
 // controller
 use App\Http\Controllers\AuthController;
@@ -33,53 +34,71 @@ use App\Http\Controllers\MailController;
 /**
  * ログイン情報のチェック
  */
-Route::middleware('auth:sanctum')->group(function () {
-
-    Route::get('/user', function (Request $request) {
-        // \Log::debug("てすと");
-        return $request->user();
-    })->name('auth.user');
 
 
-    Route::get('/check', function () {
-        return Auth::check();
-    })->name('auth.check');
-});
+Route::get('/user', [AuthController::class, 'fetch'])->name('auth.user');
 
+Route::get('/auth/check', function () {
+    return Auth::check();
+})->name('auth.check');
+
+
+Route::get('/guest/user', function (Request $request) {
+    return (bool)Auth::guard('guest')->check();
+})->name('auth.guest_user');
+
+
+
+//? auth
 Route::get('/admin', [AuthController::class, 'admin'])->name('auth.admin');
 // Route::post('/user/create', [AuthController::class, 'test_create'])->name('auth.create');
 Route::post('/user/create', [AuthController::class, 'create'])->name('auth.create');
 
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
-Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
-//! ボクサー
-Route::get('/boxer/count', [BoxerController::class, 'count'])->name('boxer.count');
-Route::get('/boxer/search', [BoxerController::class, 'search'])->name('boxer.search');
-Route::get('/boxer', [BoxerController::class, 'fetch'])->name('boxer.fetch');
-Route::post('/boxer', [BoxerController::class, 'register'])->name('boxer.register');
-Route::put('/boxer', [BoxerController::class, 'update'])->name('boxer.update');
-Route::delete('/boxer', [BoxerController::class, 'delete'])->name('boxer.delete');
+Route::post('/guest/login', [AuthController::class, 'guest_login'])->name('auth.guest_login');
 
-//! 試合
+//? 試合
 Route::get('/match', [MatchController::class, 'fetch'])->name('match.fetch');
-Route::post('/match', [MatchController::class, 'register'])->name('match.register');
-Route::delete('/match', [MatchController::class, 'delete'])->name('match.delete');
-Route::put('/match', [MatchController::class, 'update'])->name('match.delete');
-//! コメント
-Route::get('/comment', [CommentController::class, 'fetch'])->name('comment.fetch');
-Route::post('/comment', [CommentController::class, 'post'])->name('comment.post');
-Route::delete('/comment', [CommentController::class, 'delete'])->name('comment.delete');
-
-//! 勝利予想
+//? ボクサー
+Route::get('/boxer/count', [BoxerController::class, 'count'])->name('boxer.count');
+Route::get('/boxer', [BoxerController::class, 'fetch'])->name('boxer.fetch');
+//? 勝利予想
 Route::get('/prediction', [WinLossPredictionController::class, 'fetch'])->name('vote.fetch');
-Route::put('/prediction', [WinLossPredictionController::class, 'win_loss_prediction'])->name('vote');
+//? コメント
+Route::get('/comment', [CommentController::class, 'fetch'])->name('comment.fetch');
 
-//! メールテスト
+// !ゲストユーザーか通常の認証が必須
+Route::middleware('auth.user_or_guest')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+    Route::post('/guest/logout', [AuthController::class, 'guest_logout'])->name('auth.guest_logout');
+    Route::put('/prediction', [WinLossPredictionController::class, 'win_loss_prediction'])->name('vote');
+    Route::post('/comment', [CommentController::class, 'post'])->name('comment.post');
+});
+
+// !管理者
+Route::middleware('administrator')->group(function () {
+    //? ボクサー
+    Route::get('/boxer/search', [BoxerController::class, 'search'])->name('boxer.search');
+    Route::post('/boxer', [BoxerController::class, 'register'])->name('boxer.register');
+    Route::put('/boxer', [BoxerController::class, 'update'])->name('boxer.update');
+    Route::delete('/boxer', [BoxerController::class, 'delete'])->name('boxer.delete');
+    //? コメント
+    Route::delete('/comment', [CommentController::class, 'delete'])->name('comment.delete');
+    //? 試合
+    Route::post('/match', [MatchController::class, 'register'])->name('match.register');
+    Route::delete('/match', [MatchController::class, 'delete'])->name('match.delete');
+    Route::put('/match', [MatchController::class, 'update'])->name('match.update');
+});
+
+
+
+
+//? メールテスト
 Route::get('/mail', [MailController::class, 'send'])->name('mail.send');
 
-//! テストapi
-Route::post('/testtest', [BoxerController::class, 'testtest'])->name('mail.testtest');
+//? テストapi
+Route::post('/testtest', [BoxerController::class, 'testtest'])->name('testtest');
 
 
 Route::get("/{match_id}/check_vote", function (string $match_id) {

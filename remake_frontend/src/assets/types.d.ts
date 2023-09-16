@@ -96,3 +96,10 @@ export type MatchesDataType = {
 export type GRADE_Type = (typeof GRADE)[keyof typeof GRADE];
 export type WEIGHT_CLASS_Type = (typeof WEIGHT_CLASS)[keyof typeof WEIGHT_CLASS];
 export type ORGANIZATIONS_Type = (typeof ORGANIZATIONS)[keyof typeof ORGANIZATIONS];
+
+
+export type PredictionType = {
+  id: number,
+  match_id: number,
+  prediction: "red" | "blue"
+}

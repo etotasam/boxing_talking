@@ -23,17 +23,16 @@ export const BG_COLOR_ON_TOAST_MODAL = {
 
 export const MESSAGE = {
 
+  //? user登録
   SIGNUP_LACK_INPUT: "入力情報が不足しています",
-
+  NAME_IS_REQUIRED: "登録には名前が必要です",
+  EMAIL_IS_REQUIRED: "メールアドレスが正しくありません",
   USER_REGISTER_SUCCESSFULLY: "登録が完了しました",
-  USER_REGISTER_FAILED: "登録に失敗しました",
+  USER_REGISTER_FAILED: "登録に失敗しました。\n 入力情報に誤りがないかご確認ください",
   USER_ALREADY_EXIST: "すでに登録されているEmailです",
   USER_NAME_ALREADY_USE: "すでに使われている名前です \n 別の名前を検討してください",
 
-  INVALID_COUNTRY: "国籍が無効です",
-  VOTE_FAILED_WITH_NO_AUTH: '勝敗予想を投票するにはログインが必要です',
-  VOTE_FAILD: `投票に失敗しました`,
-  VOTE_SUCCESSFULLY: `投票しました`,
+
 
 
   // ! login form
@@ -82,6 +81,8 @@ export const MESSAGE = {
   FIGHTER_DELETING: "選手情報を削除中...",
   FAILD_FIGHTER_DELETE: "選手削除に失敗しました",
   //? コメント
+  COMMENT_IS_NOT_ENTER: 'コメントの入力がありません',
+  COMMENT_IS_TOO_LONG: 'コメントが長すぎます。\n 投稿は1000文字までです',
   FAILED_POST_COMMENT_WITHOUT_AUTH: 'コメント投稿にはログインが必要です',
   COMMENT_IS_EMPTY: 'コメントを入力してください',
   COMMENT_POST_SUCCESS: 'コメントを投稿しました',
