@@ -9,25 +9,162 @@ import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal"
 import { useToastModal } from "./useToastModal"
 import { useLoading } from "./useLoading"
 import { useLoginModal } from "./useLoginModal"
-import { useFetchMatchPredictVote } from "./uesWinLossPredition"
+import { useAllFetchMatchPredictionOfAuthUser } from "./uesWinLossPredition"
+import { useReactQuery } from "./useReactQuery"
 //! types
 import type { UserType } from "@/assets/types"
 
 
-//! authチェック
-export const useAuth = () => {
+//! ゲストauthチェック
+export const useGuest = () => {
 
   const api = useCallback(async () => {
     try {
-      const res = await Axios.get(`/api/user`).then(value => value.data)
-      return res
+      const res = await Axios.get(`/api/guest/user`).then(value => value.data);
+      return Boolean(res);
     } catch (error) {
       return null
     }
   }, [])
-  const { data, isLoading, isError } = useQuery<UserType>(QUERY_KEY.auth, api, {
+  const { data, isLoading, isError } = useQuery<boolean | null>(QUERY_KEY.guest, api, {
     retry: false,
     staleTime: Infinity
+  })
+
+  return { data, isLoading, isError }
+}
+
+//! ゲストログイン
+export const useGuestLogin = () => {
+  // ? react query
+  const queryClient = useQueryClient()
+  // ? toast modal
+  // const { setToastModal, showToastModal } = useToastModal()
+  // ? Loading state
+  const { resetLoadingState, startLoading, hasError, successful } = useLoading()
+  // ? login modal (hook)
+  const { hideLoginModal } = useLoginModal()
+  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+
+  //? ReactQuery controller
+  const { setReactQueryData } = useReactQuery()
+
+  const api = useCallback(async ({ dummy }: { dummy?: unknown }) => {
+    const res = await Axios.post('/api/guest/login').then(value => value.data)
+    return res
+  }, [])
+
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
+    onMutate: () => {
+      startLoading()
+    }
+  })
+
+  const guestLogin = () => {
+    mutate(({}), {
+      onSuccess: (data) => {
+        refetchMatchPrediction()
+        resetLoadingState()
+        setReactQueryData<boolean>(QUERY_KEY.guest, Boolean(data))
+      },
+      onError: () => {
+        resetLoadingState()
+      }
+    })
+  }
+  return { guestLogin, isLoading, isSuccess }
+}
+
+//! ゲストログアウト
+export const useGuestLogout = () => {
+  // const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+  // ? react query
+  const queryClient = useQueryClient()
+  // ? toast message modal
+  const { setToastModal, showToastModal } = useToastModal()
+  // ? Loading state
+  const { resetLoadingState, startLoading, hasError, successful } = useLoading()
+  // ? api
+  const api = useCallback(async ({ dummy }: { dummy?: any }) => {
+    await Axios.post<void>("api/guest/logout").then(value => value.data)
+  }, [])
+
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
+    onMutate: () => {
+      startLoading()
+    }
+  })
+  const guestLogout = useCallback(() => {
+    mutate({}, {
+      onSuccess: () => {
+        // ? ユーザー情報のキャッシュをclear
+        queryClient.setQueryData<boolean>(QUERY_KEY.guest, false)
+        // queryClient.invalidateQueries(QUERY_KEY.admin)
+        //? 勝敗予想のキャッシュをclearしてリフェッチ
+        // queryClient.setQueryData(QUERY_KEY.prediction, undefined)
+        // refetchMatchPrediction()
+        successful()
+        setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
+        showToastModal()
+        // //? ユーザの勝敗予想データのキャッシュを削除
+        // queryClient.setQueryData(QUERY_KEY.vote, [])
+        // //? auth を削除
+        // queryClient.setQueryData<boolean>(QUERY_KEY.auth, false)
+        // navigate("/")
+        resetLoadingState()
+      },
+      onError: () => {
+        hasError()
+        setToastModal({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showToastModal()
+        resetLoadingState()
+      }
+    })
+  }, [])
+  return { guestLogout, isLoading, isSuccess }
+}
+
+
+//! auth check
+
+export const useAuthCheck = () => {
+
+  const api = useCallback(async () => {
+    try {
+      const res = await Axios.get(`/api/auth/user`).then(value => value.data)
+      return Boolean(res)
+    } catch (error) {
+      return null
+    }
+  }, [])
+  const { data, isLoading, isError } = useQuery<boolean | null>(QUERY_KEY.auth, api, {
+    retry: false,
+    staleTime: Infinity
+  })
+
+  return { data, isLoading, isError }
+}
+
+
+//! auth user
+export const useAuth = () => {
+  // const { setToastModal, showToastModal } = useToastModal()
+  const queryClient = useQueryClient()
+
+  const api = useCallback(async () => {
+    const res = await Axios.get(`/api/user`).then(value => value.data)
+    return res
+  }, [])
+  const { data, isLoading, isError } = useQuery<UserType | null>(QUERY_KEY.auth, api, {
+    retry: false,
+    staleTime: Infinity,
+    onSuccess: (data) => {
+      if (!data) {
+        queryClient.setQueryData<UserType | null>(QUERY_KEY.auth, null)
+      }
+    },
+    onError: () => {
+    }
   })
 
   return { data, isLoading, isError }
@@ -68,8 +205,40 @@ export const useCreateUser = () => {
         hideLoginModal()
       },
 
-      onError: () => {
+      onError: (error: any) => {
         hasError()
+        if (error.status === 422) {
+          const errorMessages = error.data.errors as any
+          if (errorMessages.name) {
+            if ((errorMessages.name as string[]).includes('name is required')) {
+              setToastModal({ message: MESSAGE.NAME_IS_REQUIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showToastModal()
+              return
+            }
+          }
+          if (errorMessages.email) {
+            if (errorMessages.email.includes('email is alredy registered')) {
+              setToastModal({ message: MESSAGE.NAME_IS_REQUIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showToastModal()
+              return
+            }
+          }
+          setToastModal({ message: MESSAGE.SIGNUP_LACK_INPUT, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showToastModal()
+          return
+        }
+        //? すでに使われている名前
+        if (error.message === "The name is alredy in use") {
+          setToastModal({ message: MESSAGE.USER_NAME_ALREADY_USE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showToastModal()
+          return
+        }
+        //? すでに登録されているメールアドレス
+        if (error.message === "The name is alredy in use") {
+          setToastModal({ message: MESSAGE.USER_ALREADY_EXIST, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showToastModal()
+          return
+        }
         setToastModal({ message: MESSAGE.USER_REGISTER_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
       }
@@ -89,7 +258,9 @@ export const useLogin = () => {
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? login modal (hook)
   const { hideLoginModal } = useLoginModal()
-  const { refetch: refetchMatchPrediction } = useFetchMatchPredictVote()
+  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+  //? ReactQuery controller
+  const { setReactQueryData } = useReactQuery()
 
   const api = useCallback(async (props: { email: string, password: string }) => {
     const res = await Axios.post<UserType>("api/login", { ...props }).then(value => value.data)
@@ -109,7 +280,7 @@ export const useLogin = () => {
         resetLoadingState()
         refetchAdmin()
         // ? ログインユーザーをreact query内でキャッシュする
-        queryClient.setQueryData<UserType>(QUERY_KEY.auth, userData)
+        setReactQueryData<UserType | boolean>(QUERY_KEY.auth, userData)
         successful()
         setToastModal({ message: MESSAGE.LOGIN_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
@@ -128,7 +299,7 @@ export const useLogin = () => {
 }
 //! ログアウト
 export const useLogout = () => {
-  const { refetch: refetchMatchPrediction } = useFetchMatchPredictVote()
+  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
   // ? react query
   const queryClient = useQueryClient()
   // ? toast message modal
@@ -136,8 +307,8 @@ export const useLogout = () => {
   // ? Loading state
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? api
-  const api = useCallback(async ({ userName }: { userName: string }) => {
-    await Axios.post<void>("api/logout", { user_name: userName }).then(value => value.data)
+  const api = useCallback(async ({ dummy }: { dummy?: unknown }) => {
+    await Axios.post<void>("api/logout").then(value => value.data)
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -145,14 +316,15 @@ export const useLogout = () => {
       startLoading()
     }
   })
-  const logout = useCallback(({ userName }: { userName: string }) => {
-    mutate({ userName }, {
+  const logout = useCallback(() => {
+    mutate({}, {
       onSuccess: () => {
         // ? ユーザー情報のキャッシュをclear
         queryClient.setQueryData(QUERY_KEY.auth, null)
         queryClient.invalidateQueries(QUERY_KEY.admin)
         //? 勝敗予想のキャッシュをclearしてリフェッチ
-        queryClient.setQueryData(QUERY_KEY.prediction, undefined)
+        // queryClient.removeQueries(QUERY_KEY.prediction)
+        // queryClient.setQueryData(QUERY_KEY.prediction, undefined)
         refetchMatchPrediction()
         successful()
         setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })

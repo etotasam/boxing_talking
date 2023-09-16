@@ -1,9 +1,15 @@
 // import React, { ReactNode, useEffect } from "react";
-import { Link } from "react-router-dom";
-//! data
-import { linksArray } from "@/assets/pathLinks";
+import { Link } from 'react-router-dom';
 //! hooks
-import { usePagePath } from "@/hooks/usePagePath";
+import { usePagePath } from '@/hooks/usePagePath';
+
+const linksArray = [
+  { pathName: 'Home', path: '/' },
+  { pathName: 'ボクサー登録', path: '/admin/boxer_register' },
+  { pathName: 'ボクサー編集', path: '/admin/boxer_edit' },
+  { pathName: '試合登録', path: '/admin/match_register' },
+  { pathName: '試合編集', path: '/admin/match_edit' },
+] as const;
 
 export const LinkList = () => {
   const { state: pagePath } = usePagePath();

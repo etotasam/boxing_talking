@@ -103,7 +103,6 @@ export const useUpdateBoxerData = () => {
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: async () => {
-      console.log("選手データ更新");
       startLoading()
       // clearToastModaleMessage()
       // const isLeeway = fightersCount ? !!(fightersCount % limit) : false
@@ -175,7 +174,6 @@ export const useRegisterBoxer = () => {
         // queryClient.invalidateQueries(QUERY_KEY.boxer)
       },
       onError: (error: any) => {
-        console.log("onError");
         hasError()
         resetLoadingState()
         if (error.status === STATUS.NOT_ACCEPTABLE) {
@@ -211,28 +209,12 @@ export const useDeleteBoxer = () => {
   const api = async (boxerData: BoxerType | BoxerDataOnFormType) => {
     // try {
     await Axios.delete('/api/boxer', { data: { boxer_id: boxerData.id, eng_name: boxerData.eng_name } }).then(v => v.data)
-    // resetLoadingState()
-    // setToastModal({ message: MESSAGE.FIGHTER_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-    // showToastModal()
-    // } catch (error: any) {
-    //   console.error("エラー", error);
-    //   resetLoadingState()
-    //   if (error.status === STATUS.NOT_ACCEPTABLE) {
-    //     setToastModal({ message: MESSAGE.FIGHTER_CAN_NOT_DELETE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-    //     showToastModal()
-    //     return
-    //   }
-    //   setToastModal({ message: MESSAGE.FIGHTER_EDIT_FAILD, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-    //   showToastModal()
-    // }
+
   }
 
   const { mutate, isLoading, isError, isSuccess } = useMutation(api, {
     onMutate: () => {
       startLoading()
-      // const snapshotFighters = queryClient.getQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: paramPage }])
-      // const widtoutDeleteFighters = queryClient.getQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: paramPage }])!.filter(fighter => fighter.id !== boxerData.id)
-      // return { snapshotFighters, widtoutDeleteFighters }
     }
   })
   const deleteBoxer = (boxerData: BoxerType | BoxerDataOnFormType) => {
@@ -241,23 +223,8 @@ export const useDeleteBoxer = () => {
         resetLoadingState()
         setToastModal({ message: MESSAGE.BOXER_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
-
-        // queryClient.setQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: paramPage }], context.widtoutDeleteFighters)
-        // if (!context.widtoutDeleteFighters.length) {
-        //   if (paramPage > 1) {
-        //     navigate(`/fighter/edit?page=${paramPage - 1}`)
-        //   }
-        // }
-
         //? 選手データと選手数をリフェッチ
         RefetchBoxerData()
-        // queryClient.setQueryData<number>(queryKeys.countFighter, (prev) => prev! - 1)
-        //   //? 削除した選手より後のpage情報は再取得させる
-        //   const pages = [...Array(pageCount + 1)].map((_, num) => num).filter(n => n >= paramPage)
-        // pages.forEach((page) => {
-        //   queryClient.removeQueries([QUERY_KEY.boxer, { page }], { exact: true })
-        // })
-        //   queryClient.setQueryData(QUERY_KEY.boxerEditData, initialFighterInfoState)
       },
       onError: (error: any) => {
         resetLoadingState()
