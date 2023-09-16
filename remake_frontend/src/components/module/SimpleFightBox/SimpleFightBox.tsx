@@ -27,7 +27,7 @@ export const SimpleFightBox = ({
       {matchData && (
         <div
           onClick={() => onClick(matchData.id)}
-          className="relative flex justify-between md:w-[80%] w-full max-w-[1024px] cursor-pointer md:py-4 py-8 md:border-[1px] border-b-[1px] border-stone-400 md:rounded-md md:hover:bg-yellow-100 md:hover:border-white md:duration-300"
+          className="relative flex justify-between md:w-[90%] w-full max-w-[1024px] cursor-pointer md:py-4 py-8 md:border-[1px] border-b-[1px] border-stone-400 md:rounded-md md:hover:bg-yellow-100 md:hover:border-white md:duration-300"
         >
           <BoxerBox boxer={matchData.red_boxer} />
 

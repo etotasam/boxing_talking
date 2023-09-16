@@ -68,7 +68,12 @@ class AuthController extends Controller
                 throw new Exception('Faild guest logout', Response::HTTP_FORBIDDEN);
             }
 
-            return $guestGuard->logout();
+            $guestGuard->logout();
+            if (!Auth::guard('guest')->check()) {
+                return true;
+            } else {
+                throw new Exception('Faild guest logout', Response::HTTP_FORBIDDEN);
+            }
         } catch (Exception $e) {
             return response()->json(["message" => $e->getMessage()], $e->getCode());
         }
@@ -158,27 +163,25 @@ class AuthController extends Controller
     /**
      * logout
      *
-     * @param string $user_name
      * @return \Illuminate\Http\Response
      */
-    public function logout(Request $request)
+    public function logout()
     {
         // throw new Exception();
-        $name = $request->user_name;
         try {
-            if (!Auth::User()) {
+            if (!Auth::check()) {
                 throw new Exception('Forbidden', Response::HTTP_FORBIDDEN);
             };
-            if ($name == Auth::User()->name) {
-                return Auth::logout();
+            Auth::logout();
+            if (!Auth::check()) {
+                return true;
             } else {
-                throw new Exception('dose not logout...', Response::HTTP_BAD_REQUEST);
-            };
+                throw new Exception('dose not logout...', Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
         } catch (Exception $e) {
             return response()->json(["message" => $e->getMessage()], $e->getCode());
         }
     }
-
 
 
     /**

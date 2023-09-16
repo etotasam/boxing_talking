@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Str;
+use App\Models\WinLossPrediction;
 
 class GuestUser extends Authenticatable
 {
@@ -16,6 +17,11 @@ class GuestUser extends Authenticatable
         'created_at',
         'updated_at'
     ];
+
+    public function prediction()
+    {
+        return $this->hasMany(WinLossPrediction::class, 'user_id');
+    }
 
     protected static function booted()
     {

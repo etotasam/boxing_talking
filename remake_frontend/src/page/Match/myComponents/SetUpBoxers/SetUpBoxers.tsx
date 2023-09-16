@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { MdHowToVote } from 'react-icons/md';
 //! types
-import { BoxerType, MatchesDataType, PredictionType } from '@/assets/types';
+import { BoxerType, MatchesDataType } from '@/assets/types';
 //! components
 import { BackgroundFlag } from './BackgroundFlag';
 import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
@@ -17,19 +17,8 @@ import {
 
 type SetUpBoxersType = {
   paramsMatchID: number;
-  // predictionVote: ({
-  //   name,
-  //   color,
-  // }: {
-  //   name: string;
-  //   color: 'red' | 'blue';
-  // }) => void;
   thisMatchPredictionOfUsers: 'red' | 'blue' | 'No prediction vote' | undefined;
-  // sendPrecition: () => void;
-  // selectPredictionBoxer: { name: string; color: 'red' | 'blue' } | undefined;
   thisMatch: MatchesDataType | undefined;
-  // showConfirmModal: boolean;
-  // setShowConfirmModal: React.Dispatch<React.SetStateAction<boolean>>;
   thisMatchPredictionCount: Record<
     'redCount' | 'blueCount' | 'totalCount',
     number
@@ -40,12 +29,7 @@ type SetUpBoxersType = {
 export const SetUpBoxers = ({
   paramsMatchID,
   thisMatch,
-  // showConfirmModal,
-  // setShowConfirmModal,
-  // selectPredictionBoxer,
-  // sendPrecition,
   thisMatchPredictionOfUsers,
-  // predictionVote,
   thisMatchPredictionCount,
   isFetchingComments,
 }: SetUpBoxersType) => {
@@ -100,6 +84,7 @@ export const SetUpBoxers = ({
           ref={boxerSectionRef}
           className="flex border-b-[1px] h-[100px] relative"
         >
+          {/* //? 投票ボタン */}
           <AnimatePresence>
             {isPredictionVote === false && (
               <VotesButton setShowConfirmModal={setShowConfirmModal} />
@@ -125,24 +110,32 @@ export const SetUpBoxers = ({
             thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
             // predictionVote={predictionVote}
           />
+          {/* //? 投票数bar */}
           {!isFetchingComments &&
             (thisMatchPredictionOfUsers === 'red' ||
               thisMatchPredictionOfUsers === 'blue') && (
               <>
                 <motion.span
-                  initial={{ width: 0 }}
+                  initial={{
+                    width: 0,
+                    opacity: 0,
+                  }}
                   animate={{
+                    opacity: 1,
                     width: `${getPredictionCountPercent(
                       thisMatchPredictionCount.redCount
                     )}%`,
                   }}
                   transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-                  // style={{ width: `${red}%` }}
                   className="bolck absolute bottom-0 left-0 bg-red-600 h-2"
                 />
                 <motion.span
-                  initial={{ width: 0 }}
+                  initial={{
+                    opacity: 0,
+                    width: 0,
+                  }}
                   animate={{
+                    opacity: 1,
                     width: `${getPredictionCountPercent(
                       thisMatchPredictionCount.blueCount
                     )}%`,
@@ -161,21 +154,17 @@ export const SetUpBoxers = ({
 type PredictionConfirmModalType = {
   thisMatch: MatchesDataType;
   voteExecution: (color: 'red' | 'blue') => void;
-  // boxerName: string;
-  // execution: () => void;
   cancel: () => void;
 };
 
 const PredictionConfirmModal = ({
   thisMatch,
   voteExecution,
-  // boxerName,
-  // execution,
   cancel,
 }: PredictionConfirmModalType) => {
   return (
     <>
-      <div className="fixed top-0 left-0 w-full h-[100vh] flex justify-center items-center">
+      <div className="z-20 fixed top-0 left-0 w-full h-[100vh] flex justify-center items-center">
         <div className="px-10 py-5 bg-white border-[1px] border-stone-400 shadow-lg shadow-stone-500/50">
           <p className="text-center text-stone-600">
             どちらが勝つと思いますか？
@@ -221,7 +210,6 @@ type BoxerBoxType = {
 
 const BoxerBox = ({
   boxerColor,
-  color,
   thisMatchPredictionOfUsers,
 }: // predictionVote,
 BoxerBoxType) => {
@@ -255,6 +243,15 @@ type VoteButtonType = React.ComponentProps<'button'> & {
 };
 
 const VotesButton = ({ setShowConfirmModal }: VoteButtonType) => {
+  const {
+    isRefetching: isRefetchingAllMatchPrediction,
+    isLoading: isLoadingAllMatchPrediction,
+  } = useAllFetchMatchPredictionOfAuthUser();
+
+  const hancleClick = () => {
+    if (isRefetchingAllMatchPrediction || isLoadingAllMatchPrediction) return;
+    setShowConfirmModal(true);
+  };
   return (
     <>
       <motion.button
@@ -262,7 +259,7 @@ const VotesButton = ({ setShowConfirmModal }: VoteButtonType) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        onClick={() => setShowConfirmModal(true)}
+        onClick={hancleClick}
         className="z-20 absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[50px] h-[50px] bg-green-600 hover:bg-green-600/80 rounded-[50%] flex justify-center items-center text-white text-[20px] hover:text-[25px] duration-200"
       >
         <MdHowToVote />

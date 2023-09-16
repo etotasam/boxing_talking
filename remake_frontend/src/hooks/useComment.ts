@@ -70,7 +70,7 @@ export const useFetchComments = (matchId: number) => {
 //! コメント投稿
 
 export const usePostComment = () => {
-  const { startLoading, resetLoadingState } = useLoading()
+  // const { startLoading, resetLoadingState } = useLoading()
   const { setToastModal, showToastModal } = useToastModal()
   type ApiPropsType = {
     matchId: number,
@@ -100,7 +100,7 @@ export const usePostComment = () => {
 
   const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      // startLoading()
       // const snapshot = queryClient.getQueryData<CommentType[]>([QUERY_KEY.comment, { id: matchId }])
       // queryClient.setQueryData([QUERY_KEY.comment, { id: matchId }], [{ id: NaN, post_user_name: "name", comment, created_at: nowDate }, ...snapshot!])
       // return { snapshot }
@@ -111,7 +111,7 @@ export const usePostComment = () => {
     mutate({ matchId, comment: sanitizedComment }, {
       onSuccess: () => {
         // console.log(data);
-        resetLoadingState()
+        // resetLoadingState()
         setToastModal({ message: MESSAGE.COMMENT_POST_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
         // ? match_idを指定してコメントを再取得
@@ -120,7 +120,7 @@ export const usePostComment = () => {
       },
       onError: (error: any, _, context) => {
         // queryClient.setQueryData([QUERY_KEY.comment, { id: matchId }], context?.snapshot)
-        resetLoadingState()
+        // resetLoadingState()
         if (error.status === 401) {
           setToastModal({ message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
           showToastModal()

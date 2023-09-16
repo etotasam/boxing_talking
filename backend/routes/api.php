@@ -43,7 +43,7 @@ Route::get('/auth/check', function () {
 })->name('auth.check');
 
 
-Route::get('/guest_user', function (Request $request) {
+Route::get('/guest/user', function (Request $request) {
     return (bool)Auth::guard('guest')->check();
 })->name('auth.guest_user');
 
@@ -55,11 +55,8 @@ Route::get('/admin', [AuthController::class, 'admin'])->name('auth.admin');
 Route::post('/user/create', [AuthController::class, 'create'])->name('auth.create');
 
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
-Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
-Route::post('/guest_login', [AuthController::class, 'guest_login'])->name('auth.guest_login');
-Route::post('/guest_auth', [AuthController::class, 'guest_auth'])->name('auth.guest');
-Route::post('/guest_logout', [AuthController::class, 'guest_logout'])->name('auth.guest_logout');
+Route::post('/guest/login', [AuthController::class, 'guest_login'])->name('auth.guest_login');
 
 //? 試合
 Route::get('/match', [MatchController::class, 'fetch'])->name('match.fetch');
@@ -68,11 +65,14 @@ Route::get('/boxer/count', [BoxerController::class, 'count'])->name('boxer.count
 Route::get('/boxer', [BoxerController::class, 'fetch'])->name('boxer.fetch');
 //? 勝利予想
 Route::get('/prediction', [WinLossPredictionController::class, 'fetch'])->name('vote.fetch');
-Route::put('/prediction', [WinLossPredictionController::class, 'win_loss_prediction'])->name('vote');
 //? コメント
 Route::get('/comment', [CommentController::class, 'fetch'])->name('comment.fetch');
+
 // !ゲストユーザーか通常の認証が必須
 Route::middleware('auth.user_or_guest')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+    Route::post('/guest/logout', [AuthController::class, 'guest_logout'])->name('auth.guest_logout');
+    Route::put('/prediction', [WinLossPredictionController::class, 'win_loss_prediction'])->name('vote');
     Route::post('/comment', [CommentController::class, 'post'])->name('comment.post');
 });
 

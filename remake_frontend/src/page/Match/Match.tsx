@@ -1,15 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-
+import { RotatingLines } from 'react-loader-spinner';
+//! icon
+import { BiSend } from 'react-icons/bi';
 //! types
 import { MatchesDataType } from '@/assets/types';
 // ! hook
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth, useGuest } from '@/hooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useFetchMatches } from '@/hooks/useMatch';
 import { usePagePath } from '@/hooks/usePagePath';
-import { useEitherAuth } from '@/hooks/useEitherAuth';
 import {
   useVoteMatchPrediction,
   useAllFetchMatchPredictionOfAuthUser,
@@ -31,8 +32,7 @@ export const Match = () => {
   const query = new URLSearchParams(search);
   const paramsMatchID = Number(query.get('match_id'));
   const { data: matches } = useFetchMatches();
-  const { matchVotePrediction, isSuccess: isSuccessVoteMatchPrediction } =
-    useVoteMatchPrediction();
+  const { isSuccess: isSuccessVoteMatchPrediction } = useVoteMatchPrediction();
   const { data: allPredictionVoteOfUsers, refetch: refetchAllPredictionData } =
     useAllFetchMatchPredictionOfAuthUser();
   const { setToastModal, showToastModal } = useToastModal();
@@ -40,8 +40,9 @@ export const Match = () => {
   const { isLoading: isFetchingComments } = useFetchComments(paramsMatchID);
 
   const { setter: setPagePath } = usePagePath();
+  const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
-  const { isEitherAuth } = useEitherAuth();
+  const isEitherAuth = Boolean(isGuest || authUser);
 
   const {
     postComment,
@@ -56,9 +57,6 @@ export const Match = () => {
   const [thisMatchPredictionCount, setThisMatchPredictionCount] = useState<
     Record<'redCount' | 'blueCount' | 'totalCount', number>
   >({ redCount: 0, blueCount: 0, totalCount: 0 });
-  const [boxerSectionElHeight, setBoxerSectionRef] = useState<
-    number | undefined
-  >();
 
   //? set data of this match(この試合の各データをuseState等にセット)
   useEffect(() => {
@@ -118,19 +116,8 @@ export const Match = () => {
   useEffect(() => {
     if (isSuccessVoteMatchPrediction) {
       refetchAllPredictionData();
-      setIsPredictionModal(false);
     }
   }, [isSuccessVoteMatchPrediction]);
-  //? コメント投稿失敗時
-  // useEffect(() => {
-  //   if (isErrorPostComment) {
-  //     setToastModal({
-  //       message: MESSAGE.COMMENT_POST_FAILED,
-  //       bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR,
-  //     });
-  //     showToastModal();
-  //   }
-  // }, [isErrorPostComment]);
 
   //? コメント入力欄の高さを取得
   useEffect(() => {
@@ -142,15 +129,6 @@ export const Match = () => {
       }
     }
   }, [comment]);
-
-  //? コメント投稿中にモーダル表示
-  // useEffect(() => {
-  //   if (isPostingComment) {
-  //     startLoading();
-  //   } else {
-  //     resetLoadingState();
-  //   }
-  // }, [isPostingComment]);
 
   // ? コメント投稿成功時にコメント入力欄をclearメッセージモーダル
   useEffect(() => {
@@ -175,13 +153,6 @@ export const Match = () => {
   //? コメント投稿
   const sendComment = () => {
     if (isPostingComment) return;
-    // try {
-    //   console.log(comment);
-    //   throw new Error('throw error');
-    // } catch (error) {
-    //   console.log(error);
-    //   return;
-    // }
     if (!isEitherAuth) {
       setToastModal({
         message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH,
@@ -201,66 +172,29 @@ export const Match = () => {
     postComment({ matchId: paramsMatchID, comment: comment });
     return;
   };
-  // const commentDelete = (commentID: number) => {
-  //   deleteComment({ commentID, matchID: paramsMatchID });
-  // };
 
+  const textarea = textareaRef.current as unknown as HTMLTextAreaElement;
   const autoExpandTextareaAndSetComment = (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     setComment(e.target.value);
-    const textarea = textareaRef.current as unknown as HTMLTextAreaElement;
     if (!textarea) return;
-    if (textarea.scrollHeight > 250) return;
+    if (textarea.scrollHeight > 250) {
+      textarea.style.height = 'auto';
+      textarea.style.height = '250px';
+      return;
+    }
     textarea.style.height = 'auto';
     textarea.style.height = `${textarea.scrollHeight}px`;
   };
 
-  const [_, setIsPredictionModal] = useState(true);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-
-  const [selectPredictionBoxer, setSelectPredictionBoxer] = useState<{
-    name: string;
-    color: 'red' | 'blue';
-  }>();
-  //? 勝敗予想の投票
-  // const sendPrecition = () => {
-  //   if (!selectPredictionBoxer) return;
-  //   if (
-  //     thisMatchPredictionOfUsers === 'red' ||
-  //     thisMatchPredictionOfUsers === 'blue'
-  //   )
-  //     return;
-  //   matchVotePrediction({
-  //     matchID: paramsMatchID,
-  //     prediction: selectPredictionBoxer.color,
-  //   });
-  //   setShowConfirmModal(false);
-  // };
-
-  // const predictionVote = ({
-  //   name,
-  //   color,
-  // }: {
-  //   name: string;
-  //   color: 'red' | 'blue';
-  // }) => {
-  //   if (thisMatchPredictionOfUsers !== 'No prediction vote') return;
-  //   setSelectPredictionBoxer({ name, color });
-  //   setShowConfirmModal(true);
-  // };
-
+  //! DOM
   return (
     <>
       {/* //? Boxer */}
       <SetUpBoxers
         paramsMatchID={paramsMatchID}
-        // predictionVote={predictionVote}
         thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
-        // sendPrecition={sendPrecition}
-        // selectPredictionBoxer={selectPredictionBoxer}
-        // setShowConfirmModal={setShowConfirmModal}
-        // showConfirmModal={showConfirmModal}
         thisMatch={thisMatch}
         thisMatchPredictionCount={thisMatchPredictionCount}
         isFetchingComments={isFetchingComments}
@@ -330,11 +264,17 @@ const PostCommentTextarea = ({
       <button
         onClick={sendComment}
         className={clsx(
-          'absolute bottom-[7px] text-[14px] right-[10px] border-[1px] bg-stone-600 hover:bg-stone-800 duration-300 py-1 text-white pl-4 pr-3 tracking-[0.4em]',
+          'absolute bottom-[7px] w-[50px] h-[30px] text-[14px] right-[10px] border-[1px] bg-stone-600 hover:bg-cyan-800 focus:bg-cyan-800 rounded-sm duration-300 py-1 text-white text-xl pl-4 pr-3',
           isPostingComment && 'text-white/50 select-none'
         )}
       >
-        送信
+        {isPostingComment ? (
+          <span className="w-[full] h-[full]">
+            <RotatingLines width="auto" strokeColor="white" />
+          </span>
+        ) : (
+          <BiSend />
+        )}
       </button>
     </div>
   );

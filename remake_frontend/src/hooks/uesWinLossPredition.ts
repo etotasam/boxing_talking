@@ -7,25 +7,32 @@ import { QUERY_KEY } from "@/assets/queryKeys";
 //! hook
 import { useLoading } from "./useLoading"
 import { useToastModal } from "./useToastModal";
-import { useAuth } from "./useAuth";
 import { useFetchMatches } from "./useMatch";
+import { useGuest, useAuth } from "./useAuth";
 //! types
 import { PredictionType } from "@/assets/types"
+// import { useEitherAuth } from "./useEitherAuth";
 
 
 //! ユーザーの勝敗予想の取得
 export const useAllFetchMatchPredictionOfAuthUser = () => {
   const { data: authUser } = useAuth()
-  // const { setToastModal, showToastModal } = useToastModal()
-  const isAuth = Boolean(authUser)
-  // const queryClient = useQueryClient()
+  const { data: isGuest } = useGuest()
+  const isEitherAuth = Boolean(authUser || isGuest)
+
   const api = useCallback(async () => {
-    const res = await Axios.get<PredictionType[]>('/api/prediction').then(v => v.data)
-    return res
+    const res = await Axios.get<PredictionType[] | "">('/api/prediction').then(v => v.data)
+    let formattedData
+    if (res === "") {
+      formattedData = undefined
+    } else {
+      formattedData = res
+    }
+    return formattedData
   }, [])
   const { data, isLoading, isRefetching, refetch } = useQuery(QUERY_KEY.prediction, api, {
     staleTime: Infinity,
-    enabled: isAuth,
+    enabled: isEitherAuth,
     onError: () => {
       // queryClient.setQueryData(queryKeys.vote, [])
     },

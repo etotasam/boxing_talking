@@ -2,9 +2,10 @@ import React, { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 // ! hooks
-import { useAuth, useGuest, useAuthCheck } from '@/hooks/useAuth';
+import { useGuest, useAuthCheck } from '@/hooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useFetchMatches } from '@/hooks/useMatch';
+import { useAdmin } from '@/hooks/useAuth';
 // import { useLoading } from "@/hooks/useLoading";
 // ! modal
 import { ToastModalContainer } from '@/components/modal/ToastModal';
@@ -17,14 +18,16 @@ import { useRecoilValue } from 'recoil';
 import { loginModalSelector } from '@/store/loginModalState';
 import { loadingSelector } from '@/store/loadingState';
 import { useFetchBoxer } from '@/hooks/useBoxer';
+//! component
+import { LinkList } from '@/components/module/LinkList';
 
 const Container = () => {
+  const { isAdmin } = useAdmin();
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
   const isShowLoginModal = useRecoilValue(loginModalSelector);
   const { isLoading: isLoadingByRecoil } = useRecoilValue(loadingSelector);
   const { data: isAuth, isLoading: isFirstCheckingAuth } = useAuthCheck();
   const { data: guestUser } = useGuest();
-  // console.log(data);
   const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } =
     useFetchBoxer();
   const { isLoading: isMatchesFetching } = useFetchMatches();
@@ -76,6 +79,12 @@ const Container = () => {
         )}
       </AnimatePresence>
       {isShowLoginModal && <LoginFormModal key={'LoginFormModal'} />}
+      {/* // ? 管理者用 */}
+      {isAdmin && (
+        <div className="fixed right-[200px] top-0">
+          <LinkList />
+        </div>
+      )}
     </>
   );
 };

@@ -1,14 +1,31 @@
 import { MdHowToVote } from 'react-icons/md';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+//!hook
+import { useGuest, useAuth } from '@/hooks/useAuth';
 
 export const PredictionVoteIcon = ({
   isPredictionVote,
 }: {
   isPredictionVote: boolean | undefined;
 }) => {
+  const { data: authUser } = useAuth();
+  const { data: isGuest } = useGuest();
+  const [isShowPredictionIton, setIsShowPredictionIcon] = useState(false);
+
+  useEffect(() => {
+    setIsShowPredictionIcon(
+      Boolean(
+        (authUser || isGuest) &&
+          !isPredictionVote &&
+          isPredictionVote !== undefined
+      )
+    );
+  }, [isPredictionVote, authUser, isGuest]);
+
   return (
     <>
-      {!isPredictionVote && isPredictionVote !== undefined && (
+      {isShowPredictionIton && (
         <motion.div
           initial={{
             width: 0,

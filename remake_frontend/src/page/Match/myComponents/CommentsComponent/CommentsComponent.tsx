@@ -1,7 +1,10 @@
 import clsx from 'clsx';
 import dayjs from 'dayjs';
+//!icon
+import { LiaCommentDotsSolid } from 'react-icons/lia';
+import { AiOutlineUser } from 'react-icons/ai';
 //! hooks
-import { useFetchComments, usePostComment } from '@/hooks/useComment';
+import { useFetchComments } from '@/hooks/useComment';
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useMatchBoxerSectionHeight } from '@/hooks/useMatchBoxerSectionHeight';
 
@@ -70,35 +73,40 @@ export const CommentsComponent = ({
         minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
       }}
     >
-      {commentsOfThisMatches.map((commentData) => (
-        <div
-          key={commentData.id}
-          className={clsx('p-5 border-b-[1px] border-stone-200')}
-        >
-          <p
-            className="text-[20px] font-light text-stone-800"
-            dangerouslySetInnerHTML={{
-              __html: commentData.comment,
-            }}
-          />
-          <div className="flex mt-3">
-            {!Number.isNaN(commentData.id) ? (
-              <>
-                <time className="text-sm text-stone-400">
-                  {dateFormatter(commentData.created_at)}
-                </time>
-                <p className="text-sm ml-3 text-stone-600">
-                  {commentData.post_user_name
-                    ? commentData.post_user_name
-                    : 'ゲスト投稿'}
-                </p>
-              </>
-            ) : (
-              <p className="text-sm text-stone-400">投稿中...</p>
-            )}
-          </div>
-          {/* //? ゴミ箱 */}
-          {/* {authUser && authUser.name === commentData.post_user_name && (
+      <ul>
+        {commentsOfThisMatches.map((commentData) => (
+          <li
+            key={commentData.id}
+            className={clsx('p-5 pb-1 border-b-[1px] border-stone-200')}
+          >
+            <p
+              className="text-lg font-light text-stone-600"
+              dangerouslySetInnerHTML={{
+                __html: commentData.comment,
+              }}
+            />
+            <div className="flex mt-3">
+              <time className="text-xs text-stone-400 leading-6">
+                {dateFormatter(commentData.created_at)}
+              </time>
+              <div className="flex ml-3">
+                {commentData.post_user_name ? (
+                  <>
+                    <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+                    <p className="text-sm text-stone-500">
+                      {commentData.post_user_name}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <AiOutlineUser className="mr-1 block bg-stone-300 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+                    <p className="text-sm text-stone-600">ゲスト投稿</p>
+                  </>
+                )}
+              </div>
+            </div>
+            {/* //? ゴミ箱 */}
+            {/* {authUser && authUser.name === commentData.post_user_name && (
                   <button
                     onClick={() => commentDelete(commentData.id)}
                     className="bg-blue-300 px-3 py-1"
@@ -106,18 +114,23 @@ export const CommentsComponent = ({
                     ゴミ箱
                   </button>
                 )} */}
-        </div>
-      ))}
+          </li>
+        ))}
+      </ul>
     </section>
   ) : !isFetchingComments && !isErrorFetchComments ? (
     <section
       className="flex justify-center items-center text-[18px] border-l-[1px] w-[70%]"
       style={{
-        // marginBottom: `${commentPostTextareaHeight}px`,
         minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
       }}
     >
-      <p>まだコメントがありません…</p>
+      <div className="relative">
+        <p>まだコメントがありません</p>
+        <LiaCommentDotsSolid
+          className={'absolute top-[-15px] right-[-30px] w-[30px] h-[30px]'}
+        />
+      </div>
     </section>
   ) : (
     isErrorFetchComments && (
