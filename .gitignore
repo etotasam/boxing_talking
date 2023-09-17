@@ -25,6 +25,9 @@ remake_frontend/.env.production
 # production
 remake_frontend/build
 
+#testpage
+TestModule.tsx
+
 
 
 

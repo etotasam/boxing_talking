@@ -53,6 +53,12 @@ export const Header = (porps: PropsType) => {
             <p className="text-sm">{userData.name}</p>
           </div>
         )}
+        {isGuest && (
+          <div className="absolute top-0 right-[30px] flex">
+            <AiOutlineUser className="mr-1 block bg-stone-400 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+            <p className="text-sm">ゲストログイン</p>
+          </div>
+        )}
         {isEitherAuth && (
           <div className="absolute top-0 right-0 bg-red-300 h-full flex justify-center">
             <div className="absolute bottom-5 lg:right-10 md:right-5 right-2 flex justify-center">

@@ -1,27 +1,40 @@
+import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 import { MdHowToVote } from 'react-icons/md';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
 //!hook
 import { useGuest, useAuth } from '@/hooks/useAuth';
 
 export const PredictionVoteIcon = ({
   isPredictionVote,
+  thisMatchDate,
 }: {
   isPredictionVote: boolean | undefined;
+  thisMatchDate: string;
 }) => {
   const { data: authUser } = useAuth();
   const { data: isGuest } = useGuest();
   const [isShowPredictionIton, setIsShowPredictionIcon] = useState(false);
+  const [matchIsAfterToday, setMatchIsAfterToday] = useState<boolean>();
 
   useEffect(() => {
     setIsShowPredictionIcon(
       Boolean(
         (authUser || isGuest) &&
           !isPredictionVote &&
-          isPredictionVote !== undefined
+          isPredictionVote !== undefined &&
+          matchIsAfterToday
       )
     );
-  }, [isPredictionVote, authUser, isGuest]);
+  }, [isPredictionVote, authUser, isGuest, matchIsAfterToday]);
+
+  //? 試合の日が当日以降かどうか
+  useEffect(() => {
+    if (!thisMatchDate) return;
+    const todaySubtractOneSecond = dayjs().startOf('day').add(1, 'second');
+    const isAfterToday = dayjs(thisMatchDate).isAfter(todaySubtractOneSecond);
+    setMatchIsAfterToday(isAfterToday);
+  }, [thisMatchDate]);
 
   return (
     <>

@@ -97,6 +97,11 @@ export const useVoteMatchPrediction = () => {
       },
       onError: (error: any) => {
         resetLoadingState()
+        if (error.data.message === "Cannot win-loss prediction after match date") {
+          setToastModal({ message: MESSAGE.MATCH_IS_ALREDY_DONE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showToastModal()
+          return
+        }
         if (error.data.message === "Cannot win-loss prediction. You have already done.") {
           setToastModal({ message: MESSAGE.ALREADY_HAVE_DONE_VOTE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
           showToastModal()

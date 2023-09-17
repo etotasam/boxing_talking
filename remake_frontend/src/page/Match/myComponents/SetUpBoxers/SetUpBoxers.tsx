@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import dayjs from 'dayjs';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { MdHowToVote } from 'react-icons/md';
@@ -77,6 +78,17 @@ export const SetUpBoxers = ({
     return undefined;
   }, [paramsMatchID, AllMatchPredictionOfAuthUserState]);
 
+  //? 試合の日が当日以降かどうか
+  const [matchIsAfterToday, setMatchIsAfterToday] = useState<boolean>();
+  useEffect(() => {
+    if (!thisMatch) return;
+    const todaySubtractOneSecond = dayjs().startOf('day').add(1, 'second');
+    const isAfterToday = dayjs(thisMatch.match_date).isAfter(
+      todaySubtractOneSecond
+    );
+    setMatchIsAfterToday(isAfterToday);
+  }, [thisMatch]);
+
   return (
     <>
       {thisMatch && (
@@ -85,11 +97,13 @@ export const SetUpBoxers = ({
           className="flex border-b-[1px] h-[100px] relative"
         >
           {/* //? 投票ボタン */}
-          <AnimatePresence>
-            {isPredictionVote === false && (
-              <VotesButton setShowConfirmModal={setShowConfirmModal} />
-            )}
-          </AnimatePresence>
+          {matchIsAfterToday && (
+            <AnimatePresence>
+              {isPredictionVote === false && (
+                <VotesButton setShowConfirmModal={setShowConfirmModal} />
+              )}
+            </AnimatePresence>
+          )}
           {/* //? 投票モーダル */}
           {showConfirmModal && (
             <PredictionConfirmModal
@@ -199,25 +213,11 @@ type BoxerBoxType = {
   boxerColor: BoxerType;
   color: 'red' | 'blue';
   thisMatchPredictionOfUsers: 'red' | 'blue' | 'No prediction vote' | undefined;
-  // predictionVote: ({
-  //   name,
-  //   color,
-  // }: {
-  //   name: string;
-  //   color: 'red' | 'blue';
-  // }) => void;
 };
 
-const BoxerBox = ({
-  boxerColor,
-  thisMatchPredictionOfUsers,
-}: // predictionVote,
-BoxerBoxType) => {
+const BoxerBox = ({ boxerColor, thisMatchPredictionOfUsers }: BoxerBoxType) => {
   return (
-    <div
-      // onClick={() => predictionVote({ name: boxerColor.name, color })}
-      className={clsx('flex-1 py-5 relative')}
-    >
+    <div className={clsx('flex-1 py-5 relative')}>
       <BackgroundFlag
         nationaly={boxerColor.country}
         thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 // ! types
 import { MatchesDataType } from '@/assets/types';
@@ -20,6 +21,15 @@ export const FightBox = ({
   onClick,
   isPredictionVote,
 }: PropsType) => {
+  const [isMatchDateInFuture, setIsMatchDateInFuture] = useState<boolean>();
+  //?試合日が今日、もしくは過ぎているか
+  useEffect(() => {
+    if (!matchData) return;
+    const yesterday = dayjs().subtract(1, 'day');
+    const matchDate = dayjs(matchData?.match_date);
+
+    setIsMatchDateInFuture(matchDate.isAfter(yesterday));
+  }, [matchData]);
   return (
     <>
       {matchData && (
@@ -36,7 +46,12 @@ export const FightBox = ({
           <div className="w-[300px]">
             <BoxerInfo boxer={matchData.blue_boxer} />
           </div>
-          <PredictionVoteIcon isPredictionVote={isPredictionVote} />
+          {isMatchDateInFuture && (
+            <PredictionVoteIcon
+              thisMatchDate={matchData.match_date}
+              isPredictionVote={isPredictionVote}
+            />
+          )}
         </div>
       )}
     </>

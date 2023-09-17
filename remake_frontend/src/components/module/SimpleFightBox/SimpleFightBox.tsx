@@ -34,7 +34,11 @@ export const SimpleFightBox = ({
           <MatchInfo matchData={matchData} />
 
           <BoxerBox boxer={matchData.blue_boxer} />
-          <PredictionVoteIcon isPredictionVote={isPredictionVote} />
+
+          <PredictionVoteIcon
+            thisMatchDate={matchData.match_date}
+            isPredictionVote={isPredictionVote}
+          />
         </div>
       )}
     </>

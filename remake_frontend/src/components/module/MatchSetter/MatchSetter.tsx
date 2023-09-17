@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { cloneDeep } from "lodash";
-import dayjs from "dayjs";
-import _ from "lodash";
+import React, { useEffect, useState } from 'react';
+import { cloneDeep } from 'lodash';
+import dayjs from 'dayjs';
+import _ from 'lodash';
 // ! types
 import {
   NationalityType,
@@ -10,17 +10,17 @@ import {
   WEIGHT_CLASS_Type,
   ORGANIZATIONS_Type,
   MatchesDataType,
-} from "@/assets/types";
+} from '@/assets/types';
 //! data
-import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from "@/assets/boxerData";
+import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
 import {
   MESSAGE,
   BG_COLOR_ON_TOAST_MODAL,
-} from "@/assets/statusesOnToastModal";
-import { Nationality } from "@/assets/NationalFlagData";
+} from '@/assets/statusesOnToastModal';
+import { Nationality } from '@/assets/NationalFlagData';
 //! hook
-import { useToastModal } from "@/hooks/useToastModal";
-import { useUpdateMatch } from "@/hooks/useMatch";
+import { useToastModal } from '@/hooks/useToastModal';
+import { useUpdateMatch } from '@/hooks/useMatch';
 
 export const MatchSetter = ({
   selectMatch,
@@ -34,13 +34,13 @@ export const MatchSetter = ({
   const { updateMatch } = useUpdateMatch();
   // const { registerMatch } = useRegisterMatch();
   // const matchDate = useRef("");
-  const [matchDate, setMatchDate] = useState("");
+  const [matchDate, setMatchDate] = useState('');
   const [matchGrade, setMatchGrade] = useState<GRADE_Type>();
   const [matchPlaceCountry, setMatchPlaceCountry] = useState<
-    NationalityType | ""
+    NationalityType | ''
   >();
-  const [matchVenue, setMatchVenue] = useState("");
-  const [matchWeight, setMatchWeight] = useState<WEIGHT_CLASS_Type | "">();
+  const [matchVenue, setMatchVenue] = useState('');
+  const [matchWeight, setMatchWeight] = useState<WEIGHT_CLASS_Type | ''>();
   const [belt, setBelt] = useState<ORGANIZATIONS_Type[] | []>([]);
   const [title, setTitle] = useState(false);
   const [counter, setCounter] = useState(1);
@@ -48,11 +48,11 @@ export const MatchSetter = ({
   //? 試合の削除が成功した時…
   useEffect(() => {
     if (!isSuccessDeleteMatch) return;
-    setMatchDate("");
-    setMatchGrade("");
-    setMatchPlaceCountry("");
-    setMatchVenue("");
-    setMatchWeight("");
+    setMatchDate('');
+    setMatchGrade('');
+    setMatchPlaceCountry('');
+    setMatchVenue('');
+    setMatchWeight('');
     setBelt([]);
   }, [isSuccessDeleteMatch]);
 
@@ -153,12 +153,12 @@ export const MatchSetter = ({
 
     //? selectMatchから必要なプロパティだけ抽出
     const matchProperty = [
-      "country",
-      "grade",
-      "venue",
-      "weight",
-      "titles",
-      "match_date",
+      'country',
+      'grade',
+      'venue',
+      'weight',
+      'titles',
+      'match_date',
     ];
     const pickSelectMatchData = _.pick(selectMatch, matchProperty) as any;
 
@@ -191,7 +191,6 @@ export const MatchSetter = ({
     }
 
     const matchId = selectMatch.id;
-    console.log(updateMatchData);
 
     updateMatch({ matchId, updateMatchData });
   };
@@ -218,8 +217,8 @@ export const MatchSetter = ({
             className="w-[150px] p-1"
             id="match-date"
             type="date"
-            min={dayjs().format("YYYY-MM-DD")}
-            value={matchDate || dayjs().format("YYYY-MM-DD")}
+            min={dayjs().format('YYYY-MM-DD')}
+            value={matchDate || dayjs().format('YYYY-MM-DD')}
             onChange={(e) => {
               setMatchDate(e.target.value);
             }}
