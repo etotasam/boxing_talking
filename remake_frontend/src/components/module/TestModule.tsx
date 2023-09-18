@@ -2,6 +2,15 @@ import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const TestModule = () => {
+  const myData = {
+    name: 'カネロ',
+    red_count: 256,
+    blue_count: 243,
+  };
+  const total = myData.red_count + myData.blue_count;
+  const redRaito = Math.round((myData.red_count / total) * 100);
+  const blueRaito = Math.round((myData.blue_count / total) * 100);
+
   return (
     <>
       {/* //? 自身の投票と投票数 */}
@@ -19,55 +28,51 @@ export const TestModule = () => {
               </span>
             </p>
 
-            <div className="flex mt-5">
+            <div className="flex justify-between mt-5">
+              <span
+                className={clsx(
+                  'block pl-3 text-lg font-semibold text-red-600 right-0 top-0',
+                  "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1"
+                )}
+              >
+                {myData.red_count}
+              </span>
+              <span
+                className={clsx(
+                  'block text-right pr-3 text-lg font-semibold right-0 top-0',
+                  "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1"
+                )}
+              >
+                {myData.blue_count}
+              </span>
+            </div>
+
+            <div className="flex mt-0">
               <div className="flex-1 flex justify-between relative">
-                <div className="w-[calc(60%-10px)]">
-                  <span
-                    className={clsx(
-                      'block pl-3 text-lg font-semibold text-red-600 right-0 top-0',
-                      "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1"
-                    )}
-                  >
-                    153
-                  </span>
-                  <motion.div
-                    className={clsx(
-                      'left-[5px] h-[10px] flex justify-center items-center bg-red-500 relative',
-                      'before:w-[10px] before:h-[10px] before:rounded-[50%] before:bg-red-500 before:absolute before:top-0 before:left-[-5px]',
-                      'after:w-[10px] after:h-[10px] after:rounded-[50%] after:bg-red-500 after:absolute after:top-0 after:right-[-5px]'
-                    )}
-                  />
-                </div>
-                <div className="w-[calc(40%-10px)]">
-                  <span
-                    className={clsx(
-                      'block text-right pr-3 text-lg font-semibold right-0 top-0',
-                      "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1"
-                    )}
-                  >
-                    3
-                  </span>
-                  <div className="relative">
-                    <motion.div
-                      initial={{
-                        width: 0,
-                      }}
-                      animate={{
-                        width: '100%',
-                      }}
-                      transition={{ duration: 3, ease: [0.25, 1, 0.5, 1] }}
-                      className="absolute right-0"
-                    >
-                      <span
-                        className={clsx(
-                          'right-[5px] h-[10px] flex justify-center items-center bg-blue-500 relative',
-                          'before:w-[10px] before:h-[10px] before:rounded-[50%] before:bg-blue-500 before:absolute before:top-0 before:left-[-5px]',
-                          'after:w-[10px] after:h-[10px] after:rounded-[50%] after:bg-blue-500 after:absolute after:top-0 after:right-[-5px]'
-                        )}
-                      />
-                    </motion.div>
-                  </div>
-                </div>
+                <motion.div
+                  initial={{
+                    width: 0,
+                  }}
+                  animate={{
+                    width: `${redRaito}%`,
+                  }}
+                  transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
+                  className="h-[10px] absolute top-0 left-[-1px] rounded-[50px] bg-red-600"
+                  // style={{ width: `calc(${redRaito}%)` }}
+                ></motion.div>
+
+                <motion.div
+                  initial={{
+                    width: 0,
+                  }}
+                  animate={{
+                    width: `${blueRaito}%`,
+                  }}
+                  transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
+                  className="h-[10px] absolute top-0 right-[-1px] rounded-[50px] bg-blue-600"
+                  // style={{ width: `calc(${blueRaito}%)` }}
+                ></motion.div>
+                {/*  */}
               </div>
             </div>
           </div>

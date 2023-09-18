@@ -1,5 +1,5 @@
-import { TailSpin } from "react-loader-spinner";
-import { motion } from "framer-motion";
+import { TailSpin } from 'react-loader-spinner';
+import { motion } from 'framer-motion';
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const FirstLoadinModal = () => {
@@ -14,7 +14,7 @@ export const FirstLoadinModal = () => {
         exit={{ opacity: 0, translateY: -30, transition: { duration: 0.3 } }}
         className="bg-white"
       >
-        <h1 className="text-[50px] font-thin text-center select-none">
+        <h1 className="lg:text-[50px] sm:text-[36px] text-[24px] font-thin text-center select-none">
           {siteTitle}
         </h1>
         <div className="flex justify-center items-center mt-8">

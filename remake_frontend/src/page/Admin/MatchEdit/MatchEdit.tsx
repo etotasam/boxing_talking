@@ -1,31 +1,31 @@
-import React, { useState, useEffect } from "react";
-import dayjs from "dayjs";
-import clsx from "clsx";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import dayjs from 'dayjs';
+import clsx from 'clsx';
+import { useLocation } from 'react-router-dom';
 //! data
 // import { GRADE } from "@/assets/boxerData";
 //! layout
-import AdminiLayout from "@/layout/AdminiLayout";
+import AdminiLayout from '@/layout/AdminiLayout';
 //! components
 // import { FightBox } from "@/components/module/FightBox";
-import { FlagImage } from "@/components/atomc/FlagImage";
-import { MatchSetter } from "@/components/module/MatchSetter/MatchSetter";
-import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
-import { Confirm } from "@/components/modal/Confirm";
+import { FlagImage } from '@/components/atomc/FlagImage';
+import { MatchSetter } from '@/components/module/MatchSetter/MatchSetter';
+import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
+import { Confirm } from '@/components/modal/Confirm';
 // ! hooks
-import { useFetchMatches, useDeleteMatch } from "@/hooks/useMatch";
-import { useToastModal } from "@/hooks/useToastModal";
-import { usePagePath } from "@/hooks/usePagePath";
-import { useLoading } from "@/hooks/useLoading";
+import { useFetchMatches, useDeleteMatch } from '@/hooks/useMatch';
+import { useToastModal } from '@/hooks/useToastModal';
+import { usePagePath } from '@/hooks/usePagePath';
+import { useLoading } from '@/hooks/useLoading';
 //! types
-import { MatchesDataType } from "@/assets/types";
+import { MatchDataType } from '@/assets/types';
 
 // ! image
-import crown from "@/assets/images/etc/champion.svg";
+import crown from '@/assets/images/etc/champion.svg';
 import {
   BG_COLOR_ON_TOAST_MODAL,
   MESSAGE,
-} from "@/assets/statusesOnToastModal";
+} from '@/assets/statusesOnToastModal';
 
 export const MatchEdit = () => {
   // ! use hook
@@ -36,7 +36,7 @@ export const MatchEdit = () => {
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
   const { setter: setPagePath } = usePagePath();
 
-  const [selectMatch, setSelectMatch] = useState<MatchesDataType>();
+  const [selectMatch, setSelectMatch] = useState<MatchDataType>();
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
 
   //? 初期設定(クリーンアップとか)
@@ -125,10 +125,10 @@ export const MatchEdit = () => {
 };
 
 type MatchComponentType = {
-  matchData: MatchesDataType[] | undefined;
-  selectMatch: MatchesDataType | undefined;
+  matchData: MatchDataType[] | undefined;
+  selectMatch: MatchDataType | undefined;
   setSelectMatch: React.Dispatch<
-    React.SetStateAction<MatchesDataType | undefined>
+    React.SetStateAction<MatchDataType | undefined>
   >;
 };
 
@@ -146,14 +146,14 @@ export const MatchListComponent = ({
               key={match.id}
               onClick={() => setSelectMatch(match)}
               className={clsx(
-                "text-center border-[1px] border-stone-400 p-3 mb-5 w-full cursor-pointer",
+                'text-center border-[1px] border-stone-400 p-3 mb-5 w-full cursor-pointer',
                 match.id === selectMatch?.id
                   ? `bg-yellow-100`
                   : `hover:bg-stone-200`
               )}
             >
               <h2 className="text-[18px]">
-                {dayjs(match.match_date).format("YYYY年M月D日")}
+                {dayjs(match.match_date).format('YYYY年M月D日')}
               </h2>
               <div className="flex mt-3">
                 <div className="flex-1">
@@ -190,7 +190,7 @@ export const MatchListComponent = ({
 export const SelectedMatchInfo = ({
   matchData,
 }: {
-  matchData: MatchesDataType | undefined;
+  matchData: MatchDataType | undefined;
 }) => {
   if (!matchData) return <div>選択なし</div>;
   return (
@@ -199,7 +199,7 @@ export const SelectedMatchInfo = ({
       <div className="p-5 text-stone-600 border-[1px] rounded-md border-stone-400 w-full">
         <div className="text-center relative mt-5">
           <h2 className="lg:text-2xl text-lg after:content-['(日本時間)'] after:absolute after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] after:text-sm">
-            {dayjs(matchData.match_date).format("YYYY年M月D日")}
+            {dayjs(matchData.match_date).format('YYYY年M月D日')}
           </h2>
           {matchData.titles.length > 0 && (
             <span className="absolute top-[-32px] left-[50%] translate-x-[-50%] w-[32px] h-[32px] mr-2">
@@ -210,7 +210,7 @@ export const SelectedMatchInfo = ({
 
         {/* グレード */}
         <div className="text-center text-xl mt-5">
-          {matchData.grade === "タイトルマッチ" ? (
+          {matchData.grade === 'タイトルマッチ' ? (
             <ul className="flex flex-col">
               {matchData.titles.sort().map((title) => (
                 <li key={title} className="mt-1">
@@ -242,7 +242,7 @@ export const SelectedMatchInfo = ({
 
         <div className="mt-10 text-center">
           <p className="relative inline-block lg:text-lg text-sm before:content-['階級'] before:w-full before:absolute before:top-[-25px] before:min-w-[100px] before:left-[50%] before:translate-x-[-50%] before:text-[14px] before:text-stone-500">
-            {`${matchData.weight.replace("S", "スーパー")}級`}
+            {`${matchData.weight.replace('S', 'スーパー')}級`}
           </p>
         </div>
       </div>

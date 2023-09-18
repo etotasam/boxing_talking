@@ -1,17 +1,25 @@
 import dayjs from 'dayjs';
 import clsx from 'clsx';
+import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 // ! types
-import { MatchesDataType } from '@/assets/types';
+import { MatchDataType } from '@/assets/types';
+import { BoxerType } from '@/assets/types';
 // ! components
 import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
-import { PredictionVoteIcon } from '@/components/atomc/PredictionVoteIcon';
+import { useEffect, useState } from 'react';
+import {
+  PredictionVoteIcon,
+  PredictionVoteIconMini,
+} from '@/components/atomc/PredictionVoteIcon';
 // ! image
 import crown from '@/assets/images/etc/champion.svg';
-// ! type
-import { BoxerType } from '@/assets/types';
+//! hook
+import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
+import { useWindowSize } from '@/hooks/useWindowSize';
+import { useGuest, useAuth } from '@/hooks/useAuth';
 
 type PropsType = {
-  matchData: MatchesDataType;
+  matchData: MatchDataType;
   onClick: (matchId: number) => void;
   className?: string;
   isPredictionVote: boolean | undefined;
@@ -22,12 +30,49 @@ export const SimpleFightBox = ({
   onClick,
   isPredictionVote,
 }: PropsType) => {
+  const { data: authUser } = useAuth();
+  const { data: isGuest } = useGuest();
+  const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
+  const { windowSize } = useWindowSize();
+  const [isShowPredictionIton, setIsShowPredictionIcon] = useState(false);
+
+  //? 未投票アイコンの表示条件設定
+  useEffect(() => {
+    if (isPredictionVote === undefined) return;
+    if (authUser === undefined) return;
+    if (isGuest === undefined) return;
+    if (windowSize === undefined) return;
+    if (isDayOverFight === undefined) return;
+    if (isFightToday === undefined) return;
+    setIsShowPredictionIcon(
+      Boolean(
+        (authUser || isGuest) &&
+          !isPredictionVote &&
+          isPredictionVote !== undefined &&
+          !isDayOverFight &&
+          !isFightToday
+      )
+    );
+  }, [
+    isPredictionVote,
+    authUser,
+    isGuest,
+    windowSize,
+    isDayOverFight,
+    isFightToday,
+  ]);
+
   return (
     <>
       {matchData && (
         <div
           onClick={() => onClick(matchData.id)}
-          className="relative flex justify-between md:w-[90%] w-full max-w-[1024px] cursor-pointer md:py-4 py-8 md:border-[1px] border-b-[1px] border-stone-400 md:rounded-md md:hover:bg-yellow-100 md:hover:border-white md:duration-300"
+          className={clsx(
+            'relative flex justify-between md:w-[90%] w-full max-w-[1024px] cursor-pointer md:py-4 py-8 border-b-[1px]  md:rounded-md md:hover:bg-yellow-100 md:hover:border-white md:duration-300  md:border-[1px]',
+            isDayOverFight && 'bg-stone-100 border-stone-300',
+            isFightToday && 'border-red-300 bg-red-50',
+            !isDayOverFight && !isFightToday && 'border-stone-400'
+          )}
         >
           <BoxerBox boxer={matchData.red_boxer} />
 
@@ -35,17 +80,23 @@ export const SimpleFightBox = ({
 
           <BoxerBox boxer={matchData.blue_boxer} />
 
-          <PredictionVoteIcon
-            thisMatchDate={matchData.match_date}
-            isPredictionVote={isPredictionVote}
-          />
+          {isShowPredictionIton &&
+            windowSize !== undefined &&
+            windowSize > TAILWIND_BREAKPOINT.md && <PredictionVoteIcon />}
+          {isShowPredictionIton &&
+            windowSize !== undefined &&
+            windowSize < TAILWIND_BREAKPOINT.md && (
+              <div className="absolute top-[10px] left-[40%] translate-x-[-50%]">
+                <PredictionVoteIconMini />
+              </div>
+            )}
         </div>
       )}
     </>
   );
 };
 
-const MatchInfo = ({ matchData }: { matchData: MatchesDataType }) => {
+const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
   return (
     <>
       {/* //? 日時 */}

@@ -67,7 +67,7 @@ export const CommentsComponent = ({
 
   return commentsOfThisMatches && Boolean(commentsOfThisMatches.length) ? (
     <section
-      className="w-[70%] border-l-[1px] border-stone-200"
+      className="xl:w-[70%] md:w-[60%] w-full border-l-[1px] border-stone-200"
       style={{
         marginBottom: `${commentPostTextareaHeight}px`,
         minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
@@ -85,11 +85,11 @@ export const CommentsComponent = ({
                 __html: commentData.comment,
               }}
             />
-            <div className="flex mt-3">
+            <div className="sm:flex mt-3">
               <time className="text-xs text-stone-400 leading-6">
                 {dateFormatter(commentData.created_at)}
               </time>
-              <div className="flex ml-3">
+              <div className="flex sm:ml-3">
                 {commentData.post_user_name ? (
                   <>
                     <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
@@ -120,7 +120,7 @@ export const CommentsComponent = ({
     </section>
   ) : !isFetchingComments && !isErrorFetchComments ? (
     <section
-      className="flex justify-center items-center text-[18px] border-l-[1px] w-[70%]"
+      className="flex justify-center items-center text-[18px] border-l-[1px] xl:w-[70%] md:w-[60%] w-full"
       style={{
         minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
       }}

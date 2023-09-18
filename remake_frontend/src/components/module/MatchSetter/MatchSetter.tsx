@@ -9,7 +9,7 @@ import {
   GRADE_Type,
   WEIGHT_CLASS_Type,
   ORGANIZATIONS_Type,
-  MatchesDataType,
+  MatchDataType,
 } from '@/assets/types';
 //! data
 import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
@@ -26,7 +26,7 @@ export const MatchSetter = ({
   selectMatch,
   isSuccessDeleteMatch,
 }: {
-  selectMatch: MatchesDataType | undefined;
+  selectMatch: MatchDataType | undefined;
   isSuccessDeleteMatch?: boolean;
 }) => {
   //? use hook

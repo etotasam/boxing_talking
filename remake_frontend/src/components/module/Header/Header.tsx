@@ -37,18 +37,18 @@ export const Header = (porps: PropsType) => {
     <>
       <header
         ref={headerRef}
-        className="sm:h-[80px] h-[70px] flex relative after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
+        className="h-[80px] flex relative after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
       >
-        <h1 className="md:text-[64px] sm:text-[54px] text-[36px] select-none font-thin">
+        <h1 className="md:text-[64px] sm:text-[54px] text-[32px] select-none font-thin">
           {siteTitle}
         </h1>
         {pagePath !== '/' && (
-          <div className="flex items-end mb-4 ml-10">
+          <div className="absolute bottom-2 left-2 sm:static sm:flex sm:items-end sm:mb-4 sm:ml-10">
             <ToBoxMatchLink />
           </div>
         )}
         {userData && (
-          <div className="absolute top-0 right-[30px] flex">
+          <div className="absolute top-2 sm:top-0 bottom-2 md:right-5 right-2 flex">
             <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
             <p className="text-sm">{userData.name}</p>
           </div>
@@ -61,7 +61,7 @@ export const Header = (porps: PropsType) => {
         )}
         {isEitherAuth && (
           <div className="absolute top-0 right-0 bg-red-300 h-full flex justify-center">
-            <div className="absolute bottom-5 lg:right-10 md:right-5 right-2 flex justify-center">
+            <div className="absolute sm:bottom-5 bottom-2 lg:right-10 md:right-5 right-2 flex justify-center">
               <LogoutBottun />
             </div>
           </div>
@@ -75,11 +75,11 @@ const ToBoxMatchLink = () => {
   return (
     <>
       <Link to="/">
-        <div className="flex bg-stone-600 duration-300 lg:hover:bg-black rounded-[25px] text-white px-3 py-2 [&>span]:duration-300 [&>span]:rotate-[-40deg] lg:[&>span]:hover:rotate-[230deg]">
-          <span className="text-[18px] text-white mr-2">
+        <div className="flex bg-stone-600 duration-300 lg:hover:bg-black rounded-[25px] text-white sm:px-3 sm:py-2 px-2 py-1 [&>span]:duration-300 [&>span]:rotate-[-40deg] lg:[&>span]:hover:rotate-[230deg]">
+          <span className="text-[16px] sm:text-[18px] text-white mr-2">
             <GiBoxingGlove />
           </span>
-          <p className="text-sm">試合一覧</p>
+          <p className="text-[10px] sm:text-sm">試合一覧</p>
         </div>
       </Link>
     </>
