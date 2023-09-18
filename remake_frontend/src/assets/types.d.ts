@@ -79,7 +79,7 @@ export type RegstarMatchPropsType = {
   titles: string[],
 }
 
-export type MatchesDataType = {
+export type MatchDataType = {
   id: number,
   red_boxer: BoxerType,
   blue_boxer: BoxerType,

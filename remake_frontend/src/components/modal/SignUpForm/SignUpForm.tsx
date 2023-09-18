@@ -90,13 +90,13 @@ export const SignUpForm = () => {
       onMouseDown={(e) => {
         e.stopPropagation();
       }}
-      className="w-1/2 min-w-[350px] max-w-[500px] min-h-[450px] bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
+      className="md:w-[550px] md:h-[600px] sm:w-2/3 sm:h-2/3 w-[95%] max-w-[500px] h-2/3 bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
     >
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, transition: { duration: 0.3 } }}
         exit={{ opacity: 0, transition: { duration: 0.3 } }}
-        className="relative w-[70%] py-10"
+        className="relative sm:w-[70%] sm:max-w-[450px] w-[80%] max-w-[350px] py-10"
       >
         <h1 className="w-full text-center text-stone-500 font-light text-xl">
           アカウント作成

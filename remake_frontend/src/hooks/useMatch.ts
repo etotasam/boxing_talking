@@ -6,7 +6,7 @@ import { useQuery, useMutation } from "react-query"
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 import { QUERY_KEY } from "@/assets/queryKeys"
 // ! types
-import { MatchesDataType, RegstarMatchPropsType } from "@/assets/types"
+import { MatchDataType, RegstarMatchPropsType } from "@/assets/types"
 // ! hook
 import { useToastModal } from "./useToastModal"
 import { useLoading } from "./useLoading"
@@ -17,7 +17,7 @@ export const useFetchMatches = () => {
   const fetcher = useCallback(async () => {
     return await Axios.get("api/match").then(value => value.data)
   }, [])
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchesDataType[]>(QUERY_KEY.matchesFetch, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.matchesFetch, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
   return { data, isLoading, isError, isRefetching, refetch }
 }
 

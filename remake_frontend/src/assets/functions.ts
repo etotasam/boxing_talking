@@ -1,6 +1,8 @@
 import _ from "lodash"
+import dayjs from 'dayjs';
+
 // ! types
-import { BoxerType, BoxerDataOnFormType } from "@/assets/types"
+import { BoxerType, BoxerDataOnFormType, MatchDataType } from "@/assets/types"
 
 
 // ? boxerDataOnFormのtitle_holeプロパティをstring[]型に変形してデータベースに保存する為の関数
@@ -31,4 +33,15 @@ export const convertToBoxerData = (boxerDataOnForm: BoxerDataOnFormType): BoxerT
 
 export const getBoxerDataWithID = ({ boxerID, boxersData }: { boxerID: number, boxersData: BoxerType[] }): BoxerType | undefined => {
   return boxersData.find(boxer => boxer.id === boxerID)
+}
+
+//? 試合日が過ぎているか
+export const getFightDataOfPastDays = (matchDate: MatchDataType): boolean => {
+  const today = dayjs().startOf('day');
+  const dayAfterFight = dayjs(matchDate.match_date)
+    .startOf('day')
+    .add(1, 'day')
+    .subtract(1, 'second');
+
+  return today.isAfter(dayAfterFight)
 }
