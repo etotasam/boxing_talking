@@ -30,10 +30,13 @@ class CreateAuthRequest extends FormRequest
                 'max:30'
             ],
             'email' => [
-                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'
+                'required',
+                'email',
+                'unique:users',
+                'unique:pre_users'
             ],
             'password' => [
-                'regex:/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,24}$/'
+                'regex: /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+{}\[\]:;<>,.?~\\-]{8,24}$/'
             ]
         ];
     }

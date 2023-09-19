@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 // ! hooks
 import { useGuest, useAuthCheck } from '@/hooks/useAuth';
@@ -15,8 +15,8 @@ import { FirstLoadinModal } from '@/components/modal/FirstLoadinModal';
 import { useLoginModal } from '@/hooks/useLoginModal';
 // ! recoil
 import { useRecoilValue } from 'recoil';
-import { loginModalSelector } from '@/store/loginModalState';
 import { loadingSelector } from '@/store/loadingState';
+import { loginModalSelector } from '@/store/loginModalState';
 import { useFetchBoxer } from '@/hooks/useBoxer';
 //! component
 import { LinkList } from '@/components/module/LinkList';
@@ -33,6 +33,7 @@ const Container = () => {
   const { isLoading: isMatchesFetching } = useFetchMatches();
   const navigate = useNavigate();
   const { showLoginModal, hideLoginModal } = useLoginModal();
+  const { pathname } = useLocation();
 
   // ! Toast Modalの表示時間等の設定
   const waitTime = 5000;
@@ -56,13 +57,13 @@ const Container = () => {
 
   useEffect(() => {
     if (isAuth === undefined || guestUser === undefined) return;
-    if (!isAuth && !guestUser) {
+    if (!isAuth && !guestUser && pathname !== '/identification/') {
       showLoginModal();
       navigate('/');
     } else {
       hideLoginModal();
     }
-  }, [isAuth, guestUser]);
+  }, [isAuth, guestUser, pathname]);
 
   return (
     <>

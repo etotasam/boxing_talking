@@ -170,14 +170,14 @@ export const useAuth = () => {
   return { data, isLoading, isError }
 }
 
-//! ユーザ作成
-export const useCreateUser = () => {
+//! ユーザ作成（仮登録）
+export const usePreSignUp = () => {
   // ? react query
   const queryClient = useQueryClient()
   // ? toast modal
   const { setToastModal, showToastModal } = useToastModal()
   // ? Loading state (hook)
-  const { startLoading, hasError, successful } = useLoading()
+  const { startLoading, hasError, successful, resetLoadingState } = useLoading()
   // ? login modal (hook)
   const { hideLoginModal } = useLoginModal()
 
@@ -187,38 +187,40 @@ export const useCreateUser = () => {
     password: string
   }
   const api = useCallback(async ({ name, email, password }: ApiPropsType) => {
-    const res = await Axios.post<UserType>(`/api/user/create`, { name, email, password }).then(value => value.data)
+    const res = await Axios.post<UserType>(`/api/user/pre_create`, { name, email, password }).then(value => value.data)
     return res
   }, [])
-  const { mutate, isLoading, isSuccess } = useMutation(api, {
+  const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
     onMutate: () => {
       startLoading()
     }
   })
-  const createUser = ({ name, email, password }: ApiPropsType) => {
+  const preSignUp = ({ name, email, password }: ApiPropsType) => {
     mutate({ name, email, password }, {
-      onSuccess: (registerUserData) => {
-        queryClient.setQueryData<UserType>(QUERY_KEY.auth, registerUserData)
-        successful()
-        setToastModal({ message: MESSAGE.USER_REGISTER_SUCCESSFULLY, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
-        hideLoginModal()
+      onSuccess: () => {
+        resetLoadingState()
+        // hideLoginModal()
       },
 
       onError: (error: any) => {
-        hasError()
+        resetLoadingState()
         if (error.status === 422) {
-          const errorMessages = error.data.errors as any
+          const errorMessages = error.data.message as any
           if (errorMessages.name) {
-            if ((errorMessages.name as string[]).includes('name is required')) {
-              setToastModal({ message: MESSAGE.NAME_IS_REQUIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+            if ((errorMessages.name as string[]).includes('The name has already been taken.')) {
+              setToastModal({ message: MESSAGE.USER_NAME_ALREADY_USE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showToastModal()
+              return
+            }
+            if ((errorMessages.name as string[]).includes('The name must not be greater than 30 characters.')) {
+              setToastModal({ message: MESSAGE.NAME_CHAR_LIMIT_OVER, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
               showToastModal()
               return
             }
           }
           if (errorMessages.email) {
-            if (errorMessages.email.includes('email is alredy registered')) {
-              setToastModal({ message: MESSAGE.NAME_IS_REQUIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+            if (errorMessages.email.includes('The email has already been taken.')) {
+              setToastModal({ message: MESSAGE.EMAIL_HAS_ALREADY_EXIST, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
               showToastModal()
               return
             }
@@ -227,24 +229,13 @@ export const useCreateUser = () => {
           showToastModal()
           return
         }
-        //? すでに使われている名前
-        if (error.message === "The name is alredy in use") {
-          setToastModal({ message: MESSAGE.USER_NAME_ALREADY_USE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          showToastModal()
-          return
-        }
-        //? すでに登録されているメールアドレス
-        if (error.message === "The name is alredy in use") {
-          setToastModal({ message: MESSAGE.USER_ALREADY_EXIST, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          showToastModal()
-          return
-        }
+
         setToastModal({ message: MESSAGE.USER_REGISTER_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
       }
     })
   }
-  return { createUser, isLoading, isSuccess }
+  return { preSignUp, isLoading, isSuccess, isError }
 }
 
 //! ログイン

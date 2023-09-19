@@ -1,6 +1,8 @@
-<p>テストメール</p>
-@if(isset($test))
+<p>件名</p>
+{{-- @if(isset($test))
   <p>{{ $test }}</p>
-@endif
+@endif --}}
 
-<a href="http://localhost:8080/create/{{ $token }}/{{ $id }}">http://localhost:8080/create/{{ $token }}/{{ $id }}</a>
+<a href="ボタン">http://localhost:3000/identification/?signup={{ $token }}</a>
+
+{{-- <p>{{ $token }}</p> --}}

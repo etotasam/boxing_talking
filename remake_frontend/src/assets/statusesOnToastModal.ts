@@ -29,8 +29,9 @@ export const MESSAGE = {
   EMAIL_IS_REQUIRED: "メールアドレスが正しくありません",
   USER_REGISTER_SUCCESSFULLY: "登録が完了しました",
   USER_REGISTER_FAILED: "登録に失敗しました。\n 入力情報に誤りがないかご確認ください",
-  USER_ALREADY_EXIST: "すでに登録されているEmailです",
+  EMAIL_HAS_ALREADY_EXIST: "すでに登録されているEmailです",
   USER_NAME_ALREADY_USE: "すでに使われている名前です \n 別の名前を検討してください",
+  NAME_CHAR_LIMIT_OVER: "名前の文字数がオーバーしています \n 30文字までです",
 
 
 
