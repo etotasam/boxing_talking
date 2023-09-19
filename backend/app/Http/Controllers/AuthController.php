@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Mail\Mailer;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use App\Helpers\ErrorHelper;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -10,18 +15,23 @@ use Exception;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Mail;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+// use Mail;
 // models
 use App\Models\User;
+use App\Models\PreUser;
 use App\Models\GuestUser;
 use App\Models\ProvisionalUser;
 use App\Models\Administrator;
 
-use App\Http\Requests\CreateAuthRequest;
 use Laravel\Sanctum\PersonalAccessTokenResult;
 // use \Symfony\Component\HttpFoundation\Response;
 use \Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cookie;
+
+// !request
+use App\Http\Requests\CreateAuthRequest;
 
 class AuthController extends Controller
 {
@@ -54,7 +64,7 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function guest_logout(Response $request)
+    public function guest_logout(Request $request)
     {
 
         // $response = new Response('Logged out successfully');
@@ -79,6 +89,68 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * pre_create
+     *
+     * @param string $name
+     * @param string $email
+     * @param string $password
+     * @return \Illuminate\Http\Response
+     */
+    public function pre_create(Request $request)
+    {
+
+        // throw new Exception();
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email|unique:users,email|unique:pre_users,email',
+                'name' => 'required|string|unique:users,name|unique:pre_users,name|max:30',
+                'password' => 'regex: /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+{}\[\]:;<>,.?~\\-]{8,24}$/'
+            ]);
+
+            if ($validator->fails()) {
+                return new JsonResponse(['success' => false, 'message' => $validator->errors()], 422);
+            }
+
+            // ? password Hash
+            $hashed_password = Hash::make($request->password);
+
+            DB::beginTransaction();
+
+            $pre_user = PreUser::create([
+                "name" => $request->name,
+                "email" => $request->email,
+                "password" => $hashed_password,
+            ]);
+            $payload = [
+                'user_id' => $pre_user->id,
+                'exp' => strtotime('+30 minutes'),
+            ];
+
+            $secretKey = config('app.token_secret_key');
+
+            $token = JWT::encode($payload, $secretKey, 'HS256');
+            $data = ["token" => $token, "email" => $pre_user->email];
+
+            Mail::to($request->email)->send(new Mailer($request->name, $token));
+
+            DB::commit();
+            return new JsonResponse(
+                [
+                    'success' => true,
+                    'message' => "Thank you for subscribing to our email, please check your inbox"
+                ],
+                Response::HTTP_CREATED
+            );
+        } catch (Exception $e) {
+            DB::rollBack();
+            if ($e->getCode()) {
+                // return response()->json(["message" => $e->getMessage(), "error_details" => $e->getTrace()], 422);
+                return new JsonResponse(['success' => false, 'message' => $e->getMessage()], $e->getCode());
+            }
+            return response()->json(["message" => $e->getMessage()], 500);
+        }
+    }
 
     /**
      * create
@@ -90,29 +162,86 @@ class AuthController extends Controller
      */
     public function create(Request $request)
     {
-        // throw new Exception();
         try {
-            $name = $request->name;
-            $email = $request->email;
-            $password = Hash::make($request->password);
-            $is_name_exist = User::where("name", $name)->exists();
-            $is_email_exist = User::where("email", $email)->exists();
-            if ($is_email_exist) {
-                throw new Exception('user already exists', Response::HTTP_FORBIDDEN);
+            $credentials = $request->only('token');
+            $secret_key = config('app.token_secret_key');
+
+            $decoded = JWT::decode($credentials['token'], new Key($secret_key, 'HS256'));
+            $exp = $decoded->exp;
+            $current_time = time();
+            if ($current_time > $exp) {
+                throw new Exception("期限切れ", 403);
             }
-            if ($is_name_exist) {
-                throw new Exception('name already use', Response::HTTP_FORBIDDEN);
+
+            $user_id = $decoded->user_id;
+            $pre_user = PreUser::find($user_id);
+
+            if (!$pre_user) {
+                throw new Exception("無効", 403);
             }
-            $user = ["name" => $name, "email" => $email, "password" => $password];
-            User::create($user);
-            if (Auth::attempt(['email' => $email, 'password' => $request->password])) {
-                return Auth::user();
+            DB::beginTransaction();
+            $auth_user = User::create([
+                "name" => $pre_user->name,
+                "email" => $pre_user->email,
+                "password" => $pre_user->password
+            ]);
+
+            if (!$auth_user) {
+                throw new Exception("本登録しっぱい", 401);
             }
-            return response()->json(["message" => "created user"], Response::HTTP_CREATED);
+
+            // if (!Auth::attempt(['email' => $auth_user->email, 'password' => $auth_user->password])) {
+            // }
+            // $auth_user = Auth::user();
+            // if (!$auth_user) {
+            //     throw new Exception("ログインミス", 403);
+            // }
+
+            $pre_user->delete();
+            DB::commit();
+            return response()->json(["message" => "successful"], Response::HTTP_CREATED);
         } catch (Exception $e) {
-            return response()->json(["message" => $e->getMessage()], $e->getCode());
+            DB::rollBack();
+            if ($e->getCode()) {
+                return response()->json(["message" => $e->getMessage()], $e->getCode());
+            }
+            return response()->json(["message" => "failed"], 500);
         }
     }
+
+
+    /**
+     * create
+     *
+     * @param string $name
+     * @param string $email
+     * @param string $password
+     * @return \Illuminate\Http\Response
+     */
+    // public function create(Request $request)
+    // {
+    //     try {
+    //         $name = $request->name;
+    //         $email = $request->email;
+    //         $password = Hash::make($request->password);
+    //         $is_name_exist = User::where("name", $name)->exists();
+    //         $is_email_exist = User::where("email", $email)->exists();
+    //         if ($is_email_exist) {
+    //             throw new Exception('user already exists', Response::HTTP_FORBIDDEN);
+    //         }
+    //         if ($is_name_exist) {
+    //             throw new Exception('name already use', Response::HTTP_FORBIDDEN);
+    //         }
+    //         $user = ["name" => $name, "email" => $email, "password" => $password];
+    //         User::create($user);
+    //         if (Auth::attempt(['email' => $email, 'password' => $request->password])) {
+    //             return Auth::user();
+    //         }
+    //         return response()->json(["message" => "created user"], Response::HTTP_CREATED);
+    //     } catch (Exception $e) {
+    //         return response()->json(["message" => $e->getMessage()], $e->getCode());
+    //     }
+    // }
 
     /**
      * user

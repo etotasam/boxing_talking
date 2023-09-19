@@ -51,8 +51,9 @@ Route::get('/guest/user', function (Request $request) {
 
 //? auth
 Route::get('/admin', [AuthController::class, 'admin'])->name('auth.admin');
-// Route::post('/user/create', [AuthController::class, 'test_create'])->name('auth.create');
+// Route::post('/user/create', [AuthController::class, 'test_create'])->name('auth.test_create');
 Route::post('/user/create', [AuthController::class, 'create'])->name('auth.create');
+Route::post('/user/pre_create', [AuthController::class, 'pre_create'])->name('auth.pre_create');
 
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 

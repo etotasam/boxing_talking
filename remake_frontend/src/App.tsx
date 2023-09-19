@@ -9,6 +9,8 @@ import { BoxerEdit } from '@/page/Admin/BoxerEdit';
 import { MatchRegister } from '@/page/Admin/MatchRegister';
 import { MatchEdit } from '@/page/Admin/MatchEdit';
 import { Terms } from './page/Terms/Terms';
+import { Identification } from '@/page/Identification';
+import { NotFound } from '@/page/NotFound';
 // ! middleware
 import AdminOnly from './middleware/AdminOnly';
 import Container from './middleware/Container';
@@ -42,9 +44,11 @@ function App() {
         {/* //! テスト用 */}
         <Route element={<MainLayout />}>
           <Route path="/test_module" element={<TestModule />} />
+          <Route path="/identification" element={<Identification />} />
           {/* //? </MainLayout> */}
         </Route>
         <Route path="/terms" element={<Terms />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

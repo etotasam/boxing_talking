@@ -15,7 +15,7 @@ import { useMatchBoxerSectionHeight } from '@/hooks/useMatchBoxerSectionHeight';
 import {
   useVoteMatchPrediction,
   useAllFetchMatchPredictionOfAuthUser,
-} from '@/hooks/uesWinLossPredition';
+} from '@/hooks/uesWinLossPrediction';
 import { useWindowSize } from '@/hooks/useWindowSize';
 
 type SetUpBoxersType = {

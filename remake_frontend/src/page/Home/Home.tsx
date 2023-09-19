@@ -14,7 +14,7 @@ import { useLoading } from '@/hooks/useLoading';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useFooterHeight } from '@/hooks/useFooterHeight';
-import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/uesWinLossPredition';
+import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/uesWinLossPrediction';
 import { useVisualModeController } from '@/hooks/useVisualModeController';
 // ! func
 import { getFightDataOfPastDays } from '@/assets/functions';
