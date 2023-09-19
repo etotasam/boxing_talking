@@ -16,7 +16,7 @@ import { usePagePath } from '@/hooks/usePagePath';
 import {
   useVoteMatchPrediction,
   useAllFetchMatchPredictionOfAuthUser,
-} from '@/hooks/uesWinLossPredition';
+} from '@/hooks/uesWinLossPrediction';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { usePostComment, useFetchComments } from '@/hooks/useComment';
 //! component
@@ -237,7 +237,7 @@ export const Match = () => {
   );
 };
 
-// ! post commnet textarea
+// ! post comment textarea
 type PostCommentTextareaType = {
   isPostingComment: boolean;
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -275,7 +275,7 @@ const PostCommentTextarea = ({
         )}
       >
         {isPostingComment ? (
-          <span className="w-[full] h-[full]">
+          <span className="sm:w-[20px] sm:h-[20px] w-[15px] h-[15px]">
             <RotatingLines width="auto" strokeColor="white" />
           </span>
         ) : (

@@ -9,7 +9,7 @@ import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal"
 import { useToastModal } from "./useToastModal"
 import { useLoading } from "./useLoading"
 import { useLoginModal } from "./useLoginModal"
-import { useAllFetchMatchPredictionOfAuthUser } from "./uesWinLossPredition"
+import { useAllFetchMatchPredictionOfAuthUser } from "./uesWinLossPrediction"
 import { useReactQuery } from "./useReactQuery"
 //! types
 import type { UserType } from "@/assets/types"

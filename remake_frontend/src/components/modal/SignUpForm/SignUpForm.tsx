@@ -72,6 +72,12 @@ export const SignUpForm = () => {
 
   const [isShowPreSignUpModal, setIsShowPreSignUpModal] = useState(false);
 
+  const passwordPassedConditions = [
+    { word: '長さ8~24文字', condition: isValidLength },
+    { word: '大文字を含む', condition: isValidUppercase },
+    { word: '数字を含む', condition: isValidHasNumber },
+  ];
+
   return (
     <>
       {isShowPreSignUpModal && (
@@ -98,7 +104,10 @@ export const SignUpForm = () => {
               placeholder="Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className={`mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 border-stone-400 focus:border-green-500 duration-300 bg-transparent`}
+              className={clsx(
+                `mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600  focus:border-green-500 duration-300 bg-transparent`,
+                isPassedValidateName ? 'border-green-500' : 'border-stone-400'
+              )}
             />
 
             <input
@@ -106,7 +115,10 @@ export const SignUpForm = () => {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 border-stone-400 focus:border-green-500 duration-300 bg-transparent`}
+              className={clsx(
+                `mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 focus:border-green-500 duration-300 bg-transparent`,
+                isPassedValidateEmail ? 'border-green-500' : 'border-stone-400'
+              )}
             />
 
             <input
@@ -116,7 +128,10 @@ export const SignUpForm = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={clsx(
-                'mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 border-stone-400 focus:border-green-500 duration-300 bg-transparent'
+                'mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 focus:border-green-500 duration-300 bg-transparent',
+                isPassedValidatePassword
+                  ? 'border-green-500'
+                  : 'border-stone-400'
               )}
             />
             <div className="mt-3 p-3 border-[1px] border-stone-300 text-stone-500">
@@ -125,36 +140,19 @@ export const SignUpForm = () => {
               </p>
               <p className="mt-2">パスワードは以下が必要です</p>
               <ul className="mt-2 space-y-1">
-                <li
-                  className={clsx(
-                    `relative pl-[15px] before:absolute before:top-0 before:left-0 before:w-[2px]`,
-                    isValidLength
-                      ? `text-green-700/60 before:content-["✓"]`
-                      : `before:content-[""]`
-                  )}
-                >
-                  <span>長さ8~24文字</span>
-                </li>
-                <li
-                  className={clsx(
-                    `relative pl-[15px] before:absolute before:top-0 before:left-0 before:w-[2px]`,
-                    isValidUppercase
-                      ? `text-green-700/60 before:content-["✓"]`
-                      : `before:content-[""]`
-                  )}
-                >
-                  大文字を含む
-                </li>
-                <li
-                  className={clsx(
-                    `relative pl-[15px] before:absolute before:top-0 before:left-0 before:w-[2px]`,
-                    isValidHasNumber
-                      ? `text-green-700/60 before:content-["✓"]`
-                      : `before:content-[""]`
-                  )}
-                >
-                  数字を含む
-                </li>
+                {passwordPassedConditions.map((el) => (
+                  <li
+                    key={el.word}
+                    className={clsx(
+                      `relative pl-[15px] before:absolute before:top-0 before:left-0 before:w-[2px] text-sm`,
+                      el.condition
+                        ? `text-green-700/60 before:content-["✓"]`
+                        : `before:content-[""]`
+                    )}
+                  >
+                    <span>{el.word}</span>
+                  </li>
+                ))}
               </ul>
             </div>
 
