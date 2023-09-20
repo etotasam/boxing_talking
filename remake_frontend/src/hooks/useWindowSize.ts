@@ -3,12 +3,15 @@ import { useEffect, useState } from "react"
 
 export const useWindowSize = () => {
 
-  const [windowSize, setWindowSize] = useState<"PC" | "SP">()
+  const [device, setDevice] = useState<"PC" | "SP">()
+  const [windowSize, setWindowSize] = useState<number>()
 
   const getViewportWidth = () => {
-    const width = document.documentElement.clientWidth
+    const width = window.innerWidth
+    // const width = document.documentElement.offsetWidth
     const device = width > 900 ? "PC" : "SP"
-    setWindowSize(device)
+    setDevice(device)
+    setWindowSize(width)
   }
 
   useEffect(() => {
@@ -19,5 +22,5 @@ export const useWindowSize = () => {
     }
   }, [])
 
-  return { windowSize }
+  return { device, windowSize }
 }

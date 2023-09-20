@@ -1,30 +1,39 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 // ! hooks
-import { useAuth } from '@/hooks/useAuth';
+import { useGuest, useAuthCheck } from '@/hooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useFetchMatches } from '@/hooks/useMatch';
+import { useAdmin } from '@/hooks/useAuth';
 // import { useLoading } from "@/hooks/useLoading";
 // ! modal
 import { ToastModalContainer } from '@/components/modal/ToastModal';
 import { LoginFormModal } from '@/components/modal/LoginFormModal';
 import { FullScreenSpinnerModal } from '@/components/modal/FullScreenSpinnerModal';
 import { FirstLoadinModal } from '@/components/modal/FirstLoadinModal';
+import { useLoginModal } from '@/hooks/useLoginModal';
 // ! recoil
 import { useRecoilValue } from 'recoil';
-import { loginModalSelector } from '@/store/loginModalState';
 import { loadingSelector } from '@/store/loadingState';
+import { loginModalSelector } from '@/store/loginModalState';
 import { useFetchBoxer } from '@/hooks/useBoxer';
+//! component
+import { LinkList } from '@/components/module/LinkList';
 
 const Container = () => {
+  const { isAdmin } = useAdmin();
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
   const isShowLoginModal = useRecoilValue(loginModalSelector);
   const { isLoading: isLoadingByRecoil } = useRecoilValue(loadingSelector);
-  const { isLoading: isFirstCheckingAuth } = useAuth();
+  const { data: isAuth, isLoading: isFirstCheckingAuth } = useAuthCheck();
+  const { data: guestUser } = useGuest();
   const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } =
     useFetchBoxer();
   const { isLoading: isMatchesFetching } = useFetchMatches();
+  const navigate = useNavigate();
+  const { showLoginModal, hideLoginModal } = useLoginModal();
+  const { pathname } = useLocation();
 
   // ! Toast Modalの表示時間等の設定
   const waitTime = 5000;
@@ -46,6 +55,16 @@ const Container = () => {
     });
   };
 
+  useEffect(() => {
+    if (isAuth === undefined || guestUser === undefined) return;
+    if (!isAuth && !guestUser && pathname !== '/identification/') {
+      showLoginModal();
+      navigate('/');
+    } else {
+      hideLoginModal();
+    }
+  }, [isAuth, guestUser, pathname]);
+
   return (
     <>
       <Outlet />
@@ -61,6 +80,12 @@ const Container = () => {
         )}
       </AnimatePresence>
       {isShowLoginModal && <LoginFormModal key={'LoginFormModal'} />}
+      {/* // ? 管理者用 */}
+      {isAdmin && (
+        <div className="fixed right-[200px] top-0">
+          <LinkList />
+        </div>
+      )}
     </>
   );
 };

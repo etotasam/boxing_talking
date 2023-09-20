@@ -1,75 +1,63 @@
 import React, { useEffect, useState, useRef } from 'react';
-// import { AiOutlineClose } from "react-icons/ai";
-import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
-import clsx from 'clsx';
-import dayjs from 'dayjs';
-// import { useRecoilValue } from "recoil";
-// import { loginModalSelector } from "@/store/loginModalState";
-// import { loadingSelector } from "@/store/loadingState";
-// import japanFlag from "@/assets/images/flags/japan.svg";
+import { RotatingLines } from 'react-loader-spinner';
+//! data
+import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
+//! icon
+import { BiSend } from 'react-icons/bi';
 //! types
-import { BoxerType, MatchesDataType } from '@/assets/types';
+import { MatchDataType } from '@/assets/types';
 // ! hook
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth, useGuest } from '@/hooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useFetchMatches } from '@/hooks/useMatch';
 import { usePagePath } from '@/hooks/usePagePath';
-import { useHeaderAndBottomHeight } from '@/hooks/useHeaderAndBottomHeightState';
 import {
   useVoteMatchPrediction,
-  useFetchMatchPredictVote,
-} from '@/hooks/uesWinLossPredition';
+  useAllFetchMatchPredictionOfAuthUser,
+} from '@/hooks/uesWinLossPrediction';
+import { useWindowSize } from '@/hooks/useWindowSize';
 import { usePostComment, useFetchComments } from '@/hooks/useComment';
 //! component
-import { BackgroundFlag } from '@/components/atomc/BackgroundFlag';
-import { SelectedMatchInfo } from '@/page/Admin/MatchEdit';
-import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
+import { LeftSection } from './myComponents/LeftSection';
+import { CommentsComponent } from './myComponents/CommentsComponent';
+import { SetUpBoxers } from './myComponents/SetUpBoxers';
 import {
   BG_COLOR_ON_TOAST_MODAL,
   MESSAGE,
 } from '@/assets/statusesOnToastModal';
+import clsx from 'clsx';
 
 export const Match = () => {
   // ? use hook
+  const { windowSize } = useWindowSize();
   const { pathname, search } = useLocation();
   const query = new URLSearchParams(search);
   const paramsMatchID = Number(query.get('match_id'));
   const { data: matches } = useFetchMatches();
-  const { matchPrediction, isSuccess: isSuccessVoteMatchPrediction } =
-    useVoteMatchPrediction();
+  const { isSuccess: isSuccessVoteMatchPrediction } = useVoteMatchPrediction();
   const { data: allPredictionVoteOfUsers, refetch: refetchAllPredictionData } =
-    useFetchMatchPredictVote();
+    useAllFetchMatchPredictionOfAuthUser();
   const { setToastModal, showToastModal } = useToastModal();
   const { startLoading, resetLoadingState } = useLoading();
-  const {
-    data: comments,
-    isLoading: isFetchingComments,
-    isError: isErrorFetchComments,
-  } = useFetchComments(paramsMatchID);
-  // console.log(comments);
+  const { isLoading: isFetchingComments } = useFetchComments(paramsMatchID);
+
   const { setter: setPagePath } = usePagePath();
+  const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
-  // const { deleteComment } = useDeleteComment();
+  const isEitherAuth = Boolean(isGuest || authUser);
+
   const {
     postComment,
     isSuccess: isSuccessPostComment,
-    // isLoading: isPostingComment,
-    // isError: isErrorPostComment,
+    isLoading: isPostingComment,
   } = usePostComment();
-  const {
-    setMiddleContentHeight,
-    // setBottomHeight,
-    state: excludeHeight,
-  } = useHeaderAndBottomHeight();
-  // console.log(excludeHeight);
-
   //? useState
   const [comment, setComment] = useState<string>();
-  const [commentPostComponentHeight, setCommentPostComponentHeight] =
+  const [commentPostTextareaHeight, setCommentPostComponentHeight] =
     useState<number>();
-  const [thisMatch, setThisMatch] = useState<MatchesDataType>();
+  const [thisMatch, setThisMatch] = useState<MatchDataType>();
   const [thisMatchPredictionCount, setThisMatchPredictionCount] = useState<
     Record<'redCount' | 'blueCount' | 'totalCount', number>
   >({ redCount: 0, blueCount: 0, totalCount: 0 });
@@ -98,7 +86,6 @@ export const Match = () => {
   //? useRef
   const commentPostRef = useRef(null);
   const textareaRef = useRef(null);
-  const boxerSectionRef = useRef(null);
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -108,15 +95,6 @@ export const Match = () => {
       resetLoadingState();
     };
   }, []);
-
-  //? boxer sectionの高さを取得
-  useEffect(() => {
-    if (boxerSectionRef.current) {
-      const height = (boxerSectionRef?.current as unknown as HTMLElement)
-        .clientHeight;
-      setMiddleContentHeight(height);
-    }
-  }, [boxerSectionRef.current]);
 
   //? この試合の勝敗予想の有無とその投票
   useEffect(() => {
@@ -142,19 +120,8 @@ export const Match = () => {
   useEffect(() => {
     if (isSuccessVoteMatchPrediction) {
       refetchAllPredictionData();
-      setIsPredictionModal(false);
     }
   }, [isSuccessVoteMatchPrediction]);
-  //? コメント投稿失敗時
-  // useEffect(() => {
-  //   if (isErrorPostComment) {
-  //     setToastModal({
-  //       message: MESSAGE.COMMENT_POST_FAILED,
-  //       bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR,
-  //     });
-  //     showToastModal();
-  //   }
-  // }, [isErrorPostComment]);
 
   //? コメント入力欄の高さを取得
   useEffect(() => {
@@ -166,15 +133,6 @@ export const Match = () => {
       }
     }
   }, [comment]);
-
-  //? コメント投稿中にモーダル表示
-  // useEffect(() => {
-  //   if (isPostingComment) {
-  //     startLoading();
-  //   } else {
-  //     resetLoadingState();
-  //   }
-  // }, [isPostingComment]);
 
   // ? コメント投稿成功時にコメント入力欄をclearメッセージモーダル
   useEffect(() => {
@@ -198,7 +156,8 @@ export const Match = () => {
 
   //? コメント投稿
   const sendComment = () => {
-    if (!authUser) {
+    if (isPostingComment) return;
+    if (!isEitherAuth) {
       setToastModal({
         message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH,
         bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
@@ -214,239 +173,58 @@ export const Match = () => {
       showToastModal();
       return;
     }
-    postComment({ matchId: paramsMatchID, comment });
+    postComment({ matchId: paramsMatchID, comment: comment });
     return;
   };
-  // const commentDelete = (commentID: number) => {
-  //   deleteComment({ commentID, matchID: paramsMatchID });
-  // };
 
+  const textarea = textareaRef.current as unknown as HTMLTextAreaElement;
   const autoExpandTextareaAndSetComment = (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
-    const textarea = textareaRef.current as unknown as HTMLTextAreaElement;
+    setComment(e.target.value);
     if (!textarea) return;
-    if (textarea.scrollHeight > 250) return;
+    if (textarea.scrollHeight > 250) {
+      textarea.style.height = 'auto';
+      textarea.style.height = '250px';
+      return;
+    }
     textarea.style.height = 'auto';
     textarea.style.height = `${textarea.scrollHeight}px`;
-    setComment(e.target.value);
   };
 
-  const [_, setIsPredictionModal] = useState(true);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-
-  const [selectpredictionBoxer, setSelectPredictionBoxer] = useState<{
-    name: string;
-    color: 'red' | 'blue';
-  }>();
-  //? 勝敗予想の投票
-  const sendPrecition = () => {
-    if (!selectpredictionBoxer) return;
-    if (thisMatchPredictionOfUsers) return;
-    matchPrediction({
-      matchID: paramsMatchID,
-      prediction: selectpredictionBoxer.color,
-    });
-    setShowConfirmModal(false);
-  };
-
-  const prediction = ({
-    name,
-    color,
-  }: {
-    name: string;
-    color: 'red' | 'blue';
-  }) => {
-    if (thisMatchPredictionOfUsers) return;
-    setSelectPredictionBoxer({ name, color });
-    setShowConfirmModal(true);
-  };
-
-  const getPredictionCountPercent = (predictionCoount: number) => {
-    const percent = Math.ceil(
-      (predictionCoount / thisMatchPredictionCount.totalCount) * 100
-    );
-    if (percent) {
-      return percent;
-    } else {
-      return 0;
-    }
-  };
-
+  //! DOM
   return (
     <>
-      {/* //? boxer */}
-      {thisMatch && (
-        <section
-          ref={boxerSectionRef}
-          className="flex border-b-[1px] h-[100px] relative"
-        >
-          {/* {isPrectionModal && !thisMatchPredictionOfUsers && !isLoading && (
-            <BalloonModal setIsPredictionModal={setIsPredictionModal} />
-          )} */}
-          {/* //? 投票確認モーダル */}
-          {showConfirmModal && (
-            <PredictionConfirmModal
-              boxerName={selectpredictionBoxer!.name!}
-              execution={sendPrecition}
-              cancel={() => setShowConfirmModal(false)}
-            />
-          )}
-          <BoxerBox
-            boxerColor={thisMatch.red_boxer}
-            color="red"
-            thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
-            prediction={prediction}
-          />
-          <BoxerBox
-            boxerColor={thisMatch.blue_boxer}
-            color="blue"
-            thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
-            prediction={prediction}
-          />
-          {!isFetchingComments && (
-            <>
-              <motion.span
-                initial={{ width: 0 }}
-                animate={{
-                  width: `${getPredictionCountPercent(
-                    thisMatchPredictionCount.redCount
-                  )}%`,
-                }}
-                transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-                // style={{ width: `${red}%` }}
-                className="bolck absolute bottom-0 left-0 bg-red-600 h-2"
-              />
-              <motion.span
-                initial={{ width: 0 }}
-                animate={{
-                  width: `${getPredictionCountPercent(
-                    thisMatchPredictionCount.blueCount
-                  )}%`,
-                }}
-                transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-                className="bolck absolute bottom-0 right-0 bg-blue-600 h-2"
-              />
-            </>
-          )}
-        </section>
-      )}
+      {/* //? Boxer */}
+      <SetUpBoxers
+        paramsMatchID={paramsMatchID}
+        thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
+        thisMatch={thisMatch}
+        thisMatchPredictionCount={thisMatchPredictionCount}
+        isFetchingComments={isFetchingComments}
+      />
       <div className="flex w-full">
-        {/* //? match info */}
-        <div className="w-[30%]">
-          <div className="sticky top-5">
-            <div className="w-full">
-              <div className="flex justify-center mt-5">
-                <SelectedMatchInfo matchData={thisMatch} />
-              </div>
-              {/* //? 自身の投票と投票数 */}
-              {thisMatchPredictionOfUsers && (
-                <div className="flex justify-center mt-5">
-                  <div className="w-[80%]">
-                    {thisMatchPredictionOfUsers === 'red' && (
-                      <p className="text-center">
-                        {thisMatch?.red_boxer.name}の勝利を予想しました
-                      </p>
-                    )}
-                    {thisMatchPredictionOfUsers === 'blue' && (
-                      <p className="text-center">
-                        {thisMatch?.blue_boxer.name}の勝利を予想しました
-                      </p>
-                    )}
-                    <div className="flex">
-                      <div className="flex-1 flex justify-center">
-                        <div className="rounded-[50%] w-[60px] h-[60px] flex justify-center items-center bg-red-500">
-                          <p className="text-white text-[24px]">
-                            {thisMatch?.count_red}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex-1 flex justify-center">
-                        <div className="rounded-[50%] w-[60px] h-[60px] flex justify-center items-center bg-blue-500">
-                          <p className="text-white text-[24px]">
-                            {thisMatch?.count_blue}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        {/* //? comments */}
-        {comments && Boolean(comments.length) ? (
-          <section
-            className="w-[70%] border-l-[1px] border-stone-200"
-            style={{
-              marginBottom: `${commentPostComponentHeight}px`,
-              minHeight: `calc(100vh - (${excludeHeight}px + ${commentPostComponentHeight}px) - 1px)`,
-            }}
-          >
-            <AnimatePresence>
-              {comments.map((commentData) => (
-                <motion.div
-                  // layout
-                  // exit={{ opacity: 0 }}
-                  // initial={{ opacity: 0 }}
-                  // animate={{ opacity: 1 }}
-                  // transition={{ duration: 0.2 }}
-                  key={commentData.id}
-                  className={clsx('p-5 border-b-[1px] border-stone-200')}
-                >
-                  <p
-                    className="text-[20px] font-light text-stone-800"
-                    dangerouslySetInnerHTML={{
-                      __html: commentData.comment,
-                    }}
-                  />
-                  <div className="flex mt-3">
-                    <time className="text-sm text-stone-400">
-                      {dayjs(commentData.created_at).format('YYYY/MM/DD HH:mm')}
-                    </time>
-                    <p className="text-sm ml-3 text-stone-600">
-                      {commentData.post_user_name}
-                    </p>
-                  </div>
-                  {/* //? ゴミ箱 */}
-                  {/* {authUser && authUser.name === commentData.post_user_name && (
-                  <button
-                    onClick={() => commentDelete(commentData.id)}
-                    className="bg-blue-300 px-3 py-1"
-                  >
-                    ゴミ箱
-                  </button>
-                )} */}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </section>
-        ) : !isFetchingComments && !isErrorFetchComments ? (
-          <div
-            className="flex justify-center items-center text-[18px] border-l-[1px] w-[70%]"
-            style={{
-              // marginBottom: `${commentPostComponentHeight}px`,
-              minHeight: `calc(100vh - (${excludeHeight}px + ${commentPostComponentHeight}px) - 1px)`,
-            }}
-          >
-            <p>まだコメントがありません…</p>
-          </div>
-        ) : (
-          isErrorFetchComments && (
-            <div>
-              コメントの取得に失敗しました。お手数ですがページの更新を行ってください。
-            </div>
-          )
+        {/* //? Left section (Match info) */}
+        {windowSize && windowSize >= TAILWIND_BREAKPOINT.md && (
+          <LeftSection
+            thisMatch={thisMatch}
+            thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
+          />
         )}
+        {/* //? Comments */}
+        <CommentsComponent
+          paramsMatchID={paramsMatchID}
+          commentPostTextareaHeight={commentPostTextareaHeight}
+        />
       </div>
 
       <section
         ref={commentPostRef}
         className="fixed bottom-0 w-full flex bg-white/60 justify-center py-8 border-t-[1px] border-stone-200"
       >
-        <div className="w-[70%] max-w-[800px]">
+        <div className="md:w-[70%] sm:w-[85%] sm:max-w-[800px] w-[95%]">
           <PostCommentTextarea
+            isPostingComment={isPostingComment}
             setComment={setComment}
             comment={comment}
             sendComment={sendComment}
@@ -459,8 +237,9 @@ export const Match = () => {
   );
 };
 
-// ! post commnet textarea
+// ! post comment textarea
 type PostCommentTextareaType = {
+  isPostingComment: boolean;
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
   sendComment: () => void;
   comment: string | undefined;
@@ -474,9 +253,10 @@ const PostCommentTextarea = ({
   sendComment,
   textareaRef,
   autoExpandTextareaAndSetComment,
+  isPostingComment,
 }: PostCommentTextareaType) => {
   return (
-    <div className="border-stone-400 bg-white relative border-[1px] pl-3 py-2 rounded-sm flex justify-center items-center">
+    <div className="border-stone-400 bg-white relative border-[1px] sm:pl-3 sm:py-2 pl-2 py-1 rounded-sm flex justify-center items-center">
       <textarea
         ref={textareaRef}
         className="w-full resize-none outline-0 leading-[28px] pr-[100px] bg-white"
@@ -489,140 +269,19 @@ const PostCommentTextarea = ({
       ></textarea>
       <button
         onClick={sendComment}
-        className="absolute bottom-[7px] text-[14px] right-[10px] border-[1px] bg-stone-600 py-1 text-white pl-4 pr-3 tracking-[0.4em]"
-      >
-        送信
-      </button>
-    </div>
-  );
-};
-
-// const BalloonModal = ({
-//   setIsPredictionModal,
-// }: {
-//   setIsPredictionModal: React.Dispatch<React.SetStateAction<boolean>>;
-// }) => {
-//   return (
-//     <>
-//       <motion.div
-//         animate={{ y: 10 }}
-//         initial={{ x: -10 }}
-//         transition={{
-//           duration: 3,
-//           repeat: Infinity,
-//           repeatType: "mirror",
-//           // type: "spring",
-//           stiffness: 50,
-//         }}
-//         className="z-10 absolute top-[-60px] left-[calc(50%-150px)] bg-white shadow-lg shadow-stone-600/30 rounded-[25px] text-stone-700"
-//       >
-//         <button
-//           onClick={() => setIsPredictionModal(false)}
-//           className="text-stone-800 text-[20px] absolute top-4 right-4"
-//         >
-//           <AiOutlineClose />
-//         </button>
-//         <div className="bg-cyan-200/80 select-none w-full h-full p-10 rounded-[25px]">
-//           <p>
-//             勝利すると思う選手名をクリックして
-//             <br />
-//             勝敗予想を投票してください。
-//           </p>
-//         </div>
-//       </motion.div>
-//     </>
-//   );
-// };
-
-type PredictionConfirmModalType = {
-  boxerName: string;
-  execution: () => void;
-  cancel: () => void;
-};
-
-const PredictionConfirmModal = ({
-  boxerName,
-  execution,
-  cancel,
-}: PredictionConfirmModalType) => {
-  return (
-    <>
-      <div className="fixed top-0 left-0 w-full h-[100vh] flex justify-center items-center">
-        <div className="px-10 py-5 rounded-lg bg-white shadow-lg shadow-stone-500/50">
-          <p>
-            <span className="text-[18px] mx-2">{boxerName}</span>
-            が勝つと思いますか？
-          </p>
-          <div className="flex justify-between mt-5">
-            <button
-              onClick={execution}
-              className="bg-red-500 text-white py-1 px-5 rounded-md"
-            >
-              はい
-            </button>
-            <button
-              onClick={cancel}
-              className="bg-stone-500 text-white py-1 px-5 rounded-md"
-            >
-              わからない
-            </button>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
-type BoxerBoxType = {
-  boxerColor: BoxerType;
-  color: 'red' | 'blue';
-  thisMatchPredictionOfUsers: 'red' | 'blue' | 'No prediction vote' | undefined;
-  prediction: ({
-    name,
-    color,
-  }: {
-    name: string;
-    color: 'red' | 'blue';
-  }) => void;
-};
-
-const BoxerBox = ({
-  boxerColor,
-  color,
-  thisMatchPredictionOfUsers,
-  prediction,
-}: BoxerBoxType) => {
-  return (
-    <div className="flex-1 py-5 relative">
-      <BackgroundFlag nationaly={boxerColor.country} />
-
-      <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col justify-center items-center">
-        {thisMatchPredictionOfUsers !== 'No prediction vote' ? (
-          <>
-            <EngNameWithFlag
-              boxerCountry={boxerColor.country}
-              boxerEngName={boxerColor.eng_name}
-            />
-            <h2 className="text-[20px]">{boxerColor.name}</h2>
-          </>
-        ) : (
-          <div
-            onClick={() =>
-              prediction({
-                name: boxerColor.name,
-                color,
-              })
-            }
-            className="flex flex-col justify-center items-center min-w-[250px] px-5 py-1 rounded-md border-[1px] border-stone-300 md:hover:bg-stone-300/80 cursor-pointer"
-          >
-            <EngNameWithFlag
-              boxerCountry={boxerColor.country}
-              boxerEngName={boxerColor.eng_name}
-            />
-            <h2 className="lg:text-[20px] text-[16px]">{boxerColor.name}</h2>
-          </div>
+        className={clsx(
+          'absolute bottom-[5px] sm:bottom-[7px] sm:w-[50px] sm:h-[30px] w-[45px] h-[25px] text-[14px] right-[10px] border-[1px] bg-stone-600 hover:bg-cyan-800 focus:bg-cyan-800 rounded-sm duration-300 py-1 text-white text-xl flex justify-center items-center',
+          isPostingComment && 'text-white/50 select-none'
         )}
-      </div>
+      >
+        {isPostingComment ? (
+          <span className="sm:w-[20px] sm:h-[20px] w-[15px] h-[15px]">
+            <RotatingLines width="100%" strokeColor="white" />
+          </span>
+        ) : (
+          <BiSend />
+        )}
+      </button>
     </div>
   );
 };

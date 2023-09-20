@@ -2,72 +2,144 @@
 
 namespace App\Http\Controllers;
 
+
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Exception;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Mail;
-// models
+use Illuminate\Support\Str;
+use Exception;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use App\Mail\Mailer;
 use App\Models\User;
-use App\Models\ProvisionalUser;
+use App\Models\PreUser;
+use App\Models\GuestUser;
 use App\Models\Administrator;
+use Illuminate\Http\Request;
+use \Illuminate\Http\Response;
 
-
-use \Symfony\Component\HttpFoundation\Response;
+// !request
+use App\Http\Requests\PreCreateAuthRequest;
 
 class AuthController extends Controller
 {
+
+    public function __construct(User $user, PreUser $pre_user, GuestUser $guest)
+    {
+        $this->user = $user;
+        $this->pre_user = $pre_user;
+        $this->guest = $guest;
+    }
+
     /**
-     * create
+     * guest_login
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function guest_login(Request $request)
+    {
+        try {
+            if (Auth::check()) {
+                throw new Exception("Guest login is not allowed as already authenticated", Response::HTTP_BAD_REQUEST);
+            }
+            $guest_user = $this->guest->create();
+            Auth::guard('guest')->login($guest_user);
+            if (Auth::guard('guest')->check()) {
+                $request->session()->regenerate();
+                return response()->json(["success" => true, "message" => "success guest login"], Response::HTTP_ACCEPTED);
+            } else {
+                throw new Exception("Failed guest login", Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception $e) {
+            return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
+        }
+    }
+
+
+    /**
+     * guest_logout
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function guest_logout()
+    {
+        try {
+            $guestGuard = Auth::guard('guest');
+            $guestUser = $guestGuard->user();
+            if (!$guestUser) {
+                throw new Exception('Failed guest logout', Response::HTTP_FORBIDDEN);
+            }
+
+            $guestGuard->logout();
+            if (!Auth::guard('guest')->check()) {
+                return response()->json(["success" => true, "message" => "Logout guest user"], Response::HTTP_ACCEPTED);
+            } else {
+                throw new Exception('Failed guest logout', Response::HTTP_FORBIDDEN);
+            }
+        } catch (Exception $e) {
+            if ($e - getCode()) {
+                return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
+            }
+            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+        }
+    }
+
+
+    /**
+     * pre_create
      *
      * @param string $name
      * @param string $email
      * @param string $password
      * @return \Illuminate\Http\Response
      */
-    public function test_create(Request $request)
+    public function pre_create(PreCreateAuthRequest $request)
     {
         // throw new Exception();
         try {
-            // $id = (string) Str::uuid();
-            $name = $request->name;
-            $email = $request->email;
-            $token = Str::random(60);
-            $password = Hash::make($request->password);
-            $is_name_exist = User::where("name", $name)->exists();
-            $is_email_exist = User::where("email", $email)->exists();
-            if ($is_email_exist) {
-                throw new Exception('user already exists', Response::HTTP_FORBIDDEN);
-            }
-            if ($is_name_exist) {
-                throw new Exception('name already use', Response::HTTP_FORBIDDEN);
-            }
-            $user = ["name" => $name, "email" => $email, "password" => $password, "token" => $token];
-            // \Log::debug($user);
-            // User::create($user);
-            ProvisionalUser::create($user);
-            // $data = ["token" => $token];
-            // Mail::send('email.test', $data, function($message) {
-            //     $message->to("cye_ma_kun245@yahoo.co.jp", "Test")
-            //     ->from("from@test.com", "Boxing Talking")
-            //     ->subject('Boxint Taking Email確認');
-            // });
-            return response()->json(["message" => "created user"], Response::HTTP_CREATED);
-        } catch (Exception $e) {
-            if ($e->getCode() === Response::HTTP_FORBIDDEN) {
-                return response()->json(['message' => $e->getMessage()], Response::HTTP_FORBIDDEN);
-            }
-            return response()->json(['message' => "create user faild"], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-        // if(Auth::attempt(['email' => $email, 'password' => $password])) {
-        //     return Auth::user();
-        // }
-        // return response()->json(["message" => "401"], 401);
-    }
+            // ? password Hash
+            $hashed_password = Hash::make($request->password);
 
+            DB::beginTransaction();
+
+            $pre_user = $this->pre_user->create([
+                "name" => $request->name,
+                "email" => $request->email,
+                "password" => $hashed_password,
+            ]);
+
+            if (!$pre_user) {
+                throw new Exception("Failed pre user create", 500);
+            }
+
+            $payload = [
+                'user_id' => $pre_user->id,
+                'exp' => strtotime('+30 minutes'),
+            ];
+
+            $secret_key = config('app.token_secret_key');
+            $token = JWT::encode($payload, $secret_key, 'HS256');
+            Mail::to($request->email)->send(new Mailer($request->name, $token));
+
+            DB::commit();
+            return response()->json(
+                [
+                    'success' => true,
+                    'message' => "Successful pre signup."
+                ],
+                Response::HTTP_CREATED
+            );
+        } catch (Exception $e) {
+            DB::rollBack();
+            if ($e->getCode()) {
+                // return response()->json(["message" => $e->getMessage(), "error_details" => $e->getTrace()], 422);
+                return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
+            }
+            return response()->json(['success' => false, "message" => $e->getMessage()], 500);
+        }
+    }
 
     /**
      * create
@@ -79,29 +151,74 @@ class AuthController extends Controller
      */
     public function create(Request $request)
     {
-        // throw new Exception();
         try {
-            $name = $request->name;
-            $email = $request->email;
-            $password = Hash::make($request->password);
-            $is_name_exist = User::where("name", $name)->exists();
-            $is_email_exist = User::where("email", $email)->exists();
-            if ($is_email_exist) {
-                throw new Exception('user already exists', Response::HTTP_FORBIDDEN);
+            $validator = Validator::make($request->only('token'), [
+                "token" => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(["success" => false, "message" => $validator->errors()], 422);
             }
-            if ($is_name_exist) {
-                throw new Exception('name already use', Response::HTTP_FORBIDDEN);
+            // $credentials = $request->only('token');
+            $secret_key = config('app.token_secret_key');
+
+            $decoded = JWT::decode($request->token, new Key($secret_key, 'HS256'));
+            // $exp = $decoded->exp;
+            // $current_time = time();
+            // if ($current_time > $exp) {
+            //     throw new Exception("Token has expired", 403);
+            // }
+
+            $user_id = $decoded->user_id;
+            $pre_user = $this->pre_user->find($user_id);
+            // $pre_user = PreUser::find($user_id);
+            if (!$pre_user) {
+                throw new Exception("Invalid access", 403);
             }
-            $user = ["name" => $name, "email" => $email, "password" => $password];
-            User::create($user);
-            if (Auth::attempt(['email' => $email, 'password' => $request->password])) {
-                return Auth::user();
+            DB::beginTransaction();
+            $auth_user = $this->user->create([
+                "name" => $pre_user->name,
+                "email" => $pre_user->email,
+                "password" => $pre_user->password
+            ]);
+
+            if (!$auth_user) {
+                throw new Exception("Failed signup...", 500);
             }
-            return response()->json(["message" => "created user"], Response::HTTP_CREATED);
+
+            $pre_user->delete();
+            DB::commit();
+            return response()->json(["message" => "Successful signup"], Response::HTTP_CREATED);
         } catch (Exception $e) {
-            return response()->json(["message" => $e->getMessage()], $e->getCode());
+            DB::rollBack();
+            if ($e->getCode()) {
+                return response()->json(["message" => $e->getMessage()], $e->getCode());
+            }
+            return response()->json(["message" => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * user
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function fetch(Request $request)
+    {
+        try {
+            if (Auth::check()) {
+                return $request->user();
+            } else {
+                return null;
+            }
+        } catch (Exception $e) {
+            if ($e - getCode()) {
+                return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
+            }
+            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+        }
+    }
+
 
     /**
      * login
@@ -112,6 +229,18 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            "email" => "required|email",
+            "password" => "required"
+        ]);
+        if ($validator->fails()) {
+            return response()->json(["success" => false, "message" => [$validator->errors()], 422]);
+        }
+        //? ゲストでログインしてる場合はゲスト_ログアウト
+        if (Auth::guard('guest')->check()) {
+            Auth::guard('guest')->logout();
+        }
+
         $email = $request->email;
         $password = $request->password;
         try {
@@ -121,34 +250,38 @@ class AuthController extends Controller
             }
             throw new Exception("Failed Login", Response::HTTP_UNAUTHORIZED);
         } catch (Exception $e) {
-            return response()->json(["message" => $e->getMessage()], $e->getCode());
+            if ($e - getCode()) {
+                return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
+            }
+            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
         }
     }
 
     /**
      * logout
      *
-     * @param string $user_name
      * @return \Illuminate\Http\Response
      */
-    public function logout(Request $request)
+    public function logout()
     {
         // throw new Exception();
-        $name = $request->user_name;
         try {
-            if (!Auth::User()) {
+            if (!Auth::check()) {
                 throw new Exception('Forbidden', Response::HTTP_FORBIDDEN);
             };
-            if ($name == Auth::User()->name) {
-                return Auth::logout();
+            Auth::logout();
+            if (!Auth::check()) {
+                return true;
             } else {
-                throw new Exception('dose not logout...', Response::HTTP_BAD_REQUEST);
-            };
+                throw new Exception('dose not logout...', Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
         } catch (Exception $e) {
-            return response()->json(["message" => $e->getMessage()], $e->getCode());
+            if ($e - getCode()) {
+                return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
+            }
+            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
         }
     }
-
 
 
     /**
@@ -162,18 +295,15 @@ class AuthController extends Controller
         try {
             if (!Auth::User()) {
                 return false;
-                // throw new Exception("no auth user", 401);
-                // return response()->json(["message" => "no auth user", 401]);
             }
-            // $req_user_id = $request->user_id;
             $auth_user_id = Auth::User()->id;
-            // if ($req_user_id != $auth_user_id) {
-            //     return response()->json(["message" => "illegal user", 406]);
-            // }
             $is_admin = Administrator::where("user_id", $auth_user_id)->exists();
             return $is_admin;
         } catch (Exception $e) {
-            return response()->json(["message" => $e->getMessage()], $e->getCode());
+            if ($e - getCode()) {
+                return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
+            }
+            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
         }
     }
 }

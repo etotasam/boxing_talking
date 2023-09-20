@@ -1,115 +1,87 @@
 import { useEffect, useRef } from 'react';
-// ! modules
-import { Button } from '@/components/atomc/Button';
-// ! recoil
-import { useSetRecoilState } from 'recoil';
-import { formTypeSelector, FORM_TYPE } from '@/store/formTypeState';
-import { loginModalSelector } from '@/store/loginModalState';
-// ! types
-import { UserType } from '@/assets/types';
-// ! hooks
-import { useLogout } from '@/hooks/useAuth';
-import { useHeaderAndBottomHeight } from '@/hooks/useHeaderAndBottomHeightState';
 // ! icons
-import { IconContext } from 'react-icons';
-import { BiUserCircle } from 'react-icons/bi';
+import { GiBoxingGlove } from 'react-icons/gi';
+import { AiOutlineUser } from 'react-icons/ai'; // ! types
+import { UserType } from '@/assets/types';
+//! hooks
+import { usePagePath } from '@/hooks/usePagePath';
+import { useHeaderHeight } from '@/hooks/useHeaderHeight';
+import { useGuest, useAuth } from '@/hooks/useAuth';
 //! component
-import { LinkList } from '../LinkList';
-import { useAdmin } from '@/hooks/useAuth';
+import { Link } from 'react-router-dom';
+import { LogoutBottun } from '@/components/atomc/LogoutBottun';
 //! env
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 type PropsType = {
-  userData: UserType | undefined;
+  userData: UserType | undefined | null;
 };
 
 export const Header = (porps: PropsType) => {
   const { userData } = porps;
-  const { isAdmin } = useAdmin();
-  const { setHeaderHeight } = useHeaderAndBottomHeight();
+  const { data: isGuest } = useGuest();
+  const { data: authUser } = useAuth();
+  const isEitherAuth = Boolean(isGuest || authUser);
+  const { state: pagePath } = usePagePath();
+
+  const { setter: setHeader } = useHeaderHeight();
 
   const headerRef = useRef(null);
   useEffect(() => {
     if (!headerRef.current) return;
     const height = (headerRef.current as HTMLHeadElement).clientHeight;
-    setHeaderHeight(height);
+    setHeader(height);
   }, [headerRef.current]);
-
-  const setFormType = useSetRecoilState(formTypeSelector);
-
-  // ! loginモーダルの表示のOn/Offメソッド
-  const setLoginModalState = useSetRecoilState(loginModalSelector);
-  const openLoginForm = () => {
-    setFormType(FORM_TYPE.LOGIN_FORM);
-    setLoginModalState(true);
-  };
-
-  const { logout } = useLogout();
 
   return (
     <>
       <header
         ref={headerRef}
-        className="sm:h-[80px] h-[70px] felx relative after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
+        className="h-[80px] flex relative after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
       >
-        {/* <DivVerticalCenter> */}
-        <h1 className="md:text-[64px] sm:text-[54px] text-[36px] select-none absolute md:top-0 sm:top-2 top-5 left-0 font-thin">
+        <h1 className="md:text-[64px] sm:text-[54px] text-[32px] select-none font-thin">
           {siteTitle}
         </h1>
-        {/* </DivVerticalCenter> */}
-        {isAdmin && (
-          <div className="absolute right-[200px] top-0">
-            <LinkList />
+        {pagePath !== '/' && (
+          <div className="absolute bottom-2 left-2 sm:static sm:flex sm:items-end sm:mb-4 sm:ml-10">
+            <ToBoxMatchLink />
           </div>
         )}
-        {/* <LinkList /> */}
-        {/* <DivVerticalCenter className="absolute right-[50px] top-0"> */}
-
         {userData && (
-          <div className="absolute top-0 right-[30px] flex">
-            <IconContext.Provider value={{ color: '#1e1e1e', size: '25px' }}>
-              <span className="mr-1">
-                <BiUserCircle />
-              </span>
-            </IconContext.Provider>
-            {userData.name}
+          <div className="absolute top-2 sm:top-0 bottom-2 md:right-5 right-2 flex">
+            <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+            <p className="text-sm">{userData.name}</p>
           </div>
         )}
-        <AuthControlComponent
-          userData={userData}
-          logout={logout}
-          openLoginForm={openLoginForm}
-        />
-        {/* </DivVerticalCenter> */}
+        {isGuest && (
+          <div className="absolute top-0 right-[30px] flex">
+            <AiOutlineUser className="mr-1 block bg-stone-400 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+            <p className="text-sm">ゲストログイン</p>
+          </div>
+        )}
+        {isEitherAuth && (
+          <div className="absolute top-0 right-0 bg-red-300 h-full flex justify-center">
+            <div className="absolute sm:bottom-5 bottom-2 lg:right-10 md:right-5 right-2 flex justify-center">
+              <LogoutBottun />
+            </div>
+          </div>
+        )}
       </header>
     </>
   );
 };
 
-type AuthControlComponentPropsType = {
-  userData: UserType | undefined;
-  logout: ({ userName }: { userName: string }) => void;
-  openLoginForm: () => void;
-};
-// ! ログイン/ログアウトのボタン
-const AuthControlComponent = ({
-  userData,
-  logout,
-  openLoginForm,
-}: AuthControlComponentPropsType) => {
+const ToBoxMatchLink = () => {
   return (
     <>
-      <div className="absolute top-0 right-0 md:w-[200px] w-[130px] h-full flex justify-center">
-        <div className="absolute bottom-3 flex justify-center">
-          {userData ? (
-            <Button onClick={() => logout({ userName: userData.name! })}>
-              ログアウト
-            </Button>
-          ) : (
-            <Button onClick={() => openLoginForm()}>ログイン</Button>
-          )}
+      <Link to="/">
+        <div className="flex bg-stone-600 duration-300 lg:hover:bg-black rounded-[25px] text-white sm:px-3 sm:py-2 px-2 py-1 [&>span]:duration-300 [&>span]:rotate-[-40deg] lg:[&>span]:hover:rotate-[230deg]">
+          <span className="text-[16px] sm:text-[18px] text-white mr-2">
+            <GiBoxingGlove />
+          </span>
+          <p className="text-[10px] sm:text-sm">試合一覧</p>
         </div>
-      </div>
+      </Link>
     </>
   );
 };

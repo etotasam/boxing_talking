@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Exception;
 // models
 use App\Models\User;
+use App\Models\GuestUser;
 use App\Models\WinLossPrediction;
 use App\Models\BoxingMatch;
 
@@ -23,11 +24,19 @@ class WinLossPredictionController extends Controller
     public function fetch()
     {
         try {
-            if (!Auth::user()) {
-                throw new Exception('no auth', Response::HTTP_UNAUTHORIZED);
+            $is_user = Auth::check();
+            $is_guest = Auth::guard('guest')->check();
+            if (!$is_user && !$is_guest) {
+                return false;
             }
-            $user_id = Auth::user()->id;
-            $prediction = User::find($user_id)->prediction;
+            if ($is_user) {
+                $user_id = Auth::user()->id;
+                $prediction = User::find($user_id)->prediction;
+            } else {
+                $guest = Auth::guard('guest')->user();
+                $guest_id = $guest->id;
+                $prediction = GuestUser::find($guest_id)->prediction;
+            }
             return $prediction;
         } catch (Exception $e) {
             if ($e->getCode() == Response::HTTP_UNAUTHORIZED) {
@@ -48,10 +57,15 @@ class WinLossPredictionController extends Controller
     {
 
         try {
-            if (!Auth::user()) {
-                throw new Exception('no auth', Response::HTTP_UNAUTHORIZED);
+            if (!Auth::user() && !Auth::guard('guest')->check()) {
+                throw new Exception('win-loss prediction vote require auth', Response::HTTP_UNAUTHORIZED);
             }
-            $user_id = Auth::user()->id;
+            //? ゲストユーザーか一般ログインユーザーか
+            if (Auth::check()) {
+                $user_id = Auth::user()->id;
+            } else if (Auth::guard('guest')->check()) {
+                $user_id = Auth::guard('guest')->user()->id;
+            }
             $match_id = $request->match_id;
             $prediction = $request->prediction;
             $match_id = intval($match_id);
@@ -80,7 +94,7 @@ class WinLossPredictionController extends Controller
         try {
             DB::beginTransaction();
             WinLossPrediction::create([
-                "user_id" => Auth::user()->id,
+                "user_id" => $user_id,
                 "match_id" => intval($match_id),
                 "prediction" => $prediction
             ]);

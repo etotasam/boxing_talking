@@ -1,27 +1,66 @@
-import dayjs from "dayjs";
+import { useEffect, useState } from 'react';
+import clsx from 'clsx';
+import dayjs from 'dayjs';
+import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 // ! types
-import { MatchesDataType } from "@/assets/types";
-// ! hook
-// import { useFetchBoxer } from "@/hooks/useBoxer";
+import { MatchDataType } from '@/assets/types';
 // ! components
-import { BoxerInfo } from "../BoxerInfo";
-import { FlagImage } from "@/components/atomc/FlagImage";
+import { BoxerInfo } from '../BoxerInfo';
+import { FlagImage } from '@/components/atomc/FlagImage';
+import { PredictionVoteIcon } from '@/components/atomc/PredictionVoteIcon';
 // ! image
-import crown from "@/assets/images/etc/champion.svg";
+import crown from '@/assets/images/etc/champion.svg';
+//! hook
+import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
+import { useWindowSize } from '@/hooks/useWindowSize';
+import { useGuest, useAuth } from '@/hooks/useAuth';
 
 type PropsType = {
-  matchData: MatchesDataType;
+  matchData: MatchDataType;
   onClick: (matchId: number) => void;
   className?: string;
+  isPredictionVote: boolean | undefined;
 };
 
-export const FightBox = ({ matchData, onClick }: PropsType) => {
+export const FightBox = ({
+  matchData,
+  onClick,
+  isPredictionVote,
+}: PropsType) => {
+  const { data: authUser } = useAuth();
+  const { data: isGuest } = useGuest();
+  const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
+  const [isShowPredictionIton, setIsShowPredictionIcon] = useState(false);
+
+  //? 未投票アイコンの表示条件設定
+  useEffect(() => {
+    if (isPredictionVote === undefined) return;
+    if (authUser === undefined) return;
+    if (isGuest === undefined) return;
+    if (isDayOverFight === undefined) return;
+    if (isFightToday === undefined) return;
+    setIsShowPredictionIcon(
+      Boolean(
+        (authUser || isGuest) &&
+          !isPredictionVote &&
+          isPredictionVote !== undefined &&
+          !isDayOverFight &&
+          !isFightToday
+      )
+    );
+  }, [isPredictionVote, authUser, isGuest, isDayOverFight, isFightToday]);
+
   return (
     <>
       {matchData && (
         <div
           onClick={() => onClick(matchData.id)}
-          className="flex justify-between w-[80%] max-w-[1024px] min-w-[900px] cursor-pointer border-[1px] border-stone-400 rounded-md md:hover:bg-yellow-100 md:hover:border-white md:duration-300"
+          className={clsx(
+            'relative flex justify-between w-[80%] max-w-[1024px] min-w-[900px] cursor-pointer border-[1px] rounded-md md:hover:bg-yellow-100 md:hover:border-white md:duration-300',
+            isDayOverFight && 'bg-stone-100 border-stone-300',
+            isFightToday && 'border-red-300 bg-red-50',
+            !isDayOverFight && !isFightToday && 'border-stone-400'
+          )}
         >
           <div className="w-[300px]">
             <BoxerInfo boxer={matchData.red_boxer} />
@@ -32,20 +71,21 @@ export const FightBox = ({ matchData, onClick }: PropsType) => {
           <div className="w-[300px]">
             <BoxerInfo boxer={matchData.blue_boxer} />
           </div>
+          {isShowPredictionIton && <PredictionVoteIcon />}
         </div>
       )}
     </>
   );
 };
 
-const MatchInfo = ({ matchData }: { matchData: MatchesDataType }) => {
+const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
   return (
     <>
       {/* //? 日時 */}
       <div className="p-5 text-stone-600">
         <div className="text-center relative mt-5">
           <h2 className="text-2xl after:content-['(日本時間)'] after:absolute after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] after:text-sm">
-            {dayjs(matchData.match_date).format("YYYY年M月D日")}
+            {dayjs(matchData.match_date).format('YYYY年M月D日')}
           </h2>
           {matchData.titles.length > 0 && (
             <span className="absolute top-[-32px] left-[50%] translate-x-[-50%] w-[32px] h-[32px] mr-2">
@@ -56,7 +96,7 @@ const MatchInfo = ({ matchData }: { matchData: MatchesDataType }) => {
 
         {/* //? グレード */}
         <div className="text-center text-xl mt-5">
-          {matchData.grade === "タイトルマッチ" ? (
+          {matchData.grade === 'タイトルマッチ' ? (
             <ul className="flex flex-col">
               {matchData.titles.sort().map((title) => (
                 <li key={title} className="mt-1">
@@ -89,7 +129,7 @@ const MatchInfo = ({ matchData }: { matchData: MatchesDataType }) => {
 
         <div className="mt-10 text-center">
           <p className="relative inline-block text-lg before:content-['階級'] before:absolute before:top-[-25px] before:min-w-[100px] before:left-[50%] before:translate-x-[-50%] before:text-[14px] before:text-stone-500">
-            {`${matchData.weight.replace("S", "スーパー")}級`}
+            {`${matchData.weight.replace('S', 'スーパー')}級`}
           </p>
         </div>
       </div>

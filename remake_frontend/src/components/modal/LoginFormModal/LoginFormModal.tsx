@@ -1,6 +1,6 @@
 import React from 'react';
 import { ClearFullScreenDiv } from '@/components/atomc/ClearFullScreenDiv';
-import { loginModalSelector } from '@/store/loginModalState';
+// import { loginModalSelector } from '@/store/loginModalState';
 import { motion, AnimatePresence } from 'framer-motion';
 // ! recoil
 import { useSetRecoilState, useRecoilValue } from 'recoil';
@@ -8,7 +8,7 @@ import { formTypeSelector, FORM_TYPE } from '@/store/formTypeState';
 // ! components
 import { SignUpForm } from '../SignUpForm';
 // ! hooks
-import { useLogin } from '@/hooks/useAuth';
+import { useLogin, useGuestLogin } from '@/hooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 // !etc
 import {
@@ -20,15 +20,15 @@ export const LoginFormModal = () => {
   // ! recoil
   const formType = useRecoilValue(formTypeSelector);
   // !loginモーダルを閉じるメソッド
-  const setState = useSetRecoilState(loginModalSelector);
-  const loginModalHide = () => {
-    setState(false);
-  };
+  // const setState = useSetRecoilState(loginModalSelector);
+  // const loginModalHide = () => {
+  //   setState(false);
+  // };
   return (
     <>
       <ClearFullScreenDiv
         className="bg-stone-500/70 flex justify-center items-center"
-        onMouseDown={() => loginModalHide()}
+        // onMouseDown={() => loginModalHide()}
       >
         <AnimatePresence>
           {formType === FORM_TYPE.LOGIN_FORM && <LoginForm />}
@@ -40,6 +40,7 @@ export const LoginFormModal = () => {
 };
 
 const LoginForm = () => {
+  const { guestLogin } = useGuestLogin();
   // ! email passwordの入力と取得
   const email = React.useRef<string>('');
   const [defaultEmail, setDefaultEmail] = React.useState<string>('');
@@ -59,7 +60,7 @@ const LoginForm = () => {
    * @param e event
    * @returns void
    */
-  const toLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const toLogin = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     // ? email of password が未入力の場合
     if (!email.current || !password.current) {
@@ -112,17 +113,22 @@ const LoginForm = () => {
     setFormType(FORM_TYPE.SIGN_ON_FORM);
   };
 
+  //? ゲストログイン
+  const gustLogin = () => {
+    guestLogin();
+  };
+
   return (
     <div
-      onMouseDown={(e) => e.stopPropagation()}
-      className="w-1/2 min-w-[350px] max-w-[500px] h-3/5 min-h-[450px] bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
+      // onMouseDown={(e) => e.stopPropagation()}
+      className="md:w-[550px] md:h-[600px] sm:w-2/3 sm:h-2/3 w-[95%] max-w-[500px] h-2/3 bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
     >
       <motion.div
         initial="initial"
         animate="show"
         exit="hide"
         variants={variants}
-        className="relative w-[70%]"
+        className="relative sm:w-[70%] sm:max-w-[450px] w-[80%] max-w-[350px]"
       >
         <h1 className="absolute top-[-60px] left-0 w-full text-center text-stone-500 font-light text-xl">
           ログイン
@@ -144,8 +150,17 @@ const LoginForm = () => {
             className="mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 border-stone-400 focus:border-green-500 duration-300 bg-transparent"
           />
           <div className="relative mt-12 ">
-            <button className="h-[30px] w-full bg-stone-700 hover:bg-stone-600 rounded duration-300 text-white">
+            <button className="h-[30px] w-full bg-green-600 hover:bg-green-700 rounded duration-300 text-white">
               ログイン
+            </button>
+          </div>
+          <div className="relative mt-3 ">
+            <button
+              type="button"
+              onClick={gustLogin}
+              className="h-[30px] w-full bg-stone-600 hover:bg-stone-700 rounded duration-300 text-white"
+            >
+              ゲストログイン
             </button>
           </div>
           <div className="text-right mt-5">

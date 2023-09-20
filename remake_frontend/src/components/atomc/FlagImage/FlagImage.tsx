@@ -1,21 +1,21 @@
-import React from "react";
-import clsx from "clsx";
+import React from 'react';
+import clsx from 'clsx';
 // ! types
-import { NationalityType } from "@/assets/types";
+import { NationalityType } from '@/assets/types';
 // ! Nationaly
-import { Nationality } from "@/assets/NationalFlagData";
+import { Nationality } from '@/assets/NationalFlagData';
 // ! Flags
-import japanFlag from "@/assets/images/flags/japan.svg";
-import usaFlag from "@/assets/images/flags/usa.svg";
-import philpinFlag from "@/assets/images/flags/philpin.svg";
-import mexicoFlag from "@/assets/images/flags/mexico.svg";
-import kazakhstanFlag from "@/assets/images/flags/kz.svg";
-import ukFlag from "@/assets/images/flags/uk.svg";
-import rusiaFlag from "@/assets/images/flags/rusia.svg";
-import ukrineFlag from "@/assets/images/flags/ukrine.svg";
-import southAfricaFlag from "@/assets/images/flags/southafrica.svg";
+import japanFlag from '@/assets/images/flags/japan.svg';
+import usaFlag from '@/assets/images/flags/usa.svg';
+import philpinFlag from '@/assets/images/flags/philpin.svg';
+import mexicoFlag from '@/assets/images/flags/mexico.svg';
+import kazakhstanFlag from '@/assets/images/flags/kz.svg';
+import ukFlag from '@/assets/images/flags/uk.svg';
+import rusiaFlag from '@/assets/images/flags/rusia.svg';
+import ukrineFlag from '@/assets/images/flags/ukrine.svg';
+import southAfricaFlag from '@/assets/images/flags/southafrica.svg';
 
-type PropsType = React.ComponentProps<"div"> & { nationaly: NationalityType };
+type PropsType = React.ComponentProps<'div'> & { nationaly: NationalityType };
 
 export const FlagImage = ({ nationaly, className }: PropsType) => {
   const getNatinalFlag = (country: NationalityType) => {

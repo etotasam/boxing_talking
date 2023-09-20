@@ -234,4 +234,6 @@ return [
 
     ],
 
+    'token_secret_key' => env('TOKEN_SECRET_ACCESS_KEY'),
+
 ];
