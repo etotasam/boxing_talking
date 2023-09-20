@@ -1,8 +1,6 @@
-import React from 'react';
 import { IoMdLogOut } from 'react-icons/io';
 import { useLogout, useGuestLogout, useAuth, useGuest } from '@/hooks/useAuth';
 
-type PropsType = React.ComponentProps<'button'>;
 export const LogoutBottun = () => {
   const { data: authUser } = useAuth();
   const { data: isGuest } = useGuest();
