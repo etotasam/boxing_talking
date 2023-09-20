@@ -36,69 +36,70 @@ use App\Http\Controllers\MailController;
  */
 
 
-Route::get('/user', [AuthController::class, 'fetch'])->name('auth.user');
+Route::get('/user', [AuthController::class, 'fetch']);
 
 Route::get('/auth/check', function () {
     return Auth::check();
-})->name('auth.check');
+});
 
 
 Route::get('/guest/user', function (Request $request) {
     return (bool)Auth::guard('guest')->check();
-})->name('auth.guest_user');
+});
 
 
 
 //? auth
-Route::get('/admin', [AuthController::class, 'admin'])->name('auth.admin');
-// Route::post('/user/create', [AuthController::class, 'test_create'])->name('auth.create');
-Route::post('/user/create', [AuthController::class, 'create'])->name('auth.create');
+Route::get('/admin', [AuthController::class, 'admin']);
+// Route::post('/user/create', [AuthController::class, 'test_create'])->name('auth.test_create');
+Route::post('/user/create', [AuthController::class, 'create']);
+Route::post('/user/pre_create', [AuthController::class, 'pre_create']);
 
-Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::post('/guest/login', [AuthController::class, 'guest_login'])->name('auth.guest_login');
+Route::post('/guest/login', [AuthController::class, 'guest_login']);
 
 //? 試合
-Route::get('/match', [MatchController::class, 'fetch'])->name('match.fetch');
+Route::get('/match', [MatchController::class, 'fetch']);
 //? ボクサー
-Route::get('/boxer/count', [BoxerController::class, 'count'])->name('boxer.count');
-Route::get('/boxer', [BoxerController::class, 'fetch'])->name('boxer.fetch');
+Route::get('/boxer/count', [BoxerController::class, 'count']);
+Route::get('/boxer', [BoxerController::class, 'fetch']);
 //? 勝利予想
-Route::get('/prediction', [WinLossPredictionController::class, 'fetch'])->name('vote.fetch');
+Route::get('/prediction', [WinLossPredictionController::class, 'fetch']);
 //? コメント
-Route::get('/comment', [CommentController::class, 'fetch'])->name('comment.fetch');
+Route::get('/comment', [CommentController::class, 'fetch']);
 
 // !ゲストユーザーか通常の認証が必須
 Route::middleware('auth.user_or_guest')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
-    Route::post('/guest/logout', [AuthController::class, 'guest_logout'])->name('auth.guest_logout');
-    Route::put('/prediction', [WinLossPredictionController::class, 'win_loss_prediction'])->name('vote');
-    Route::post('/comment', [CommentController::class, 'post'])->name('comment.post');
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/guest/logout', [AuthController::class, 'guest_logout']);
+    Route::put('/prediction', [WinLossPredictionController::class, 'win_loss_prediction']);
+    Route::post('/comment', [CommentController::class, 'post']);
 });
 
 // !管理者
 Route::middleware('administrator')->group(function () {
     //? ボクサー
-    Route::get('/boxer/search', [BoxerController::class, 'search'])->name('boxer.search');
-    Route::post('/boxer', [BoxerController::class, 'register'])->name('boxer.register');
-    Route::put('/boxer', [BoxerController::class, 'update'])->name('boxer.update');
-    Route::delete('/boxer', [BoxerController::class, 'delete'])->name('boxer.delete');
+    Route::get('/boxer/search', [BoxerController::class, 'search']);
+    Route::post('/boxer', [BoxerController::class, 'register']);
+    Route::put('/boxer', [BoxerController::class, 'update']);
+    Route::delete('/boxer', [BoxerController::class, 'delete']);
     //? コメント
-    Route::delete('/comment', [CommentController::class, 'delete'])->name('comment.delete');
+    Route::delete('/comment', [CommentController::class, 'delete']);
     //? 試合
-    Route::post('/match', [MatchController::class, 'register'])->name('match.register');
-    Route::delete('/match', [MatchController::class, 'delete'])->name('match.delete');
-    Route::put('/match', [MatchController::class, 'update'])->name('match.update');
+    Route::post('/match', [MatchController::class, 'register']);
+    Route::delete('/match', [MatchController::class, 'delete']);
+    Route::put('/match', [MatchController::class, 'update']);
 });
 
 
 
 
 //? メールテスト
-Route::get('/mail', [MailController::class, 'send'])->name('mail.send');
+Route::get('/mail', [MailController::class, 'send']);
 
 //? テストapi
-Route::post('/testtest', [BoxerController::class, 'testtest'])->name('testtest');
+Route::post('/testtest', [BoxerController::class, 'testtest']);
 
 
 Route::get("/{match_id}/check_vote", function (string $match_id) {

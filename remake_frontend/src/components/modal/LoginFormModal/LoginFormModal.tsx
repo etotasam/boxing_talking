@@ -60,7 +60,7 @@ const LoginForm = () => {
    * @param e event
    * @returns void
    */
-  const toLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const toLogin = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     // ? email of password が未入力の場合
     if (!email.current || !password.current) {
@@ -121,14 +121,14 @@ const LoginForm = () => {
   return (
     <div
       // onMouseDown={(e) => e.stopPropagation()}
-      className="w-1/2 min-w-[350px] max-w-[500px] h-3/5 min-h-[450px] bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
+      className="md:w-[550px] md:h-[600px] sm:w-2/3 sm:h-2/3 w-[95%] max-w-[500px] h-2/3 bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
     >
       <motion.div
         initial="initial"
         animate="show"
         exit="hide"
         variants={variants}
-        className="relative w-[70%]"
+        className="relative sm:w-[70%] sm:max-w-[450px] w-[80%] max-w-[350px]"
       >
         <h1 className="absolute top-[-60px] left-0 w-full text-center text-stone-500 font-light text-xl">
           ログイン

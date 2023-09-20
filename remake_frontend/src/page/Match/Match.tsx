@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { RotatingLines } from 'react-loader-spinner';
+//! data
+import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 //! icon
 import { BiSend } from 'react-icons/bi';
 //! types
-import { MatchesDataType } from '@/assets/types';
+import { MatchDataType } from '@/assets/types';
 // ! hook
 import { useAuth, useGuest } from '@/hooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
@@ -14,7 +16,8 @@ import { usePagePath } from '@/hooks/usePagePath';
 import {
   useVoteMatchPrediction,
   useAllFetchMatchPredictionOfAuthUser,
-} from '@/hooks/uesWinLossPredition';
+} from '@/hooks/uesWinLossPrediction';
+import { useWindowSize } from '@/hooks/useWindowSize';
 import { usePostComment, useFetchComments } from '@/hooks/useComment';
 //! component
 import { LeftSection } from './myComponents/LeftSection';
@@ -28,6 +31,7 @@ import clsx from 'clsx';
 
 export const Match = () => {
   // ? use hook
+  const { windowSize } = useWindowSize();
   const { pathname, search } = useLocation();
   const query = new URLSearchParams(search);
   const paramsMatchID = Number(query.get('match_id'));
@@ -53,7 +57,7 @@ export const Match = () => {
   const [comment, setComment] = useState<string>();
   const [commentPostTextareaHeight, setCommentPostComponentHeight] =
     useState<number>();
-  const [thisMatch, setThisMatch] = useState<MatchesDataType>();
+  const [thisMatch, setThisMatch] = useState<MatchDataType>();
   const [thisMatchPredictionCount, setThisMatchPredictionCount] = useState<
     Record<'redCount' | 'blueCount' | 'totalCount', number>
   >({ redCount: 0, blueCount: 0, totalCount: 0 });
@@ -201,10 +205,12 @@ export const Match = () => {
       />
       <div className="flex w-full">
         {/* //? Left section (Match info) */}
-        <LeftSection
-          thisMatch={thisMatch}
-          thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
-        />
+        {windowSize && windowSize >= TAILWIND_BREAKPOINT.md && (
+          <LeftSection
+            thisMatch={thisMatch}
+            thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
+          />
+        )}
         {/* //? Comments */}
         <CommentsComponent
           paramsMatchID={paramsMatchID}
@@ -216,7 +222,7 @@ export const Match = () => {
         ref={commentPostRef}
         className="fixed bottom-0 w-full flex bg-white/60 justify-center py-8 border-t-[1px] border-stone-200"
       >
-        <div className="w-[70%] max-w-[800px]">
+        <div className="md:w-[70%] sm:w-[85%] sm:max-w-[800px] w-[95%]">
           <PostCommentTextarea
             isPostingComment={isPostingComment}
             setComment={setComment}
@@ -231,7 +237,7 @@ export const Match = () => {
   );
 };
 
-// ! post commnet textarea
+// ! post comment textarea
 type PostCommentTextareaType = {
   isPostingComment: boolean;
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -250,7 +256,7 @@ const PostCommentTextarea = ({
   isPostingComment,
 }: PostCommentTextareaType) => {
   return (
-    <div className="border-stone-400 bg-white relative border-[1px] pl-3 py-2 rounded-sm flex justify-center items-center">
+    <div className="border-stone-400 bg-white relative border-[1px] sm:pl-3 sm:py-2 pl-2 py-1 rounded-sm flex justify-center items-center">
       <textarea
         ref={textareaRef}
         className="w-full resize-none outline-0 leading-[28px] pr-[100px] bg-white"
@@ -264,13 +270,13 @@ const PostCommentTextarea = ({
       <button
         onClick={sendComment}
         className={clsx(
-          'absolute bottom-[7px] w-[50px] h-[30px] text-[14px] right-[10px] border-[1px] bg-stone-600 hover:bg-cyan-800 focus:bg-cyan-800 rounded-sm duration-300 py-1 text-white text-xl pl-4 pr-3',
+          'absolute bottom-[5px] sm:bottom-[7px] sm:w-[50px] sm:h-[30px] w-[45px] h-[25px] text-[14px] right-[10px] border-[1px] bg-stone-600 hover:bg-cyan-800 focus:bg-cyan-800 rounded-sm duration-300 py-1 text-white text-xl flex justify-center items-center',
           isPostingComment && 'text-white/50 select-none'
         )}
       >
         {isPostingComment ? (
-          <span className="w-[full] h-[full]">
-            <RotatingLines width="auto" strokeColor="white" />
+          <span className="sm:w-[20px] sm:h-[20px] w-[15px] h-[15px]">
+            <RotatingLines width="100%" strokeColor="white" />
           </span>
         ) : (
           <BiSend />

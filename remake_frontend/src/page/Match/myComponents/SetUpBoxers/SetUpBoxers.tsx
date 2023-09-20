@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from 'react';
+import dayjs from 'dayjs';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { MdHowToVote } from 'react-icons/md';
+import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 //! types
-import { BoxerType, MatchesDataType } from '@/assets/types';
+import { BoxerType, MatchDataType } from '@/assets/types';
 //! components
 import { BackgroundFlag } from './BackgroundFlag';
 import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
@@ -13,12 +15,13 @@ import { useMatchBoxerSectionHeight } from '@/hooks/useMatchBoxerSectionHeight';
 import {
   useVoteMatchPrediction,
   useAllFetchMatchPredictionOfAuthUser,
-} from '@/hooks/uesWinLossPredition';
+} from '@/hooks/uesWinLossPrediction';
+import { useWindowSize } from '@/hooks/useWindowSize';
 
 type SetUpBoxersType = {
   paramsMatchID: number;
   thisMatchPredictionOfUsers: 'red' | 'blue' | 'No prediction vote' | undefined;
-  thisMatch: MatchesDataType | undefined;
+  thisMatch: MatchDataType | undefined;
   thisMatchPredictionCount: Record<
     'redCount' | 'blueCount' | 'totalCount',
     number
@@ -38,6 +41,7 @@ export const SetUpBoxers = ({
   const { setter: setMatchBoxerSectionHeight } = useMatchBoxerSectionHeight();
   const { data: AllMatchPredictionOfAuthUserState } =
     useAllFetchMatchPredictionOfAuthUser();
+  const { windowSize } = useWindowSize();
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const boxerSectionRef = useRef<HTMLElement>(null);
@@ -48,10 +52,10 @@ export const SetUpBoxers = ({
   }, [boxerSectionRef.current]);
 
   const getPredictionCountPercent = (predictionCoount: number) => {
-    const percent = Math.ceil(
+    const percent = Math.round(
       (predictionCoount / thisMatchPredictionCount.totalCount) * 100
     );
-    if (percent) {
+    if (!isNaN(percent)) {
       return percent;
     } else {
       return 0;
@@ -77,82 +81,103 @@ export const SetUpBoxers = ({
     return undefined;
   }, [paramsMatchID, AllMatchPredictionOfAuthUserState]);
 
+  //? 試合の日が当日以降かどうか
+  const [matchIsAfterToday, setMatchIsAfterToday] = useState<boolean>();
+  useEffect(() => {
+    if (!thisMatch) return;
+    const todaySubtractOneSecond = dayjs().startOf('day').add(1, 'second');
+    const isAfterToday = dayjs(thisMatch.match_date).isAfter(
+      todaySubtractOneSecond
+    );
+    setMatchIsAfterToday(isAfterToday);
+  }, [thisMatch]);
+
   return (
     <>
       {thisMatch && (
         <section
           ref={boxerSectionRef}
-          className="flex border-b-[1px] h-[100px] relative"
+          className="flex border-b-[1px] border-stone-300 sm:h-[100px] h-[75px] md:relative sticky top-0"
         >
           {/* //? 投票ボタン */}
-          <AnimatePresence>
-            {isPredictionVote === false && (
-              <VotesButton setShowConfirmModal={setShowConfirmModal} />
-            )}
-          </AnimatePresence>
+          {matchIsAfterToday && (
+            <AnimatePresence>
+              {isPredictionVote === false && (
+                <VotesButton setShowConfirmModal={setShowConfirmModal} />
+              )}
+            </AnimatePresence>
+          )}
           {/* //? 投票モーダル */}
-          {showConfirmModal && (
+          {/* {showConfirmModal && (
             <PredictionConfirmModal
               thisMatch={thisMatch}
               voteExecution={voteExecution}
               cancel={() => setShowConfirmModal(false)}
             />
-          )}
+          )} */}
           <BoxerBox
             boxerColor={thisMatch.red_boxer}
+            boxerName={thisMatch.red_boxer.name}
             color="red"
             thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
             // predictionVote={predictionVote}
           />
           <BoxerBox
             boxerColor={thisMatch.blue_boxer}
+            boxerName={thisMatch.blue_boxer.name}
             color="blue"
             thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
             // predictionVote={predictionVote}
           />
           {/* //? 投票数bar */}
-          {!isFetchingComments &&
+          {windowSize &&
+            windowSize <= TAILWIND_BREAKPOINT.md &&
+            !isFetchingComments &&
             (thisMatchPredictionOfUsers === 'red' ||
               thisMatchPredictionOfUsers === 'blue') && (
               <>
                 <motion.span
                   initial={{
                     width: 0,
-                    opacity: 0,
                   }}
                   animate={{
-                    opacity: 1,
                     width: `${getPredictionCountPercent(
                       thisMatchPredictionCount.redCount
                     )}%`,
                   }}
                   transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-                  className="bolck absolute bottom-0 left-0 bg-red-600 h-2"
+                  className="bolck absolute bottom-0 left-0 bg-red-600 h-1"
                 />
                 <motion.span
                   initial={{
-                    opacity: 0,
                     width: 0,
                   }}
                   animate={{
-                    opacity: 1,
                     width: `${getPredictionCountPercent(
                       thisMatchPredictionCount.blueCount
                     )}%`,
                   }}
                   transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-                  className="bolck absolute bottom-0 right-0 bg-blue-600 h-2"
+                  className="bolck absolute bottom-0 right-0 bg-blue-600 h-1"
                 />
               </>
             )}
         </section>
+      )}
+      {/* //? 投票モーダル */}
+      {thisMatch && showConfirmModal && (
+        <PredictionConfirmModal
+          thisMatch={thisMatch}
+          voteExecution={voteExecution}
+          cancel={() => setShowConfirmModal(false)}
+        />
       )}
     </>
   );
 };
 
 type PredictionConfirmModalType = {
-  thisMatch: MatchesDataType;
+  thisMatch: MatchDataType;
   voteExecution: (color: 'red' | 'blue') => void;
   cancel: () => void;
 };
@@ -196,42 +221,41 @@ const PredictionConfirmModal = ({
 };
 
 type BoxerBoxType = {
+  boxerName: string;
   boxerColor: BoxerType;
   color: 'red' | 'blue';
   thisMatchPredictionOfUsers: 'red' | 'blue' | 'No prediction vote' | undefined;
-  // predictionVote: ({
-  //   name,
-  //   color,
-  // }: {
-  //   name: string;
-  //   color: 'red' | 'blue';
-  // }) => void;
 };
 
 const BoxerBox = ({
   boxerColor,
   thisMatchPredictionOfUsers,
-}: // predictionVote,
-BoxerBoxType) => {
+  boxerName,
+}: BoxerBoxType) => {
   return (
-    <div
-      // onClick={() => predictionVote({ name: boxerColor.name, color })}
-      className={clsx('flex-1 py-5 relative')}
-    >
+    <div className={clsx('flex-1 py-5 relative')}>
       <BackgroundFlag
         nationaly={boxerColor.country}
         thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
       >
         <div
           className={
-            'select-none absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col justify-center items-center'
+            'select-none absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full flex flex-col justify-center items-center'
           }
         >
           <EngNameWithFlag
             boxerCountry={boxerColor.country}
             boxerEngName={boxerColor.eng_name}
           />
-          <h2 className={'text-[20px]'}>{boxerColor.name}</h2>
+          <h2
+            className={clsx(
+              boxerName.length > 7
+                ? `sm:text-[18px] text-[12px]`
+                : `sm:text-[20px] text-[16px]`
+            )}
+          >
+            {boxerColor.name}
+          </h2>
         </div>
       </BackgroundFlag>
     </div>
@@ -260,7 +284,7 @@ const VotesButton = ({ setShowConfirmModal }: VoteButtonType) => {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
         onClick={hancleClick}
-        className="z-20 absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[50px] h-[50px] bg-green-600 hover:bg-green-600/80 rounded-[50%] flex justify-center items-center text-white text-[20px] hover:text-[25px] duration-200"
+        className="z-20 absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] sm:w-[50px] sm:h-[50px] w-[40px] h-[40px] bg-green-600 hover:bg-green-600/80 rounded-[50%] flex justify-center items-center text-white text-[20px] hover:text-[25px] duration-200"
       >
         <MdHowToVote />
       </motion.button>

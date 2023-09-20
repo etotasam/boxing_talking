@@ -9,7 +9,7 @@ import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal"
 import { useToastModal } from "./useToastModal"
 import { useLoading } from "./useLoading"
 import { useLoginModal } from "./useLoginModal"
-import { useAllFetchMatchPredictionOfAuthUser } from "./uesWinLossPredition"
+import { useAllFetchMatchPredictionOfAuthUser } from "./uesWinLossPrediction"
 import { useReactQuery } from "./useReactQuery"
 //! types
 import type { UserType } from "@/assets/types"
@@ -39,7 +39,7 @@ export const useGuestLogin = () => {
   // ? react query
   const queryClient = useQueryClient()
   // ? toast modal
-  // const { setToastModal, showToastModal } = useToastModal()
+  const { setToastModal, showToastModal } = useToastModal()
   // ? Loading state
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? login modal (hook)
@@ -66,9 +66,14 @@ export const useGuestLogin = () => {
         refetchMatchPrediction()
         resetLoadingState()
         setReactQueryData<boolean>(QUERY_KEY.guest, Boolean(data))
+        setToastModal({ message: MESSAGE.LOGIN_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+        showToastModal()
       },
       onError: () => {
         resetLoadingState()
+        setToastModal({ message: MESSAGE.LOGIN_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showToastModal()
+
       }
     })
   }
@@ -148,7 +153,6 @@ export const useAuthCheck = () => {
 
 //! auth user
 export const useAuth = () => {
-  // const { setToastModal, showToastModal } = useToastModal()
   const queryClient = useQueryClient()
 
   const api = useCallback(async () => {
@@ -170,16 +174,14 @@ export const useAuth = () => {
   return { data, isLoading, isError }
 }
 
-//! ユーザ作成
-export const useCreateUser = () => {
+//! ユーザ作成（仮登録）
+export const usePreSignUp = () => {
   // ? react query
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
   // ? toast modal
   const { setToastModal, showToastModal } = useToastModal()
   // ? Loading state (hook)
-  const { startLoading, hasError, successful } = useLoading()
-  // ? login modal (hook)
-  const { hideLoginModal } = useLoginModal()
+  const { startLoading, resetLoadingState } = useLoading()
 
   type ApiPropsType = {
     name: string,
@@ -187,38 +189,39 @@ export const useCreateUser = () => {
     password: string
   }
   const api = useCallback(async ({ name, email, password }: ApiPropsType) => {
-    const res = await Axios.post<UserType>(`/api/user/create`, { name, email, password }).then(value => value.data)
+    const res = await Axios.post<UserType>(`/api/user/pre_create`, { name, email, password }).then(value => value.data)
     return res
   }, [])
-  const { mutate, isLoading, isSuccess } = useMutation(api, {
+  const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
     onMutate: () => {
       startLoading()
     }
   })
-  const createUser = ({ name, email, password }: ApiPropsType) => {
+  const preSignUp = ({ name, email, password }: ApiPropsType) => {
     mutate({ name, email, password }, {
-      onSuccess: (registerUserData) => {
-        queryClient.setQueryData<UserType>(QUERY_KEY.auth, registerUserData)
-        successful()
-        setToastModal({ message: MESSAGE.USER_REGISTER_SUCCESSFULLY, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
-        hideLoginModal()
+      onSuccess: () => {
+        resetLoadingState()
       },
 
       onError: (error: any) => {
-        hasError()
+        resetLoadingState()
         if (error.status === 422) {
           const errorMessages = error.data.errors as any
-          if (errorMessages.name) {
-            if ((errorMessages.name as string[]).includes('name is required')) {
-              setToastModal({ message: MESSAGE.NAME_IS_REQUIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          if (errorMessages.email) {
+            if (errorMessages.email.includes('email is already exists')) {
+              setToastModal({ message: MESSAGE.EMAIL_HAS_ALREADY_EXIST, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
               showToastModal()
               return
             }
           }
-          if (errorMessages.email) {
-            if (errorMessages.email.includes('email is alredy registered')) {
-              setToastModal({ message: MESSAGE.NAME_IS_REQUIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          if (errorMessages.name) {
+            if ((errorMessages.name as string[]).includes('name is already used')) {
+              setToastModal({ message: MESSAGE.USER_NAME_ALREADY_USE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showToastModal()
+              return
+            }
+            if ((errorMessages.name as string[]).includes('The name must not be greater than 30 characters.')) {
+              setToastModal({ message: MESSAGE.NAME_CHAR_LIMIT_OVER, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
               showToastModal()
               return
             }
@@ -227,24 +230,13 @@ export const useCreateUser = () => {
           showToastModal()
           return
         }
-        //? すでに使われている名前
-        if (error.message === "The name is alredy in use") {
-          setToastModal({ message: MESSAGE.USER_NAME_ALREADY_USE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          showToastModal()
-          return
-        }
-        //? すでに登録されているメールアドレス
-        if (error.message === "The name is alredy in use") {
-          setToastModal({ message: MESSAGE.USER_ALREADY_EXIST, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          showToastModal()
-          return
-        }
+
         setToastModal({ message: MESSAGE.USER_REGISTER_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
       }
     })
   }
-  return { createUser, isLoading, isSuccess }
+  return { preSignUp, isLoading, isSuccess, isError }
 }
 
 //! ログイン

@@ -58,7 +58,7 @@ class WinLossPredictionController extends Controller
 
         try {
             if (!Auth::user() && !Auth::guard('guest')->check()) {
-                throw new Exception('no auth', Response::HTTP_UNAUTHORIZED);
+                throw new Exception('win-loss prediction vote require auth', Response::HTTP_UNAUTHORIZED);
             }
             //? ゲストユーザーか一般ログインユーザーか
             if (Auth::check()) {

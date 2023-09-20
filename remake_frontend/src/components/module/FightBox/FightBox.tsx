@@ -1,15 +1,22 @@
+import { useEffect, useState } from 'react';
+import clsx from 'clsx';
 import dayjs from 'dayjs';
+import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 // ! types
-import { MatchesDataType } from '@/assets/types';
+import { MatchDataType } from '@/assets/types';
 // ! components
 import { BoxerInfo } from '../BoxerInfo';
 import { FlagImage } from '@/components/atomc/FlagImage';
 import { PredictionVoteIcon } from '@/components/atomc/PredictionVoteIcon';
 // ! image
 import crown from '@/assets/images/etc/champion.svg';
+//! hook
+import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
+import { useWindowSize } from '@/hooks/useWindowSize';
+import { useGuest, useAuth } from '@/hooks/useAuth';
 
 type PropsType = {
-  matchData: MatchesDataType;
+  matchData: MatchDataType;
   onClick: (matchId: number) => void;
   className?: string;
   isPredictionVote: boolean | undefined;
@@ -20,12 +27,40 @@ export const FightBox = ({
   onClick,
   isPredictionVote,
 }: PropsType) => {
+  const { data: authUser } = useAuth();
+  const { data: isGuest } = useGuest();
+  const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
+  const [isShowPredictionIton, setIsShowPredictionIcon] = useState(false);
+
+  //? 未投票アイコンの表示条件設定
+  useEffect(() => {
+    if (isPredictionVote === undefined) return;
+    if (authUser === undefined) return;
+    if (isGuest === undefined) return;
+    if (isDayOverFight === undefined) return;
+    if (isFightToday === undefined) return;
+    setIsShowPredictionIcon(
+      Boolean(
+        (authUser || isGuest) &&
+          !isPredictionVote &&
+          isPredictionVote !== undefined &&
+          !isDayOverFight &&
+          !isFightToday
+      )
+    );
+  }, [isPredictionVote, authUser, isGuest, isDayOverFight, isFightToday]);
+
   return (
     <>
       {matchData && (
         <div
           onClick={() => onClick(matchData.id)}
-          className="relative flex justify-between w-[80%] max-w-[1024px] min-w-[900px] cursor-pointer border-[1px] border-stone-400 rounded-md md:hover:bg-yellow-100 md:hover:border-white md:duration-300"
+          className={clsx(
+            'relative flex justify-between w-[80%] max-w-[1024px] min-w-[900px] cursor-pointer border-[1px] rounded-md md:hover:bg-yellow-100 md:hover:border-white md:duration-300',
+            isDayOverFight && 'bg-stone-100 border-stone-300',
+            isFightToday && 'border-red-300 bg-red-50',
+            !isDayOverFight && !isFightToday && 'border-stone-400'
+          )}
         >
           <div className="w-[300px]">
             <BoxerInfo boxer={matchData.red_boxer} />
@@ -36,14 +71,14 @@ export const FightBox = ({
           <div className="w-[300px]">
             <BoxerInfo boxer={matchData.blue_boxer} />
           </div>
-          <PredictionVoteIcon isPredictionVote={isPredictionVote} />
+          {isShowPredictionIton && <PredictionVoteIcon />}
         </div>
       )}
     </>
   );
 };
 
-const MatchInfo = ({ matchData }: { matchData: MatchesDataType }) => {
+const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
   return (
     <>
       {/* //? 日時 */}

@@ -20,7 +20,7 @@ class AuthenticateAuthUserOrGuestUser
         if (Auth::check() || Auth::guard('guest')->check()) {
             return $next($request);
         } else {
-            return response()->json(["message" => "Mout be auth for access"], 401);
+            return response()->json(["message" => "Must be auth for access"], 401);
         }
     }
 }

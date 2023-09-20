@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { flatten } from 'lodash';
 // ! components
 import { FightBox } from '@/components/module/FightBox';
 import { SimpleFightBox } from '@/components/module/SimpleFightBox';
@@ -13,10 +14,12 @@ import { useLoading } from '@/hooks/useLoading';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useFooterHeight } from '@/hooks/useFooterHeight';
-import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/uesWinLossPredition';
+import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/uesWinLossPrediction';
 import { useVisualModeController } from '@/hooks/useVisualModeController';
+// ! func
+import { getFightDataOfPastDays } from '@/assets/functions';
 //! types
-import { MatchesDataType } from '@/assets/types';
+import { MatchDataType } from '@/assets/types';
 
 export const Home = () => {
   // ! use hook
@@ -25,7 +28,7 @@ export const Home = () => {
   const { setter: setPagePath } = usePagePath();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { windowSize } = useWindowSize();
+  const { device } = useWindowSize();
 
   const { state: headerHeight } = useHeaderHeight();
   const { state: footerHeight } = useFooterHeight();
@@ -43,6 +46,26 @@ export const Home = () => {
     };
   }, []);
 
+  //? 試合データの並び替え
+  const [formattedMatchesData, setFormattedMatchesData] =
+    useState<MatchDataType[]>();
+  useEffect(() => {
+    if (!matchesData) return;
+    const multipleArrayMatchData = matchesData.reduce(
+      (accum: MatchDataType[][], current) => {
+        const isFightPast = getFightDataOfPastDays(current);
+        if (isFightPast) {
+          return [[...accum[0]], [current, ...accum[1]]];
+        } else {
+          return [[...accum[0], current], [...accum[1]]];
+        }
+      },
+      [[], []]
+    );
+
+    setFormattedMatchesData(flatten(multipleArrayMatchData));
+  }, [matchesData]);
+
   return (
     <>
       <div
@@ -51,15 +74,15 @@ export const Home = () => {
           minHeight: `calc(100vh - (${headerHeight}px + ${footerHeight}px) - 1px)`,
         }}
       >
-        {windowSize == 'PC' && (
+        {device == 'PC' && (
           <div className="absolute top-0 left-[50%] translate-x-[-50%] lg:mt-3 mt-1">
             <VisualModeChangeIcon onClick={() => visualModeToggleSwitch()} />
           </div>
         )}
 
         <ul>
-          {matchesData &&
-            matchesData.map((match) => (
+          {formattedMatchesData &&
+            formattedMatchesData.map((match) => (
               <li
                 key={match.id}
                 className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5"
@@ -76,7 +99,7 @@ export const Home = () => {
 };
 
 type MatchesViewPropsType = {
-  match: MatchesDataType;
+  match: MatchDataType;
   matchSelect: (matchId: number) => void;
 };
 
@@ -93,9 +116,9 @@ const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
     }
   }, [myAllPredictionVote]);
   // console.log(myAllPredictionVote);
-  const { windowSize } = useWindowSize();
+  const { device } = useWindowSize();
 
-  if (windowSize === 'SP')
+  if (device === 'SP' || visualMode === 'simple')
     return (
       <SimpleFightBox
         isPredictionVote={isPredictionVote}
@@ -103,15 +126,8 @@ const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
         matchData={match}
       />
     );
-  if (visualMode === 'simple')
-    return (
-      <SimpleFightBox
-        isPredictionVote={isPredictionVote}
-        onClick={matchSelect}
-        matchData={match}
-      />
-    );
-  if (windowSize === 'PC')
+
+  if (device === 'PC')
     return (
       <FightBox
         onClick={matchSelect}

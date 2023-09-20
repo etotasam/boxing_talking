@@ -29,8 +29,9 @@ export const MESSAGE = {
   EMAIL_IS_REQUIRED: "メールアドレスが正しくありません",
   USER_REGISTER_SUCCESSFULLY: "登録が完了しました",
   USER_REGISTER_FAILED: "登録に失敗しました。\n 入力情報に誤りがないかご確認ください",
-  USER_ALREADY_EXIST: "すでに登録されているEmailです",
+  EMAIL_HAS_ALREADY_EXIST: "すでに登録されているEmailです",
   USER_NAME_ALREADY_USE: "すでに使われている名前です \n 別の名前を検討してください",
+  NAME_CHAR_LIMIT_OVER: "名前の文字数がオーバーしています \n 30文字までです",
 
 
 
@@ -98,6 +99,7 @@ export const MESSAGE = {
   SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION: '投票が完了しました',
   FAILED_VOTE_WIN_LOSS_PREDICTION: '投票に失敗しました。\n ページの更新後再度実行してください',
   ALREADY_HAVE_DONE_VOTE: "勝敗予想はすでに投票しています",
+  MATCH_IS_ALREDY_DONE: "投票期日が過ぎています。\n 投票は試合の前日までです",
 } as const
 
 
