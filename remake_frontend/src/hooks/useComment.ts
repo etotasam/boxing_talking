@@ -1,5 +1,4 @@
 import { useCallback } from "react"
-import dayjs from "dayjs";
 // import { useLocation } from "react-router-dom"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
@@ -58,7 +57,7 @@ export const useFetchComments = (matchId: number) => {
   }
 
   const { data, isLoading, isFetching, refetch, isError } = useQuery<CommentType[]>([QUERY_KEY.comment, { id: matchId }], api, {
-    staleTime: 60000, onError: (error) => {
+    staleTime: 60000, onError: () => {
       // console.error(error);
     }
   })
@@ -76,7 +75,7 @@ export const usePostComment = () => {
     matchId: number,
     comment: string
   }
-  const nowDate = dayjs().format('YYYY/MM/DD H:mm')
+  // const nowDate = dayjs().format('YYYY/MM/DD H:mm')
   //? コメントの改行は5行までに書き換える
   const sanitizeComment = (commentText: string) => {
     commentText = commentText.trim();
@@ -109,7 +108,7 @@ export const usePostComment = () => {
         queryClient.invalidateQueries([QUERY_KEY.comment, { id: matchId }]);
         return
       },
-      onError: (error: any, _, context) => {
+      onError: (error: any) => {
         if (error.status === 401) {
           setToastModal({ message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
           showToastModal()
