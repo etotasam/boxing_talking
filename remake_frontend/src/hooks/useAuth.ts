@@ -37,19 +37,18 @@ export const useGuest = () => {
 //! ゲストログイン
 export const useGuestLogin = () => {
   // ? react query
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
   // ? toast modal
   const { setToastModal, showToastModal } = useToastModal()
   // ? Loading state
-  const { resetLoadingState, startLoading, hasError, successful } = useLoading()
+  const { resetLoadingState, startLoading } = useLoading()
   // ? login modal (hook)
-  const { hideLoginModal } = useLoginModal()
+  // const { hideLoginModal } = useLoginModal()
   const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
 
   //? ReactQuery controller
   const { setReactQueryData } = useReactQuery()
-
-  const api = useCallback(async ({ dummy }: { dummy?: unknown }) => {
+  const api = useCallback(async ({ _ }: { _?: unknown }) => {
     const res = await Axios.post('/api/guest/login').then(value => value.data)
     return res
   }, [])
@@ -90,7 +89,7 @@ export const useGuestLogout = () => {
   // ? Loading state
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? api
-  const api = useCallback(async ({ dummy }: { dummy?: any }) => {
+  const api = useCallback(async ({ _ }: { _?: unknown }) => {
     await Axios.post<void>("api/guest/logout").then(value => value.data)
   }, [])
 
@@ -243,7 +242,7 @@ export const usePreSignUp = () => {
 export const useLogin = () => {
   const { refetch: refetchAdmin } = useAdmin()
   // ? react query
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
   // ? toast modal
   const { setToastModal, showToastModal } = useToastModal()
   // ? Loading state
@@ -299,7 +298,7 @@ export const useLogout = () => {
   // ? Loading state
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? api
-  const api = useCallback(async ({ dummy }: { dummy?: unknown }) => {
+  const api = useCallback(async ({ _ }: { _?: any }) => {
     await Axios.post<void>("api/logout").then(value => value.data)
   }, [])
 

@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { MdHowToVote } from 'react-icons/md';
 import { motion } from 'framer-motion';
 //!hook
