@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateAuthRequest extends FormRequest
+class PreCreateAuthRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,13 +27,16 @@ class CreateAuthRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                'max:30'
+                'max:30',
+                'min:3',
+                'unique:users,name',
+                'unique:pre_users,name',
             ],
             'email' => [
                 'required',
                 'email',
-                'unique:users',
-                'unique:pre_users'
+                'unique:users,email',
+                'unique:pre_users,email'
             ],
             'password' => [
                 'regex: /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+{}\[\]:;<>,.?~\\-]{8,24}$/'
@@ -48,6 +51,10 @@ class CreateAuthRequest extends FormRequest
         return [
             'name.required' => 'name is required',
             'name.max' => 'name is too long',
+            'name.unique' => "name is already used",
+
+            'email.required' => "email is required",
+            'email.unique' => "email is already exists",
         ];
     }
 }

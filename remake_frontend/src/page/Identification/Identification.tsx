@@ -11,6 +11,7 @@ import { RotatingLines } from 'react-loader-spinner';
 // ! recoil
 import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { authenticatingSelector } from '@/store/authenticatingState';
+import { tokenErrorMessageSelector } from '@/store/tokenErrorMessageState';
 
 export const Identification = () => {
   const { createUser } = useSignUpIdentification();
@@ -84,10 +85,15 @@ const SuccessRegister = () => {
   );
 };
 const FiledAuth = () => {
+  const tokenErrorMessage = useRecoilValue(tokenErrorMessageSelector);
   return (
     <>
       <div className="text-center">
-        <p>無効なリクエストです</p>
+        {tokenErrorMessage ? (
+          <p>{tokenErrorMessage}</p>
+        ) : (
+          <p>無効なリクエストです</p>
+        )}
         <Link to="/">
           <button className="mt-5 py-1 px-4 bg-stone-700 hover:bg-stone-500 text-white rounded-md">
             Home

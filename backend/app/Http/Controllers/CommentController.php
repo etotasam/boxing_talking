@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\JsonResponse;
 // Models
 use App\Models\BoxingMatch;
 use App\Models\User;
@@ -23,9 +24,9 @@ class CommentController extends Controller
 
     public function test_fetch(Request $request)
     {
-        // return $request->limt;
+        // return $request->limit;
         $offset = $request->offset;
-        $limt = $request->limt;
+        $limit = $request->limit;
         $match_id = $request->match_id;
         $comments_array = [];
         if (!$match_id) {
@@ -33,7 +34,7 @@ class CommentController extends Controller
         }
         $match = BoxingMatch::find($match_id);
         if ($match) {
-            $comments_on_match = $match->comments->skip($offset)->take($limt);
+            $comments_on_match = $match->comments->skip($offset)->take($limit);
         } else {
             throw new Exception('Match is not exits', Response::HTTP_NOT_FOUND);
         }
@@ -109,13 +110,18 @@ class CommentController extends Controller
      * @param string comment
      * @return \Illuminate\Http\Response
      */
-    public function post(CommentRequest $request)
+    public function post(Request $request)
     {
         try {
-            // $is_auth = Auth::user();
-            // if (!$is_auth) {
-            //     throw new Exception("Posting comments require Login", Response::HTTP_UNAUTHORIZED);
-            // }
+            $validator = Validator::make($request->all(), [
+                "comment" => 'required|string|max:1000',
+                "match_id" => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return new JsonResponse(['success' => false, 'message' => $validator->errors()], 422);
+            }
+
             if (Auth::check()) {
                 $user_id = Auth::user()->id;
             } else if (Auth::guard('guest')->check()) {
