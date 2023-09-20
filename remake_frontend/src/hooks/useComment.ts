@@ -93,25 +93,16 @@ export const usePostComment = () => {
       match_id: matchId,
       comment: comment
     })
-    // } catch (error) {
-    //   return error
-    // }
   }, [])
 
   const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
     onMutate: () => {
-      // startLoading()
-      // const snapshot = queryClient.getQueryData<CommentType[]>([QUERY_KEY.comment, { id: matchId }])
-      // queryClient.setQueryData([QUERY_KEY.comment, { id: matchId }], [{ id: NaN, post_user_name: "name", comment, created_at: nowDate }, ...snapshot!])
-      // return { snapshot }
     }
   })
   const postComment = ({ matchId, comment }: ApiPropsType) => {
     const sanitizedComment = sanitizeComment(comment)
     mutate({ matchId, comment: sanitizedComment }, {
       onSuccess: () => {
-        // console.log(data);
-        // resetLoadingState()
         setToastModal({ message: MESSAGE.COMMENT_POST_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
         // ? match_idを指定してコメントを再取得
@@ -119,8 +110,6 @@ export const usePostComment = () => {
         return
       },
       onError: (error: any, _, context) => {
-        // queryClient.setQueryData([QUERY_KEY.comment, { id: matchId }], context?.snapshot)
-        // resetLoadingState()
         if (error.status === 401) {
           setToastModal({ message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
           showToastModal()
@@ -128,10 +117,10 @@ export const usePostComment = () => {
         }
         //? 入力エラー
         if (error.status === 422) {
-          const errors = error.data.errors as any
+          const errors = error.message.errors as any
           if (errors.comment) {
             //? コメントが長すぎる(1000文字以内)
-            if ((errors.comment as string[]).includes('comment is too long')) {
+            if ((errors.comment as string[]).includes('The comment must not be greater')) {
               setToastModal({ message: MESSAGE.COMMENT_IS_TOO_LONG, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
               showToastModal()
               return

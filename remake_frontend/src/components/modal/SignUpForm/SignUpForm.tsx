@@ -209,6 +209,7 @@ const PreSignUpModal = ({ onClick }: { onClick: (bool: boolean) => void }) => {
           <p className="text-stone-600">
             お送りしたメールにて本人確認と本登録が完了いたします。
           </p>
+          <p className="text-stone-600">(30分以上経過しますと無効となります)</p>
         </div>
       </div>
     </div>

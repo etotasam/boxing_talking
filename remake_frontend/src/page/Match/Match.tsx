@@ -276,7 +276,7 @@ const PostCommentTextarea = ({
       >
         {isPostingComment ? (
           <span className="sm:w-[20px] sm:h-[20px] w-[15px] h-[15px]">
-            <RotatingLines width="auto" strokeColor="white" />
+            <RotatingLines width="100%" strokeColor="white" />
           </span>
         ) : (
           <BiSend />

@@ -39,7 +39,7 @@ export const useGuestLogin = () => {
   // ? react query
   const queryClient = useQueryClient()
   // ? toast modal
-  // const { setToastModal, showToastModal } = useToastModal()
+  const { setToastModal, showToastModal } = useToastModal()
   // ? Loading state
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? login modal (hook)
@@ -66,9 +66,14 @@ export const useGuestLogin = () => {
         refetchMatchPrediction()
         resetLoadingState()
         setReactQueryData<boolean>(QUERY_KEY.guest, Boolean(data))
+        setToastModal({ message: MESSAGE.LOGIN_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+        showToastModal()
       },
       onError: () => {
         resetLoadingState()
+        setToastModal({ message: MESSAGE.LOGIN_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showToastModal()
+
       }
     })
   }
@@ -148,7 +153,6 @@ export const useAuthCheck = () => {
 
 //! auth user
 export const useAuth = () => {
-  // const { setToastModal, showToastModal } = useToastModal()
   const queryClient = useQueryClient()
 
   const api = useCallback(async () => {
@@ -173,13 +177,11 @@ export const useAuth = () => {
 //! ユーザ作成（仮登録）
 export const usePreSignUp = () => {
   // ? react query
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
   // ? toast modal
   const { setToastModal, showToastModal } = useToastModal()
   // ? Loading state (hook)
-  const { startLoading, hasError, successful, resetLoadingState } = useLoading()
-  // ? login modal (hook)
-  const { hideLoginModal } = useLoginModal()
+  const { startLoading, resetLoadingState } = useLoading()
 
   type ApiPropsType = {
     name: string,
@@ -199,28 +201,27 @@ export const usePreSignUp = () => {
     mutate({ name, email, password }, {
       onSuccess: () => {
         resetLoadingState()
-        // hideLoginModal()
       },
 
       onError: (error: any) => {
         resetLoadingState()
         if (error.status === 422) {
-          const errorMessages = error.data.message as any
+          const errorMessages = error.data.errors as any
+          if (errorMessages.email) {
+            if (errorMessages.email.includes('email is already exists')) {
+              setToastModal({ message: MESSAGE.EMAIL_HAS_ALREADY_EXIST, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showToastModal()
+              return
+            }
+          }
           if (errorMessages.name) {
-            if ((errorMessages.name as string[]).includes('The name has already been taken.')) {
+            if ((errorMessages.name as string[]).includes('name is already used')) {
               setToastModal({ message: MESSAGE.USER_NAME_ALREADY_USE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
               showToastModal()
               return
             }
             if ((errorMessages.name as string[]).includes('The name must not be greater than 30 characters.')) {
               setToastModal({ message: MESSAGE.NAME_CHAR_LIMIT_OVER, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-              showToastModal()
-              return
-            }
-          }
-          if (errorMessages.email) {
-            if (errorMessages.email.includes('The email has already been taken.')) {
-              setToastModal({ message: MESSAGE.EMAIL_HAS_ALREADY_EXIST, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
               showToastModal()
               return
             }
