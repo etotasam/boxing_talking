@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { FullScreenSpinnerModal } from '@/components/modal/FullScreenSpinnerModal';
 //! hook
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useFooterHeight } from '@/hooks/useFooterHeight';
@@ -9,7 +8,7 @@ import { useSignUpIdentification } from '@/hooks/useSignUpIdentification';
 import { Footer } from '@/components/module/Footer';
 import { RotatingLines } from 'react-loader-spinner';
 // ! recoil
-import { useSetRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { authenticatingSelector } from '@/store/authenticatingState';
 import { tokenErrorMessageSelector } from '@/store/tokenErrorMessageState';
 

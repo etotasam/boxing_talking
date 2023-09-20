@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
-import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 // ! types
 import { MatchDataType } from '@/assets/types';
 // ! components
@@ -12,7 +11,6 @@ import { PredictionVoteIcon } from '@/components/atomc/PredictionVoteIcon';
 import crown from '@/assets/images/etc/champion.svg';
 //! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
-import { useWindowSize } from '@/hooks/useWindowSize';
 import { useGuest, useAuth } from '@/hooks/useAuth';
 
 type PropsType = {

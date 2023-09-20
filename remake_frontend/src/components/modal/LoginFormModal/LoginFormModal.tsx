@@ -121,16 +121,16 @@ const LoginForm = () => {
   return (
     <div
       // onMouseDown={(e) => e.stopPropagation()}
-      className="md:w-[550px] md:h-[600px] sm:w-2/3 sm:h-2/3 w-[95%] max-w-[500px] h-2/3 bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
+      className="md:w-[550px] md:h-[600px] sm:w-2/3 w-[95%] max-w-[500px] h-auto bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
     >
       <motion.div
         initial="initial"
         animate="show"
         exit="hide"
         variants={variants}
-        className="relative sm:w-[70%] sm:max-w-[450px] w-[80%] max-w-[350px]"
+        className="relative sm:w-[70%] sm:max-w-[450px] w-[80%] max-w-[350px] py-10"
       >
-        <h1 className="absolute top-[-60px] left-0 w-full text-center text-stone-500 font-light text-xl">
+        <h1 className="w-full text-center text-stone-500 font-light text-xl mb-5">
           ログイン
         </h1>
         <form onSubmit={toLogin} className=" flex flex-col w-full">

@@ -63,6 +63,7 @@ export const MESSAGE = {
   MATCH_REGISTER_FAILD: "試合情報の登録に失敗しました \n 再度登録してください",
   MATCH_UPDATE_FAILD: "試合情報の更新に失敗しました \n 一度画面を更新し、再度更新の実行を行ってください",
 
+  INVALID_COUNTRY: "国の選択がありません",
 
   FIGHTER_NOT_ABLE_TO_REGISTER: "すでに登録されている選手です",
   FIGHTER_REGISTER_PENDING: "選手登録を実行中...",
