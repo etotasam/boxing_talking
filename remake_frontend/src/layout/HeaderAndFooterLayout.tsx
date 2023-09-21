@@ -1,4 +1,4 @@
-import { useEffect, ReactNode } from 'react';
+import { useEffect } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 // ! components
 import { Footer } from '@/components/module/Footer';

@@ -109,7 +109,6 @@ export const useUpdateMatch = () => {
   const { setToastModal, showToastModal } = useToastModal()
   const { resetLoadingState, startLoading } = useLoading()
   const { refetch } = useFetchMatches()
-  // const queryClient = useQueryClient()
   const api = useCallback(async (arg: ArgumentType) => {
     const updateDeta = {
       match_id: arg.matchId,
@@ -120,17 +119,6 @@ export const useUpdateMatch = () => {
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
       startLoading()
-      // const snapshot = queryClient.getQueryData<MatchesType[]>(queryKeys.match)
-      // if (!snapshot) return
-      // const newMathcesState = snapshot.map(match => {
-      //   if (match.id === .id) {
-
-      //     return alterMatchData
-      //   }
-      //   return match
-      // })
-      // queryClient.setQueryData(queryKeys.match, newMathcesState)
-      // return { snapshot }
     }
   })
   const updateMatch = (updateMatchData: ArgumentType) => {
@@ -140,15 +128,11 @@ export const useUpdateMatch = () => {
         resetLoadingState()
         setToastModal({ message: MESSAGE.MATCH_UPDATE_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
-        // setToastModalMessage({ message: MESSAGE.MATCH_UPDATE_SUCCESS, bgColor: ModalBgColorType.SUCCESS })
-        // queryClient.setQueryData(queryKeys.deleteMatchSub, undefined)
       },
       onError: () => {
         resetLoadingState()
         setToastModal({ message: MESSAGE.MATCH_UPDATE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
-        // queryClient.setQueryData(queryKeys.match, context?.snapshot)
-        // queryClient.setQueryData(queryKeys.deleteMatchSub, undefined)
       }
     })
   }

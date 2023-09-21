@@ -68,7 +68,9 @@ export const MatchSetter = ({
       const organizations = selectMatch.titles
         .map((value) => {
           for (const organi of Object.values(ORGANIZATIONS)) {
-            if (value.includes(organi)) return organi;
+            if (value.includes(organi)) {
+              return organi;
+            }
           }
         })
         .filter((v) => v !== undefined) as ORGANIZATIONS_Type[] | [];
@@ -108,6 +110,7 @@ export const MatchSetter = ({
     }
   }, [matchGrade]);
 
+  //? Submit
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectMatch) {

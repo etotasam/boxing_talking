@@ -19,6 +19,11 @@ use \Symfony\Component\HttpFoundation\Response;
 class MatchController extends Controller
 {
 
+    public function __construct(BoxingMatch $match)
+    {
+        $this->match = $match;
+    }
+
 
 
     // ! 保有タイトルを配列にして返す
@@ -62,24 +67,14 @@ class MatchController extends Controller
             $blue_boxer = Boxer::find($blue_id);
             $titles = $item->titles;
 
-            $formatted_red_boxer = $this->toArrayTitles($red_boxer);
-            $formatted_blue_boxer = $this->toArrayTitles($blue_boxer);
-
-
-            if (empty($titles)) {
-                $formatted_titles = [];
-            } else {
-                $formatted_titles = explode('/', $titles);
-            };
-
             return  [
                 "id" => $item->id,
-                "red_boxer" => $formatted_red_boxer,
-                "blue_boxer" => $formatted_blue_boxer,
+                "red_boxer" => $red_boxer,
+                "blue_boxer" => $blue_boxer,
                 "country" => $item->country,
                 "venue" => $item->venue,
                 "grade" => $item->grade,
-                "titles" => $formatted_titles,
+                "titles" => $titles,
                 "weight" => $item->weight,
                 "match_date" => $item->match_date,
                 "count_red" => $item->count_red,
@@ -110,24 +105,14 @@ class MatchController extends Controller
             $blue_boxer = Boxer::find($blue_id);
             $titles = $item->titles;
 
-            $formatted_red_boxer = $this->toArrayTitles($red_boxer);
-            $formatted_blue_boxer = $this->toArrayTitles($blue_boxer);
-
-
-            if (empty($titles)) {
-                $formatted_titles = [];
-            } else {
-                $formatted_titles = explode('/', $titles);
-            };
-
             return  [
                 "id" => $item->id,
-                "red_boxer" => $formatted_red_boxer,
-                "blue_boxer" => $formatted_blue_boxer,
+                "red_boxer" => $red_boxer,
+                "blue_boxer" => $blue_boxer,
                 "country" => $item->country,
                 "venue" => $item->venue,
                 "grade" => $item->grade,
-                "titles" => $formatted_titles,
+                "titles" => $titles,
                 "weight" => $item->weight,
                 "match_date" => $item->match_date,
                 "count_red" => $item->count_red,
@@ -146,15 +131,8 @@ class MatchController extends Controller
     {
         try {
             $match = $request->all();
-            // ! 配列で受けた保有タイトルを文字列に変換する
-            $titles = implode('/', $match["titles"]);
-            if (empty($titles)) {
-                $match['titles'] = null;
-            } else {
-                $match['titles'] = $titles;
-            };
             try {
-                BoxingMatch::create($match);
+                $this->match->create($match);
             } catch (Exception $e) {
                 throw new Exception("Catch error when register");
             }
@@ -164,7 +142,7 @@ class MatchController extends Controller
                 return response()->json(["message" => $e->getMessage()], Response::HTTP_NOT_IMPLEMENTED);
             }
         };
-        return response()->json(["message" => "faild match register"], 500);
+        return response()->json(["message" => " Failed match register"], 500);
     }
 
     /**
@@ -216,13 +194,17 @@ class MatchController extends Controller
      */
     public function update(Request $request)
     {
-        $id = $request->match_id;
-        $update_match_data = $request->update_match_data;
-        // throw new Exception();
         try {
-            BoxingMatch::find($id)->update($update_match_data);
+            $id = $request->match_id;
+            $match = $this->match->find($id);
+            if (!$match) {
+                return response()->json(["success" => false, "message" => "Match is not exists"], 404);
+            }
+            $update_match_data = $request->update_match_data;
+            $match->update($update_match_data);
+            return response()->json(["success" => true, "message" => "Success update match data"], 200);
         } catch (Exception $e) {
-            return response()->json(["message" => "failed update match"], 500);
+            return response()->json(["message" => $update_match_data], 500);
         }
     }
 }
