@@ -9,6 +9,8 @@ export const Stance = {
 
 
 export const ORGANIZATIONS = {
+  WBC_INTERIM: "WBC暫定",
+  WBO_INTERIM: "WBO暫定",
   WBA: "WBA",
   WBC: "WBC",
   WBO: "WBO",

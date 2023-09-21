@@ -1,16 +1,6 @@
-import { Footer } from '@/components/module/Footer';
-
-//! env
-const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 export const Terms = () => {
   return (
     <>
-      <header className="sm:h-[80px] h-[70px] felx relative after:w-full after:absolute after:z-10 after:bottom-[-3px] after:left-0 after:h-[3px] after:bg-red-500">
-        {/* <DivVerticalCenter> */}
-        <h1 className="md:text-[64px] sm:text-[54px] text-[36px] absolute md:top-0 sm:top-2 top-5 left-0 font-thin">
-          {siteTitle}
-        </h1>
-      </header>
       <div className="text-stone-800 w-full flex justify-center items-center">
         <div className="max-w-[1000px] md:w-[80%] w-[90%] my-10">
           <h1 className="text-center text-[26px]">利用規約</h1>
@@ -128,7 +118,6 @@ export const Terms = () => {
           </p>
         </div>
       </div>
-      <Footer />
     </>
   );
 };

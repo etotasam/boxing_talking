@@ -1,18 +1,18 @@
-import clsx from "clsx";
-import dayjs from "dayjs";
+import clsx from 'clsx';
+import dayjs from 'dayjs';
 // ! image
-import crown from "@/assets/images/etc/champion.svg";
+import crown from '@/assets/images/etc/champion.svg';
 // ! types
-import { BoxerType } from "@/assets/types";
+import { BoxerType } from '@/assets/types';
 // ! components
-import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
+import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
 
-type PropsType = React.ComponentProps<"div"> & { boxer: BoxerType };
+type PropsType = React.ComponentProps<'div'> & { boxer: BoxerType };
 
 export const BoxerInfo = ({ boxer, className }: PropsType) => {
   const currentDate = dayjs();
   return (
-    <div className={clsx("w-[300px] h-full flex justify-center", className)}>
+    <div className={clsx('w-[300px] h-full flex justify-center', className)}>
       {/* <div className="h-[60%] border-b-[1px] border-stone-300">データ</div> */}
       <div className="text-center w-full px-5 py-5">
         <div>
@@ -46,7 +46,7 @@ export const BoxerInfo = ({ boxer, className }: PropsType) => {
                 年齢
               </p>
               <p className="flex-1">
-                {currentDate.diff(dayjs(boxer.birth), "year")}
+                {currentDate.diff(dayjs(boxer.birth), 'year')}
               </p>
             </li>
             <li className="flex justify-between mt-1">
@@ -78,9 +78,9 @@ export const BoxerInfo = ({ boxer, className }: PropsType) => {
                 スタイル
               </p>
               <p className="flex-1">
-                {boxer.style === "orthodox" && "オーソドックス"}
-                {boxer.style === "southpaw" && "サウスポー"}
-                {boxer.style === "unknown" && "-"}
+                {boxer.style === 'orthodox' && 'オーソドックス'}
+                {boxer.style === 'southpaw' && 'サウスポー'}
+                {boxer.style === 'unknown' && '-'}
               </p>
             </li>
           </ul>

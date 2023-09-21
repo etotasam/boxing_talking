@@ -97,7 +97,7 @@ export const SetUpBoxers = ({
       {thisMatch && (
         <section
           ref={boxerSectionRef}
-          className="flex border-b-[1px] border-stone-300 sm:h-[100px] h-[75px] md:relative sticky top-0"
+          className="z-20 flex border-b-[1px] border-stone-300 sm:h-[100px] h-[75px] md:relative sticky top-0"
         >
           {/* //? 投票ボタン */}
           {matchIsAfterToday && (
