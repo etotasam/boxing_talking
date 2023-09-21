@@ -37,20 +37,25 @@ class MatchController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function fetch()
+    public function fetch(Request $request)
     {
-        // throw new Exception();
 
-        // \Log::debug();
-        //? 管理者の場合のみ過去の試合を含めすべての試合を取得する
-        if (Auth::user() && Auth::user()->administrator) {
-            $all_match = BoxingMatch::orderBy('match_date')->get();
+        $range = $request->range;
+        if ($range == "all") {
+            if (Auth::user()->administrator) {
+                $matches = BoxingMatch::orderBy('match_date')->get();
+            } else {
+                return response()->json(["success" => false, "message" => "Cannot get all matches without auth administrator"], 401);
+            }
+        } else if ($range == "past") {
+            $fetchRange = date('Y-m-d', strtotime('-1 week'));
+            $matches = BoxingMatch::where('match_date', '<', $fetchRange)->orderBy('match_date')->get();
         } else {
-            $today = date('Y-m-d', strtotime('-2 week'));
-            $all_match = BoxingMatch::where('match_date', '>', $today)->orderBy('match_date')->get();
+            $fetchRange = date('Y-m-d', strtotime('-1 week'));
+            $matches = BoxingMatch::where('match_date', '>', $fetchRange)->orderBy('match_date')->get();
         }
 
-        $matches = $all_match->map(function ($item, $key) {
+        $formattedMatches = $matches->map(function ($item, $key) {
             $red_id = $item->red_boxer_id;
             $blue_id = $item->blue_boxer_id;
             $red_boxer = Boxer::find($red_id);
@@ -81,7 +86,55 @@ class MatchController extends Controller
                 "count_blue" => $item->count_blue
             ];
         });
-        return response()->json($matches);
+        return response()->json($formattedMatches);
+    }
+
+    /**
+     * fetch past matches from DB
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function fetchArchiveMatches()
+    {
+        // throw new Exception();
+
+        // \Log::debug();
+        //? 管理者の場合のみ過去の試合を含めすべての試合を取得する
+        $fetchRange = date('Y-m-d', strtotime('-1 week'));
+        $matches = BoxingMatch::where('match_date', '<', $fetchRange)->orderBy('match_date')->get();
+
+        $formattedMatches = $matches->map(function ($item, $key) {
+            $red_id = $item->red_boxer_id;
+            $blue_id = $item->blue_boxer_id;
+            $red_boxer = Boxer::find($red_id);
+            $blue_boxer = Boxer::find($blue_id);
+            $titles = $item->titles;
+
+            $formatted_red_boxer = $this->toArrayTitles($red_boxer);
+            $formatted_blue_boxer = $this->toArrayTitles($blue_boxer);
+
+
+            if (empty($titles)) {
+                $formatted_titles = [];
+            } else {
+                $formatted_titles = explode('/', $titles);
+            };
+
+            return  [
+                "id" => $item->id,
+                "red_boxer" => $formatted_red_boxer,
+                "blue_boxer" => $formatted_blue_boxer,
+                "country" => $item->country,
+                "venue" => $item->venue,
+                "grade" => $item->grade,
+                "titles" => $formatted_titles,
+                "weight" => $item->weight,
+                "match_date" => $item->match_date,
+                "count_red" => $item->count_red,
+                "count_blue" => $item->count_blue
+            ];
+        });
+        return response()->json($formattedMatches);
     }
 
     /**

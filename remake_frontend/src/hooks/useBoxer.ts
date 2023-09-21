@@ -115,6 +115,7 @@ export const useUpdateBoxerData = () => {
     mutate(convertedBoxerData, {
       onSuccess: () => {
         refetchReactQueryData(QUERY_KEY.boxer)
+        refetchReactQueryData(QUERY_KEY.matchesFetch)
         resetLoadingState()
         setToastModal({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS });
         showToastModal()

@@ -21,6 +21,35 @@ export const useFetchMatches = () => {
   return { data, isLoading, isError, isRefetching, refetch }
 }
 
+//! 過去の試合情報の取得(試合後一週間以上経っている試合全部)
+export const useFetchPastMatches = () => {
+  const { startLoading, resetLoadingState } = useLoading()
+  const fetcher = useCallback(async () => {
+    startLoading()
+    return await Axios.get("api/match", { params: { range: "past" } }).then(value => value.data)
+  }, [])
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.pastMatches, fetcher, {
+    keepPreviousData: true, staleTime: Infinity, enabled: true, onSuccess: () => {
+      resetLoadingState()
+    }, onError: () => {
+      resetLoadingState()
+    }
+  })
+
+
+
+  return { data, isLoading, isError, isRefetching, refetch }
+}
+
+//! すべての試合情報の取得(過去含めすべて)
+export const useFetchAllMatches = () => {
+  const fetcher = useCallback(async () => {
+    return await Axios.get("api/match", { params: { range: "all" } }).then(value => value.data)
+  }, [])
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.allMatches, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
+  return { data, isLoading, isError, isRefetching, refetch }
+}
+
 
 
 //! 試合の登録

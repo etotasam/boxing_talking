@@ -11,12 +11,14 @@ import { MatchEdit } from '@/page/Admin/MatchEdit';
 import { Terms } from './page/Terms/Terms';
 import { Identification } from '@/page/Identification';
 import { NotFound } from '@/page/NotFound';
+import { PastMatches } from './page/PastMatches';
 // ! middleware
 import AdminOnly from './middleware/AdminOnly';
 import Container from './middleware/Container';
 import './App.css';
 //! layout
-import MainLayout from '@/layout/MainLayout';
+import HeaderOnlyLayout from '@/layout/HeaderOnlyLayout';
+import HeaderAndFooterLayout from '@/layout/HeaderAndFooterLayout';
 // import AdminiLayout from "@/layout/AdminiLayout";
 
 import { TestModule } from './components/module/TestModule';
@@ -26,10 +28,14 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<Container />}>
-          <Route element={<MainLayout />}>
+          <Route element={<HeaderAndFooterLayout />}>
             <Route path="/" element={<Home />} />
+            <Route path="/past_matches" element={<PastMatches />} />
+            {/* //? </HeaderAndFooterLayout> */}
+          </Route>
+          <Route element={<HeaderOnlyLayout />}>
             <Route path="/match" element={<Match />} />
-            {/* //? </MainLayout> */}
+            {/* //? </HeaderOnlyLayout> */}
           </Route>
           <Route element={<AdminOnly />}>
             <Route path="/admin" element={<Admin />} />
@@ -41,14 +47,18 @@ function App() {
           </Route>
           {/* //? </container> */}
         </Route>
-        {/* //! テスト用 */}
-        <Route element={<MainLayout />}>
-          <Route path="/test_module" element={<TestModule />} />
+
+        <Route element={<HeaderOnlyLayout />}>
+          {/* <Route path="/test_module" element={<TestModule />} /> */}
           <Route path="/identification" element={<Identification />} />
-          {/* //? </MainLayout> */}
+          {/* //? </HeaderOnlyLayout> */}
         </Route>
-        <Route path="/terms" element={<Terms />} />
-        <Route path="*" element={<NotFound />} />
+
+        <Route element={<HeaderAndFooterLayout />}>
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/*" element={<NotFound />} />
+          {/* //? </HeaderAndFooterLayout> */}
+        </Route>
       </Routes>
     </BrowserRouter>
   );
