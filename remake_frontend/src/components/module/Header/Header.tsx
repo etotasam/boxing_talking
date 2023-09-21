@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import clsx from 'clsx';
 // ! icons
 import { GiBoxingGlove } from 'react-icons/gi';
 import { AiOutlineUser } from 'react-icons/ai'; // ! types
@@ -50,7 +51,13 @@ export const Header = (porps: PropsType) => {
         {userData && (
           <div className="absolute top-2 sm:top-0 bottom-2 md:right-5 right-2 flex">
             <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-            <p className="text-sm">{userData.name}</p>
+            <p
+              className={clsx(
+                userData.name!.length > 20 ? 'text-[8px]' : 'text-sm'
+              )}
+            >
+              {userData.name}
+            </p>
           </div>
         )}
         {isGuest && (

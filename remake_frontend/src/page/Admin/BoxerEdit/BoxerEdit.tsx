@@ -1,36 +1,36 @@
-import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { isEqual } from "lodash";
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { isEqual } from 'lodash';
 //! data
 import {
   BG_COLOR_ON_TOAST_MODAL,
   MESSAGE,
-} from "@/assets/statusesOnToastModal";
-import { initialBoxerDataOnForm } from "@/assets/boxerData";
+} from '@/assets/statusesOnToastModal';
+import { initialBoxerDataOnForm } from '@/assets/boxerData';
 // ! functions
-import { getBoxerDataWithID, convertToBoxerData } from "@/assets/functions";
+import { getBoxerDataWithID, convertToBoxerData } from '@/assets/functions';
 //! hooks
-import { useToastModal } from "@/hooks/useToastModal";
-import { usePagePath } from "@/hooks/usePagePath";
-import { useLoading } from "@/hooks/useLoading";
+import { useToastModal } from '@/hooks/useToastModal';
+import { usePagePath } from '@/hooks/usePagePath';
+import { useLoading } from '@/hooks/useLoading';
 import {
   useFetchBoxer,
   useUpdateBoxerData,
   useDeleteBoxer,
   // limit,
-} from "@/hooks/useBoxer";
-import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
+} from '@/hooks/useBoxer';
+import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 //! types
-import { BoxerType } from "@/assets/types";
+import { BoxerType } from '@/assets/types';
 //! layout
-import AdminiLayout from "@/layout/AdminiLayout";
+import AdminiLayout from '@/layout/AdminiLayout';
 //! component
 // import { FlagImage } from "@/components/atomc/FlagImage";
-import { BoxerEditForm } from "@/components/module/BoxerEditForm";
-import { SearchBoxer } from "@/components/module/SearchBoxer";
-import { Confirm } from "@/components/modal/Confirm";
-import { PaginationBoxerList } from "@/components/module/PaginationBoxerList";
-import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
+import { BoxerEditForm } from '@/components/module/BoxerEditForm';
+import { SearchBoxer } from '@/components/module/SearchBoxer';
+import { Confirm } from '@/components/modal/Confirm';
+import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
+import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
 
 export const BoxerEdit = () => {
   // ? use hook
@@ -113,7 +113,7 @@ export const BoxerEdit = () => {
       showToastModal();
       return;
     }
-    if (!boxersData) return console.error("Not have boxers data");
+    if (!boxersData) return console.error('Not have boxers data');
     //? データ変更がされていない時
     const boxer = getBoxerDataWithID({
       boxerID: editTargetBoxerData.id,
@@ -257,7 +257,7 @@ const BoxersList = ({
                 data-testid={`input-${boxer.id}`}
               />
               <label
-                className={"w-[90%] cursor-pointer"}
+                className={'w-[90%] cursor-pointer'}
                 htmlFor={`${boxer.id}_${boxer.name}`}
               >
                 <li className="w-[300px] mt-3 border-[1px] border-stone-300 rounded-md p-3">

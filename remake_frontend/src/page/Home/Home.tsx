@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { flatten } from 'lodash';
 // ! components
 import { FightBox } from '@/components/module/FightBox';
 import { SimpleFightBox } from '@/components/module/SimpleFightBox';
-import { Footer } from '@/components/module/Footer';
 //! icon
 import { VisualModeChangeIcon } from '@/components/atomc/VisualModeChangeIcon';
 // ! hooks
@@ -12,8 +11,6 @@ import { useFetchMatches } from '@/hooks/useMatch';
 import { usePagePath } from '@/hooks/usePagePath';
 import { useLoading } from '@/hooks/useLoading';
 import { useWindowSize } from '@/hooks/useWindowSize';
-import { useHeaderHeight } from '@/hooks/useHeaderHeight';
-import { useFooterHeight } from '@/hooks/useFooterHeight';
 import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/uesWinLossPrediction';
 import { useVisualModeController } from '@/hooks/useVisualModeController';
 // ! func
@@ -30,8 +27,6 @@ export const Home = () => {
   const { pathname } = useLocation();
   const { device } = useWindowSize();
 
-  const { state: headerHeight } = useHeaderHeight();
-  const { state: footerHeight } = useFooterHeight();
   const { visualModeToggleSwitch } = useVisualModeController();
 
   const matchSelect = (matchId: number) => {
@@ -52,12 +47,12 @@ export const Home = () => {
   useEffect(() => {
     if (!matchesData) return;
     const multipleArrayMatchData = matchesData.reduce(
-      (accum: MatchDataType[][], current) => {
+      (accumulator: MatchDataType[][], current) => {
         const isFightPast = getFightDataOfPastDays(current);
         if (isFightPast) {
-          return [[...accum[0]], [current, ...accum[1]]];
+          return [[...accumulator[0]], [current, ...accumulator[1]]];
         } else {
-          return [[...accum[0], current], [...accum[1]]];
+          return [[...accumulator[0], current], [...accumulator[1]]];
         }
       },
       [[], []]
@@ -68,21 +63,16 @@ export const Home = () => {
 
   return (
     <>
-      <div
-        className="md:py-10 pb-5 relative"
-        style={{
-          minHeight: `calc(100vh - (${headerHeight}px + ${footerHeight}px) - 1px)`,
-        }}
-      >
-        {device == 'PC' && (
-          <div className="absolute top-0 left-[50%] translate-x-[-50%] lg:mt-3 mt-1">
-            <VisualModeChangeIcon onClick={() => visualModeToggleSwitch()} />
-          </div>
-        )}
+      {formattedMatchesData && (
+        <>
+          {device == 'PC' && (
+            <div className="absolute top-0 left-[50%] translate-x-[-50%] lg:mt-3 mt-1">
+              <VisualModeChangeIcon onClick={() => visualModeToggleSwitch()} />
+            </div>
+          )}
 
-        <ul>
-          {formattedMatchesData &&
-            formattedMatchesData.map((match) => (
+          <ul className="md:pt-10">
+            {formattedMatchesData.map((match) => (
               <li
                 key={match.id}
                 className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5"
@@ -90,10 +80,17 @@ export const Home = () => {
                 <MatchCard match={match} matchSelect={matchSelect} />
               </li>
             ))}
-        </ul>
-      </div>
+          </ul>
 
-      <Footer />
+          {/* <div className="text-center md:my-10 my-5">
+            <Link to="/past_matches">
+              <button className="py-2 px-4 bg-stone-600 hover:bg-stone-800 duration-300 text-white rounded-sm sm:w-auto w-[95%]">
+                その他過去の試合一覧
+              </button>
+            </Link>
+          </div> */}
+        </>
+      )}
     </>
   );
 };

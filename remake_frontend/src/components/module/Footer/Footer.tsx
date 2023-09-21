@@ -16,7 +16,7 @@ export const Footer = () => {
     <>
       <div
         ref={footerRef}
-        className="relative w-full h-[100px] border-t-[1px] border-stone-200 text-stone-400"
+        className="relative w-full h-[50px] border-t-[1px] border-stone-200 text-stone-400"
       >
         <div className="flex absolute bottom-2 right-10">
           {location.pathname !== '/terms' && (
@@ -25,7 +25,7 @@ export const Footer = () => {
             </Link>
           )}
           <p className="md:text-sm text-[8px] select-none">
-            ©2023 BOXINT TALKING
+            ©2023 BOXING TALKING
           </p>
         </div>
       </div>

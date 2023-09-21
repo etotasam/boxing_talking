@@ -20,6 +20,8 @@ export const QUERY_KEY = {
   countBoxer: generateQueryKey('boxer/count'),
   isBoxerSelected: generateQueryKey('boxer/select'),
   matchesFetch: generateQueryKey('match/fetch'),
+  pastMatches: generateQueryKey('matches/past'),
+  allMatches: generateQueryKey('matches/all'),
   matchDelete: generateQueryKey('match/delete'),
   comment: generateQueryKey('comment'),
   prediction: generateQueryKey('prediction'),

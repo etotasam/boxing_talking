@@ -1,8 +1,8 @@
 // import React from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
 //! component
-import { HeaderContainer } from "@/components/module/Header";
-const MainLayout = () => {
+import { HeaderContainer } from '@/components/module/Header';
+const HeaderOnlyLayout = () => {
   return (
     <div className="text-stone-700 font-sans">
       <HeaderContainer />
@@ -13,4 +13,4 @@ const MainLayout = () => {
   );
 };
 
-export default MainLayout;
+export default HeaderOnlyLayout;

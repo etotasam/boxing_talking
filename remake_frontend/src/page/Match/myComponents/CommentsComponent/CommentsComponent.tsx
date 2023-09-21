@@ -1,12 +1,16 @@
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
+import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 //!icon
 import { LiaCommentDotsSolid } from 'react-icons/lia';
 import { AiOutlineUser } from 'react-icons/ai';
 //! hooks
+import { useWindowSize } from '@/hooks/useWindowSize';
 import { useFetchComments } from '@/hooks/useComment';
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useMatchBoxerSectionHeight } from '@/hooks/useMatchBoxerSectionHeight';
+import { useRef } from 'react';
 
 type CommentsSectionType = {
   paramsMatchID: number;
@@ -18,6 +22,7 @@ export const CommentsComponent = ({
   commentPostTextareaHeight,
 }: CommentsSectionType) => {
   // ? use hook
+  const { windowSize } = useWindowSize();
   const { state: headerHeight } = useHeaderHeight();
   const { state: matchBoxerSectionHeight } = useMatchBoxerSectionHeight();
   const {
@@ -65,27 +70,55 @@ export const CommentsComponent = ({
     // return dayjs(postDate).format('YYYY年M月D日 H:mm');
   };
 
+  const [liElements, setLiElements] = React.useState<Element[]>();
+  const ulRef = useRef(null);
+  useEffect(() => {
+    if (!ulRef.current) return;
+    const childElements = (ulRef.current as HTMLUListElement).children;
+    const childArray = Array.from(childElements);
+    setLiElements(childArray);
+  }, [ulRef.current, commentsOfThisMatches]);
+
+  const stretchCommentElement = (
+    event: React.MouseEvent<HTMLParagraphElement, MouseEvent>
+  ) => {
+    const handleClickElement = event.target as HTMLSpanElement;
+    const parentElement = (
+      handleClickElement.parentElement as HTMLParagraphElement
+    ).parentElement as HTMLDivElement;
+
+    (parentElement as HTMLDivElement).style.height = 'auto';
+    if (handleClickElement) {
+      (handleClickElement.parentElement as HTMLParagraphElement).style.display =
+        'none';
+    }
+  };
+
+  const initialCommentElHeight = () => {
+    if (!windowSize) return 0;
+    if (windowSize > TAILWIND_BREAKPOINT.sm) return 200;
+    if (windowSize < TAILWIND_BREAKPOINT.sm) return 100;
+    return 0;
+  };
+
   return commentsOfThisMatches && Boolean(commentsOfThisMatches.length) ? (
     <section
-      className="xl:w-[70%] md:w-[60%] w-full border-l-[1px] border-stone-200"
+      className="xl:w-[70%] md:w-[60%] w-full border-l-[1px] border-stone-200 relative"
       style={{
         marginBottom: `${commentPostTextareaHeight}px`,
         minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
       }}
     >
-      <ul>
+      {!liElements && (
+        <div className="z-10 absolute top-0 left-0 w-full h-full bg-white" />
+      )}
+      <ul ref={ulRef}>
         {commentsOfThisMatches.map((commentData) => (
           <li
             key={commentData.id}
-            className={clsx('p-5 pb-1 border-b-[1px] border-stone-200')}
+            className={clsx('sm:p-5 p-3 pt-1 border-b-[1px] border-stone-200')}
           >
-            <p
-              className="text-lg font-light text-stone-600"
-              dangerouslySetInnerHTML={{
-                __html: commentData.comment,
-              }}
-            />
-            <div className="sm:flex mt-3">
+            <div className="sm:flex mb-2">
               <time className="text-xs text-stone-400 leading-6">
                 {dateFormatter(commentData.created_at)}
               </time>
@@ -93,7 +126,14 @@ export const CommentsComponent = ({
                 {commentData.post_user_name ? (
                   <>
                     <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-                    <p className="text-sm text-stone-500">
+                    <p
+                      className={clsx(
+                        'text-stone-500',
+                        commentData.post_user_name.length > 20
+                          ? 'text-[12px] sm:text-sm'
+                          : 'text-sm'
+                      )}
+                    >
                       {commentData.post_user_name}
                     </p>
                   </>
@@ -105,6 +145,42 @@ export const CommentsComponent = ({
                 )}
               </div>
             </div>
+            <div
+              className="relative"
+              style={
+                document.getElementById(`comment_${commentData.id}`) &&
+                (document.getElementById(`comment_${commentData.id}`)
+                  ?.clientHeight as number) > initialCommentElHeight()
+                  ? { height: '135px', overflow: 'hidden' }
+                  : { height: 'auto' }
+              }
+            >
+              <p
+                id={`comment_${commentData.id}`}
+                className={clsx(
+                  'md:text-lg text-sm font-light sm:tracking-normal tracking-wider text-stone-600'
+                )}
+                dangerouslySetInnerHTML={{
+                  __html: commentData.comment,
+                }}
+              />
+              {document.getElementById(`comment_${commentData.id}`) &&
+                (document.getElementById(`comment_${commentData.id}`)
+                  ?.clientHeight as number) > initialCommentElHeight() && (
+                  <p className="absolute bottom-0 left-0 md:h-[25px] h-[35px] bg-white w-full">
+                    <span
+                      onClick={stretchCommentElement}
+                      className={clsx(
+                        'text-stone-500 cursor-pointer border-[1px] border-transparent text-sm absolute box-border bottom-0',
+                        'hover:border-b-stone-800 hover:text-stone-800'
+                      )}
+                    >
+                      続きを読む
+                    </span>
+                  </p>
+                )}
+            </div>
+
             {/* //? ゴミ箱 */}
             {/* {authUser && authUser.name === commentData.post_user_name && (
                   <button
@@ -140,3 +216,15 @@ export const CommentsComponent = ({
     )
   );
 };
+
+// const Test = ({ height, index }: any) => {
+//   useEffect(() => {
+//     if (!height[index]) return;
+//     console.log('よばれた', height[index].clientHeight);
+//   }, [index, height]);
+//   return (
+//     <>
+//       <p>てすと</p>
+//     </>
+//   );
+// };

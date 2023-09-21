@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { cloneDeep } from "lodash";
+import { useEffect, useState } from 'react';
+import { cloneDeep } from 'lodash';
 // ! data
-import { ORGANIZATIONS, WEIGHT_CLASS } from "@/assets/boxerData";
+import { ORGANIZATIONS, WEIGHT_CLASS } from '@/assets/boxerData';
 // ! types
 // import { TitleType } from "@/assets/types";
 // ! hooks
-import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
+import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 
 // type PropsType = {
 //   setTitles: React.Dispatch<React.SetStateAction<TitleType[]>>;
@@ -49,7 +49,7 @@ export const TitleSelector = () => {
                   value={
                     boxerDataOnForm.title_hold[i]
                       ? boxerDataOnForm.title_hold[i].organization
-                      : ""
+                      : ''
                   }
                   onChange={(e) =>
                     setBoxerDataToForm((boxerDataOnForm) => {
@@ -95,7 +95,7 @@ export const TitleSelector = () => {
                   value={
                     boxerDataOnForm.title_hold[i]
                       ? boxerDataOnForm.title_hold[i].weightClass
-                      : ""
+                      : ''
                   }
                   onChange={(e) =>
                     setBoxerDataToForm((boxerDataOnForm) => {

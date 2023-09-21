@@ -79,6 +79,7 @@ export const Match = () => {
     'red' | 'blue' | 'No prediction vote' | undefined
   >();
 
+  //? 読み込み時にtopへ
   React.useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -132,7 +133,7 @@ export const Match = () => {
         );
       }
     }
-  }, [comment]);
+  }, [comment, windowSize]);
 
   // ? コメント投稿成功時にコメント入力欄をclearメッセージモーダル
   useEffect(() => {
@@ -178,6 +179,7 @@ export const Match = () => {
   };
 
   const textarea = textareaRef.current as unknown as HTMLTextAreaElement;
+
   const autoExpandTextareaAndSetComment = (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -193,6 +195,7 @@ export const Match = () => {
   };
 
   //! DOM
+  if (!windowSize) return;
   return (
     <>
       {/* //? Boxer */}
@@ -205,7 +208,7 @@ export const Match = () => {
       />
       <div className="flex w-full">
         {/* //? Left section (Match info) */}
-        {windowSize && windowSize >= TAILWIND_BREAKPOINT.md && (
+        {windowSize >= TAILWIND_BREAKPOINT.md && (
           <LeftSection
             thisMatch={thisMatch}
             thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
@@ -226,7 +229,7 @@ export const Match = () => {
           <PostCommentTextarea
             isPostingComment={isPostingComment}
             setComment={setComment}
-            comment={comment}
+            // comment={comment}
             sendComment={sendComment}
             textareaRef={textareaRef}
             autoExpandTextareaAndSetComment={autoExpandTextareaAndSetComment}
@@ -242,7 +245,7 @@ type PostCommentTextareaType = {
   isPostingComment: boolean;
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
   sendComment: () => void;
-  comment: string | undefined;
+  // comment: string | undefined;
   textareaRef: React.MutableRefObject<null>;
   autoExpandTextareaAndSetComment: (
     e: React.ChangeEvent<HTMLTextAreaElement>
