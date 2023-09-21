@@ -55,16 +55,16 @@ export const useFetchBoxer = () => {
 
 
 
-  const fetchBoxerApi = async ({ page, limit, searchWords }: FetcherPropsType) => {
+  const fetchBoxerAPI = async ({ page, limit, searchWords }: FetcherPropsType) => {
     const res = await Axios.get<BoxerType[]>("/api/boxer", { params: { page, limit, ...searchWords } }).then(value => value.data)
     return res
   }
-  const { data: boxersData, isLoading, isError, isPreviousData, refetch, isRefetching, } = useQuery<BoxerType[]>([QUERY_KEY.boxer, { ...queryKey }], () => fetchBoxerApi({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), {
+  const { data: boxersData, isLoading, isError, isPreviousData, refetch, isRefetching, } = useQuery<BoxerType[]>([QUERY_KEY.boxer, { ...queryKey }], () => fetchBoxerAPI({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), {
     keepPreviousData: true, staleTime: Infinity, onSuccess: () => { }, onError: () => { }
   })
 
-  const fetchCountBoxer = async (searchWords: SearchWordType) => await Axios.get<number>("/api/boxer/count", { params: { ...searchWords } }).then(v => v.data)
-  const { data: boxersCount } = useQuery<number>([QUERY_KEY.countBoxer, { name: paramName, country: paramCountry }], () => fetchCountBoxer({ name: paramName, country: paramCountry }), { staleTime: Infinity })
+  const fetchCountBoxerAPI = async (searchWords: SearchWordType) => await Axios.get<number>("/api/boxer/count", { params: { ...searchWords } }).then(v => v.data)
+  const { data: boxersCount } = useQuery<number>([QUERY_KEY.countBoxer, { name: paramName, country: paramCountry }], () => fetchCountBoxerAPI({ name: paramName, country: paramCountry }), { staleTime: Infinity })
   const pageCount = boxersCount ? Math.ceil(boxersCount / limit) : 0
 
   return { boxersData, boxersCount, pageCount, isLoading, isError, isPreviousData, refetch, isRefetching }
@@ -74,40 +74,15 @@ export const useFetchBoxer = () => {
 export const useUpdateBoxerData = () => {
   const { startLoading, resetLoadingState } = useLoading()
   const { refetchReactQueryData } = useReactQuery()
-  // const queryClient = useQueryClient()
   //? params page の取得
-  // const { search } = useLocation();
-  // const query = new URLSearchParams(search);
-  // const paramPage = Number(query.get("page"));
   const { setToastModal, showToastModal } = useToastModal()
-  // const snapshotFighters = queryClient.getQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: paramPage }])
   const api = async (updateFighterData: BoxerType): Promise<Record<string, string> | void> => {
-    // try {
-    //? 編集した選手データを含めた全選手データ
-    // const updateFightersData = snapshotFighters?.reduce((acc: BoxerType[], curr: BoxerType) => {
-    //   if (curr.id === updateFighterData.id) {
-    //     return [...acc, updateFighterData];
-    //   }
-    //   return [...acc, curr];
-    // }, []);
     await Axios.put("/api/boxer", updateFighterData);
-    // queryClient.setQueryData([QUERY_KEY.boxer, { page: paramPage }], updateFightersData)
-    //   setToastModal({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS });
-    //   showToastModal()
-    // } catch (error) {
-    //   console.error("選手データ更新:", error);
-    // queryClient.setQueryData([QUERY_KEY.boxer, { page: paramPage }], snapshotFighters)
-    //   setToastModal({ message: MESSAGE.FIGHTER_EDIT_FAILD, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR });
-    //   showToastModal()
-    // }
+
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: async () => {
       startLoading()
-      // clearToastModaleMessage()
-      // const isLeeway = fightersCount ? !!(fightersCount % limit) : false
-      // const pageCount = fightersCount ? Math.ceil(fightersCount / limit) : 1
-      // return { isLeeway, pageCount }
     }
   })
   const updateFighter = (updateFighterData: BoxerDataOnFormType) => {
@@ -122,7 +97,7 @@ export const useUpdateBoxerData = () => {
       },
       onError: () => {
         resetLoadingState()
-        setToastModal({ message: MESSAGE.FIGHTER_EDIT_FAILD, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR });
+        setToastModal({ message: MESSAGE.FIGHTER_EDIT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR });
         showToastModal()
       }
     })
@@ -144,10 +119,6 @@ export const useRegisterBoxer = () => {
   const { mutate, isLoading, isError, isSuccess } = useMutation(api, {
     onMutate: async () => {
       startLoading()
-      // clearToastModaleMessage()
-      // const isLeeway = fightersCount ? !!(fightersCount % limit) : false
-      // const pageCount = fightersCount ? Math.ceil(fightersCount / limit) : 1
-      // return { isLeeway, pageCount }
     }
   })
   const registerBoxer = (newBoxerData: BoxerDataOnFormType) => {
@@ -159,29 +130,28 @@ export const useRegisterBoxer = () => {
         setToastModal({ message: MESSAGE.FIGHTER_REGISTER_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
         refetchReactQueryData(QUERY_KEY.boxer)
-        // queryClient.setQueryData<number>(queryKeys.countFighter, (prev) => prev! + 1)
-        // if (context.isLeeway) {
-        //   const fightersData = queryClient.getQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: context.pageCount }])
-        //   if (fightersData?.length) {
-        //     queryClient.setQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: context.pageCount }], [...fightersData, newBoxerData])
-        //   }
-        // } else {
-        //   queryClient.setQueryData<BoxerType[]>([QUERY_KEY.boxer, { page: context.pageCount++ }], [newBoxerData])
-        // }
-        // //? 選手数を更新
-        // queryClient.setQueryData<number>(queryKeys.countFighter, (prevFightersCount) => {
-        //   return prevFightersCount! ++
-        // })
-        // queryClient.invalidateQueries(QUERY_KEY.boxer)
       },
       onError: (error: any) => {
-        hasError()
         resetLoadingState()
-        if (error.status === STATUS.NOT_ACCEPTABLE) {
-          setToastModal({ message: MESSAGE.BOXER_IS_ALRADY_EXISTS, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          showToastModal()
-          return
+        if (error.status === 422) {
+          const errors = error.data.errors as any
+          if (errors.name) {
+            if ((errors.name as string[]).includes('name is already exists')) {
+              setToastModal({ message: MESSAGE.BOXER_IS_ALREADY_EXISTS, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showToastModal()
+              return
+            }
+          }
+
+          if (errors.eng_name) {
+            if ((errors.eng_name as string[]).includes('eng_name is already exists')) {
+              setToastModal({ message: MESSAGE.BOXER_IS_ALREADY_EXISTS, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showToastModal()
+              return
+            }
+          }
         }
+
         setToastModal({ message: MESSAGE.FIGHTER_REGISTER_FAILD, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
       }
@@ -234,14 +204,14 @@ export const useDeleteBoxer = () => {
           if (errorMessage === ERROR_MESSAGE_FROM_BACKEND.BOXER_NOT_EXIST_IN_DB || errorMessage === ERROR_MESSAGE_FROM_BACKEND.REQUEST_DATA_IS_NOT_MATCH_BOXER_IN_DB) {
             setToastModal({ message: MESSAGE.ILLEGAL_DATA, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
           }
-          if (errorMessage === ERROR_MESSAGE_FROM_BACKEND.BOXER_HAS_ALRADY_SETUP_MATCH) {
-            setToastModal({ message: MESSAGE.BOXER_IS_ALRADY_SETUP_MATCH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          if (errorMessage === ERROR_MESSAGE_FROM_BACKEND.BOXER_HAS_ALREADY_SETUP_MATCH) {
+            setToastModal({ message: MESSAGE.BOXER_IS_ALREADY_SETUP_MATCH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
             showToastModal()
           }
           showToastModal()
           return
         }
-        setToastModal({ message: MESSAGE.FIGHTER_EDIT_FAILD, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        setToastModal({ message: MESSAGE.FIGHTER_EDIT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
         return
       }
