@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { flatten } from 'lodash';
 // ! components
 import { FightBox } from '@/components/module/FightBox';
 import { SimpleFightBox } from '@/components/module/SimpleFightBox';
 //! icon
-import { VisualModeChangeIcon } from '@/components/atomc/VisualModeChangeIcon';
+import { VisualModeChangeIcon } from '@/components/atomic/VisualModeChangeIcon';
 // ! hooks
 import { useFetchMatches } from '@/hooks/useMatch';
 import { usePagePath } from '@/hooks/usePagePath';
@@ -112,7 +112,6 @@ const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
       setIsPredictionVote(bool);
     }
   }, [myAllPredictionVote]);
-  // console.log(myAllPredictionVote);
   const { device } = useWindowSize();
 
   if (device === 'SP' || visualMode === 'simple')

@@ -1,12 +1,12 @@
-import React from "react";
-import { Nationality } from "@/assets/NationalFlagData";
-import { useNavigate, useLocation } from "react-router-dom";
+import React from 'react';
+import { Nationality } from '@/assets/NationalFlagData';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const SearchBoxer = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const searchName = React.useRef("");
-  const country = React.useRef("");
+  const searchName = React.useRef('');
+  const country = React.useRef('');
 
   const searchExecution = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,7 +31,7 @@ export const SearchBoxer = () => {
     >
       <h2 className="text-center text-[26px] tracking-[0.2em]">選手検索</h2>
       <div className="flex mt-3">
-        <label className="w-[50px] text-center" htmlFor="countrys">
+        <label className="w-[50px] text-center" htmlFor="country">
           国籍
         </label>
         <select
@@ -41,7 +41,7 @@ export const SearchBoxer = () => {
           onChange={(e) => {
             country.current = e.target.value;
           }}
-          id="countrys"
+          id="country"
         >
           <option value={undefined}></option>
           {Object.values(Nationality).map((nationalName) => (

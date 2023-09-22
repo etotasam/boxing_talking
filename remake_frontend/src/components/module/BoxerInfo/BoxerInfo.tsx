@@ -5,7 +5,7 @@ import crown from '@/assets/images/etc/champion.svg';
 // ! types
 import { BoxerType } from '@/assets/types';
 // ! components
-import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
+import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 
 type PropsType = React.ComponentProps<'div'> & { boxer: BoxerType };
 

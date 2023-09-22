@@ -5,12 +5,12 @@ import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 import { MatchDataType } from '@/assets/types';
 import { BoxerType } from '@/assets/types';
 // ! components
-import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
+import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { useEffect, useState } from 'react';
 import {
   PredictionVoteIcon,
   PredictionVoteIconMini,
-} from '@/components/atomc/PredictionVoteIcon';
+} from '@/components/atomic/PredictionVoteIcon';
 // ! image
 import crown from '@/assets/images/etc/champion.svg';
 //! hook
