@@ -11,7 +11,7 @@
 名前： {{ $name }} でアカウントが作成されます。
 
 
-@component('mail::button', ['url' => 'http://localhost:3000/identification?signup='.  $token])
+@component('mail::button', ['url' => config('app.url'). '/identification?signup='.  $token])
 アカウント作成
 @endcomponent
 
