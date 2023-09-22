@@ -2,10 +2,10 @@ import React from 'react';
 import clsx from 'clsx';
 // ! types
 import { NationalityType } from '@/assets/types';
-import { getNatinalFlag, formatPosition } from '@/assets/NationalFlagData';
+import { getNationalFlag, formatPosition } from '@/assets/NationalFlagData';
 
 type PropsType = React.ComponentProps<'div'> & {
-  nationaly: NationalityType;
+  nationality: NationalityType;
   thisMatchPredictionOfUsers?:
     | 'red'
     | 'blue'
@@ -14,7 +14,7 @@ type PropsType = React.ComponentProps<'div'> & {
 };
 
 export const BackgroundFlag = ({
-  nationaly,
+  nationality,
   thisMatchPredictionOfUsers = undefined,
   children,
 }: PropsType) => {
@@ -23,9 +23,9 @@ export const BackgroundFlag = ({
       <div
         className={'flex-1 py-5 absolute top-0 left-0 w-full h-full'}
         style={{
-          backgroundImage: `url(${getNatinalFlag(nationaly)})`,
+          backgroundImage: `url(${getNationalFlag(nationality)})`,
           backgroundSize: 'cover',
-          backgroundPosition: `${formatPosition(nationaly)}`,
+          backgroundPosition: `${formatPosition(nationality)}`,
         }}
       >
         <div

@@ -19,9 +19,6 @@ import './App.css';
 //! layout
 import HeaderOnlyLayout from '@/layout/HeaderOnlyLayout';
 import HeaderAndFooterLayout from '@/layout/HeaderAndFooterLayout';
-// import AdminiLayout from "@/layout/AdminiLayout";
-
-import { TestModule } from './components/module/TestModule';
 
 function App() {
   return (
@@ -39,8 +36,8 @@ function App() {
           </Route>
           <Route element={<AdminOnly />}>
             <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/boxer_register" element={<BoxerRegister />} />
             <Route path="/admin/boxer_edit" element={<BoxerEdit />} />
+            <Route path="/admin/boxer_register" element={<BoxerRegister />} />
             <Route path="/admin/match_register" element={<MatchRegister />} />
             <Route path="/admin/match_edit" element={<MatchEdit />} />
             {/* //? </AdminOnly> */}

@@ -74,12 +74,12 @@ export const MESSAGE = {
   BOXER_NOT_EDIT: "選手データに変更がありません",
   BOXER_NO_SELECTED: "対象選手を選択してください",
   BOXER_NAME_UNDEFINED: "名前の入力が必要です",
-  BOXER_IS_ALRADY_EXISTS: "同じ名前の選手がすでに存在しています",
-  BOXER_IS_ALRADY_SETUP_MATCH: "選手は試合が組まれています。削除出来ません",
+  BOXER_IS_ALREADY_EXISTS: "同じ名前の選手がすでに存在しています",
+  BOXER_IS_ALREADY_SETUP_MATCH: "選手は試合が組まれています。削除出来ません",
   ILLEGAL_DATA: "不正なデータです",
 
   FIGHTER_EDIT_SUCCESS: "選手情報が更新されました",
-  FIGHTER_EDIT_FAILD: "選手情報の編集に失敗しました \n 再度行ってください",
+  FIGHTER_EDIT_FAILED: "選手情報の編集に失敗しました \n 再度行ってください",
   FIGHTER_DELETING: "選手情報を削除中...",
   FAILD_FIGHTER_DELETE: "選手削除に失敗しました",
   //? コメント

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 type PropsType = {
   pageCount: number;
@@ -8,15 +8,15 @@ type PropsType = {
 export const PaginationBoxerList = ({ pageCount }: PropsType) => {
   const { search, pathname } = useLocation();
   const query = new URLSearchParams(search);
-  const paramPage = Number(query.get("page") || 1);
-  const paramName = query.get("name");
-  const paramCountry = query.get("country");
-  const [formattedParames, setFormattedParames] = useState("");
+  const paramPage = Number(query.get('page') || 1);
+  const paramName = query.get('name');
+  const paramCountry = query.get('country');
+  const [formattedParames, setFormattedParames] = useState('');
   useEffect(() => {
     let pageURL: string[] = [];
     if (paramName) pageURL = [...pageURL, `name=${paramName}`];
     if (paramCountry) pageURL = [...pageURL, `country=${paramCountry}`];
-    setFormattedParames(pageURL.length ? `&${pageURL.join("&")}` : "");
+    setFormattedParames(pageURL.length ? `&${pageURL.join('&')}` : '');
   }, [search]);
 
   const pagesArray = (): number[] => {

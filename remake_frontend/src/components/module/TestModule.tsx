@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export const TestModule = () => {
   const myData = {

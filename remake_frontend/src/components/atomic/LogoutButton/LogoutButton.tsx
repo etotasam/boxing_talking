@@ -1,7 +1,7 @@
 import { IoMdLogOut } from 'react-icons/io';
 import { useLogout, useGuestLogout, useAuth, useGuest } from '@/hooks/useAuth';
 
-export const LogoutBottun = () => {
+export const LogoutButton = () => {
   const { data: authUser } = useAuth();
   const { data: isGuest } = useGuest();
   const { logout } = useLogout();

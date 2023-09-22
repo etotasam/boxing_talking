@@ -8,7 +8,7 @@ import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 import { BoxerType, MatchDataType } from '@/assets/types';
 //! components
 import { BackgroundFlag } from './BackgroundFlag';
-import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
+import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { useEffect, useRef } from 'react';
 import { useMatchBoxerSectionHeight } from '@/hooks/useMatchBoxerSectionHeight';
 //! hook
@@ -235,7 +235,7 @@ const BoxerBox = ({
   return (
     <div className={clsx('flex-1 py-5 relative')}>
       <BackgroundFlag
-        nationaly={boxerColor.country}
+        nationality={boxerColor.country}
         thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
       >
         <div

@@ -39,14 +39,25 @@ class BoxingMatch extends Model
         return $this->hasMany(Comment::class, 'match_id');
     }
 
-    // protected function getBlueFighter() {
-    //     $blue_fighter = $this->hasOne(Fighter::class, 'id', 'blue_fighter_id');
-    //     return $blue_fighter;
-    // }
 
-    // protected function getRedFighter() {
-    //     $red_fighter =  $this->hasOne(Fighter::class, 'id', 'red_fighter_id');
-    //     return $red_fighter;
-    // }
+    // ! 保有タイトルを配列にして返す
+    protected function getTitlesAttribute($titles)
+    {
+        if (empty($titles)) {
+            $titles = [];
+        } else {
+            $titles = explode('/', $titles);
+        };
+        return $titles;
+    }
 
+    // ! 配列で受けた保有タイトルを文字列に変換してDBに保存する 
+    protected function setTitlesAttribute($titles)
+    {
+        $formattedTitles = implode('/', $titles);
+        if (empty($formattedTitles)) {
+            $formattedTitles = null;
+        }
+        $this->attributes['titles'] = $formattedTitles;
+    }
 }

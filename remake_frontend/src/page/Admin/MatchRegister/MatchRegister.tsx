@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import dayjs from "dayjs";
-import { cloneDeep } from "lodash";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import { cloneDeep } from 'lodash';
+import { useLocation } from 'react-router-dom';
 // ! types
 import {
   NationalityType,
@@ -9,28 +9,28 @@ import {
   GRADE_Type,
   WEIGHT_CLASS_Type,
   ORGANIZATIONS_Type,
-} from "@/assets/types";
+} from '@/assets/types';
 // ! data
-import { Nationality } from "@/assets/NationalFlagData";
-import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from "@/assets/boxerData";
+import { Nationality } from '@/assets/NationalFlagData';
+import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
 import {
   MESSAGE,
   BG_COLOR_ON_TOAST_MODAL,
-} from "@/assets/statusesOnToastModal";
+} from '@/assets/statusesOnToastModal';
 //! layout
-import AdminiLayout from "@/layout/AdminiLayout";
+import AdminLayout from '@/layout/AdminLayout';
 // ! hooks
-import { useFetchBoxer } from "@/hooks/useBoxer";
-import { BoxerType } from "@/assets/types";
-import { useRegisterMatch } from "@/hooks/useMatch";
-import { useToastModal } from "@/hooks/useToastModal";
-import { usePagePath } from "@/hooks/usePagePath";
-import { useLoading } from "@/hooks/useLoading";
+import { useFetchBoxer } from '@/hooks/useBoxer';
+import { BoxerType } from '@/assets/types';
+import { useRegisterMatch } from '@/hooks/useMatch';
+import { useToastModal } from '@/hooks/useToastModal';
+import { usePagePath } from '@/hooks/usePagePath';
+import { useLoading } from '@/hooks/useLoading';
 //! component
-// import { FlagImage } from "@/components/atomc/FlagImage";
-import { SearchBoxer } from "@/components/module/SearchBoxer";
-import { PaginationBoxerList } from "@/components/module/PaginationBoxerList";
-import { EngNameWithFlag } from "@/components/atomc/EngNameWithFlag";
+// import { FlagImage } from "@/components/atomic/FlagImage";
+import { SearchBoxer } from '@/components/module/SearchBoxer';
+import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
+import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 
 export const MatchRegister = () => {
   //! hooks
@@ -55,7 +55,7 @@ export const MatchRegister = () => {
   }, []);
 
   return (
-    <AdminiLayout>
+    <AdminLayout>
       <div className="w-full flex">
         <section className="w-[70%]">
           <div className="sticky top-[calc(100px+20px)] mt-[20px]">
@@ -84,7 +84,7 @@ export const MatchRegister = () => {
           />
         </section>
       </div>
-    </AdminiLayout>
+    </AdminLayout>
   );
 };
 
@@ -205,7 +205,7 @@ const BoxersList = ({
                 onChange={(e) => handleCheckboxChange(e, boxer)}
               />
               <label
-                className={"w-[90%] cursor-pointer"}
+                className={'w-[90%] cursor-pointer'}
                 htmlFor={`${boxer.id}_${boxer.name}`}
               >
                 <li className="w-[300px] mt-3 border-[1px] border-stone-300 rounded-md p-3">
@@ -244,25 +244,25 @@ const MatchDataSetter = ({
     useRegisterMatch();
   // const matchDate = useRef("");
   const [matchDate, setMatchDate] = useState<string>(
-    dayjs().format("YYYY-MM-DD")
+    dayjs().format('YYYY-MM-DD')
   );
-  const [matchGrade, setMatchGrade] = useState<GRADE_Type>("");
+  const [matchGrade, setMatchGrade] = useState<GRADE_Type>('');
   const [matchPlaceCountry, setMatchPlaceCountry] = useState<
-    NationalityType | ""
+    NationalityType | ''
   >();
-  const [matchVenue, setMatchVenue] = useState<string>("");
-  const [matchWeight, setMatchWeght] = useState<WEIGHT_CLASS_Type | "">();
+  const [matchVenue, setMatchVenue] = useState<string>('');
+  const [matchWeight, setMatchWeight] = useState<WEIGHT_CLASS_Type | ''>();
   const [belt, setBelt] = useState<ORGANIZATIONS_Type[]>([]);
   const [title, setTitle] = useState(false);
   const [counter, setCounter] = useState(1);
 
   useEffect(() => {
     if (!isSuccessRegisterMatch) return;
-    setMatchDate(dayjs().format("YYYY-MM-DD"));
-    setMatchGrade("");
-    setMatchPlaceCountry("");
-    setMatchVenue("");
-    setMatchWeght("");
+    setMatchDate(dayjs().format('YYYY-MM-DD'));
+    setMatchGrade('');
+    setMatchPlaceCountry('');
+    setMatchVenue('');
+    setMatchWeight('');
     setBelt([]);
     setTitle(false);
     setCounter(1);
@@ -299,6 +299,7 @@ const MatchDataSetter = ({
     }
   }, [matchGrade]);
 
+  //? 試合登録
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -356,6 +357,7 @@ const MatchDataSetter = ({
     };
     registerMatch(matchData);
   };
+
   return (
     // <div className="bg-stone-200 flex justify-center items-center py-5 mt-5">
     <form
@@ -376,7 +378,7 @@ const MatchDataSetter = ({
           className="w-[150px] p-1"
           id="match-date"
           type="date"
-          min={dayjs().format("YYYY-MM-DD")}
+          min={dayjs().format('YYYY-MM-DD')}
           value={matchDate}
           onChange={(e) => {
             setMatchDate(e.target.value);
@@ -447,7 +449,7 @@ const MatchDataSetter = ({
           name="matchWeight"
           value={matchWeight}
           onChange={(e) => {
-            setMatchWeght(e.target.value as WEIGHT_CLASS_Type);
+            setMatchWeight(e.target.value as WEIGHT_CLASS_Type);
           }}
           id="matchWeight"
         >
