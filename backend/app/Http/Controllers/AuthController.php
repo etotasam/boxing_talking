@@ -125,7 +125,7 @@ class AuthController extends Controller
                 'exp' => strtotime('+30 minutes'),
             ];
 
-            $secret_key = config('app.token_secret_key');
+            $secret_key = config('const.jwt_secret_key');
             $token = JWT::encode($payload, $secret_key, 'HS256');
             Mail::to($request->email)->send(new Mailer($request->name, $token));
 
@@ -140,7 +140,6 @@ class AuthController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
             if ($e->getCode()) {
-                // return response()->json(["message" => $e->getMessage(), "error_details" => $e->getTrace()], 422);
                 return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
             }
             return response()->json(['success' => false, "message" => $e->getMessage()], 500);
@@ -165,19 +164,16 @@ class AuthController extends Controller
             if ($validator->fails()) {
                 return response()->json(["success" => false, "message" => $validator->errors()], 422);
             }
-            // $credentials = $request->only('token');
-            $secret_key = config('app.token_secret_key');
 
+            $secret_key = config('const.jwt_secret_key');
+            if (!isset($secret_key)) {
+                throw new Exception("cannot get secret-key", 500);
+            }
             $decoded = JWT::decode($request->token, new Key($secret_key, 'HS256'));
-            // $exp = $decoded->exp;
-            // $current_time = time();
-            // if ($current_time > $exp) {
-            //     throw new Exception("Token has expired", 403);
-            // }
 
             $user_id = $decoded->user_id;
             $pre_user = $this->pre_user->find($user_id);
-            // $pre_user = PreUser::find($user_id);
+
             if (!$pre_user) {
                 throw new Exception("Invalid access", 403);
             }

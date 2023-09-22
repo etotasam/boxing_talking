@@ -5,7 +5,6 @@ import _ from 'lodash';
 // ! types
 import {
   NationalityType,
-  // RegstarMatchPropsType,
   GRADE_Type,
   WEIGHT_CLASS_Type,
   ORGANIZATIONS_Type,
@@ -32,8 +31,6 @@ export const MatchSetter = ({
   //? use hook
   const { showToastModal, setToastModal, hideToastModal } = useToastModal();
   const { updateMatch } = useUpdateMatch();
-  // const { registerMatch } = useRegisterMatch();
-  // const matchDate = useRef("");
   const [matchDate, setMatchDate] = useState('');
   const [matchGrade, setMatchGrade] = useState<GRADE_Type>();
   const [matchPlaceCountry, setMatchPlaceCountry] = useState<
@@ -64,7 +61,9 @@ export const MatchSetter = ({
     setMatchPlaceCountry(selectMatch.country);
     setMatchVenue(selectMatch.venue);
     setMatchWeight(selectMatch.weight);
-    if (selectMatch.titles) {
+    setTitle(false);
+    if (selectMatch.titles.length) {
+      setTitle(true);
       const organizations = selectMatch.titles
         .map((value) => {
           for (const organi of Object.values(ORGANIZATIONS)) {
@@ -254,32 +253,30 @@ export const MatchSetter = ({
         {title && (
           <ul className="ml-[140px]">
             {/* //? タイトル */}
-            {Array.from({ length: counter }, (_, index) => index).map(
-              (_, i) => (
-                <li className="mt-1" key={i}>
-                  <select
-                    className="w-[150px]"
-                    name="matchBelt"
-                    value={belt[i]}
-                    onChange={(e) => {
-                      setBelt((current) => {
-                        const clone = cloneDeep(current);
-                        clone[i] = e.target.value as ORGANIZATIONS_Type;
-                        return clone;
-                      });
-                    }}
-                    id="matchBelt"
-                  >
-                    <option value={undefined}></option>
-                    {Object.values(ORGANIZATIONS).map((v) => (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ))}
-                  </select>
-                </li>
-              )
-            )}
+            {[...Array(counter)].map((_, i) => (
+              <li className="mt-1" key={i}>
+                <select
+                  className="w-[150px]"
+                  name="matchBelt"
+                  value={belt[i]}
+                  onChange={(e) => {
+                    setBelt((current) => {
+                      const clone = cloneDeep(current);
+                      clone[i] = e.target.value as ORGANIZATIONS_Type;
+                      return clone;
+                    });
+                  }}
+                  id="matchBelt"
+                >
+                  <option value={undefined}></option>
+                  {Object.values(ORGANIZATIONS).map((v) => (
+                    <option key={v} value={v}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+              </li>
+            ))}
           </ul>
         )}
 

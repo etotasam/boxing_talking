@@ -92,7 +92,8 @@ class Boxer extends Model
         }
     }
 
-    //! 文字列を配列にして返す
+    //! Accessor
+    //? 文字列を配列にして返す
     protected function getTitleHoldAttribute($title_hold)
     {
         if (empty($title_hold)) {
@@ -103,7 +104,8 @@ class Boxer extends Model
         return $formatted_title_hold;
     }
 
-    // ! 配列で受けた保有タイトルを文字列に変換してDBに保存
+    //! Mutate
+    //? 配列で受けた保有タイトルを文字列に変換してDBに保存
     protected function setTitleHoldAttribute($title_hold)
     {
         $string_title_hold = implode('/', $title_hold);
