@@ -134,7 +134,10 @@ Route::put("/{id}/test", function ($id = null) {
 Route::get('/test', function () {
 
     try {
-        // throw new Exception("エラーです");
+        $secret_key = config('const.jwt_secret_key');
+        if (!isset($secret_key)) {
+            throw new Exception("cannot get secret-key", 500);
+        }
         return "fetch data complete";
     } catch (Exception $e) {
         return response()->json(["message" => $e->getMessage()], 500);

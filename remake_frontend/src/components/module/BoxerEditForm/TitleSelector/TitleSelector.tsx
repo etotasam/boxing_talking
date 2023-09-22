@@ -40,100 +40,96 @@ export const TitleSelector = () => {
     <>
       <section className="">
         <p>保有タイトル</p>
-        {Array.from({ length: countHasBelt }, (_, index) => index).map(
-          (_, i) => (
-            <div key={i} className="flex">
-              {/* //? 団体選択 */}
-              <div className="mt-3 flex p-1">
-                <select
-                  value={
-                    boxerDataOnForm.title_hold[i]
-                      ? boxerDataOnForm.title_hold[i].organization
-                      : ''
-                  }
-                  onChange={(e) =>
-                    setBoxerDataToForm((boxerDataOnForm) => {
-                      const copyTitles = cloneDeep(boxerDataOnForm);
-                      if (!e.target.value) {
-                        // delete copyTitles.title_hold[i];
-                        copyTitles.title_hold[i] = {
-                          ...copyTitles.title_hold[i],
-                          organization: undefined,
-                        };
-                        return copyTitles;
-                        // return copyTitles.title_hold.filter(
-                        //   (obj) => obj !== undefined
-                        // );
-                      } else {
-                        copyTitles.title_hold[i] = {
-                          ...copyTitles.title_hold[i],
-                          organization: e.target
-                            .value as (typeof ORGANIZATIONS)[keyof typeof ORGANIZATIONS],
-                        };
-                        return copyTitles;
-                      }
-                    })
-                  }
-                  // name="boxing-style"
-                  // id="organzation"
-                >
-                  <option value=""></option>
-                  {(
-                    Object.keys(ORGANIZATIONS) as Array<
-                      keyof typeof ORGANIZATIONS
-                    >
-                  ).map((key) => (
-                    <option key={key} value={ORGANIZATIONS[key]}>
-                      {ORGANIZATIONS[key]}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {/* //? 階級選択 */}
-              <div className="mt-3 flex p-1">
-                <select
-                  value={
-                    boxerDataOnForm.title_hold[i]
-                      ? boxerDataOnForm.title_hold[i].weightClass
-                      : ''
-                  }
-                  onChange={(e) =>
-                    setBoxerDataToForm((boxerDataOnForm) => {
-                      const copyTitles = cloneDeep(boxerDataOnForm);
-                      if (!e.target.value) {
-                        copyTitles.title_hold[i] = {
-                          ...copyTitles.title_hold[i],
-                          weightClass: undefined,
-                        };
-                        return copyTitles;
-                      } else {
-                        copyTitles.title_hold[i] = {
-                          ...copyTitles.title_hold[i],
-                          weightClass: e.target
-                            .value as (typeof WEIGHT_CLASS)[keyof typeof WEIGHT_CLASS],
-                        };
-                        return copyTitles;
-                      }
-                    })
-                  }
-                  // name="aaaaaaaa"
-                  // id="class"
-                >
-                  <option value=""></option>
-                  {(
-                    Object.keys(WEIGHT_CLASS) as Array<
-                      keyof typeof WEIGHT_CLASS
-                    >
-                  ).map((key) => (
-                    <option key={key} value={WEIGHT_CLASS[key]}>
-                      {WEIGHT_CLASS[key]}
-                    </option>
-                  ))}
-                </select>
-              </div>
+        {[...Array(countHasBelt)].map((_, i) => (
+          <div key={i} className="flex">
+            {/* //? 団体選択 */}
+            <div className="mt-3 flex p-1">
+              <select
+                value={
+                  boxerDataOnForm.title_hold[i]
+                    ? boxerDataOnForm.title_hold[i].organization
+                    : ''
+                }
+                onChange={(e) =>
+                  setBoxerDataToForm((boxerDataOnForm) => {
+                    const copyTitles = cloneDeep(boxerDataOnForm);
+                    if (!e.target.value) {
+                      // delete copyTitles.title_hold[i];
+                      copyTitles.title_hold[i] = {
+                        ...copyTitles.title_hold[i],
+                        organization: undefined,
+                      };
+                      return copyTitles;
+                      // return copyTitles.title_hold.filter(
+                      //   (obj) => obj !== undefined
+                      // );
+                    } else {
+                      copyTitles.title_hold[i] = {
+                        ...copyTitles.title_hold[i],
+                        organization: e.target
+                          .value as (typeof ORGANIZATIONS)[keyof typeof ORGANIZATIONS],
+                      };
+                      return copyTitles;
+                    }
+                  })
+                }
+                // name="boxing-style"
+                // id="organzation"
+              >
+                <option value=""></option>
+                {(
+                  Object.keys(ORGANIZATIONS) as Array<
+                    keyof typeof ORGANIZATIONS
+                  >
+                ).map((key) => (
+                  <option key={key} value={ORGANIZATIONS[key]}>
+                    {ORGANIZATIONS[key]}
+                  </option>
+                ))}
+              </select>
             </div>
-          )
-        )}
+            {/* //? 階級選択 */}
+            <div className="mt-3 flex p-1">
+              <select
+                value={
+                  boxerDataOnForm.title_hold[i]
+                    ? boxerDataOnForm.title_hold[i].weightClass
+                    : ''
+                }
+                onChange={(e) =>
+                  setBoxerDataToForm((boxerDataOnForm) => {
+                    const copyTitles = cloneDeep(boxerDataOnForm);
+                    if (!e.target.value) {
+                      copyTitles.title_hold[i] = {
+                        ...copyTitles.title_hold[i],
+                        weightClass: undefined,
+                      };
+                      return copyTitles;
+                    } else {
+                      copyTitles.title_hold[i] = {
+                        ...copyTitles.title_hold[i],
+                        weightClass: e.target
+                          .value as (typeof WEIGHT_CLASS)[keyof typeof WEIGHT_CLASS],
+                      };
+                      return copyTitles;
+                    }
+                  })
+                }
+                // name="aaaaaaaa"
+                // id="class"
+              >
+                <option value=""></option>
+                {(
+                  Object.keys(WEIGHT_CLASS) as Array<keyof typeof WEIGHT_CLASS>
+                ).map((key) => (
+                  <option key={key} value={WEIGHT_CLASS[key]}>
+                    {WEIGHT_CLASS[key]}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        ))}
       </section>
     </>
   );
