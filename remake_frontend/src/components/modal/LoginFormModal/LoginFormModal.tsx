@@ -1,5 +1,5 @@
 import React from 'react';
-import { ClearFullScreenDiv } from '@/components/atomc/ClearFullScreenDiv';
+import { ClearFullScreenDiv } from '@/components/atomic/ClearFullScreenDiv';
 // import { loginModalSelector } from '@/store/loginModalState';
 import { motion, AnimatePresence } from 'framer-motion';
 // ! recoil

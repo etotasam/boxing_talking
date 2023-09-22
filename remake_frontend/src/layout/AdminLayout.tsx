@@ -1,11 +1,11 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
 // ! components
-import { LinkList } from "@/components/module/LinkList";
+import { LinkList } from '@/components/module/LinkList';
 // components
 // import { EditHeader } from "@/components/module/EditHeader";
 
-const AdminiLayout = ({ children }: { children?: ReactNode }) => {
+const AdminLayout = ({ children }: { children?: ReactNode }) => {
   return (
     <>
       <Header />
@@ -13,7 +13,7 @@ const AdminiLayout = ({ children }: { children?: ReactNode }) => {
     </>
   );
 };
-export default AdminiLayout;
+export default AdminLayout;
 
 const Header = () => {
   return (

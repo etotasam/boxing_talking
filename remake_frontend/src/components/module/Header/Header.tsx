@@ -10,7 +10,7 @@ import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useGuest, useAuth } from '@/hooks/useAuth';
 //! component
 import { Link } from 'react-router-dom';
-import { LogoutBottun } from '@/components/atomc/LogoutBottun';
+import { LogoutButton } from '@/components/atomic/LogoutButton';
 //! env
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -49,7 +49,7 @@ export const Header = (porps: PropsType) => {
           </div>
         )}
         {userData && (
-          <div className="absolute top-2 sm:top-0 bottom-2 md:right-5 right-2 flex">
+          <div className="absolute top-2 sm:top-0 bottom-2 md:right-5 sm:right-2 right-1 flex">
             <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
             <p
               className={clsx(
@@ -61,15 +61,15 @@ export const Header = (porps: PropsType) => {
           </div>
         )}
         {isGuest && (
-          <div className="absolute top-0 right-[30px] flex">
+          <div className="absolute top-2 sm:top-0 bottom-2 md:right-5 sm:right-2 right-1 flex">
             <AiOutlineUser className="mr-1 block bg-stone-400 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
             <p className="text-sm">ゲストログイン</p>
           </div>
         )}
         {isEitherAuth && (
           <div className="absolute top-0 right-0 bg-red-300 h-full flex justify-center">
-            <div className="absolute sm:bottom-5 bottom-2 lg:right-10 md:right-5 right-2 flex justify-center">
-              <LogoutBottun />
+            <div className="absolute sm:bottom-5 bottom-3 lg:right-10 md:right-5 right-2 flex justify-center">
+              <LogoutButton />
             </div>
           </div>
         )}

@@ -5,12 +5,12 @@ import { useLocation } from 'react-router-dom';
 //! data
 // import { GRADE } from "@/assets/boxerData";
 //! layout
-import AdminiLayout from '@/layout/AdminiLayout';
+import AdminLayout from '@/layout/AdminLayout';
 //! components
 // import { FightBox } from "@/components/module/FightBox";
-import { FlagImage } from '@/components/atomc/FlagImage';
+import { FlagImage } from '@/components/atomic/FlagImage';
 import { MatchSetter } from '@/components/module/MatchSetter/MatchSetter';
-import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
+import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { Confirm } from '@/components/modal/Confirm';
 // ! hooks
 import { useFetchMatches, useDeleteMatch } from '@/hooks/useMatch';
@@ -73,7 +73,7 @@ export const MatchEdit = () => {
   };
 
   return (
-    <AdminiLayout>
+    <AdminLayout>
       <div className="mt-[120px] flex w-full">
         <section className="w-[30%] flex justify-center">
           {selectMatch ? (
@@ -120,7 +120,7 @@ export const MatchEdit = () => {
           />
         </section>
       </div>
-    </AdminiLayout>
+    </AdminLayout>
   );
 };
 
@@ -235,7 +235,7 @@ export const SelectedMatchInfo = ({
           <div className="relative inline-block lg:text-lg text-sm before:content-['会場'] before:w-full before:absolute before:top-[-25px] before:left-[50%] before:translate-x-[-50%] before:text-[14px] before:text-stone-500">
             {matchData.venue}
             <span className="lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] border-[1px] overflow-hidden absolute top-[1px] lg:left-[-40px] left-[-30px]">
-              <FlagImage nationaly={matchData.country} />
+              <FlagImage nationality={matchData.country} />
             </span>
           </div>
         </div>

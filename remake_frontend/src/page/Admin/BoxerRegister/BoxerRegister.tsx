@@ -1,23 +1,23 @@
-import { useEffect } from "react";
-import _ from "lodash";
-import { useLocation } from "react-router-dom";
+import { useEffect } from 'react';
+import _ from 'lodash';
+import { useLocation } from 'react-router-dom';
 // ! types
 // import { BoxerType } from "@/assets/types";
 // ! data
 import {
   BG_COLOR_ON_TOAST_MODAL,
   MESSAGE,
-} from "@/assets/statusesOnToastModal";
+} from '@/assets/statusesOnToastModal';
 //! component
-import { BoxerEditForm } from "@/components/module/BoxerEditForm";
+import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 //! layout
-import AdminiLayout from "@/layout/AdminiLayout";
+import AdminLayout from '@/layout/AdminLayout';
 //! hooks
-import { usePagePath } from "@/hooks/usePagePath";
-import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
-import { useToastModal } from "@/hooks/useToastModal";
-import { useRegisterBoxer } from "@/hooks/useBoxer";
-import { useLoading } from "@/hooks/useLoading";
+import { usePagePath } from '@/hooks/usePagePath';
+import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
+import { useToastModal } from '@/hooks/useToastModal';
+import { useRegisterBoxer } from '@/hooks/useBoxer';
+import { useLoading } from '@/hooks/useLoading';
 
 export const BoxerRegister = () => {
   // ! use hook
@@ -74,10 +74,10 @@ export const BoxerRegister = () => {
   };
 
   return (
-    <AdminiLayout>
+    <AdminLayout>
       <div className="min-h-[calc(100vh-100px)] flex justify-center items-center">
         <BoxerEditForm isSuccess={successRegisterBoxer} onSubmit={onSubmit} />
       </div>
-    </AdminiLayout>
+    </AdminLayout>
   );
 };

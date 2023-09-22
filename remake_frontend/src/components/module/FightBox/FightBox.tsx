@@ -5,8 +5,8 @@ import dayjs from 'dayjs';
 import { MatchDataType } from '@/assets/types';
 // ! components
 import { BoxerInfo } from '../BoxerInfo';
-import { FlagImage } from '@/components/atomc/FlagImage';
-import { PredictionVoteIcon } from '@/components/atomc/PredictionVoteIcon';
+import { FlagImage } from '@/components/atomic/FlagImage';
+import { PredictionVoteIcon } from '@/components/atomic/PredictionVoteIcon';
 // ! image
 import crown from '@/assets/images/etc/champion.svg';
 //! hook
@@ -117,7 +117,7 @@ const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
           <div className="relative flex items-center justify-center text-lg before:content-['会場'] before:absolute before:top-[-25px] before:left-[50%] before:translate-x-[-50%] before:text-[14px] before:text-stone-500">
             <FlagImage
               className="inline-block border-[1px] w-[32px] h-[24px] mr-3"
-              nationaly={matchData.country}
+              nationality={matchData.country}
             />
             {matchData.venue}
             {/* <span className="w-[32px] h-[24px] border-[1px] overflow-hidden absolute top-[1px] left-[-40px]"> */}

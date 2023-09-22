@@ -53,8 +53,6 @@ export const useFetchBoxer = () => {
     queryKey = { ...queryKey, country: paramCountry }
   }
 
-
-
   const fetchBoxerAPI = async ({ page, limit, searchWords }: FetcherPropsType) => {
     const res = await Axios.get<BoxerType[]>("/api/boxer", { params: { page, limit, ...searchWords } }).then(value => value.data)
     return res
@@ -108,7 +106,7 @@ export const useUpdateBoxerData = () => {
 // //! 選手登録
 export const useRegisterBoxer = () => {
   const { refetchReactQueryData } = useReactQuery()
-  const { startLoading, resetLoadingState, successful, hasError } = useLoading()
+  const { startLoading, resetLoadingState, successful } = useLoading()
   const { showToastModal } = useToastModal()
   // const { count: fightersCount } = useFetchBoxer()
   const { setToastModal } = useToastModal()
@@ -122,8 +120,8 @@ export const useRegisterBoxer = () => {
     }
   })
   const registerBoxer = (newBoxerData: BoxerDataOnFormType) => {
-    const convetedBoxerData = convertToBoxerData(newBoxerData)
-    mutate(convetedBoxerData, {
+    const convertedBoxerDataBoxerData = convertToBoxerData(newBoxerData)
+    mutate(convertedBoxerDataBoxerData, {
       onSuccess: () => {
         successful()
         resetLoadingState()

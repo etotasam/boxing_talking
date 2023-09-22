@@ -11,7 +11,7 @@ import { useVisualModeController } from '@/hooks/useVisualModeController';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/uesWinLossPrediction';
 //! icon
-import { VisualModeChangeIcon } from '@/components/atomc/VisualModeChangeIcon';
+import { VisualModeChangeIcon } from '@/components/atomic/VisualModeChangeIcon';
 //! types
 import { MatchDataType } from '@/assets/types';
 
