@@ -23,14 +23,14 @@ import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 //! types
 import { BoxerType } from '@/assets/types';
 //! layout
-import AdminiLayout from '@/layout/AdminiLayout';
+import AdminLayout from '@/layout/AdminLayout';
 //! component
-// import { FlagImage } from "@/components/atomc/FlagImage";
+// import { FlagImage } from "@/components/atomic/FlagImage";
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { Confirm } from '@/components/modal/Confirm';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
-import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
+import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 
 export const BoxerEdit = () => {
   // ? use hook
@@ -44,7 +44,8 @@ export const BoxerEdit = () => {
   const {
     boxersData,
     pageCount,
-    // isRefetching: isRefechingBoxerData,
+    // refetch: refetchBoxers
+    // isRefetching: isRefetchingBoxerData,
   } = useFetchBoxer();
   //? 選択したボクサーのidが入る(選手が選択されているかの判断に使用)
   const [checked, setChecked] = useState<number>();
@@ -113,7 +114,7 @@ export const BoxerEdit = () => {
       showToastModal();
       return;
     }
-    if (!boxersData) return console.error('Not have boxers data');
+    if (!boxersData) return console.error('No have boxers data');
     //? データ変更がされていない時
     const boxer = getBoxerDataWithID({
       boxerID: editTargetBoxerData.id,
@@ -133,17 +134,7 @@ export const BoxerEdit = () => {
     updateFighter(editTargetBoxerData);
   };
 
-  //? spinnerを出す条件
-  // const conditionVisibleSpinner = (boxer: BoxerType) => {
-  //   if (!editFighterData) return;
-  //   const isLoading =
-  //     (isDeletingFighter && editFighterData.id === fighter.id) ||
-  //     (isUpdatingFighter && editFighterData.id === fighter.id) ||
-  //     !fighter.id;
-  //   return isLoading;
-  // };
-
-  const [isDeleteConfirmm, setIsDeleteConfirm] = useState(false);
+  const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
 
   const cancel = () => {
     setIsDeleteConfirm(false);
@@ -165,7 +156,7 @@ export const BoxerEdit = () => {
   };
 
   return (
-    <AdminiLayout>
+    <AdminLayout>
       <div className="w-full flex">
         <section className="w-[70%]">
           <div className="flex sticky top-[calc(100px+30px)] mt-[30px]">
@@ -215,12 +206,12 @@ export const BoxerEdit = () => {
           />
         </section>
       </div>
-      {isDeleteConfirmm && (
+      {isDeleteConfirm && (
         <Confirm execution={execution} cancel={cancel}>
           削除しますか？
         </Confirm>
       )}
-    </AdminiLayout>
+    </AdminLayout>
   );
 };
 
@@ -254,7 +245,6 @@ const BoxersList = ({
                   setChecked(boxer.id ? boxer.id : undefined);
                   setEditTargetBoxerData(boxer);
                 }}
-                data-testid={`input-${boxer.id}`}
               />
               <label
                 className={'w-[90%] cursor-pointer'}

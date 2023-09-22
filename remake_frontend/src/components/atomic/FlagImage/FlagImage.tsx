@@ -3,18 +3,18 @@ import clsx from 'clsx';
 // ! types
 import { NationalityType } from '@/assets/types';
 // ! Nationaly
-import { getNatinalFlag } from '@/assets/NationalFlagData';
+import { getNationalFlag } from '@/assets/NationalFlagData';
 
-type PropsType = React.ComponentProps<'div'> & { nationaly: NationalityType };
+type PropsType = React.ComponentProps<'div'> & { nationality: NationalityType };
 
-export const FlagImage = ({ nationaly, className }: PropsType) => {
+export const FlagImage = ({ nationality, className }: PropsType) => {
   return (
     <>
       <div className={clsx(className)}>
         <img
           className="w-full h-full object-cover"
-          src={getNatinalFlag(nationaly)}
-          alt={nationaly}
+          src={getNationalFlag(nationality)}
+          alt={nationality}
         />
       </div>
     </>

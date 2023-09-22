@@ -18,7 +18,7 @@ import {
   BG_COLOR_ON_TOAST_MODAL,
 } from '@/assets/statusesOnToastModal';
 //! layout
-import AdminiLayout from '@/layout/AdminiLayout';
+import AdminLayout from '@/layout/AdminLayout';
 // ! hooks
 import { useFetchBoxer } from '@/hooks/useBoxer';
 import { BoxerType } from '@/assets/types';
@@ -27,10 +27,10 @@ import { useToastModal } from '@/hooks/useToastModal';
 import { usePagePath } from '@/hooks/usePagePath';
 import { useLoading } from '@/hooks/useLoading';
 //! component
-// import { FlagImage } from "@/components/atomc/FlagImage";
+// import { FlagImage } from "@/components/atomic/FlagImage";
 import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
-import { EngNameWithFlag } from '@/components/atomc/EngNameWithFlag';
+import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 
 export const MatchRegister = () => {
   //! hooks
@@ -55,7 +55,7 @@ export const MatchRegister = () => {
   }, []);
 
   return (
-    <AdminiLayout>
+    <AdminLayout>
       <div className="w-full flex">
         <section className="w-[70%]">
           <div className="sticky top-[calc(100px+20px)] mt-[20px]">
@@ -84,7 +84,7 @@ export const MatchRegister = () => {
           />
         </section>
       </div>
-    </AdminiLayout>
+    </AdminLayout>
   );
 };
 
@@ -251,7 +251,7 @@ const MatchDataSetter = ({
     NationalityType | ''
   >();
   const [matchVenue, setMatchVenue] = useState<string>('');
-  const [matchWeight, setMatchWeght] = useState<WEIGHT_CLASS_Type | ''>();
+  const [matchWeight, setMatchWeight] = useState<WEIGHT_CLASS_Type | ''>();
   const [belt, setBelt] = useState<ORGANIZATIONS_Type[]>([]);
   const [title, setTitle] = useState(false);
   const [counter, setCounter] = useState(1);
@@ -262,7 +262,7 @@ const MatchDataSetter = ({
     setMatchGrade('');
     setMatchPlaceCountry('');
     setMatchVenue('');
-    setMatchWeght('');
+    setMatchWeight('');
     setBelt([]);
     setTitle(false);
     setCounter(1);
@@ -449,7 +449,7 @@ const MatchDataSetter = ({
           name="matchWeight"
           value={matchWeight}
           onChange={(e) => {
-            setMatchWeght(e.target.value as WEIGHT_CLASS_Type);
+            setMatchWeight(e.target.value as WEIGHT_CLASS_Type);
           }}
           id="matchWeight"
         >
