@@ -24,8 +24,6 @@ class MatchController extends Controller
         $this->match = $match;
     }
 
-
-
     // ! 保有タイトルを配列にして返す
     protected function toArrayTitles($boxer)
     {
@@ -62,16 +60,16 @@ class MatchController extends Controller
             }
 
             $formattedMatches = $matches->map(function ($item, $key) {
-                $red_id = $item->red_boxer_id;
-                $blue_id = $item->blue_boxer_id;
-                $red_boxer = Boxer::find($red_id);
-                $blue_boxer = Boxer::find($blue_id);
+                $redID = $item->red_boxer_id;
+                $blueID = $item->blue_boxer_id;
+                $redBoxer = Boxer::find($redID);
+                $blueBoxer = Boxer::find($blueID);
                 $titles = $item->titles;
 
                 return  [
                     "id" => $item->id,
-                    "red_boxer" => $red_boxer,
-                    "blue_boxer" => $blue_boxer,
+                    "red_boxer" => $redBoxer,
+                    "blue_boxer" => $blueBoxer,
                     "country" => $item->country,
                     "venue" => $item->venue,
                     "grade" => $item->grade,
@@ -106,16 +104,16 @@ class MatchController extends Controller
         $matches = BoxingMatch::where('match_date', '<', $fetchRange)->orderBy('match_date')->get();
 
         $formattedMatches = $matches->map(function ($item, $key) {
-            $red_id = $item->red_boxer_id;
-            $blue_id = $item->blue_boxer_id;
-            $red_boxer = Boxer::find($red_id);
-            $blue_boxer = Boxer::find($blue_id);
+            $redID = $item->red_boxer_id;
+            $blueID = $item->blue_boxer_id;
+            $redBoxer = Boxer::find($redID);
+            $blueBoxer = Boxer::find($blueID);
             $titles = $item->titles;
 
             return  [
                 "id" => $item->id,
-                "red_boxer" => $red_boxer,
-                "blue_boxer" => $blue_boxer,
+                "red_boxer" => $redBoxer,
+                "blue_boxer" => $blueBoxer,
                 "country" => $item->country,
                 "venue" => $item->venue,
                 "grade" => $item->grade,
@@ -155,7 +153,7 @@ class MatchController extends Controller
     /**
      * Delete resource from DB
      *
-     * @param  matchId number
+     * @param  match_id number
      * @return \Illuminate\Http\Response
      */
     public function delete(Request $request)
@@ -163,21 +161,21 @@ class MatchController extends Controller
 
         try {
             // ? まず管理者かどうかを確認する
-            $auth_user_id = Auth::User()->id;
-            $is_admin = Administrator::where("user_id", $auth_user_id)->exists();
-            if (!$is_admin) {
+            $authUserID = Auth::User()->id;
+            $isAdmin = Administrator::where("user_id", $authUserID)->exists();
+            if (!$isAdmin) {
                 throw new Exception("unauthorize", 406);
             }
 
 
-            $match_id = $request->matchId;
+            $matchID = $request->match_id;
             DB::beginTransaction();
             //? 削除対象の試合に付いているコメントを削除する
-            Comment::where("match_id", $match_id)->delete();
+            Comment::where("match_id", $matchID)->delete();
             //? 削除対象の試合に付いている勝敗予想を削除する
-            WinLossPrediction::where("match_id", $match_id)->delete();
+            WinLossPrediction::where("match_id", $matchID)->delete();
 
-            $match = BoxingMatch::find($match_id);
+            $match = BoxingMatch::find($matchID);
             if (!isset($match)) {
                 throw new Exception("not exit match");
             }
@@ -189,14 +187,15 @@ class MatchController extends Controller
             if ($e->getMessage()) {
                 return response()->json(["message" => $e->getMessage()], 500);
             }
-            return response()->json(["message" => "faild while match delete"], 500);
+            return response()->json(["message" => "Failed while match delete"], 500);
         }
     }
 
     /**
      * update
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  match_id number
+     * @param  update_match_data object(only update data)
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request)
@@ -207,11 +206,11 @@ class MatchController extends Controller
             if (!$match) {
                 return response()->json(["success" => false, "message" => "Match is not exists"], 404);
             }
-            $update_match_data = $request->update_match_data;
-            $match->update($update_match_data);
+            $updateMatchData = $request->update_match_data;
+            $match->update($updateMatchData);
             return response()->json(["success" => true, "message" => "Success update match data"], 200);
         } catch (Exception $e) {
-            return response()->json(["message" => $update_match_data], 500);
+            return response()->json(["message" => $updateMatchData], 500);
         }
     }
 }

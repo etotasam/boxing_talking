@@ -394,33 +394,4 @@ export const useAdmin = () => {
   })
 
   return { isAdmin, isLoading, isError, refetch }
-  // // ? react query
-  // const queryClient = useQueryClient()
-  // // ? Loading state
-  // const { resetLoadingState, startLoading, hasError, successful, endLoading } = useLoading()
-  // // ? api
-  // const api = useCallback(async ({ userId }: { userId: string | undefined }) => {
-  //   const res = await Axios.post<boolean>("api/admin", { user_id: userId }).then(value => value.data)
-  //   return res
-  // }, [])
-
-  // const { mutate, isLoading, isSuccess } = useMutation(api, {
-  //   onMutate: () => {
-  //     startLoading()
-  //   }
-  // })
-
-  // const isAdmin = useCallback(({ userId }: { userId: string | undefined }) => {
-  //   mutate({ userId }, {
-  //     onSuccess: (isAdmin) => {
-  //       queryClient.setQueryData<boolean | undefined>(QUERY_KEY.admin, isAdmin)
-  //       resetLoadingState()
-  //     },
-  //     onError: () => {
-  //       console.log("has error on validat admin");
-  //       resetLoadingState()
-  //     }
-  //   })
-  // }, [])  
-  // return { admin, isLoading, isSuccess }
 }
