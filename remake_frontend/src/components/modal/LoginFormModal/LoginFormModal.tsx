@@ -106,7 +106,7 @@ const LoginForm = () => {
     },
   };
 
-  const toCreateAcountForm = (
+  const toCreateAccountForm = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
@@ -165,7 +165,7 @@ const LoginForm = () => {
           </div>
           <div className="text-right mt-5">
             <button
-              onClick={toCreateAcountForm}
+              onClick={toCreateAccountForm}
               className="hover:border-b hover:border-blue-600 text-blue-600 text-sm cursor-pointer"
             >
               アカウント作成

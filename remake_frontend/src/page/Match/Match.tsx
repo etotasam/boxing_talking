@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { RotatingLines } from 'react-loader-spinner';
+import { Helmet } from 'react-helmet-async';
 //! data
 import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 //! icon
@@ -28,6 +29,9 @@ import {
   MESSAGE,
 } from '@/assets/statusesOnToastModal';
 import clsx from 'clsx';
+import { title } from 'process';
+
+const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const Match = () => {
   // ? use hook
@@ -198,6 +202,16 @@ export const Match = () => {
   if (!windowSize) return;
   return (
     <>
+      <Helmet>
+        {thisMatch ? (
+          <title>
+            {thisMatch?.red_boxer.name} vs {thisMatch?.blue_boxer.name} |{' '}
+            {siteTitle}
+          </title>
+        ) : (
+          <title> The Match | {siteTitle}</title>
+        )}
+      </Helmet>
       {/* //? Boxer */}
       <SetUpBoxers
         paramsMatchID={paramsMatchID}

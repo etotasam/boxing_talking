@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { isEqual } from 'lodash';
+import { Helmet } from 'react-helmet-async';
 //! data
 import {
   BG_COLOR_ON_TOAST_MODAL,
@@ -31,6 +32,8 @@ import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { Confirm } from '@/components/modal/Confirm';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
+
+const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const BoxerEdit = () => {
   // ? use hook
@@ -157,6 +160,9 @@ export const BoxerEdit = () => {
 
   return (
     <AdminLayout>
+      <Helmet>
+        <title>Boxer編集 | {siteTitle}</title>
+      </Helmet>
       <div className="w-full flex">
         <section className="w-[70%]">
           <div className="flex sticky top-[calc(100px+30px)] mt-[30px]">

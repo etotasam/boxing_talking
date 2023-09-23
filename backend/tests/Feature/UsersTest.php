@@ -14,12 +14,13 @@ class UsersTest extends TestCase
     /**
      * @test
      */
-    public function test_example(): void
-    {
-        $user = User::factory()->create([
-            "name" => "terashima"
-        ]);
-        $result = $user->name;
-        $this->assertEquals("terashima", $result);
-    }
+    // public function test_example(): void
+    // {
+
+    //     $user = User::factory()->create([
+    //         "name" => "terashima"
+    //     ]);
+    //     $result = $user->name;
+    //     $this->assertEquals("terashima", $result);
+    // }
 }

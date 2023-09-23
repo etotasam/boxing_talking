@@ -53,22 +53,21 @@ export const MESSAGE = {
   MATCH_UPDATE_FAILED: "試合情報の更新に失敗しました",
   MATCH_UPDATE_SUCCESS: "試合情報を更新しました",
   MATCH_DELETED: "試合情報を削除しました",
-  MATCH_DELETE_FAILD: "試合情報の削除に失敗しました \n 一度画面を更新し、再度削除の実行を行ってください",
+  MATCH_DELETE_FAILED: "試合情報の削除に失敗しました \n 一度画面を更新し、再度削除の実行を行ってください",
 
   MATCH_HAS_NOT_ENTRIES: "未入力・未選択の項目があります",
   MATCH_NOT_SELECTED: "対象の試合を選択してください",
   MATCH_NOT_SELECTED_BOXER: "試合を組む選手を選択してください",
   MATCH_NOT_ALTER: "試合情報に変更がありません",
   MATCH_REGISTER_SUCCESS: "試合情報の登録が完了しました",
-  MATCH_REGISTER_FAILD: "試合情報の登録に失敗しました \n 再度登録してください",
-  MATCH_UPDATE_FAILD: "試合情報の更新に失敗しました \n 一度画面を更新し、再度更新の実行を行ってください",
+  MATCH_REGISTER_FAILED: "試合情報の登録に失敗しました \n 再度登録してください",
 
   INVALID_COUNTRY: "国の選択がありません",
 
   FIGHTER_NOT_ABLE_TO_REGISTER: "すでに登録されている選手です",
   FIGHTER_REGISTER_PENDING: "選手登録を実行中...",
   FIGHTER_REGISTER_SUCCESS: "選手を登録しました",
-  FIGHTER_REGISTER_FAILD: "選手の登録に失敗しました",
+  FIGHTER_REGISTER_FAILED: "選手の登録に失敗しました",
   //? 選手編/選手登録
   BOXER_DELETED: "選手を削除しました",
   BOXER_NOT_EDIT: "選手データに変更がありません",
@@ -81,8 +80,6 @@ export const MESSAGE = {
   FIGHTER_EDIT_SUCCESS: "選手情報が更新されました",
   FIGHTER_EDIT_FAILED: "選手情報の編集に失敗しました \n 再度行ってください",
   FIGHTER_DELETING: "選手情報を削除中...",
-  FAILD_FIGHTER_DELETE: "選手削除に失敗しました",
-  //? コメント
   COMMENT_IS_NOT_ENTER: 'コメントの入力がありません',
   COMMENT_IS_TOO_LONG: 'コメントが長すぎます。\n 投稿は1000文字までです',
   FAILED_POST_COMMENT_WITHOUT_AUTH: 'コメント投稿にはログインが必要です',
@@ -90,7 +87,6 @@ export const MESSAGE = {
   COMMENT_POST_SUCCESS: 'コメントを投稿しました',
   COMMENT_DELETE_FAILED: `コメントの削除に失敗しました \n 一度更新して、再度削除を実行してください`,
   COMMENT_DELETED: 'コメントを削除しました',
-  COMMENT_CANT_POST_WITH_UNAUTH: "コメント投稿にはログインが必要です",
   // COMMENT_DELETING: `削除中です.... \n そのままお待ち下さい`,
   COMMENT_DELETE_CONFIRM: "※コメントを削除します",
   COMMENT_POST_FAILED: `コメント投稿に失敗しました \n お手数ですが、時間を空けて再度投稿してください`,
@@ -100,7 +96,7 @@ export const MESSAGE = {
   SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION: '投票が完了しました',
   FAILED_VOTE_WIN_LOSS_PREDICTION: '投票に失敗しました。\n ページの更新後再度実行してください',
   ALREADY_HAVE_DONE_VOTE: "勝敗予想はすでに投票しています",
-  MATCH_IS_ALREDY_DONE: "投票期日が過ぎています。\n 投票は試合の前日までです",
+  MATCH_IS_ALREADY_DONE: "投票期日が過ぎています。\n 投票は試合の前日までです",
 } as const
 
 
