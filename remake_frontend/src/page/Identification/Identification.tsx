@@ -3,7 +3,7 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 //! hook
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useFooterHeight } from '@/hooks/useFooterHeight';
-import { useSignUpIdentification } from '@/hooks/useSignUpIdentification';
+import { useSignUpIdentification } from '@/hooks/useAuth';
 //! component
 import { Footer } from '@/components/module/Footer';
 import { RotatingLines } from 'react-loader-spinner';

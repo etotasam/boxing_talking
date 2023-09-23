@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { RotatingLines } from 'react-loader-spinner';
 import { Helmet } from 'react-helmet-async';
 //! data
@@ -29,7 +29,6 @@ import {
   MESSAGE,
 } from '@/assets/statusesOnToastModal';
 import clsx from 'clsx';
-import { title } from 'process';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -46,7 +45,7 @@ export const Match = () => {
   const { setToastModal, showToastModal } = useToastModal();
   const { startLoading, resetLoadingState } = useLoading();
   const { isLoading: isFetchingComments } = useFetchComments(paramsMatchID);
-
+  const navigate = useNavigate();
   const { setter: setPagePath } = usePagePath();
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
@@ -66,17 +65,22 @@ export const Match = () => {
     Record<'redCount' | 'blueCount' | 'totalCount', number>
   >({ redCount: 0, blueCount: 0, totalCount: 0 });
 
-  //? set data of this match(この試合の各データをuseState等にセット)
+  //? この試合の各データをuseState等にセット
   useEffect(() => {
     if (!matches || !paramsMatchID) return;
     const match = matches?.find((match) => match.id === paramsMatchID);
-    if (!match) return;
-    setThisMatch(match);
-    setThisMatchPredictionCount({
-      redCount: match.count_red,
-      blueCount: match.count_blue,
-      totalCount: match.count_red + match.count_blue,
-    });
+    if (match) {
+      setThisMatch(match);
+      setThisMatchPredictionCount({
+        redCount: match.count_red,
+        blueCount: match.count_blue,
+        totalCount: match.count_red + match.count_blue,
+      });
+    } else {
+      //試合が存在しない場合はリダイレクト
+      navigate('/');
+      return;
+    }
   }, [paramsMatchID, matches]);
 
   const [thisMatchPredictionOfUsers, setThisMatchPredictionOfUsers] = useState<

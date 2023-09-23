@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\ApiRequest;
 
-class PreCreateAuthRequest extends FormRequest
+class PreCreateAuthRequest extends ApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -10,9 +10,6 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Hash;
 use Firebase\JWT\JWT;
 
-
-use function PHPUnit\Framework\isNull;
-
 class AuthControllerTest extends TestCase
 {
 
@@ -58,19 +55,19 @@ class AuthControllerTest extends TestCase
   /**
    * @test
    */
-  public function loginFunctionTest()
+  public function userLogin()
   {
     $rightEmail = 'test@test.com';
     $rightPassword = 'test';
     $notRightEmail = 'test123@test.com';
     $notRightPassword = 'test123';
-    //? 失敗
+    //? emailが空
     $response = $this->post('/api/login', ['email' => '', 'password' => $rightPassword]);
     $response->assertStatus(422);
-
+    //? パスワード間違い
     $response = $this->post('/api/login', ['email' => $rightEmail, 'password' => $notRightPassword]);
     $response->assertStatus(401);
-
+    //? メールアドレス間違い
     $response = $this->post('/api/login', ['email' => $notRightEmail, 'password' => $rightPassword]);
     $response->assertStatus(401);
 
@@ -83,10 +80,9 @@ class AuthControllerTest extends TestCase
   /**
    * @test
    */
-  public function logoutFunctionTest()
+  public function userLogout()
   {
-    //? 失敗
-    //ログインしてない状態でログアウトapiを投げると
+    //? ログインしてない状態ではログアウトはエラーになる
     $response = $this->post('/api/logout');
     //middlewareの認証で引っかかる
     $response->assertStatus(401);
@@ -106,7 +102,7 @@ class AuthControllerTest extends TestCase
   {
     //?認証なし
     $response = $this->get('/api/guest/user');
-    //?認証がなくてもステータスは成功
+    //認証がなくてもステータスは成功を返す
     $response->assertSuccessful();
     $guest = $response->getContent();
     $this->assertEquals($guest, false);
@@ -124,7 +120,7 @@ class AuthControllerTest extends TestCase
   /**
    * @test
    */
-  public function guestLoginTest()
+  public function guestLogin()
   {
     $newGuest = $this->attributes = [];
     //?成功
@@ -133,7 +129,7 @@ class AuthControllerTest extends TestCase
     $this->assertDatabaseHas('guest_users', $newGuest);
     $response->assertSuccessful();
 
-    //?失敗
+    //?通常ログインしている場合はゲストでログインは出来ない
     $response = $this->actingAs($this->user)->post('/api/guest/login');
     $response->assertStatus(400);
   }
@@ -141,7 +137,7 @@ class AuthControllerTest extends TestCase
   /**
    * @test
    */
-  public function guestLogoutTest()
+  public function guestLogout()
   {
     //?成功
     //まずguestとしてdbに保存されているかをチェック
@@ -151,7 +147,7 @@ class AuthControllerTest extends TestCase
     $this->assertDatabaseMissing('guest_users', ['id' => $this->guestUser->id]);
 
 
-    //?失敗
+    //?//?通常ログインしている場合はゲストでログアウトは出来ない(当たり前？？)
     $response = $this->actingAs($this->user)->post('/api/guest/login');
     $response->assertStatus(400);
   }
@@ -160,8 +156,9 @@ class AuthControllerTest extends TestCase
   /**
    * @test
    */
-  public function preUserCreateTest()
+  public function preUserCreate()
   {
+    //?成功
     Mail::fake();
 
     $name = "testUser";
@@ -185,13 +182,14 @@ class AuthControllerTest extends TestCase
   /**
    * @test
    */
-  public function userCreateTest()
+  public function userCreate()
   {
     $preUser = PreUser::create([
       "name" => "pre_user",
       "email" => "pre_email@test.com",
       "password" => "pre_Password1"
     ]);
+
     $secret_key = config('const.jwt_secret_key');
 
     $validPayload = [
@@ -206,20 +204,21 @@ class AuthControllerTest extends TestCase
     $invalidToken = JWT::encode($invalidPayload, $secret_key, 'HS256');
     $response = $this->post('/api/user/create', ["token" => $invalidToken]);
     $response->assertStatus(500);
-    $this->assertDatabaseMissing('users', ["email" => $preUser['email']]);
-    $this->assertDatabaseHas('pre_users', ["email" => $preUser['email']]);
+    $this->assertDatabaseMissing('users', ["id" => $preUser["id"], "email" => $preUser['email']])
+      ->assertDatabaseHas('pre_users', ["id" => $preUser["id"], "email" => $preUser['email']]);
     //?secretKeyが違う場合
     $invalidToken = JWT::encode($validPayload, "invalid secret key", 'HS256');
     $response = $this->post('/api/user/create', ["token" => $invalidToken]);
     $response->assertStatus(500);
-    $this->assertDatabaseMissing('users', ["email" => $preUser['email']]);
-    $this->assertDatabaseHas('pre_users', ["email" => $preUser['email']]);
+    $this->assertDatabaseMissing('users', ["id" => $preUser["id"], "email" => $preUser['email']])
+      ->assertDatabaseHas('pre_users', ["id" => $preUser["id"], "email" => $preUser['email']]);
 
     //?成功
     $validToken = JWT::encode($validPayload, $secret_key, 'HS256');
     $response = $this->post('/api/user/create', ["token" => $validToken]);
     $response->assertSuccessful();
-    $this->assertDatabaseHas('users', ["email" => $preUser['email']]);
-    $this->assertDatabaseMissing('pre_users', ["email" => $preUser['email']]);
+    $this->assertDatabaseHas('users', ["email" => $preUser['email']])
+      ->assertDatabaseMissing('users', ["id" => $preUser["id"]])
+      ->assertDatabaseMissing('pre_users', ["id" => $preUser["id"], "email" => $preUser['email']]);
   }
 }
