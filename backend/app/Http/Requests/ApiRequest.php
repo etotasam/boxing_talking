@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Http\Response;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;

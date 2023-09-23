@@ -175,6 +175,7 @@ class AuthController extends Controller
             }
             DB::beginTransaction();
             $auth_user = $this->user->create([
+                // "id" => $pre_user->id,
                 "name" => $pre_user->name,
                 "email" => $pre_user->email,
                 "password" => $pre_user->password

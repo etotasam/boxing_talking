@@ -24,6 +24,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'id',
         'name',
         'email',
         'password',
@@ -63,5 +64,17 @@ class User extends Authenticatable
         static::creating(function (User $model) {
             empty($model->id) && $model->id = Str::uuid();
         });
+    }
+
+    //?pre_usersから登録される時にidがuuidで作成されたものかを調べる...必要か？
+    protected function setIdAttribute($id)
+    {
+        $uuidPattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i';
+
+        if (preg_match($uuidPattern, $id)) {
+            $this->attributes['id'] = $id;
+        } else {
+            throw new Exception("invalid id", 500);
+        }
     }
 }
