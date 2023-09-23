@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { flatten } from 'lodash';
 // ! components
 import { FightBox } from '@/components/module/FightBox';
 import { SimpleFightBox } from '@/components/module/SimpleFightBox';
@@ -13,8 +12,7 @@ import { useLoading } from '@/hooks/useLoading';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/uesWinLossPrediction';
 import { useVisualModeController } from '@/hooks/useVisualModeController';
-// ! func
-import { getFightDataOfPastDays } from '@/assets/functions';
+import { useSortMatches } from '@/hooks/useSortMatches';
 //! types
 import { MatchDataType } from '@/assets/types';
 
@@ -22,6 +20,7 @@ export const Home = () => {
   // ! use hook
   const { resetLoadingState } = useLoading();
   const { data: matchesData } = useFetchMatches();
+  const { sortedMatches } = useSortMatches(matchesData);
   const { setter: setPagePath } = usePagePath();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -41,29 +40,9 @@ export const Home = () => {
     };
   }, []);
 
-  //? 試合データの並び替え
-  const [formattedMatchesData, setFormattedMatchesData] =
-    useState<MatchDataType[]>();
-  useEffect(() => {
-    if (!matchesData) return;
-    const multipleArrayMatchData = matchesData.reduce(
-      (accumulator: MatchDataType[][], current) => {
-        const isFightPast = getFightDataOfPastDays(current);
-        if (isFightPast) {
-          return [[...accumulator[0]], [current, ...accumulator[1]]];
-        } else {
-          return [[...accumulator[0], current], [...accumulator[1]]];
-        }
-      },
-      [[], []]
-    );
-
-    setFormattedMatchesData(flatten(multipleArrayMatchData));
-  }, [matchesData]);
-
   return (
     <>
-      {formattedMatchesData && (
+      {sortedMatches && (
         <>
           {device == 'PC' && (
             <div className="absolute top-0 left-[50%] translate-x-[-50%] lg:mt-3 mt-1">
@@ -72,7 +51,7 @@ export const Home = () => {
           )}
 
           <ul className="md:pt-10">
-            {formattedMatchesData.map((match) => (
+            {sortedMatches.map((match) => (
               <li
                 key={match.id}
                 className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5"

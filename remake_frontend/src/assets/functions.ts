@@ -1,6 +1,5 @@
 import _ from "lodash"
 import dayjs from 'dayjs';
-
 // ! types
 import { BoxerType, BoxerDataOnFormType, MatchDataType } from "@/assets/types"
 
@@ -35,8 +34,9 @@ export const getBoxerDataWithID = ({ boxerID, boxersData }: { boxerID: number, b
   return boxersData.find(boxer => boxer.id === boxerID)
 }
 
+
 //? 試合日が過ぎているか
-export const getFightDataOfPastDays = (matchDate: MatchDataType): boolean => {
+export const isMatchDatePast = (matchDate: MatchDataType): boolean => {
   const today = dayjs().startOf('day');
   const dayAfterFight = dayjs(matchDate.match_date)
     .startOf('day')

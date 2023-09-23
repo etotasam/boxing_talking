@@ -24,25 +24,25 @@ class WinLossPredictionController extends Controller
     public function fetch()
     {
         try {
-            $is_user = Auth::check();
-            $is_guest = Auth::guard('guest')->check();
-            if (!$is_user && !$is_guest) {
+            $isUser = Auth::check();
+            $isGuest = Auth::guard('guest')->check();
+            if (!$isUser && !$isGuest) {
                 return false;
             }
-            if ($is_user) {
-                $user_id = Auth::user()->id;
-                $prediction = User::find($user_id)->prediction;
+            if ($isUser) {
+                $userID = Auth::user()->id;
+                $prediction = User::find($userID)->prediction;
             } else {
                 $guest = Auth::guard('guest')->user();
-                $guest_id = $guest->id;
-                $prediction = GuestUser::find($guest_id)->prediction;
+                $guestID = $guest->id;
+                $prediction = GuestUser::find($guestID)->prediction;
             }
             return $prediction;
         } catch (Exception $e) {
             if ($e->getCode() == Response::HTTP_UNAUTHORIZED) {
                 return response()->json(["message" => $e->getMessage()], Response::HTTP_UNAUTHORIZED);
             }
-            return response()->json(["message" => "get user vote faild"], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(["message" => "get user vote failed"], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -62,20 +62,20 @@ class WinLossPredictionController extends Controller
             }
             //? ゲストユーザーか一般ログインユーザーか
             if (Auth::check()) {
-                $user_id = Auth::user()->id;
+                $userID = Auth::user()->id;
             } else if (Auth::guard('guest')->check()) {
-                $user_id = Auth::guard('guest')->user()->id;
+                $userID = Auth::guard('guest')->user()->id;
             }
-            $match_id = $request->match_id;
+            $matchID = $request->match_id;
             $prediction = $request->prediction;
-            $match_id = intval($match_id);
+            $matchID = intval($matchID);
             //? 試合が見つからない場合は投票不可 throw error
-            $is_match = BoxingMatch::find($match_id)->exists();
-            if (!$is_match) {
+            $isMatch = BoxingMatch::find($matchID)->exists();
+            if (!$isMatch) {
                 throw new Exception('the match not exist', Response::HTTP_NOT_FOUND);
             }
             //? 試合当日以降は試合予想の投票不可 throw error
-            $data = BoxingMatch::select('match_date')->where('id', $match_id)->first();
+            $data = BoxingMatch::select('match_date')->where('id', $matchID)->first();
             $match_data = strtotime($data['match_date']);
             $now_date = strtotime('now');
             if ($now_date > $match_data) {
@@ -83,8 +83,8 @@ class WinLossPredictionController extends Controller
             }
 
             //? すでに投票済みの場合は投票不可 throw error
-            $has_vote = WinLossPrediction::where([["user_id", $user_id], ["match_id", $match_id]])->first();
-            if ($has_vote) {
+            $isVote = WinLossPrediction::where([["user_id", $userID], ["match_id", $matchID]])->first();
+            if ($isVote) {
                 throw new Exception("Cannot win-loss prediction. You have already done.", Response::HTTP_BAD_REQUEST);
             }
         } catch (Exception $e) {
@@ -94,11 +94,11 @@ class WinLossPredictionController extends Controller
         try {
             DB::beginTransaction();
             WinLossPrediction::create([
-                "user_id" => $user_id,
-                "match_id" => intval($match_id),
+                "user_id" => $userID,
+                "match_id" => intval($matchID),
                 "prediction" => $prediction
             ]);
-            $matches = BoxingMatch::where("id", intval($match_id))->first();
+            $matches = BoxingMatch::where("id", intval($matchID))->first();
             if ($prediction == "red") {
                 $matches->increment("count_red");
             } else if ($prediction == "blue") {
@@ -109,7 +109,7 @@ class WinLossPredictionController extends Controller
             return response()->json(["message" => "Win-Loss prediction success"], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(["message" => "Faild save to prediction" . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(["message" => "Failed save to prediction" . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

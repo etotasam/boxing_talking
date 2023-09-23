@@ -110,11 +110,11 @@ export const useUpdateMatch = () => {
   const { resetLoadingState, startLoading } = useLoading()
   const { refetch } = useFetchMatches()
   const api = useCallback(async (arg: ArgumentType) => {
-    const updateDeta = {
+    const updateData = {
       match_id: arg.matchId,
       update_match_data: arg.updateMatchData
     }
-    await Axios.put("/api/match", updateDeta)
+    await Axios.put("/api/match", updateData)
   }, [])
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
@@ -147,7 +147,7 @@ export const useDeleteMatch = () => {
   const { refetch: refetchMatches } = useFetchMatches()
   // const { state: matchesState, setter: setMatchesState } = useQueryState<MatchesType[]>(queryKeys.match)
   const api = useCallback(async (matchId: number) => {
-    await Axios.delete("/api/match", { data: { matchId } })
+    await Axios.delete("/api/match", { data: { match_id: matchId } })
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {

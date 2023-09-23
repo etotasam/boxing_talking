@@ -13,6 +13,7 @@ import southAfricaFlag from '@/assets/images/flags/south_africa.svg';
 import chinaFlag from '@/assets/images/flags/china.svg';
 import canadaFlag from '@/assets/images/flags/canada.svg';
 import venezuelaFlag from '@/assets/images/flags/venezuela.svg';
+import puertoRicoFlag from '@/assets/images/flags/puerto_rico.svg';
 
 export const Nationality = {
   Japan: "Japan",
@@ -25,9 +26,9 @@ export const Nationality = {
   Ukraine: "Ukraine",
   Canada: "Canada",
   Venezuela: "Venezuela",
-  Puerto_rico: "Puerto_rico",
   SouthAfrica: "SouthAfrica",
   China: "China",
+  PuertoRico: "PuertoRico",
 } as const
 
 
@@ -44,6 +45,7 @@ export const getNationalFlag = (country: NationalityType) => {
   if (country == Nationality.China) return chinaFlag;
   if (country == Nationality.Canada) return canadaFlag;
   if (country == Nationality.Venezuela) return venezuelaFlag;
+  if (country == Nationality.PuertoRico) return puertoRicoFlag;
 };
 
 

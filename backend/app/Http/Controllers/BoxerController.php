@@ -75,7 +75,7 @@ class BoxerController extends Controller
         try {
             $name = $request->name;
             $country = $request->country;
-            $arr_word = compact("name", "country");
+            $arrayWords = compact("name", "country");
             $arrayQuery = array_map(function ($key, $value) {
                 if (isset($value)) {
                     if ($key == 'name') {
@@ -84,7 +84,7 @@ class BoxerController extends Controller
                         return [$key, 'like', $value];
                     }
                 }
-            }, array_keys($arr_word), array_values($arr_word));
+            }, array_keys($arrayWords), array_values($arrayWords));
 
             $likeQueries = array_filter($arrayQuery, function ($el) {
                 if (isset($el)) {
@@ -128,14 +128,14 @@ class BoxerController extends Controller
         try {
             // throw new Exception("@@@@@@エラー", 406);
             $id = $request->boxer_id;
-            $req_boxer_eng_name = $request->eng_name;
+            $boxerEngName = $request->eng_name;
             try {
                 $boxer = $this->boxer->findOrFail($id);
             } catch (Exception $e) {
                 return response()->json(["message" => "Boxer is not exist in DB"], 406);
             };
             //? データの整合性をチェック
-            if ($boxer->eng_name != $req_boxer_eng_name) {
+            if ($boxer->eng_name != $boxerEngName) {
                 throw new Exception("Request data is dose not match boxer in database", 406);
             };
             //? 試合が組まれているかどうかをチェックする
@@ -164,8 +164,8 @@ class BoxerController extends Controller
     {
         // throw new Exception();
         try {
-            $boxer_id = $request->id;
-            $boxer = $this->boxer->find($boxer_id);
+            $boxerID = $request->id;
+            $boxer = $this->boxer->find($boxerID);
             if (!$boxer) {
                 throw new Exception("Boxer is not exists", 404);
             }
