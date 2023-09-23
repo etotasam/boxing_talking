@@ -68,7 +68,7 @@ export type FightInfoType = {
   class: string,
 }
 //? 登録用 matchデータ
-export type RegstarMatchPropsType = {
+export type RegisterMatchPropsType = {
   red_boxer_id: number,
   blue_boxer_id: number,
   match_date: string,

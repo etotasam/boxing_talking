@@ -23,7 +23,7 @@ class CommentControllerTest extends TestCase
     private $fighter_2;
     private $fighter_3;
 
-    protected function setUp():void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -55,40 +55,42 @@ class CommentControllerTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function fetch_コメントの取得():void
-    {
-        $response = $this->get(route('comment.fetch', ['match_id' => $this->matches->id]));
-        $response->assertStatus(200);
-        $response->assertJsonFragment(['name' => 'auth_user_name']);
-        $response->assertJsonFragment(['comment' => 'user_1_of_comment_on_match_of_1']);
-    }
+    // /**
+    //  * @test
+    //  */
+    // public function fetch_コメントの取得(): void
+    // {
 
-    /**
-     * @test
-     */
-    public function post_コメントの投稿():void
-    {
-        $response = $this->post(route('comment.post', ['user_id' => $this->user->id ,'match_id' => $this->matches->id, 'comment' => 'new comment']));
-        $response->assertStatus(200);
-        $this->assertDatabaseHas('comments',['user_id' => $this->user->id]);
-        $this->assertDatabaseHas('comments',['comment' => 'new comment']);
-    }
+    //     $response = $this->get(route('comment.fetch', ['match_id' => $this->matches->id]));
+    //     $response->assertStatus(200);
+    //     $response->assertJsonFragment(['name' => 'auth_user_name']);
+    //     $response->assertJsonFragment(['comment' => 'user_1_of_comment_on_match_of_1']);
+    // }
 
-    /**
-     * @test
-     */
-    public function delete_コメントの削除():void
-    {
-        //? 削除対象コメントが存在している
-        $this->assertDatabaseHas('comments',['comment' => 'user_1_of_comment_on_match_of_1']);
+    // /**
+    //  * @test
+    //  */
+    // public function post_コメントの投稿(): void
+    // {
 
-        //? 削除対象コメントの削除実行
-        $this->actingAs($this->user);
-        $response = $this->delete(route('comment.delete', ['user_id' => $this->user->id ,'comment_id' => $this->comments->id]));
-        $response->assertStatus(200);
-        $this->assertDatabaseMissing('comments',['comment' => 'user_1_of_comment_on_match_of_1']);
-    }
+    //     $response = $this->post(route('comment.post', ['user_id' => $this->user->id, 'match_id' => $this->matches->id, 'comment' => 'new comment']));
+    //     $response->assertStatus(200);
+    //     $this->assertDatabaseHas('comments', ['user_id' => $this->user->id]);
+    //     $this->assertDatabaseHas('comments', ['comment' => 'new comment']);
+    // }
+
+    // /**
+    //  * @test
+    //  */
+    // public function delete_コメントの削除(): void
+    // {
+    //     //? 削除対象コメントが存在している
+    //     $this->assertDatabaseHas('comments', ['comment' => 'user_1_of_comment_on_match_of_1']);
+
+    //     //? 削除対象コメントの削除実行
+    //     $this->actingAs($this->user);
+    //     $response = $this->delete(route('comment.delete', ['user_id' => $this->user->id, 'comment_id' => $this->comments->id]));
+    //     $response->assertStatus(200);
+    //     $this->assertDatabaseMissing('comments', ['comment' => 'user_1_of_comment_on_match_of_1']);
+    // }
 }

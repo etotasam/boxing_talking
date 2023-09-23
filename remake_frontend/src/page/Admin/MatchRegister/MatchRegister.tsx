@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 import { useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 // ! types
 import {
   NationalityType,
-  RegstarMatchPropsType,
+  RegisterMatchPropsType,
   GRADE_Type,
   WEIGHT_CLASS_Type,
   ORGANIZATIONS_Type,
@@ -32,6 +33,8 @@ import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 
+const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
+
 export const MatchRegister = () => {
   //! hooks
   const { setter: setPagePath } = usePagePath();
@@ -56,6 +59,9 @@ export const MatchRegister = () => {
 
   return (
     <AdminLayout>
+      <Helmet>
+        <title>試合登録 | {siteTitle}</title>
+      </Helmet>
       <div className="w-full flex">
         <section className="w-[70%]">
           <div className="sticky top-[calc(100px+20px)] mt-[20px]">
@@ -345,7 +351,7 @@ const MatchDataSetter = ({
       formattedBelt = cloneDeep(belt);
     }
 
-    const matchData: RegstarMatchPropsType = {
+    const matchData: RegisterMatchPropsType = {
       red_boxer_id: matchBoxers.red_boxer!.id!,
       blue_boxer_id: matchBoxers.blue_boxer!.id!,
       match_date: matchDate,

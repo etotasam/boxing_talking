@@ -94,14 +94,6 @@ Route::middleware('administrator')->group(function () {
 
 
 
-
-//? メールテスト
-Route::get('/mail', [MailController::class, 'send']);
-
-//? テストapi
-Route::post('/testtest', [BoxerController::class, 'testtest']);
-
-
 Route::get("/{match_id}/check_vote", function (string $match_id) {
     $user_id = Auth::user()->id;
     $match_id = intval($match_id);
@@ -134,6 +126,8 @@ Route::put("/{id}/test", function ($id = null) {
 Route::get('/test', function () {
 
     try {
+        return response()->json(["message" => "era-"], 500);
+
         $url = config('app.url');
         // if (!isset($secret_key)) {
         //     throw new Exception("cannot get secret-key", 500);

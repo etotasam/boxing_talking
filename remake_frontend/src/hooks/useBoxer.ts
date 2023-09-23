@@ -71,12 +71,11 @@ export const useFetchBoxer = () => {
 // //! 選手データ更新
 export const useUpdateBoxerData = () => {
   const { startLoading, resetLoadingState } = useLoading()
-  const { refetchReactQueryData } = useReactQuery()
+  const { refetchReactQueryArrayKeys } = useReactQuery()
   //? params page の取得
   const { setToastModal, showToastModal } = useToastModal()
-  const api = async (updateFighterData: BoxerType): Promise<Record<string, string> | void> => {
-    await Axios.put("/api/boxer", updateFighterData);
-
+  const api = async (updateFighterData: BoxerType): Promise<void> => {
+    await Axios.put<void>("/api/boxer", updateFighterData);
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: async () => {
@@ -87,8 +86,7 @@ export const useUpdateBoxerData = () => {
     const convertedBoxerData = convertToBoxerData(updateFighterData)
     mutate(convertedBoxerData, {
       onSuccess: () => {
-        refetchReactQueryData(QUERY_KEY.boxer)
-        refetchReactQueryData(QUERY_KEY.matchesFetch)
+        refetchReactQueryArrayKeys([QUERY_KEY.matchesFetch, QUERY_KEY.boxer])
         resetLoadingState()
         setToastModal({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS });
         showToastModal()
@@ -110,9 +108,9 @@ export const useRegisterBoxer = () => {
   const { showToastModal } = useToastModal()
   // const { count: fightersCount } = useFetchBoxer()
   const { setToastModal } = useToastModal()
-  const api = useCallback(async (newBoxerData: BoxerType) => {
-    const res = await Axios.post("/api/boxer", newBoxerData).then(v => v.data)
-    return res
+  const api = useCallback(async (newBoxerData: BoxerType): Promise<void> => {
+    await Axios.post<void>("/api/boxer", newBoxerData).then(v => v.data)
+    // return res
   }, []);
   const { mutate, isLoading, isError, isSuccess } = useMutation(api, {
     onMutate: async () => {
@@ -150,7 +148,7 @@ export const useRegisterBoxer = () => {
           }
         }
 
-        setToastModal({ message: MESSAGE.FIGHTER_REGISTER_FAILD, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        setToastModal({ message: MESSAGE.FIGHTER_REGISTER_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
       }
     })
@@ -175,10 +173,8 @@ export const useDeleteBoxer = () => {
   // const query = new URLSearchParams(search);
   // const paramPage = Number(query.get("page"));
   //? api
-  const api = async (boxerData: BoxerType | BoxerDataOnFormType) => {
-    // try {
-    await Axios.delete('/api/boxer', { data: { boxer_id: boxerData.id, eng_name: boxerData.eng_name } }).then(v => v.data)
-
+  const api = async (boxerData: BoxerType | BoxerDataOnFormType): Promise<void> => {
+    await Axios.delete<void>('/api/boxer', { data: { boxer_id: boxerData.id, eng_name: boxerData.eng_name } }).then(v => v.data)
   }
 
   const { mutate, isLoading, isError, isSuccess } = useMutation(api, {

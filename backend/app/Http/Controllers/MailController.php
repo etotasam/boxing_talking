@@ -34,7 +34,7 @@ class MailController extends Controller
         Mail::send('email.test', $data, function ($message) {
             $message->to("test@gmail.com", "Test")
                 ->from("from@test.com", "Boxing Talking")
-                ->subject('Boxint Taking Email確認');
+                ->subject('Boxing Taking Email確認');
         });
     }
 }

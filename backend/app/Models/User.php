@@ -56,18 +56,12 @@ class User extends Authenticatable
         return $this->hasMany(WinLossPrediction::class);
     }
 
+    public $incrementing = false; // 自動インクリメントを無効化
+    protected $keyType = 'string'; // 主キーのデータ型をUUIDに設定
     protected static function booted()
     {
         static::creating(function (User $model) {
             empty($model->id) && $model->id = Str::uuid();
         });
-    }
-
-    public $incrementing = false; // 自動インクリメントを無効化
-    protected $keyType = 'string'; // 主キーのデータ型をUUIDに設定
-
-    public function getAdministratorAttribute($value)
-    {
-        return !!$value;
     }
 }

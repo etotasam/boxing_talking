@@ -48,9 +48,8 @@ export const useGuestLogin = () => {
 
   //? ReactQuery controller
   const { setReactQueryData } = useReactQuery()
-  const api = useCallback(async ({ _ }: { _?: unknown }) => {
-    const res = await Axios.post('/api/guest/login').then(value => value.data)
-    return res
+  const api = useCallback(async ({ _ }: { _?: unknown }): Promise<void> => {
+    await Axios.post<void>('/api/guest/login').then(value => value.data)
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
