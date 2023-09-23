@@ -45,43 +45,50 @@ class MatchController extends Controller
     public function fetch(Request $request)
     {
 
-        $range = $request->range;
-        if ($range == "all") {
-            if (Auth::user()->administrator) {
-                $matches = BoxingMatch::orderBy('match_date')->get();
+        try {
+            $range = $request->range;
+            if ($range == "all") {
+                if (Auth::user()->administrator) {
+                    $matches = BoxingMatch::orderBy('match_date')->get();
+                } else {
+                    return response()->json(["success" => false, "message" => "Cannot get all matches without auth administrator"], 401);
+                }
+            } else if ($range == "past") {
+                $fetchRange = date('Y-m-d', strtotime('-1 week'));
+                $matches = BoxingMatch::where('match_date', '<', $fetchRange)->orderBy('match_date')->get();
             } else {
-                return response()->json(["success" => false, "message" => "Cannot get all matches without auth administrator"], 401);
+                $fetchRange = date('Y-m-d', strtotime('-1 week'));
+                $matches = BoxingMatch::where('match_date', '>', $fetchRange)->orderBy('match_date')->get();
             }
-        } else if ($range == "past") {
-            $fetchRange = date('Y-m-d', strtotime('-1 week'));
-            $matches = BoxingMatch::where('match_date', '<', $fetchRange)->orderBy('match_date')->get();
-        } else {
-            $fetchRange = date('Y-m-d', strtotime('-1 week'));
-            $matches = BoxingMatch::where('match_date', '>', $fetchRange)->orderBy('match_date')->get();
+
+            $formattedMatches = $matches->map(function ($item, $key) {
+                $red_id = $item->red_boxer_id;
+                $blue_id = $item->blue_boxer_id;
+                $red_boxer = Boxer::find($red_id);
+                $blue_boxer = Boxer::find($blue_id);
+                $titles = $item->titles;
+
+                return  [
+                    "id" => $item->id,
+                    "red_boxer" => $red_boxer,
+                    "blue_boxer" => $blue_boxer,
+                    "country" => $item->country,
+                    "venue" => $item->venue,
+                    "grade" => $item->grade,
+                    "titles" => $titles,
+                    "weight" => $item->weight,
+                    "match_date" => $item->match_date,
+                    "count_red" => $item->count_red,
+                    "count_blue" => $item->count_blue
+                ];
+            });
+            return response()->json($formattedMatches);
+        } catch (Exception $e) {
+            if ($e->getCode()) {
+                return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
+            }
+            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
         }
-
-        $formattedMatches = $matches->map(function ($item, $key) {
-            $red_id = $item->red_boxer_id;
-            $blue_id = $item->blue_boxer_id;
-            $red_boxer = Boxer::find($red_id);
-            $blue_boxer = Boxer::find($blue_id);
-            $titles = $item->titles;
-
-            return  [
-                "id" => $item->id,
-                "red_boxer" => $red_boxer,
-                "blue_boxer" => $blue_boxer,
-                "country" => $item->country,
-                "venue" => $item->venue,
-                "grade" => $item->grade,
-                "titles" => $titles,
-                "weight" => $item->weight,
-                "match_date" => $item->match_date,
-                "count_red" => $item->count_red,
-                "count_blue" => $item->count_blue
-            ];
-        });
-        return response()->json($formattedMatches);
     }
 
     /**

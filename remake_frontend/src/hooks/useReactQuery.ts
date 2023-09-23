@@ -17,7 +17,11 @@ export const useReactQuery = () => {
     queryClient.refetchQueries(queryKey)
   }
 
+  const refetchReactQueryArrayKeys = (queryKeys: string[]) => {
+    queryClient.invalidateQueries(queryKeys)
+  }
 
-  return { getReactQueryData, setReactQueryData, refetchReactQueryData }
+
+  return { getReactQueryData, setReactQueryData, refetchReactQueryData, refetchReactQueryArrayKeys }
 
 }

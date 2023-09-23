@@ -24,6 +24,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'id',
         'name',
         'email',
         'password',
@@ -56,6 +57,8 @@ class User extends Authenticatable
         return $this->hasMany(WinLossPrediction::class);
     }
 
+    public $incrementing = false; // 自動インクリメントを無効化
+    protected $keyType = 'string'; // 主キーのデータ型をUUIDに設定
     protected static function booted()
     {
         static::creating(function (User $model) {
@@ -63,11 +66,15 @@ class User extends Authenticatable
         });
     }
 
-    public $incrementing = false; // 自動インクリメントを無効化
-    protected $keyType = 'string'; // 主キーのデータ型をUUIDに設定
-
-    public function getAdministratorAttribute($value)
+    //?pre_usersから登録される時にidがuuidで作成されたものかを調べる...必要か？
+    protected function setIdAttribute($id)
     {
-        return !!$value;
+        $uuidPattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i';
+
+        if (preg_match($uuidPattern, $id)) {
+            $this->attributes['id'] = $id;
+        } else {
+            throw new Exception("invalid id", 500);
+        }
     }
 }

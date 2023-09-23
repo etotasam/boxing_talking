@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 //! data
 // import { GRADE } from "@/assets/boxerData";
 //! layout
@@ -26,6 +27,8 @@ import {
   BG_COLOR_ON_TOAST_MODAL,
   MESSAGE,
 } from '@/assets/statusesOnToastModal';
+
+const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const MatchEdit = () => {
   // ! use hook
@@ -74,6 +77,9 @@ export const MatchEdit = () => {
 
   return (
     <AdminLayout>
+      <Helmet>
+        <title>試合編集 | {siteTitle}</title>
+      </Helmet>
       <div className="mt-[120px] flex w-full">
         <section className="w-[30%] flex justify-center">
           {selectMatch ? (

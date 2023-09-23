@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 // ! components
 import { FightBox } from '@/components/module/FightBox';
 import { SimpleFightBox } from '@/components/module/SimpleFightBox';
@@ -14,6 +15,8 @@ import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/uesWinLossPredicti
 import { VisualModeChangeIcon } from '@/components/atomic/VisualModeChangeIcon';
 //! types
 import { MatchDataType } from '@/assets/types';
+
+const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const PastMatches = () => {
   const { setter: setPagePath } = usePagePath();
@@ -40,6 +43,9 @@ export const PastMatches = () => {
   if (pastMatches && Boolean(!pastMatches.length))
     return (
       <>
+        <Helmet>
+          <title>過去の試合 | {siteTitle}</title>
+        </Helmet>
         <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
           <div>過去の試合が見つかりませんでした</div>
         </div>
@@ -47,24 +53,25 @@ export const PastMatches = () => {
     );
   return (
     <>
-      <>
-        {device == 'PC' && (
-          <div className="absolute top-0 left-[50%] translate-x-[-50%] lg:mt-3 mt-1">
-            <VisualModeChangeIcon onClick={() => visualModeToggleSwitch()} />
-          </div>
-        )}
+      <Helmet>
+        <title>過去の試合 | {siteTitle}</title>
+      </Helmet>
+      {device == 'PC' && (
+        <div className="absolute top-0 left-[50%] translate-x-[-50%] lg:mt-3 mt-1">
+          <VisualModeChangeIcon onClick={() => visualModeToggleSwitch()} />
+        </div>
+      )}
 
-        <ul>
-          {pastMatches.map((match) => (
-            <li
-              key={match.id}
-              className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5"
-            >
-              <MatchCard match={match} matchSelect={matchSelect} />
-            </li>
-          ))}
-        </ul>
-      </>
+      <ul>
+        {pastMatches.map((match) => (
+          <li
+            key={match.id}
+            className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5"
+          >
+            <MatchCard match={match} matchSelect={matchSelect} />
+          </li>
+        ))}
+      </ul>
     </>
   );
 };

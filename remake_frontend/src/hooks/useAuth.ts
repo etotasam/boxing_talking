@@ -3,8 +3,11 @@ import { QUERY_KEY } from "@/assets/queryKeys"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal"
-// import { useNavigate } from "react-router-dom";
-
+import { tokenErrorMessageSelector } from "@/store/tokenErrorMessageState"
+import { tokenErrorMessages } from "@/assets/tokenErrorMessage"
+//! Recoil
+import { useSetRecoilState } from "recoil"
+import { authenticatingSelector } from "@/store/authenticatingState"
 // !hooks
 import { useToastModal } from "./useToastModal"
 import { useLoading } from "./useLoading"
@@ -43,14 +46,13 @@ export const useGuestLogin = () => {
   // ? Loading state
   const { resetLoadingState, startLoading } = useLoading()
   // ? login modal (hook)
-  // const { hideLoginModal } = useLoginModal()
+  const { hideLoginModal } = useLoginModal()
   const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
 
   //? ReactQuery controller
   const { setReactQueryData } = useReactQuery()
-  const api = useCallback(async ({ _ }: { _?: unknown }) => {
-    const res = await Axios.post('/api/guest/login').then(value => value.data)
-    return res
+  const api = useCallback(async ({ _ }: { _?: unknown }): Promise<void> => {
+    await Axios.post<void>('/api/guest/login').then(value => value.data)
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -62,6 +64,7 @@ export const useGuestLogin = () => {
   const guestLogin = () => {
     mutate(({}), {
       onSuccess: (data) => {
+        hideLoginModal()
         refetchMatchPrediction()
         resetLoadingState()
         setReactQueryData<boolean>(QUERY_KEY.guest, Boolean(data))
@@ -236,6 +239,42 @@ export const usePreSignUp = () => {
     })
   }
   return { preSignUp, isLoading, isSuccess, isError }
+}
+
+//! ユーザ登録（本登録）
+export const useSignUpIdentification = () => {
+  // ? react query
+  const setAuthenticatingState = useSetRecoilState(authenticatingSelector)
+  const setTokenErrorMessage = useSetRecoilState(tokenErrorMessageSelector)
+
+  const api = useCallback(async ({ token }: { token: string }) => {
+    try {
+      const res = await Axios.post<boolean>(`/api/user/create`, { token }).then(value => value.data)
+      setAuthenticatingState({ isLoading: false, isError: false, isSuccess: true })
+      return res
+    } catch (error: any) {
+      const errorMessage = error.data.message
+      if (errorMessage === "Expired token") {
+        setTokenErrorMessage(tokenErrorMessages.EXPIRED_TOKEN)
+      }
+      setAuthenticatingState({ isLoading: false, isError: true, isSuccess: false })
+    }
+  }, [])
+  const { mutate } = useMutation(api, {
+    onMutate: () => {
+      setAuthenticatingState({ isLoading: true, isError: false, isSuccess: false })
+    }
+  })
+  const createUser = ({ token }: { token: string }) => {
+    mutate({ token }, {
+      onSuccess: () => {
+      },
+
+      onError: () => {
+      }
+    })
+  }
+  return { createUser }
 }
 
 //! ログイン

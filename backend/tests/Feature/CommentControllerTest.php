@@ -1,94 +1,102 @@
 <?php
 
-namespace Tests\Feature;
+// namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\BoxingMatch;
-use App\Models\Fighter;
+use App\Models\Boxer;
 use App\Models\Comment;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use App\Models\GuestUser;
 
 class CommentControllerTest extends TestCase
 {
 
     use RefreshDatabase;
 
-    private $user;
-    private $comments;
-    private $matches;
-    private $fighter_1;
-    private $fighter_2;
-    private $fighter_3;
-
-    protected function setUp():void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->user = User::factory()->create([
             "name" => 'auth_user_name',
-            // "email" => 'test@test.com',
-            // "password" => Hash::make("test")
         ]);
 
-        $this->fighter_1 = Fighter::factory()->create([
-            "name" => "fighter_name_1",
-        ]);
-        $this->fighter_2 = Fighter::factory()->create([
-            "name" => "fighter_name_2",
-        ]);
-        $this->fighter_3 = Fighter::factory()->create([
-            "name" => "fighter_name_3",
-        ]);
+        $this->guest = GuestUser::create([]);
+
+        $this->boxers = Boxer::factory()->count(2)->create();
 
         $this->matches = BoxingMatch::factory()->create([
-            'red_fighter_id' => $this->fighter_1->id,
-            'blue_fighter_id' => $this->fighter_2->id
+            'red_boxer_id' => $this->boxers[0]->id,
+            'blue_boxer_id' => $this->boxers[1]->id
         ],);
 
         $this->comments = Comment::create([
             'user_id' => $this->user->id,
             'match_id' => $this->matches->id,
-            'comment' => "user_1_of_comment_on_match_of_1"
+            'comment' => "コメント"
         ]);
     }
 
     /**
      * @test
      */
-    public function fetch_コメントの取得():void
+    public function commentsFetch(): void
     {
-        $response = $this->get(route('comment.fetch', ['match_id' => $this->matches->id]));
+        //?存在しない試合IDを指定された場合
+        $response = $this->get('/api/comment?match_id=' . 100);
+        $response->assertStatus(404);
+
+        //?成功
+        $response = $this->get('/api/comment?match_id=' . $this->matches->id);
         $response->assertStatus(200);
-        $response->assertJsonFragment(['name' => 'auth_user_name']);
-        $response->assertJsonFragment(['comment' => 'user_1_of_comment_on_match_of_1']);
+        $response->assertJsonFragment(['post_user_name' => 'auth_user_name']);
+        $response->assertJsonFragment(['comment' => 'コメント']);
     }
 
     /**
      * @test
      */
-    public function post_コメントの投稿():void
+    public function commentPost(): void
     {
-        $response = $this->post(route('comment.post', ['user_id' => $this->user->id ,'match_id' => $this->matches->id, 'comment' => 'new comment']));
-        $response->assertStatus(200);
-        $this->assertDatabaseHas('comments',['user_id' => $this->user->id]);
-        $this->assertDatabaseHas('comments',['comment' => 'new comment']);
-    }
+        //?認証なしでの投稿
+        $response = $this
+            ->post(
+                '/api/comment',
+                [
+                    'user_id' => null,
+                    'match_id' => $this->matches->id,
+                    'comment' => '認証なし投稿'
+                ]
+            );
+        $response->assertStatus(401);
+        $this->assertDatabaseMissing('comments', ['match_id' => $this->matches->id, 'comment' => '認証なし投稿']);
 
-    /**
-     * @test
-     */
-    public function delete_コメントの削除():void
-    {
-        //? 削除対象コメントが存在している
-        $this->assertDatabaseHas('comments',['comment' => 'user_1_of_comment_on_match_of_1']);
+        //?ログインユーザーによるコメント投稿
+        $response = $this->actingAs($this->user)
+            ->post(
+                '/api/comment',
+                [
+                    'user_id' => $this->user->id,
+                    'match_id' => $this->matches->id,
+                    'comment' => 'コメント投稿'
+                ]
+            );
+        $response->assertSuccessful(200);
+        $this->assertDatabaseHas('comments', ['user_id' => $this->user->id, 'match_id' => $this->matches->id, 'comment' => 'コメント投稿']);
 
-        //? 削除対象コメントの削除実行
-        $this->actingAs($this->user);
-        $response = $this->delete(route('comment.delete', ['user_id' => $this->user->id ,'comment_id' => $this->comments->id]));
-        $response->assertStatus(200);
-        $this->assertDatabaseMissing('comments',['comment' => 'user_1_of_comment_on_match_of_1']);
+        //?ゲストユーザーによるコメント投稿
+        $response = $this->actingAs($this->guest, 'guest')
+            ->post(
+                '/api/comment',
+                [
+                    'user_id' => $this->guest->id,
+                    'match_id' => $this->matches->id,
+                    'comment' => 'ゲストの投稿'
+                ]
+            );
+        $response->assertSuccessful(200);
+        $this->assertDatabaseHas('comments', ['user_id' => $this->guest->id, 'match_id' => $this->matches->id, 'comment' => 'ゲストの投稿']);
     }
 }

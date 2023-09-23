@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import _ from 'lodash';
 import { useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 // ! types
 // import { BoxerType } from "@/assets/types";
 // ! data
@@ -18,6 +18,8 @@ import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useRegisterBoxer } from '@/hooks/useBoxer';
 import { useLoading } from '@/hooks/useLoading';
+
+const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const BoxerRegister = () => {
   // ! use hook
@@ -75,6 +77,9 @@ export const BoxerRegister = () => {
 
   return (
     <AdminLayout>
+      <Helmet>
+        <title>Boxer登録 | {siteTitle}</title>
+      </Helmet>
       <div className="min-h-[calc(100vh-100px)] flex justify-center items-center">
         <BoxerEditForm isSuccess={successRegisterBoxer} onSubmit={onSubmit} />
       </div>

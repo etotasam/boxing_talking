@@ -76,23 +76,17 @@ class CommentController extends Controller
             } else {
                 throw new Exception('Match is not exits', Response::HTTP_NOT_FOUND);
             }
-            foreach ($comments_on_match as $comment) {
-                $user_id = $comment->user_id;
-                $created_at = $comment->created_at;
+            foreach ($comments_on_match as $commentData) {
+                $user_id = $commentData->user_id;
+                $created_at = $commentData->created_at;
                 $user = User::find($user_id);
                 if ($user) {
                     $post_user_name = $user->name;
                 } else {
                     $post_user_name = null;
                 }
-                // $prediction = WinLossPrediction::where([["user_id", $user_id], ["match_id", $match_id]])->first();
-                // if (isset($vote)) {
-                //     $prediction_color = $prediction["prediction"];
-                // } else {
-                //     $prediction_color = Null;
-                // }
-                $formatted_comment = nl2br(htmlspecialchars($comment->comment));
-                array_unshift($comments_array, ['id' => $comment->id, "post_user_name" => $post_user_name, "comment" => $formatted_comment, "created_at" => $created_at]);
+                $formatted_comment = nl2br(htmlspecialchars($commentData->comment));
+                array_unshift($comments_array, ['id' => $commentData->id, "post_user_name" => $post_user_name, "comment" => $formatted_comment, "created_at" => $created_at]);
             }
             return $comments_array;
         } catch (Exception $e) {
@@ -110,18 +104,9 @@ class CommentController extends Controller
      * @param string comment
      * @return \Illuminate\Http\Response
      */
-    public function post(Request $request)
+    public function post(CommentRequest $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
-                "comment" => 'required|string|max:1000',
-                "match_id" => 'required'
-            ]);
-
-            if ($validator->fails()) {
-                return new JsonResponse(['success' => false, 'message' => $validator->errors()], 422);
-            }
-
             if (Auth::check()) {
                 $user_id = Auth::user()->id;
             } else if (Auth::guard('guest')->check()) {

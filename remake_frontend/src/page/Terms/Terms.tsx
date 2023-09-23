@@ -1,6 +1,12 @@
+import { Helmet } from 'react-helmet-async';
+
+const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 export const Terms = () => {
   return (
     <>
+      <Helmet>
+        <title>利用規約 | {siteTitle}</title>
+      </Helmet>
       <div className="text-stone-800 w-full flex justify-center items-center">
         <div className="max-w-[1000px] md:w-[80%] w-[90%] my-10">
           <h1 className="text-center text-[26px]">利用規約</h1>

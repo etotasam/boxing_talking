@@ -6,7 +6,7 @@ import { useQuery, useMutation } from "react-query"
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 import { QUERY_KEY } from "@/assets/queryKeys"
 // ! types
-import { MatchDataType, RegstarMatchPropsType } from "@/assets/types"
+import { MatchDataType, RegisterMatchPropsType } from "@/assets/types"
 // ! hook
 import { useToastModal } from "./useToastModal"
 import { useLoading } from "./useLoading"
@@ -60,7 +60,7 @@ export const useRegisterMatch = () => {
   const { resetLoadingState, startLoading } = useLoading()
 
 
-  const api = async ({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }: RegstarMatchPropsType) => {
+  const api = async ({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }: RegisterMatchPropsType) => {
     await Axios.post("/api/match", { match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles })
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -77,7 +77,7 @@ export const useRegisterMatch = () => {
     }
   })
 
-  const registerMatch = ({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }: RegstarMatchPropsType) => {
+  const registerMatch = ({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }: RegisterMatchPropsType) => {
     mutate({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }, {
       onSuccess: () => {
         refetchMatches()
@@ -88,7 +88,7 @@ export const useRegisterMatch = () => {
       onError: () => {
         resetLoadingState()
         // queryClient.setQueryData(queryKeys.match, context?.snapshot)
-        setToastModal({ message: MESSAGE.MATCH_REGISTER_FAILD, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        setToastModal({ message: MESSAGE.MATCH_REGISTER_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
       }
     })
@@ -171,9 +171,9 @@ export const useDeleteMatch = () => {
       },
       onError: () => {
         resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_DELETE_FAILD, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        setToastModal({ message: MESSAGE.MATCH_DELETE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
-        // setToastModalMessage({ message: MESSAGE.MATCH_DELETE_FAILD, bgColor: ModalBgColorType.ERROR })
+        // setToastModalMessage({ message: MESSAGE.MATCH_DELETE_FAILED, bgColor: ModalBgColorType.ERROR })
         // setMatchesState(context!.snapshot)
       }
     })

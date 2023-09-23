@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Exception;
@@ -18,10 +17,11 @@ use App\Models\PreUser;
 use App\Models\GuestUser;
 use App\Models\Administrator;
 use Illuminate\Http\Request;
-use \Illuminate\Http\Response;
+use Illuminate\Http\Response;
 
 // !request
 use App\Http\Requests\PreCreateAuthRequest;
+use App\Http\Requests\LoginRequest;
 
 class AuthController extends Controller
 {
@@ -105,15 +105,11 @@ class AuthController extends Controller
     {
         // throw new Exception();
         try {
-            // ? password Hash
-            $hashed_password = Hash::make($request->password);
-
             DB::beginTransaction();
-
             $pre_user = $this->pre_user->create([
                 "name" => $request->name,
                 "email" => $request->email,
-                "password" => $hashed_password,
+                "password" => $request->password,
             ]);
 
             if (!$pre_user) {
@@ -179,6 +175,7 @@ class AuthController extends Controller
             }
             DB::beginTransaction();
             $auth_user = $this->user->create([
+                // "id" => $pre_user->id,
                 "name" => $pre_user->name,
                 "email" => $pre_user->email,
                 "password" => $pre_user->password
@@ -214,7 +211,7 @@ class AuthController extends Controller
                 return null;
             }
         } catch (Exception $e) {
-            if ($e - getCode()) {
+            if ($e->getCode()) {
                 return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
             }
             return response()->json(["success" => false, "message" => $e->getMessage()], 500);
@@ -229,30 +226,22 @@ class AuthController extends Controller
      * @param string $password
      * @return \Illuminate\Http\Response
      */
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            "email" => "required|email",
-            "password" => "required"
-        ]);
-        if ($validator->fails()) {
-            return response()->json(["success" => false, "message" => [$validator->errors()], 422]);
-        }
         //? ゲストでログインしてる場合はゲスト_ログアウト
-        if (Auth::guard('guest')->check()) {
-            Auth::guard('guest')->logout();
-        }
 
-        $email = $request->email;
-        $password = $request->password;
         try {
-            // throw new Exception();
-            if (Auth::attempt(['email' => $email, 'password' => $password])) {
-                return Auth::user();
+            if (Auth::guard('guest')->check()) {
+                Auth::guard('guest')->logout();
             }
-            throw new Exception("Failed Login", Response::HTTP_UNAUTHORIZED);
+            // throw new Exception();
+            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                return Auth::user();
+            } else {
+                throw new Exception("Failed Login", Response::HTTP_UNAUTHORIZED);
+            }
         } catch (Exception $e) {
-            if ($e - getCode()) {
+            if ($e->getCode()) {
                 return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
             }
             return response()->json(["success" => false, "message" => $e->getMessage()], 500);
@@ -278,7 +267,7 @@ class AuthController extends Controller
                 throw new Exception('dose not logout...', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         } catch (Exception $e) {
-            if ($e - getCode()) {
+            if ($e->getCode()) {
                 return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
             }
             return response()->json(["success" => false, "message" => $e->getMessage()], 500);
@@ -302,7 +291,7 @@ class AuthController extends Controller
             $is_admin = Administrator::where("user_id", $auth_user_id)->exists();
             return $is_admin;
         } catch (Exception $e) {
-            if ($e - getCode()) {
+            if ($e->getCode()) {
                 return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
             }
             return response()->json(["success" => false, "message" => $e->getMessage()], 500);

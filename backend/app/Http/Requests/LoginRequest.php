@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use App\Http\Requests\ApiRequest;
 
-class CommentRequest extends ApiRequest
+class LoginRequest extends ApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,24 +24,18 @@ class CommentRequest extends ApiRequest
     public function rules()
     {
         return [
-            'comment' => [
-                'required',
-                'string',
-                'max:1000',
-            ],
-            'match_id' => [
-                'required'
-            ]
+            "email" => "required|email",
+            "password" => "required"
         ];
     }
-
 
     public function messages()
     {
         return [
-            'comment.required' => 'comment is require',
-            'comment.max' => 'comment is too long',
-            'match_id.required' => 'match_id is require',
+            'email.required' => 'Email is require',
+            'email.email' => 'Must be email',
+
+            'password.required' => 'password is require',
         ];
     }
 }
