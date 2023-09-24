@@ -114,7 +114,6 @@ class AuthController extends Controller
             if (!$preUser) {
                 throw new Exception("Failed pre user create", 500);
             }
-
             MailSendJob::dispatch($preUser->id, $request->name, $request->email);
 
             return response()->json(
