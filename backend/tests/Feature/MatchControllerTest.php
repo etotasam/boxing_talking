@@ -12,7 +12,6 @@ class MatchControllerTest extends TestCase
 {
 
     use RefreshDatabase;
-    use WithFaker;
 
 
     protected function setUp(): void

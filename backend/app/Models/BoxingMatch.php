@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Comment;
+use App\Models\Title;
 use Illuminate\Support\Facades\Log;
 
 class BoxingMatch extends Model
@@ -37,6 +38,11 @@ class BoxingMatch extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class, 'match_id');
+    }
+
+    public function title()
+    {
+        return $this->hasOne(Title::class, 'match_id');
     }
 
 

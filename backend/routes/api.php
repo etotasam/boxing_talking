@@ -58,13 +58,4 @@ Route::middleware('administrator')->group(function () {
 });
 
 
-// Route::get('/test', function () {
-
-//     try {
-//         return response()->json(["message" => "era-"], 500);
-//         $url = config('app.url');
-//         return $url;
-//     } catch (Exception $e) {
-//         return response()->json(["message" => $e->getMessage()], 500);
-//     }
-// });
+Route::get('/test', [BoxerController::class, 'test']);

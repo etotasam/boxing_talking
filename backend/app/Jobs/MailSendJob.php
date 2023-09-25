@@ -21,13 +21,15 @@ class MailSendJob implements ShouldQueue
 
     public $tries = 3;
 
-    protected $email;
-    protected $name;
-    protected $userID;
-    protected $token;
+    public $userID;
+    public $name;
+    public $email;
     /**
      * Create a new job instance.
      *
+     * @param  int  $userId
+     * @param  string  $name
+     * @param  string  $email
      * @return void
      */
     public function __construct($userID, $name, $email)
@@ -52,7 +54,7 @@ class MailSendJob implements ShouldQueue
             ];
             $secretKey = config('const.jwt_secret_key');
             $token = JWT::encode($payload, $secretKey, 'HS256');
-            Mail::to($this->email)->send(new Mailer($this->name, $token));
+            Mail::to($this->email)->send(new Mailer($this->name,  $token));
         } catch (Exception $e) {
             $preUser = PreUser::find($this->userID);
             if ($preUser) {

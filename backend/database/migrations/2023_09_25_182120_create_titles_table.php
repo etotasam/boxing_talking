@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ChangeColumnIdTypeGurestUsersTable extends Migration
+class CreateTitlesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class ChangeColumnIdTypeGurestUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('guest_users', function (Blueprint $table) {
-            $table->uuid('id')->change();
+        Schema::create('titles', function (Blueprint $table) {
+            $table->unsignedBigInteger('boxer_id');
+            $table->unsignedBigInteger('organization_id');
+            $table->unsignedBigInteger('weight_division_id');
         });
     }
 
@@ -25,8 +27,6 @@ class ChangeColumnIdTypeGurestUsersTable extends Migration
      */
     public function down()
     {
-        Schema::table('guest_users', function (Blueprint $table) {
-            $table->id();
-        });
+        Schema::dropIfExists('titles');
     }
 }

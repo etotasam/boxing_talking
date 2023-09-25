@@ -1,18 +1,19 @@
 <?php
 
-// namespace Tests\Feature;
+namespace CommentController;
+
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use App\Models\User;
+use App\Models\GuestUser;
 use App\Models\BoxingMatch;
 use App\Models\Boxer;
 use App\Models\Comment;
-use App\Models\User;
-use App\Models\GuestUser;
 
-class CommentControllerTest extends TestCase
+class CommentPostTest extends TestCase
 {
-
     use RefreshDatabase;
 
     protected function setUp(): void
@@ -41,24 +42,9 @@ class CommentControllerTest extends TestCase
 
     /**
      * @test
+     * 認証なしでのコメント投稿
      */
-    public function commentsFetch(): void
-    {
-        //?存在しない試合IDを指定された場合
-        $response = $this->get('/api/comment?match_id=' . 100);
-        $response->assertStatus(404);
-
-        //?成功
-        $response = $this->get('/api/comment?match_id=' . $this->matches->id);
-        $response->assertStatus(200);
-        $response->assertJsonFragment(['post_user_name' => 'auth_user_name']);
-        $response->assertJsonFragment(['comment' => 'コメント']);
-    }
-
-    /**
-     * @test
-     */
-    public function commentPost(): void
+    public function postWithNoAuth(): void
     {
         //?認証なしでの投稿
         $response = $this
@@ -72,8 +58,14 @@ class CommentControllerTest extends TestCase
             );
         $response->assertStatus(401);
         $this->assertDatabaseMissing('comments', ['match_id' => $this->matches->id, 'comment' => '認証なし投稿']);
+    }
 
-        //?ログインユーザーによるコメント投稿
+    /**
+     * @test
+     * ログインユーザーによるコメント投稿
+     */
+    public function postByLoginUser(): void
+    {
         $response = $this->actingAs($this->user)
             ->post(
                 '/api/comment',
@@ -85,8 +77,13 @@ class CommentControllerTest extends TestCase
             );
         $response->assertSuccessful(200);
         $this->assertDatabaseHas('comments', ['user_id' => $this->user->id, 'match_id' => $this->matches->id, 'comment' => 'コメント投稿']);
-
-        //?ゲストユーザーによるコメント投稿
+    }
+    /**
+     * @test
+     * ゲストによるコメント投稿
+     */
+    public function postByGuestUser(): void
+    {
         $response = $this->actingAs($this->guest, 'guest')
             ->post(
                 '/api/comment',
