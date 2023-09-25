@@ -50,6 +50,12 @@ export const useToastModal = () => {
     })
   }
 
+  const showToastModalMessage = ({ message, bgColor }: { message: MessageType, bgColor: BgColorType }) => {
+    setter(current => {
+      return { ...current, message, bgColor, isShow: true }
+    })
+  }
 
-  return { showToastModal, hideToastModal, messageOnToast, bgColor, resetToastModalToDefault, isShowToastModal, setToastModal }
+
+  return { showToastModal, hideToastModal, messageOnToast, bgColor, resetToastModalToDefault, isShowToastModal, setToastModal, showToastModalMessage }
 }

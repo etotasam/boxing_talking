@@ -8,6 +8,7 @@ import {
   BG_COLOR_ON_TOAST_MODAL,
   MESSAGE,
 } from '@/assets/statusesOnToastModal';
+import { initialBoxerDataOnForm } from '@/assets/boxerData';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 //! layout
@@ -26,7 +27,8 @@ export const BoxerRegister = () => {
   const { setter: setPagePath } = usePagePath();
   const { resetLoadingState } = useLoading();
   const { pathname } = useLocation();
-  const { state: boxerDataOnForm } = useBoxerDataOnForm();
+  const { state: boxerDataOnForm, setter: setEditTargetBoxerData } =
+    useBoxerDataOnForm();
   const { setToastModal, showToastModal, hideToastModal } = useToastModal();
   const { registerBoxer, isSuccess: successRegisterBoxer } = useRegisterBoxer();
 
@@ -40,11 +42,14 @@ export const BoxerRegister = () => {
   }, []);
 
   // ? アンマウント時にはトーストモーダルを隠す
+  //? form内データをデフォルトに戻す
   useEffect(() => {
     return () => {
       hideToastModal();
+      setEditTargetBoxerData(initialBoxerDataOnForm);
     };
   }, []);
+
   //! formデータのsubmit
   /**
    * sendData
