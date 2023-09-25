@@ -2,41 +2,17 @@ import { useEffect, useState } from 'react';
 import { cloneDeep } from 'lodash';
 // ! data
 import { ORGANIZATIONS, WEIGHT_CLASS } from '@/assets/boxerData';
-// ! types
-// import { TitleType } from "@/assets/types";
+
 // ! hooks
 import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
-// ! recoil
-import { useSetRecoilState, useRecoilValue } from 'recoil';
-import { boxerDataOnFormSelector } from '@/store/boxerDataOnFormState';
-
-// type PropsType = {
-//   setTitles: React.Dispatch<React.SetStateAction<TitleType[]>>;
-//   titles: TitleType[];
-// };
 
 export const TitleSelector = () => {
   // ! use hook
-  // const { state: boxerDataOnForm, setter: setBoxerDataToForm } =
-  //   useBoxerDataOnForm();
-  // ? タイトル保持かどうかチェックボックスの値 useState
-  // const [hasBelt, setHasBelt] = useState(true);
   // ? タイトル入力欄(<input> <select>)の数を決める useState
   const [countHasBelt, setCountHasBelt] = useState(1);
-  //?recoil
-  const boxerDataOnForm = useRecoilValue(boxerDataOnFormSelector);
-  const setBoxerDataOnForm = useSetRecoilState(boxerDataOnFormSelector);
 
-  const [titlesState, setTitlesState] = useState<
-    { organization: string | undefined; weight: string | undefined }[]
-  >(boxerDataOnForm.titles);
-  // console.log(titlesState);
-
-  useEffect(() => {
-    setBoxerDataOnForm((boxerData) => {
-      return { ...boxerData, titles: titlesState };
-    });
-  }, [titlesState]);
+  const { state: boxerDataOnForm, setter: setBoxerDataOnForm } =
+    useBoxerDataOnForm();
 
   // ? 団体と階級を選択した場合入力欄を追加
   useEffect(() => {
@@ -68,17 +44,17 @@ export const TitleSelector = () => {
                     : ''
                 }
                 onChange={(e) =>
-                  setTitlesState((titles) => {
-                    const cloneTitles = cloneDeep(titles);
+                  setBoxerDataOnForm((boxerDataOnForm) => {
+                    const cloneBoxerDataOnForm = cloneDeep(boxerDataOnForm);
                     if (!e.target.value) {
-                      cloneTitles.splice(i, 1);
-                      return cloneTitles;
+                      cloneBoxerDataOnForm.titles.splice(i, 1);
+                      return cloneBoxerDataOnForm;
                     }
-                    cloneTitles[i] = {
-                      ...titles[i],
+                    cloneBoxerDataOnForm.titles[i] = {
+                      ...cloneBoxerDataOnForm.titles[i],
                       organization: e.target.value,
                     };
-                    return cloneTitles;
+                    return cloneBoxerDataOnForm;
                   })
                 }
               >
@@ -103,14 +79,17 @@ export const TitleSelector = () => {
                     : ''
                 }
                 onChange={(e) =>
-                  setTitlesState((titles) => {
-                    const cloneTitles = cloneDeep(titles);
+                  setBoxerDataOnForm((boxerDataOnForm) => {
+                    const cloneBoxerDataOnForm = cloneDeep(boxerDataOnForm);
                     if (!e.target.value) {
-                      cloneTitles.splice(i, 1);
-                      return cloneTitles;
+                      cloneBoxerDataOnForm.titles.splice(i, 1);
+                      return cloneBoxerDataOnForm;
                     }
-                    cloneTitles[i] = { ...titles[i], weight: e.target.value };
-                    return cloneTitles;
+                    cloneBoxerDataOnForm.titles[i] = {
+                      ...cloneBoxerDataOnForm.titles[i],
+                      weight: e.target.value,
+                    };
+                    return cloneBoxerDataOnForm;
                   })
                 }
               >
