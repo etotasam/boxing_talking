@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 // requests
 use App\Http\Requests\BoxerRequest;
 
+use App\Http\Resources\BoxerResource;
+
 class BoxerController extends Controller
 {
 
@@ -53,7 +55,7 @@ class BoxerController extends Controller
     public function fetch(Request $request)
     {
         try {
-            $boxers = $this->boxer->search($request->name, $request->country, $request->limit, $request->page);
+            $boxers = $this->boxer->getBoxersByNameAndCountry($request->name, $request->country, $request->limit, $request->page);
             return response()->json($boxers, 200);
         } catch (Exception $e) {
             if ($e->getCode()) {
@@ -179,6 +181,21 @@ class BoxerController extends Controller
                 return response()->json(["message" => $e->getMessage()], $e->getCode());
             }
             return response()->json(["message" => "Failed fighter update"], 500);
+        }
+    }
+
+
+
+
+    public function test()
+    {
+        try {
+
+            // $boxer = $this->boxer->getBoxerWithTitles(11);
+
+            // return response()->json($boxer);
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage()], 500);
         }
     }
 }
