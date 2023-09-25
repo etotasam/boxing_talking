@@ -15,9 +15,9 @@ import { useLoading } from "./useLoading"
 import { useToastModal } from "./useToastModal";
 import { MESSAGE, STATUS, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal";
 // //! types
-import type { BoxerDataOnFormType, BoxerType, NationalityType } from "@/assets/types"
+import type { BoxerType, NationalityType } from "@/assets/types"
 // ! functions
-import { convertToBoxerData } from "@/assets/functions";
+// import { convertToBoxerData } from "@/assets/functions";
 
 
 //! 選手データ取得 and 登録済み選手の数を取得
@@ -82,9 +82,9 @@ export const useUpdateBoxerData = () => {
       startLoading()
     }
   })
-  const updateFighter = (updateFighterData: BoxerDataOnFormType) => {
-    const convertedBoxerData = convertToBoxerData(updateFighterData)
-    mutate(convertedBoxerData, {
+  const updateFighter = (updateFighterData: BoxerType) => {
+    // const convertedBoxerData = convertToBoxerData(updateFighterData)
+    mutate(updateFighterData, {
       onSuccess: () => {
         refetchReactQueryArrayKeys([QUERY_KEY.matchesFetch, QUERY_KEY.boxer])
         resetLoadingState()
@@ -117,9 +117,9 @@ export const useRegisterBoxer = () => {
       startLoading()
     }
   })
-  const registerBoxer = (newBoxerData: BoxerDataOnFormType) => {
-    const convertedBoxerDataBoxerData = convertToBoxerData(newBoxerData)
-    mutate(convertedBoxerDataBoxerData, {
+  const registerBoxer = (newBoxerData: BoxerType) => {
+    // const convertedBoxerDataBoxerData = convertToBoxerData(newBoxerData)
+    mutate(newBoxerData, {
       onSuccess: () => {
         successful()
         resetLoadingState()
@@ -173,7 +173,7 @@ export const useDeleteBoxer = () => {
   // const query = new URLSearchParams(search);
   // const paramPage = Number(query.get("page"));
   //? api
-  const api = async (boxerData: BoxerType | BoxerDataOnFormType): Promise<void> => {
+  const api = async (boxerData: BoxerType): Promise<void> => {
     await Axios.delete<void>('/api/boxer', { data: { boxer_id: boxerData.id, eng_name: boxerData.eng_name } }).then(v => v.data)
   }
 
@@ -182,7 +182,7 @@ export const useDeleteBoxer = () => {
       startLoading()
     }
   })
-  const deleteBoxer = (boxerData: BoxerType | BoxerDataOnFormType) => {
+  const deleteBoxer = (boxerData: BoxerType) => {
     mutate(boxerData, {
       onSuccess: async () => {
         resetLoadingState()

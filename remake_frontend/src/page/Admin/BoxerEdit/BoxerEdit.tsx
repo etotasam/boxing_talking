@@ -9,7 +9,7 @@ import {
 } from '@/assets/statusesOnToastModal';
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
 // ! functions
-import { getBoxerDataWithID, convertToBoxerData } from '@/assets/functions';
+import { getBoxerDataWithID } from '@/assets/functions';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 import { usePagePath } from '@/hooks/usePagePath';
@@ -18,7 +18,6 @@ import {
   useFetchBoxer,
   useUpdateBoxerData,
   useDeleteBoxer,
-  // limit,
 } from '@/hooks/useBoxer';
 import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 //! types
@@ -26,7 +25,7 @@ import { BoxerType } from '@/assets/types';
 //! layout
 import AdminLayout from '@/layout/AdminLayout';
 //! component
-// import { FlagImage } from "@/components/atomic/FlagImage";
+
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { Confirm } from '@/components/modal/Confirm';
@@ -44,21 +43,11 @@ export const BoxerEdit = () => {
     useBoxerDataOnForm();
   const { updateFighter } = useUpdateBoxerData();
   const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
-  const {
-    boxersData,
-    pageCount,
-    // refetch: refetchBoxers
-    // isRefetching: isRefetchingBoxerData,
-  } = useFetchBoxer();
+  const { boxersData, pageCount } = useFetchBoxer();
   //? 選択したボクサーのidが入る(選手が選択されているかの判断に使用)
   const [checked, setChecked] = useState<number>();
   //? paramsの取得
   const { pathname } = useLocation();
-  // const query = new URLSearchParams(search);
-  // const paramPage = Number(query.get("page"));
-  // const paramName = query.get("name");
-  // const paramCountry = query.get("country");
-  // const navigate = useNavigate();
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -83,18 +72,6 @@ export const BoxerEdit = () => {
       hideToastModal();
     };
   }, []);
-
-  //? 選手データの削除実行
-  // const {
-  //   deleteFighter,
-  //   isLoading: isDeletingFighter,
-  //   isSuccess: isDeleteSuccess,
-  // } = useDeleteFighter();
-
-  // const fighterDelete = async () => {
-  //   setOpenConfirmModal(false);
-  //   deleteFighter(editFighterData!);
-  // };
 
   // ! ボクサーの編集を実行
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -123,8 +100,8 @@ export const BoxerEdit = () => {
       boxerID: editTargetBoxerData.id,
       boxersData: boxersData,
     });
-    const convertedData = convertToBoxerData(editTargetBoxerData);
-    if (isEqual(boxer, convertedData)) {
+    // const convertedData = convertToBoxerData(editTargetBoxerData);
+    if (isEqual(boxer, editTargetBoxerData)) {
       setToastModal({
         message: MESSAGE.BOXER_NOT_EDIT,
         bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
@@ -132,6 +109,9 @@ export const BoxerEdit = () => {
       showToastModal();
       return;
     }
+
+    console.log(editTargetBoxerData);
+    return;
 
     //? ボクサーデータ編集実行
     updateFighter(editTargetBoxerData);

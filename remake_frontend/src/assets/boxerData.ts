@@ -1,4 +1,4 @@
-import { BoxerType, BoxerDataOnFormType } from "./types";
+import { BoxerType } from "./types";
 import { Nationality } from "./NationalFlagData";
 
 export const Stance = {
@@ -45,15 +45,15 @@ export const initialBoxerData: BoxerType = {
   birth: "1990-01-01",
   height: 165,
   reach: 165,
-  title_hold: [],
   style: Stance.Orthodox,
   win: 0,
   ko: 0,
   draw: 0,
   lose: 0,
+  titles: []
 };
 
-export const initialBoxerDataOnForm: BoxerDataOnFormType = {
+export const initialBoxerDataOnForm: BoxerType = {
   id: NaN,
   name: "",
   eng_name: "",
@@ -61,12 +61,12 @@ export const initialBoxerDataOnForm: BoxerDataOnFormType = {
   birth: "1990-01-01",
   height: 165,
   reach: 165,
-  title_hold: [],
   style: Stance.Unknown,
   win: 0,
   ko: 0,
   draw: 0,
   lose: 0,
+  titles: []
 };
 
 export const GRADE = {

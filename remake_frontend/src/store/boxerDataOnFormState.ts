@@ -2,12 +2,12 @@ import { atom, selector } from "recoil";
 // ! data
 import { initialBoxerDataOnForm } from "@/assets/boxerData";
 // ! types
-import { BoxerDataOnFormType } from "@/assets/types";
+import { BoxerType } from "@/assets/types";
 
 
 const initialState = initialBoxerDataOnForm
 
-const boxerDataOnFormState = atom<BoxerDataOnFormType>({
+const boxerDataOnFormState = atom<BoxerType>({
   key: "boxerDataOnFormState",
   default: initialState
 })
