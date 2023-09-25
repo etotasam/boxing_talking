@@ -21,9 +21,9 @@ class MailSendJob implements ShouldQueue
 
     public $tries = 3;
 
-    protected $userID;
-    protected $name;
-    protected $email;
+    public $userID;
+    public $name;
+    public $email;
     /**
      * Create a new job instance.
      *

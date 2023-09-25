@@ -24,8 +24,8 @@ class MailSendJobTest extends TestCase
 
         $this->preUser = PreUser::create([
             "name" => "testName",
-            "email" => "testEmail",
-            "password" => "password"
+            "email" => "testEmail@test.com",
+            "password" => "PassWord1"
         ]);
     }
     /**

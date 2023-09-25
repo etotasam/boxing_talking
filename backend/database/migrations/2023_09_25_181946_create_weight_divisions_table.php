@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ChangeColumnIdTypeGurestUsersTable extends Migration
+class CreateWeightDivisionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,9 @@ class ChangeColumnIdTypeGurestUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('guest_users', function (Blueprint $table) {
-            $table->uuid('id')->change();
+        Schema::create('weight_divisions', function (Blueprint $table) {
+            $table->id();
+            $table->string('weight');
         });
     }
 
@@ -25,8 +26,6 @@ class ChangeColumnIdTypeGurestUsersTable extends Migration
      */
     public function down()
     {
-        Schema::table('guest_users', function (Blueprint $table) {
-            $table->id();
-        });
+        Schema::dropIfExists('weight_divisions');
     }
 }

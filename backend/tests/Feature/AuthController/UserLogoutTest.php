@@ -27,6 +27,7 @@ class UserLogoutTest extends TestCase
 
     /**
      * @test
+     * ログイン状態にない時にログアウトのリクエストは無効にする
      */
     public function failLogoutWhenNotBeLogin()
     {
@@ -37,6 +38,7 @@ class UserLogoutTest extends TestCase
 
     /**
      * @test
+     * ログアウト成功
      */
     public function logoutSuccess()
     {

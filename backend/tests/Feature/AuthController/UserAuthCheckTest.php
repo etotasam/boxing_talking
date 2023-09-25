@@ -28,13 +28,18 @@ class UserAuthCheckTest extends TestCase
       "email" => 'test@test.com',
       "password" => Hash::make("test")
     ]);
+
+    $this->rightEmail = $this->user->email;
+    $this->rightPassword = 'test';
+    $this->notRightEmail = 'test123@test.com';
+    $this->notRightPassword = 'test123';
   }
 
   /**
    * @test
    * 認証ありの場合
    */
-  public function hasAuth()
+  public function hasAuthCheck()
   {
     $this->actingAs($this->user);
     $response = $this->get('/api/user');
@@ -47,7 +52,7 @@ class UserAuthCheckTest extends TestCase
    * @test
    * 認証なしのテスト
    */
-  public function noAuth()
+  public function noAuthCheck()
   {
     $response = $this->get('/api/user');
     $response->assertSuccessful();
