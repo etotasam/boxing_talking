@@ -3,13 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Exception;
+use Illuminate\Support\Facades\DB;
 // Models
 use App\Models\Boxer;
 use App\Models\BoxingMatch;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Organization;
+use App\Models\WeightDivision;
+use App\Models\Title;
+
 // requests
 use App\Http\Requests\BoxerRequest;
+
+use App\Http\Resources\BoxerResource;
 
 class BoxerController extends Controller
 {
@@ -53,7 +60,7 @@ class BoxerController extends Controller
     public function fetch(Request $request)
     {
         try {
-            $boxers = $this->boxer->search($request->name, $request->country, $request->limit, $request->page);
+            $boxers = $this->boxer->getBoxersByNameAndCountry($request->name, $request->country, $request->limit, $request->page);
             return response()->json($boxers, 200);
         } catch (Exception $e) {
             if ($e->getCode()) {
@@ -170,6 +177,23 @@ class BoxerController extends Controller
                 throw new Exception("Boxer is not exists", 404);
             }
 
+            $formattedBoxerData = $request->toArray();
+            DB::beginTransaction();
+            Title::where('boxer_id', $boxerID)->delete();
+            if ($formattedBoxerData["titles"]) {
+                $formattedBoxerData["titles"]->foreach(function ($title) use ($boxerID) {
+                    $organizationName = $title["organization"];
+                    $organization = Organization::where("name", $organizationName);
+                    $weightDivisionWeight = $title["weight"];
+                    $weightDivision = WeightDivision::where("weight", $weightDivisionWeight);
+                    Title::create([
+                        "boxer_id" => $boxerID,
+                        "organization_id" => $organization["id"],
+                        "weight_division_id" => $weightDivision["id"]
+                    ]);
+                });
+            }
+
             $updateBoxer = $request->toArray();
 
             $boxer->update($updateBoxer);
@@ -179,6 +203,21 @@ class BoxerController extends Controller
                 return response()->json(["message" => $e->getMessage()], $e->getCode());
             }
             return response()->json(["message" => "Failed fighter update"], 500);
+        }
+    }
+
+
+
+
+    public function test()
+    {
+        try {
+
+            // $boxer = $this->boxer->getBoxerWithTitles(11);
+
+            // return response()->json($boxer);
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage()], 500);
         }
     }
 }

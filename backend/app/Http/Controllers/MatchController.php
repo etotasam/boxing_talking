@@ -19,9 +19,10 @@ use \Symfony\Component\HttpFoundation\Response;
 class MatchController extends Controller
 {
 
-    public function __construct(BoxingMatch $match)
+    public function __construct(BoxingMatch $match, Boxer $boxer)
     {
         $this->match = $match;
+        $this->boxer = $boxer;
     }
 
     // ! 保有タイトルを配列にして返す
@@ -62,8 +63,8 @@ class MatchController extends Controller
             $formattedMatches = $matches->map(function ($item, $key) {
                 $redID = $item->red_boxer_id;
                 $blueID = $item->blue_boxer_id;
-                $redBoxer = Boxer::find($redID);
-                $blueBoxer = Boxer::find($blueID);
+                $redBoxer = $this->boxer->getBoxerWithTitles($redID);
+                $blueBoxer = $this->boxer->getBoxerWithTitles($blueID);
                 $titles = $item->titles;
 
                 return  [
@@ -106,8 +107,8 @@ class MatchController extends Controller
         $formattedMatches = $matches->map(function ($item, $key) {
             $redID = $item->red_boxer_id;
             $blueID = $item->blue_boxer_id;
-            $redBoxer = Boxer::find($redID);
-            $blueBoxer = Boxer::find($blueID);
+            $redBoxer = $this->boxer->getBoxerWithTitles($redID);
+            $blueBoxer = $this->boxer->getBoxerWithTitles($blueID);
             $titles = $item->titles;
 
             return  [

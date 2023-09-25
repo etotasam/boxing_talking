@@ -42,6 +42,8 @@ class User extends Authenticatable
         'updated_at'
     ];
 
+
+
     /**
      * The attributes that should be cast.
      *
