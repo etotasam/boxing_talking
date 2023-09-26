@@ -15,9 +15,14 @@ class Title extends Model
 
     public $timestamps = false;
 
+    protected $fillable = [
+        'boxer_id',
+        'organization_id',
+        'weight_division_id',
+    ];
+
     protected $hidden = [
         'boxer_id',
-        'match_id'
     ];
 
 

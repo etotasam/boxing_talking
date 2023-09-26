@@ -71,7 +71,7 @@ export const useFetchBoxer = () => {
 // //! 選手データ更新
 export const useUpdateBoxerData = () => {
   const { startLoading, resetLoadingState } = useLoading()
-  const { refetchReactQueryArrayKeys } = useReactQuery()
+  const { refetchReactQueryArrayKeys, refetchReactQueryData } = useReactQuery()
   //? params page の取得
   const { setToastModal, showToastModal } = useToastModal()
   const api = async (updateFighterData: BoxerType): Promise<void> => {
@@ -86,8 +86,8 @@ export const useUpdateBoxerData = () => {
     // const convertedBoxerData = convertToBoxerData(updateFighterData)
     mutate(updateFighterData, {
       onSuccess: () => {
-        refetchReactQueryArrayKeys([QUERY_KEY.matchesFetch, QUERY_KEY.boxer])
         resetLoadingState()
+        refetchReactQueryArrayKeys([QUERY_KEY.matchesFetch, QUERY_KEY.boxer])
         setToastModal({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS });
         showToastModal()
       },
@@ -108,7 +108,7 @@ export const useRegisterBoxer = () => {
   const { showToastModal } = useToastModal()
   // const { count: fightersCount } = useFetchBoxer()
   const { setToastModal } = useToastModal()
-  const api = useCallback(async (newBoxerData: BoxerType): Promise<void> => {
+  const api = useCallback(async (newBoxerData: Omit<BoxerType, "id">): Promise<void> => {
     await Axios.post<void>("/api/boxer", newBoxerData).then(v => v.data)
     // return res
   }, []);
@@ -117,7 +117,7 @@ export const useRegisterBoxer = () => {
       startLoading()
     }
   })
-  const registerBoxer = (newBoxerData: BoxerType) => {
+  const registerBoxer = (newBoxerData: Omit<BoxerType, "id">) => {
     // const convertedBoxerDataBoxerData = convertToBoxerData(newBoxerData)
     mutate(newBoxerData, {
       onSuccess: () => {

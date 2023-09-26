@@ -12,19 +12,21 @@ use App\Models\BoxingMatch;
 use App\Models\Organization;
 use App\Models\WeightDivision;
 use App\Models\Title;
-
 // requests
 use App\Http\Requests\BoxerRequest;
+// Services
+use App\Services\BoxerService;
 
-use App\Http\Resources\BoxerResource;
+use function PHPUnit\Framework\isEmpty;
 
 class BoxerController extends Controller
 {
 
-    public function __construct(Boxer $boxer, BoxingMatch $match)
+    public function __construct(Boxer $boxer, BoxingMatch $match, BoxerService $boxerService)
     {
         $this->boxer = $boxer;
         $this->match = $match;
+        $this->boxerService = $boxerService;
     }
 
     //? name eng_name countryで検索出来るqueryを作る
@@ -114,12 +116,19 @@ class BoxerController extends Controller
     public function register(BoxerRequest $request)
     {
         try {
-            $boxer = $request->all();
-            $this->boxer->create($boxer);
-            return response()->json(["message" => "created fighter"], 200);
+            $boxer = $request->toArray();
+            DB::beginTransaction();
+            $newBoxer = $this->boxer->create($boxer);
+            $this->boxerService->setTitle($newBoxer["id"], $boxer["titles"]);
+            DB::commit();
+            return response()->json(["message" => "Success created boxer"], 200);
         } catch (Exception $e) {
+            DB::rollBack();
             if ($e->getCode() === 406) {
                 return response()->json(["message" => $e->getMessage()], 406);
+            }
+            if ($e->getCode()) {
+                return response()->json(["message" => $e->getMessage()], $e->getCode());
             }
             return response()->json(["message" => "Failed boxer register"], 500);
         }
@@ -169,36 +178,25 @@ class BoxerController extends Controller
      */
     public function update(Request $request)
     {
-        // throw new Exception();
         try {
+            DB::beginTransaction();
             $boxerID = $request->id;
             $boxer = $this->boxer->find($boxerID);
             if (!$boxer) {
                 throw new Exception("Boxer is not exists", 404);
             }
 
-            $formattedBoxerData = $request->toArray();
-            DB::beginTransaction();
-            Title::where('boxer_id', $boxerID)->delete();
-            if ($formattedBoxerData["titles"]) {
-                $formattedBoxerData["titles"]->foreach(function ($title) use ($boxerID) {
-                    $organizationName = $title["organization"];
-                    $organization = Organization::where("name", $organizationName);
-                    $weightDivisionWeight = $title["weight"];
-                    $weightDivision = WeightDivision::where("weight", $weightDivisionWeight);
-                    Title::create([
-                        "boxer_id" => $boxerID,
-                        "organization_id" => $organization["id"],
-                        "weight_division_id" => $weightDivision["id"]
-                    ]);
-                });
-            }
+            $updateBoxerData = $request->toArray();
+            \Log::error($updateBoxerData["titles"]);
+            $this->boxerService->setTitle($boxerID, $updateBoxerData["titles"]);
 
-            $updateBoxer = $request->toArray();
+            unset($updateBoxerData["titles"]);
 
-            $boxer->update($updateBoxer);
+            $boxer->update($updateBoxerData);
+            DB::commit();
             return response()->json(["message" => "boxer updated"], 200);
         } catch (Exception $e) {
+            DB::rollBack();
             if ($e->getCode()) {
                 return response()->json(["message" => $e->getMessage()], $e->getCode());
             }

@@ -21,7 +21,7 @@ import {
 } from '@/hooks/useBoxer';
 import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 //! types
-import { BoxerType } from '@/assets/types';
+import { BoxerType, MessageType } from '@/assets/types';
 //! layout
 import AdminLayout from '@/layout/AdminLayout';
 //! component
@@ -79,28 +79,20 @@ export const BoxerEdit = () => {
     };
   }, []);
 
-  // ? 選手が選択されていない時モーダル表示
+  // ? 選手が選択されていない時
   const showModalIfBoxerNotSelected = () => {
     if (!isSelectBoxer) {
-      showToastModalMessage({
-        message: MESSAGE.BOXER_NO_SELECTED,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
-      });
-      return;
+      throw new Error(MESSAGE.BOXER_NO_SELECTED);
     }
   };
 
-  //? 名前が空の時モーダル表示
+  //? 名前が空の時
   const showModalIfNameUndefined = () => {
     if (!editTargetBoxerData.name || !editTargetBoxerData.eng_name) {
-      showToastModalMessage({
-        message: MESSAGE.BOXER_NAME_UNDEFINED,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
-      });
-      return;
+      throw new Error(MESSAGE.BOXER_NAME_UNDEFINED);
     }
   };
-  //? データ変更がされていない時モーダル表示
+  //? データ変更がされていない時
   const showModalIfNotUpdateBoxerData = () => {
     if (!boxersData) return console.error('No have boxers data');
 
@@ -110,26 +102,26 @@ export const BoxerEdit = () => {
     });
 
     if (isEqual(boxer, editTargetBoxerData)) {
-      showToastModalMessage({
-        message: MESSAGE.BOXER_NOT_EDIT,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
-      });
-      return;
+      throw new Error(MESSAGE.BOXER_NOT_EDIT);
     }
   };
 
   // ! ボクサーの編集を実行
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    showModalIfBoxerNotSelected();
-    showModalIfNameUndefined();
-    showModalIfNotUpdateBoxerData();
-
-    console.log(editTargetBoxerData);
-    return;
-
-    //? ボクサーデータ編集実行
-    updateFighter(editTargetBoxerData);
+    try {
+      showModalIfBoxerNotSelected();
+      showModalIfNameUndefined();
+      showModalIfNotUpdateBoxerData();
+      //? ボクサーデータ編集実行
+      updateFighter(editTargetBoxerData);
+    } catch (error: any) {
+      if (!error.message) return;
+      showToastModalMessage({
+        message: error.message as MessageType,
+        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
+      });
+    }
   };
 
   const [isShowDeleteConfirmModal, setIsShowDeleteConfirmModal] =
