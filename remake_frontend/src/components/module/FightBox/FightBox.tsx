@@ -85,7 +85,7 @@ const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
           <h2 className="text-2xl after:content-['(日本時間)'] after:absolute after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] after:text-sm">
             {dayjs(matchData.match_date).format('YYYY年M月D日')}
           </h2>
-          {matchData.titles.length > 0 && (
+          {Boolean(matchData.titles.length) && (
             <span className="absolute top-[-32px] left-[50%] translate-x-[-50%] w-[32px] h-[32px] mr-2">
               <img src={crown} alt="" />
             </span>
@@ -96,8 +96,8 @@ const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
         <div className="text-center text-xl mt-5">
           {matchData.grade === 'タイトルマッチ' ? (
             <ul className="flex flex-col">
-              {matchData.titles.sort().map((title) => (
-                <li key={title} className="mt-1">
+              {matchData.titles.sort().map((title, index) => (
+                <li key={index} className="mt-1">
                   <div className="relative inline-block text-[18px]">
                     <span className="absolute top-[4px] right-[-28px] w-[18px] h-[18px] mr-2">
                       <img src={crown} alt="" />

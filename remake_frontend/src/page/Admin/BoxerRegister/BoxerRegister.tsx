@@ -71,11 +71,6 @@ export const BoxerRegister = () => {
   };
 
   //! formデータのsubmit
-  /**
-   * sendData
-   * @param e Event
-   * @returns void
-   */
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {

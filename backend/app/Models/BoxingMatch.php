@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Comment;
-use App\Models\Title;
+use App\Models\TitleMatch;
+use App\Models\Organization;
 use Illuminate\Support\Facades\Log;
 
 class BoxingMatch extends Model
@@ -40,30 +41,30 @@ class BoxingMatch extends Model
         return $this->hasMany(Comment::class, 'match_id');
     }
 
-    public function title()
+    public function organization()
     {
-        return $this->hasOne(Title::class, 'match_id');
+        return $this->belongsToMany(Organization::class, 'title_matches', 'match_id');
     }
 
 
     // ! 保有タイトルを配列にして返す
-    protected function getTitlesAttribute($titles)
-    {
-        if (empty($titles)) {
-            $titles = [];
-        } else {
-            $titles = explode('/', $titles);
-        };
-        return $titles;
-    }
+    // protected function getTitlesAttribute($titles)
+    // {
+    //     if (empty($titles)) {
+    //         $titles = [];
+    //     } else {
+    //         $titles = explode('/', $titles);
+    //     };
+    //     return $titles;
+    // }
 
     // ! 配列で受けた保有タイトルを文字列に変換してDBに保存する 
-    protected function setTitlesAttribute($titles)
-    {
-        $formattedTitles = implode('/', $titles);
-        if (empty($formattedTitles)) {
-            $formattedTitles = null;
-        }
-        $this->attributes['titles'] = $formattedTitles;
-    }
+    // protected function setTitlesAttribute($titles)
+    // {
+    //     $formattedTitles = implode('/', $titles);
+    //     if (empty($formattedTitles)) {
+    //         $formattedTitles = null;
+    //     }
+    //     $this->attributes['titles'] = $formattedTitles;
+    // }
 }

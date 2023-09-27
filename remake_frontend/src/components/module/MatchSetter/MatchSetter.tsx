@@ -144,14 +144,14 @@ export const MatchSetter = ({
     }
 
     // ? 保持タイトルをデータベース保存様にフォーマット
-    let formattedBelt;
-    if (belt.length) {
-      formattedBelt = belt.map((title) => {
-        return `${title}世界${matchWeight!}級`;
-      });
-    } else {
-      formattedBelt = cloneDeep(belt);
-    }
+    // let formattedBelt;
+    // if (belt.length) {
+    //   formattedBelt = belt.map((title) => {
+    //     return `${title}世界${matchWeight!}級`;
+    //   });
+    // } else {
+    //   formattedBelt = cloneDeep(belt);
+    // }
 
     //? selectMatchから必要なプロパティだけ抽出
     const matchProperty = [
@@ -171,7 +171,7 @@ export const MatchSetter = ({
       match_date: matchDate,
       venue: matchVenue,
       weight: matchWeight,
-      titles: formattedBelt,
+      titles: belt,
     };
 
     //? 現在のmatchデータと変更データを比較して、変更があるプロパティだけを抽出

@@ -130,7 +130,7 @@ export const useRegisterBoxer = () => {
       onError: (error: any) => {
         resetLoadingState()
         if (error.status === 422) {
-          const errors = error.data.errors as any
+          const errors = error.data.message as any
           if (errors.name) {
             if ((errors.name as string[]).includes('name is already exists')) {
               setToastModal({ message: MESSAGE.BOXER_IS_ALREADY_EXISTS, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })

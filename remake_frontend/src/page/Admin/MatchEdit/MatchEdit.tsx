@@ -219,8 +219,8 @@ export const SelectedMatchInfo = ({
         <div className="text-center text-xl mt-5">
           {matchData.grade === 'タイトルマッチ' ? (
             <ul className="flex flex-col">
-              {matchData.titles.sort().map((title) => (
-                <li key={title} className="mt-1">
+              {matchData.titles.sort().map((title, index) => (
+                <li key={index} className="mt-1">
                   <div className="relative inline-block lg:text-[18px] text-[16px]">
                     <span className="absolute top-[4px] right-[-28px] w-[18px] h-[18px] mr-2">
                       <img src={crown} alt="" />

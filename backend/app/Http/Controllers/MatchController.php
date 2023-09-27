@@ -3,37 +3,29 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-
 // Models
 use App\Models\BoxingMatch;
+use App\Models\TitleMatch;
 use App\Models\Boxer;
 use App\Models\Comment;
 use App\Models\WinLossPrediction;
 use App\Models\Administrator;
 use Exception;
-
-use \Symfony\Component\HttpFoundation\Response;
+//Service
+use App\Services\MatchService;
 
 class MatchController extends Controller
 {
 
-    public function __construct(BoxingMatch $match, Boxer $boxer)
+    public function __construct(BoxingMatch $match, Boxer $boxer, TitleMatch $titleMatch, MatchService $matchService)
     {
         $this->match = $match;
         $this->boxer = $boxer;
-    }
-
-    // ! 保有タイトルを配列にして返す
-    protected function toArrayTitles($boxer)
-    {
-        if (empty($boxer->title_hold)) {
-            $boxer->title_hold = [];
-        } else {
-            $boxer->title_hold = explode('/', $boxer->title_hold);
-        };
-        return $boxer;
+        $this->titleMatch = $titleMatch;
+        $this->matchService = $matchService;
     }
 
     /**
@@ -43,44 +35,10 @@ class MatchController extends Controller
      */
     public function fetch(Request $request)
     {
-
         try {
             $range = $request->range;
-            if ($range == "all") {
-                if (Auth::user()->administrator) {
-                    $matches = BoxingMatch::orderBy('match_date')->get();
-                } else {
-                    return response()->json(["success" => false, "message" => "Cannot get all matches without auth administrator"], 401);
-                }
-            } else if ($range == "past") {
-                $fetchRange = date('Y-m-d', strtotime('-1 week'));
-                $matches = BoxingMatch::where('match_date', '<', $fetchRange)->orderBy('match_date')->get();
-            } else {
-                $fetchRange = date('Y-m-d', strtotime('-1 week'));
-                $matches = BoxingMatch::where('match_date', '>', $fetchRange)->orderBy('match_date')->get();
-            }
-
-            $formattedMatches = $matches->map(function ($item, $key) {
-                $redID = $item->red_boxer_id;
-                $blueID = $item->blue_boxer_id;
-                $redBoxer = $this->boxer->getBoxerWithTitles($redID);
-                $blueBoxer = $this->boxer->getBoxerWithTitles($blueID);
-                $titles = $item->titles;
-
-                return  [
-                    "id" => $item->id,
-                    "red_boxer" => $redBoxer,
-                    "blue_boxer" => $blueBoxer,
-                    "country" => $item->country,
-                    "venue" => $item->venue,
-                    "grade" => $item->grade,
-                    "titles" => $titles,
-                    "weight" => $item->weight,
-                    "match_date" => $item->match_date,
-                    "count_red" => $item->count_red,
-                    "count_blue" => $item->count_blue
-                ];
-            });
+            $matches = $this->matchService->getMatches($range);
+            $formattedMatches = $this->matchService->formatMatches($matches);
             return response()->json($formattedMatches);
         } catch (Exception $e) {
             if ($e->getCode()) {
@@ -91,44 +49,6 @@ class MatchController extends Controller
     }
 
     /**
-     * fetch past matches from DB
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function fetchArchiveMatches()
-    {
-        // throw new Exception();
-
-        // \Log::debug();
-        //? 管理者の場合のみ過去の試合を含めすべての試合を取得する
-        $fetchRange = date('Y-m-d', strtotime('-1 week'));
-        $matches = BoxingMatch::where('match_date', '<', $fetchRange)->orderBy('match_date')->get();
-
-        $formattedMatches = $matches->map(function ($item, $key) {
-            $redID = $item->red_boxer_id;
-            $blueID = $item->blue_boxer_id;
-            $redBoxer = $this->boxer->getBoxerWithTitles($redID);
-            $blueBoxer = $this->boxer->getBoxerWithTitles($blueID);
-            $titles = $item->titles;
-
-            return  [
-                "id" => $item->id,
-                "red_boxer" => $redBoxer,
-                "blue_boxer" => $blueBoxer,
-                "country" => $item->country,
-                "venue" => $item->venue,
-                "grade" => $item->grade,
-                "titles" => $titles,
-                "weight" => $item->weight,
-                "match_date" => $item->match_date,
-                "count_red" => $item->count_red,
-                "count_blue" => $item->count_blue
-            ];
-        });
-        return response()->json($formattedMatches);
-    }
-
-    /**
      * register match.
      *
      * @return \Illuminate\Http\Response
@@ -136,19 +56,23 @@ class MatchController extends Controller
     public function register(Request $request)
     {
         try {
-            $match = $request->all();
-            try {
-                $this->match->create($match);
-            } catch (Exception $e) {
-                throw new Exception("Catch error when register");
-            }
+            DB::beginTransaction();
+            $registerMatch = $request->toArray();
+            $organizationsArray = $this->matchService->getOrganizationsArray($registerMatch);
+
+            unset($registerMatch['titles']);
+            $createdMatch = $this->match->create($registerMatch);
+
+            $this->matchService->createTitleOfMatch($organizationsArray, $createdMatch["id"]);
+            DB::commit();
             return response()->json(["message" => "success"], 200);
         } catch (Exception $e) {
+            DB::rollBack();
             if ($e->getCode()) {
-                return response()->json(["message" => $e->getMessage()], Response::HTTP_NOT_IMPLEMENTED);
+                return response()->json(["message" => $e->getMessage()], $e->getCode());
             }
         };
-        return response()->json(["message" => " Failed match register"], 500);
+        return response()->json(["message" => "Failed match register"], 500);
     }
 
     /**
@@ -168,13 +92,19 @@ class MatchController extends Controller
                 throw new Exception("unauthorize", 406);
             }
 
-
             $matchID = $request->match_id;
             DB::beginTransaction();
             //? 削除対象の試合に付いているコメントを削除する
             Comment::where("match_id", $matchID)->delete();
             //? 削除対象の試合に付いている勝敗予想を削除する
             WinLossPrediction::where("match_id", $matchID)->delete();
+
+            //? 削除対象の試合に付いているタイトルを削除
+            $titles = $this->titleMatch->where('match_id', $matchID)->get();
+            if (!$titles->isEmpty()) {
+                $idsToDelete = $titles->pluck('match_id')->toArray();
+                $this->titleMatch->whereIn('match_id', $idsToDelete)->delete();
+            }
 
             $match = BoxingMatch::find($matchID);
             if (!isset($match)) {
@@ -202,16 +132,47 @@ class MatchController extends Controller
     public function update(Request $request)
     {
         try {
-            $id = $request->match_id;
+            $requestArray = $request->toArray();
+            $id = $requestArray['match_id'];
             $match = $this->match->find($id);
             if (!$match) {
-                return response()->json(["success" => false, "message" => "Match is not exists"], 404);
+                throw new Exception("Match is not exists", 404);
             }
-            $updateMatchData = $request->update_match_data;
+            DB::beginTransaction();
+            $updateMatchData = $requestArray['update_match_data'];
+            if (isset($updateMatchData['titles'])) {
+                $this->matchService->createTitleOfMatch($updateMatchData['titles'], $id);
+                unset($updateMatchData['titles']);
+            }
             $match->update($updateMatchData);
+            DB::commit();
             return response()->json(["success" => true, "message" => "Success update match data"], 200);
         } catch (Exception $e) {
-            return response()->json(["message" => $updateMatchData], 500);
+            DB::rollBack();
+            if ($e->getCode()) {
+                return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
+            }
+            return response()->json(["success" => false, "message" => "Failed update match"], 500);
         }
     }
+
+    // public function test(Request $request)
+    // {
+    //     try {
+    //         $id = $request->id;
+
+    //         $match = BoxingMatch::find($id);
+    //         $organizations = $match->organization;
+    //         if (!empty($organizations)) {
+    //             $organizationsArray = $organizations->map(function ($organization) {
+    //                 return $organization->name;
+    //             });
+    //             return $organizationsArray;
+    //         } else {
+    //             return [];
+    //         }
+    //     } catch (Exception $e) {
+    //         return response()->json(["message" => $e->getMessage()], 500);
+    //     }
+    // }
 }

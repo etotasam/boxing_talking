@@ -342,14 +342,14 @@ const MatchDataSetter = ({
       return;
     }
 
-    let formattedBelt;
-    if (belt.length) {
-      formattedBelt = belt.map((title) => {
-        return `${title}世界${matchWeight}級`;
-      });
-    } else {
-      formattedBelt = cloneDeep(belt);
-    }
+    // let formattedBelt;
+    // if (belt.length) {
+    //   formattedBelt = belt.map((title) => {
+    //     return `${title}世界${matchWeight}級`;
+    //   });
+    // } else {
+    //   formattedBelt = cloneDeep(belt);
+    // }
 
     const matchData: RegisterMatchPropsType = {
       red_boxer_id: matchBoxers.red_boxer!.id!,
@@ -359,7 +359,7 @@ const MatchDataSetter = ({
       country: matchPlaceCountry,
       venue: matchVenue,
       weight: matchWeight!,
-      titles: formattedBelt,
+      titles: belt,
     };
     registerMatch(matchData);
   };
