@@ -1,61 +1,93 @@
-import React, { useEffect } from "react";
-import { Outlet } from "react-router-dom";
-import { ToastModal } from "@/components/modal/ToastModal";
-import { motion, AnimatePresence } from "framer-motion";
-import { useQueryClient } from "react-query";
-//! hooks
-import { useFetchMatches } from "@/libs/hooks/useMatches";
-import { useAuth } from "@/libs/hooks/useAuth";
-import { useToastModal } from "@/libs/hooks/useToastModal";
-import { queryKeys } from "@/libs/queryKeys";
+import React, { useEffect } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+// ! hooks
+import { useGuest, useAuthCheck } from '@/hooks/useAuth';
+import { useToastModal } from '@/hooks/useToastModal';
+import { useFetchMatches } from '@/hooks/useMatch';
+import { useAdmin } from '@/hooks/useAuth';
+// import { useLoading } from "@/hooks/useLoading";
+// ! modal
+import { ToastModalContainer } from '@/components/modal/ToastModal';
+import { LoginFormModal } from '@/components/modal/LoginFormModal';
+import { FullScreenSpinnerModal } from '@/components/modal/FullScreenSpinnerModal';
+import { FirstLoadinModal } from '@/components/modal/FirstLoadinModal';
+import { useLoginModal } from '@/hooks/useLoginModal';
+// ! recoil
+import { useRecoilValue } from 'recoil';
+import { loadingSelector } from '@/store/loadingState';
+import { loginModalSelector } from '@/store/loginModalState';
+import { useFetchBoxer } from '@/hooks/useBoxer';
 //! component
-import { LoadingModal } from "@/components/modal/LoadingModal";
+import { AdministratorPageLinks } from '@/components/module/AdministratorPageLinks';
 
-const Container = React.memo(() => {
-  const queryClient = useQueryClient();
-  const { clearToastModaleMessage, isOpenToastModal, message } = useToastModal();
-  const [waitId, setWaitId] = React.useState<NodeJS.Timeout>();
+const Container = () => {
+  const { isAdmin } = useAdmin();
+  const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
+  const isShowLoginModal = useRecoilValue(loginModalSelector);
+  const { isLoading: isLoadingByRecoil } = useRecoilValue(loadingSelector);
+  const { data: isAuth, isLoading: isFirstCheckingAuth } = useAuthCheck();
+  const { data: guestUser } = useGuest();
+  const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } =
+    useFetchBoxer();
+  const { isLoading: isMatchesFetching } = useFetchMatches();
+  const navigate = useNavigate();
+  const { showLoginModal, hideLoginModal } = useLoginModal();
+  const { pathname } = useLocation();
+
+  // ! Toast Modalの表示時間等の設定
+  const waitTime = 5000;
+  const waitId = React.useRef<NodeJS.Timeout>();
   //? メッセージモーダルのタイマーセット
-  useEffect(() => {
-    if (!isOpenToastModal) return;
+  React.useEffect(() => {
+    if (!isShowToastModal) return;
     (async () => {
-      if (waitId) clearTimeout(waitId);
-      await wait(5000);
-      clearToastModaleMessage();
+      if (waitId.current) clearTimeout(waitId.current);
+      await wait(waitTime);
+      hideToastModal();
     })();
-  }, [isOpenToastModal, message]);
+  }, [isShowToastModal, messageOnToast]);
 
   const wait = (ms: number) => {
     return new Promise((resolve) => {
       const id: NodeJS.Timeout = setTimeout(resolve, ms);
-      setWaitId(id);
+      waitId.current = id;
     });
   };
 
-  const { isLoading: isCheckingAuth, isError } = useAuth();
-  const { isLoading: isFetchingMatches } = useFetchMatches();
-
-  //? cookieでログインチェック。なければfalseを入れる
   useEffect(() => {
-    if (!isError) return;
-    queryClient.setQueryData(queryKeys.auth, false);
-  }, [isError]);
+    if (isAuth === undefined || guestUser === undefined) return;
+    if (!isAuth && !guestUser && pathname !== '/identification/') {
+      showLoginModal();
+      navigate('/');
+    } else {
+      hideLoginModal();
+    }
+  }, [isAuth, guestUser, pathname]);
 
   return (
     <>
-      {/* <Header /> */}
       <Outlet />
-      {/* 以下 modal */}
       <AnimatePresence>
-        {isOpenToastModal && (
-          <motion.div>
-            <ToastModal />
-          </motion.div>
+        {isShowToastModal && (
+          <ToastModalContainer key={'ToastModalContainer'} />
+        )}
+        {(isLoadingByRecoil || isRefetchingBoxers) && (
+          <FullScreenSpinnerModal key={'FullScreenSpinnerModal'} />
+        )}
+        {(isFirstCheckingAuth || isBoxersFetching || isMatchesFetching) && (
+          <FirstLoadinModal key={'FirstLoadinModal'} />
         )}
       </AnimatePresence>
-      {(isCheckingAuth || isFetchingMatches) && <LoadingModal />}
+      {isShowLoginModal && <LoginFormModal key={'LoginFormModal'} />}
+      {/* // ? 管理者用 */}
+      {isAdmin && (
+        <div className="fixed right-[200px] top-0">
+          <AdministratorPageLinks />
+        </div>
+      )}
     </>
   );
-});
+};
 
 export default Container;

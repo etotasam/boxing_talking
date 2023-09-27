@@ -1,27 +1,33 @@
 import React from "react";
 import { motion } from "framer-motion";
 //! message contoller
-import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
+import { BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal";
+// ! hooks
+import { useToastModal } from "@/hooks/useToastModal";
 
 export const ToastModal = () => {
-  const { message, bgColor, clearToastModaleMessage } = useToastModal();
+  const { messageOnToast, bgColor, hideToastModal } = useToastModal();
+
+  const hideModal = () => {
+    hideToastModal();
+  };
 
   const [color, setColor] = React.useState<string>();
   React.useEffect(() => {
     switch (bgColor) {
-      case ModalBgColorType.ERROR:
-        setColor("bg-rose-500");
+      case BG_COLOR_ON_TOAST_MODAL.ERROR:
+        setColor("bg-red-700");
         break;
-      case ModalBgColorType.SUCCESS:
+      case BG_COLOR_ON_TOAST_MODAL.SUCCESS:
         setColor("bg-emerald-600");
         break;
-      case ModalBgColorType.DELETE:
+      case BG_COLOR_ON_TOAST_MODAL.DELETE:
         setColor("bg-stone-700");
         break;
-      case ModalBgColorType.NOTICE:
+      case BG_COLOR_ON_TOAST_MODAL.NOTICE:
         setColor("bg-sky-600");
         break;
-      case ModalBgColorType.GRAY:
+      case BG_COLOR_ON_TOAST_MODAL.GRAY:
         setColor("bg-stone-600");
         break;
       default:
@@ -31,7 +37,7 @@ export const ToastModal = () => {
 
   const variants = {
     hidden: {
-      y: -100,
+      y: -80,
       x: "-50%",
       transition: {
         duration: 0.5,
@@ -53,10 +59,10 @@ export const ToastModal = () => {
       animate="visible"
       exit="hidden"
       variants={variants}
-      onClick={clearToastModaleMessage}
-      className={`z-[999] fixed top-0 left-[50%] py-2 px-5 min-w-[80%] md:min-w-[30%] text-center text-white rounded whitespace-pre-wrap select-none ${color}`}
+      onClick={hideModal}
+      className={`cursor-pointer z-[999] fixed top-[10px] left-[50%] py-2 px-5 min-w-[80%] md:min-w-[30%] text-center text-white rounded whitespace-pre-wrap select-none ${color}`}
     >
-      {message}
+      {messageOnToast}
     </motion.div>
   );
 };

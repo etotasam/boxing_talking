@@ -1,313 +1,94 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { DefaultLogoutBtn, PlainLogoutBtn } from "@/components/module/LogoutBtn";
-import { WINDOW_WIDTH } from "@/libs/utils";
-import { motion, useAnimation, AnimationControls, AnimatePresence } from "framer-motion";
-import { clsx } from "clsx";
-//! components
-import { CustomLink } from "@/components/module/CustomLink";
-import { LoginForm } from "@/components/module/LoginForm";
-import { Hamburger } from "@/components/module/Hamburger";
+import { useEffect, useRef } from 'react';
+import clsx from 'clsx';
+// ! icons
+import { GiBoxingGlove } from 'react-icons/gi';
+import { AiOutlineUser } from 'react-icons/ai'; // ! types
+import { UserType } from '@/assets/types';
 //! hooks
-// import { useAuth } from "@/libs/hooks/useAuth";
-import { useAuth } from "@/libs/hooks/useAuth";
-import { useQueryState } from "@/libs/hooks/useQueryState";
-import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
+import { usePagePath } from '@/hooks/usePagePath';
+import { useHeaderHeight } from '@/hooks/useHeaderHeight';
+import { useGuest, useAuth } from '@/hooks/useAuth';
+//! component
+import { Link } from 'react-router-dom';
+import { LogoutButton } from '@/components/atomic/LogoutButton';
+//! env
+const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
-type Props = {
-  className?: string;
+type PropsType = {
+  userData: UserType | undefined | null;
 };
 
-const animationDuration = 0.5;
-
-export const Header = React.memo((props: Props) => {
-  const { pathname } = useLocation();
-  const currentPage = pathname.split("/")[1];
+export const Header = (porps: PropsType) => {
+  const { userData } = porps;
+  const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
+  const isEitherAuth = Boolean(isGuest || authUser);
+  const { state: pagePath } = usePagePath();
 
-  const { state: isOpenHamburgerMenu, setter: setIsOpenHamburgerMenu } =
-    useQueryState<boolean>("q/isOpenHamburgerMenu");
+  const { setter: setHeaderHeight } = useHeaderHeight();
 
-  const { width: windowWidth } = useGetWindowSize();
-
-  //? window widthが md より大きくなったらhamburger menu modal は閉じる
+  const headerRef = useRef(null);
   useEffect(() => {
-    if (windowWidth && windowWidth >= WINDOW_WIDTH.md) {
-      setIsOpenHamburgerMenu(false);
-    }
-  }, [windowWidth]);
-
-  const headerControls: AnimationControls = useAnimation();
-  const hamburgerControls: AnimationControls = useAnimation();
-  const h1Controls: AnimationControls = useAnimation();
-
-  useEffect(() => {
-    if (isOpenHamburgerMenu) {
-      window.scroll({ top: 0, behavior: "smooth" });
-    }
-    startAnimate();
-    scrollLockOnBody();
-  }, [isOpenHamburgerMenu]);
-
-  const scrollLockOnBody = () => {
-    if (isOpenHamburgerMenu) {
-      document.body.style.overflowY = "hidden";
-      return;
-    }
-    if (!isOpenHamburgerMenu) {
-      document.body.style.overflowY = "scroll";
-      return;
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      document.body.style.overflowY = "scroll";
-    };
-  }, []);
-
-  const startAnimate = () => {
-    if (isOpenHamburgerMenu) {
-      hamburgerControls.start(() => {
-        return {
-          zIndex: 999,
-          position: "fixed",
-        };
-      });
-      headerControls.start(() => {
-        return {
-          height: "100vh",
-          width: "100%",
-          zIndex: 30,
-          transition: { duration: animationDuration },
-        };
-      });
-      h1Controls.start(() => {
-        return {
-          bottom: "15px",
-          transition: { duration: animationDuration },
-        };
-      });
-    }
-    if (!isOpenHamburgerMenu) {
-      hamburgerControls.start(() => {
-        return {
-          transition: { duration: animationDuration },
-          transitionEnd: {
-            position: "absolute",
-          },
-        };
-      });
-      headerControls.start(() => {
-        return {
-          height: "100px",
-          width: "100%",
-          transition: { duration: animationDuration },
-        };
-      });
-      h1Controls.start(() => {
-        return {
-          transition: { duration: animationDuration },
-        };
-      });
-    }
-  };
+    if (!headerRef.current) return;
+    const height = (headerRef.current as HTMLHeadElement).clientHeight;
+    setHeaderHeight(height);
+  }, [headerRef.current]);
 
   return (
     <>
-      <motion.header
-        animate={headerControls}
-        initial={{ height: "100px", width: "100%" }}
-        className={`bg-stone-900 fixed top-0 left-0 z-30`}
+      <header
+        ref={headerRef}
+        className="h-[80px] flex relative after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
       >
-        <div className="relative h-[100px] max-w-[1024px] lg:mx-auto">
-          <motion.h1
-            animate={h1Controls}
-            className="w-[150px] absolute left-[8px] md:left-[20px] lg:left-0 bottom-[15px] text-3xl text-white"
-          >
-            BOXING TALKING
-          </motion.h1>
-          {windowWidth && windowWidth >= WINDOW_WIDTH.md && (
-            <div className="text-white absolute bottom-[15px] left-[170px]">
-              <ul className="flex">
-                {currentPage !== "" && (
-                  <li>
-                    <CustomLink to="/" className="">
-                      Home
-                    </CustomLink>
-                  </li>
-                )}
-                {authUser && authUser?.administrator === true && (
-                  <li className="ml-2">
-                    <CustomLink to="/fighter/register" className="">
-                      Edit Page
-                    </CustomLink>
-                  </li>
-                )}
-              </ul>
+        <h1 className="md:text-[64px] sm:text-[54px] text-[32px] select-none font-thin">
+          {siteTitle}
+        </h1>
+        {pagePath !== '/' && (
+          <div className="absolute bottom-2 left-2 sm:static sm:flex sm:items-end sm:mb-4 sm:ml-10">
+            <ToBoxMatchLink />
+          </div>
+        )}
+        {userData && (
+          <div className="absolute top-2 sm:top-0 bottom-2 md:right-5 sm:right-2 right-1 flex">
+            <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+            <p
+              className={clsx(
+                userData.name!.length > 20 ? 'text-[8px]' : 'text-sm'
+              )}
+            >
+              {userData.name}
+            </p>
+          </div>
+        )}
+        {isGuest && (
+          <div className="absolute top-2 sm:top-0 bottom-2 md:right-5 sm:right-2 right-1 flex">
+            <AiOutlineUser className="mr-1 block bg-stone-400 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+            <p className="text-sm">ゲストログイン</p>
+          </div>
+        )}
+        {isEitherAuth && (
+          <div className="absolute top-0 right-0 bg-red-300 h-full flex justify-center">
+            <div className="absolute sm:bottom-5 bottom-3 lg:right-10 md:right-5 right-2 flex justify-center">
+              <LogoutButton />
             </div>
-          )}
-          <motion.div
-            animate={hamburgerControls}
-            className="absolute top-[40px] right-[8px] md:right-[20px] lg:right-0"
-          >
-            <AuthControlComponent />
-          </motion.div>
-          <AnimatePresence>{isOpenHamburgerMenu && <ModalMenu />}</AnimatePresence>
-        </div>
-      </motion.header>
+          </div>
+        )}
+      </header>
     </>
   );
-});
+};
 
-const AuthControlComponent = () => {
-  const { data: authState } = useAuth();
-  //? openSignUpModalの状態管理
-  const { setter: setIsOpenSignUpModal } = useQueryState<boolean>("q/isOpenSignUpModal", false);
-  const openSignUpModal = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-    e.preventDefault();
-    setIsOpenSignUpModal(true);
-  };
-
-  const userName = authState ? authState.name : process.env.REACT_APP_GUEST_NAME;
-
-  const { width: windowWidth } = useGetWindowSize();
-
+const ToBoxMatchLink = () => {
   return (
     <>
-      <div className="relative col-span-1 flex items-center justify-end">
-        <p className="whitespace-nowrap absolute top-[-30px] right-0 text-right font-extralight text-sm md:text-base text-white">{`${userName}さん`}</p>
-        {windowWidth && windowWidth > WINDOW_WIDTH.md ? (
-          <>
-            <LoginOutComponent />
-            {!authState && (
-              <Link
-                to={"#"}
-                onClick={openSignUpModal}
-                className={`absolute bottom-[-25px] text-[13px] right-0 h-[20px] text-green-600 box-border hover:border-green-600 hover:border-b`}
-              >
-                アカウント作成
-              </Link>
-            )}
-          </>
-        ) : (
-          <Hamburger />
-        )}
-      </div>
+      <Link to="/">
+        <div className="flex bg-stone-600 duration-300 lg:hover:bg-black rounded-[25px] text-white sm:px-3 sm:py-2 px-2 py-1 [&>span]:duration-300 [&>span]:rotate-[-40deg] lg:[&>span]:hover:rotate-[230deg]">
+          <span className="text-[16px] sm:text-[18px] text-white mr-2">
+            <GiBoxingGlove />
+          </span>
+          <p className="text-[10px] sm:text-sm">試合一覧</p>
+        </div>
+      </Link>
     </>
   );
 };
-
-const LoginOutComponent = () => {
-  const { data: authState } = useAuth();
-  return authState ? <DefaultLogoutBtn /> : <LoginForm />;
-};
-
-const ModalMenu = React.memo(() => {
-  const { pathname } = useLocation();
-  // const currentPage = pathname.split("/")[1];
-  // const isCurrentPageHome = /^\/$/.test(pathname);
-
-  const [currentPage, setCurrentPage] = useState<string>();
-  useEffect(() => {
-    if (/^\/$/.test(pathname)) setCurrentPage("Home");
-  }, [pathname]);
-
-  const { data: authState } = useAuth();
-  const navigate = useNavigate();
-  const { setter: setIsOpenHamburgerMenu } = useQueryState<boolean>("q/isOpenHamburgerMenu");
-  const vatiant = {
-    initial: {
-      y: "-100vh",
-      zIndex: 50,
-    },
-    show: {
-      y: 0,
-      transition: { duration: animationDuration },
-    },
-    hidden: {
-      y: "-100vh",
-      transition: { duration: animationDuration },
-    },
-  };
-
-  useEffect(() => {
-    return () => {
-      setIsOpenHamburgerMenu(false);
-      setIsOpenLoginModal(false);
-    };
-  }, []);
-
-  //todo
-  // const testclick = async () => {
-  //   try {
-  //     const res = await axios
-  //       .post(
-  //         "http://localhost:8080/api/user/create",
-  //         {
-  //           name: "test",
-  //           email: "test@test.com",
-  //           password: "test",
-  //         },
-  //         { withCredentials: true }
-  //       )
-  //       .then((res) => res.data);
-  //     console.log("aaaaaaaaa", res);
-  //   } catch (error) {}
-  // };
-
-  const handleClickCustomLink = (e: React.MouseEvent<HTMLParagraphElement, MouseEvent>) => {
-    e.preventDefault();
-    const text = (e.target as HTMLElement).innerText;
-    switch (text) {
-      case "ログイン":
-        setIsOpenLoginModal(true);
-        break;
-      case "Home":
-        setIsOpenHamburgerMenu(false);
-        navigate("/");
-        break;
-      default:
-        if (process.env.REACT_APP_NODE_ENV === "development") {
-          console.error("error on handleClickCustomLink");
-        }
-        return;
-    }
-  };
-
-  //? loginモーダルの状態管理
-  const { setter: setIsOpenLoginModal } = useQueryState<boolean>("q/isOpenLoginModal");
-
-  return (
-    <motion.div
-      initial="initial"
-      exit="hidden"
-      animate="show"
-      // animate={modalControls}
-      variants={vatiant}
-      className="absolute top-0 left-0 w-full h-[100vh] flex justify-center items-center"
-    >
-      <div className="flex flex-col last:border-2 border-white text-white p-10">
-        <CustomLink
-          onClick={(e) => handleClickCustomLink(e)}
-          className={clsx(
-            "text-center",
-            currentPage === "Home"
-              ? "text-stone-600 cursor-default pointer-events-none"
-              : "text-white"
-          )}
-        >
-          Home
-        </CustomLink>
-        <CustomLink className="mt-5">
-          {authState ? (
-            <PlainLogoutBtn />
-          ) : (
-            <p onClick={(e) => handleClickCustomLink(e)}>ログイン</p>
-          )}
-        </CustomLink>
-        {/* <p onClick={testclick}>てすと</p> */}
-      </div>
-    </motion.div>
-  );
-});

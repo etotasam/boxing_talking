@@ -16,16 +16,27 @@ use App\Models\Administrator;
 use Exception;
 //Service
 use App\Services\MatchService;
+use App\Services\AuthService;
 
 class MatchController extends Controller
 {
 
-    public function __construct(BoxingMatch $match, Boxer $boxer, TitleMatch $titleMatch, MatchService $matchService)
-    {
+    public function __construct(
+        BoxingMatch $match,
+        Boxer $boxer,
+        TitleMatch $titleMatch,
+        MatchService $matchService,
+        AuthService $authService,
+        Comment $comment,
+        WinLossPrediction $winLossPrediction
+    ) {
         $this->match = $match;
         $this->boxer = $boxer;
         $this->titleMatch = $titleMatch;
         $this->matchService = $matchService;
+        $this->authService = $authService;
+        $this->comment = $comment;
+        $this->winLossPrediction = $winLossPrediction;
     }
 
     /**
@@ -83,36 +94,22 @@ class MatchController extends Controller
      */
     public function delete(Request $request)
     {
-
         try {
-            // ? まず管理者かどうかを確認する
-            $authUserID = Auth::User()->id;
-            $isAdmin = Administrator::where("user_id", $authUserID)->exists();
-            if (!$isAdmin) {
-                throw new Exception("unauthorize", 406);
-            }
+            // ? まず管理者かどうかを確認する(なければthrow)
+            $this->authService->requireAdminRole();
 
             $matchID = $request->match_id;
             DB::beginTransaction();
-            //? 削除対象の試合に付いているコメントを削除する
-            Comment::where("match_id", $matchID)->delete();
-            //? 削除対象の試合に付いている勝敗予想を削除する
-            WinLossPrediction::where("match_id", $matchID)->delete();
-
+            //? 試合の削除
+            $this->matchService->deleteMatch($matchID);
+            //? 削除対象の試合に付いているコメントを削除
+            $this->comment->where("match_id", $matchID)->delete();
+            //? 削除対象の試合に付いている勝敗予想を削除
+            $this->winLossPrediction->where("match_id", $matchID)->delete();
             //? 削除対象の試合に付いているタイトルを削除
-            $titles = $this->titleMatch->where('match_id', $matchID)->get();
-            if (!$titles->isEmpty()) {
-                $idsToDelete = $titles->pluck('match_id')->toArray();
-                $this->titleMatch->whereIn('match_id', $idsToDelete)->delete();
-            }
-
-            $match = BoxingMatch::find($matchID);
-            if (!isset($match)) {
-                throw new Exception("not exit match");
-            }
-            $match->delete();
+            $this->matchService->deleteTitleMatch($matchID);
             DB::commit();
-            return response()->json(["message" => "match deleted"], 200);
+            return response()->json(["message" => "Success match delete"], 200);
         } catch (Exception $e) {
             DB::rollBack();
             if ($e->getMessage()) {
@@ -133,15 +130,17 @@ class MatchController extends Controller
     {
         try {
             $requestArray = $request->toArray();
-            $id = $requestArray['match_id'];
-            $match = $this->match->find($id);
-            if (!$match) {
-                throw new Exception("Match is not exists", 404);
-            }
+            $matchID = $requestArray['match_id'];
+            //?試合の取得
+            $match = $this->matchService->getSingleMatch($matchID);
             DB::beginTransaction();
+            //?リクエストから変更対象を取得
             $updateMatchData = $requestArray['update_match_data'];
+            \Log::error($updateMatchData);
+            //?変更対象が試合のグレード(タイトルマッチ?10R or 8R...)の場合はグレードのセット
+            $this->matchService->deleteTitleMatch($matchID);
             if (isset($updateMatchData['titles'])) {
-                $this->matchService->createTitleOfMatch($updateMatchData['titles'], $id);
+                $this->matchService->createTitleOfMatch($updateMatchData['titles'], $matchID);
                 unset($updateMatchData['titles']);
             }
             $match->update($updateMatchData);
@@ -156,23 +155,21 @@ class MatchController extends Controller
         }
     }
 
-    // public function test(Request $request)
-    // {
-    //     try {
-    //         $id = $request->id;
-
-    //         $match = BoxingMatch::find($id);
-    //         $organizations = $match->organization;
-    //         if (!empty($organizations)) {
-    //             $organizationsArray = $organizations->map(function ($organization) {
-    //                 return $organization->name;
-    //             });
-    //             return $organizationsArray;
-    //         } else {
-    //             return [];
-    //         }
-    //     } catch (Exception $e) {
-    //         return response()->json(["message" => $e->getMessage()], 500);
-    //     }
-    // }
+    public function test(Request $request)
+    {
+        try {
+            $auth = Auth::User();
+            if ($auth) {
+                $authUserID = Auth::User()->id;
+            } else {
+                throw new Exception("No auth", 401);
+            }
+            $isAdmin = Administrator::where("user_id", $authUserID)->exists();
+            if (!$isAdmin) {
+                throw new Exception("unauthorize", 406);
+            }
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage()], 500);
+        }
+    }
 }

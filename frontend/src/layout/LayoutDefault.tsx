@@ -1,13 +1,12 @@
-import { ReactNode } from "react";
 import { Outlet } from "react-router-dom";
-import { Header } from "@/components/module/Header";
+// import { Header } from "@/components/module/Header";
 
 const LayoutDefault = () => {
   return (
-    <div className={`bg-stone-200 pt-[100px]`}>
-      <Header />
+    <div className={``}>
+      {/* <Header /> */}
       {/* //! HeaderはContainer */}
-      <main className={`min-h-[calc(100vh-150px)]`}>
+      <main className={``}>
         <Outlet />
       </main>
     </div>

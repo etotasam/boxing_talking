@@ -48,6 +48,19 @@ class MatchService
   }
 
   /**
+   * @param int matchID
+   * @return array matchData
+   */
+  public function getSingleMatch($matchID)
+  {
+    $match = $this->match->find($matchID);
+    if (!$match) {
+      throw new Exception("Match is not exists", 404);
+    }
+    return $match;
+  }
+
+  /**
    *
    * @param array matches
    * @return array
@@ -89,9 +102,10 @@ class MatchService
     $organizations = $match->organization;
     if (!empty($organizations)) {
       $organizationsArray = $organizations->map(function ($organization) use ($match) {
-        $title = $organization->name . "世界" . $match->weight . "級";
+        $title = ["organization" => $organization->name, 'weightDivision' => $match->weight];
         return $title;
       });
+      return $organizationsArray;
     } else {
       $organizationsArray = [];
     }
@@ -119,6 +133,23 @@ class MatchService
     }
   }
 
+
+  /**
+   * @param int matchID
+   * @return \Illuminate\Support\Collection
+   */
+  public function getTitleOfMatch($matchID)
+  {
+    if (!empty($matchID)) {
+      $titles = $this->titleMatch->where('match_id', $matchID)->get();
+      if (!$titles->isEmpty()) {
+        return $titles;
+      } else {
+        return collect();
+      }
+    }
+  }
+
   /**
    * @param array match
    * @return void
@@ -131,5 +162,30 @@ class MatchService
       throw new Exception("titles(organizations) is not exists in match data", Response::HTTP_NOT_ACCEPTABLE);
     }
     return $organizationsArray;
+  }
+
+  /**
+   * @param int matchID
+   * @return void
+   */
+  public function deleteMatch($matchID)
+  {
+    $match = $this->match->find($matchID);
+    if (!isset($match)) {
+      throw new Exception("not exit match");
+    }
+    $match->delete();
+  }
+  /**
+   * @param int matchID
+   * @return void
+   */
+  public function deleteTitleMatch($matchID)
+  {
+    $titles = $this->titleMatch->where('match_id', $matchID)->get();
+    if (!$titles->isEmpty()) {
+      $idsToDelete = $titles->pluck('match_id')->toArray();
+      $this->titleMatch->whereIn('match_id', $idsToDelete)->delete();
+    }
   }
 }
