@@ -1,12 +1,12 @@
 
+.env*
+
 # backend
 backend/node_modules
 backend/public/hot
 backend/public/storage
 backend/storage/*.key
 backend/vendor/
-backend/.env
-backend/.env.backup
 backend/.phpunit.result.cache
 backend/docker-compose.override.yml
 backend/Homestead.json
@@ -20,16 +20,12 @@ backend/.vscode
 # remake_frontend
 # dependencies
 remake_frontend/node_modules
-remake_frontend/.env
 remake_frontend/.env.production
 # production
 remake_frontend/dist
 
 #testpage
 TestModule.tsx
-
-
-
 
 
 # frontend
