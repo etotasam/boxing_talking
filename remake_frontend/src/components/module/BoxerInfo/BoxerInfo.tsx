@@ -85,15 +85,15 @@ export const BoxerInfo = ({ boxer, className }: PropsType) => {
             </li>
           </ul>
           {/* //? タイトル */}
-          {boxer.title_hold.length > 0 && (
+          {Boolean(boxer.titles.length) && (
             <ul className="mt-3">
-              {boxer.title_hold.sort().map((belt: string) => (
-                <li key={`belt_${belt}`} className="mt-2">
+              {boxer.titles.map((title) => (
+                <li key={`${title.organization}_${title.weight}`} className="mt-2">
                   <p className="relative inline-block">
                     <span className="absolute top-[2px] left-[-23px] w-[18px] h-[18px] mr-2">
                       <img src={crown} alt="" />
                     </span>
-                    {belt}
+                    {`${title.organization}世界${title.weight}級王者`}
                   </p>
                 </li>
               ))}

@@ -1,23 +1,23 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 // ! data
-import { Stance, initialBoxerDataOnForm } from "@/assets/boxerData";
-import { Nationality } from "@/assets/NationalFlagData";
+import { Stance, initialBoxerDataOnForm } from '@/assets/boxerData';
+import { Nationality } from '@/assets/NationalFlagData';
 //! type
-import { BoxerType, BoxerDataOnFormType } from "@/assets/types";
+import { BoxerType } from '@/assets/types';
 // ! hooks
-import { useBoxerDataOnForm } from "@/hooks/useBoxerDataOnForm";
+import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 // ! component
-import { TitleSelector } from "./TitleSelector";
+import { TitleSelector } from './TitleSelector';
 
 type PropsType = {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   isPending?: boolean;
-  editTargetBoxerData?: BoxerType | BoxerDataOnFormType;
+  editTargetBoxerData?: BoxerType;
   isSuccess?: boolean;
   isGuard?: boolean;
 };
 
-const countryUndefined = "国籍の選択";
+const countryUndefined = '国籍の選択';
 
 export const BoxerEditForm = (props: PropsType) => {
   // ! use hook
@@ -65,7 +65,7 @@ export const BoxerEditForm = (props: PropsType) => {
         />
         {/* //? country */}
         <div className="flex mt-3">
-          <label className="w-[100px] text-center" htmlFor="countrys">
+          <label className="w-[100px] text-center" htmlFor="country">
             国籍
           </label>
           <select
@@ -83,7 +83,7 @@ export const BoxerEditForm = (props: PropsType) => {
                 });
               }
             }}
-            id="countrys"
+            id="country"
           >
             <option value={undefined}>{countryUndefined}</option>
             {Object.values(Nationality).map((nationalName) => (

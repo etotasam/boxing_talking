@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 
-use Illuminate\Support\Facades\Mail;
+// use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +11,8 @@ use Illuminate\Support\Str;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use App\Mail\Mailer;
+// use App\Mail\Mailer;
+use App\Jobs\MailSendJob;
 use App\Models\User;
 use App\Models\PreUser;
 use App\Models\GuestUser;
@@ -26,10 +27,10 @@ use App\Http\Requests\LoginRequest;
 class AuthController extends Controller
 {
 
-    public function __construct(User $user, PreUser $pre_user, GuestUser $guest)
+    public function __construct(User $user, PreUser $preUser, GuestUser $guest)
     {
         $this->user = $user;
-        $this->pre_user = $pre_user;
+        $this->preUser = $preUser;
         $this->guest = $guest;
     }
 
@@ -38,14 +39,14 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function guest_login(Request $request)
+    public function guestLogin(Request $request)
     {
         try {
             if (Auth::check()) {
                 throw new Exception("Guest login is not allowed as already authenticated", Response::HTTP_BAD_REQUEST);
             }
-            $guest_user = $this->guest->create();
-            Auth::guard('guest')->login($guest_user);
+            $guestUser = $this->guest->create();
+            Auth::guard('guest')->login($guestUser);
             if (Auth::guard('guest')->check()) {
                 $request->session()->regenerate();
                 return response()->json(["success" => true, "message" => "success guest login"], Response::HTTP_ACCEPTED);
@@ -63,7 +64,7 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function guest_logout()
+    public function guestLogout()
     {
         try {
             $guestGuard = Auth::guard('guest');
@@ -73,9 +74,9 @@ class AuthController extends Controller
             }
 
             //? ログアウトと同時にゲストユーザーを削除
-            $guest_user_id = $guestGuard->user()->id;
+            $guestUserID = $guestGuard->user()->id;
             $guestGuard->logout();
-            $guest = $this->guest->find($guest_user_id);
+            $guest = $this->guest->find($guestUserID);
             if ($guest) {
                 $guest->delete();
             }
@@ -101,31 +102,20 @@ class AuthController extends Controller
      * @param string $password
      * @return \Illuminate\Http\Response
      */
-    public function pre_create(PreCreateAuthRequest $request)
+    public function preCreate(PreCreateAuthRequest $request)
     {
         // throw new Exception();
         try {
-            DB::beginTransaction();
-            $pre_user = $this->pre_user->create([
+            $preUser = $this->preUser->create([
                 "name" => $request->name,
                 "email" => $request->email,
                 "password" => $request->password,
             ]);
-
-            if (!$pre_user) {
+            if (!$preUser) {
                 throw new Exception("Failed pre user create", 500);
             }
+            MailSendJob::dispatch($preUser->id, $request->name, $request->email);
 
-            $payload = [
-                'user_id' => $pre_user->id,
-                'exp' => strtotime('+30 minutes'),
-            ];
-
-            $secret_key = config('const.jwt_secret_key');
-            $token = JWT::encode($payload, $secret_key, 'HS256');
-            Mail::to($request->email)->send(new Mailer($request->name, $token));
-
-            DB::commit();
             return response()->json(
                 [
                     'success' => true,
@@ -134,7 +124,6 @@ class AuthController extends Controller
                 Response::HTTP_CREATED
             );
         } catch (Exception $e) {
-            DB::rollBack();
             if ($e->getCode()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
             }
@@ -161,31 +150,31 @@ class AuthController extends Controller
                 return response()->json(["success" => false, "message" => $validator->errors()], 422);
             }
 
-            $secret_key = config('const.jwt_secret_key');
-            if (!isset($secret_key)) {
+            $secretKey = config('const.jwt_secret_key');
+            if (!isset($secretKey)) {
                 throw new Exception("cannot get secret-key", 500);
             }
-            $decoded = JWT::decode($request->token, new Key($secret_key, 'HS256'));
+            $decoded = JWT::decode($request->token, new Key($secretKey, 'HS256'));
 
-            $user_id = $decoded->user_id;
-            $pre_user = $this->pre_user->find($user_id);
+            $userID = $decoded->user_id;
+            $preUser = $this->preUser->find($userID);
 
-            if (!$pre_user) {
+            if (!$preUser) {
                 throw new Exception("Invalid access", 403);
             }
             DB::beginTransaction();
-            $auth_user = $this->user->create([
-                // "id" => $pre_user->id,
-                "name" => $pre_user->name,
-                "email" => $pre_user->email,
-                "password" => $pre_user->password
+            $authUser = $this->user->create([
+                // "id" => $preUser->id,
+                "name" => $preUser->name,
+                "email" => $preUser->email,
+                "password" => $preUser->password
             ]);
 
-            if (!$auth_user) {
+            if (!$authUser) {
                 throw new Exception("Failed signup...", 500);
             }
 
-            $pre_user->delete();
+            $preUser->delete();
             DB::commit();
             return response()->json(["message" => "Successful signup"], Response::HTTP_CREATED);
         } catch (Exception $e) {
@@ -278,7 +267,7 @@ class AuthController extends Controller
     /**
      * admin check
      *
-     * @param str $user_id
+     * @param str $userID
      * @return \Illuminate\Http\Response
      */
     public function admin(Request $request)
@@ -287,8 +276,8 @@ class AuthController extends Controller
             if (!Auth::User()) {
                 return false;
             }
-            $auth_user_id = Auth::User()->id;
-            $is_admin = Administrator::where("user_id", $auth_user_id)->exists();
+            $authUser_id = Auth::User()->id;
+            $is_admin = Administrator::where("user_id", $authUser_id)->exists();
             return $is_admin;
         } catch (Exception $e) {
             if ($e->getCode()) {

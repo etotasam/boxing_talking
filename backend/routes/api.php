@@ -23,9 +23,9 @@ Route::get('/guest/user', function () {
 Route::get('/admin', [AuthController::class, 'admin']);
 // Route::post('/user/create', [AuthController::class, 'test_create'])->name('auth.test_create');
 Route::post('/user/create', [AuthController::class, 'create']);
-Route::post('/user/pre_create', [AuthController::class, 'pre_create']);
+Route::post('/user/pre_create', [AuthController::class, 'preCreate']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/guest/login', [AuthController::class, 'guest_login']);
+Route::post('/guest/login', [AuthController::class, 'guestLogin']);
 //? 試合
 Route::get('/match', [MatchController::class, 'fetch']);
 //? ボクサー
@@ -38,7 +38,7 @@ Route::get('/comment', [CommentController::class, 'fetch']);
 // !ゲストユーザーか通常の認証が必須
 Route::middleware('auth.user_or_guest')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/guest/logout', [AuthController::class, 'guest_logout']);
+    Route::post('/guest/logout', [AuthController::class, 'guestLogout']);
     Route::put('/prediction', [WinLossPredictionController::class, 'win_loss_prediction']);
     Route::post('/comment', [CommentController::class, 'post']);
 });
@@ -58,13 +58,4 @@ Route::middleware('administrator')->group(function () {
 });
 
 
-// Route::get('/test', function () {
-
-//     try {
-//         return response()->json(["message" => "era-"], 500);
-//         $url = config('app.url');
-//         return $url;
-//     } catch (Exception $e) {
-//         return response()->json(["message" => $e->getMessage()], 500);
-//     }
-// });
+Route::get('/test', [BoxerController::class, 'test']);

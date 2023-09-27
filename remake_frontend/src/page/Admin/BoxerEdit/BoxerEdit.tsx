@@ -9,7 +9,7 @@ import {
 } from '@/assets/statusesOnToastModal';
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
 // ! functions
-import { getBoxerDataWithID, convertToBoxerData } from '@/assets/functions';
+import { getBoxerDataWithID } from '@/assets/functions';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 import { usePagePath } from '@/hooks/usePagePath';
@@ -18,15 +18,13 @@ import {
   useFetchBoxer,
   useUpdateBoxerData,
   useDeleteBoxer,
-  // limit,
 } from '@/hooks/useBoxer';
 import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 //! types
-import { BoxerType } from '@/assets/types';
+import { BoxerType, MessageType } from '@/assets/types';
 //! layout
 import AdminLayout from '@/layout/AdminLayout';
 //! component
-// import { FlagImage } from "@/components/atomic/FlagImage";
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { Confirm } from '@/components/modal/Confirm';
@@ -39,26 +37,21 @@ export const BoxerEdit = () => {
   // ? use hook
   const { resetLoadingState } = useLoading();
   const { setter: setPagePath } = usePagePath();
-  const { setToastModal, showToastModal, hideToastModal } = useToastModal();
+  const {
+    setToastModal,
+    showToastModal,
+    hideToastModal,
+    showToastModalMessage,
+  } = useToastModal();
   const { state: editTargetBoxerData, setter: setEditTargetBoxerData } =
     useBoxerDataOnForm();
   const { updateFighter } = useUpdateBoxerData();
   const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
-  const {
-    boxersData,
-    pageCount,
-    // refetch: refetchBoxers
-    // isRefetching: isRefetchingBoxerData,
-  } = useFetchBoxer();
+  const { boxersData, pageCount } = useFetchBoxer();
   //? 選択したボクサーのidが入る(選手が選択されているかの判断に使用)
-  const [checked, setChecked] = useState<number>();
+  const [isSelectBoxer, setIsSelectBoxer] = useState<number>();
   //? paramsの取得
   const { pathname } = useLocation();
-  // const query = new URLSearchParams(search);
-  // const paramPage = Number(query.get("page"));
-  // const paramName = query.get("name");
-  // const paramCountry = query.get("country");
-  // const navigate = useNavigate();
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -73,89 +66,79 @@ export const BoxerEdit = () => {
   useEffect(() => {
     if (isDeleteBoxerSuccess) {
       setEditTargetBoxerData(initialBoxerDataOnForm);
-      setChecked(undefined);
+      setIsSelectBoxer(undefined);
     }
   }, [isDeleteBoxerSuccess]);
 
   // ? アンマウント時にはトーストモーダルを隠す
+  //? form内データをデフォルトに戻す
   useEffect(() => {
     return () => {
       hideToastModal();
+      setEditTargetBoxerData(initialBoxerDataOnForm);
     };
   }, []);
 
-  //? 選手データの削除実行
-  // const {
-  //   deleteFighter,
-  //   isLoading: isDeletingFighter,
-  //   isSuccess: isDeleteSuccess,
-  // } = useDeleteFighter();
-
-  // const fighterDelete = async () => {
-  //   setOpenConfirmModal(false);
-  //   deleteFighter(editFighterData!);
-  // };
-
-  // ! ボクサーの編集を実行
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // ? 選手が選択されていない
-    if (!checked) {
-      setToastModal({
-        message: MESSAGE.BOXER_NO_SELECTED,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
-      });
-      showToastModal();
-      return;
+  // ? 選手が選択されていない時
+  const showModalIfBoxerNotSelected = () => {
+    if (!isSelectBoxer) {
+      throw new Error(MESSAGE.BOXER_NO_SELECTED);
     }
-    //? 名前が空
+  };
+
+  //? 名前が空の時
+  const showModalIfNameUndefined = () => {
     if (!editTargetBoxerData.name || !editTargetBoxerData.eng_name) {
-      setToastModal({
-        message: MESSAGE.BOXER_NAME_UNDEFINED,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
-      });
-      showToastModal();
-      return;
+      throw new Error(MESSAGE.BOXER_NAME_UNDEFINED);
     }
+  };
+  //? データ変更がされていない時
+  const showModalIfNotUpdateBoxerData = () => {
     if (!boxersData) return console.error('No have boxers data');
-    //? データ変更がされていない時
+
     const boxer = getBoxerDataWithID({
       boxerID: editTargetBoxerData.id,
       boxersData: boxersData,
     });
-    const convertedData = convertToBoxerData(editTargetBoxerData);
-    if (isEqual(boxer, convertedData)) {
-      setToastModal({
-        message: MESSAGE.BOXER_NOT_EDIT,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
-      });
-      showToastModal();
-      return;
-    }
 
-    //? ボクサーデータ編集実行
-    updateFighter(editTargetBoxerData);
+    if (isEqual(boxer, editTargetBoxerData)) {
+      throw new Error(MESSAGE.BOXER_NOT_EDIT);
+    }
   };
 
-  const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
+  // ! ボクサーの編集を実行
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      showModalIfBoxerNotSelected();
+      showModalIfNameUndefined();
+      showModalIfNotUpdateBoxerData();
+      //? ボクサーデータ編集実行
+      updateFighter(editTargetBoxerData);
+    } catch (error: any) {
+      if (!error.message) return;
+      showToastModalMessage({
+        message: error.message as MessageType,
+        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
+      });
+    }
+  };
+
+  const [isShowDeleteConfirmModal, setIsShowDeleteConfirmModal] =
+    useState(false);
 
   const cancel = () => {
-    setIsDeleteConfirm(false);
+    setIsShowDeleteConfirmModal(false);
   };
 
   //?削除データの実行
   const execution = () => {
-    setIsDeleteConfirm(false);
-    if (!checked) {
-      setToastModal({
-        message: MESSAGE.BOXER_NO_SELECTED,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR,
-      });
-      showToastModal();
-      return;
-    }
+    setIsShowDeleteConfirmModal(false);
+
+    showModalIfBoxerNotSelected();
+
     deleteBoxer(editTargetBoxerData);
-    setIsDeleteConfirm(false);
+    setIsShowDeleteConfirmModal(false);
   };
 
   return (
@@ -183,7 +166,7 @@ export const BoxerEdit = () => {
                 <div className="mt-10">
                   <button
                     onClick={() => {
-                      if (!checked) {
+                      if (!isSelectBoxer) {
                         setToastModal({
                           message: MESSAGE.BOXER_NO_SELECTED,
                           bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
@@ -191,7 +174,7 @@ export const BoxerEdit = () => {
                         showToastModal();
                         return;
                       }
-                      setIsDeleteConfirm(true);
+                      setIsShowDeleteConfirmModal(true);
                     }}
                     className="bg-red-600 text-white rounded py-2 px-10"
                   >
@@ -205,14 +188,14 @@ export const BoxerEdit = () => {
         <section className="w-[30%] min-w-[300px] border-l-[1px] border-stone-200 mb-5">
           <PaginationBoxerList pageCount={pageCount} />
           <BoxersList
-            checked={checked}
-            setChecked={setChecked}
+            isSelectBoxer={isSelectBoxer}
+            setIsSelectBoxer={setIsSelectBoxer}
             boxersData={boxersData}
             setEditTargetBoxerData={setEditTargetBoxerData}
           />
         </section>
       </div>
-      {isDeleteConfirm && (
+      {isShowDeleteConfirmModal && (
         <Confirm execution={execution} cancel={cancel}>
           削除しますか？
         </Confirm>
@@ -224,13 +207,13 @@ export const BoxerEdit = () => {
 type BoxerListPropsType = {
   boxersData: BoxerType[] | undefined;
   setEditTargetBoxerData: (boxer: BoxerType) => void;
-  checked: number | undefined;
-  setChecked: React.Dispatch<React.SetStateAction<number | undefined>>;
+  isSelectBoxer: number | undefined;
+  setIsSelectBoxer: React.Dispatch<React.SetStateAction<number | undefined>>;
 };
 
 const BoxersList = ({
-  checked,
-  setChecked,
+  isSelectBoxer,
+  setIsSelectBoxer,
   boxersData,
   setEditTargetBoxerData,
 }: BoxerListPropsType) => {
@@ -246,9 +229,9 @@ const BoxersList = ({
                 id={`${boxer.id}_${boxer.name}`}
                 type="radio"
                 name="boxer"
-                checked={boxer.id === checked}
+                checked={boxer.id === isSelectBoxer}
                 onChange={() => {
-                  setChecked(boxer.id ? boxer.id : undefined);
+                  setIsSelectBoxer(boxer.id ? boxer.id : undefined);
                   setEditTargetBoxerData(boxer);
                 }}
               />

@@ -3,21 +3,30 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Exception;
+use Illuminate\Support\Facades\DB;
 // Models
 use App\Models\Boxer;
 use App\Models\BoxingMatch;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Organization;
+use App\Models\WeightDivision;
+use App\Models\Title;
 // requests
 use App\Http\Requests\BoxerRequest;
+// Services
+use App\Services\BoxerService;
+
+use function PHPUnit\Framework\isEmpty;
 
 class BoxerController extends Controller
 {
 
-    public function __construct(Boxer $boxer, BoxingMatch $match)
+    public function __construct(Boxer $boxer, BoxingMatch $match, BoxerService $boxerService)
     {
         $this->boxer = $boxer;
         $this->match = $match;
+        $this->boxerService = $boxerService;
     }
 
     //? name eng_name countryで検索出来るqueryを作る
@@ -53,7 +62,7 @@ class BoxerController extends Controller
     public function fetch(Request $request)
     {
         try {
-            $boxers = $this->boxer->search($request->name, $request->country, $request->limit, $request->page);
+            $boxers = $this->boxer->getBoxersByNameAndCountry($request->name, $request->country, $request->limit, $request->page);
             return response()->json($boxers, 200);
         } catch (Exception $e) {
             if ($e->getCode()) {
@@ -75,7 +84,7 @@ class BoxerController extends Controller
         try {
             $name = $request->name;
             $country = $request->country;
-            $arr_word = compact("name", "country");
+            $arrayWords = compact("name", "country");
             $arrayQuery = array_map(function ($key, $value) {
                 if (isset($value)) {
                     if ($key == 'name') {
@@ -84,7 +93,7 @@ class BoxerController extends Controller
                         return [$key, 'like', $value];
                     }
                 }
-            }, array_keys($arr_word), array_values($arr_word));
+            }, array_keys($arrayWords), array_values($arrayWords));
 
             $likeQueries = array_filter($arrayQuery, function ($el) {
                 if (isset($el)) {
@@ -107,12 +116,19 @@ class BoxerController extends Controller
     public function register(BoxerRequest $request)
     {
         try {
-            $boxer = $request->all();
-            $this->boxer->create($boxer);
-            return response()->json(["message" => "created fighter"], 200);
+            $boxer = $request->toArray();
+            DB::beginTransaction();
+            $newBoxer = $this->boxer->create($boxer);
+            $this->boxerService->setTitle($newBoxer["id"], $boxer["titles"]);
+            DB::commit();
+            return response()->json(["message" => "Success created boxer"], 200);
         } catch (Exception $e) {
+            DB::rollBack();
             if ($e->getCode() === 406) {
                 return response()->json(["message" => $e->getMessage()], 406);
+            }
+            if ($e->getCode()) {
+                return response()->json(["message" => $e->getMessage()], $e->getCode());
             }
             return response()->json(["message" => "Failed boxer register"], 500);
         }
@@ -128,14 +144,14 @@ class BoxerController extends Controller
         try {
             // throw new Exception("@@@@@@エラー", 406);
             $id = $request->boxer_id;
-            $req_boxer_eng_name = $request->eng_name;
+            $boxerEngName = $request->eng_name;
             try {
                 $boxer = $this->boxer->findOrFail($id);
             } catch (Exception $e) {
                 return response()->json(["message" => "Boxer is not exist in DB"], 406);
             };
             //? データの整合性をチェック
-            if ($boxer->eng_name != $req_boxer_eng_name) {
+            if ($boxer->eng_name != $boxerEngName) {
                 throw new Exception("Request data is dose not match boxer in database", 406);
             };
             //? 試合が組まれているかどうかをチェックする
@@ -162,23 +178,44 @@ class BoxerController extends Controller
      */
     public function update(Request $request)
     {
-        // throw new Exception();
         try {
-            $boxer_id = $request->id;
-            $boxer = $this->boxer->find($boxer_id);
+            DB::beginTransaction();
+            $boxerID = $request->id;
+            $boxer = $this->boxer->find($boxerID);
             if (!$boxer) {
                 throw new Exception("Boxer is not exists", 404);
             }
 
-            $updateBoxer = $request->toArray();
+            $updateBoxerData = $request->toArray();
+            \Log::error($updateBoxerData["titles"]);
+            $this->boxerService->setTitle($boxerID, $updateBoxerData["titles"]);
 
-            $boxer->update($updateBoxer);
+            unset($updateBoxerData["titles"]);
+
+            $boxer->update($updateBoxerData);
+            DB::commit();
             return response()->json(["message" => "boxer updated"], 200);
         } catch (Exception $e) {
+            DB::rollBack();
             if ($e->getCode()) {
                 return response()->json(["message" => $e->getMessage()], $e->getCode());
             }
             return response()->json(["message" => "Failed fighter update"], 500);
+        }
+    }
+
+
+
+
+    public function test()
+    {
+        try {
+
+            // $boxer = $this->boxer->getBoxerWithTitles(11);
+
+            // return response()->json($boxer);
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage()], 500);
         }
     }
 }

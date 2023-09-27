@@ -4,14 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\JsonResponse;
 // Models
 use App\Models\BoxingMatch;
 use App\Models\User;
-use App\Models\GuestUser;
 use App\Models\Comment;
-use App\Models\WinLossPrediction;
 use Exception;
 
 use \Symfony\Component\HttpFoundation\Response;
@@ -19,44 +15,8 @@ use App\Http\Requests\CommentRequest;
 
 class CommentController extends Controller
 {
-
-
-
-    public function test_fetch(Request $request)
-    {
-        // return $request->limit;
-        $offset = $request->offset;
-        $limit = $request->limit;
-        $match_id = $request->match_id;
-        $comments_array = [];
-        if (!$match_id) {
-            throw new Exception('Failed fetch comments', Response::HTTP_BAD_REQUEST);
-        }
-        $match = BoxingMatch::find($match_id);
-        if ($match) {
-            $comments_on_match = $match->comments->skip($offset)->take($limit);
-        } else {
-            throw new Exception('Match is not exits', Response::HTTP_NOT_FOUND);
-        }
-        foreach ($comments_on_match as $comment) {
-            $user_id = $comment->user_id;
-            $created_at = $comment->created_at;
-            $user = User::find($user_id);
-            $post_user_name = $user->name;
-            // $prediction = WinLossPrediction::where([["user_id", $user_id], ["match_id", $match_id]])->first();
-            // if (isset($vote)) {
-            //     $prediction_color = $prediction["prediction"];
-            // } else {
-            //     $prediction_color = Null;
-            // }
-            $formatted_comment = nl2br(htmlspecialchars($comment->comment));
-            array_unshift($comments_array, ['id' => $comment->id, "post_user_name" => $post_user_name, "comment" => $formatted_comment, "created_at" => $created_at]);
-        }
-        return $comments_array;
-    }
-
     /**
-     * fetch all comments from DB
+     * fetch all comments
      *
      * @param int match_id
      * @return \Illuminate\Http\Response
@@ -65,30 +25,30 @@ class CommentController extends Controller
     {
         try {
             // throw new Exception("fetch comment failed");
-            $match_id = $request->match_id;
-            $comments_array = [];
-            if (!$match_id) {
+            $matchID = $request->match_id;
+            $arrayComments = [];
+            if (!$matchID) {
                 throw new Exception('Failed fetch comments', Response::HTTP_BAD_REQUEST);
             }
-            $match = BoxingMatch::find($match_id);
+            $match = BoxingMatch::find($matchID);
             if ($match) {
-                $comments_on_match = $match->comments;
+                $thisMatchComments = $match->comments;
             } else {
                 throw new Exception('Match is not exits', Response::HTTP_NOT_FOUND);
             }
-            foreach ($comments_on_match as $commentData) {
-                $user_id = $commentData->user_id;
-                $created_at = $commentData->created_at;
-                $user = User::find($user_id);
+            foreach ($thisMatchComments as $commentData) {
+                $userID = $commentData->user_id;
+                $createdAt = $commentData->created_at;
+                $user = User::find($userID);
                 if ($user) {
-                    $post_user_name = $user->name;
+                    $postUserName = $user->name;
                 } else {
-                    $post_user_name = null;
+                    $postUserName = null;
                 }
-                $formatted_comment = nl2br(htmlspecialchars($commentData->comment));
-                array_unshift($comments_array, ['id' => $commentData->id, "post_user_name" => $post_user_name, "comment" => $formatted_comment, "created_at" => $created_at]);
+                $formattedComment = nl2br(htmlspecialchars($commentData->comment));
+                array_unshift($arrayComments, ['id' => $commentData->id, "post_user_name" => $postUserName, "comment" => $formattedComment, "created_at" => $createdAt]);
             }
-            return $comments_array;
+            return $arrayComments;
         } catch (Exception $e) {
             if ($e->getCode()) {
                 return response()->json(["message" => $e->getMessage()], $e->getCode());
@@ -108,26 +68,26 @@ class CommentController extends Controller
     {
         try {
             if (Auth::check()) {
-                $user_id = Auth::user()->id;
+                $userID = Auth::user()->id;
             } else if (Auth::guard('guest')->check()) {
-                $user_id = (string)Auth::guard('guest')->user()->id;
+                $userID = (string)Auth::guard('guest')->user()->id;
             } else {
                 throw new Exception("Posting comments require Login", Response::HTTP_UNAUTHORIZED);
             }
-            $match_id = $request->match_id;
+            $matchID = $request->match_id;
             //? 試合は存在しているか
-            $has_match = BoxingMatch::find($match_id);
-            if (!$has_match) {
+            $match = BoxingMatch::find($matchID);
+            if (!$match) {
                 throw new Exception("The match is not exist", Response::HTTP_FORBIDDEN);
             }
 
             $comment = $request->comment;
             //? 改行は4回以上の改行は3回の改行に変更する
-            $formatted_comment = preg_replace('/(\n{4,})/', "\n\n\n", $comment);
+            $formattedComment = preg_replace('/(\n{4,})/', "\n\n\n", $comment);
             Comment::create([
-                "user_id" => $user_id,
-                "match_id" => $match_id,
-                "comment" => $formatted_comment,
+                "user_id" => $userID,
+                "match_id" => $matchID,
+                "comment" => $formattedComment,
             ]);
             return response()->json(["message" => "posted comment successfully"], 200);
         } catch (Exception $e) {
@@ -146,33 +106,21 @@ class CommentController extends Controller
      */
     public function delete(Request $request)
     {
-        // $user_id = $request->user_id;
-        $comment_id = $request->comment_id;
+        // $userID = $request->user_id;
+        $commentID = $request->comment_id;
         $user = Auth::user();
         try {
             if (!$user) {
                 throw new Exception('Unauthorized', Response::HTTP_UNAUTHORIZED);
             };
-            $comment_data = Comment::find($comment_id);
-            if ($comment_data->user_id != $user->id) {
+            $commentData = Comment::find($commentID);
+            if ($commentData->user_id != $user->id) {
                 throw new Exception('Forbidden', Response::HTTP_FORBIDDEN);
             }
-            $comment_data->delete();
+            $commentData->delete();
             return response()->json(["message" => "Comment deleted"], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json(["message" => $e->getMessage()], $e->getCode());
         }
     }
-}
-
-//? コメント投稿のvalidation
-function sanitizeComment($commentText)
-{
-    // 前後の空白をトリム
-    $commentText = trim($commentText);
-
-    // 4つ以上の連続した改行を3つに置き換え
-    $commentText = preg_replace('/(\r?\n){4,}/', "\n\n\n", $commentText);
-
-    return $commentText; // 改行を置き換えたコメント
 }

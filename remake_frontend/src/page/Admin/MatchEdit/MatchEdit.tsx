@@ -3,8 +3,12 @@ import dayjs from 'dayjs';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-//! data
-// import { GRADE } from "@/assets/boxerData";
+import {
+  BG_COLOR_ON_TOAST_MODAL,
+  MESSAGE,
+} from '@/assets/statusesOnToastModal';
+//! func
+import { isMatchDatePast } from '@/assets/functions';
 //! layout
 import AdminLayout from '@/layout/AdminLayout';
 //! components
@@ -18,15 +22,11 @@ import { useFetchMatches, useDeleteMatch } from '@/hooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
 import { usePagePath } from '@/hooks/usePagePath';
 import { useLoading } from '@/hooks/useLoading';
+import { useSortMatches } from '@/hooks/useSortMatches';
 //! types
 import { MatchDataType } from '@/assets/types';
-
 // ! image
 import crown from '@/assets/images/etc/champion.svg';
-import {
-  BG_COLOR_ON_TOAST_MODAL,
-  MESSAGE,
-} from '@/assets/statusesOnToastModal';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -35,6 +35,7 @@ export const MatchEdit = () => {
   const { resetLoadingState } = useLoading();
   const { pathname } = useLocation();
   const { data: matchesData } = useFetchMatches();
+  const { sortedMatches } = useSortMatches(matchesData);
   const { setToastModal, showToastModal } = useToastModal();
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
   const { setter: setPagePath } = usePagePath();
@@ -120,7 +121,7 @@ export const MatchEdit = () => {
 
         <section className="w-[30%] flex justify-center">
           <MatchListComponent
-            matchData={matchesData}
+            sortedMatches={sortedMatches}
             selectMatch={selectMatch}
             setSelectMatch={setSelectMatch}
           />
@@ -131,7 +132,7 @@ export const MatchEdit = () => {
 };
 
 type MatchComponentType = {
-  matchData: MatchDataType[] | undefined;
+  sortedMatches: MatchDataType[] | undefined;
   selectMatch: MatchDataType | undefined;
   setSelectMatch: React.Dispatch<
     React.SetStateAction<MatchDataType | undefined>
@@ -139,23 +140,23 @@ type MatchComponentType = {
 };
 
 export const MatchListComponent = ({
-  matchData,
+  sortedMatches,
   selectMatch,
   setSelectMatch,
 }: MatchComponentType) => {
   return (
     <>
       <ul className="w-[95%]">
-        {matchData &&
-          matchData.map((match) => (
+        {sortedMatches &&
+          sortedMatches.map((match) => (
             <li
               key={match.id}
               onClick={() => setSelectMatch(match)}
               className={clsx(
-                'text-center border-[1px] border-stone-400 p-3 mb-5 w-full cursor-pointer',
+                'text-center border-[1px] border-stone-400 p-3 mb-5 w-full cursor-pointer hover:bg-yellow-50',
                 match.id === selectMatch?.id
-                  ? `bg-yellow-100`
-                  : `hover:bg-stone-200`
+                  ? `bg-yellow-100 hover:bg-yellow-100`
+                  : isMatchDatePast(match) && 'bg-stone-100'
               )}
             >
               <h2 className="text-[18px]">
