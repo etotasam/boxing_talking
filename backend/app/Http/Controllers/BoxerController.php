@@ -3,29 +3,26 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Exception;
 use Illuminate\Support\Facades\DB;
 // Models
 use App\Models\Boxer;
 use App\Models\BoxingMatch;
-use App\Models\Organization;
-use App\Models\WeightDivision;
 use App\Models\Title;
 // requests
 use App\Http\Requests\BoxerRequest;
 // Services
 use App\Services\BoxerService;
 
-use function PHPUnit\Framework\isEmpty;
 
 class BoxerController extends Controller
 {
 
-    public function __construct(Boxer $boxer, BoxingMatch $match, BoxerService $boxerService)
+    public function __construct(Boxer $boxer, BoxingMatch $match, BoxerService $boxerService, Title $title)
     {
         $this->boxer = $boxer;
         $this->match = $match;
+        $this->title = $title;
         $this->boxerService = $boxerService;
     }
 
@@ -118,8 +115,8 @@ class BoxerController extends Controller
         try {
             $boxer = $request->toArray();
             DB::beginTransaction();
-            $newBoxer = $this->boxer->create($boxer);
-            $this->boxerService->setTitle($newBoxer["id"], $boxer["titles"]);
+            $response = $this->boxerService->createBoxer($boxer);
+            $this->boxerService->setTitle($response['boxer']['id'], $response['titles']);
             DB::commit();
             return response()->json(["message" => "Success created boxer"], 200);
         } catch (Exception $e) {
@@ -160,6 +157,12 @@ class BoxerController extends Controller
             if ($red_exist or $blue_exist) {
                 throw new Exception("Boxer has already setup match", 406);
             };
+            //? ボクサーが所持しているタイトルを削除
+            $titles = $this->title->where('boxer_id', $id)->get();
+            if (!$titles->isEmpty()) {
+                $deleteTargetBoxerIDs = $titles->pluck('boxer_id')->toArray();
+                $this->title->whereIn('boxer_id', $deleteTargetBoxerIDs)->delete();
+            }
 
             $boxer->delete();
             return response()->json(["message" => "Boxer is deleted"], 200);
@@ -201,21 +204,6 @@ class BoxerController extends Controller
                 return response()->json(["message" => $e->getMessage()], $e->getCode());
             }
             return response()->json(["message" => "Failed fighter update"], 500);
-        }
-    }
-
-
-
-
-    public function test()
-    {
-        try {
-
-            // $boxer = $this->boxer->getBoxerWithTitles(11);
-
-            // return response()->json($boxer);
-        } catch (Exception $e) {
-            return response()->json(["message" => $e->getMessage()], 500);
         }
     }
 }

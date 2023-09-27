@@ -21,9 +21,7 @@ class Title extends Model
         'weight_division_id',
     ];
 
-    protected $hidden = [
-        'boxer_id',
-    ];
+    protected $hidden = [];
 
 
 

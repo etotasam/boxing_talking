@@ -58,4 +58,4 @@ Route::middleware('administrator')->group(function () {
 });
 
 
-Route::get('/test', [BoxerController::class, 'test']);
+Route::get('/test', [MatchController::class, 'test']);

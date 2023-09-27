@@ -10,9 +10,14 @@ export const FullScreenSpinnerModal = () => {
   }, []);
   return (
     <div
-      className={`z-50 w-[100vw] h-[100vh] fixed top-0 left-0 flex justify-center items-center bg-black/50`}
+      className={`z-50 w-[100vw] h-[100vh] fixed top-0 left-0 flex justify-center items-center bg-black/30`}
     >
-      <RotatingLines strokeColor="#f1f1f1" strokeWidth="3" animationDuration="1" width="60" />
+      <RotatingLines
+        strokeColor="#f1f1f1"
+        strokeWidth="3"
+        animationDuration="1"
+        width="60"
+      />
     </div>
   );
 };
