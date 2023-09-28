@@ -7,6 +7,8 @@ use App\Models\Organization;
 use App\Models\WeightDivision;
 use App\Models\Title;
 use App\Models\Boxer;
+//Resource
+use App\Http\Resources\BoxerResource;
 
 class BoxerService
 {
@@ -50,21 +52,107 @@ class BoxerService
     }
   }
 
+
   /**
-   * update titles
    *
-   * @param array boxer
-   * @return array
+   * @param string name
+   * @param string country
+   * @param int limit
+   * @param int page
+   *
+   * @return array (key-value) boxers
+   * @return int count
    */
-  public function createBoxer($boxer): array
+  public function getBoxersAndCount($requestName, $country, $limit, $page)
   {
-    if (array_key_exists('titles', $boxer)) {
-      $titlesArray = $boxer["titles"];
-      unset($boxer["titles"]);
-    } else {
-      throw new Exception('titles is not exists in boxer data', 404);
+    try {
+      if ($requestName) {
+        if ($this->isEnglish($requestName)) {
+          $eng_name = $requestName;
+          $name = null;
+        } else {
+          $eng_name = null;
+          $name = $requestName;
+        }
+      } else {
+        $eng_name = null;
+        $name = null;
+      }
+      $country = $country;
+      $limit = 15;
+      $page = $page;
+
+      if (!isset($page)) $page = 1;
+      $under = ($page - 1) * $limit;
+
+      $searchWordArray = array_merge(compact("name"), compact("eng_name"), compact("country"));
+      $formattedSearchWordArray = array_filter($searchWordArray, function ($value) {
+        return $value !== null;
+      });
+
+      $newQuery = $this->boxer->newQuery();
+      if (empty($formattedSearchWordArray)) {
+        $query = $newQuery->offset($under)->limit($limit);
+      } else {
+        $whereClauseArray = $this->createWhereClauseArray($formattedSearchWordArray);
+        $query = $newQuery->where($whereClauseArray)->offset($under)->limit($limit);
+      }
+      // \Log::error($whereClauseArray);
+      $boxers = $query->with(["titles.organization", "titles.weightDivision"])->get();
+
+      $formattedBoxers = $boxers->map(function ($boxer) {
+        $formattedBoxer = new BoxerResource($boxer);
+        return $formattedBoxer;
+      });
+
+      return response()->json($formattedBoxers, 200);
+    } catch (Exception $e) {
+      if ($e->getCode()) {
+        throw new Exception($e->getMessage(), $e->getCode());
+      }
+      throw new Exception("Failed getBoxersWithNameAndCountry", 500);
     }
-    $createdBoxer = $this->boxer->create($boxer);
-    return ['boxer' => $createdBoxer, 'titles' => $titlesArray];
+  }
+
+  protected function createWhereClauseArray($arr_word): array
+  {
+    $arrayQuery = array_map(function ($key, $value) {
+      if (isset($value)) {
+        if ($key == 'name' || $key == "eng_name") {
+          return [$key, 'like', "%" . addcslashes($value, '%_\\') . "%"];
+        } else {
+          return [$key, 'like', $value];
+        }
+      }
+    }, array_keys($arr_word), array_values($arr_word));
+
+    $arrayQueries = array_filter($arrayQuery, function ($el) {
+      if (isset($el)) {
+        return $el;
+      }
+    });
+
+    return $arrayQueries;
+  }
+
+  protected function isEnglish($str)
+  {
+    $englishRanges = [
+      ['start' => 0x0041, 'end' => 0x005A], // 大文字アルファベット (A-Z)
+      ['start' => 0x0061, 'end' => 0x007A], // 小文字アルファベット (a-z)
+    ];
+
+    if (mb_strlen($str, 'UTF-8') > 0) {
+      $firstChar = mb_substr($str, 0, 1, 'UTF-8');
+      $unicodeValue = ord($firstChar);
+
+      foreach ($englishRanges as $range) {
+        if ($unicodeValue >= $range['start'] && $unicodeValue <= $range['end']) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 }

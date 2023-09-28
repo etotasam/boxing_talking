@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, reduce } from 'lodash';
 import dayjs from 'dayjs';
 import _ from 'lodash';
 // ! types
@@ -11,8 +11,12 @@ import {
   MatchDataType,
   MessageType,
 } from '@/assets/types';
+//!type evolution
+import { isMessageType } from '@/assets/typeEvaluations';
 //! data
 import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
+//? update可能なmatchデータのプロパティ
+// import { needMatchPropertyForUpdate } from '@/assets/needMatchPropertyForUpdate';
 import {
   MESSAGE,
   BG_COLOR_ON_TOAST_MODAL,
@@ -30,12 +34,7 @@ export const MatchSetter = ({
   isSuccessDeleteMatch?: boolean;
 }) => {
   //? use hook
-  const {
-    showToastModal,
-    setToastModal,
-    hideToastModal,
-    showToastModalMessage,
-  } = useToastModal();
+  const { hideToastModal, showToastModalMessage } = useToastModal();
   const { updateMatch } = useUpdateMatch();
   const [matchDate, setMatchDate] = useState('');
   const [matchGrade, setMatchGrade] = useState<GRADE_Type>();
@@ -142,15 +141,18 @@ export const MatchSetter = ({
       'weight',
       'titles',
       'match_date',
-    ];
-    const pickData = _.pick(selectMatch, needMatchPropertyForUpdate) as any;
+    ] as const;
+    const pickData = _.pick(
+      selectMatch,
+      needMatchPropertyForUpdate
+    ) as Partial<MatchDataType>;
     return pickData;
   };
 
   //? 現在のmatchデータと変更データを比較して、変更があるプロパティだけを抽出
   const extractChangeData = (
     matchDataForUpdate: any
-  ): Record<string, string | string[]> => {
+  ): Partial<MatchDataType> => {
     //データをセット
     const modificationData = {
       country: matchPlaceCountry,
@@ -181,6 +183,7 @@ export const MatchSetter = ({
     return updateMatchData;
   };
 
+  //?データ変更が無い時モーダル表示
   const showModalIfDataNotChanged = (onlyModifiedData: any) => {
     if (!Object.keys(onlyModifiedData).length) {
       throw new Error(MESSAGE.MATCH_IS_NOT_MODIFIED);
@@ -205,7 +208,7 @@ export const MatchSetter = ({
 
       updateMatch({ matchId, changeData: onlyModifiedData });
     } catch (error: any) {
-      if (error.message as MessageType) {
+      if (isMessageType(error.message)) {
         showToastModalMessage({
           message: error.message,
           bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,

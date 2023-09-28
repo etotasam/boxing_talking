@@ -58,4 +58,5 @@ Route::middleware('administrator')->group(function () {
 });
 
 
-Route::get('/test', [MatchController::class, 'test']);
+// Route::get('/test', [MatchController::class, 'test']);
+Route::get('/test', [BoxerController::class, 'testQuery']);

@@ -54,12 +54,13 @@ export const useFetchBoxer = () => {
   }
 
   const fetchBoxerAPI = async ({ page, limit, searchWords }: FetcherPropsType) => {
-    const res = await Axios.get<BoxerType[]>("/api/boxer", { params: { page, limit, ...searchWords } }).then(value => value.data)
+    const res = await Axios.get<{ boxers: BoxerType[], count: number }>("/api/boxer", { params: { page, limit, ...searchWords } }).then(value => value.data)
     return res
   }
-  const { data: boxersData, isLoading, isError, isPreviousData, refetch, isRefetching, } = useQuery<BoxerType[]>([QUERY_KEY.boxer, { ...queryKey }], () => fetchBoxerAPI({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), {
+  const { data: boxersData, isLoading, isError, isPreviousData, refetch, isRefetching, } = useQuery<{ boxers: BoxerType[], count: number }>([QUERY_KEY.boxer, { ...queryKey }], () => fetchBoxerAPI({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), {
     keepPreviousData: true, staleTime: Infinity, onSuccess: () => { }, onError: () => { }
   })
+
 
   const fetchCountBoxerAPI = async (searchWords: SearchWordType) => await Axios.get<number>("/api/boxer/count", { params: { ...searchWords } }).then(v => v.data)
   const { data: boxersCount } = useQuery<number>([QUERY_KEY.countBoxer, { name: paramName, country: paramCountry }], () => fetchCountBoxerAPI({ name: paramName, country: paramCountry }), { staleTime: Infinity })

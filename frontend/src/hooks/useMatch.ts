@@ -102,7 +102,7 @@ export const useRegisterMatch = () => {
 
 type ArgumentType = {
   matchId: number,
-  changeData: Record<string, string | string[]>
+  changeData: Partial<MatchDataType>
 }
 
 export const useUpdateMatch = () => {

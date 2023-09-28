@@ -68,8 +68,8 @@ class MatchService
   public function formatMatches($matches)
   {
     $formattedMatches = $matches->map(function ($item) {
-      $redBoxer = $this->boxer->getBoxerWithTitles($item->red_boxer_id);
-      $blueBoxer = $this->boxer->getBoxerWithTitles($item->blue_boxer_id);
+      $redBoxer = $this->boxer->getBoxerSingleByID($item->red_boxer_id);
+      $blueBoxer = $this->boxer->getBoxerSingleByID($item->blue_boxer_id);
       $titles = $this->formatTitles($item);
 
       return  [

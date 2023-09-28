@@ -14,7 +14,6 @@ use App\Http\Requests\BoxerRequest;
 // Services
 use App\Services\BoxerService;
 
-
 class BoxerController extends Controller
 {
 
@@ -26,27 +25,7 @@ class BoxerController extends Controller
         $this->boxerService = $boxerService;
     }
 
-    //? name eng_name countryで検索出来るqueryを作る
-    protected function createQuery($arr_word): array
-    {
-        $arrayQuery = array_map(function ($key, $value) {
-            if (isset($value)) {
-                if ($key == 'name' || $key == "eng_name") {
-                    return [$key, 'like', "%" . addcslashes($value, '%_\\') . "%"];
-                } else {
-                    return [$key, 'like', $value];
-                }
-            }
-        }, array_keys($arr_word), array_values($arr_word));
 
-        $arrayQueries = array_filter($arrayQuery, function ($el) {
-            if (isset($el)) {
-                return $el;
-            }
-        });
-
-        return $arrayQueries;
-    }
     /**
      * fetch fighters data from DB
      *
@@ -54,13 +33,15 @@ class BoxerController extends Controller
      * @param int require page
      * @param string name
      * @param string country
-     * @return array 選手情報
+     *
+     * @return array (key-value)boxers
+     * @return int count
      */
     public function fetch(Request $request)
     {
         try {
-            $boxers = $this->boxer->getBoxersByNameAndCountry($request->name, $request->country, $request->limit, $request->page);
-            return response()->json($boxers, 200);
+            $result = $this->boxerService->getBoxersAndCount($request->name, $request->country, $request->limit, $request->page);
+            return $result;
         } catch (Exception $e) {
             if ($e->getCode()) {
                 return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
@@ -98,10 +79,10 @@ class BoxerController extends Controller
                 }
             });
 
-            $fighters_count = Boxer::where($likeQueries)->count();
-            return response()->json($fighters_count, 200);
+            $boxersCount = $this->boxer->where($likeQueries)->count();
+            return response()->json($boxersCount, 200);
         } catch (Exception $e) {
-            return response()->json(["message" => "faild get count fighters"], 500);
+            return response()->json(["message" => "Failed get count boxers"], 500);
         }
     }
 
@@ -115,7 +96,7 @@ class BoxerController extends Controller
         try {
             $boxer = $request->toArray();
             DB::beginTransaction();
-            $response = $this->boxerService->createBoxer($boxer);
+            $response = $this->boxer->createBoxer($boxer);
             $this->boxerService->setTitle($response['boxer']['id'], $response['titles']);
             DB::commit();
             return response()->json(["message" => "Success created boxer"], 200);
@@ -190,7 +171,7 @@ class BoxerController extends Controller
             }
 
             $updateBoxerData = $request->toArray();
-            \Log::error($updateBoxerData["titles"]);
+            // \Log::error($updateBoxerData["titles"]);
             $this->boxerService->setTitle($boxerID, $updateBoxerData["titles"]);
 
             unset($updateBoxerData["titles"]);
@@ -205,5 +186,11 @@ class BoxerController extends Controller
             }
             return response()->json(["message" => "Failed fighter update"], 500);
         }
+    }
+
+    public function testQuery(Request $request)
+    {
+        $result = $this->boxerService->getBoxersAndCount($request->name, $request->country, $request->limit, $request->page);
+        return $result;
     }
 }
