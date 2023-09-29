@@ -2,9 +2,9 @@
 
 namespace Tests\Unit;
 
+use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use App\Models\BoxingMatch;
 use App\Models\Boxer;
 
@@ -51,8 +51,13 @@ class MatchControllerTest extends TestCase
     /**
      * @test
      */
-    public function matchesFetch()
+    public function matchesFetchTest()
     {
+        //? setupでセットした数のボクサーがちゃんとDBに入ってるかテスト
+        $count = BoxingMatch::count();
+        $this->assertSame(5, $count);
+
+
         //?指定がない場合は過去の試合を取得しない(一週間前までの試合は取得)
         $response = $this->get('/api/match');
         $response->assertSuccessful()

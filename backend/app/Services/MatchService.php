@@ -3,11 +3,14 @@
 namespace App\Services;
 
 use Exception;
+use Illuminate\Support\Collection;
 use Illuminate\Http\Response;
 use App\Models\Organization;
 use App\Models\TitleMatch;
 use App\Models\Boxer;
 use App\Models\BoxingMatch;
+// Services
+use App\Services\BoxerService;
 
 class MatchService
 {
@@ -16,12 +19,14 @@ class MatchService
     BoxingMatch $match,
     Boxer $boxer,
     Organization $organization,
-    TitleMatch $titleMatch
+    TitleMatch $titleMatch,
+    BoxerService $boxerService
   ) {
     $this->match = $match;
     $this->boxer = $boxer;
     $this->organization = $organization;
     $this->titleMatch = $titleMatch;
+    $this->boxerService = $boxerService;
   }
 
   /**
@@ -49,9 +54,9 @@ class MatchService
 
   /**
    * @param int matchID
-   * @return array matchData
+   * @return BoxingMatch match
    */
-  public function getSingleMatch($matchID)
+  public function getSingleMatchOrThrowExceptionWhenNotExists($matchID): BoxingMatch
   {
     $match = $this->match->find($matchID);
     if (!$match) {
@@ -61,15 +66,14 @@ class MatchService
   }
 
   /**
-   *
    * @param array matches
-   * @return array
+   * @return Collection
    */
-  public function formatMatches($matches)
+  public function formatMatches($matches): Collection
   {
     $formattedMatches = $matches->map(function ($item) {
-      $redBoxer = $this->boxer->getBoxerSingleByID($item->red_boxer_id);
-      $blueBoxer = $this->boxer->getBoxerSingleByID($item->blue_boxer_id);
+      $redBoxer = $this->boxerService->getBoxerSingleByID($item->red_boxer_id);
+      $blueBoxer = $this->boxerService->getBoxerSingleByID($item->blue_boxer_id);
       $titles = $this->formatTitles($item);
 
       return  [

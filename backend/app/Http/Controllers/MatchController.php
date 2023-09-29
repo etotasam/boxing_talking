@@ -132,7 +132,7 @@ class MatchController extends Controller
             $requestArray = $request->toArray();
             $matchID = $requestArray['match_id'];
             //?試合の取得
-            $match = $this->matchService->getSingleMatch($matchID);
+            $match = $this->matchService->getSingleMatchOrThrowExceptionWhenNotExists($matchID);
             DB::beginTransaction();
             //?リクエストから変更対象を取得
             $updateMatchData = $requestArray['update_match_data'];
