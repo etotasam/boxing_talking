@@ -22,6 +22,8 @@ import {
 import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 //! types
 import { BoxerType, MessageType } from '@/assets/types';
+//! type evolution
+import { isMessageType } from '@/assets/typeEvaluations';
 //! layout
 import AdminLayout from '@/layout/AdminLayout';
 //! component
@@ -116,11 +118,14 @@ export const BoxerEdit = () => {
       //? ボクサーデータ編集実行
       updateFighter(editTargetBoxerData);
     } catch (error: any) {
-      if (!error.message) return;
-      showToastModalMessage({
-        message: error.message as MessageType,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
+      if (isMessageType(error.message)) {
+        showToastModalMessage({
+          message: error.message,
+          bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
+        });
+      } else {
+        console.error('Failed boxer edit');
+      }
     }
   };
 

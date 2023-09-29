@@ -29,7 +29,7 @@ Route::post('/guest/login', [AuthController::class, 'guestLogin']);
 //? 試合
 Route::get('/match', [MatchController::class, 'fetch']);
 //? ボクサー
-Route::get('/boxer/count', [BoxerController::class, 'count']);
+// Route::get('/boxer/count', [BoxerController::class, 'count']);
 Route::get('/boxer', [BoxerController::class, 'fetch']);
 //? 勝利予想
 Route::get('/prediction', [WinLossPredictionController::class, 'fetch']);
@@ -47,15 +47,16 @@ Route::middleware('administrator')->group(function () {
     //? ボクサー
     Route::get('/boxer/search', [BoxerController::class, 'search']);
     Route::post('/boxer', [BoxerController::class, 'register']);
-    Route::put('/boxer', [BoxerController::class, 'update']);
+    Route::patch('/boxer', [BoxerController::class, 'update']);
     Route::delete('/boxer', [BoxerController::class, 'delete']);
     //? コメント
     Route::delete('/comment', [CommentController::class, 'delete']);
     //? 試合
     Route::post('/match', [MatchController::class, 'register']);
     Route::delete('/match', [MatchController::class, 'delete']);
-    Route::put('/match', [MatchController::class, 'update']);
+    Route::patch('/match', [MatchController::class, 'update']);
 });
 
 
-Route::get('/test', [MatchController::class, 'test']);
+// Route::get('/test', [MatchController::class, 'test']);
+// Route::get('/test', [BoxerController::class, 'testQuery']);

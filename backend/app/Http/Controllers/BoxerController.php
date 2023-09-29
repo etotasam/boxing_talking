@@ -14,7 +14,6 @@ use App\Http\Requests\BoxerRequest;
 // Services
 use App\Services\BoxerService;
 
-
 class BoxerController extends Controller
 {
 
@@ -26,41 +25,21 @@ class BoxerController extends Controller
         $this->boxerService = $boxerService;
     }
 
-    //? name eng_name countryで検索出来るqueryを作る
-    protected function createQuery($arr_word): array
-    {
-        $arrayQuery = array_map(function ($key, $value) {
-            if (isset($value)) {
-                if ($key == 'name' || $key == "eng_name") {
-                    return [$key, 'like', "%" . addcslashes($value, '%_\\') . "%"];
-                } else {
-                    return [$key, 'like', $value];
-                }
-            }
-        }, array_keys($arr_word), array_values($arr_word));
-
-        $arrayQueries = array_filter($arrayQuery, function ($el) {
-            if (isset($el)) {
-                return $el;
-            }
-        });
-
-        return $arrayQueries;
-    }
     /**
-     * fetch fighters data from DB
      *
      * @param int require limit
      * @param int require page
      * @param string name
      * @param string country
-     * @return array 選手情報
+     *
+     * @return array (key-value)boxers
+     * @return int count
      */
     public function fetch(Request $request)
     {
         try {
-            $boxers = $this->boxer->getBoxersByNameAndCountry($request->name, $request->country, $request->limit, $request->page);
-            return response()->json($boxers, 200);
+            $result = $this->boxerService->getBoxersAndCount($request->name, $request->country, $request->limit, $request->page);
+            return $result;
         } catch (Exception $e) {
             if ($e->getCode()) {
                 return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
@@ -71,42 +50,6 @@ class BoxerController extends Controller
 
 
     /**
-     * count fighters
-     * @param string name
-     * @param string country
-     * @return int 選手の数
-     */
-    public function count(Request $request)
-    {
-        try {
-            $name = $request->name;
-            $country = $request->country;
-            $arrayWords = compact("name", "country");
-            $arrayQuery = array_map(function ($key, $value) {
-                if (isset($value)) {
-                    if ($key == 'name') {
-                        return [$key, 'like', "%" . addcslashes($value, '%_\\') . "%"];
-                    } else {
-                        return [$key, 'like', $value];
-                    }
-                }
-            }, array_keys($arrayWords), array_values($arrayWords));
-
-            $likeQueries = array_filter($arrayQuery, function ($el) {
-                if (isset($el)) {
-                    return $el;
-                }
-            });
-
-            $fighters_count = Boxer::where($likeQueries)->count();
-            return response()->json($fighters_count, 200);
-        } catch (Exception $e) {
-            return response()->json(["message" => "faild get count fighters"], 500);
-        }
-    }
-
-    /**
-     * fetch fighters data from DB
      *
      * @param \Illuminate\Http\Request
      */
@@ -115,7 +58,7 @@ class BoxerController extends Controller
         try {
             $boxer = $request->toArray();
             DB::beginTransaction();
-            $response = $this->boxerService->createBoxer($boxer);
+            $response = $this->boxer->createBoxer($boxer);
             $this->boxerService->setTitle($response['boxer']['id'], $response['titles']);
             DB::commit();
             return response()->json(["message" => "Success created boxer"], 200);
@@ -139,7 +82,6 @@ class BoxerController extends Controller
     public function delete(Request $request)
     {
         try {
-            // throw new Exception("@@@@@@エラー", 406);
             $id = $request->boxer_id;
             $boxerEngName = $request->eng_name;
             try {
@@ -151,53 +93,45 @@ class BoxerController extends Controller
             if ($boxer->eng_name != $boxerEngName) {
                 throw new Exception("Request data is dose not match boxer in database", 406);
             };
-            //? 試合が組まれているかどうかをチェックする
-            $red_exist = $this->match->where("red_boxer_id", $id)->exists();
-            $blue_exist = $this->match->where("blue_boxer_id", $id)->exists();
-            if ($red_exist or $blue_exist) {
-                throw new Exception("Boxer has already setup match", 406);
-            };
-            //? ボクサーが所持しているタイトルを削除
-            $titles = $this->title->where('boxer_id', $id)->get();
-            if (!$titles->isEmpty()) {
-                $deleteTargetBoxerIDs = $titles->pluck('boxer_id')->toArray();
-                $this->title->whereIn('boxer_id', $deleteTargetBoxerIDs)->delete();
-            }
+            //? 対象ボクサーが既に試合を組まれている場合はthrow
+            $this->boxerService->throwErrorIfBoxerHaveMatch($this->match, $id);
 
+            DB::beginTransaction();
+            $this->title->where('boxer_id', $id)->delete(); //?ボクサーが所持しているタイトルを削除
             $boxer->delete();
+            DB::commit();
             return response()->json(["message" => "Boxer is deleted"], 200);
         } catch (Exception $e) {
+            DB::rollBack();
             if ($e->getCode() === 406) {
                 return response()->json(["message" => $e->getMessage()], 406);
             }
-            return response()->json(["message" => "delete error"], 500);
+            return response()->json(["message" => "Delete error"], 500);
         }
     }
 
     /**
-     * update fighter data
      *
      * @param
      */
     public function update(Request $request)
     {
         try {
-            DB::beginTransaction();
             $boxerID = $request->id;
             $boxer = $this->boxer->find($boxerID);
             if (!$boxer) {
-                throw new Exception("Boxer is not exists", 404);
+                throw new Exception("No boxer with that ID exists", 404);
             }
 
             $updateBoxerData = $request->toArray();
-            \Log::error($updateBoxerData["titles"]);
+            DB::beginTransaction();
             $this->boxerService->setTitle($boxerID, $updateBoxerData["titles"]);
 
             unset($updateBoxerData["titles"]);
 
             $boxer->update($updateBoxerData);
             DB::commit();
-            return response()->json(["message" => "boxer updated"], 200);
+            return response()->json(["message" => "Successful boxer update"], 200);
         } catch (Exception $e) {
             DB::rollBack();
             if ($e->getCode()) {

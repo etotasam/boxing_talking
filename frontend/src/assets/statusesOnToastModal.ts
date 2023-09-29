@@ -21,6 +21,9 @@ export const BG_COLOR_ON_TOAST_MODAL = {
   GRAY: "stone"
 } as const
 
+
+
+
 export const MESSAGE = {
 
   //? user登録
@@ -32,9 +35,6 @@ export const MESSAGE = {
   EMAIL_HAS_ALREADY_EXIST: "すでに登録されているEmailです",
   USER_NAME_ALREADY_USE: "すでに使われている名前です \n 別の名前を検討してください",
   NAME_CHAR_LIMIT_OVER: "名前の文字数がオーバーしています \n 30文字までです",
-
-
-
 
   // ! login form
   EMAIL_OR_PASSWORD_NO_INPUT: "Email・Passwordの入力が必要です",

@@ -11,7 +11,7 @@ import { useAdmin } from '@/hooks/useAuth';
 import { ToastModalContainer } from '@/components/modal/ToastModal';
 import { LoginFormModal } from '@/components/modal/LoginFormModal';
 import { FullScreenSpinnerModal } from '@/components/modal/FullScreenSpinnerModal';
-import { FirstLoadinModal } from '@/components/modal/FirstLoadinModal';
+import { FirstLoadingModal } from '@/components/modal/FirstLoadingModal';
 import { useLoginModal } from '@/hooks/useLoginModal';
 // ! recoil
 import { useRecoilValue } from 'recoil';
@@ -55,6 +55,7 @@ const Container = () => {
     });
   };
 
+  //? authコントロール
   useEffect(() => {
     if (isAuth === undefined || guestUser === undefined) return;
     if (!isAuth && !guestUser && pathname !== '/identification/') {
@@ -76,7 +77,7 @@ const Container = () => {
           <FullScreenSpinnerModal key={'FullScreenSpinnerModal'} />
         )}
         {(isFirstCheckingAuth || isBoxersFetching || isMatchesFetching) && (
-          <FirstLoadinModal key={'FirstLoadinModal'} />
+          <FirstLoadingModal key={'FirstLoadingModal'} />
         )}
       </AnimatePresence>
       {isShowLoginModal && <LoginFormModal key={'LoginFormModal'} />}

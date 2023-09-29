@@ -2,7 +2,7 @@ import { TailSpin } from 'react-loader-spinner';
 import { motion } from 'framer-motion';
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
-export const FirstLoadinModal = () => {
+export const FirstLoadingModal = () => {
   return (
     <motion.div
       initial={{ opacity: 1 }}

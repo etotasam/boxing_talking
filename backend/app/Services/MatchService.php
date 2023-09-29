@@ -68,8 +68,8 @@ class MatchService
   public function formatMatches($matches)
   {
     $formattedMatches = $matches->map(function ($item) {
-      $redBoxer = $this->boxer->getBoxerWithTitles($item->red_boxer_id);
-      $blueBoxer = $this->boxer->getBoxerWithTitles($item->blue_boxer_id);
+      $redBoxer = $this->boxer->getBoxerSingleByID($item->red_boxer_id);
+      $blueBoxer = $this->boxer->getBoxerSingleByID($item->blue_boxer_id);
       $titles = $this->formatTitles($item);
 
       return  [
@@ -90,27 +90,23 @@ class MatchService
     return $formattedMatches;
   }
 
-
-
-  /**
-   *
-   * @param object match
-   * @return array
-   */
+  // formatMatches()内で使用
   public function formatTitles($match)
   {
     $organizations = $match->organization;
-    if (!empty($organizations)) {
-      $organizationsArray = $organizations->map(function ($organization) use ($match) {
-        $title = ["organization" => $organization->name, 'weightDivision' => $match->weight];
-        return $title;
-      });
-      return $organizationsArray;
-    } else {
-      $organizationsArray = [];
-    }
+    $organizationsArray = !empty($organizations) ? $this->formatTitlesInCaseExists($organizations, $match) : [];
     return $organizationsArray;
   }
+
+  private function formatTitlesInCaseExists($organizations, $match)
+  {
+    $organizationsArray =  $organizations->map(function ($organization) use ($match) {
+      $title = ["organization" => $organization->name, 'weightDivision' => $match->weight];
+      return $title;
+    });
+    return $organizationsArray;
+  }
+
 
   /**
    * @param array organizationsArray
@@ -142,19 +138,15 @@ class MatchService
   {
     if (!empty($matchID)) {
       $titles = $this->titleMatch->where('match_id', $matchID)->get();
-      if (!$titles->isEmpty()) {
-        return $titles;
-      } else {
-        return collect();
-      }
+      return !$titles->isEmpty() ? $titles : collect();
     }
   }
 
   /**
    * @param array match
-   * @return void
+   * @return  array
    */
-  public function getOrganizationsArray($match)
+  public function getOrganizationsArray($match): array
   {
     if (array_key_exists('titles', $match)) {
       $organizationsArray = $match['titles'];
@@ -168,7 +160,7 @@ class MatchService
    * @param int matchID
    * @return void
    */
-  public function deleteMatch($matchID)
+  public function deleteMatch($matchID): void
   {
     $match = $this->match->find($matchID);
     if (!isset($match)) {
@@ -176,11 +168,12 @@ class MatchService
     }
     $match->delete();
   }
+
   /**
    * @param int matchID
    * @return void
    */
-  public function deleteTitleMatch($matchID)
+  public function deleteTitleMatch($matchID): void
   {
     $titles = $this->titleMatch->where('match_id', $matchID)->get();
     if (!$titles->isEmpty()) {

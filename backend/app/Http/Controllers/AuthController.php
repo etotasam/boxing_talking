@@ -73,13 +73,9 @@ class AuthController extends Controller
                 throw new Exception('Failed guest logout', Response::HTTP_FORBIDDEN);
             }
 
-            //? ログアウトと同時にゲストユーザーを削除
             $guestUserID = $guestGuard->user()->id;
             $guestGuard->logout();
-            $guest = $this->guest->find($guestUserID);
-            if ($guest) {
-                $guest->delete();
-            }
+            $this->guest->find($guestUserID)->delete(); //? ログアウトと同時にゲストユーザーを削除
             if (!Auth::guard('guest')->check()) {
                 return response()->json(["success" => true, "message" => "Logout guest user"], Response::HTTP_ACCEPTED);
             } else {

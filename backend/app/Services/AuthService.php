@@ -29,7 +29,7 @@ class AuthService
     } else {
       throw new Exception("No auth", Response::HTTP_UNAUTHORIZED);
     }
-    $isAdmin = Administrator::where("user_id", $authUserID)->exists();
+    $isAdmin = $this->admin->where("user_id", $authUserID)->exists();
     if (!$isAdmin) {
       throw new Exception("No admin", Response::HTTP_UNAUTHORIZED);
     }

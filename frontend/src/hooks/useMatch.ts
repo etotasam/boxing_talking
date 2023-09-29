@@ -102,7 +102,7 @@ export const useRegisterMatch = () => {
 
 type ArgumentType = {
   matchId: number,
-  changeData: Record<string, string | string[]>
+  changeData: Partial<MatchDataType>
 }
 
 export const useUpdateMatch = () => {
@@ -114,7 +114,7 @@ export const useUpdateMatch = () => {
       match_id: arg.matchId,
       update_match_data: arg.changeData
     }
-    await Axios.put("/api/match", updateData)
+    await Axios.patch("/api/match", updateData)
   }, [])
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {

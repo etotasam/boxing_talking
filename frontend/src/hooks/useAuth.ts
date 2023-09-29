@@ -63,11 +63,11 @@ export const useGuestLogin = () => {
 
   const guestLogin = () => {
     mutate(({}), {
-      onSuccess: (data) => {
+      onSuccess: () => {
         hideLoginModal()
         refetchMatchPrediction()
         resetLoadingState()
-        setReactQueryData<boolean>(QUERY_KEY.guest, Boolean(data))
+        setReactQueryData<boolean>(QUERY_KEY.guest, true)
         setToastModal({ message: MESSAGE.LOGIN_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
       },
@@ -106,18 +106,9 @@ export const useGuestLogout = () => {
       onSuccess: () => {
         // ? ユーザー情報のキャッシュをclear
         queryClient.setQueryData<boolean>(QUERY_KEY.guest, false)
-        // queryClient.invalidateQueries(QUERY_KEY.admin)
-        //? 勝敗予想のキャッシュをclearしてリフェッチ
-        // queryClient.setQueryData(QUERY_KEY.prediction, undefined)
-        // refetchMatchPrediction()
         successful()
         setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
         showToastModal()
-        // //? ユーザの勝敗予想データのキャッシュを削除
-        // queryClient.setQueryData(QUERY_KEY.vote, [])
-        // //? auth を削除
-        // queryClient.setQueryData<boolean>(QUERY_KEY.auth, false)
-        // navigate("/")
         resetLoadingState()
       },
       onError: () => {
