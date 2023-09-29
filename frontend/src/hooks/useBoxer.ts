@@ -79,7 +79,7 @@ export const useUpdateBoxerData = () => {
   //? params page の取得
   const { setToastModal, showToastModal } = useToastModal()
   const api = async (updateFighterData: BoxerType): Promise<void> => {
-    await Axios.put<void>("/api/boxer", updateFighterData);
+    await Axios.patch<void>("/api/boxer", updateFighterData);
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: async () => {

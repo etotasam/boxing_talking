@@ -26,7 +26,6 @@ class BoxerController extends Controller
     }
 
     /**
-     * fetch fighters data from DB
      *
      * @param int require limit
      * @param int require page
@@ -51,7 +50,6 @@ class BoxerController extends Controller
 
 
     /**
-     * fetch fighters data from DB
      *
      * @param \Illuminate\Http\Request
      */
@@ -142,10 +140,4 @@ class BoxerController extends Controller
             return response()->json(["message" => "Failed fighter update"], 500);
         }
     }
-
-    // public function testQuery(Request $request)
-    // {
-    //     $result = $this->boxerService->getBoxersAndCount($request->name, $request->country, $request->limit, $request->page);
-    //     return $result;
-    // }
 }
