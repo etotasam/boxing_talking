@@ -49,8 +49,6 @@ Route::middleware('administrator')->group(function () {
     Route::post('/boxer', [BoxerController::class, 'register']);
     Route::patch('/boxer', [BoxerController::class, 'update']);
     Route::delete('/boxer', [BoxerController::class, 'delete']);
-    //? コメント
-    Route::delete('/comment', [CommentController::class, 'delete']);
     //? 試合
     Route::post('/match', [MatchController::class, 'register']);
     Route::delete('/match', [MatchController::class, 'delete']);

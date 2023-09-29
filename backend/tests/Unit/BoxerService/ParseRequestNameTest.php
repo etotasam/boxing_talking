@@ -7,6 +7,7 @@ use App\Services\BoxerService;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Title;
 use App\Models\Boxer;
+use App\Models\BoxingMatch;
 use App\Models\Organization;
 use App\Models\WeightDivision;
 
@@ -17,7 +18,7 @@ class ParseRequestNameTest extends TestCase
   {
     parent::setUp();
     // $this->mock = Mockery::mock(Model::class);
-    $this->boxerService = new BoxerService(new Organization, new WeightDivision, new Title, new Boxer);
+    $this->boxerService = new BoxerService(new Organization, new WeightDivision, new Title, new Boxer, new BoxingMatch);
   }
 
 

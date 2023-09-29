@@ -2,26 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-// Models
-use App\Models\Boxer;
-use App\Models\BoxingMatch;
-use App\Models\Title;
-// requests
 use App\Http\Requests\BoxerRequest;
-// Services
 use App\Services\BoxerService;
 
 class BoxerController extends Controller
 {
 
-    public function __construct(Boxer $boxer, BoxingMatch $match, BoxerService $boxerService, Title $title)
+    public function __construct(BoxerService $boxerService)
     {
-        $this->boxer = $boxer;
-        $this->match = $match;
-        $this->title = $title;
         $this->boxerService = $boxerService;
     }
 
@@ -51,15 +42,15 @@ class BoxerController extends Controller
 
     /**
      *
-     * @param \Illuminate\Http\Request
+     * @param \Illuminate\Http\Request boxerData
      */
     public function register(BoxerRequest $request)
     {
         try {
-            $boxer = $request->toArray();
+            $boxerData = $request->toArray();
             DB::beginTransaction();
-            $response = $this->boxer->createBoxer($boxer);
-            $this->boxerService->setTitle($response['boxer']['id'], $response['titles']);
+            list($createdBoxer, $titles) = $this->boxerService->createBoxer($boxerData);
+            $this->boxerService->setTitle($createdBoxer['id'], $titles);
             DB::commit();
             return response()->json(["message" => "Success created boxer"], 200);
         } catch (Exception $e) {
@@ -75,17 +66,17 @@ class BoxerController extends Controller
     }
 
     /**
-     * delete boxer in DB
      *
-     * @param
+     * @param int boxer_id
+     * @param string eng_name
      */
     public function delete(Request $request)
     {
         try {
-            $id = $request->boxer_id;
+            $boxerID = $request->boxer_id;
             $boxerEngName = $request->eng_name;
             try {
-                $boxer = $this->boxer->findOrFail($id);
+                $boxer = $this->boxerService->getBoxerFindOrFail($boxerID);
             } catch (Exception $e) {
                 return response()->json(["message" => "Boxer is not exist in DB"], 406);
             };
@@ -94,10 +85,10 @@ class BoxerController extends Controller
                 throw new Exception("Request data is dose not match boxer in database", 406);
             };
             //? 対象ボクサーが既に試合を組まれている場合はthrow
-            $this->boxerService->throwErrorIfBoxerHaveMatch($this->match, $id);
+            $this->boxerService->throwErrorIfBoxerHaveMatch($boxerID);
 
             DB::beginTransaction();
-            $this->title->where('boxer_id', $id)->delete(); //?ボクサーが所持しているタイトルを削除
+            $this->boxerService->deleteBoxerTitles($boxerID); //?ボクサーが所持しているタイトルを削除
             $boxer->delete();
             DB::commit();
             return response()->json(["message" => "Boxer is deleted"], 200);
@@ -118,8 +109,9 @@ class BoxerController extends Controller
     {
         try {
             $boxerID = $request->id;
-            $boxer = $this->boxer->find($boxerID);
-            if (!$boxer) {
+            try {
+                $boxer = $this->boxerService->getBoxerFindOrFail($boxerID);
+            } catch (Exception $e) {
                 throw new Exception("No boxer with that ID exists", 404);
             }
 

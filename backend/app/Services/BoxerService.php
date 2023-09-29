@@ -7,18 +7,74 @@ use App\Models\Organization;
 use App\Models\WeightDivision;
 use App\Models\Title;
 use App\Models\Boxer;
+use App\Models\BoxingMatch;
 //Resource
 use App\Http\Resources\BoxerResource;
 
 class BoxerService
 {
 
-  public function __construct(Organization $organization, WeightDivision $weightDivision, Title $title, Boxer $boxer)
-  {
+  public function __construct(
+    Organization $organization,
+    WeightDivision $weightDivision,
+    Title $title,
+    Boxer $boxer,
+    BoxingMatch $match
+  ) {
     $this->organization = $organization;
     $this->weightDivision = $weightDivision;
     $this->title = $title;
     $this->boxer = $boxer;
+    $this->match = $match;
+  }
+
+  /**
+   *
+   * @param array boxer
+   * @return array
+   */
+  public function createBoxer($boxer): array
+  {
+    if (array_key_exists('titles', $boxer)) {
+      $titlesArray = $boxer["titles"];
+      unset($boxer["titles"]);
+    } else {
+      throw new Exception('titles is not exists in boxer data', 404);
+    }
+    $createdBoxer = $this->boxer->create($boxer);
+    return [$createdBoxer, $titlesArray];
+  }
+
+  /**
+   * @param int boxerID
+   * @return collection boxer data
+   */
+  public function getBoxerFindOrFail($boxerID)
+  {
+    return $this->boxer->findOrFail($boxerID);
+  }
+
+  /**
+   * boxerを個別で取得
+   * @param int boxerID
+   *
+   * @return array(key-value) boxerData
+   */
+  public function getBoxerSingleByID($boxerID)
+  {
+    $fetchedBoxer = $this->boxer->with(["titles.organization", "titles.weightDivision"])
+      ->find($boxerID);
+    if (!$fetchedBoxer) {
+      throw new Exception("no exist boxer", 500);
+    }
+    $titles = $fetchedBoxer->titles->map(function ($title) {
+      $name = $title->organization->name;
+      $weight = $title->weightDivision->weight;
+      return ["organization" => $name, "weight" => $weight];
+    });
+    $formattedBoxer = $fetchedBoxer->toArray();
+    $formattedBoxer["titles"] = $titles;
+    return $formattedBoxer;
   }
 
   /**
@@ -50,6 +106,15 @@ class BoxerService
         ]);
       }
     }
+  }
+
+  /**
+   * @param ind boxerID
+   * @return void
+   */
+  public function deleteBoxerTitles($boxerID): void
+  {
+    $this->title->where('boxer_id', $boxerID)->delete();
   }
 
   //getBoxersAndCount()内で検索ワードが英語名検索かどうか日本語名の方かを振り分ける
@@ -165,9 +230,9 @@ class BoxerService
    *
    * @return void
    */
-  public function throwErrorIfBoxerHaveMatch($boxingMatchModel, $boxerID): void
+  public function throwErrorIfBoxerHaveMatch($boxerID): void
   {
-    $isBoxerHaveMatchQuery = $boxingMatchModel->query();
+    $isBoxerHaveMatchQuery = $this->match->query();
     $isBoxerHaveMatchQuery->where("red_boxer_id", $boxerID)->orWhere("blue_boxer_id", $boxerID);
     if ($isBoxerHaveMatchQuery->exists()) {
       throw new Exception("Boxer has already setup match", 406);

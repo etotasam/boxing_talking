@@ -34,4 +34,20 @@ class AuthService
       throw new Exception("No admin", Response::HTTP_UNAUTHORIZED);
     }
   }
+
+  /**
+   * @return string (uuid) userID
+   */
+  public function getUserIdOrThrowExceptionWhenNotExists(): string
+  {
+    if (Auth::check()) {
+      $userID = Auth::user()->id;
+    } else if (Auth::guard('guest')->check()) {
+      $userID = (string)Auth::guard('guest')->user()->id;
+    } else {
+      throw new Exception("Posting comments require Login", Response::HTTP_UNAUTHORIZED);
+    }
+
+    return $userID;
+  }
 }
