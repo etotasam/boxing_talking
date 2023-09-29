@@ -100,7 +100,7 @@ const LoginForm = () => {
     },
     hide: {
       opacity: 0,
-      taransition: {
+      transition: {
         duration: 0.3,
       },
     },

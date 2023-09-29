@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Organization;
 use App\Models\WeightDivision;
+use App\Models\BoxingMatch;
 use App\Models\Title;
 use Exception;
 
@@ -43,6 +44,16 @@ class Boxer extends Model
     public function titles()
     {
         return $this->hasMany(Title::class);
+    }
+
+    // public function hasMatch()
+    // {
+    //     return $this->match()->exists();
+    // }
+
+    public function hasMatch()
+    {
+        return $this->belongsTo(BoxingMatch::class, ['red_boxer_id', 'blue_boxer_id']);
     }
 
     /**

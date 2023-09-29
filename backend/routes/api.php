@@ -29,7 +29,7 @@ Route::post('/guest/login', [AuthController::class, 'guestLogin']);
 //? 試合
 Route::get('/match', [MatchController::class, 'fetch']);
 //? ボクサー
-Route::get('/boxer/count', [BoxerController::class, 'count']);
+// Route::get('/boxer/count', [BoxerController::class, 'count']);
 Route::get('/boxer', [BoxerController::class, 'fetch']);
 //? 勝利予想
 Route::get('/prediction', [WinLossPredictionController::class, 'fetch']);
@@ -59,4 +59,4 @@ Route::middleware('administrator')->group(function () {
 
 
 // Route::get('/test', [MatchController::class, 'test']);
-Route::get('/test', [BoxerController::class, 'testQuery']);
+// Route::get('/test', [BoxerController::class, 'testQuery']);

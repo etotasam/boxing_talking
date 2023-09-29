@@ -1,6 +1,6 @@
 
 .env*
-
+.husky/*
 # backend
 backend/node_modules
 backend/public/hot

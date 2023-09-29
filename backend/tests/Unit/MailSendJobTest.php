@@ -1,16 +1,15 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Unit;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use App\Jobs\MailSendJob;
 use App\Models\PreUser;
 use App\Mail\Mailer;
-use Illuminate\Queue\SyncQueue;
+
 
 class MailSendJobTest extends TestCase
 {
@@ -21,28 +20,25 @@ class MailSendJobTest extends TestCase
         parent::setUp();
         Queue::fake();
         Mail::fake();
-
-        $this->preUser = PreUser::create([
-            "name" => "testName",
-            "email" => "testEmail@test.com",
-            "password" => "PassWord1"
-        ]);
     }
     /**
      * @test
      */
-    public function mailSend()
+    public function mailQueueSetToJob()
     {
-        $preUser = $this->preUser;
+        $preUser = PreUser::create([
+            "name" => "testName",
+            "email" => "testEmail@test.com",
+            "password" => "PassWord1"
+        ]);
 
-        MailSendJob::dispatch($preUser->id, $preUser->name, $preUser->email)->onQueue("mailQueue");
+        $queueName = "mailQueue";
+
+        MailSendJob::dispatch($preUser->id, $preUser->name, $preUser->email)->onQueue($queueName);
 
         Queue::assertPushed(MailSendJob::class, function ($job) use ($preUser) {
             return $job->userID === $preUser->id && $job->name === $preUser->name && $job->email === $preUser->email;
         });
-        Queue::assertPushedOn("mailQueue", MailSendJob::class);
-        Mail::assertSent(Mailer::class, function ($mail) use ($preUser) {
-            return $mail->to == $preUser->email;
-        });
+        Queue::assertPushedOn($queueName, MailSendJob::class);
     }
 }

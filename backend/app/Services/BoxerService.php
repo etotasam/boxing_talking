@@ -30,7 +30,7 @@ class BoxerService
    */
   public function setTitle($boxerID, $titles)
   {
-    Title::where('boxer_id', $boxerID)->delete();
+    $this->title->where('boxer_id', $boxerID)->delete();
     if (!empty($titles)) {
       foreach ($titles as $title) {
         $organizationName = $title["organization"];
@@ -52,90 +52,17 @@ class BoxerService
     }
   }
 
-
-  /**
-   *
-   * @param string name
-   * @param string country
-   * @param int limit
-   * @param int page
-   *
-   * @return array (key-value) boxers
-   * @return int count
-   */
-  public function getBoxersAndCount($requestName, $country, $limit, $page)
+  //getBoxersAndCount()内で検索ワードが英語名検索かどうか日本語名の方かを振り分ける
+  public function parseRequestName($requestName): array
   {
-    try {
-      if ($requestName) {
-        if ($this->isEnglish($requestName)) {
-          $eng_name = $requestName;
-          $name = null;
-        } else {
-          $eng_name = null;
-          $name = $requestName;
-        }
-      } else {
-        $eng_name = null;
-        $name = null;
-      }
-      $country = $country;
-      $limit = 15;
-      $page = $page;
-
-      if (!isset($page)) $page = 1;
-      $under = ($page - 1) * $limit;
-
-      $searchWordArray = array_merge(compact("name"), compact("eng_name"), compact("country"));
-      $formattedSearchWordArray = array_filter($searchWordArray, function ($value) {
-        return $value !== null;
-      });
-
-      $newQuery = $this->boxer->newQuery();
-      if (empty($formattedSearchWordArray)) {
-        $query = $newQuery->offset($under)->limit($limit);
-      } else {
-        $whereClauseArray = $this->createWhereClauseArray($formattedSearchWordArray);
-        $query = $newQuery->where($whereClauseArray)->offset($under)->limit($limit);
-      }
-      // \Log::error($whereClauseArray);
-      $boxers = $query->with(["titles.organization", "titles.weightDivision"])->get();
-
-      $formattedBoxers = $boxers->map(function ($boxer) {
-        $formattedBoxer = new BoxerResource($boxer);
-        return $formattedBoxer;
-      });
-
-      return response()->json($formattedBoxers, 200);
-    } catch (Exception $e) {
-      if ($e->getCode()) {
-        throw new Exception($e->getMessage(), $e->getCode());
-      }
-      throw new Exception("Failed getBoxersWithNameAndCountry", 500);
+    if (!$requestName) {
+      return [null, null];
     }
+
+    return $this->isEnglish($requestName) ? [$requestName, null] : [null, $requestName];
   }
 
-  protected function createWhereClauseArray($arr_word): array
-  {
-    $arrayQuery = array_map(function ($key, $value) {
-      if (isset($value)) {
-        if ($key == 'name' || $key == "eng_name") {
-          return [$key, 'like', "%" . addcslashes($value, '%_\\') . "%"];
-        } else {
-          return [$key, 'like', $value];
-        }
-      }
-    }, array_keys($arr_word), array_values($arr_word));
-
-    $arrayQueries = array_filter($arrayQuery, function ($el) {
-      if (isset($el)) {
-        return $el;
-      }
-    });
-
-    return $arrayQueries;
-  }
-
-  protected function isEnglish($str)
+  protected function isEnglish($str): bool
   {
     $englishRanges = [
       ['start' => 0x0041, 'end' => 0x005A], // 大文字アルファベット (A-Z)
@@ -154,5 +81,96 @@ class BoxerService
     }
 
     return false;
+  }
+
+  //getBoxersAndCount()内でクエリ作成関数
+  private function buildQuery($searchWordArray, $under, $limit): array
+  {
+    $getBoxersNewQuery = $this->boxer->query();
+    $getBoxersCountNewQuery = $this->boxer->query();
+
+    if (empty($searchWordArray)) {
+      $getBoxerQuery = $getBoxersNewQuery->offset($under)->limit($limit);
+      $getCountQuery = $getBoxersCountNewQuery;
+    } else {
+      $whereClauseArray = $this->createWhereClauseArray($searchWordArray);
+      $getBoxerQuery = $getBoxersNewQuery->where($whereClauseArray)->offset($under)->limit($limit);
+      $getCountQuery = $getBoxersCountNewQuery->where($whereClauseArray);
+    }
+
+    return [$getBoxerQuery, $getCountQuery];
+  }
+
+  //buildQuery()内でwhere句を作成
+  private function createWhereClauseArray($arr_word): array
+  {
+    $arrayQuery = array_map(function ($key, $value) {
+      if (isset($value)) {
+        if ($key == 'name' || $key == "eng_name") {
+          return [$key, 'like', "%" . addcslashes($value, '%_\\') . "%"];
+        } else {
+          return [$key, 'like', $value];
+        }
+      }
+    }, array_keys($arr_word), array_values($arr_word));
+
+    $arrayQueries = array_filter($arrayQuery);
+
+    return $arrayQueries;
+  }
+
+
+  /**
+   *
+   * @param string name
+   * @param string country
+   * @param int limit
+   * @param int page
+   *
+   * @return array (key-value) boxers
+   * @return int count
+   */
+  public function getBoxersAndCount($requestName, $country, $limit, $page)
+  {
+    try {
+      list($eng_name, $name) = $this->parseRequestName($requestName);
+      $country = $country ?? null;
+      $limit = $limit ?? 15;
+      $page = $page ?? 1;
+      $under = ($page - 1) * $limit;  //取得を開始する位置を指定(2ページ目などもあるので…)
+
+      $searchWordArray = array_filter(compact("name", "eng_name", "country"));
+
+      list($getBoxerQuery, $getCountQuery) = $this->buildQuery($searchWordArray, $under, $limit);
+      $boxers = $getBoxerQuery->with(["titles.organization", "titles.weightDivision"])->get();
+      $boxersCount = $getCountQuery->count();
+
+      $formattedBoxers = $boxers->map(function ($boxer) {
+        $formattedBoxer = new BoxerResource($boxer);
+        return $formattedBoxer;
+      });
+
+      return response()->json(['boxers' => $formattedBoxers, 'count' => $boxersCount], 200);
+    } catch (Exception $e) {
+      if ($e->getCode()) {
+        throw new Exception($e->getMessage(), $e->getCode());
+      }
+      throw new Exception("Failed getBoxersWithNameAndCountry", 500);
+    }
+  }
+
+  /**
+   * @param Model boxingMatchModel
+   * @param int boxerID
+   *
+   * @return void
+   */
+  public function throwErrorIfBoxerHaveMatch($boxingMatchModel, $boxerID): void
+  {
+    $isBoxerHaveMatchQuery = $boxingMatchModel->query();
+    $isBoxerHaveMatchQuery->where("red_boxer_id", $boxerID)->orWhere("blue_boxer_id", $boxerID);
+    if ($isBoxerHaveMatchQuery->exists()) {
+      throw new Exception("Boxer has already setup match", 406);
+    }
   }
 }

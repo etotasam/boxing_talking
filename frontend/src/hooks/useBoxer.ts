@@ -57,13 +57,16 @@ export const useFetchBoxer = () => {
     const res = await Axios.get<{ boxers: BoxerType[], count: number }>("/api/boxer", { params: { page, limit, ...searchWords } }).then(value => value.data)
     return res
   }
-  const { data: boxersData, isLoading, isError, isPreviousData, refetch, isRefetching, } = useQuery<{ boxers: BoxerType[], count: number }>([QUERY_KEY.boxer, { ...queryKey }], () => fetchBoxerAPI({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), {
+  const { data: result, isLoading, isError, isPreviousData, refetch, isRefetching, } = useQuery<{ boxers: BoxerType[], count: number }>([QUERY_KEY.boxer, { ...queryKey }], () => fetchBoxerAPI({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), {
     keepPreviousData: true, staleTime: Infinity, onSuccess: () => { }, onError: () => { }
   })
 
-
-  const fetchCountBoxerAPI = async (searchWords: SearchWordType) => await Axios.get<number>("/api/boxer/count", { params: { ...searchWords } }).then(v => v.data)
-  const { data: boxersCount } = useQuery<number>([QUERY_KEY.countBoxer, { name: paramName, country: paramCountry }], () => fetchCountBoxerAPI({ name: paramName, country: paramCountry }), { staleTime: Infinity })
+  let boxersData
+  let boxersCount
+  if (result) {
+    boxersData = result.boxers
+    boxersCount = result.count
+  }
   const pageCount = boxersCount ? Math.ceil(boxersCount / limit) : 0
 
   return { boxersData, boxersCount, pageCount, isLoading, isError, isPreviousData, refetch, isRefetching }

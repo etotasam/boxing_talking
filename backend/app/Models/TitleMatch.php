@@ -13,6 +13,7 @@ class TitleMatch extends Model
     use HasFactory;
 
     public $timestamps = false;
+    public $incrementing = false;
 
     protected $fillable = [
         'match_id',
