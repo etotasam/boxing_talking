@@ -14,7 +14,7 @@ class PreUserCreateTest extends TestCase
     /**
      * @test
      */
-    public function preUserCreate()
+    public function preUserCreateTest()
     {
         //?成功(メールの送信は非同期なので別でテスト)
         // Mail::fake();
@@ -24,6 +24,7 @@ class PreUserCreateTest extends TestCase
         $password = "testPassword1";
         //リクエスト送信
         $response = $this->post('/api/user/pre_create', compact("name", "email", "password"));
+        $response->assertSuccessful();
         $preUser = PreUser::where('email', $email)->first();
         $hashedPasswordInDatabase =  $preUser->password;
         //データベースに登録されているか
@@ -33,6 +34,5 @@ class PreUserCreateTest extends TestCase
         // Mail::assertSent(Mailable::class, function ($mail) use ($preUser) {
         //   return $mail->hasTo($preUser['email']);
         // });
-        $response->assertSuccessful();
     }
 }

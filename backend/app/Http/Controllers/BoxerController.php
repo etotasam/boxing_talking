@@ -49,7 +49,7 @@ class BoxerController extends Controller
         try {
             $boxerData = $request->toArray();
             DB::beginTransaction();
-            list($createdBoxer, $titles) = $this->boxerService->createBoxer($boxerData);
+            list($createdBoxer, $titles) = $this->boxerService->createBoxerWithTitles($boxerData);
             $this->boxerService->setTitle($createdBoxer['id'], $titles);
             DB::commit();
             return response()->json(["message" => "Success created boxer"], 200);
@@ -75,11 +75,7 @@ class BoxerController extends Controller
         try {
             $boxerID = $request->boxer_id;
             $boxerEngName = $request->eng_name;
-            try {
-                $boxer = $this->boxerService->getBoxerFindOrFail($boxerID);
-            } catch (Exception $e) {
-                return response()->json(["message" => "Boxer is not exist in DB"], 406);
-            };
+            $boxer = $this->boxerService->getBoxerOrThrowExceptionIfNotExists($boxerID);
             //? データの整合性をチェック
             if ($boxer->eng_name != $boxerEngName) {
                 throw new Exception("Request data is dose not match boxer in database", 406);
@@ -109,11 +105,7 @@ class BoxerController extends Controller
     {
         try {
             $boxerID = $request->id;
-            try {
-                $boxer = $this->boxerService->getBoxerFindOrFail($boxerID);
-            } catch (Exception $e) {
-                throw new Exception("No boxer with that ID exists", 404);
-            }
+            $boxer = $this->boxerService->getBoxerOrThrowExceptionIfNotExists($boxerID);
 
             $updateBoxerData = $request->toArray();
             DB::beginTransaction();

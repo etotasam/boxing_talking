@@ -9,14 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Exception;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
-// use App\Mail\Mailer;
-use App\Jobs\MailSendJob;
-use App\Models\User;
-use App\Models\PreUser;
-use App\Models\GuestUser;
 use App\Models\Administrator;
+use App\Services\UserService;
+use App\Services\PreUserService;
+use App\Services\GuestUserService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -27,11 +23,11 @@ use App\Http\Requests\LoginRequest;
 class AuthController extends Controller
 {
 
-    public function __construct(User $user, PreUser $preUser, GuestUser $guest)
+    public function __construct(UserService $userService, PreUserService $preUserService, GuestUserService $guestService)
     {
-        $this->user = $user;
-        $this->preUser = $preUser;
-        $this->guest = $guest;
+        $this->userService = $userService;
+        $this->preUserService = $preUserService;
+        $this->guestService = $guestService;
     }
 
     /**
@@ -42,17 +38,8 @@ class AuthController extends Controller
     public function guestLogin(Request $request)
     {
         try {
-            if (Auth::check()) {
-                throw new Exception("Guest login is not allowed as already authenticated", Response::HTTP_BAD_REQUEST);
-            }
-            $guestUser = $this->guest->create();
-            Auth::guard('guest')->login($guestUser);
-            if (Auth::guard('guest')->check()) {
-                $request->session()->regenerate();
-                return response()->json(["success" => true, "message" => "success guest login"], Response::HTTP_ACCEPTED);
-            } else {
-                throw new Exception("Failed guest login", Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
+            $this->guestService->loginGuest($request);
+            return response()->json(["success" => true, "message" => "success guest login"], Response::HTTP_ACCEPTED);
         } catch (Exception $e) {
             return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
         }
@@ -67,20 +54,8 @@ class AuthController extends Controller
     public function guestLogout()
     {
         try {
-            $guestGuard = Auth::guard('guest');
-            $guestUser = $guestGuard->user();
-            if (!$guestUser) {
-                throw new Exception('Failed guest logout', Response::HTTP_FORBIDDEN);
-            }
-
-            $guestUserID = $guestGuard->user()->id;
-            $guestGuard->logout();
-            $this->guest->find($guestUserID)->delete(); //? ログアウトと同時にゲストユーザーを削除
-            if (!Auth::guard('guest')->check()) {
-                return response()->json(["success" => true, "message" => "Logout guest user"], Response::HTTP_ACCEPTED);
-            } else {
-                throw new Exception('Failed guest logout', Response::HTTP_FORBIDDEN);
-            }
+            $this->guestService->logoutGuest();
+            return response()->json(["success" => true, "message" => "Logout guest user"], Response::HTTP_ACCEPTED);
         } catch (Exception $e) {
             if ($e->getCode()) {
                 return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
@@ -102,24 +77,18 @@ class AuthController extends Controller
     {
         // throw new Exception();
         try {
-            $preUser = $this->preUser->create([
+            $preUserDataForRegister = [
                 "name" => $request->name,
                 "email" => $request->email,
                 "password" => $request->password,
-            ]);
-            if (!$preUser) {
-                throw new Exception("Failed pre user create", 500);
-            }
-            MailSendJob::dispatch($preUser->id, $request->name, $request->email);
+            ];
 
-            return response()->json(
-                [
-                    'success' => true,
-                    'message' => "Successful pre signup."
-                ],
-                Response::HTTP_CREATED
-            );
+            DB::beginTransaction();
+            $this->preUserService->createPreUserAndSendEmail($preUserDataForRegister);
+            DB::commit();
+            return response()->json(['success' => true, 'message' => "Successful pre signup."], Response::HTTP_CREATED);
         } catch (Exception $e) {
+            DB::rollBack();
             if ($e->getCode()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
             }
@@ -146,31 +115,8 @@ class AuthController extends Controller
                 return response()->json(["success" => false, "message" => $validator->errors()], 422);
             }
 
-            $secretKey = config('const.jwt_secret_key');
-            if (!isset($secretKey)) {
-                throw new Exception("cannot get secret-key", 500);
-            }
-            $decoded = JWT::decode($request->token, new Key($secretKey, 'HS256'));
-
-            $userID = $decoded->user_id;
-            $preUser = $this->preUser->find($userID);
-
-            if (!$preUser) {
-                throw new Exception("Invalid access", 403);
-            }
             DB::beginTransaction();
-            $authUser = $this->user->create([
-                // "id" => $preUser->id,
-                "name" => $preUser->name,
-                "email" => $preUser->email,
-                "password" => $preUser->password
-            ]);
-
-            if (!$authUser) {
-                throw new Exception("Failed signup...", 500);
-            }
-
-            $preUser->delete();
+            $this->userService->createUserService($request->token);
             DB::commit();
             return response()->json(["message" => "Successful signup"], Response::HTTP_CREATED);
         } catch (Exception $e) {

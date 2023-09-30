@@ -54,7 +54,7 @@ export const FightBox = ({
         <div
           onClick={() => onClick(matchData.id)}
           className={clsx(
-            'relative flex justify-between w-[80%] max-w-[1024px] min-w-[900px] cursor-pointer border-[1px] rounded-md md:hover:bg-yellow-100 md:hover:border-white md:duration-300',
+            'relative flex justify-between w-[80%] max-w-[1024px] min-w-[900px] cursor-pointer border-[1px] rounded-sm md:hover:bg-yellow-100 md:hover:border-white md:duration-300',
             isDayOverFight && 'bg-stone-100 border-stone-300',
             isFightToday && 'border-red-300 bg-red-50',
             !isDayOverFight && !isFightToday && 'border-stone-400'
