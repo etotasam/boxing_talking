@@ -4,9 +4,6 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Title;
 use App\Models\Boxer;
-use App\Models\BoxingMatch;
-use App\Models\Organization;
-use App\Models\WeightDivision;
 use App\Services\BoxerService;
 use Database\Seeders\OrganizationSeeder;
 use Database\Seeders\WeightDivisionSeeder;
@@ -19,7 +16,7 @@ class SetTitleTest extends TestCase
   protected function setUp(): void
   {
     parent::setUp();
-    $this->boxerService = new BoxerService(new Organization, new WeightDivision, new Title, new Boxer, new BoxingMatch);
+    $this->boxerService = new BoxerService();
   }
 
 

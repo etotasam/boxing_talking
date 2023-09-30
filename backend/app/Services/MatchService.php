@@ -9,6 +9,10 @@ use App\Models\Organization;
 use App\Models\TitleMatch;
 use App\Models\Boxer;
 use App\Models\BoxingMatch;
+use App\Repository\MatchRepository;
+use App\Repository\CommentRepository;
+use App\Repository\PredictionRepository;
+use App\Repository\TitleRepository;
 // Services
 use App\Services\BoxerService;
 
@@ -29,28 +33,6 @@ class MatchService
     $this->boxerService = $boxerService;
   }
 
-  /**
-   * @param string range
-   * @return array
-   */
-  public function getMatches($range)
-  {
-    if ($range == "all") {
-      if (Auth::user()->administrator) {
-        $matches = $this->match->orderBy('match_date')->get();
-      } else {
-        return response()->json(["success" => false, "message" => "Cannot get all matches without auth administrator"], 401);
-      }
-    } else if ($range == "past") {
-      $fetchRange = date('Y-m-d', strtotime('-1 week'));
-      $matches = $this->match->where('match_date', '<', $fetchRange)->orderBy('match_date')->get();
-    } else {
-      $fetchRange = date('Y-m-d', strtotime('-1 week'));
-      $matches = $this->match->where('match_date', '>', $fetchRange)->orderBy('match_date')->get();
-    }
-
-    return $matches;
-  }
 
   /**
    * @param int matchID
@@ -66,11 +48,12 @@ class MatchService
   }
 
   /**
-   * @param array matches
+   * @param string range
    * @return Collection
    */
-  public function formatMatches($matches): Collection
+  public function getAndFormatMatches($range): Collection
   {
+    $matches = MatchRepository::getMatches($range);
     $formattedMatches = $matches->map(function ($item) {
       $redBoxer = $this->boxerService->getBoxerSingleByID($item->red_boxer_id);
       $blueBoxer = $this->boxerService->getBoxerSingleByID($item->blue_boxer_id);
@@ -114,11 +97,12 @@ class MatchService
 
   /**
    * @param array organizationsArray
-   * @param int matchID
+   * @param array match
    * @return void
    */
-  public function createTitleOfMatch($organizationsArray, $matchID)
+  public function createMatchWithTitles($organizationsArray, $match)
   {
+    $createdMatch = MatchRepository::createMatch($match);
     if (!empty($organizationsArray)) {
       foreach ($organizationsArray as $organizationName) {
         $organization = $this->organization->where('name', $organizationName)->first();
@@ -126,7 +110,7 @@ class MatchService
           throw new Exception("Not get organization name", Response::HTTP_METHOD_NOT_ALLOWED);
         }
         $this->titleMatch->create([
-          'match_id' => $matchID,
+          'match_id' => $createdMatch['id'],
           'organization_id' => $organization['id']
         ]);
       }
@@ -164,13 +148,16 @@ class MatchService
    * @param int matchID
    * @return void
    */
-  public function deleteMatch($matchID): void
+  public function deleteMatchAndRelatedData($matchID): void
   {
-    $match = $this->match->find($matchID);
+    $match = MatchRepository::getMatch($matchID);
     if (!isset($match)) {
       throw new Exception("not exit match");
     }
     $match->delete();
+    CommentRepository::deleteCommentByMatchId($matchID);
+    PredictionRepository::deletePredictionByMatchId($matchID);
+    TitleRepository::deleteTitleByBoxerId($matchID);
   }
 
   /**

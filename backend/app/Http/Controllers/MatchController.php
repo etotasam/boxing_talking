@@ -2,19 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-// Models
-use App\Models\BoxingMatch;
-use App\Models\TitleMatch;
-use App\Models\Boxer;
-use App\Models\Comment;
-use App\Models\WinLossPrediction;
 use App\Models\Administrator;
-use Exception;
-//Service
 use App\Services\MatchService;
 use App\Services\AuthService;
 
@@ -22,21 +15,11 @@ class MatchController extends Controller
 {
 
     public function __construct(
-        BoxingMatch $match,
-        Boxer $boxer,
-        TitleMatch $titleMatch,
         MatchService $matchService,
         AuthService $authService,
-        Comment $comment,
-        WinLossPrediction $winLossPrediction
     ) {
-        $this->match = $match;
-        $this->boxer = $boxer;
-        $this->titleMatch = $titleMatch;
         $this->matchService = $matchService;
         $this->authService = $authService;
-        $this->comment = $comment;
-        $this->winLossPrediction = $winLossPrediction;
     }
 
     /**
@@ -48,8 +31,7 @@ class MatchController extends Controller
     {
         try {
             $range = $request->range;
-            $matches = $this->matchService->getMatches($range);
-            $formattedMatches = $this->matchService->formatMatches($matches);
+            $formattedMatches = $this->matchService->getAndFormatMatches($range);
             return response()->json($formattedMatches);
         } catch (Exception $e) {
             if ($e->getCode()) {
@@ -70,11 +52,8 @@ class MatchController extends Controller
             DB::beginTransaction();
             $registerMatch = $request->toArray();
             $organizationsArray = $this->matchService->getOrganizationsArray($registerMatch);
-
             unset($registerMatch['titles']);
-            $createdMatch = $this->match->create($registerMatch);
-
-            $this->matchService->createTitleOfMatch($organizationsArray, $createdMatch["id"]);
+            $this->matchService->createMatchWithTitles($organizationsArray, $registerMatch);
             DB::commit();
             return response()->json(["message" => "success"], 200);
         } catch (Exception $e) {
@@ -100,14 +79,8 @@ class MatchController extends Controller
 
             $matchID = $request->match_id;
             DB::beginTransaction();
-            //? 試合の削除
-            $this->matchService->deleteMatch($matchID);
-            //? 削除対象の試合に付いているコメントを削除
-            $this->comment->where("match_id", $matchID)->delete();
-            //? 削除対象の試合に付いている勝敗予想を削除
-            $this->winLossPrediction->where("match_id", $matchID)->delete();
-            //? 削除対象の試合に付いているタイトルを削除
-            $this->matchService->deleteTitleMatch($matchID);
+            //? 試合の削除とそれに紐づくcommentなどの関連データの削除
+            $this->matchService->deleteMatchAndRelatedData($matchID);
             DB::commit();
             return response()->json(["message" => "Success match delete"], 200);
         } catch (Exception $e) {
@@ -136,7 +109,6 @@ class MatchController extends Controller
             DB::beginTransaction();
             //?リクエストから変更対象を取得
             $updateMatchData = $requestArray['update_match_data'];
-            \Log::error($updateMatchData);
             //?変更対象が試合のグレード(タイトルマッチ?10R or 8R...)の場合はグレードのセット
             $this->matchService->deleteTitleMatch($matchID);
             if (isset($updateMatchData['titles'])) {
@@ -155,21 +127,21 @@ class MatchController extends Controller
         }
     }
 
-    public function test(Request $request)
-    {
-        try {
-            $auth = Auth::User();
-            if ($auth) {
-                $authUserID = Auth::User()->id;
-            } else {
-                throw new Exception("No auth", 401);
-            }
-            $isAdmin = Administrator::where("user_id", $authUserID)->exists();
-            if (!$isAdmin) {
-                throw new Exception("unauthorize", 406);
-            }
-        } catch (Exception $e) {
-            return response()->json(["message" => $e->getMessage()], 500);
-        }
-    }
+    // public function test(Request $request)
+    // {
+    //     try {
+    //         $auth = Auth::User();
+    //         if ($auth) {
+    //             $authUserID = Auth::User()->id;
+    //         } else {
+    //             throw new Exception("No auth", 401);
+    //         }
+    //         $isAdmin = Administrator::where("user_id", $authUserID)->exists();
+    //         if (!$isAdmin) {
+    //             throw new Exception("unauthorize", 406);
+    //         }
+    //     } catch (Exception $e) {
+    //         return response()->json(["message" => $e->getMessage()], 500);
+    //     }
+    // }
 }

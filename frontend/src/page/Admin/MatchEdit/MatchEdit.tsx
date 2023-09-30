@@ -203,7 +203,7 @@ export const SelectedMatchInfo = ({
   return (
     <div className="w-[80%]">
       {/* 日時 */}
-      <div className="p-5 text-stone-600 border-[1px] rounded-md border-stone-400 w-full">
+      <div className="p-5 text-stone-600 border-[1px] rounded-sm border-stone-300 w-full">
         <div className="text-center relative mt-5">
           <h2 className="lg:text-2xl text-lg after:content-['(日本時間)'] after:absolute after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] after:text-sm">
             {dayjs(matchData.match_date).format('YYYY年M月D日')}
