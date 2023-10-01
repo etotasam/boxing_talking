@@ -52,33 +52,11 @@ class MatchController extends Controller
      *
      * @param  match_id number
      * @param  update_match_data object(only update data)
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function update(Request $request)
+    public function update(Request $request): JsonResponse
     {
-        try {
-            $requestArray = $request->toArray();
-            $matchID = $requestArray['match_id'];
-            //?リクエストから変更対象を取得
-            $updateMatchData = $requestArray['update_match_data'];
-            //?試合の取得
-            $match = $this->matchService->getSingleMatch($matchID);
-            DB::beginTransaction();
-            $this->matchService->deleteTitleMatch($matchID);
-            if (isset($updateMatchData['titles'])) {
-                $this->matchService->storeMatchAndStoreTitleMatches($updateMatchData['titles'], $matchID);
-                unset($updateMatchData['titles']);
-            }
-            $match->update($updateMatchData);
-            DB::commit();
-            return response()->json(["success" => true, "message" => "Success update match data"], 200);
-        } catch (Exception $e) {
-            DB::rollBack();
-            if ($e->getCode()) {
-                return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
-            }
-            return response()->json(["success" => false, "message" => "Failed update match"], 500);
-        }
+        return $this->matchService->updateMatch($request->match_id, $request->update_match_data);
     }
 
     // public function test(Request $request)

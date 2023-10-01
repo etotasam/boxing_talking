@@ -47,6 +47,13 @@ export const MatchSetter = ({
   const [title, setTitle] = useState(false);
   const [counter, setCounter] = useState(1);
 
+  //? belt配列にnull,空文字が含まれていたら削除する
+  useEffect(() => {
+    if (belt.some((title) => !title)) {
+      setBelt(belt.filter((organization) => !!organization));
+    }
+  }, [belt]);
+
   //? 試合の削除が成功した時…
   useEffect(() => {
     if (!isSuccessDeleteMatch) return;
@@ -354,10 +361,10 @@ export const MatchSetter = ({
         {/* //? 会場 */}
         <div className="flex mt-2 ml-[140px]">
           <input
-            className="w-full px-1 bourder border-black"
+            className="w-full px-1 border-black"
             type="text"
             placeholder="試合会場入力"
-            name="matachCountry"
+            name="matchCountry"
             value={matchVenue}
             onChange={(e) => setMatchVenue(e.target.value)}
           />

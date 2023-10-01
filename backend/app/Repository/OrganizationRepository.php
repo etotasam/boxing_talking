@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use Exception;
 use App\Models\Organization;
 
 class OrganizationRepository
@@ -16,7 +17,7 @@ class OrganizationRepository
   {
     $organization = Organization::where("name", $organizationName)->first();
     if (!$organization) {
-      throw new Exception("organization is not exists");
+      throw new Exception("organization is not exists", 500);
     }
     return $organization;
   }
