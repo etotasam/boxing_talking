@@ -47,6 +47,13 @@ export const MatchSetter = ({
   const [title, setTitle] = useState(false);
   const [counter, setCounter] = useState(1);
 
+  //? belt配列にnull,空文字が含まれていたら削除する
+  useEffect(() => {
+    if (belt.some((title) => !title)) {
+      setBelt(belt.filter((organization) => !!organization));
+    }
+  }, [belt]);
+
   //? 試合の削除が成功した時…
   useEffect(() => {
     if (!isSuccessDeleteMatch) return;
