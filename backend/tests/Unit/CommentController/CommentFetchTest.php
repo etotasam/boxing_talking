@@ -45,7 +45,7 @@ class CommentFetchTest extends TestCase
      */
     public function commentsFetchRequestWithNotExistsBoxingMatchId(): void
     {
-        $response = $this->get('/api/comment?match_id=' . 100);
+        $response = $this->get('/api/comment?match_id=' . 100); // 存在しない試合を指定
         $response->assertStatus(404);
     }
     /**

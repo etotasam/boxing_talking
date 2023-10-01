@@ -46,11 +46,11 @@ Route::middleware('auth.user_or_guest')->group(function () {
 Route::middleware('administrator')->group(function () {
     //? ボクサー
     Route::get('/boxer/search', [BoxerController::class, 'search']);
-    Route::post('/boxer', [BoxerController::class, 'register']);
+    Route::post('/boxer', [BoxerController::class, 'store']);
     Route::patch('/boxer', [BoxerController::class, 'update']);
     Route::delete('/boxer', [BoxerController::class, 'delete']);
     //? 試合
-    Route::post('/match', [MatchController::class, 'register']);
+    Route::post('/match', [MatchController::class, 'store']);
     Route::delete('/match', [MatchController::class, 'delete']);
     Route::patch('/match', [MatchController::class, 'update']);
 });

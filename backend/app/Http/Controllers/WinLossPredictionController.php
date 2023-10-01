@@ -11,11 +11,17 @@ use App\Models\User;
 use App\Models\GuestUser;
 use App\Models\WinLossPrediction;
 use App\Models\BoxingMatch;
+use App\Services\WinLossPredictionService;
 
 use \Symfony\Component\HttpFoundation\Response;
 
 class WinLossPredictionController extends Controller
 {
+
+    public function __construct(WinLossPredictionService $predictionService)
+    {
+        $this->predictionService = $predictionService;
+    }
     /**
      * fetch vote by auth user
      *
@@ -24,19 +30,7 @@ class WinLossPredictionController extends Controller
     public function fetch()
     {
         try {
-            $isUser = Auth::check();
-            $isGuest = Auth::guard('guest')->check();
-            if (!$isUser && !$isGuest) {
-                return false;
-            }
-            if ($isUser) {
-                $userID = Auth::user()->id;
-                $prediction = User::find($userID)->prediction;
-            } else {
-                $guest = Auth::guard('guest')->user();
-                $guestID = $guest->id;
-                $prediction = GuestUser::find($guestID)->prediction;
-            }
+            $prediction = $this->predictionService->getPrediction();
             return $prediction;
         } catch (Exception $e) {
             if ($e->getCode() == Response::HTTP_UNAUTHORIZED) {

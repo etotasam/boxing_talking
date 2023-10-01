@@ -36,18 +36,18 @@ class AuthService
   }
 
   /**
-   * @return string (uuid) userID
+   * @return string (uuid) userId
    */
-  public function getUserIdOrThrowExceptionWhenNotExists(): string
+  public function getUserIdOrGuestUserId(): string
   {
     if (Auth::check()) {
-      $userID = Auth::user()->id;
+      $userId = Auth::user()->id;
     } else if (Auth::guard('guest')->check()) {
-      $userID = (string)Auth::guard('guest')->user()->id;
+      $userId = (string)Auth::guard('guest')->user()->id;
     } else {
       throw new Exception("Posting comments require Login", Response::HTTP_UNAUTHORIZED);
     }
 
-    return $userID;
+    return $userId;
   }
 }

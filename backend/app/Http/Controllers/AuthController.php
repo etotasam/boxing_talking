@@ -3,20 +3,18 @@
 namespace App\Http\Controllers;
 
 
+use Exception;
 // use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Exception;
 use App\Models\Administrator;
 use App\Services\UserService;
 use App\Services\PreUserService;
 use App\Services\GuestUserService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-
-// !request
 use App\Http\Requests\PreCreateAuthRequest;
 use App\Http\Requests\LoginRequest;
 
@@ -159,18 +157,11 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request)
     {
-        //? ゲストでログインしてる場合はゲスト_ログアウト
-
         try {
-            if (Auth::guard('guest')->check()) {
-                Auth::guard('guest')->logout();
-            }
-            // throw new Exception();
-            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-                return Auth::user();
-            } else {
-                throw new Exception("Failed Login", Response::HTTP_UNAUTHORIZED);
-            }
+            $email = $request->email;
+            $password = $request->password;
+            $loggedInUser = $this->userService->loginUserService($email, $password);
+            return response()->json($loggedInUser, 200);
         } catch (Exception $e) {
             if ($e->getCode()) {
                 return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
@@ -186,17 +177,9 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        // throw new Exception();
         try {
-            if (!Auth::check()) {
-                throw new Exception('Forbidden', Response::HTTP_FORBIDDEN);
-            };
-            Auth::logout();
-            if (!Auth::check()) {
-                return true;
-            } else {
-                throw new Exception('dose not logout...', Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
+            $this->userService->logoutUserService();
+            return response()->json(["success" => true], 200);
         } catch (Exception $e) {
             if ($e->getCode()) {
                 return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
@@ -210,9 +193,9 @@ class AuthController extends Controller
      * admin check
      *
      * @param str $userID
-     * @return \Illuminate\Http\Response
+     * @return bool
      */
-    public function admin(Request $request)
+    public function admin(Request $request): bool
     {
         try {
             if (!Auth::User()) {

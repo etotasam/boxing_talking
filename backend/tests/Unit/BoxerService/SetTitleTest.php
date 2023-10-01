@@ -60,7 +60,7 @@ class SetTitleTest extends TestCase
     //? 実行前に保持タイトルがtitlesテーブルに存在しているか
     $this->assertDatabaseHas('titles', $titlesArray);
     //? テスト対象メソッドの実行
-    $this->boxerService->setTitle($boxer->id, $newSetTitles);
+    $this->boxerService->storeTitle($boxer->id, $newSetTitles);
     //? titlesをセットする前に保持しているtitlesが削除されているか
     $this->assertDatabaseMissing('titles', $titlesArray);
     //? 新たにセットしたタイトルがDBに登録されているか

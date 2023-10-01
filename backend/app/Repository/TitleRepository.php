@@ -12,7 +12,7 @@ class TitleRepository
    * @param int boxerId
    * @return Title
    */
-  public static function getTitleByBoxerId($boxerId): Title
+  public static function get($boxerId): Title
   {
     return Title::where('boxer_id', $boxerId)->get();
   }
@@ -23,7 +23,7 @@ class TitleRepository
    * @param int weightDivisionId
    * @return Title
    */
-  public static function createTitle($boxerId, $organizationId, $weightDivisionId): Title
+  public static function create($boxerId, $organizationId, $weightDivisionId): Title
   {
     return Title::create([
       "boxer_id" => $boxerId,
@@ -36,7 +36,7 @@ class TitleRepository
    * @param int boxerId
    * @return void
    */
-  public static function deleteTitleByBoxerId($boxerId)
+  public static function delete($boxerId)
   {
     Title::where('boxer_id', $boxerId)->delete();
   }

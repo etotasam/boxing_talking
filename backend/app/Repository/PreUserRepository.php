@@ -12,17 +12,17 @@ class PreUserRepository
    * @param array preUserData
    * @return PreUser
    */
-  public static function createPreUser($preUserData): PreUser
+  public static function create($preUserData): PreUser
   {
     return PreUser::create($preUserData);
   }
 
   /**
-   * @param int id
+   * @param int preUserId
    * @return PreUser
    */
-  public static function getPreUser($id): PreUser
+  public static function get($preUserId): PreUser
   {
-    return PreUser::find($id);
+    return PreUser::find($preUserId);
   }
 }

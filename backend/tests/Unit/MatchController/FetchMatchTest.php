@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use App\Models\BoxingMatch;
 use App\Models\Boxer;
 
-class MatchControllerTest extends TestCase
+class FetchMatchTest extends TestCase
 {
 
     use RefreshDatabase;
@@ -50,23 +50,34 @@ class MatchControllerTest extends TestCase
 
     /**
      * @test
+     * setupでセットした数のボクサーがちゃんとDBに入ってるかテスト
      */
-    public function matchesFetchTest()
+    public function setUpTest()
     {
-        //? setupでセットした数のボクサーがちゃんとDBに入ってるかテスト
         $count = BoxingMatch::count();
         $this->assertSame(5, $count);
+    }
 
-
-        //?指定がない場合は過去の試合を取得しない(一週間前までの試合は取得)
+    /**
+     * @test
+     * 指定がない場合は過去の試合を取得しない(一週間前までの試合は取得)
+     */
+    public function fetchMatchDefaultTest()
+    {
         $response = $this->get('/api/match');
         $response->assertSuccessful()
             ->assertJsonFragment(["name" => 'boxer1'])
             ->assertJsonMissing(["name" => 'boxer3']);
         $data = json_decode($response->getContent(), true);
         $this->assertCount(2, $data);
+    }
 
-        //?過去の試合を取得(現在から一週間よりも前の試合)
+    /**
+     * @test
+     * 過去の試合を取得(現在から一週間よりも前の試合)
+     */
+    public function fetchPastMatchTest()
+    {
         $response = $this->get('/api/match?range=past');
         $response->assertSuccessful()
             ->assertJsonFragment(["name" => 'boxer3'])

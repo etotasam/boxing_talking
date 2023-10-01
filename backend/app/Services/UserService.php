@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use App\Models\User;
@@ -28,6 +30,36 @@ class UserService
   }
 
   /**
+   * @param string email
+   * @param string password
+   * @return User
+   */
+  public function loginUserService($email, $password): User
+  {
+    if (Auth::guard('guest')->check()) {
+      Auth::guard('guest')->logout();
+    }
+    if (!Auth::attempt(compact("email", "password"))) {
+      throw new Exception("Failed Login", 401);
+    }
+    return Auth::user();
+  }
+
+  /**
+   * @return void
+   */
+  public function logoutUserService(): void
+  {
+    if (!Auth::check()) {
+      throw new Exception('Forbidden', 403);
+    };
+    Auth::logout();
+    if (Auth::check()) {
+      throw new Exception('dose not logout...', 500);
+    }
+  }
+
+  /**
    * @param int userID
    * @return bool
    */
@@ -48,12 +80,12 @@ class UserService
     $decodedToken = JWT::decode($token, new Key($secretKey, 'HS256'));
 
     $preUserId = $decodedToken->user_id;
-    $preUser = PreUserRepository::getPreUser($preUserId);
+    $preUser = PreUserRepository::get($preUserId);
 
     if (!$preUser) {
       throw new Exception("Invalid access", 403);
     }
-    $authUser = UserRepository::createUser([
+    $authUser = UserRepository::create([
       "name" => $preUser->name,
       "email" => $preUser->email,
       "password" => $preUser->password
