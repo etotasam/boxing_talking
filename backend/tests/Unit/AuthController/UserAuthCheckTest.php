@@ -6,12 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 // use PHPUnit\Framework\TestCase;
 use Tests\TestCase;
 use App\Models\User;
-use App\Models\GuestUser;
-use App\Models\PreUser;
-use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Hash;
-use Firebase\JWT\JWT;
-use Illuminate\Support\Facades\Mail;
 
 class UserAuthCheckTest extends TestCase
 {

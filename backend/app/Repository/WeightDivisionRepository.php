@@ -12,7 +12,7 @@ class WeightDivisionRepository
    * @param string weightName
    * @return WeightDivision
    */
-  public static function getWeightDivisionByWeightName($weightName): WeightDivision
+  public static function get($weightName): WeightDivision
   {
     $weightDivision = WeightDivision::where("weight", $weightName)->first();
     if (!$weightDivision) {

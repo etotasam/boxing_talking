@@ -20,7 +20,7 @@ class GuestUserService
     if (Auth::check()) {
       throw new Exception("Guest login is not allowed as already authenticated", 400);
     }
-    $guestUser = GuestUserRepository::createGuestUser();
+    $guestUser = GuestUserRepository::create();
     Auth::guard('guest')->login($guestUser);
     if (!Auth::guard('guest')->check()) {
       throw new Exception("Failed guest login", 500);
@@ -40,7 +40,7 @@ class GuestUserService
     }
     $guestUserId = $guestGuard->user()->id;
     $guestGuard->logout();
-    GuestUserRepository::deleteGuestUser($guestUserId);
+    GuestUserRepository::delete($guestUserId);
     if (Auth::guard('guest')->check()) {
       throw new Exception('Failed guest logout', 403);
     }

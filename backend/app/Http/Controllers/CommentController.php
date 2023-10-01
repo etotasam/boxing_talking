@@ -9,6 +9,7 @@ use App\Services\AuthService;
 use App\Services\MatchService;
 use App\Services\CommentService;
 use App\Http\Requests\CommentRequest;
+use Illuminate\Http\JsonResponse;
 
 
 class CommentController extends Controller
@@ -23,48 +24,21 @@ class CommentController extends Controller
     /**
      *
      * @param int match_id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function fetch(Request $request)
+    public function fetch(Request $request): JsonResponse
     {
-        try {
-            $matchID = $request->match_id;
-            if (!$matchID) {
-                throw new Exception('Failed fetch comments', Response::HTTP_BAD_REQUEST);
-            }
-            $match = $this->matchService->getSingleMatchOrThrowExceptionWhenNotExists($matchID);
-            $commentsOfMatch = $this->commentService->getCommentsOfMatch($match);
-            return $commentsOfMatch;
-        } catch (Exception $e) {
-            if ($e->getCode()) {
-                return response()->json(["message" => $e->getMessage()], $e->getCode());
-            }
-            return response()->json(["message" => $e->getMessage()], 500);
-        }
+        return $this->commentService->getComments($request->match_id);
     }
 
     /**
      *
      * @param int match_id
      * @param string comment
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function post(CommentRequest $request)
+    public function post(CommentRequest $request): JsonResponse
     {
-        try {
-            $userID = $this->authService->getUserIdOrThrowExceptionWhenNotExists();
-            $matchID = $request->match_id;
-            //? 試合が存在してない場合throw exception
-            $this->matchService->getSingleMatchOrThrowExceptionWhenNotExists($matchID);
-
-            $comment = $request->comment;
-            $this->commentService->postCommentAndFormat($userID, $matchID, $comment);
-            return response()->json(["message" => "posted comment successfully"], 200);
-        } catch (Exception $e) {
-            if ($e->getCode()) {
-                return response()->json(["message" => $e->getMessage()], $e->getCode());
-            }
-            return response()->json(["message" => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return $this->commentService->postComment($request->match_id, $request->comment);
     }
 }

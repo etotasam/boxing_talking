@@ -15,7 +15,7 @@ class BoxerRepository
    * @param Boxer
    * @return Boxer
    */
-  public static function createBoxer($boxerModel): Boxer
+  public static function create($boxerModel): Boxer
   {
     return Boxer::create($boxerModel);
   }
@@ -24,7 +24,7 @@ class BoxerRepository
    * @param int boxerID
    * @return Boxer
    */
-  public static function getBoxer($boxerID): Boxer
+  public static function get($boxerID): Boxer
   {
     return Boxer::find($boxerID);
   }
@@ -42,7 +42,7 @@ class BoxerRepository
    * @param int boxerID
    * @return Boxer
    */
-  public static function getBoxerSingleWithTitles($boxerID): Boxer
+  public static function getWithTitles($boxerID): Boxer
   {
     return Boxer::with(["titles.organization", "titles.weightDivision"])
       ->find($boxerID);
@@ -56,7 +56,7 @@ class BoxerRepository
    *
    * @return [Boxer, int] [boxers, boxersCount]
    */
-  public function getBoxersWithTitlesAndCount($searchWordArray, $under, $limit)
+  public function getBoxers($searchWordArray, $under, $limit)
   {
     list($getBoxerQuery, $getCountQuery) = $this->buildQuery($searchWordArray, $under, $limit);
     $boxers = $getBoxerQuery->with(["titles.organization", "titles.weightDivision"])->get();

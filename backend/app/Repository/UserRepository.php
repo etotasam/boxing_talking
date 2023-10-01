@@ -12,8 +12,17 @@ class UserRepository
    * @param array userData
    * @return User
    */
-  public static function createUser($userData): User
+  public static function create($userData): User
   {
     return User::create($userData);
+  }
+
+  /**
+   * @param int userId
+   * @return User
+   */
+  public static function get($userId): User
+  {
+    return User::find($userId);
   }
 }

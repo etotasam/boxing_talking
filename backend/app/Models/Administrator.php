@@ -9,6 +9,8 @@ class Administrator extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['user_id'];
+
     protected $hidden = [
         'user_id',
         'created_at',

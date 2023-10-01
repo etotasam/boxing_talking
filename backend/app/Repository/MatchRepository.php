@@ -13,7 +13,7 @@ class MatchRepository
    * @param array match
    * @return BoxingMatch
    */
-  public static function createMatch($match): BoxingMatch
+  public static function create($match): BoxingMatch
   {
     return BoxingMatch::create($match);
   }
@@ -22,7 +22,7 @@ class MatchRepository
    * @param int matchID
    * @return void
    */
-  public static function deleteMatch($matchID): void
+  public static function delete($matchID): void
   {
     BoxingMatch::find($matchID)->delete();
   }
@@ -31,7 +31,7 @@ class MatchRepository
    * @param int matchID
    * @return BoxingMatch
    */
-  public static function getMatch($matchID): BoxingMatch
+  public static function get($matchID): ?BoxingMatch
   {
     return BoxingMatch::find($matchID);
   }
@@ -60,7 +60,7 @@ class MatchRepository
    * @param string range
    * @return object
    */
-  public static function getMatches($range): object
+  public static function getMatches($range)
   {
     if ($range == "all") {
       if (Auth::user()->administrator) {

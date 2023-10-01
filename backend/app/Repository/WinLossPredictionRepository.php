@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Models\WinLossPrediction;
 
-class PredictionRepository
+class WinLossPredictionRepository
 {
 
 
@@ -12,7 +12,7 @@ class PredictionRepository
    * @param int matchId
    * @return void
    */
-  public static function deletePredictionByMatchId($matchId): void
+  public static function delete($matchId): void
   {
     WinLossPrediction::where("match_id", $matchId)->delete();
   }

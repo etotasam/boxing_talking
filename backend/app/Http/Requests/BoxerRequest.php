@@ -4,6 +4,10 @@ namespace App\Http\Requests;
 
 use App\Http\Requests\ApiRequest;
 
+/**
+ * @property string name
+ * @property string eng_name
+ */
 class BoxerRequest extends ApiRequest
 {
     /**

@@ -12,7 +12,7 @@ class OrganizationRepository
    * @param string organizationName
    * @return Organization
    */
-  public static function getOrganizationByOrganizationName($organizationName): Organization
+  public static function get($organizationName): Organization
   {
     $organization = Organization::where("name", $organizationName)->first();
     if (!$organization) {

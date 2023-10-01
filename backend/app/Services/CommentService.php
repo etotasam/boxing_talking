@@ -2,27 +2,69 @@
 
 namespace App\Services;
 
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use App\Models\BoxingMatch;
-use App\Models\Comment;
 use App\Services\UserService;
+use App\Services\AuthService;
+use App\Services\MatchService;
+use App\Repository\CommentRepository;
 
 class CommentService
 {
 
-  public function __construct(Comment $comment, UserService $userService)
+  public function __construct(UserService $userService, MatchService $matchService, AuthService $authService)
   {
-    $this->comment = $comment;
     $this->userService = $userService;
+    $this->matchService = $matchService;
+    $this->authService = $authService;
+  }
+
+  /**
+   * コントローラーのpost
+   */
+  public function postComment(int $matchId, string $comment): JsonResponse
+  {
+    try {
+      $userId = $this->authService->getUserIdOrGuestUserId();
+      $match = $this->matchService->getSingleMatch($matchId);
+      $this->storeCommentAndFormat($userId, $match['id'], $comment);
+      return response()->json(["message" => "posted comment successfully"], 200);
+    } catch (Exception $e) {
+      if ($e->getCode()) {
+        return response()->json(["message" => $e->getMessage()], $e->getCode());
+      }
+      return response()->json(["message" => $e->getMessage()], 500);
+    }
+  }
+
+  /**
+   * コントローラーのfetch
+   */
+  public function getComments(int $matchId): JsonResponse
+  {
+    try {
+      if (!$matchId) {
+        throw new Exception('Failed fetch comments', 400);
+      }
+      $match = $this->matchService->getSingleMatch($matchId);
+      $commentsOfMatch = $this->getCommentsOnMatch($match);
+      return response()->json($commentsOfMatch, 200);
+    } catch (Exception $e) {
+      if ($e->getCode()) {
+        return response()->json(["message" => $e->getMessage()], $e->getCode());
+      }
+      return response()->json(["message" => $e->getMessage()], 500);
+    }
   }
 
 
 
   /**
-   * @param BoxingMatch match
    * @return array (key-value)
    */
-  public function getCommentsOfMatch($match)
+  private function getCommentsOnMatch(BoxingMatch $match): array
   {
     $commentsArray = [];
     $thisMatchComments = $match->comments;
@@ -40,20 +82,10 @@ class CommentService
     return $commentsArray;
   }
 
-  /**
-   * @param int userID
-   * @param int matchID
-   * @param string comment
-   *
-   * @return void
-   */
-  public function postCommentAndFormat($userID, $matchID, $comment): void
+
+  public function storeCommentAndFormat(string $userId, int $matchId, string $comment): void
   {
     $formattedComment = preg_replace('/(\n{4,})/', "\n\n\n", $comment);
-    $this->comment->create([
-      "user_id" => $userID,
-      "match_id" => $matchID,
-      "comment" => $formattedComment,
-    ]);
+    CommentRepository::store($userId, $matchId, $formattedComment);
   }
 }

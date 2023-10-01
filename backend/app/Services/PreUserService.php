@@ -20,7 +20,7 @@ class PreUserService
    */
   public function createPreUserAndSendEmail($preUserDataForRegister): void
   {
-    $preUser = PreUserRepository::createPreUser($preUserDataForRegister);
+    $preUser = PreUserRepository::create($preUserDataForRegister);
     if (!$preUser) {
       throw new Exception("Failed pre user create", 500);
     }
