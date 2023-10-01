@@ -287,12 +287,12 @@ export const MatchSetter = ({
                 <select
                   className="w-[150px]"
                   name="matchBelt"
-                  value={belt[i]}
+                  value={belt[i] ? belt[i] : ''}
                   onChange={(e) => {
                     setBelt((current) => {
-                      const clone = cloneDeep(current);
-                      clone[i] = e.target.value as ORGANIZATIONS_Type;
-                      return clone;
+                      const cloneCurrent = cloneDeep(current);
+                      cloneCurrent[i] = e.target.value as ORGANIZATIONS_Type;
+                      return cloneCurrent.filter((v) => !!v);
                     });
                   }}
                   id="matchBelt"

@@ -23,16 +23,10 @@ class MatchService
 {
 
   public function __construct(
-    BoxingMatch $match,
-    Boxer $boxer,
-    Organization $organization,
     TitleMatch $titleMatch,
     BoxerService $boxerService,
     TitleMatchService $titleMatchService
   ) {
-    $this->match = $match;
-    $this->boxer = $boxer;
-    $this->organization = $organization;
     $this->titleMatch = $titleMatch;
     $this->boxerService = $boxerService;
     $this->titleMatchService = $titleMatchService;
@@ -103,9 +97,8 @@ class MatchService
     try {
       $match = $this->getSingleMatch($matchId);
       DB::beginTransaction();
-      $this->deleteTitleMatch($matchId);
       if (isset($updateMatchData['titles'])) {
-        $this->titleMatchService->storeTitleMatches($matchId, $updateMatchData['titles']);
+        $this->titleMatchService->updateTitleMatches($matchId, $updateMatchData['titles']);
         unset($updateMatchData['titles']);
       }
       $match->update($updateMatchData);
@@ -230,18 +223,5 @@ class MatchService
     CommentRepository::delete($matchId);
     WinLossPredictionRepository::delete($matchId);
     $match->delete();
-  }
-
-  /**
-   * @param int matchId
-   * @return void
-   */
-  public function deleteTitleMatch($matchId): void
-  {
-    $titles = $this->titleMatch->where('match_id', $matchId)->get();
-    if (!$titles->isEmpty()) {
-      $idsToDelete = $titles->pluck('match_id')->toArray();
-      $this->titleMatch->whereIn('match_id', $idsToDelete)->delete();
-    }
   }
 }

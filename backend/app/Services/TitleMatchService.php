@@ -16,8 +16,9 @@ class TitleMatchService
   /**
    * @return void
    */
-  public function storeTitleMatches(int $matchId, array $titleMatchArray): void
+  public function updateTitleMatches(int $matchId, array $titleMatchArray): void
   {
+    TitleMatchRepository::delete($matchId);
     foreach ($titleMatchArray as $titleOrganizationName) {
       $organization = OrganizationRepository::get($titleOrganizationName);
       TitleMatchRepository::store($matchId, $organization['id']);
