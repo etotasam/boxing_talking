@@ -280,12 +280,12 @@ export const MatchSetter = ({
                 <select
                   className="w-[150px]"
                   name="matchBelt"
-                  value={belt[i]}
+                  value={belt[i] ? belt[i] : ''}
                   onChange={(e) => {
                     setBelt((current) => {
-                      const clone = cloneDeep(current);
-                      clone[i] = e.target.value as ORGANIZATIONS_Type;
-                      return clone;
+                      const cloneCurrent = cloneDeep(current);
+                      cloneCurrent[i] = e.target.value as ORGANIZATIONS_Type;
+                      return cloneCurrent.filter((v) => !!v);
                     });
                   }}
                   id="matchBelt"
@@ -354,10 +354,10 @@ export const MatchSetter = ({
         {/* //? 会場 */}
         <div className="flex mt-2 ml-[140px]">
           <input
-            className="w-full px-1 bourder border-black"
+            className="w-full px-1 border-black"
             type="text"
             placeholder="試合会場入力"
-            name="matachCountry"
+            name="matchCountry"
             value={matchVenue}
             onChange={(e) => setMatchVenue(e.target.value)}
           />

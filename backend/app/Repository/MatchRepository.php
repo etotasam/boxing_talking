@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
 use App\Models\BoxingMatch;
 
 class MatchRepository
@@ -57,10 +58,10 @@ class MatchRepository
 
 
   /**
-   * @param string range
-   * @return object
+   * @param string|null range
+   * @return Collection
    */
-  public static function getMatches($range)
+  public static function getMatches(string $range = null): Collection
   {
     if ($range == "all") {
       if (Auth::user()->administrator) {
