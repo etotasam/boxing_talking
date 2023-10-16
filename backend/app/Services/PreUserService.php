@@ -16,7 +16,7 @@ class PreUserService
   }
 
   /**
-   * @param array preUserDataForRegister (name. email, password)
+   * @param array $preUserDataForRegister associative array [name. email, password]
    */
   public function createPreUserAndSendEmail($preUserDataForRegister): void
   {

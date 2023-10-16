@@ -19,22 +19,7 @@ class UserService
     $this->user = $user;
   }
 
-
-  /**
-   * @param int userID
-   * @return collection user data
-   */
-  public function getUser($userID)
-  {
-    return $this->user->find($userID);
-  }
-
-  /**
-   * @param string email
-   * @param string password
-   * @return User
-   */
-  public function loginUserService($email, $password): User
+  public function loginUserService(string $email, string $password): User
   {
     if (Auth::guard('guest')->check()) {
       Auth::guard('guest')->logout();
@@ -45,9 +30,7 @@ class UserService
     return Auth::user();
   }
 
-  /**
-   * @return void
-   */
+
   public function logoutUserService(): void
   {
     if (!Auth::check()) {
@@ -59,19 +42,7 @@ class UserService
     }
   }
 
-  /**
-   * @param int userID
-   * @return bool
-   */
-  public function isUserExists($userID)
-  {
-    return $this->user->find($userID)->exists();
-  }
-
-  /**
-   * @param int userID
-   */
-  public function createUserService($token): void
+  public function createUserService(string $token): void
   {
     $secretKey = config('const.jwt_secret_key');
     if (!isset($secretKey)) {

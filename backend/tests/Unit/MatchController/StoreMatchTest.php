@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\MatchController;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -54,7 +54,7 @@ class StoreMatchTest extends TestCase
    * @test
    * タイトルマッチの時はtitle_matchesテーブルへもsoreされる
    */
-  public function storeMatchWithTitleMatchTest()
+  public function testStoreMatchWithTitleMatch()
   {
     //adminユーザとして実行
     $this->actingAs(TestHelper::createAdminUser());
@@ -78,7 +78,7 @@ class StoreMatchTest extends TestCase
    * @test
    * タイトルマッチでは無い時はtitle_matchesテーブルへの登録はされない
    */
-  public function storeMatchWithNonTitleMatchTest()
+  public function testStoreMatchWithNonTitleMatch()
   {
     //adminユーザとして実行
     $this->actingAs(TestHelper::createAdminUser());
@@ -100,7 +100,7 @@ class StoreMatchTest extends TestCase
    * @test
    * adminユーザー以外で実行した時はエラー
    */
-  public function storeMatchWithNotAdminTest()
+  public function testStoreMatchWithNotAdmin()
   {
     $response = $this->post('/api/match', $this->storeMatchData);
     $response->assertStatus(401);

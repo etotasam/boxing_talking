@@ -1,6 +1,6 @@
 <?php
 
-namespace CommentController;
+namespace Tests\CommentController;
 
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -12,7 +12,7 @@ use App\Models\BoxingMatch;
 use App\Models\Boxer;
 use App\Models\Comment;
 
-class CommentPostTest extends TestCase
+class StoreCommentTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -44,7 +44,7 @@ class CommentPostTest extends TestCase
      * @test
      * 認証なしでのコメント投稿
      */
-    public function postWithNoAuth(): void
+    public function testPostWithNoAuth(): void
     {
         //?認証なしでの投稿
         $response = $this
@@ -64,7 +64,7 @@ class CommentPostTest extends TestCase
      * @test
      * ログインユーザーによるコメント投稿
      */
-    public function postByLoginUser(): void
+    public function testPostByLoginUser(): void
     {
         $response = $this->actingAs($this->user)
             ->post(
@@ -82,7 +82,7 @@ class CommentPostTest extends TestCase
      * @test
      * ゲストによるコメント投稿
      */
-    public function postByGuestUser(): void
+    public function testPostByGuestUser(): void
     {
         $response = $this->actingAs($this->guest, 'guest')
             ->post(

@@ -8,29 +8,17 @@ use App\Models\GuestUser;
 class GuestUserRepository
 {
 
-
-  /**
-   * @return GuestUser
-   */
   public static function create(): GuestUser
   {
     return GuestUser::create();
   }
 
-  /**
-   * @param int guestId
-   * @return GuestUser
-   */
-  public static function get($guestId): GuestUser
+  public static function get(string $guestId): ?GuestUser
   {
     return GuestUser::find($guestId);
   }
 
-  /**
-   * @param int guestUserId
-   * @return void
-   */
-  public static function delete($guestUserId): void
+  public static function delete(string $guestUserId): void
   {
     GuestUser::find($guestUserId)->delete();
   }

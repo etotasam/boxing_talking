@@ -3,13 +3,11 @@
 namespace App\Services;
 
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use App\Models\Organization;
-use App\Models\TitleMatch;
-use App\Models\Boxer;
 use App\Models\BoxingMatch;
 use App\Repository\MatchRepository;
 use App\Repository\OrganizationRepository;
@@ -23,171 +21,143 @@ class MatchService
 {
 
   public function __construct(
-    TitleMatch $titleMatch,
     BoxerService $boxerService,
     TitleMatchService $titleMatchService
   ) {
-    $this->titleMatch = $titleMatch;
     $this->boxerService = $boxerService;
     $this->titleMatchService = $titleMatchService;
   }
 
   /**
-   * コントローラーのstore
+   * 試合データの保存
+   *
+   * @param array $matchDataForStore
+   *
+   * @return JsonResponse
    */
   public function storeMatch(array $matchDataForStore): JsonResponse
   {
+    $organizationsArray = $this->extractOrganizationsArray($matchDataForStore);
+    unset($matchDataForStore['titles']);
+
+    DB::beginTransaction();
     try {
-      DB::beginTransaction();
-      $organizationsArray = $this->extractOrganizationsArray($matchDataForStore);
-      unset($matchDataForStore['titles']);
-      $this->storeMatchAndStoreTitleMatches($organizationsArray, $matchDataForStore);
-      DB::commit();
-      return response()->json(["success" => true, "message" => "Success store match"], 200);
+      $this->storeMatchExecute($organizationsArray, $matchDataForStore);
     } catch (Exception $e) {
       DB::rollBack();
-      if ($e->getCode()) {
-        return response()->json(["message" => $e->getMessage()], $e->getCode());
-      }
-      return response()->json(["message" => "Failed store match"], 500);
-    };
-  }
-
-  /**
-   * コントローラーのfetch
-   */
-  public function fetchMatches(string $range = null): JsonResponse
-  {
-    try {
-      $matches = MatchRepository::getMatches($range);
-      $formattedMatchesData = $this->formatMatchesDataWhenFetchMatches($matches);
-      return response()->json($formattedMatchesData, 200);
-    } catch (Exception $e) {
-      if ($e->getCode()) {
-        return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
-      }
-      return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+      return response()->json(["success" => false, "message" => "Failed store match", 500]);
     }
+
+    DB::commit();
+    return response()->json(["success" => true, "message" => "Success store match", 200]);
   }
 
   /**
-   * コントローラーのdelete
+   * 試合一覧の取得
+   *
+   * @param string|null range
+   *
+   * @return \Illuminate\Support\Collection $matches
+   */
+  public static function getMatches(string|null $range)
+  {
+    if ($range == "all") {
+      $user = Auth::user();
+      if ($user->administrator) {
+        $matches = BoxingMatch::orderBy('match_date')->get();
+      } else {
+        throw new Exception("Cannot get all matches without auth administrator", 401);
+      }
+    } else if ($range == "past") {
+      $fetchRange = date('Y-m-d', strtotime('-1 week'));
+      $matches = BoxingMatch::where('match_date', '<', $fetchRange)->orderBy('match_date')->get();
+    } else {
+      $fetchRange = date('Y-m-d', strtotime('-1 week'));
+      $matches = BoxingMatch::where('match_date', '>', $fetchRange)->orderBy('match_date')->get();
+    }
+
+    return $matches;
+  }
+
+  /**
+   * 試合データの削除
+   *
+   * @param int $matchId
+   *
+   * @return JsonResponse
    */
   public function deleteMatch(int $matchId): JsonResponse
   {
     try {
-      DB::beginTransaction();
-      $this->deleteMatchAndRelatedData($matchId);
-      DB::commit();
-      return response()->json(["message" => "Success match delete"], 200);
+      DB::transaction(function () use ($matchId) {
+        $this->deleteMatchExecute($matchId);
+      });
     } catch (Exception $e) {
-      DB::rollBack();
-      if ($e->getMessage()) {
-        return response()->json(["message" => $e->getMessage()], $e->getCode());
-      }
-      return response()->json(["message" => "Failed while match delete"], 500);
+      return response()->json(["message" => $e->getMessage() ?: "Failed while match delete"], $e->getCode() ?: 500);
     }
+
+    return response()->json(["message" => "Success match delete"], 200);
   }
 
   /**
-   * コントローラーのupdate
+   * 試合データの更新
+   *
+   * @param array $updateMatchData 更新データだけが連想配列で送られる 例)['name' => '変更名', 'titles' => ['WBA', 'WBC']]
+   *
+   * @return JsonResponse
    */
-  public function updateMatch(int $matchId, array $updateMatchData): JsonResponse
+  public function updateMatch(int $matchId, array $updateMatchData)
   {
     try {
       $match = $this->getSingleMatch($matchId);
       DB::beginTransaction();
       if (isset($updateMatchData['titles'])) {
-        $this->titleMatchService->updateTitleMatches($matchId, $updateMatchData['titles']);
+        $this->titleMatchService->updateExecute($matchId, $updateMatchData['titles']);
         unset($updateMatchData['titles']);
       }
-      $match->update($updateMatchData);
-      DB::commit();
-      return response()->json(["success" => true, "message" => "Success update match data"], 200);
+      if (!empty($updateMatchData)) {
+        $match->update($updateMatchData);
+      }
     } catch (Exception $e) {
       DB::rollBack();
-      if ($e->getCode()) {
-        return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
-      }
-      return response()->json(["success" => false, "message" => "Failed update match"], 500);
+      return response()->json(["success" => false, "message" => $e->getMessage() ?: "Failed update match"], $e->getCode() ?: 500);
     }
-  }
 
-
-  public function formatTitles(BoxingMatch $match): array
-  {
-    $organizations = $match->organization;
-    $organizationsArray = !empty($organizations) ? $this->formatTitlesInCaseExists($organizations, $match)->toArray() : [];
-    return $organizationsArray;
-  }
-
-  private function formatTitlesInCaseExists(Collection $organizations, BoxingMatch $match): Collection
-  {
-    $organizationsArray =  $organizations->map(function ($organization) use ($match) {
-      $title = ["organization" => $organization->name, 'weightDivision' => $match->weight];
-      return $title;
-    });
-    return $organizationsArray;
-  }
-
-  private function formatMatchesDataWhenFetchMatches(Collection $matches): Collection
-  {
-    $formattedMatches = $matches->map(function ($item) {
-      $redBoxer = $this->boxerService->getBoxerSingleByID($item->red_boxer_id);
-      $blueBoxer = $this->boxerService->getBoxerSingleByID($item->blue_boxer_id);
-      $titles = $this->formatTitles($item);
-
-      return  [
-        "id" => $item->id,
-        "red_boxer" => $redBoxer,
-        "blue_boxer" => $blueBoxer,
-        "country" => $item->country,
-        "venue" => $item->venue,
-        "grade" => $item->grade,
-        "titles" => $titles,
-        "weight" => $item->weight,
-        "match_date" => $item->match_date,
-        "count_red" => $item->count_red,
-        "count_blue" => $item->count_blue
-      ];
-    });
-    return $formattedMatches;
+    DB::commit();
+    return response()->json(["success" => true, "message" => "Success update match data"], 200);
   }
 
 
   /**
-   * @param array organizationsArray
-   * @param array match
+   * 試合データと試合がタイトルマッチの場合はそのタイトルの保存の実行
+   *
+   * @param array $organizationsArray
+   * @param array $matchData
+   *
    * @return void
    */
-  public function storeMatchAndStoreTitleMatches(array $organizationsArray, array $match)
+  public function storeMatchExecute(array $organizationsArray, array $matchData): void
   {
-    $createdMatch = MatchRepository::create($match);
+    $createdMatch = MatchRepository::create($matchData);
     if (!empty($organizationsArray)) {
       foreach ($organizationsArray as $organizationName) {
         $organization = OrganizationRepository::get($organizationName);
-        if (!$organization) {
-          throw new Exception("Not get organization name", Response::HTTP_METHOD_NOT_ALLOWED);
-        }
+        // if (!$organization) {
+        //   throw new Exception("Not get organization name", 405);
+        // }
         TitleMatchRepository::store($createdMatch['id'], $organization['id']);
       }
     }
   }
 
-
   /**
-   * @param int matchId
-   * @return \Illuminate\Support\Collection
+   * 試合データを1つ取得
+   *
+   * @param int $matchId
+   *
+   * @return BoxingMatch
    */
-  public function getTitleOfMatch($matchId): Collection
-  {
-    if (!empty($matchId)) {
-      $titles = $this->titleMatch->where('match_id', $matchId)->get();
-      return !$titles->isEmpty() ? $titles : collect();
-    }
-  }
-
-  public function getSingleMatch(int $matchId): BoxingMatch
+  public function getSingleMatch(int $matchId)
   {
     $match = MatchRepository::get($matchId);
     if (!$match) {
@@ -195,6 +165,7 @@ class MatchService
     }
     return $match;
   }
+
 
   /**
    * @return  array organizationsArray
@@ -204,16 +175,20 @@ class MatchService
     if (array_key_exists('titles', $matchDataForStore)) {
       $organizationsArray = $matchDataForStore['titles'];
     } else {
-      throw new Exception("titles(organizations) is not exists in match data", Response::HTTP_NOT_ACCEPTABLE);
+      throw new Exception("titles(organizations) is not exists in match data", 406);
     }
     return $organizationsArray;
   }
 
+
   /**
-   * @param int matchId
+   * 試合データ削除の実行メソッド
+   *
+   * @param int $matchId
+   *
    * @return void
    */
-  public function deleteMatchAndRelatedData(int $matchId): void
+  public function deleteMatchExecute(int $matchId): void
   {
     $match = MatchRepository::get($matchId);
     if (is_null($match)) {
@@ -223,5 +198,25 @@ class MatchService
     CommentRepository::delete($matchId);
     WinLossPredictionRepository::delete($matchId);
     $match->delete();
+  }
+
+  public function isMatchDateTodayOrPast(int $matchId): bool
+  {
+    $data = MatchRepository::getMatchDate($matchId);
+    $matchDate = strtotime($data['match_date']);
+    $nowDate = strtotime('now');
+
+    return ($nowDate > $matchDate);
+  }
+
+  public function matchPredictionCountUpdate(int $matchId, string $prediction): void
+  {
+    $match = MatchRepository::get($matchId);
+    if ($prediction == "red") {
+      $match->increment("count_red");
+    } else if ($prediction == "blue") {
+      $match->increment("count_blue");
+    }
+    $match->save();
   }
 }

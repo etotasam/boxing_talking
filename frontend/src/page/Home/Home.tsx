@@ -86,7 +86,7 @@ const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
   const [isPredictionVote, setIsPredictionVote] = useState<boolean>();
 
   useEffect(() => {
-    if (myAllPredictionVote) {
+    if (Array.isArray(myAllPredictionVote)) {
       const bool = myAllPredictionVote.some((ob) => ob.match_id === match.id);
       setIsPredictionVote(bool);
     }

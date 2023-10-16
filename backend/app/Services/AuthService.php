@@ -18,10 +18,7 @@ class AuthService
     $this->admin = $admin;
   }
 
-  /**
-   * @return void
-   */
-  public function requireAdminRole()
+  public function requireAdminRole(): void
   {
     $auth = Auth::User();
     if ($auth) {
@@ -45,7 +42,7 @@ class AuthService
     } else if (Auth::guard('guest')->check()) {
       $userId = (string)Auth::guard('guest')->user()->id;
     } else {
-      throw new Exception("Posting comments require Login", Response::HTTP_UNAUTHORIZED);
+      throw new Exception("No auth", Response::HTTP_UNAUTHORIZED);
     }
 
     return $userId;

@@ -1,6 +1,6 @@
 <?php
 
-namespace AuthController;
+namespace Tests\AuthController;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -39,7 +39,7 @@ class UserCreateTest extends TestCase
      * @test
      * トークンの期限切れ
      */
-    public function expiredToken()
+    public function testExpiredToken()
     {
         $this->assertDatabaseHas('pre_users', $this->preUser->toArray());
 
@@ -53,7 +53,7 @@ class UserCreateTest extends TestCase
      * @test
      * secretKeyが違う場合
      */
-    public function unmatchedSecretKey()
+    public function testUnmatchedSecretKey()
     {
         $invalidToken = JWT::encode($this->validPayload, "invalid secret key", 'HS256');
         $response = $this->post('/api/user/create', ["token" => $invalidToken]);

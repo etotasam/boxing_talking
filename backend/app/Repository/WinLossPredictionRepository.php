@@ -16,4 +16,18 @@ class WinLossPredictionRepository
   {
     WinLossPrediction::where("match_id", $matchId)->delete();
   }
+
+  public static function store(string $userId, int $matchId, string $prediction): void
+  {
+    WinLossPrediction::create([
+      "user_id" => $userId,
+      "match_id" => $matchId,
+      "prediction" => $prediction
+    ]);
+  }
+
+  public static function isVoteMatchPrediction(string $userId, int $matchId): ?WinLossPrediction
+  {
+    return WinLossPrediction::where([["user_id", $userId], ["match_id", $matchId]])->first();
+  }
 }

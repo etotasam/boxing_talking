@@ -15,7 +15,8 @@ import { useLoading } from "./useLoading"
 //! 試合情報の取得
 export const useFetchMatches = () => {
   const fetcher = useCallback(async () => {
-    return await Axios.get("api/match").then(value => value.data)
+    const response = await Axios.get("api/match").then(value => value.data)
+    return response.data
   }, [])
   const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.matchesFetch, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
   return { data, isLoading, isError, isRefetching, refetch }
@@ -26,7 +27,8 @@ export const useFetchPastMatches = () => {
   const { startLoading, resetLoadingState } = useLoading()
   const fetcher = useCallback(async () => {
     startLoading()
-    return await Axios.get("api/match", { params: { range: "past" } }).then(value => value.data)
+    const res = await Axios.get("api/match", { params: { range: "past" } }).then(value => value.data)
+    return res.data
   }, [])
   const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.pastMatches, fetcher, {
     keepPreviousData: true, staleTime: Infinity, enabled: true, onSuccess: () => {
@@ -44,7 +46,8 @@ export const useFetchPastMatches = () => {
 //! すべての試合情報の取得(過去含めすべて)
 export const useFetchAllMatches = () => {
   const fetcher = useCallback(async () => {
-    return await Axios.get("api/match", { params: { range: "all" } }).then(value => value.data)
+    const res = await Axios.get("api/match", { params: { range: "all" } }).then(value => value.data)
+    return res.data
   }, [])
   const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.allMatches, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
   return { data, isLoading, isError, isRefetching, refetch }
@@ -56,6 +59,7 @@ export const useFetchAllMatches = () => {
 export const useRegisterMatch = () => {
   const { setToastModal, showToastModal } = useToastModal()
   const { refetch: refetchMatches } = useFetchMatches()
+  const { refetch: refetchAllMatches } = useFetchAllMatches()
   // const queryClient = useQueryClient()
   const { resetLoadingState, startLoading } = useLoading()
 
@@ -81,6 +85,7 @@ export const useRegisterMatch = () => {
     mutate({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }, {
       onSuccess: () => {
         refetchMatches()
+        refetchAllMatches()
         resetLoadingState()
         setToastModal({ message: MESSAGE.MATCH_REGISTER_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
@@ -108,7 +113,8 @@ type ArgumentType = {
 export const useUpdateMatch = () => {
   const { setToastModal, showToastModal } = useToastModal()
   const { resetLoadingState, startLoading } = useLoading()
-  const { refetch } = useFetchMatches()
+  const { refetch: refetchMatches } = useFetchMatches()
+  const { refetch: refetchAllMatches } = useFetchAllMatches()
   const api = useCallback(async (arg: ArgumentType) => {
     const updateData = {
       match_id: arg.matchId,
@@ -124,7 +130,8 @@ export const useUpdateMatch = () => {
   const updateMatch = (updateMatchData: ArgumentType) => {
     mutate(updateMatchData, {
       onSuccess: () => {
-        refetch()
+        refetchMatches()
+        refetchAllMatches()
         resetLoadingState()
         setToastModal({ message: MESSAGE.MATCH_UPDATE_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
@@ -145,6 +152,7 @@ export const useDeleteMatch = () => {
   const { setToastModal, showToastModal } = useToastModal()
   const { resetLoadingState, startLoading } = useLoading()
   const { refetch: refetchMatches } = useFetchMatches()
+  const { refetch: refetchAllMatches } = useFetchAllMatches()
   // const { state: matchesState, setter: setMatchesState } = useQueryState<MatchesType[]>(queryKeys.match)
   const api = useCallback(async (matchId: number) => {
     await Axios.delete("/api/match", { data: { match_id: matchId } })
@@ -162,6 +170,7 @@ export const useDeleteMatch = () => {
     mutate(matchId, {
       onSuccess: () => {
         refetchMatches()
+        refetchAllMatches()
         resetLoadingState()
         setToastModal({ message: MESSAGE.MATCH_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()

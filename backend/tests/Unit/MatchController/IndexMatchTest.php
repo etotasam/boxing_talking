@@ -1,14 +1,15 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\MatchController;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use App\Helpers\TestHelper;
 use App\Models\BoxingMatch;
 use App\Models\Boxer;
 
-class FetchMatchTest extends TestCase
+class IndexMatchTest extends TestCase
 {
 
     use RefreshDatabase;
@@ -52,7 +53,7 @@ class FetchMatchTest extends TestCase
      * @test
      * setupでセットした数のボクサーがちゃんとDBに入ってるかテスト
      */
-    public function setUpTest()
+    public function testSetUp()
     {
         $count = BoxingMatch::count();
         $this->assertSame(5, $count);
@@ -62,27 +63,53 @@ class FetchMatchTest extends TestCase
      * @test
      * 指定がない場合は過去の試合を取得しない(一週間前までの試合は取得)
      */
-    public function fetchMatchDefaultTest()
+    public function testFetchMatchesDefault()
     {
         $response = $this->get('/api/match');
         $response->assertSuccessful()
             ->assertJsonFragment(["name" => 'boxer1'])
             ->assertJsonMissing(["name" => 'boxer3']);
         $data = json_decode($response->getContent(), true);
-        $this->assertCount(2, $data);
+        $this->assertCount(2, $data['data']);
     }
 
     /**
      * @test
      * 過去の試合を取得(現在から一週間よりも前の試合)
      */
-    public function fetchPastMatchTest()
+    public function testFetchPastMatches()
     {
         $response = $this->get('/api/match?range=past');
         $response->assertSuccessful()
             ->assertJsonFragment(["name" => 'boxer3'])
             ->assertJsonMissing(["name" => 'boxer1']);
         $data = json_decode($response->getContent(), true);
-        $this->assertCount(3, $data);
+        $this->assertCount(3, $data['data']);
+    }
+
+    /**
+     * @test
+     * すべての試合の取得(admin認証なしのユーザー)
+     */
+    public function testFetchAllMatchesWithoutAdminAuth()
+    {
+        $this->actingAs(TestHelper::createUser()); // 通常のuser
+        $response = $this->get('/api/match?range=all');
+        $response->assertStatus(401);
+    }
+
+    /**
+     * @test
+     * すべての試合の取得(admin認証あり)
+     */
+    public function testFetchAllMatchesWithAdminAuth()
+    {
+        $this->actingAs(TestHelper::createAdminUser());
+        $response = $this->get('/api/match?range=all');
+        $response->assertStatus(200)
+            ->assertJsonFragment(["name" => 'boxer1'])
+            ->assertJsonFragment(["name" => 'boxer3']);
+        $data = json_decode($response->getContent(), true);
+        $this->assertCount(5, $data['data']);
     }
 }

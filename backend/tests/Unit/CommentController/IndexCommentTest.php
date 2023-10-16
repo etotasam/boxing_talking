@@ -1,6 +1,6 @@
 <?php
 
-namespace CommentController;
+namespace Tests\CommentController;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -11,7 +11,7 @@ use App\Models\Comment;
 use App\Models\User;
 use App\Models\GuestUser;
 
-class CommentFetchTest extends TestCase
+class IndexCommentTest extends TestCase
 {
 
     use RefreshDatabase;
@@ -43,7 +43,7 @@ class CommentFetchTest extends TestCase
      * @test
      * 存在しない試合のコメントをリクエストされたら404を返す
      */
-    public function commentsFetchRequestWithNotExistsBoxingMatchId(): void
+    public function testCommentsFetchRequestWithNotExistsBoxingMatchId(): void
     {
         $response = $this->get('/api/comment?match_id=' . 100); // 存在しない試合を指定
         $response->assertStatus(404);
@@ -52,7 +52,7 @@ class CommentFetchTest extends TestCase
      * @test
      * 通常
      */
-    public function successCommentsFetch(): void
+    public function testSuccessCommentsFetch(): void
     {
         $response = $this->get('/api/comment?match_id=' . $this->matches->id);
         $response->assertStatus(200);

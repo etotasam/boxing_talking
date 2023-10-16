@@ -22,7 +22,6 @@ export const Header = (porps: PropsType) => {
   const { userData } = porps;
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
-  const isEitherAuth = Boolean(isGuest || authUser);
   const { state: pagePath } = usePagePath();
 
   const { setter: setHeaderHeight } = useHeaderHeight();
@@ -48,29 +47,33 @@ export const Header = (porps: PropsType) => {
             <ToBoxMatchLink />
           </div>
         )}
-        {userData && (
-          <div className="absolute top-2 sm:top-0 bottom-2 md:right-5 sm:right-2 right-1 flex">
-            <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-            <p
-              className={clsx(
-                userData.name!.length > 20 ? 'text-[8px]' : 'text-sm'
-              )}
-            >
-              {userData.name}
-            </p>
-          </div>
-        )}
-        {isGuest && (
-          <div className="absolute top-2 sm:top-0 bottom-2 md:right-5 sm:right-2 right-1 flex">
-            <AiOutlineUser className="mr-1 block bg-stone-400 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-            <p className="text-sm">ゲストログイン</p>
-          </div>
-        )}
-        {isEitherAuth && (
-          <div className="absolute top-0 right-0 bg-red-300 h-full flex justify-center">
-            <div className="absolute sm:bottom-5 bottom-3 lg:right-10 md:right-5 right-2 flex justify-center">
-              <LogoutButton />
-            </div>
+
+        <div className="absolute sm:top-1 top-2 lg:right-10 md:right-5 right-2 flex">
+          {userData && (
+            <>
+              <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+              <p
+                className={clsx(
+                  userData.name!.length > 20
+                    ? 'sm:text-[16px] text-xs'
+                    : 'sm:text-[18px] text-sm'
+                )}
+              >
+                {userData.name}
+              </p>
+            </>
+          )}
+          {isGuest && (
+            <>
+              <AiOutlineUser className="mr-1 block bg-stone-400 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+              <p className="text-sm">ゲストログイン</p>
+            </>
+          )}
+        </div>
+
+        {Boolean(isGuest || authUser) && (
+          <div className="absolute sm:bottom-5 bottom-3 lg:right-10 md:right-5 right-2 flex justify-center">
+            <LogoutButton />
           </div>
         )}
       </header>
