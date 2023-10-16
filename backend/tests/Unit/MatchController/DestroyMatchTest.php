@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\MatchController;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -12,7 +12,7 @@ use App\Models\TitleMatch;
 use App\Models\Boxer;
 use Database\Seeders\OrganizationSeeder;
 
-class DeleteMatchTest extends TestCase
+class DestroyMatchTest extends TestCase
 {
 
   use RefreshDatabase;
@@ -53,7 +53,7 @@ class DeleteMatchTest extends TestCase
    * @test
    * セットアップで入れたデーががDBに入っているか
    */
-  public function deleteMatchSetUpTest()
+  public function testDeleteMatchSetUp()
   {
     $this->assertDatabaseHas('boxing_matches', ['id' => $this->targetMatchId]);
     $this->assertDatabaseHas('title_matches', ['match_id' => $this->targetMatchId]);
@@ -63,7 +63,7 @@ class DeleteMatchTest extends TestCase
    * @test
    * 正常に削除されている
    */
-  public function deleteMatchTest()
+  public function testDeleteMatch()
   {
     $this->actingAs(TestHelper::createAdminUser());
     $response = $this->delete('/api/match', ['match_id' => $this->targetMatchId]);
@@ -77,7 +77,7 @@ class DeleteMatchTest extends TestCase
    * @test
    * 存在しないmatchをdeleteしようとすると403
    */
-  public function deleteMatchIfMatchNotExistsTest()
+  public function testDeleteMatchIfMatchNotExists()
   {
     $this->actingAs(TestHelper::createAdminUser());
     $response = $this->delete('/api/match', ['match_id' => 100]); //存在しないmatch_id
@@ -91,7 +91,7 @@ class DeleteMatchTest extends TestCase
    * @test
    * admin認証がない場合のリクエストは401
    */
-  public function deleteMatchWithNoAdminTest()
+  public function testDeleteMatchWithNoAdmin()
   {
     $response = $this->delete('/api/match', ['match_id' => $this->targetMatchId]);
     $response->assertStatus(401);

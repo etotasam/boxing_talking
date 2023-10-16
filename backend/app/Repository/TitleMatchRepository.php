@@ -7,7 +7,7 @@ use App\Models\TitleMatch;
 class TitleMatchRepository
 {
 
-  public static function get(int $matchId): TitleMatch
+  public static function get(int $matchId): ?TitleMatch
   {
     return TitleMatch::where('match_id', $matchId)->get();
   }

@@ -1,6 +1,6 @@
 <?php
 
-namespace AuthController;
+namespace Tests\AuthController;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -29,7 +29,7 @@ class UserLogoutTest extends TestCase
      * @test
      * ログイン状態にない時にログアウトのリクエストは無効にする
      */
-    public function failLogoutWhenNotBeLogin()
+    public function testFailLogoutWhenNotBeLogin()
     {
         $response = $this->post('/api/logout');
         //middlewareの認証で引っかかる
@@ -40,7 +40,7 @@ class UserLogoutTest extends TestCase
      * @test
      * ログアウト成功
      */
-    public function logoutSuccess()
+    public function testLogoutSuccess()
     {
         $response = $this->actingAs($this->user)->post('/api/logout');
         $response->assertSuccessful();

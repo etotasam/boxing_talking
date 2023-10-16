@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\BoxerService;
+
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Title;
@@ -23,7 +25,7 @@ class SetTitleTest extends TestCase
   /**
    * @test
    */
-  public function titleDeleteBeforeSetTitle(): void
+  public function testTitleDeleteBeforeSetTitle(): void
   {
     $this->seed(WeightDivisionSeeder::class);
     $this->seed(OrganizationSeeder::class);

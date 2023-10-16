@@ -1,6 +1,6 @@
 <?php
 
-namespace AuthController;
+namespace Tests\AuthController;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 // use PHPUnit\Framework\TestCase;
@@ -34,7 +34,7 @@ class UserAuthCheckTest extends TestCase
    * @test
    * 認証ありの場合
    */
-  public function hasAuthCheck()
+  public function testHasAuthCheck()
   {
     $this->actingAs($this->user);
     $response = $this->get('/api/user');
@@ -47,7 +47,7 @@ class UserAuthCheckTest extends TestCase
    * @test
    * 認証なしのテスト
    */
-  public function noAuthCheck()
+  public function testNoAuthCheck()
   {
     $response = $this->get('/api/user');
     $response->assertSuccessful();

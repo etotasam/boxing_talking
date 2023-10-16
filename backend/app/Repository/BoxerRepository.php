@@ -6,67 +6,65 @@ use App\Models\Boxer;
 
 class BoxerRepository
 {
-  // public function __construct(Boxer $boxer)
-  // {
-  //   $this->boxer = $boxer;
-  // }
 
   /**
-   * @param Boxer
-   * @return Boxer
+   * @param array $boxerData
+   * @return  \App\Models\Boxer
    */
-  public static function create($boxerModel): Boxer
+  public static function create(array $boxerData): Boxer
   {
-    return Boxer::create($boxerModel);
+    return Boxer::create($boxerData);
   }
 
   /**
-   * @param int boxerID
-   * @return Boxer
+   * @param int $boxerId
+   * @return \App\Models\Boxer|null
    */
-  public static function get($boxerID): Boxer
+  public static function get(int $boxerId): ?Boxer
   {
-    return Boxer::find($boxerID);
+    return Boxer::find($boxerId);
   }
 
   /**
-   * @param int boxerID
-   * @return Boxer
+   * @param int $boxerId
+   * @return \App\Models\Boxer
    */
-  public static function getBoxerFindOrFail($boxerID): Boxer
+  public static function getBoxerFindOrFail(int $boxerId): Boxer
   {
-    return Boxer::findOrFail($boxerID);
+    return Boxer::findOrFail($boxerId);
   }
 
   /**
-   * @param int boxerID
-   * @return Boxer
+   * 保有タイトルを含むボクサーのデータを取得
+   *
+   * @param int $boxerId
+   * @return \App\Models\Boxer|array|null
    */
-  public static function getWithTitles($boxerID): Boxer
+  public static function getWithTitles(int $boxerId): ?Boxer
   {
     return Boxer::with(["titles.organization", "titles.weightDivision"])
-      ->find($boxerID);
+      ->find($boxerId);
   }
 
-
   /**
-   * @param array searchWordArray
-   * @param int under
-   * @param int limit
-   *
-   * @return [Boxer, int] [boxers, boxersCount]
+   * @return array [array $boxersResource, int $boxersCount]
    */
-  public function getBoxers($searchWordArray, $under, $limit)
+  public function getBoxers(array $searchWordArray, int $under, int $limit): array
   {
-    list($getBoxerQuery, $getCountQuery) = $this->buildQuery($searchWordArray, $under, $limit);
+    list($getBoxerQuery, $getCountQuery) = $this->buildQueryForGetBoxers($searchWordArray, $under, $limit);
     $boxers = $getBoxerQuery->with(["titles.organization", "titles.weightDivision"])->get();
-    $boxersCount = $getCountQuery->count();
+    $boxersCount = (int) $getCountQuery->count();
 
     return [$boxers, $boxersCount];
   }
 
-  //getBoxersWithTitlesAndCount()内でクエリ作成関数
-  private function buildQuery($searchWordArray, $under, $limit): array
+  /**
+   * @param array $searchWordArray
+   * @param int $under
+   * @param int $limit
+   * @return array [query, $getBoxerQuery] [query, $getCountQuery]
+   */
+  private function buildQueryForGetBoxers(array $searchWordArray, int $under, int $limit): array
   {
     $getBoxersNewQuery = Boxer::query();
     $getBoxersCountNewQuery = Boxer::query();
@@ -83,8 +81,7 @@ class BoxerRepository
     return [$getBoxerQuery, $getCountQuery];
   }
 
-  //buildQuery()内でwhere句を作成
-  private function createWhereClauseArray($arr_word): array
+  private function createWhereClauseArray(array $arr_word): array
   {
     $arrayQuery = array_map(function ($key, $value) {
       if (isset($value)) {

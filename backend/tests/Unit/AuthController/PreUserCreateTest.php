@@ -1,6 +1,6 @@
 <?php
 
-namespace AuthController;
+namespace Tests\AuthController;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -14,7 +14,7 @@ class PreUserCreateTest extends TestCase
     /**
      * @test
      */
-    public function preUserCreateTest()
+    public function testPreUserCreate()
     {
         //?成功(メールの送信は非同期なので別でテスト)
         // Mail::fake();

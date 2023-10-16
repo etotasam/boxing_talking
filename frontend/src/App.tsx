@@ -12,6 +12,7 @@ import { Terms } from './page/Terms/Terms';
 import { Identification } from '@/page/Identification';
 import { NotFound } from '@/page/NotFound';
 import { PastMatches } from './page/PastMatches';
+import { TestPage } from './page/TestPage';
 // ! middleware
 import AdminOnly from './middleware/AdminOnly';
 import Container from './middleware/Container';
@@ -53,6 +54,7 @@ function App() {
 
         <Route element={<HeaderAndFooterLayout />}>
           <Route path="/terms" element={<Terms />} />
+          <Route path="/test" element={<TestPage />} />
           <Route path="/*" element={<NotFound />} />
           {/* //? </HeaderAndFooterLayout> */}
         </Route>

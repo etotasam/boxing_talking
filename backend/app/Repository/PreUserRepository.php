@@ -21,7 +21,7 @@ class PreUserRepository
    * @param int preUserId
    * @return PreUser
    */
-  public static function get($preUserId): PreUser
+  public static function get($preUserId): ?PreUser
   {
     return PreUser::find($preUserId);
   }

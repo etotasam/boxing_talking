@@ -49,11 +49,13 @@ export const useTestFetchComments = (matchId: number, offset: number, limit: num
 //! コメント取得
 export const useFetchComments = (matchId: number) => {
   const api = async () => {
-    return await Axios.get("/api/comment", {
+    const res = await Axios.get("/api/comment", {
       params: {
         match_id: matchId,
       },
     }).then(v => v.data)
+
+    return res.data
   }
 
   const { data, isLoading, isFetching, refetch, isError } = useQuery<CommentType[]>([QUERY_KEY.comment, { id: matchId }], api, {

@@ -18,7 +18,7 @@ import { MatchSetter } from '@/components/module/MatchSetter/MatchSetter';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { Confirm } from '@/components/modal/Confirm';
 // ! hooks
-import { useFetchMatches, useDeleteMatch } from '@/hooks/useMatch';
+import { useFetchAllMatches, useDeleteMatch } from '@/hooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
 import { usePagePath } from '@/hooks/usePagePath';
 import { useLoading } from '@/hooks/useLoading';
@@ -34,7 +34,7 @@ export const MatchEdit = () => {
   // ! use hook
   const { resetLoadingState } = useLoading();
   const { pathname } = useLocation();
-  const { data: matchesData } = useFetchMatches();
+  const { data: matchesData } = useFetchAllMatches();
   const { sortedMatches } = useSortMatches(matchesData);
   const { setToastModal, showToastModal } = useToastModal();
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();

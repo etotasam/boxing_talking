@@ -9,9 +9,7 @@ use App\Models\Boxer;
 use App\Repository\BoxerRepository;
 use App\Repository\OrganizationRepository;
 use App\Repository\TitleRepository;
-use App\Repository\MatchRepository;
 use App\Repository\WeightDivisionRepository;
-use App\Http\Resources\BoxerResource;
 
 class BoxerService
 {
@@ -20,53 +18,86 @@ class BoxerService
   {
   }
 
-
   /**
-   * @param array boxerData
+   * @param array $boxerData ボクサー登録に必要なデータの連想配列
    * @return JsonResponse
    */
-  public function createBoxer($boxerData): JsonResponse
+  public function createBoxer(array $boxerData)
   {
     try {
-      DB::beginTransaction();
-      list($storedBoxer, $titles) = $this->storeBoxerAndExtractTitles($boxerData);
-      $this->storeTitle($storedBoxer['id'], $titles);
-      DB::commit();
-      return response()->json(["message" => "Success created boxer"], 200);
+      DB::transaction(function () use ($boxerData) {
+        list($storedBoxer, $titles) = $this->storeBoxerAndExtractTitles($boxerData);
+        $this->storeTitle($storedBoxer['id'], $titles);
+      });
     } catch (Exception $e) {
-      DB::rollBack();
-      if ($e->getCode()) {
-        return response()->json(["message" => $e->getMessage()], $e->getCode());
-      }
-      return response()->json(["message" => "Failed boxer register"], 500);
+      return response()->json(["message" => $e->getMessage() ?: "Failed boxer register"], $e->getCode() ?: 500);
+    }
+
+    return response()->json(["message" => "Success created boxer"], 200);
+  }
+
+
+  /**
+   * @param Boxer $targetBoxer
+   * @return null|JsonResponse
+   */
+  public function deleteBoxer(Boxer $targetBoxer)
+  {
+    try {
+      DB::transaction(function () use ($targetBoxer) {
+        TitleRepository::delete($targetBoxer->id); //?ボクサーが所持しているタイトルを削除
+        $targetBoxer->delete();
+      });
+    } catch (Exception $e) {
+      return response()->json(["success" => false, "message" => $e->getMessage() ?: "Failed boxer delete"], $e->getCode() ?: 500);
     }
   }
 
+
   /**
-   * @param array boxerData
-   * @return array [storedBoxerData, tittlesArray]
+   * @param array $updateBoxerData アップデート対象データの配列
+   * @return null|JsonResponse
    */
-  private function storeBoxerAndExtractTitles($boxerData): array
+  public function updateBoxerExecute(Boxer $targetBoxer, array $updateBoxerData)
+  {
+
+    DB::transaction(function () use ($updateBoxerData, $targetBoxer) {
+      if (array_key_exists('titles', $updateBoxerData)) {
+        $this->storeTitle($updateBoxerData['id'], $updateBoxerData["titles"]);
+        unset($updateBoxerData["titles"]);
+      };
+      $targetBoxer->update($updateBoxerData);
+    });
+  }
+
+  /**
+   * ボクサーデータのstoreと、保持タイトルがあればstore
+   *
+   * @param array $boxerData ボクサー登録に必要なデータの連想配列
+   * @return array|JsonResponse [Boxer $storedBoxer, array $titlesArray]
+   */
+  private function storeBoxerAndExtractTitles(array $boxerData): array|JsonResponse
   {
     if (array_key_exists('titles', $boxerData)) {
       $titlesArray = $boxerData["titles"];
       unset($boxerData["titles"]);
     } else {
-      throw new Exception('Titles property is not exists in boxer data', 404);
+      return response()->json(['success' => false, 'message' => 'Titles property is not exists in boxer data'], 403);
+      // throw new Exception('Titles property is not exists in boxer data', 404);
     }
-    $createdBoxer = BoxerRepository::create($boxerData);
-    return [$createdBoxer, $titlesArray];
+    $storedBoxer = BoxerRepository::create($boxerData);
+    return [$storedBoxer, $titlesArray];
   }
 
   /**
-   * @param int boxerID
+   * @param int $boxerId
    *
    * @return Boxer
    */
-  public function getBoxer($boxerID): Boxer
+  public function getBoxer(int $boxerId): Boxer
   {
     try {
-      $boxer = BoxerRepository::getBoxerFindOrFail($boxerID);
+      $boxer = BoxerRepository::getBoxerFindOrFail($boxerId);
     } catch (Exception $e) {
       throw new Exception("No boxer with that ID exists", 404);
     };
@@ -75,14 +106,11 @@ class BoxerService
 
 
   /**
-   * boxerを個別で取得
-   * @param int boxerID
-   *
-   * @return array(key-value) boxerData
+   * @return array boxerData
    */
-  public function getBoxerSingleByID($boxerID)
+  public function getBoxerSingleById(int $boxerId): array
   {
-    $fetchedBoxer = BoxerRepository::getWithTitles($boxerID);
+    $fetchedBoxer = BoxerRepository::getWithTitles($boxerId);
     if (!$fetchedBoxer) {
       throw new Exception("no exist boxer", 500);
     }
@@ -96,13 +124,7 @@ class BoxerService
     return $formattedBoxer;
   }
 
-  /**
-   *
-   * @param int boxerId string
-   * @param object titles
-   * @return void
-   */
-  public function storeTitle($boxerId, $titles): void
+  public function storeTitle(int $boxerId, array $titles): void
   {
     TitleRepository::delete($boxerId);
     if (!empty($titles)) {
@@ -116,8 +138,11 @@ class BoxerService
     }
   }
 
-  //getBoxersAndCount()内で検索ワードが英語名検索かどうか日本語名の方かを振り分ける
-  public function parseRequestName($requestName): array
+
+  /**
+   * ボクサー検索時のワードが英語名検索かどうか日本語名の方かを振り分ける
+   */
+  public function parseRequestName(?string $requestName): array
   {
     if (!$requestName) {
       return [null, null];
@@ -145,108 +170,5 @@ class BoxerService
     }
 
     return false;
-  }
-
-  /**
-   *
-   * @param string name
-   * @param string country
-   * @param int limit
-   * @param int page
-   *
-   * @return JsonResponse
-   */
-  public function getBoxersAndCount($requestName, $country, $limit, $page): JsonResponse
-  {
-    $boxerRepository = new BoxerRepository;
-    try {
-      list($eng_name, $name) = $this->parseRequestName($requestName);
-      $country = $country ?? null;
-      $limit = $limit ?? 15;
-      $page = $page ?? 1;
-      $under = ($page - 1) * $limit;  //取得を開始する位置を指定(2ページ目などもあるので…)
-
-      $searchWordArray = array_filter(compact("name", "eng_name", "country"));
-
-      list($boxers, $boxersCount) = $boxerRepository->getBoxers($searchWordArray, $under, $limit);
-
-      $formattedBoxers = $boxers->map(function ($boxer) {
-        $formattedBoxer = new BoxerResource($boxer);
-        return $formattedBoxer;
-      });
-
-      return response()->json(["success" => true, 'boxers' => $formattedBoxers, 'count' => $boxersCount], 200);
-    } catch (Exception $e) {
-      if ($e->getCode()) {
-        return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
-      }
-      return response()->json(["success" => false, "message" => "Failed getBoxersAndCount"], 500);
-    }
-  }
-
-  /**
-   * @param int boxerId
-   *
-   * @return void
-   */
-  public function throwExceptionIfBoxerHaveMatch($boxerId): void
-  {
-    if (MatchRepository::haveMatchBoxer($boxerId)) {
-      throw new Exception("Boxer has already setup match", 406);
-    }
-  }
-
-
-  /**
-   * @param int boxerId
-   * @param string engName
-   *
-   * @return JsonResponse
-   */
-  public function deleteBoxer($boxerId, $engName): JsonResponse
-  {
-    try {
-      $targetBoxer = $this->getBoxer($boxerId);
-      //? データの整合性をチェック
-      if ($targetBoxer->eng_name != $engName) {
-        throw new Exception("Request data is dose not match boxer in database", 406);
-      };
-      $this->throwExceptionIfBoxerHaveMatch($boxerId);
-      DB::beginTransaction();
-      TitleRepository::delete($boxerId); //?ボクサーが所持しているタイトルを削除
-      $targetBoxer->delete();
-      DB::commit();
-      return response()->json(["success" => true, "message" => "Boxer is deleted"], 200);
-    } catch (Exception $e) {
-      DB::rollBack();
-      if ($e->getCode() === 406) {
-        return response()->json(["success" => false, "message" => $e->getMessage()], 406);
-      }
-      return response()->json(["success" => false, "message" => "Delete error"], 500);
-    }
-  }
-
-
-  /**
-   * @param array アップデート対象データの配列
-   * @return JsonResponse
-   */
-  public function updateBoxerData($updateBoxerData): JsonResponse
-  {
-    try {
-      $targetBoxer = $this->getBoxer($updateBoxerData['id']);
-      DB::beginTransaction();
-      $this->storeTitle($updateBoxerData['id'], $updateBoxerData["titles"]);
-      unset($updateBoxerData["titles"]);
-      $targetBoxer->update($updateBoxerData);
-      DB::commit();
-      return response()->json(["success" => true, "message" => "Successful boxer update"], 200);
-    } catch (Exception $e) {
-      DB::rollBack();
-      if ($e->getCode()) {
-        return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
-      }
-      return response()->json(["success" => false, "message" => "Failed fighter update"], 500);
-    }
   }
 }

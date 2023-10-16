@@ -28,9 +28,7 @@ class GuestUserService
     $request->session()->regenerate();
   }
 
-  /**
-   * @return void
-   */
+
   public function logoutGuest(): void
   {
     $guestGuard = Auth::guard('guest');

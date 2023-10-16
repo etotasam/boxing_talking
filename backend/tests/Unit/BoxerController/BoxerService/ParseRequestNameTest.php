@@ -1,12 +1,10 @@
 <?php
 
+namespace Tests\BoxerService;
+
 use Tests\TestCase;
-
-
 use App\Services\BoxerService;
 use Illuminate\Database\Eloquent\Model;
-
-
 
 class ParseRequestNameTest extends TestCase
 {
@@ -22,7 +20,7 @@ class ParseRequestNameTest extends TestCase
   /**
    * @test
    */
-  public function parseRequestNameInThatCaseNull(): void
+  public function testParseRequestNameInThatCaseNull(): void
   {
     $response = $this->boxerService->parseRequestName(null);
     list($eng_name, $name) = $response;
@@ -34,7 +32,7 @@ class ParseRequestNameTest extends TestCase
   /**
    * @test
    */
-  public function parseRequestNameInThatCaseJapanese(): void
+  public function testParseRequestNameInThatCaseJapanese(): void
   {
     $japaneseName = "ボクサーの名前";
     $response = $this->boxerService->parseRequestName($japaneseName);
@@ -45,7 +43,7 @@ class ParseRequestNameTest extends TestCase
   /**
    * @test
    */
-  public function parseRequestNameInThatCaseEnglish(): void
+  public function testParseRequestNameInThatCaseEnglish(): void
   {
     $engName = "english name";
     $response = $this->boxerService->parseRequestName($engName);
