@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Services\AuthService;
@@ -13,7 +12,7 @@ use App\Http\Requests\CommentRequest;
 use App\Http\Resources\CommentResource;
 
 
-class CommentController extends Controller
+class CommentController extends ApiController
 {
     public function __construct(MatchService $matchService, CommentService $commentService, AuthService $authService)
     {
@@ -30,17 +29,17 @@ class CommentController extends Controller
      */
     public function index(Request $request)
     {
+        $matchId = $request->query('match_id');
+        // 試合が存在しない場合はエラー
+        $match = MatchRepository::get($matchId);
+        if (!$match) {
+            return $this->responseNotFound("Match is not exists");
+        }
+        //BoxingMatchモデルのhasMany()で、データを降順で取得
         try {
-            $matchId = $request->query('match_id');
-            // 試合が存在しない場合はエラー
-            $match = MatchRepository::get($matchId);
-            if (!$match) {
-                throw new Exception("Match is not exists", 404);
-            }
-            //BoxingMatchモデルのhasMany()で、データを降順で取得
             $commentsOnMatch = $match->comments()->orderBy('created_at', 'desc')->get();
-        } catch (Exception $e) {
-            return response()->json(["message" => $e->getMessage()], $e->getCode() ?: 500);
+        } catch (\Exception $e) {
+            $this->responseInvalidQuery("Failed get comments on the match");
         }
 
         return CommentResource::collection($commentsOnMatch);
@@ -58,16 +57,16 @@ class CommentController extends Controller
         $matchId = $request->match_id;
         $comment = $request->comment;
 
+        if (!MatchRepository::isMatchExists($matchId)) {
+            return $this->responseNotFound('Cant post comment to not exists match');
+        }
+        $userId = $this->authService->getUserIdOrGuestUserId();
         try {
-            if (!MatchRepository::isMatchExists($matchId)) {
-                throw new Exception('Cant post comment to not exists match', 404);
-            }
-            $userId = $this->authService->getUserIdOrGuestUserId();
             $this->commentService->postComment($userId, $matchId, $comment);
-        } catch (Exception $e) {
-            return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode() ?: 500);
+        } catch (\Exception $e) {
+            return $this->responseInvalidQuery("Failed when post comment");
         };
 
-        return response()->json(["success" => true, "message" => "posted comment successfully"], 200);
+        return $this->responseSuccessful("Success post comment");
     }
 }

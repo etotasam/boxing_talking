@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\BoxerRequest;
@@ -11,7 +10,7 @@ use App\Repository\MatchRepository;
 use App\Services\BoxerService;
 use App\Http\Resources\BoxerCollection;
 
-class BoxerController extends Controller
+class BoxerController extends ApiController
 {
 
     public function __construct(BoxerService $boxerService)
@@ -43,8 +42,8 @@ class BoxerController extends Controller
 
         try {
             list($boxers, $boxersCount) = $boxerRepository->getBoxers($searchWordArray, $under, $limit);
-        } catch (Exception $e) {
-            return response()->json(["success" => false, "message" => $e->getMessage() ?: "Failed getBoxersAndCount"], $e->getCode() ?: 500);
+        } catch (\Exception $e) {
+            return $this->responseInvalidQuery("Failed when get boxers data");
         }
 
         return new BoxerCollection($boxers, $boxersCount);
@@ -68,20 +67,20 @@ class BoxerController extends Controller
     public function destroy(Request $request): JsonResponse
     {
         $boxerId = $request->boxer_id;
+        $targetBoxer = BoxerRepository::get($boxerId);
+        if (!$targetBoxer) {
+            return $this->responseNotFound("Can not find boxer");
+        }
+        if (MatchRepository::haveMatchBoxer($boxerId)) {
+            return $this->responseBadRequest("Boxer has already setup match");
+        }
         try {
-            $targetBoxer = BoxerRepository::get($boxerId);
-            if (!$targetBoxer) {
-                throw new Exception("Can not find boxer", 404);
-            }
-            if (MatchRepository::haveMatchBoxer($boxerId)) {
-                throw new Exception("Boxer has already setup match", 406);
-            }
             $this->boxerService->deleteBoxer($targetBoxer);
-        } catch (Exception $e) {
-            return response()->json(["success" => false, "message" => $e->getMessage() ?: "Delete error"], $e->getCode() ?: 500);
+        } catch (\Exception $e) {
+            return $this->responseInvalidQuery($e->getMessage() ?? "Failed when deleting boxer");
         }
 
-        return response()->json(['success' => true, "message" => "Boxer is deleted"], 200);
+        return $this->responseSuccessful("Boxer is deleted");
     }
 
     /**
@@ -95,14 +94,13 @@ class BoxerController extends Controller
         $updateBoxerData = $request->toArray();
         $targetBoxer = BoxerRepository::get($updateBoxerData['id']);
         if (!$targetBoxer) {
-            return response()->json(["success" => false, "message" => "Can not find boxer"], 404);
+            return $this->responseNotFound("Can not find boxer");
         }
         try {
             $this->boxerService->updateBoxerExecute($targetBoxer, $updateBoxerData);
-        } catch (Exception $e) {
-            return response()->json(["success" => false, "message" => $e->getMessage() ?: "Failed fighter update"], $e->getCode() ?: 500);
+        } catch (\Exception $e) {
+            return $this->responseInvalidQuery("Failed boxer update");
         }
-
-        return response()->json(["success" => true, "message" => "Successful boxer update"], 200);
+        return $this->responseSuccessful("Successful boxer update");
     }
 }

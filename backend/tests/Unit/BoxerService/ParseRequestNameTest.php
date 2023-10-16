@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\BoxerService;
+namespace Tests\Unit\BoxerService;
 
 use Tests\TestCase;
 use App\Services\BoxerService;
