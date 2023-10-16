@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\BoxerController;
+namespace Tests\Feature\BoxerController;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -48,7 +48,7 @@ class DestroyBoxerTest extends TestCase
     //adminユーザとして実行
     $this->actingAs(TestHelper::createAdminUser());
     $response = $this->delete('api/boxer', ["boxer_id" => $boxerData['id']]);
-    $response->assertStatus(406);
+    $response->assertStatus(400);
     $this->assertDatabaseHas('boxers', $boxerData); // 対象ボクサーは削除されていない
   }
   /**

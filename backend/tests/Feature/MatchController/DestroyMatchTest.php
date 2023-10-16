@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\MatchController;
+namespace Tests\Feature\MatchController;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -81,7 +81,7 @@ class DestroyMatchTest extends TestCase
   {
     $this->actingAs(TestHelper::createAdminUser());
     $response = $this->delete('/api/match', ['match_id' => 100]); //存在しないmatch_id
-    $response->assertStatus(403);
+    $response->assertStatus(404);
     //データは削除されていない
     $this->assertDatabaseHas('boxing_matches', ['id' => $this->targetMatchId]);
     $this->assertDatabaseHas('title_matches', ['match_id' => $this->targetMatchId]);

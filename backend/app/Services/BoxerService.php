@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 use App\Models\Boxer;
@@ -29,7 +28,7 @@ class BoxerService
         list($storedBoxer, $titles) = $this->storeBoxerAndExtractTitles($boxerData);
         $this->storeTitle($storedBoxer['id'], $titles);
       });
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       return response()->json(["message" => $e->getMessage() ?: "Failed boxer register"], $e->getCode() ?: 500);
     }
 
@@ -43,14 +42,10 @@ class BoxerService
    */
   public function deleteBoxer(Boxer $targetBoxer)
   {
-    try {
-      DB::transaction(function () use ($targetBoxer) {
-        TitleRepository::delete($targetBoxer->id); //?ボクサーが所持しているタイトルを削除
-        $targetBoxer->delete();
-      });
-    } catch (Exception $e) {
-      return response()->json(["success" => false, "message" => $e->getMessage() ?: "Failed boxer delete"], $e->getCode() ?: 500);
-    }
+    DB::transaction(function () use ($targetBoxer) {
+      TitleRepository::delete($targetBoxer->id); //?ボクサーが所持しているタイトルを削除
+      $targetBoxer->delete();
+    });
   }
 
 
@@ -98,8 +93,8 @@ class BoxerService
   {
     try {
       $boxer = BoxerRepository::getBoxerFindOrFail($boxerId);
-    } catch (Exception $e) {
-      throw new Exception("No boxer with that ID exists", 404);
+    } catch (\Exception $e) {
+      throw new \Exception("No boxer with that ID exists", 404);
     };
     return $boxer;
   }
@@ -112,7 +107,7 @@ class BoxerService
   {
     $fetchedBoxer = BoxerRepository::getWithTitles($boxerId);
     if (!$fetchedBoxer) {
-      throw new Exception("no exist boxer", 500);
+      throw new \Exception("no exist boxer", 500);
     }
     $titles = $fetchedBoxer->titles->map(function ($title) {
       $name = $title->organization->name;

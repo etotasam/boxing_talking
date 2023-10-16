@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\MatchController;
+namespace Tests\Feature\MatchController;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;

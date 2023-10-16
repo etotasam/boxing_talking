@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\BoxerController;
+namespace Tests\Feature\BoxerController;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;

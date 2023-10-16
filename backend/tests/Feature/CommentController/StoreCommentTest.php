@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\CommentController;
+namespace Tests\Feature\CommentController;
 
 
 use Illuminate\Foundation\Testing\RefreshDatabase;

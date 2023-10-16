@@ -9,9 +9,7 @@ use App\Services\MatchService;
 use App\Services\AuthService;
 use App\Http\Resources\BoxingMatchResource;
 
-use function Ramsey\Uuid\v1;
-
-class MatchController extends Controller
+class MatchController extends ApiController
 {
 
     public function __construct(
@@ -34,7 +32,10 @@ class MatchController extends Controller
         try {
             $matches =  $this->matchService->getMatches($request->query('range'));
         } catch (Exception $e) {
-            return response()->json(["success" => false, "message" => $e->getMessage() ?: "Failed get matches"], $e->getCode() ?: 500);
+            if ($e->getCode() === 401) {
+                return $this->responseUnauthorized($e->getMessage());
+            }
+            return $this->responseInvalidQuery("Failed get matches");
         }
 
         return BoxingMatchResource::collection($matches);
@@ -49,7 +50,12 @@ class MatchController extends Controller
      */
     public function store(Request $request)
     {
-        return $this->matchService->storeMatch($request->toArray());
+        try {
+            $this->matchService->storeMatch($request->toArray());
+        } catch (\Exception $e) {
+            return $this->responseInvalidQuery($e->getMessage ?? "Failed when store match");
+        }
+        return $this->responseSuccessful("Success store match");
     }
 
     /**
@@ -61,7 +67,15 @@ class MatchController extends Controller
      */
     public function destroy(Request $request): JsonResponse
     {
-        return $this->matchService->deleteMatch($request->match_id);
+        try {
+            $this->matchService->deleteMatchExecute($request->match_id);
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                return $this->responseNotFound($e->getMessage());
+            }
+            return $this->responseInvalidQuery("Failed delete match");
+        }
+        return $this->responseSuccessful("Success match delete");
     }
 
     /**
@@ -73,6 +87,15 @@ class MatchController extends Controller
      */
     public function update(Request $request): JsonResponse
     {
-        return $this->matchService->updateMatch($request->match_id, $request->update_match_data);
+        try {
+            $this->matchService->updateMatch($request->match_id, $request->update_match_data);
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                return $this->responseNotFound($e->getMessage());
+            }
+            return $this->responseInvalidQuery("Failed update match");
+        }
+
+        return $this->responseSuccessful("Success update match");
     }
 }

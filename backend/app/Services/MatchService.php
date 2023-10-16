@@ -33,9 +33,9 @@ class MatchService
    *
    * @param array $matchDataForStore
    *
-   * @return JsonResponse
+   * @return void
    */
-  public function storeMatch(array $matchDataForStore): JsonResponse
+  public function storeMatch(array $matchDataForStore): void
   {
     $organizationsArray = $this->extractOrganizationsArray($matchDataForStore);
     unset($matchDataForStore['titles']);
@@ -45,11 +45,10 @@ class MatchService
       $this->storeMatchExecute($organizationsArray, $matchDataForStore);
     } catch (Exception $e) {
       DB::rollBack();
-      return response()->json(["success" => false, "message" => "Failed store match", 500]);
+      throw new \Exception("Failed store match");
     }
 
     DB::commit();
-    return response()->json(["success" => true, "message" => "Success store match", 200]);
   }
 
   /**
@@ -80,37 +79,20 @@ class MatchService
   }
 
   /**
-   * 試合データの削除
-   *
-   * @param int $matchId
-   *
-   * @return JsonResponse
-   */
-  public function deleteMatch(int $matchId): JsonResponse
-  {
-    try {
-      DB::transaction(function () use ($matchId) {
-        $this->deleteMatchExecute($matchId);
-      });
-    } catch (Exception $e) {
-      return response()->json(["message" => $e->getMessage() ?: "Failed while match delete"], $e->getCode() ?: 500);
-    }
-
-    return response()->json(["message" => "Success match delete"], 200);
-  }
-
-  /**
    * 試合データの更新
    *
    * @param array $updateMatchData 更新データだけが連想配列で送られる 例)['name' => '変更名', 'titles' => ['WBA', 'WBC']]
    *
-   * @return JsonResponse
+   * @return void
    */
   public function updateMatch(int $matchId, array $updateMatchData)
   {
+    $match = MatchRepository::get($matchId);
+    if (!$match) {
+      throw new Exception("Match is not exists", 404);
+    }
+    DB::beginTransaction();
     try {
-      $match = $this->getSingleMatch($matchId);
-      DB::beginTransaction();
       if (isset($updateMatchData['titles'])) {
         $this->titleMatchService->updateExecute($matchId, $updateMatchData['titles']);
         unset($updateMatchData['titles']);
@@ -120,11 +102,10 @@ class MatchService
       }
     } catch (Exception $e) {
       DB::rollBack();
-      return response()->json(["success" => false, "message" => $e->getMessage() ?: "Failed update match"], $e->getCode() ?: 500);
+      throw new \Exception("Failed update match");
     }
 
     DB::commit();
-    return response()->json(["success" => true, "message" => "Success update match data"], 200);
   }
 
 
@@ -142,9 +123,6 @@ class MatchService
     if (!empty($organizationsArray)) {
       foreach ($organizationsArray as $organizationName) {
         $organization = OrganizationRepository::get($organizationName);
-        // if (!$organization) {
-        //   throw new Exception("Not get organization name", 405);
-        // }
         TitleMatchRepository::store($createdMatch['id'], $organization['id']);
       }
     }
@@ -192,12 +170,20 @@ class MatchService
   {
     $match = MatchRepository::get($matchId);
     if (is_null($match)) {
-      throw new Exception("Not exit the match", 403);
+      throw new \Exception("Not exit the match", 404);
     }
-    TitleMatchRepository::delete($matchId);
-    CommentRepository::delete($matchId);
-    WinLossPredictionRepository::delete($matchId);
-    $match->delete();
+    DB::beginTransaction();
+    try {
+      TitleMatchRepository::delete($matchId);
+      CommentRepository::delete($matchId);
+      WinLossPredictionRepository::delete($matchId);
+      $match->delete();
+    } catch (\Exception $e) {
+      DB::rollBack();
+      throw new \Exception("Failed when delete match");
+    }
+
+    DB::commit();
   }
 
   public function isMatchDateTodayOrPast(int $matchId): bool

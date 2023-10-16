@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\MatchController;
+namespace Tests\Feature\MatchController;
 
 use Mockery\MockInterface;
 use Tests\TestCase;
