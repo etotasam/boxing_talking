@@ -5,68 +5,98 @@ namespace App\Repositories;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Collection;
 use App\Models\BoxingMatch;
-use Exception;
+use App\Repositories\Interfaces\MatchRepositoryInterface;
 
-class MatchRepository
+class MatchRepository implements MatchRepositoryInterface
 {
 
-
-
-  public static function create(array $matchData): BoxingMatch
+  /**
+   * @return Collection
+   */
+  public function getAllMatches()
   {
-    return BoxingMatch::create($matchData);
+    return BoxingMatch::orderBy('match_date')->get();
   }
 
-
-  public static function delete(int $matchId): void
+  /**
+   * @return Collection
+   */
+  public function getPastMatches()
   {
-    BoxingMatch::find($matchId)->delete();
+    $fetchRange = date('Y-m-d', strtotime('-1 week'));
+    return BoxingMatch::where('match_date', '<', $fetchRange)->orderBy('match_date')->get();
   }
 
-
-  public static function get(int $matchId): ?BoxingMatch
+  /**
+   * @return Collection
+   */
+  public function getMatches()
   {
-    return BoxingMatch::find($matchId);
+    $fetchRange = date('Y-m-d', strtotime('-1 week'));
+    return BoxingMatch::where('match_date', '>', $fetchRange)->orderBy('match_date')->get();
   }
 
-  public static function isMatchExists(int $matchId): bool
+  /**
+   * @param int $matchId
+   * @return bool
+   */
+  public function isMatch(int $matchId)
   {
     return BoxingMatch::where('id', $matchId)->exists();
   }
 
 
-
-  public static function haveMatchBoxer(int $boxerId): bool
+  /**
+   * idで試合を取得
+   *
+   * @param int $matchId
+   * @return BoxingMatch
+   */
+  public function getMatchById(int $matchId)
   {
-    return BoxingMatch::where("red_boxer_id", $boxerId)->orWhere("blue_boxer_id", $boxerId)->exists();
+    return BoxingMatch::find($matchId);
   }
 
+  /**
+   * @param array $matchData
+   * @return BoxingMatch
+   */
+  public function createMatch(array $matchData)
+  {
+    return BoxingMatch::create($matchData);
+  }
 
   /**
-   * @param string|null range
-   * @return Collection
+   * 試合の削除(1件)
+   * @param int $matchId
+   * @return bool
    */
-  // public static function getMatches(string|null $range)
-  // {
-  //   if ($range == "all") {
-  //     if (Auth::user()->administrator) {
-  //       $matches = BoxingMatch::orderBy('match_date')->get();
-  //     } else {
-  //       throw new Exception("Cannot get all matches without auth administrator", 401);
-  //     }
-  //   } else if ($range == "past") {
-  //     $fetchRange = date('Y-m-d', strtotime('-1 week'));
-  //     $matches = BoxingMatch::where('match_date', '<', $fetchRange)->orderBy('match_date')->get();
-  //   } else {
-  //     $fetchRange = date('Y-m-d', strtotime('-1 week'));
-  //     $matches = BoxingMatch::where('match_date', '>', $fetchRange)->orderBy('match_date')->get();
-  //   }
-
-  //   return $matches;
-  // }
-
-  public static function getMatchDate(int $matchId): ?BoxingMatch
+  public function deleteMatch(int $matchId)
   {
-    return BoxingMatch::select('match_date')->where('id', $matchId)->first();
+    $res = BoxingMatch::destroy($matchId);
+    return (bool) $res;
+  }
+
+  /**
+   * @param int $matchId
+   * @param array $updateMatchData
+   *
+   * @return bool
+   */
+  public function updateMatch(int $matchId, array $updateMatchData)
+  {
+    $targetMatch = BoxingMatch::find($matchId);
+    $targetMatch->fill($updateMatchData);
+    return $targetMatch->save();
+  }
+
+  /**
+   * 指定のボクサーが試合が組まれているかをチェック
+   * @param int $boxerId
+   * @return bool
+   */
+  public function hasMatchBoxer(int $boxerId): bool
+  {
+    return BoxingMatch::where("red_boxer_id", $boxerId)->orWhere("blue_boxer_id", $boxerId)->exists();
   }
 }

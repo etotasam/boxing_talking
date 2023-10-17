@@ -56,7 +56,8 @@ class IndexCommentTest extends TestCase
     {
         $response = $this->get('/api/comment?match_id=' . $this->matches->id);
         $response->assertStatus(200);
-        $response->assertJsonFragment(['post_user_name' => 'auth_user_name']);
-        $response->assertJsonFragment(['comment' => 'コメント']);
+        $response->assertJsonFragment(['post_user_name' => 'auth_user_name'])
+            ->assertJsonFragment(['comment' => 'コメント']);
+        // $response->assertJsonFragment(['comment' => 'コメント']);
     }
 }

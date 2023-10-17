@@ -5,47 +5,71 @@ namespace App\Services;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Collection;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
-use App\Models\BoxingMatch;
-use App\Repository\MatchRepository;
-use App\Repository\OrganizationRepository;
-use App\Repository\CommentRepository;
-use App\Repository\TitleMatchRepository;
-use App\Repository\WinLossPredictionRepository;
-use App\Services\BoxerService;
+use App\Repositories\Interfaces\MatchRepositoryInterface;
+use App\Repositories\Interfaces\CommentRepositoryInterface;
+use App\Repositories\Interfaces\TitleMatchRepositoryInterface;
+use App\Repositories\WinLossPredictionRepository;
 use App\Services\TitleMatchService;
 
 class MatchService
 {
 
+  protected $titleMatchService;
+  protected $matchRepository;
+  protected $commentRepository;
+  protected $titleMatchRepository;
   public function __construct(
-    BoxerService $boxerService,
-    TitleMatchService $titleMatchService
+    TitleMatchService $titleMatchService,
+    MatchRepositoryInterface $matchRepository,
+    CommentRepositoryInterface $commentRepository,
+    TitleMatchRepositoryInterface $titleMatchRepository,
   ) {
-    $this->boxerService = $boxerService;
     $this->titleMatchService = $titleMatchService;
+    $this->matchRepository = $matchRepository;
+    $this->commentRepository = $commentRepository;
+    $this->titleMatchRepository = $titleMatchRepository;
   }
 
   /**
    * 試合データの保存
    *
    * @param array $matchDataForStore
+   *  [
+   *    'match_date' => '2023-10-18',
+   *    'red_boxer_id' => 45,
+   *    'blue_boxer_id' => 43,
+   *    'grade' => 'タイトルマッチ',
+   *    'country' => 'Mexico',
+   *    'venue' => '会場',
+   *    'weight' => 'クルーザー',
+   *    'titles' => [
+   *        0 => 'WBC暫定',
+   *        1 => 'WBO暫定',
+   *     ],
+   *  ]
    *
    * @return void
    */
-  public function storeMatch(array $matchDataForStore): void
+  public function storeMatch(array $matchDataForStore)
   {
-    $organizationsArray = $this->extractOrganizationsArray($matchDataForStore);
+    $organizationsNameArray = $this->extractOrganizationsArray($matchDataForStore);
     unset($matchDataForStore['titles']);
 
     DB::beginTransaction();
     try {
-      $this->storeMatchExecute($organizationsArray, $matchDataForStore);
+      $createdMatch = $this->matchRepository->createMatch($matchDataForStore);
+      if (!$createdMatch) {
+        throw new \Exception("Failed create match");
+      }
+
+      $titleMatchesArray = $this->titleMatchService->formatForStoreToTitleMatchTable($createdMatch['id'], $organizationsNameArray);
+      $isSuccessStoreTitleMatch = $this->titleMatchRepository->insertTitleMatch($titleMatchesArray);
+      if (!$isSuccessStoreTitleMatch) {
+        throw new \Exception("Failed store to title_matches");
+      }
     } catch (Exception $e) {
       DB::rollBack();
-      throw new \Exception("Failed store match");
+      throw new \Exception($e->getMessage() ?? "Failed store match");
     }
 
     DB::commit();
@@ -58,21 +82,19 @@ class MatchService
    *
    * @return \Illuminate\Support\Collection $matches
    */
-  public static function getMatches(string|null $range)
+  public function getMatchesExecute(string|null $range)
   {
     if ($range == "all") {
       $user = Auth::user();
       if ($user->administrator) {
-        $matches = BoxingMatch::orderBy('match_date')->get();
+        $matches = $this->matchRepository->getAllMatches();
       } else {
         throw new Exception("Cannot get all matches without auth administrator", 401);
       }
     } else if ($range == "past") {
-      $fetchRange = date('Y-m-d', strtotime('-1 week'));
-      $matches = BoxingMatch::where('match_date', '<', $fetchRange)->orderBy('match_date')->get();
+      $matches = $this->matchRepository->getPastMatches();
     } else {
-      $fetchRange = date('Y-m-d', strtotime('-1 week'));
-      $matches = BoxingMatch::where('match_date', '>', $fetchRange)->orderBy('match_date')->get();
+      $matches = $this->matchRepository->getMatches();
     }
 
     return $matches;
@@ -87,18 +109,22 @@ class MatchService
    */
   public function updateMatch(int $matchId, array $updateMatchData)
   {
-    $match = MatchRepository::get($matchId);
+    // $match = MatchRepository::get($matchId);
+    $match = $this->matchRepository->getMatchById($matchId);
     if (!$match) {
       throw new Exception("Match is not exists", 404);
     }
     DB::beginTransaction();
     try {
-      if (isset($updateMatchData['titles'])) {
-        $this->titleMatchService->updateExecute($matchId, $updateMatchData['titles']);
+      if (array_key_exists('titles', $updateMatchData)) {
+        $this->titleMatchService->updateTitleMatchExecute($matchId, $updateMatchData['titles']);
         unset($updateMatchData['titles']);
       }
       if (!empty($updateMatchData)) {
-        $match->update($updateMatchData);
+        $isUpdateSuccess = $this->matchRepository->updateMatch($matchId, $updateMatchData);
+        if (!$isUpdateSuccess) {
+          throw new \Exception();
+        }
       }
     } catch (Exception $e) {
       DB::rollBack();
@@ -108,45 +134,23 @@ class MatchService
     DB::commit();
   }
 
-
   /**
-   * 試合データと試合がタイトルマッチの場合はそのタイトルの保存の実行
+   * @param array $matchDataForStore
+   *  [
+   *    'match_date' => '2023-10-18',
+   *    'red_boxer_id' => 45,
+   *    'blue_boxer_id' => 43,
+   *    'grade' => 'タイトルマッチ',
+   *    'country' => 'Mexico',
+   *    'venue' => '会場',
+   *    'weight' => 'クルーザー',
+   *    'titles' => [
+   *        0 => 'WBC暫定',
+   *        1 => 'WBO暫定',
+   *     ],
+   *  ]
    *
-   * @param array $organizationsArray
-   * @param array $matchData
-   *
-   * @return void
-   */
-  public function storeMatchExecute(array $organizationsArray, array $matchData): void
-  {
-    $createdMatch = MatchRepository::create($matchData);
-    if (!empty($organizationsArray)) {
-      foreach ($organizationsArray as $organizationName) {
-        $organization = OrganizationRepository::get($organizationName);
-        TitleMatchRepository::store($createdMatch['id'], $organization['id']);
-      }
-    }
-  }
-
-  /**
-   * 試合データを1つ取得
-   *
-   * @param int $matchId
-   *
-   * @return BoxingMatch
-   */
-  public function getSingleMatch(int $matchId)
-  {
-    $match = MatchRepository::get($matchId);
-    if (!$match) {
-      throw new Exception("Match is not exists", 404);
-    }
-    return $match;
-  }
-
-
-  /**
-   * @return  array organizationsArray
+   * @return  array organizationsNameArray
    */
   public function extractOrganizationsArray(array $matchDataForStore): array
   {
@@ -168,16 +172,18 @@ class MatchService
    */
   public function deleteMatchExecute(int $matchId): void
   {
-    $match = MatchRepository::get($matchId);
-    if (is_null($match)) {
+    if (!$this->matchRepository->isMatch($matchId)) {
       throw new \Exception("Not exit the match", 404);
     }
     DB::beginTransaction();
     try {
-      TitleMatchRepository::delete($matchId);
-      CommentRepository::delete($matchId);
+      $this->titleMatchRepository->deleteTitleMatch($matchId);
+      $this->commentRepository->deleteAllCommentOnMatch($matchId);
       WinLossPredictionRepository::delete($matchId);
-      $match->delete();
+      $isMatchDeleted = $this->matchRepository->deleteMatch($matchId);
+      if (!$isMatchDeleted) {
+        throw new \Exception();
+      }
     } catch (\Exception $e) {
       DB::rollBack();
       throw new \Exception("Failed when delete match");
@@ -188,8 +194,8 @@ class MatchService
 
   public function isMatchDateTodayOrPast(int $matchId): bool
   {
-    $data = MatchRepository::getMatchDate($matchId);
-    $matchDate = strtotime($data['match_date']);
+    $match = $this->matchRepository->getMatchById($matchId);
+    $matchDate = strtotime($match['match_date']);
     $nowDate = strtotime('now');
 
     return ($nowDate > $matchDate);
@@ -197,7 +203,7 @@ class MatchService
 
   public function matchPredictionCountUpdate(int $matchId, string $prediction): void
   {
-    $match = MatchRepository::get($matchId);
+    $match = $this->matchRepository->getMatchById($matchId);
     if ($prediction == "red") {
       $match->increment("count_red");
     } else if ($prediction == "blue") {

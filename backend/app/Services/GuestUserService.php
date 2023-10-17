@@ -5,7 +5,7 @@ namespace App\Services;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Repository\GuestUserRepository;
+use App\Repositories\GuestUserRepository;
 
 class GuestUserService
 {

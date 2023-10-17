@@ -3,9 +3,9 @@
 namespace App\Repositories;
 
 use App\Models\Boxer;
-use App\Interfaces\Boxer\BoxerInterface;
+use App\Repositories\Interfaces\BoxerRepositoryInterface;
 
-class BoxerRepository implements BoxerInterface
+class BoxerRepository implements BoxerRepositoryInterface
 {
 
 
@@ -14,18 +14,26 @@ class BoxerRepository implements BoxerInterface
     return Boxer::findOrFail($boxerId);
   }
 
+  public function getBoxerWithTitlesById(int $boxerId): ?Boxer
+  {
+    return Boxer::with(["titles.organization", "titles.weightDivision"])
+      ->find($boxerId);
+  }
+
   public function createBoxer(array $boxerData): Boxer
   {
     return Boxer::create($boxerData);
   }
 
   /**
+   * 選手の単体の削除
    * @param int $boxerId
-   * @return  void
+   * @return bool
    */
   public function deleteBoxer(int $boxerId)
   {
-    Boxer::destroy($boxerId);
+    $res = Boxer::destroy($boxerId);
+    return (bool) $res;
   }
 
   /**
@@ -34,58 +42,21 @@ class BoxerRepository implements BoxerInterface
    */
   public function updateBoxer(array $updateBoxerData)
   {
-    $boxer = Boxer::find($$updateBoxerData['id']);
+    $boxer = Boxer::find($updateBoxerData['id']);
     $boxer->fill($updateBoxerData);
+    $boxer->save();
   }
 
 
-
-
-
   /**
-   * @param array $boxerData
-   * @return  \App\Models\Boxer
+   * @return array [array $boxers, int $boxersCount]
    */
-  public static function create(array $boxerData): Boxer
+  public function getBoxers(array $searchWordArray, ?int $reqPage, ?int $reqLimit): array
   {
-    return Boxer::create($boxerData);
-  }
+    $limit = $reqLimit ?? 15;
+    $page = $reqPage ?? 1;
+    $under = ($page - 1) * $limit;
 
-  /**
-   * @param int $boxerId
-   * @return \App\Models\Boxer|null
-   */
-  public static function get(int $boxerId): ?Boxer
-  {
-    return Boxer::find($boxerId);
-  }
-
-  /**
-   * @param int $boxerId
-   * @return \App\Models\Boxer
-   */
-  public static function getBoxerFindOrFail(int $boxerId): Boxer
-  {
-    return Boxer::findOrFail($boxerId);
-  }
-
-  /**
-   * 保有タイトルを含むボクサーのデータを取得
-   *
-   * @param int $boxerId
-   * @return \App\Models\Boxer|array|null
-   */
-  public function getBoxerWithTitles(int $boxerId): ?Boxer
-  {
-    return Boxer::with(["titles.organization", "titles.weightDivision"])
-      ->find($boxerId);
-  }
-
-  /**
-   * @return array [array $boxersResource, int $boxersCount]
-   */
-  public function getBoxers(array $searchWordArray, int $under, int $limit): array
-  {
     list($getBoxerQuery, $getCountQuery) = $this->buildQueryForGetBoxers($searchWordArray, $under, $limit);
     $boxers = $getBoxerQuery->with(["titles.organization", "titles.weightDivision"])->get();
     $boxersCount = (int) $getCountQuery->count();
@@ -99,7 +70,7 @@ class BoxerRepository implements BoxerInterface
    * @param int $limit
    * @return array [query, $getBoxerQuery] [query, $getCountQuery]
    */
-  private function buildQueryForGetBoxers(array $searchWordArray, int $under, int $limit): array
+  protected function buildQueryForGetBoxers(array $searchWordArray, int $under, int $limit): array
   {
     $getBoxersNewQuery = Boxer::query();
     $getBoxersCountNewQuery = Boxer::query();
@@ -116,7 +87,7 @@ class BoxerRepository implements BoxerInterface
     return [$getBoxerQuery, $getCountQuery];
   }
 
-  private function buildWhereClauseQueriesArray(array $arr_word): array
+  protected function buildWhereClauseQueriesArray(array $arr_word): array
   {
     $arrayQuery = array_map(function ($key, $value) {
       if (isset($value)) {

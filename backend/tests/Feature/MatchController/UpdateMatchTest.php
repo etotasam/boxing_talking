@@ -33,7 +33,7 @@ class UpdateMatchTest extends TestCase
 
   private function mockSetUp()
   {
-    $this->mockTitleMatchService->shouldReceive('updateExecute')->andReturn(null);
+    $this->mockTitleMatchService->shouldReceive('updateTitleMatchExecute')->andReturn(null);
     $this->app->instance(TitleMatchService::class, $this->mockTitleMatchService);
   }
 

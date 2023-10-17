@@ -5,7 +5,7 @@ namespace App\Services;
 use Illuminate\Http\Response;
 use App\Jobs\MailSendJob;
 use App\Models\PreUser;
-use App\Repository\PreUserRepository;
+use App\Repositories\PreUserRepository;
 
 class PreUserService
 {

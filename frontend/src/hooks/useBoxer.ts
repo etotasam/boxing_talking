@@ -61,7 +61,7 @@ export const useFetchBoxer = () => {
   }
 
   const fetchBoxerAPI = async ({ page, limit, searchWords }: FetcherPropsType) => {
-    const res = await Axios.get<ResponseType>("/api/boxer", { params: { page, limit, ...searchWords } }).then(value => value.data)
+    const res = await Axios.get<ResponseType>("/api/boxer", { params: { page, limit, ...searchWords } }).then(result => result.data)
     return res.data
   }
   const { data: result, isLoading, isError, isPreviousData, refetch, isRefetching, } = useQuery<{
@@ -101,7 +101,7 @@ export const useUpdateBoxerData = () => {
     mutate(updateFighterData, {
       onSuccess: () => {
         resetLoadingState()
-        refetchReactQueryArrayKeys([QUERY_KEY.matchesFetch, QUERY_KEY.boxer])
+        refetchReactQueryArrayKeys([QUERY_KEY.fetchMatches, QUERY_KEY.boxer])
         setToastModal({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS });
         showToastModal()
       },
@@ -207,15 +207,14 @@ export const useDeleteBoxer = () => {
       },
       onError: (error: any) => {
         resetLoadingState()
-        if (error.status === STATUS.NOT_ACCEPTABLE) {
-          const errorMessage = error.data.message
-          if (errorMessage === ERROR_MESSAGE_FROM_BACKEND.BOXER_NOT_EXIST_IN_DB || errorMessage === ERROR_MESSAGE_FROM_BACKEND.REQUEST_DATA_IS_NOT_MATCH_BOXER_IN_DB) {
-            setToastModal({ message: MESSAGE.ILLEGAL_DATA, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          }
-          if (errorMessage === ERROR_MESSAGE_FROM_BACKEND.BOXER_HAS_ALREADY_SETUP_MATCH) {
-            setToastModal({ message: MESSAGE.BOXER_IS_ALREADY_SETUP_MATCH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-            showToastModal()
-          }
+        const errorMessage = error.data.message
+        if (errorMessage === ERROR_MESSAGE_FROM_BACKEND.BOXER_HAS_ALREADY_SETUP_MATCH) {
+          setToastModal({ message: MESSAGE.BOXER_IS_ALREADY_SETUP_MATCH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showToastModal()
+          return
+        }
+        if (errorMessage === ERROR_MESSAGE_FROM_BACKEND.BOXER_NOT_EXIST_IN_DB || errorMessage === ERROR_MESSAGE_FROM_BACKEND.REQUEST_DATA_IS_NOT_MATCH_BOXER_IN_DB) {
+          setToastModal({ message: MESSAGE.ILLEGAL_DATA, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
           showToastModal()
           return
         }

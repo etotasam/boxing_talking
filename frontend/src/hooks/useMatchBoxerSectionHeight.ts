@@ -1,14 +1,14 @@
 // !Recoil
 import { useSetRecoilState, useRecoilValue } from "recoil"
-import { matchBoxerSectionHeigthtSelector } from "@/store/matchBoxerSectionHeigthtState"
+import { matchBoxerSectionHeightSelector } from "@/store/matchBoxerSectionHeightState"
 // import { useEffect } from "react"
 
 
 
 export const useMatchBoxerSectionHeight = () => {
 
-  const setter = useSetRecoilState(matchBoxerSectionHeigthtSelector)
-  const state = useRecoilValue(matchBoxerSectionHeigthtSelector)
+  const setter = useSetRecoilState(matchBoxerSectionHeightSelector)
+  const state = useRecoilValue(matchBoxerSectionHeightSelector)
 
 
 

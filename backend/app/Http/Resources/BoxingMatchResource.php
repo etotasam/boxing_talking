@@ -4,16 +4,19 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
-use App\Services\BoxerService;
+use App\Http\Resources\BoxerResource;
+use App\Repositories\Interfaces\BoxerRepositoryInterface;
 
 class BoxingMatchResource extends JsonResource
 {
 
-    protected $boxerService;
+    // protected $boxerService;
+    protected $boxerRepository;
     public function __construct($resource)
     {
+        parent::__construct($resource);
         $this->resource = $resource;
-        $this->boxerService = new BoxerService;
+        $this->boxerRepository = app(BoxerRepositoryInterface::class);
     }
     /**
      * Transform the resource into an array.
@@ -25,8 +28,8 @@ class BoxingMatchResource extends JsonResource
     {
         return  [
             "id" => $this->resource->id,
-            "red_boxer" => $this->boxerService->getBoxerSingleById($this->resource->red_boxer_id),
-            "blue_boxer" => $this->boxerService->getBoxerSingleById($this->resource->blue_boxer_id),
+            "red_boxer" => new BoxerResource($this->boxerRepository->getBoxerWithTitlesById($this->resource->red_boxer_id)),
+            "blue_boxer" => new BoxerResource($this->boxerRepository->getBoxerWithTitlesById($this->resource->blue_boxer_id)),
             "country" => $this->resource->country,
             "venue" => $this->resource->venue,
             "grade" => $this->resource->grade,

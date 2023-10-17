@@ -13,6 +13,15 @@ class OrganizationRepository
    * @param string organizationName
    * @return Organization
    */
+  public static function getOrganizationByName($organizationName)
+  {
+    return Organization::where("name", $organizationName)->first();
+  }
+
+  /**
+   * @param string organizationName
+   * @return Organization
+   */
   public static function get($organizationName): Organization
   {
     $organization = Organization::where("name", $organizationName)->first();
