@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\WinLossPredictionService;
 
-class WinLossPredictionController extends Controller
+class WinLossPredictionController extends ApiController
 {
 
     public function __construct(WinLossPredictionService $predictionService)

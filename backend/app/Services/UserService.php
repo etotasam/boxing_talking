@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use App\Models\User;
-use App\Repository\PreUserRepository;
-use App\Repository\UserRepository;
+use App\Repositories\PreUserRepository;
+use App\Repositories\UserRepository;
 
 class UserService
 {

@@ -1,11 +1,20 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repositories;
 
 use App\Models\WeightDivision;
 
 class WeightDivisionRepository
 {
+
+  /**
+   * @param string $weight
+   * @return WeightDivision
+   */
+  public static function getWeightDivisionByWeight($weight)
+  {
+    return WeightDivision::where("weight", $weight)->first();
+  }
 
 
   /**

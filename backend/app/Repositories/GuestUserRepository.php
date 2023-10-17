@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repositories;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\GuestUser;

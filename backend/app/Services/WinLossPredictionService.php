@@ -9,24 +9,28 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Collection;
 use App\Services\AuthService;
 use App\Services\MatchService;
-use App\Repository\UserRepository;
-use App\Repository\MatchRepository;
-use App\Repository\GuestUserRepository;
-use App\Repository\WinLossPredictionRepository;
+use App\Repositories\UserRepository;
+use App\Repositories\GuestUserRepository;
+use App\Repositories\WinLossPredictionRepository;
+use App\Repositories\Interfaces\MatchRepositoryInterface;
 
 class WinLossPredictionService
 {
-  public function __construct(AuthService $authService, MatchService $matchService)
+  protected $authService;
+  protected $matchService;
+  protected $matchRepository;
+  public function __construct(AuthService $authService, MatchService $matchService, MatchRepositoryInterface $matchRepository)
   {
     $this->authService = $authService;
     $this->matchService = $matchService;
+    $this->matchRepository = $matchRepository;
   }
 
   public function votePrediction(int $matchId, string $prediction): JsonResponse
   {
     try {
       $userId = $this->authService->getUserIdOrGuestUserId();
-      if (!MatchRepository::isMatchExists($matchId)) {
+      if (!$this->matchRepository->isMatch($matchId)) {
         throw new Exception("Match is not exists", 404);
       }
       //試合日が未来のみ投票可

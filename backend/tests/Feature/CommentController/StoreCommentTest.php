@@ -11,11 +11,13 @@ use App\Models\GuestUser;
 use App\Models\BoxingMatch;
 use App\Models\Boxer;
 use App\Models\Comment;
+use App\Repositories\Interfaces\CommentRepositoryInterface;
 
 class StoreCommentTest extends TestCase
 {
     use RefreshDatabase;
 
+    // protected CommentRepositoryInterface $mockCommentRepository;
     protected function setUp(): void
     {
         parent::setUp();
@@ -38,6 +40,7 @@ class StoreCommentTest extends TestCase
             'match_id' => $this->matches->id,
             'comment' => "コメント"
         ]);
+        // $this->mockCommentRepository = \Mockery::mock(CommentRepositoryInterface::class);
     }
 
     /**
@@ -61,6 +64,32 @@ class StoreCommentTest extends TestCase
     }
 
     /**
+     * コメント投稿の失敗
+     */
+    public function testFailedPostComment()
+    {
+        /**
+         * @var CommentRepositoryInterface|\Mockery\MockInterface $mockCommentRepository
+         */
+        $mockCommentRepository = \Mockery::mock(CommentRepositoryInterface::class);
+        $mockCommentRepository->shouldReceive('postComment')->andReturn(null);
+        //モックをbind
+        $this->app->instance(CommentRepositoryInterface::class, $mockCommentRepository);
+
+        $response = $this->actingAs($this->user)
+            ->post(
+                '/api/comment',
+                [
+                    'user_id' => $this->user->id,
+                    'match_id' => $this->matches->id,
+                    'comment' => 'コメント投稿'
+                ]
+            );
+        $response->assertStatus(500);
+        $this->assertDatabaseMissing('comments', ['match_id' => $this->matches->id, 'comment' => 'コメント投稿']);
+    }
+
+    /**
      * @test
      * ログインユーザーによるコメント投稿
      */
@@ -75,7 +104,7 @@ class StoreCommentTest extends TestCase
                     'comment' => 'コメント投稿'
                 ]
             );
-        $response->assertSuccessful(200);
+        $response->assertStatus(200);
         $this->assertDatabaseHas('comments', ['user_id' => $this->user->id, 'match_id' => $this->matches->id, 'comment' => 'コメント投稿']);
     }
     /**
@@ -93,7 +122,7 @@ class StoreCommentTest extends TestCase
                     'comment' => 'ゲストの投稿'
                 ]
             );
-        $response->assertSuccessful(200);
+        $response->assertStatus(200);
         $this->assertDatabaseHas('comments', ['user_id' => $this->guest->id, 'match_id' => $this->matches->id, 'comment' => 'ゲストの投稿']);
     }
 }

@@ -23,7 +23,7 @@ export const useGuest = () => {
 
   const api = useCallback(async () => {
     try {
-      const res = await Axios.get(`/api/guest/user`).then(value => value.data);
+      const res = await Axios.get(`/api/guest/user`).then(result => result.data);
       return Boolean(res);
     } catch (error) {
       return null
@@ -52,7 +52,7 @@ export const useGuestLogin = () => {
   //? ReactQuery controller
   const { setReactQueryData } = useReactQuery()
   const api = useCallback(async ({ _ }: { _?: unknown }): Promise<void> => {
-    await Axios.post<void>('/api/guest/login').then(value => value.data)
+    await Axios.post<void>('/api/guest/login').then(result => result.data)
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -93,7 +93,7 @@ export const useGuestLogout = () => {
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? api
   const api = useCallback(async ({ _ }: { _?: unknown }) => {
-    await Axios.post<void>("api/guest/logout").then(value => value.data)
+    await Axios.post<void>("api/guest/logout").then(result => result.data)
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -129,7 +129,7 @@ export const useAuthCheck = () => {
 
   const api = useCallback(async () => {
     try {
-      const res = await Axios.get(`/api/auth/user`).then(value => value.data)
+      const res = await Axios.get(`/api/auth/user`).then(result => result.data)
       return Boolean(res)
     } catch (error) {
       return null
@@ -149,7 +149,7 @@ export const useAuth = () => {
   const queryClient = useQueryClient()
 
   const api = useCallback(async () => {
-    const res = await Axios.get(`/api/user`).then(value => value.data)
+    const res = await Axios.get(`/api/user`).then(result => result.data)
     return res
   }, [])
   const { data, isLoading, isError } = useQuery<UserType | null>(QUERY_KEY.auth, api, {
@@ -182,7 +182,7 @@ export const usePreSignUp = () => {
     password: string
   }
   const api = useCallback(async ({ name, email, password }: ApiPropsType) => {
-    const res = await Axios.post<UserType>(`/api/user/pre_create`, { name, email, password }).then(value => value.data)
+    const res = await Axios.post<UserType>(`/api/user/pre_create`, { name, email, password }).then(result => result.data)
     return res
   }, [])
   const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
@@ -240,7 +240,7 @@ export const useSignUpIdentification = () => {
 
   const api = useCallback(async ({ token }: { token: string }) => {
     try {
-      const res = await Axios.post<boolean>(`/api/user/create`, { token }).then(value => value.data)
+      const res = await Axios.post<boolean>(`/api/user/create`, { token }).then(result => result.data)
       setAuthenticatingState({ isLoading: false, isError: false, isSuccess: true })
       return res
     } catch (error: any) {
@@ -284,7 +284,7 @@ export const useLogin = () => {
   const { setReactQueryData } = useReactQuery()
 
   const api = useCallback(async (props: { email: string, password: string }) => {
-    const res = await Axios.post<UserType>("api/login", { ...props }).then(value => value.data)
+    const res = await Axios.post<UserType>("api/login", { ...props }).then(result => result.data)
     return res
   }, [])
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -329,7 +329,7 @@ export const useLogout = () => {
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? api
   const api = useCallback(async ({ _ }: { _?: any }) => {
-    await Axios.post<void>("api/logout").then(value => value.data)
+    await Axios.post<void>("api/logout").then(result => result.data)
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -373,7 +373,7 @@ export const useLogout = () => {
 export const useAdmin = () => {
   const api = useCallback(async () => {
     try {
-      const res = await Axios.get(`/api/admin`).then(value => value.data)
+      const res = await Axios.get(`/api/admin`).then(result => result.data)
       return res
     } catch (error) {
       return null

@@ -13,7 +13,7 @@ class ParseRequestNameTest extends TestCase
   {
     parent::setUp();
     // $this->mock = Mockery::mock(Model::class);
-    $this->boxerService = new BoxerService();
+    $this->boxerService = app()->make(BoxerService::class);
   }
 
 

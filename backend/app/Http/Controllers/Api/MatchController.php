@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Services\MatchService;
 use App\Services\AuthService;
 use App\Http\Resources\BoxingMatchResource;
+use App\Models\BoxingMatch;
 
 class MatchController extends ApiController
 {
@@ -30,7 +31,7 @@ class MatchController extends ApiController
     public function index(Request $request)
     {
         try {
-            $matches =  $this->matchService->getMatches($request->query('range'));
+            $matches =  $this->matchService->getMatchesExecute($request->query('range'));
         } catch (Exception $e) {
             if ($e->getCode() === 401) {
                 return $this->responseUnauthorized($e->getMessage());
@@ -42,9 +43,33 @@ class MatchController extends ApiController
     }
 
     /**
+     * idで指定の試合データの取得
+     *
+     * @param BoxingMatch $match
+     *
+     * @return BoxingMatchResource
+     */
+    public function show(BoxingMatch $match)
+    {
+        return new BoxingMatchResource($match);
+    }
+
+    /**
      * 試合データの登録
      *
-     * @param array matchDataForStoreArray
+     * @param array [
+     *  'match_date' => '2023-10-18',
+     *  'red_boxer_id' => 45,
+     *  'blue_boxer_id' => 43,
+     *  'grade' => 'タイトルマッチ',
+     *  'country' => 'Mexico',
+     *  'venue' => '会場',
+     *  'weight' => 'クルーザー',
+     *  'titles' => [
+     *      0 => 'WBC暫定',
+     *      1 => 'WBO暫定',
+     *   ],
+     *  ]
      *
      * @return JsonResponse
      */
@@ -65,7 +90,7 @@ class MatchController extends ApiController
      *
      * @return JsonResponse
      */
-    public function destroy(Request $request): JsonResponse
+    public function destroy(Request $request)
     {
         try {
             $this->matchService->deleteMatchExecute($request->match_id);
@@ -85,7 +110,7 @@ class MatchController extends ApiController
      * @param  array update_match_data
      * @return JsonResponse
      */
-    public function update(Request $request): JsonResponse
+    public function update(Request $request)
     {
         try {
             $this->matchService->updateMatch($request->match_id, $request->update_match_data);

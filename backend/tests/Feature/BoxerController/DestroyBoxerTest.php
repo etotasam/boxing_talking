@@ -51,6 +51,17 @@ class DestroyBoxerTest extends TestCase
     $response->assertStatus(400);
     $this->assertDatabaseHas('boxers', $boxerData); // 対象ボクサーは削除されていない
   }
+
+  /**
+   * 削除対象のボクサーが見つからない
+   */
+  public function testDeleteIfNotExistsBoxer()
+  {
+    //adminユーザとして実行
+    $this->actingAs(TestHelper::createAdminUser());
+    $response = $this->delete('api/boxer', ["boxer_id" => 100]); // 存在しないボクサーID
+    $response->assertStatus(404);
+  }
   /**
    * ボクサーデータの削除
    */

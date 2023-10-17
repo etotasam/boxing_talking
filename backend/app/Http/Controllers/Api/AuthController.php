@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 
 use Exception;
@@ -18,7 +18,7 @@ use Illuminate\Http\Response;
 use App\Http\Requests\PreCreateAuthRequest;
 use App\Http\Requests\LoginRequest;
 
-class AuthController extends Controller
+class AuthController extends ApiController
 {
 
     public function __construct(UserService $userService, PreUserService $preUserService, GuestUserService $guestService)

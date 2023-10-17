@@ -3,17 +3,20 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 // controller
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\MatchController;
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\WinLossPredictionController;
-use App\Http\Controllers\BoxerController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\MatchController;
+use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\WinLossPredictionController;
+use App\Http\Controllers\Api\BoxerController;
+
 
 /*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
 */
+
+Route::delete("/test", [BoxerController::class, 'test']);
 
 Route::get('/user', [AuthController::class, 'fetch']);
 Route::get('/guest/user', function () {
@@ -27,6 +30,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/guest/login', [AuthController::class, 'guestLogin']);
 //? 試合
 Route::get('/match', [MatchController::class, 'index']);
+Route::get('/match/{match}/show', [MatchController::class, 'show']);
 //? ボクサー
 Route::get('/boxer', [BoxerController::class, 'index']);
 //? 勝利予想
@@ -50,4 +54,6 @@ Route::middleware('administrator')->group(function () {
     Route::post('/match', [MatchController::class, 'store']);
     Route::delete('/match', [MatchController::class, 'destroy']);
     Route::patch('/match', [MatchController::class, 'update']);
+    //コメント削除
+    Route::delete('/comment/{comment}', [CommentController::class, 'destroy']);
 });

@@ -3,7 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Repository\UserRepository;
+use App\Repositories\UserRepository;
 
 class CommentResource extends JsonResource
 {

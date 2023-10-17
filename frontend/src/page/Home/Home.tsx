@@ -50,7 +50,7 @@ export const Home = () => {
             </div>
           )}
 
-          <ul className="md:pt-10">
+          <ul className="md:py-10">
             {sortedMatches.map((match) => (
               <li
                 key={match.id}

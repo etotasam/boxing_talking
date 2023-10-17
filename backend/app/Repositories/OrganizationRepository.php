@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repositories;
 
 use Exception;
 use App\Models\Organization;
@@ -8,6 +8,15 @@ use App\Models\Organization;
 class OrganizationRepository
 {
 
+
+  /**
+   * @param string organizationName
+   * @return Organization
+   */
+  public static function getOrganizationByName($organizationName)
+  {
+    return Organization::where("name", $organizationName)->first();
+  }
 
   /**
    * @param string organizationName

@@ -51,7 +51,7 @@ class UpdateBoxerTest extends TestCase
     $this->actingAs(TestHelper::createAdminUser()); // admin権限ありのユーザーで実行
     $response = $this->patch('api/boxer', ["id" => $boxerData['id'], "titles" => $titlesUpdateData, "name" => "変更後の名前"]);
     $response->assertStatus(200);
-    $this->assertDatabaseHas('boxers', ["name" => "変更後の名前"])
+    $this->assertDatabaseHas('boxers', ["name" => "変更後の名前", "country" => "Japan"]) // "country" => "Japan"は変更対象になってないデータ
       ->assertDatabaseHas('titles', ["boxer_id" => $boxerData['id'], "organization_id" => 1, "weight_division_id" => 1]);
     // "organization_id" => 1 WBAのidナンバー
     // "weight_division_id" => 1 ヘビー のidナンバー

@@ -12,25 +12,35 @@ import { useToastModal } from "./useToastModal"
 import { useLoading } from "./useLoading"
 
 
-//! 試合情報の取得
-export const useFetchMatches = () => {
-  const fetcher = useCallback(async () => {
-    const response = await Axios.get("api/match").then(value => value.data)
-    return response.data
+//! 試合情報の取得(1試合)
+export const useFetchMatchById = (matchId: number) => {
+  const api = useCallback(async () => {
+    const res = await Axios.get(`api/match/${matchId}/show`).then(result => result.data)
+    return res.data
   }, [])
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.matchesFetch, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType>([QUERY_KEY.matchSingle, { "id": matchId }], api, { keepPreviousData: true, staleTime: Infinity, enabled: true })
   return { data, isLoading, isError, isRefetching, refetch }
 }
 
-//! 過去の試合情報の取得(試合後一週間以上経っている試合全部)
+//! 試合情報一覧の取得
+export const useFetchMatches = () => {
+  const fetcher = useCallback(async () => {
+    const res = await Axios.get("api/match").then(result => result.data)
+    return res.data
+  }, [])
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.fetchMatches, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
+  return { data, isLoading, isError, isRefetching, refetch }
+}
+
+//! 過去の試合情報一覧の取得(試合後一週間以上経っている試合全部)
 export const useFetchPastMatches = () => {
   const { startLoading, resetLoadingState } = useLoading()
   const fetcher = useCallback(async () => {
     startLoading()
-    const res = await Axios.get("api/match", { params: { range: "past" } }).then(value => value.data)
+    const res = await Axios.get("api/match", { params: { range: "past" } }).then(result => result.data)
     return res.data
   }, [])
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.pastMatches, fetcher, {
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.fetchPastMatches, fetcher, {
     keepPreviousData: true, staleTime: Infinity, enabled: true, onSuccess: () => {
       resetLoadingState()
     }, onError: () => {
@@ -46,10 +56,10 @@ export const useFetchPastMatches = () => {
 //! すべての試合情報の取得(過去含めすべて)
 export const useFetchAllMatches = () => {
   const fetcher = useCallback(async () => {
-    const res = await Axios.get("api/match", { params: { range: "all" } }).then(value => value.data)
+    const res = await Axios.get("api/match", { params: { range: "all" } }).then(result => result.data)
     return res.data
   }, [])
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.allMatches, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.fetchAllMatches, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
   return { data, isLoading, isError, isRefetching, refetch }
 }
 
@@ -70,14 +80,6 @@ export const useRegisterMatch = () => {
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
       startLoading()
-      // const snapshot = queryClient.getQueryData<MatchesType[]>(queryKeys.match)
-      // const dumyRegistMatch: MatchesType = { id: 0, date: variables.match_date, red: variables.red_fighter, blue: variables.blue_fighter, count_blue: 0, count_red: 0 }
-      // const sorfFunc = (a: MatchesType, b: MatchesType) => {
-      //   return dayjs(a.date).unix() - dayjs(b.date).unix()
-      // }
-      // const dumyMatches = [...snapshot!, dumyRegistMatch].sort(sorfFunc)
-      // queryClient.setQueryData(queryKeys.match, dumyMatches)
-      // return { snapshot }
     }
   })
 
@@ -161,8 +163,6 @@ export const useDeleteMatch = () => {
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
       startLoading()
-      // const snapshot = matchesState
-      // return { snapshot }
     }
   })
 
@@ -174,16 +174,11 @@ export const useDeleteMatch = () => {
         resetLoadingState()
         setToastModal({ message: MESSAGE.MATCH_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
-        // setToastModalMessage({ message: MESSAGE.MATCH_DELETED, bgColor: ModalBgColorType.DELETE })
-        // const withoutDeleteMatchesState = context.snapshot.filter(match => match.id !== matchId)
-        // setMatchesState(withoutDeleteMatchesState)
       },
       onError: () => {
         resetLoadingState()
         setToastModal({ message: MESSAGE.MATCH_DELETE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
-        // setToastModalMessage({ message: MESSAGE.MATCH_DELETE_FAILED, bgColor: ModalBgColorType.ERROR })
-        // setMatchesState(context!.snapshot)
       }
     })
   }
