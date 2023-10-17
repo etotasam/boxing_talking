@@ -3,11 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 // controller
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\MatchController;
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\WinLossPredictionController;
-use App\Http\Controllers\BoxerController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\MatchController;
+use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\WinLossPredictionController;
+use App\Http\Controllers\Api\BoxerController;
 
 /*
 |--------------------------------------------------------------------------
