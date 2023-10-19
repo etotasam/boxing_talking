@@ -4,12 +4,18 @@ namespace App\Services;
 
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use App\Repositories\GuestUserRepository;
+use App\Repositories\Interfaces\GuestRepositoryInterface;
 
 class GuestUserService
 {
 
+  protected $guest;
+  public function __construct(GuestRepositoryInterface $guest)
+  {
+    $this->guest = $guest;
+  }
 
   /**
    * @param Request request
@@ -20,26 +26,31 @@ class GuestUserService
     if (Auth::check()) {
       throw new Exception("Guest login is not allowed as already authenticated", 400);
     }
-    $guestUser = GuestUserRepository::create();
-    Auth::guard('guest')->login($guestUser);
-    if (!Auth::guard('guest')->check()) {
-      throw new Exception("Failed guest login", 500);
+    DB::beginTransaction();
+    try {
+      $guestUser = $this->guest->createGuestUser();
+      $this->guest->loginGuestUser($guestUser);
+      if (!$this->guest->isGuestUser()) {
+        throw new Exception();
+      }
+      $request->session()->regenerate();
+      DB::commit();
+    } catch (\Exception $e) {
+      DB::rollback();
+      throw new \Exception("Failed guest login", 500);
     }
-    $request->session()->regenerate();
   }
 
 
   public function logoutGuest(): void
   {
-    $guestGuard = Auth::guard('guest');
-    $guestUser = $guestGuard->user();
-    if (!$guestUser) {
+    if (!$this->guest->isGuestUser()) {
       throw new Exception('Must be guest user to guest logout', 403);
     }
-    $guestUserId = $guestGuard->user()->id;
-    $guestGuard->logout();
-    GuestUserRepository::delete($guestUserId);
-    if (Auth::guard('guest')->check()) {
+    $guestUserId = $this->guest->getGuestUser()->id;
+    $this->guest->logoutGuestUser();
+    $this->guest->deleteGuestUser($guestUserId);
+    if ($this->guest->isGuestUser()) {
       throw new Exception('Failed guest logout', 403);
     }
   }

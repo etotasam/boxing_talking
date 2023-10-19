@@ -11,12 +11,12 @@ export const PaginationBoxerList = ({ pageCount }: PropsType) => {
   const paramPage = Number(query.get('page') || 1);
   const paramName = query.get('name');
   const paramCountry = query.get('country');
-  const [formattedParames, setFormattedParames] = useState('');
+  const [formattedParams, setFormattedParams] = useState('');
   useEffect(() => {
     let pageURL: string[] = [];
     if (paramName) pageURL = [...pageURL, `name=${paramName}`];
     if (paramCountry) pageURL = [...pageURL, `country=${paramCountry}`];
-    setFormattedParames(pageURL.length ? `&${pageURL.join('&')}` : '');
+    setFormattedParams(pageURL.length ? `&${pageURL.join('&')}` : '');
   }, [search]);
 
   const pagesArray = (): number[] => {
@@ -38,7 +38,7 @@ export const PaginationBoxerList = ({ pageCount }: PropsType) => {
             ) : (
               <Link
                 key={page}
-                to={`${pathname}?page=${page}${formattedParames}`}
+                to={`${pathname}?page=${page}${formattedParams}`}
               >
                 <li className="px-2 bg-stone-700 text-white rounded-sm mr-2">
                   {page}

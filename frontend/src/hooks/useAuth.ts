@@ -150,7 +150,7 @@ export const useAuth = () => {
 
   const api = useCallback(async () => {
     const res = await Axios.get(`/api/user`).then(result => result.data)
-    return res
+    return res.data
   }, [])
   const { data, isLoading, isError } = useQuery<UserType | null>(QUERY_KEY.auth, api, {
     retry: false,
@@ -284,8 +284,8 @@ export const useLogin = () => {
   const { setReactQueryData } = useReactQuery()
 
   const api = useCallback(async (props: { email: string, password: string }) => {
-    const res = await Axios.post<UserType>("api/login", { ...props }).then(result => result.data)
-    return res
+    const res = await Axios.post<{ data: UserType }>("api/login", { ...props }).then(result => result.data)
+    return res.data
   }, [])
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {

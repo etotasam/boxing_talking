@@ -23,8 +23,7 @@ class StoreTitleMethodTest extends TestCase
   protected function setUp(): void
   {
     parent::setUp();
-    $this->seed(WeightDivisionSeeder::class);
-    $this->seed(OrganizationSeeder::class);
+    $this->seed([OrganizationSeeder::class, WeightDivisionSeeder::class]);
     $this->titleService = app()->make(TitleService::class);
 
     $this->boxer = Boxer::factory()->create(["name" => "ボクサー1"]);

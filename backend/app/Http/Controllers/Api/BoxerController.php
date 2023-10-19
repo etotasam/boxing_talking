@@ -73,6 +73,7 @@ class BoxerController extends ApiController
         if ($this->matchRepository->hasMatchBoxer($boxerId)) {
             return $this->responseBadRequest("Boxer has already setup match");
         }
+
         try {
             $this->boxerService->deleteBoxerExecute($boxerId);
         } catch (\Exception $e) {

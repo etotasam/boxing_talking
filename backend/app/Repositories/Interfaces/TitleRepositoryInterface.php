@@ -32,9 +32,8 @@ interface TitleRepositoryInterface
   public function storeTitlesHoldByTheBoxer($titlesArray);
 
   /**
-   * 試合に紐づいているコメントをすべて削除
-   * @param int $matchId
-   *
+   * ボクサーが所持するタイトル(titlesテーブル)を削除
+   * @param int boxerId
    * @return int
    */
   public function deleteTitlesHoldByTheBoxer($boxerId);

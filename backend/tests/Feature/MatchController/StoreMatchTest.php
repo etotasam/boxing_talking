@@ -51,7 +51,6 @@ class StoreMatchTest extends TestCase
   }
 
   /**
-   * @test
    * タイトルマッチの時はtitle_matchesテーブルへもsoreされる
    */
   public function testStoreMatchWithTitleMatch()
@@ -66,6 +65,7 @@ class StoreMatchTest extends TestCase
       $organization = Organization::where('name', $organizationName)->first();
       return $organization->id;
     }, $this->storeMatchData['titles']);
+
     foreach ($organizationIdArray as $id) {
       $this->assertDatabaseHas('title_matches', ['match_id' => 1, 'organization_id' => $id]);
     }
@@ -97,7 +97,6 @@ class StoreMatchTest extends TestCase
   }
 
   /**
-   * @test
    * adminユーザー以外で実行した時はエラー
    */
   public function testStoreMatchWithNotAdmin()

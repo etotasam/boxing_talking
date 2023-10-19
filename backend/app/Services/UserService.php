@@ -4,25 +4,35 @@ namespace App\Services;
 
 use Exception;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use App\Models\User;
-use App\Repositories\PreUserRepository;
-use App\Repositories\UserRepository;
+use App\Repositories\Interfaces\GuestRepositoryInterface;
+use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Repositories\Interfaces\PreUserRepositoryInterface;
 
 class UserService
 {
 
-  public function __construct(User $user)
-  {
-    $this->user = $user;
+  protected $userRepository;
+  protected $guest;
+  protected $preUserRepository;
+  public function __construct(
+    UserRepositoryInterface $userRepository,
+    GuestRepositoryInterface $guest,
+    PreUserRepositoryInterface $preUserRepository,
+  ) {
+    $this->userRepository = $userRepository;
+    $this->guest = $guest;
+    $this->preUserRepository = $preUserRepository;
   }
 
   public function loginUserService(string $email, string $password): User
   {
-    if (Auth::guard('guest')->check()) {
-      Auth::guard('guest')->logout();
+    if ($this->guest->isGuestUser()) {
+      $this->guest->logoutGuestUser();
     }
     if (!Auth::attempt(compact("email", "password"))) {
       throw new Exception("Failed Login", 401);
@@ -51,21 +61,29 @@ class UserService
     $decodedToken = JWT::decode($token, new Key($secretKey, 'HS256'));
 
     $preUserId = $decodedToken->user_id;
-    $preUser = PreUserRepository::get($preUserId);
+    $preUser = $this->preUserRepository->getPreUser($preUserId);
 
     if (!$preUser) {
       throw new Exception("Invalid access", 403);
     }
-    $authUser = UserRepository::create([
-      "name" => $preUser->name,
-      "email" => $preUser->email,
-      "password" => $preUser->password
-    ]);
 
-    if (!$authUser) {
-      throw new Exception("Failed signup...", 500);
+    DB::beginTransaction();
+    try {
+      $authUser = $this->userRepository->createUser([
+        "name" => $preUser->name,
+        "email" => $preUser->email,
+        "password" => $preUser->password
+      ]);
+      if (!$authUser) {
+        throw new Exception("Failed signup...", 500);
+      }
+
+      $preUser->delete();
+    } catch (\Exception $e) {
+      DB::rollback();
+      throw new \Exception($e->getMessage(), $e->getCode());
     }
 
-    $preUser->delete();
+    DB::commit();
   }
 }

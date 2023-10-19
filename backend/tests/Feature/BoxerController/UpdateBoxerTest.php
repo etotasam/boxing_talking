@@ -19,8 +19,7 @@ class UpdateBoxerTest extends TestCase
   {
     parent::setUp();
     $this->boxerData = Boxer::factory()->create(["name" => "更新対象ボクサー"]);
-    $this->seed(WeightDivisionSeeder::class);
-    $this->seed(OrganizationSeeder::class);
+    $this->seed([OrganizationSeeder::class, WeightDivisionSeeder::class]);
   }
 
   /**

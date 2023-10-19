@@ -4,25 +4,29 @@ namespace App\Http\Controllers\Api;
 
 
 use Exception;
-// use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use App\Models\Administrator;
 use App\Services\UserService;
 use App\Services\PreUserService;
 use App\Services\GuestUserService;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use App\Http\Requests\PreCreateAuthRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Resources\UserResource;
 
 class AuthController extends ApiController
 {
 
-    public function __construct(UserService $userService, PreUserService $preUserService, GuestUserService $guestService)
-    {
+    protected $userService;
+    protected $preUserService;
+    protected $guestService;
+    public function __construct(
+        UserService $userService,
+        PreUserService $preUserService,
+        GuestUserService $guestService,
+    ) {
         $this->userService = $userService;
         $this->preUserService = $preUserService;
         $this->guestService = $guestService;
@@ -31,35 +35,40 @@ class AuthController extends ApiController
     /**
      * guest_login
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function guestLogin(Request $request)
     {
         try {
             $this->guestService->loginGuest($request);
-            return response()->json(["success" => true, "message" => "success guest login"], Response::HTTP_ACCEPTED);
         } catch (Exception $e) {
-            return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
+            if ($e->getCode() === 400) {
+                return $this->responseBadRequest($e->getMessage());
+            }
+            return $this->responseInvalidQuery($e->getMessage() ?? "Failed guest login");
         }
+
+        return $this->responseSuccessful("Success guest login");
     }
 
 
     /**
      * guest_logout
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function guestLogout()
     {
         try {
             $this->guestService->logoutGuest();
-            return response()->json(["success" => true, "message" => "Logout guest user"], Response::HTTP_ACCEPTED);
         } catch (Exception $e) {
-            if ($e->getCode()) {
-                return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
+            if ($e->getCode() === 403) {
+                return $this->responseAccessDenied($e->getMessage());
             }
-            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+            return $this->responseInvalidQuery("Failed guest logout");
         }
+
+        return $this->responseSuccessful("Success guest logout");
     }
 
 
@@ -69,29 +78,17 @@ class AuthController extends ApiController
      * @param string $name
      * @param string $email
      * @param string $password
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function preCreate(PreCreateAuthRequest $request)
     {
-        // throw new Exception();
         try {
-            $preUserDataForRegister = [
-                "name" => $request->name,
-                "email" => $request->email,
-                "password" => $request->password,
-            ];
-
-            DB::beginTransaction();
-            $this->preUserService->createPreUserAndSendEmail($preUserDataForRegister);
-            DB::commit();
-            return response()->json(['success' => true, 'message' => "Successful pre signup."], Response::HTTP_CREATED);
+            $this->preUserService->createPreUserAndSendEmail($request->name, $request->email, $request->password);
         } catch (Exception $e) {
-            DB::rollBack();
-            if ($e->getCode()) {
-                return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
-            }
-            return response()->json(['success' => false, "message" => $e->getMessage()], 500);
+            return $this->responseInvalidQuery($e->getMessage() ?? "Failed create pre_user");
         }
+
+        return $this->responseSuccessful("Successful pre signup");
     }
 
     /**
@@ -100,7 +97,7 @@ class AuthController extends ApiController
      * @param string $name
      * @param string $email
      * @param string $password
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function create(Request $request)
     {
@@ -108,42 +105,36 @@ class AuthController extends ApiController
             $validator = Validator::make($request->only('token'), [
                 "token" => 'required'
             ]);
-
             if ($validator->fails()) {
-                return response()->json(["success" => false, "message" => $validator->errors()], 422);
+                return $this->responseBadRequest($validator->errors());
             }
 
-            DB::beginTransaction();
             $this->userService->createUserService($request->token);
-            DB::commit();
-            return response()->json(["message" => "Successful signup"], Response::HTTP_CREATED);
         } catch (Exception $e) {
-            DB::rollBack();
-            if ($e->getCode()) {
-                return response()->json(["message" => $e->getMessage()], $e->getCode());
+            if ($e->getCode() === 403) {
+                return $this->responseAccessDenied($e->getMessage());
             }
-            return response()->json(["message" => $e->getMessage()], 500);
+            return $this->responseInvalidQuery($e->getMessage() ?? "Failed user create");
         }
+
+        return $this->responseSuccessful("Successful signup");
     }
 
     /**
      * user
      *
-     * @return \Illuminate\Http\Response
+     * @return UserResource|null|JsonResponse
      */
     public function fetch(Request $request)
     {
         try {
             if (Auth::check()) {
-                return $request->user();
+                return new UserResource($request->user());
             } else {
                 return null;
             }
         } catch (Exception $e) {
-            if ($e->getCode()) {
-                return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
-            }
-            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+            return $this->responseInvalidQuery("Failed fetch user");
         }
     }
 
@@ -153,7 +144,7 @@ class AuthController extends ApiController
      *
      * @param string $email
      * @param string $password
-     * @return \Illuminate\Http\Response
+     * @return UserResource|JsonResponse
      */
     public function login(LoginRequest $request)
     {
@@ -161,54 +152,52 @@ class AuthController extends ApiController
             $email = $request->email;
             $password = $request->password;
             $loggedInUser = $this->userService->loginUserService($email, $password);
-            return response()->json($loggedInUser, 200);
+            $request->session()->regenerate(); // セッションIDの再発行
         } catch (Exception $e) {
-            if ($e->getCode()) {
-                return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
+            if ($e->getCode() === 401) {
+                return $this->responseUnauthorized($e->getMessage());
             }
-            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+            return $this->responseInvalidQuery("Failed user login");
         }
+
+        return new UserResource($loggedInUser);
     }
 
     /**
      * logout
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function logout()
     {
         try {
             $this->userService->logoutUserService();
-            return response()->json(["success" => true], 200);
         } catch (Exception $e) {
-            if ($e->getCode()) {
-                return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
+            if ($e->getCode() === 403) {
+                return $this->responseAccessDenied($e->getMessage());
             }
-            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+            return $this->responseInvalidQuery($e->getMessage() ?? "Failed user logout");
         }
+
+        return $this->responseSuccessful("Success user logout");
     }
 
 
     /**
      * admin check
      *
-     * @param str $userID
-     * @return bool
+     * @return bool|JsonResponse
      */
-    public function admin(Request $request): bool
+    public function admin()
     {
         try {
-            if (!Auth::User()) {
+            if (!Auth::check()) {
                 return false;
             }
-            $authUser_id = Auth::User()->id;
-            $is_admin = Administrator::where("user_id", $authUser_id)->exists();
+            $is_admin = Administrator::where("user_id", Auth::id())->exists();
             return $is_admin;
         } catch (Exception $e) {
-            if ($e->getCode()) {
-                return response()->json(["success" => false, "message" => $e->getMessage()], $e->getCode());
-            }
-            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+            return $this->responseInvalidQuery("Failed check admin auth");
         }
     }
 }

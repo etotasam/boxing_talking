@@ -22,8 +22,7 @@ class StoreBoxerTest extends TestCase
   {
     parent::setUp();
     $this->boxerData = Boxer::factory(["name" => "テストボクサー"])->make()->toArray();
-    $this->seed(WeightDivisionSeeder::class);
-    $this->seed(OrganizationSeeder::class);
+    $this->seed([OrganizationSeeder::class, WeightDivisionSeeder::class]);
   }
 
   /**

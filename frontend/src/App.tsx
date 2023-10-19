@@ -1,5 +1,6 @@
 // import { useState } from "react";
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { ROUTE_PATH } from '@/assets/RoutePath';
 // ! page
 import { Home } from '@/page/Home';
 import { Match } from '@/page/Match';
@@ -27,20 +28,26 @@ function App() {
       <Routes>
         <Route element={<Container />}>
           <Route element={<HeaderAndFooterLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/past_matches" element={<PastMatches />} />
+            <Route path={ROUTE_PATH.Home} element={<Home />} />
+            <Route path={ROUTE_PATH.PastMatches} element={<PastMatches />} />
             {/* //? </HeaderAndFooterLayout> */}
           </Route>
           <Route element={<HeaderOnlyLayout />}>
-            <Route path="/match" element={<Match />} />
+            <Route path={ROUTE_PATH.Match} element={<Match />} />
             {/* //? </HeaderOnlyLayout> */}
           </Route>
           <Route element={<AdminOnly />}>
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/boxer_edit" element={<BoxerEdit />} />
-            <Route path="/admin/boxer_register" element={<BoxerRegister />} />
-            <Route path="/admin/match_register" element={<MatchRegister />} />
-            <Route path="/admin/match_edit" element={<MatchEdit />} />
+            <Route path={ROUTE_PATH.Admin} element={<Admin />} />
+            <Route path={ROUTE_PATH.BoxerEdit} element={<BoxerEdit />} />
+            <Route
+              path={ROUTE_PATH.BoxerRegister}
+              element={<BoxerRegister />}
+            />
+            <Route path={ROUTE_PATH.MatchEdit} element={<MatchEdit />} />
+            <Route
+              path={ROUTE_PATH.MatchRegister}
+              element={<MatchRegister />}
+            />
             {/* //? </AdminOnly> */}
           </Route>
           {/* //? </container> */}
@@ -48,12 +55,15 @@ function App() {
 
         <Route element={<HeaderOnlyLayout />}>
           {/* <Route path="/test_module" element={<TestModule />} /> */}
-          <Route path="/identification" element={<Identification />} />
+          <Route
+            path={ROUTE_PATH.Identification}
+            element={<Identification />}
+          />
           {/* //? </HeaderOnlyLayout> */}
         </Route>
 
         <Route element={<HeaderAndFooterLayout />}>
-          <Route path="/terms" element={<Terms />} />
+          <Route path={ROUTE_PATH.Terms} element={<Terms />} />
           <Route path="/test" element={<TestPage />} />
           <Route path="/*" element={<NotFound />} />
           {/* //? </HeaderAndFooterLayout> */}

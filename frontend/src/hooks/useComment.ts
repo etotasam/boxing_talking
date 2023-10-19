@@ -23,6 +23,7 @@ type CommentType = {
 //! テストコメント取得
 
 export const useTestFetchComments = (matchId: number, offset: number, limit: number) => {
+  const { showToastModalMessage } = useToastModal()
   const api = async () => {
     try {
       return await Axios.get("/api/comment/test", {
@@ -38,8 +39,11 @@ export const useTestFetchComments = (matchId: number, offset: number, limit: num
   }
 
   const { data, isLoading, isFetching, refetch, isError } = useQuery<CommentType[]>([QUERY_KEY.comment, { id: matchId }], api, {
-    staleTime: 60000, onError: () => {
-
+    staleTime: 60000, onError: (error: any) => {
+      if (error.status === 419) {
+        showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        return
+      }
     }
   })
 
@@ -48,6 +52,7 @@ export const useTestFetchComments = (matchId: number, offset: number, limit: num
 
 //! コメント取得
 export const useFetchComments = (matchId: number) => {
+  const { showToastModalMessage } = useToastModal()
   const api = async () => {
     const res = await Axios.get("/api/comment", {
       params: {
@@ -59,8 +64,11 @@ export const useFetchComments = (matchId: number) => {
   }
 
   const { data, isLoading, isFetching, refetch, isError } = useQuery<CommentType[]>([QUERY_KEY.comment, { id: matchId }], api, {
-    staleTime: 60000, onError: () => {
-      // console.error(error);
+    staleTime: 60000, onError: (error: any) => {
+      if (error.status === 419) {
+        showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        return
+      }
     }
   })
 
@@ -72,7 +80,7 @@ export const useFetchComments = (matchId: number) => {
 
 export const usePostComment = () => {
   // const { startLoading, resetLoadingState } = useLoading()
-  const { setToastModal, showToastModal } = useToastModal()
+  const { showToastModalMessage } = useToastModal()
   type ApiPropsType = {
     matchId: number,
     comment: string
@@ -104,16 +112,18 @@ export const usePostComment = () => {
     const sanitizedComment = sanitizeComment(comment)
     mutate({ matchId, comment: sanitizedComment }, {
       onSuccess: () => {
-        setToastModal({ message: MESSAGE.COMMENT_POST_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        showToastModalMessage({ message: MESSAGE.COMMENT_POST_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         // ? match_idを指定してコメントを再取得
         queryClient.invalidateQueries([QUERY_KEY.comment, { id: matchId }]);
         return
       },
       onError: (error: any) => {
+        if (error.status === 419) {
+          showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          return
+        }
         if (error.status === 401) {
-          setToastModal({ message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          showToastModal()
+          showToastModalMessage({ message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
           return
         }
         //? 入力エラー
@@ -122,29 +132,25 @@ export const usePostComment = () => {
           if (errors.comment) {
             //? コメントが長すぎる(1000文字以内)
             if ((errors.comment as string[]).includes('The comment must not be greater')) {
-              setToastModal({ message: MESSAGE.COMMENT_IS_TOO_LONG, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-              showToastModal()
+              showToastModalMessage({ message: MESSAGE.COMMENT_IS_TOO_LONG, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
               return
             }
             //? 空のコメント
             if ((errors.comment as string[]).includes('comment is require')) {
-              setToastModal({ message: MESSAGE.COMMENT_IS_NOT_ENTER, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-              showToastModal()
+              showToastModalMessage({ message: MESSAGE.COMMENT_IS_NOT_ENTER, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
               return
             }
           }
           //? 試合が存在しない
           if (errors.match_id) {
             if ((errors.match_id as string[]).includes('match_id is require')) {
-              setToastModal({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-              showToastModal()
+              showToastModalMessage({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
               return
             }
           }
         }
         //? コメント投稿失敗
-        setToastModal({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showToastModalMessage({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         return
       }
     })
@@ -156,13 +162,9 @@ export const usePostComment = () => {
 //! コメントの削除
 
 export const useDeleteComment = () => {
-  // const { setter: setIsCommentDeleting } = useQueryState("q/isCommentDeleting", false)
-  // const { search } = useLocation();
-  // const query = new URLSearchParams(search);
-  // const matchIdOnParam = Number(query.get("id"));
 
   type ApiPropsType = { commentID: number, matchID: number }
-  const { setToastModal, showToastModal } = useToastModal()
+  const { setToastModal, showToastModal, showToastModalMessage } = useToastModal()
   const { startLoading, resetLoadingState } = useLoading()
   const queryClient = useQueryClient()
 
@@ -190,19 +192,15 @@ export const useDeleteComment = () => {
         resetLoadingState()
         setToastModal({ message: MESSAGE.COMMENT_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
         showToastModal()
-        // setIsCommentDeleting(false)
-        // const snapshot = queryClient.getQueryData<CommentType[]>([queryKeys.comments, { id: matchIdOnParam }])
-        // const commentsWidthoutDeleteComment = snapshot!.filter(commentState => commentState.id !== commentID)
-        // queryClient.setQueryData([queryKeys.comments, { id: matchIdOnParam }], commentsWidthoutDeleteComment)
-        // queryClient.invalidateQueries([queryKeys.comments, { id: matchIdOnParam }])
-        // setToastModalMessage({ message: MESSAGE.COMMENT_DELETED, bgColor: ModalBgColorType.DELETE })
       },
-      onError: () => {
+      onError: (error: any) => {
         resetLoadingState()
+        if (error.status === 419) {
+          showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          return
+        }
         setToastModal({ message: MESSAGE.COMMENT_DELETE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
-        // setIsCommentDeleting(false)
-        // setToastModalMessage({ message: MESSAGE.COMMENT_DELETE_FAILED, bgColor: ModalBgColorType.ERROR })
       }
     })
   }

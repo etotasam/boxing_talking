@@ -5,8 +5,6 @@ namespace App\Services;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 use App\Services\TitleService;
-use App\Repositories\OrganizationRepository;
-use App\Repositories\WeightDivisionRepository;
 use App\Repositories\Interfaces\BoxerRepositoryInterface;
 use App\Repositories\Interfaces\TitleRepositoryInterface;
 
@@ -54,7 +52,7 @@ class BoxerService
   {
     DB::beginTransaction();
     try {
-      $this->titleRepository->deleteTitlesHoldByTheBoxer($boxerId); //?ボクサーが所持しているタイトルを削除
+      $this->titleRepository->deleteTitlesHoldByTheBoxer($boxerId); //?所持タイトルの削除(外部キー制約がある為ボクサー削除の前に実行)
       $isDelete = $this->boxerRepository->deleteBoxer($boxerId);
       if (!$isDelete) {
         throw new \Exception("Target boxer not exists", 404);
@@ -63,6 +61,7 @@ class BoxerService
       DB::rollBack();
       throw new \Exception($e->getMessage(), $e->getCode());
     }
+
     DB::commit();
   }
 

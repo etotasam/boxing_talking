@@ -24,7 +24,7 @@ class MailSendJobTest extends TestCase
     /**
      * @test
      */
-    public function mailQueueSetToJob()
+    public function testMailQueueSetToJob()
     {
         $preUser = PreUser::create([
             "name" => "testName",

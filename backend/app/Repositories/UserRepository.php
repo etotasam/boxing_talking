@@ -3,25 +3,19 @@
 namespace App\Repositories;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use App\Repositories\Interfaces\UserRepositoryInterface;
 
-class UserRepository
+class UserRepository implements UserRepositoryInterface
 {
 
 
-  /**
-   * @param array userData
-   * @return User
-   */
-  public static function create($userData): User
+  public function createUser($userData)
   {
     return User::create($userData);
   }
 
-  /**
-   * @param int userId
-   * @return User
-   */
-  public static function get($userId): ?User
+  public function getUser($userId)
   {
     return User::find($userId);
   }
