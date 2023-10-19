@@ -5,28 +5,26 @@ namespace App\Services;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Response;
-//model
-// use App\Models\Organization;
-// use App\Models\WeightDivision;
-// use App\Models\Title;
 use App\Models\Administrator;
+use App\Repositories\Interfaces\GuestRepositoryInterface;
+
 
 class AuthService
 {
-  public function __construct(Administrator $admin)
+  protected $guest;
+  public function __construct(Administrator $admin, GuestRepositoryInterface $guest)
   {
     $this->admin = $admin;
+    $this->guest = $guest;
   }
 
   public function requireAdminRole(): void
   {
-    $auth = Auth::User();
-    if ($auth) {
-      $authUserID = Auth::User()->id;
+    if (Auth::check()) {
     } else {
       throw new Exception("No auth", Response::HTTP_UNAUTHORIZED);
     }
-    $isAdmin = $this->admin->where("user_id", $authUserID)->exists();
+    $isAdmin = $this->admin->where("user_id", Auth::id())->exists();
     if (!$isAdmin) {
       throw new Exception("No admin", Response::HTTP_UNAUTHORIZED);
     }
@@ -38,9 +36,9 @@ class AuthService
   public function getUserIdOrGuestUserId(): string
   {
     if (Auth::check()) {
-      $userId = Auth::user()->id;
-    } else if (Auth::guard('guest')->check()) {
-      $userId = (string)Auth::guard('guest')->user()->id;
+      $userId = Auth::id();
+    } else if ($this->guest->isGuestUser()) {
+      $userId = (string)$this->guest->getGuestUser()->id;
     } else {
       throw new Exception("No auth", Response::HTTP_UNAUTHORIZED);
     }

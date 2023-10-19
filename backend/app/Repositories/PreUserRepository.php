@@ -3,26 +3,19 @@
 namespace App\Repositories;
 
 use App\Models\PreUser;
+use App\Repositories\Interfaces\PreUserRepositoryInterface;
 
-class PreUserRepository
+class PreUserRepository implements PreUserRepositoryInterface
 {
 
-
-  /**
-   * @param array preUserData
-   * @return PreUser
-   */
-  public static function create($preUserData): PreUser
-  {
-    return PreUser::create($preUserData);
-  }
-
-  /**
-   * @param int preUserId
-   * @return PreUser
-   */
-  public static function get($preUserId): ?PreUser
+  public function getPreUser($preUserId)
   {
     return PreUser::find($preUserId);
+  }
+
+  public function createPreUser($name, $email, $password)
+  {
+
+    return PreUser::create(compact("name", "email", "password"));
   }
 }

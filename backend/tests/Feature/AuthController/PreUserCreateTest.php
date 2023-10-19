@@ -24,15 +24,12 @@ class PreUserCreateTest extends TestCase
         $password = "testPassword1";
         //リクエスト送信
         $response = $this->post('/api/user/pre_create', compact("name", "email", "password"));
-        $response->assertSuccessful();
+        $response->assertSuccessful(200);
         $preUser = PreUser::where('email', $email)->first();
         $hashedPasswordInDatabase =  $preUser->password;
         //データベースに登録されているか
         $this->assertDatabaseHas('pre_users', ["name" => $name, "email" => $email]);
         // passwordはハッシュ化されて登録されているか
         $this->assertTrue(Hash::check($password, $hashedPasswordInDatabase));
-        // Mail::assertSent(Mailable::class, function ($mail) use ($preUser) {
-        //   return $mail->hasTo($preUser['email']);
-        // });
     }
 }

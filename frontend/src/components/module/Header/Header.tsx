@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import clsx from 'clsx';
+import { ROUTE_PATH } from '@/assets/RoutePath';
 // ! icons
 import { GiBoxingGlove } from 'react-icons/gi';
 import { AiOutlineUser } from 'react-icons/ai'; // ! types
@@ -84,7 +85,7 @@ export const Header = (porps: PropsType) => {
 const ToBoxMatchLink = () => {
   return (
     <>
-      <Link to="/">
+      <Link to={ROUTE_PATH.Home}>
         <div className="flex bg-stone-600 duration-300 lg:hover:bg-black rounded-[25px] text-white sm:px-3 sm:py-2 px-2 py-1 [&>span]:duration-300 [&>span]:rotate-[-40deg] lg:[&>span]:hover:rotate-[230deg]">
           <span className="text-[16px] sm:text-[18px] text-white mr-2">
             <GiBoxingGlove />

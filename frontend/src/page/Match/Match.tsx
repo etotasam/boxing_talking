@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { RotatingLines } from 'react-loader-spinner';
 import { Helmet } from 'react-helmet-async';
+import { ROUTE_PATH } from '@/assets/RoutePath';
 //! data
 import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 //! icon
@@ -78,7 +79,7 @@ export const Match = () => {
       });
     } else {
       //試合が存在しない場合はリダイレクト
-      navigate('/');
+      navigate(ROUTE_PATH.Home);
       return;
     }
   }, [paramsMatchID, matches]);

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
+import { ROUTE_PATH } from '@/assets/RoutePath';
 // ! hooks
 import { useGuest, useAuthCheck } from '@/hooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
@@ -60,7 +61,7 @@ const Container = () => {
     if (isAuth === undefined || guestUser === undefined) return;
     if (!isAuth && !guestUser && pathname !== '/identification/') {
       showLoginModal();
-      navigate('/');
+      navigate(ROUTE_PATH.Home);
     } else {
       hideLoginModal();
     }

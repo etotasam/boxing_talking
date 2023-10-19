@@ -39,7 +39,7 @@ class UserLoginTest extends TestCase
     }
     /**
      * @test
-     *  emailが存在しない
+     *  リクエストのemailがDBに存在しない
      */
     public function testEmailNotExistsOnDB()
     {

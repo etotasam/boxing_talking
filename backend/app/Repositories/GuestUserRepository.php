@@ -4,22 +4,38 @@ namespace App\Repositories;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\GuestUser;
+use App\Repositories\Interfaces\GuestRepositoryInterface;
 
-class GuestUserRepository
+class GuestUserRepository implements GuestRepositoryInterface
 {
 
-  public static function create(): GuestUser
+  public function getGuestUser()
+  {
+    return Auth::guard('guest')->user();
+  }
+
+  public function isGuestUser()
+  {
+    return Auth::guard('guest')->check();
+  }
+
+  public function loginGuestUser($guestUser)
+  {
+    return Auth::guard('guest')->login($guestUser);
+  }
+
+  public function logoutGuestUser()
+  {
+    return Auth::guard('guest')->logout();
+  }
+
+  public function createGuestUser()
   {
     return GuestUser::create();
   }
 
-  public static function get(string $guestId): ?GuestUser
+  public function deleteGuestUser($guestUserId)
   {
-    return GuestUser::find($guestId);
-  }
-
-  public static function delete(string $guestUserId): void
-  {
-    GuestUser::find($guestUserId)->delete();
+    return GuestUser::destroy($guestUserId);
   }
 }

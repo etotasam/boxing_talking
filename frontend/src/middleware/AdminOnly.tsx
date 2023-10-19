@@ -1,8 +1,9 @@
-import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { ROUTE_PATH } from '@/assets/RoutePath';
+import { useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 //! hooks
-import { useAdmin } from "@/hooks/useAuth";
+import { useAdmin } from '@/hooks/useAuth';
 // import { useLogout } from "@/hooks/useAuth";
 
 const AdminOnly = () => {
@@ -11,7 +12,7 @@ const AdminOnly = () => {
 
   useEffect(() => {
     if (isLoading) return;
-    if (!isAdmin) return navigate("/");
+    if (!isAdmin) return navigate(ROUTE_PATH.Home);
   }, [isAdmin, isLoading]);
 
   if (isLoading)

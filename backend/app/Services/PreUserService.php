@@ -3,28 +3,39 @@
 namespace App\Services;
 
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use App\Jobs\MailSendJob;
-use App\Models\PreUser;
-use App\Repositories\PreUserRepository;
+use App\Repositories\Interfaces\PreUserRepositoryInterface;
 
 class PreUserService
 {
 
-  public function __construct(PreUser $preUser)
+  protected $preUserRepository;
+  public function __construct(PreUserRepositoryInterface $preUserRepository)
   {
-    $this->preUser = $preUser;
+    $this->preUserRepository = $preUserRepository;
   }
 
   /**
-   * @param array $preUserDataForRegister associative array [name. email, password]
+   * @param string $name
+   * @param string $email
+   * @param string $password
    */
-  public function createPreUserAndSendEmail($preUserDataForRegister): void
+  public function createPreUserAndSendEmail($name, $email, $password): void
   {
-    $preUser = PreUserRepository::create($preUserDataForRegister);
-    if (!$preUser) {
-      throw new Exception("Failed pre user create", 500);
+    DB::beginTransaction();
+    try {
+      $preUser = $this->preUserRepository->createPreUser($name, $email, $password);
+      if (!$preUser) {
+        throw new Exception("Failed pre_user create");
+      }
+
+      MailSendJob::dispatch($preUser->id, $name, $email);
+    } catch (\Exception $e) {
+      DB::rollback();
+      throw new \Exception($e->getMessage() ?? "Failed send mail");
     }
 
-    MailSendJob::dispatch($preUser->id, $preUserDataForRegister['name'], $preUserDataForRegister['email']);
+    DB::commit();
   }
 }

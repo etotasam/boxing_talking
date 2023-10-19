@@ -1,3 +1,4 @@
+import { ROUTE_PATH } from '@/assets/RoutePath';
 import { Link, useLocation } from 'react-router-dom';
 import { useFooterHeight } from '@/hooks/useFooterHeight';
 import { useEffect, useRef } from 'react';
@@ -20,7 +21,7 @@ export const Footer = () => {
       >
         <div className="flex absolute bottom-2 right-10">
           {location.pathname !== '/terms' && (
-            <Link to={'terms'} className="text-stone-500 text-sm mr-5">
+            <Link to={ROUTE_PATH.Terms} className="text-stone-500 text-sm mr-5">
               利用規約
             </Link>
           )}

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { ROUTE_PATH } from '@/assets/RoutePath';
 //! hook
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useFooterHeight } from '@/hooks/useFooterHeight';
@@ -26,7 +27,7 @@ export const Identification = () => {
     if (token) {
       createUser({ token });
     } else {
-      navigate('/');
+      navigate(ROUTE_PATH.Home);
     }
   }, []);
 
@@ -74,7 +75,7 @@ const SuccessRegister = () => {
           <br />
           下記よりログインしてください。
         </p>
-        <Link to="/">
+        <Link to={ROUTE_PATH.Home}>
           <button className="mt-5 py-1 px-4 bg-stone-700 hover:bg-stone-500 text-white rounded-md">
             ログイン
           </button>
@@ -93,7 +94,7 @@ const FiledAuth = () => {
         ) : (
           <p>無効なリクエストです</p>
         )}
-        <Link to="/">
+        <Link to={ROUTE_PATH.Home}>
           <button className="mt-5 py-1 px-4 bg-stone-700 hover:bg-stone-500 text-white rounded-md">
             Home
           </button>

@@ -20,12 +20,12 @@ export const useAllFetchMatchPredictionOfAuthUser = () => {
   const isEitherAuth = Boolean(authUser || isGuest)
 
   const api = useCallback(async () => {
-    const res = await Axios.get<PredictionType[] | "">('/api/prediction').then(v => v.data)
+    const res = await Axios.get<{ data: PredictionType[] | "" }>('/api/prediction').then(v => v.data)
     let formattedData
-    if (res === "") {
+    if (res.data === "") {
       formattedData = undefined
     } else {
-      formattedData = res
+      formattedData = res.data
     }
     return formattedData
   }, [])

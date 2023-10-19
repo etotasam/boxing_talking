@@ -9,48 +9,68 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Collection;
 use App\Services\AuthService;
 use App\Services\MatchService;
-use App\Repositories\UserRepository;
-use App\Repositories\GuestUserRepository;
-use App\Repositories\WinLossPredictionRepository;
+use App\Repositories\Interfaces\GuestRepositoryInterface;
 use App\Repositories\Interfaces\MatchRepositoryInterface;
+use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Repositories\Interfaces\WinLossPredictionRepositoryInterface;
 
 class WinLossPredictionService
 {
+  protected $guest;
   protected $authService;
   protected $matchService;
   protected $matchRepository;
-  public function __construct(AuthService $authService, MatchService $matchService, MatchRepositoryInterface $matchRepository)
-  {
+  protected $userRepository;
+  protected $predictionRepository;
+  public function __construct(
+    AuthService $authService,
+    MatchService $matchService,
+    GuestRepositoryInterface $guest,
+    MatchRepositoryInterface $matchRepository,
+    UserRepositoryInterface $userRepository,
+    WinLossPredictionRepositoryInterface $predictionRepository,
+  ) {
     $this->authService = $authService;
     $this->matchService = $matchService;
+    $this->guest = $guest;
     $this->matchRepository = $matchRepository;
+    $this->userRepository = $userRepository;
+    $this->predictionRepository = $predictionRepository;
   }
 
-  public function votePrediction(int $matchId, string $prediction): JsonResponse
+  /**
+   * ユーザーの試合予想を登録とその試合の投票数をカウントアップ
+   * @param int $matchId
+   * @param string $prediction
+   *
+   * @return void
+   */
+  public function votePrediction(int $matchId, string $prediction): void
   {
-    try {
-      $userId = $this->authService->getUserIdOrGuestUserId();
-      if (!$this->matchRepository->isMatch($matchId)) {
-        throw new Exception("Match is not exists", 404);
-      }
-      //試合日が未来のみ投票可
-      if ($this->matchService->isMatchDateTodayOrPast($matchId)) {
-        throw new Exception('Cannot vote win-loss prediction after match date', 400);
-      }
-      //既に投票済みか
-      $isVote = WinLossPredictionRepository::isVoteMatchPrediction($userId, $matchId);
-      if ($isVote) {
-        throw new Exception("Cannot win-loss prediction. You have already done.", 400);
-      }
-
-      DB::transaction(function () use ($userId, $matchId, $prediction) {
-        WinLossPredictionRepository::store($userId, $matchId, $prediction);
-        $this->matchService->matchPredictionCountUpdate($matchId, $prediction);
-      });
-      return response()->json(["message" => "Success vote win-loss prediction"], 200);
-    } catch (Exception $e) {
-      return response()->json(["message" => $e->getMessage() ?: "Failed vote win-loss prediction"], $e->getCode() ?: 500);
+    if (!$this->matchRepository->isMatch($matchId)) {
+      throw new \Exception("Match is not exists", 404);
     }
+    //試合日が未来のみ投票可
+    if ($this->matchService->isMatchDateTodayOrPast($matchId)) {
+      throw new \Exception('Cannot vote win-loss prediction after match date', 400);
+    }
+    $userId = $this->authService->getUserIdOrGuestUserId();
+    //既に投票済みか
+    $isVote = $this->predictionRepository->isVotedPredictionToMatch($userId, $matchId);
+    if ($isVote) {
+      throw new \Exception("Cannot win-loss prediction. You have already done.", 400);
+    }
+
+    DB::beginTransaction();
+    try {
+      $this->predictionRepository->storePrediction($userId, $matchId, $prediction);
+      $this->matchService->matchPredictionCountUpdate($matchId, $prediction);
+    } catch (\Exception $e) {
+      DB::rollBack();
+      throw new \Exception("Failed vote win-loss prediction");
+    }
+
+    DB::commit();
   }
 
   /**
@@ -61,18 +81,15 @@ class WinLossPredictionService
   public function getPrediction(): ?Collection
   {
     $isUser = Auth::check();
-    $isGuest = Auth::guard('guest')->check();
+    $isGuest = $this->guest->isGuestUser();
     if (!$isUser && !$isGuest) {
       return null;
     }
     if ($isUser) {
-      $userID = Auth::user()->id;
-      $prediction = UserRepository::get($userID)->prediction;
-    } else {
-      $guest = Auth::guard('guest')->user();
-      $guestID = $guest->id;
-      $prediction = GuestUserRepository::get($guestID)->prediction;
+      return Auth::user()->prediction;
     }
-    return $prediction;
+    if ($isGuest) {
+      return $this->guest->getGuestUser()->prediction;
+    }
   }
 }

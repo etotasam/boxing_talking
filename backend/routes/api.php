@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\MatchController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\WinLossPredictionController;
 use App\Http\Controllers\Api\BoxerController;
+use App\Http\Controllers\Api\HealthCheckController;
 
 
 /*
@@ -16,12 +17,13 @@ use App\Http\Controllers\Api\BoxerController;
 |--------------------------------------------------------------------------
 */
 
-Route::delete("/test", [BoxerController::class, 'test']);
 
 Route::get('/user', [AuthController::class, 'fetch']);
 Route::get('/guest/user', function () {
     return (bool)Auth::guard('guest')->check();
 });
+
+Route::get('/health', [HealthCheckController::class, 'index']);
 //? auth
 Route::get('/admin', [AuthController::class, 'admin']);
 Route::post('/user/create', [AuthController::class, 'create']);

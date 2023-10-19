@@ -8,26 +8,31 @@ use Illuminate\Support\Facades\DB;
 use App\Repositories\Interfaces\MatchRepositoryInterface;
 use App\Repositories\Interfaces\CommentRepositoryInterface;
 use App\Repositories\Interfaces\TitleMatchRepositoryInterface;
+use App\Repositories\Interfaces\WinLossPredictionRepositoryInterface;
 use App\Repositories\WinLossPredictionRepository;
 use App\Services\TitleMatchService;
 
 class MatchService
 {
 
+  protected $auth;
   protected $titleMatchService;
   protected $matchRepository;
   protected $commentRepository;
   protected $titleMatchRepository;
+  protected $predictionRepository;
   public function __construct(
     TitleMatchService $titleMatchService,
     MatchRepositoryInterface $matchRepository,
     CommentRepositoryInterface $commentRepository,
     TitleMatchRepositoryInterface $titleMatchRepository,
+    WinLossPredictionRepositoryInterface $predictionRepository,
   ) {
     $this->titleMatchService = $titleMatchService;
     $this->matchRepository = $matchRepository;
     $this->commentRepository = $commentRepository;
     $this->titleMatchRepository = $titleMatchRepository;
+    $this->predictionRepository = $predictionRepository;
   }
 
   /**
@@ -85,8 +90,7 @@ class MatchService
   public function getMatchesExecute(string|null $range)
   {
     if ($range == "all") {
-      $user = Auth::user();
-      if ($user->administrator) {
+      if (Auth::user()->administrator) {
         $matches = $this->matchRepository->getAllMatches();
       } else {
         throw new Exception("Cannot get all matches without auth administrator", 401);
@@ -179,7 +183,8 @@ class MatchService
     try {
       $this->titleMatchRepository->deleteTitleMatch($matchId);
       $this->commentRepository->deleteAllCommentOnMatch($matchId);
-      WinLossPredictionRepository::delete($matchId);
+      $this->predictionRepository->deletePredictionOnMatch($matchId);
+      // WinLossPredictionRepository::delete($matchId);
       $isMatchDeleted = $this->matchRepository->deleteMatch($matchId);
       if (!$isMatchDeleted) {
         throw new \Exception();

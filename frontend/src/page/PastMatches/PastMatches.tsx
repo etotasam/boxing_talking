@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { ROUTE_PATH } from '@/assets/RoutePath';
 // ! components
 import { FightBox } from '@/components/module/FightBox';
 import { SimpleFightBox } from '@/components/module/SimpleFightBox';
@@ -36,7 +37,7 @@ export const PastMatches = () => {
   }, []);
 
   const matchSelect = (matchId: number) => {
-    navigate(`/match?match_id=${matchId}`);
+    navigate(`${ROUTE_PATH.Match}?match_id=${matchId}`);
   };
 
   if (!pastMatches) return;
