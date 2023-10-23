@@ -1,6 +1,6 @@
 // ! data
-import { Stance, ORGANIZATIONS, WEIGHT_CLASS } from "@/assets/boxerData";
-import { Nationality } from "@/assets/NationalFlagData"
+import { STANCE, ORGANIZATIONS, WEIGHT_CLASS } from "@/assets/boxerData";
+import { NATIONALITY } from "@/assets/NationalFlagData"
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "./statusesOnToastModal";
 import { needMatchPropertyForUpdate } from "@/assets/needMatchPropertyForUpdate"
 
@@ -12,7 +12,7 @@ export type MessageType = typeof MESSAGE[keyof typeof MESSAGE]
 export type BgColorType = typeof BG_COLOR_ON_TOAST_MODAL[keyof typeof BG_COLOR_ON_TOAST_MODAL]
 
 // ? 国旗
-export type NationalityType = typeof Nationality[keyof typeof Nationality]
+export type NationalityType = typeof NATIONALITY[keyof typeof NATIONALITY]
 
 // ? ボクサー情報
 export type BoxerType = {
@@ -39,7 +39,7 @@ export type TitleType = {
 };
 
 
-export type StanceType = typeof Stance[keyof typeof Stance]
+export type StanceType = typeof STANCE[keyof typeof STANCE]
 
 ////////// ? 試合情報
 

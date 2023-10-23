@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 // ! data
-import { Stance, initialBoxerDataOnForm } from '@/assets/boxerData';
-import { Nationality } from '@/assets/NationalFlagData';
+import { STANCE, initialBoxerDataOnForm } from '@/assets/boxerData';
+import { NATIONALITY } from '@/assets/NationalFlagData';
 //! type
 import { BoxerType } from '@/assets/types';
 // ! hooks
@@ -86,7 +86,7 @@ export const BoxerEditForm = (props: PropsType) => {
             id="country"
           >
             <option value={undefined}>{countryUndefined}</option>
-            {Object.values(Nationality).map((nationalName) => (
+            {Object.values(NATIONALITY).map((nationalName) => (
               <option key={nationalName} value={nationalName}>
                 {nationalName}
               </option>
@@ -164,9 +164,9 @@ export const BoxerEditForm = (props: PropsType) => {
             name="boxing-style"
             id="stance"
           >
-            <option value={Stance.Orthodox}>{Stance.Orthodox}</option>
-            <option value={Stance.Southpaw}>{Stance.Southpaw}</option>
-            <option value={Stance.Unknown}>{Stance.Unknown}</option>
+            <option value={STANCE.ORTHODOX}>{STANCE.ORTHODOX}</option>
+            <option value={STANCE.SOUTHPAW}>{STANCE.SOUTHPAW}</option>
+            <option value={STANCE.UNKNOWN}>{STANCE.UNKNOWN}</option>
           </select>
         </div>
 

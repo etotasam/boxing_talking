@@ -5,11 +5,11 @@ import { Link } from 'react-router-dom';
 import { usePagePath } from '@/hooks/usePagePath';
 
 const linksArray = [
-  { pathName: 'Home', path: ROUTE_PATH.Home },
-  { pathName: 'ボクサー登録', path: ROUTE_PATH.BoxerRegister },
-  { pathName: 'ボクサー編集', path: ROUTE_PATH.BoxerEdit },
-  { pathName: '試合登録', path: ROUTE_PATH.MatchRegister },
-  { pathName: '試合編集', path: ROUTE_PATH.MatchEdit },
+  { pathName: 'Home', path: ROUTE_PATH.HOME },
+  { pathName: 'ボクサー登録', path: ROUTE_PATH.BOXER_REGISTER },
+  { pathName: 'ボクサー編集', path: ROUTE_PATH.BOXER_EDIT },
+  { pathName: '試合登録', path: ROUTE_PATH.MATCH_REGISTER },
+  { pathName: '試合編集', path: ROUTE_PATH.MATCH_EDIT },
 ] as const;
 
 export const AdministratorPageLinks = () => {

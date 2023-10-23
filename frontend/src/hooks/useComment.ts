@@ -3,6 +3,7 @@ import { useCallback } from "react"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { QUERY_KEY } from "@/assets/queryKeys"
+import { API_PATH } from "@/assets/ApiPath"
 //! hook
 // import { useAuth } from "@/hooks/useAuth"
 import { useLoading } from "@/hooks/useLoading"
@@ -38,7 +39,7 @@ export const useTestFetchComments = (matchId: number, offset: number, limit: num
     }
   }
 
-  const { data, isLoading, isFetching, refetch, isError } = useQuery<CommentType[]>([QUERY_KEY.comment, { id: matchId }], api, {
+  const { data, isLoading, isFetching, refetch, isError } = useQuery<CommentType[]>([QUERY_KEY.COMMENT, { id: matchId }], api, {
     staleTime: 60000, onError: (error: any) => {
       if (error.status === 419) {
         showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
@@ -54,16 +55,15 @@ export const useTestFetchComments = (matchId: number, offset: number, limit: num
 export const useFetchComments = (matchId: number) => {
   const { showToastModalMessage } = useToastModal()
   const api = async () => {
-    const res = await Axios.get("/api/comment", {
+    const res = await Axios.get(API_PATH.COMMENT, {
       params: {
         match_id: matchId,
       },
     }).then(v => v.data)
-
     return res.data
   }
 
-  const { data, isLoading, isFetching, refetch, isError } = useQuery<CommentType[]>([QUERY_KEY.comment, { id: matchId }], api, {
+  const { data, isLoading, isFetching, refetch, isError } = useQuery<CommentType[]>([QUERY_KEY.COMMENT, { id: matchId }], api, {
     staleTime: 60000, onError: (error: any) => {
       if (error.status === 419) {
         showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
@@ -98,7 +98,7 @@ export const usePostComment = () => {
   const queryClient = useQueryClient()
   const api = useCallback(async ({ matchId, comment }: ApiPropsType) => {
     // try {
-    await Axios.post("/api/comment", {
+    await Axios.post(API_PATH.COMMENT, {
       match_id: matchId,
       comment: comment
     })
@@ -114,7 +114,7 @@ export const usePostComment = () => {
       onSuccess: () => {
         showToastModalMessage({ message: MESSAGE.COMMENT_POST_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         // ? match_idを指定してコメントを再取得
-        queryClient.invalidateQueries([QUERY_KEY.comment, { id: matchId }]);
+        queryClient.invalidateQueries([QUERY_KEY.COMMENT, { id: matchId }]);
         return
       },
       onError: (error: any) => {
@@ -170,7 +170,7 @@ export const useDeleteComment = () => {
 
   const api = useCallback(async ({ commentID }: ApiPropsType) => {
 
-    await Axios.delete('/api/comment', {
+    await Axios.delete(API_PATH.COMMENT, {
       data: {
         comment_id: commentID
       },
@@ -188,7 +188,7 @@ export const useDeleteComment = () => {
     mutate({ commentID, matchID }, {
       onSuccess: () => {
         //? コメントの再取得。※refetch()を使うとmatchID=0での呼び出しが1回入るのでうざい
-        queryClient.invalidateQueries([QUERY_KEY.comment, { id: matchID }]);
+        queryClient.invalidateQueries([QUERY_KEY.COMMENT, { id: matchID }]);
         resetLoadingState()
         setToastModal({ message: MESSAGE.COMMENT_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
         showToastModal()

@@ -4,7 +4,8 @@ import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal"
 import { tokenErrorMessageSelector } from "@/store/tokenErrorMessageState"
-import { tokenErrorMessages } from "@/assets/tokenErrorMessage"
+import { TOKEN_ERROR_MESSAGE } from "@/assets/tokenErrorMessage"
+import { API_PATH } from "@/assets/ApiPath"
 //! Recoil
 import { useSetRecoilState } from "recoil"
 import { authenticatingSelector } from "@/store/authenticatingState"
@@ -23,13 +24,13 @@ export const useGuest = () => {
 
   const api = useCallback(async () => {
     try {
-      const res = await Axios.get(`/api/guest/user`).then(result => result.data);
+      const res = await Axios.get(API_PATH.GUEST).then(result => result.data);
       return Boolean(res);
     } catch (error) {
       return null
     }
   }, [])
-  const { data, isLoading, isError } = useQuery<boolean | null>(QUERY_KEY.guest, api, {
+  const { data, isLoading, isError } = useQuery<boolean | null>(QUERY_KEY.GUEST, api, {
     retry: false,
     staleTime: Infinity
   })
@@ -52,7 +53,7 @@ export const useGuestLogin = () => {
   //? ReactQuery controller
   const { setReactQueryData } = useReactQuery()
   const api = useCallback(async ({ _ }: { _?: unknown }): Promise<void> => {
-    await Axios.post<void>('/api/guest/login').then(result => result.data)
+    await Axios.post<void>(API_PATH.GUEST_LOGIN).then(result => result.data)
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -67,7 +68,7 @@ export const useGuestLogin = () => {
         hideLoginModal()
         refetchMatchPrediction()
         resetLoadingState()
-        setReactQueryData<boolean>(QUERY_KEY.guest, true)
+        setReactQueryData<boolean>(QUERY_KEY.GUEST, true)
         setToastModal({ message: MESSAGE.LOGIN_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
       },
@@ -93,7 +94,7 @@ export const useGuestLogout = () => {
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? api
   const api = useCallback(async ({ _ }: { _?: unknown }) => {
-    await Axios.post<void>("api/guest/logout").then(result => result.data)
+    await Axios.post<void>(API_PATH.GUEST_LOGOUT).then(result => result.data)
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -105,7 +106,7 @@ export const useGuestLogout = () => {
     mutate({}, {
       onSuccess: () => {
         // ? ユーザー情報のキャッシュをclear
-        queryClient.setQueryData<boolean>(QUERY_KEY.guest, false)
+        queryClient.setQueryData<boolean>(QUERY_KEY.GUEST, false)
         successful()
         setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
         showToastModal()
@@ -135,7 +136,7 @@ export const useAuthCheck = () => {
       return null
     }
   }, [])
-  const { data, isLoading, isError } = useQuery<boolean | null>(QUERY_KEY.auth, api, {
+  const { data, isLoading, isError } = useQuery<boolean | null>(QUERY_KEY.AUTH, api, {
     retry: false,
     staleTime: Infinity
   })
@@ -149,15 +150,15 @@ export const useAuth = () => {
   const queryClient = useQueryClient()
 
   const api = useCallback(async () => {
-    const res = await Axios.get(`/api/user`).then(result => result.data)
+    const res = await Axios.get(API_PATH.USER).then(result => result.data)
     return res.data
   }, [])
-  const { data, isLoading, isError } = useQuery<UserType | null>(QUERY_KEY.auth, api, {
+  const { data, isLoading, isError } = useQuery<UserType | null>(QUERY_KEY.AUTH, api, {
     retry: false,
     staleTime: Infinity,
     onSuccess: (data) => {
       if (!data) {
-        queryClient.setQueryData<UserType | null>(QUERY_KEY.auth, null)
+        queryClient.setQueryData<UserType | null>(QUERY_KEY.AUTH, null)
       }
     },
     onError: () => {
@@ -182,7 +183,7 @@ export const usePreSignUp = () => {
     password: string
   }
   const api = useCallback(async ({ name, email, password }: ApiPropsType) => {
-    const res = await Axios.post<UserType>(`/api/user/pre_create`, { name, email, password }).then(result => result.data)
+    const res = await Axios.post<UserType>(API_PATH.USER_PRE_CREATE, { name, email, password }).then(result => result.data)
     return res
   }, [])
   const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
@@ -240,13 +241,13 @@ export const useSignUpIdentification = () => {
 
   const api = useCallback(async ({ token }: { token: string }) => {
     try {
-      const res = await Axios.post<boolean>(`/api/user/create`, { token }).then(result => result.data)
+      const res = await Axios.post<boolean>(API_PATH.USER_CREATE, { token }).then(result => result.data)
       setAuthenticatingState({ isLoading: false, isError: false, isSuccess: true })
       return res
     } catch (error: any) {
       const errorMessage = error.data.message
       if (errorMessage === "Expired token") {
-        setTokenErrorMessage(tokenErrorMessages.EXPIRED_TOKEN)
+        setTokenErrorMessage(TOKEN_ERROR_MESSAGE.EXPIRED_TOKEN)
       }
       setAuthenticatingState({ isLoading: false, isError: true, isSuccess: false })
     }
@@ -284,7 +285,7 @@ export const useLogin = () => {
   const { setReactQueryData } = useReactQuery()
 
   const api = useCallback(async (props: { email: string, password: string }) => {
-    const res = await Axios.post<{ data: UserType }>("api/login", { ...props }).then(result => result.data)
+    const res = await Axios.post<{ data: UserType }>(API_PATH.USER_LOGIN, { ...props }).then(result => result.data)
     return res.data
   }, [])
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -301,7 +302,7 @@ export const useLogin = () => {
         resetLoadingState()
         refetchAdmin()
         // ? ログインユーザーをreact query内でキャッシュする
-        setReactQueryData<UserType | boolean>(QUERY_KEY.auth, userData)
+        setReactQueryData<UserType | boolean>(QUERY_KEY.AUTH, userData)
         successful()
         setToastModal({ message: MESSAGE.LOGIN_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
@@ -329,7 +330,7 @@ export const useLogout = () => {
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? api
   const api = useCallback(async ({ _ }: { _?: any }) => {
-    await Axios.post<void>("api/logout").then(result => result.data)
+    await Axios.post<void>(API_PATH.USER_LOGOUT).then(result => result.data)
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -341,8 +342,8 @@ export const useLogout = () => {
     mutate({}, {
       onSuccess: () => {
         // ? ユーザー情報のキャッシュをclear
-        queryClient.setQueryData(QUERY_KEY.auth, null)
-        queryClient.invalidateQueries(QUERY_KEY.admin)
+        queryClient.setQueryData(QUERY_KEY.AUTH, null)
+        queryClient.invalidateQueries(QUERY_KEY.ADMIN)
         //? 勝敗予想のキャッシュをclearしてリフェッチ
         // queryClient.removeQueries(QUERY_KEY.prediction)
         // queryClient.setQueryData(QUERY_KEY.prediction, undefined)
@@ -353,7 +354,7 @@ export const useLogout = () => {
         // //? ユーザの勝敗予想データのキャッシュを削除
         // queryClient.setQueryData(QUERY_KEY.vote, [])
         // //? auth を削除
-        // queryClient.setQueryData<boolean>(QUERY_KEY.auth, false)
+        // queryClient.setQueryData<boolean>(QUERY_KEY.AUTH, false)
         // navigate("/")
         resetLoadingState()
       },
@@ -373,13 +374,13 @@ export const useLogout = () => {
 export const useAdmin = () => {
   const api = useCallback(async () => {
     try {
-      const res = await Axios.get(`/api/admin`).then(result => result.data)
+      const res = await Axios.get(API_PATH.ADMIN).then(result => result.data)
       return res
     } catch (error) {
       return null
     }
   }, [])
-  const { data: isAdmin, isLoading, isError, refetch } = useQuery<boolean>(QUERY_KEY.admin, api, {
+  const { data: isAdmin, isLoading, isError, refetch } = useQuery<boolean>(QUERY_KEY.ADMIN, api, {
     retry: false,
     staleTime: Infinity
   })

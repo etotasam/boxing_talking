@@ -28,24 +28,24 @@ function App() {
       <Routes>
         <Route element={<Container />}>
           <Route element={<HeaderAndFooterLayout />}>
-            <Route path={ROUTE_PATH.Home} element={<Home />} />
-            <Route path={ROUTE_PATH.PastMatches} element={<PastMatches />} />
+            <Route path={ROUTE_PATH.HOME} element={<Home />} />
+            <Route path={ROUTE_PATH.PAST_MATCHES} element={<PastMatches />} />
             {/* //? </HeaderAndFooterLayout> */}
           </Route>
           <Route element={<HeaderOnlyLayout />}>
-            <Route path={ROUTE_PATH.Match} element={<Match />} />
+            <Route path={ROUTE_PATH.MATCH} element={<Match />} />
             {/* //? </HeaderOnlyLayout> */}
           </Route>
           <Route element={<AdminOnly />}>
-            <Route path={ROUTE_PATH.Admin} element={<Admin />} />
-            <Route path={ROUTE_PATH.BoxerEdit} element={<BoxerEdit />} />
+            <Route path={ROUTE_PATH.ADMIN} element={<Admin />} />
+            <Route path={ROUTE_PATH.BOXER_EDIT} element={<BoxerEdit />} />
             <Route
-              path={ROUTE_PATH.BoxerRegister}
+              path={ROUTE_PATH.BOXER_REGISTER}
               element={<BoxerRegister />}
             />
-            <Route path={ROUTE_PATH.MatchEdit} element={<MatchEdit />} />
+            <Route path={ROUTE_PATH.MATCH_EDIT} element={<MatchEdit />} />
             <Route
-              path={ROUTE_PATH.MatchRegister}
+              path={ROUTE_PATH.MATCH_REGISTER}
               element={<MatchRegister />}
             />
             {/* //? </AdminOnly> */}
@@ -56,14 +56,14 @@ function App() {
         <Route element={<HeaderOnlyLayout />}>
           {/* <Route path="/test_module" element={<TestModule />} /> */}
           <Route
-            path={ROUTE_PATH.Identification}
+            path={ROUTE_PATH.IDENTIFICATION}
             element={<Identification />}
           />
           {/* //? </HeaderOnlyLayout> */}
         </Route>
 
         <Route element={<HeaderAndFooterLayout />}>
-          <Route path={ROUTE_PATH.Terms} element={<Terms />} />
+          <Route path={ROUTE_PATH.TERMS} element={<Terms />} />
           <Route path="/test" element={<TestPage />} />
           <Route path="/*" element={<NotFound />} />
           {/* //? </HeaderAndFooterLayout> */}

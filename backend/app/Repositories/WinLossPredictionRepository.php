@@ -33,18 +33,13 @@ class WinLossPredictionRepository implements WinLossPredictionRepositoryInterfac
   public function storePrediction(string $userId, int $matchId, string $prediction)
   {
 
-    $prediction = new WinLossPrediction;
-    $prediction->fill([
+    $predictionInstance = new WinLossPrediction;
+    $predictionInstance->fill([
       "user_id" => $userId,
       "match_id" => $matchId,
       "prediction" => $prediction
     ]);
-    return $prediction->save();
-    // WinLossPrediction::create([
-    //   "user_id" => $userId,
-    //   "match_id" => $matchId,
-    //   "prediction" => $prediction
-    // ]);
+    return $predictionInstance->save();
   }
 
   public function isVotedPredictionToMatch(string $userId, int $matchId)

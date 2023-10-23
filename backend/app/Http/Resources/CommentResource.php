@@ -3,17 +3,14 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Models\Comment;
 
 class CommentResource extends JsonResource
 {
 
-    protected $userRepository;
-    public function __construct($resource)
+    public function __construct(private Comment $commentInstance)
     {
-        parent::__construct($resource);
-        $this->resource = $resource;
-        $this->userRepository = app(UserRepositoryInterface::class);
+        parent::__construct($commentInstance);
     }
     /**
      * Transform the resource into an array.
@@ -23,15 +20,15 @@ class CommentResource extends JsonResource
      */
     public function toArray($request)
     {
-        $user = $this->userRepository->getUser($this->user_id);
+        $user = $this->commentInstance->postUser;
         $postUserName = isset($user) ? $user->name : null;
-        $formattedComment = nl2br(htmlspecialchars($this->comment));
+        $formattedComment = nl2br(htmlspecialchars($this->commentInstance->comment));
 
         return [
-            'id' => $this->resource->id,
+            'id' => $this->commentInstance->id,
             'post_user_name' => $postUserName,
             "comment" => $formattedComment,
-            "created_at" => $this->resource->created_at
+            "created_at" => $this->commentInstance->created_at
         ];
     }
 }

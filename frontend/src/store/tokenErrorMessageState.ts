@@ -1,12 +1,12 @@
 import { atom, selector } from "recoil";
-import { tokenErrorMessages } from "@/assets/tokenErrorMessage";
+import { TOKEN_ERROR_MESSAGE } from "@/assets/tokenErrorMessage";
 
 
-type atomType = typeof tokenErrorMessages[keyof typeof tokenErrorMessages]
+type atomType = typeof TOKEN_ERROR_MESSAGE[keyof typeof TOKEN_ERROR_MESSAGE]
 
 const tokenErrorMessageState = atom<atomType>({
   key: "tokenErrorMessageState",
-  default: tokenErrorMessages.NULL
+  default: TOKEN_ERROR_MESSAGE.NULL
 })
 
 export const tokenErrorMessageSelector = selector({

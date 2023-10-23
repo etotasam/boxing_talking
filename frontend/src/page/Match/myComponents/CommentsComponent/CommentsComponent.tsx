@@ -101,88 +101,114 @@ export const CommentsComponent = ({
     return 0;
   };
 
-  return commentsOfThisMatches && Boolean(commentsOfThisMatches.length) ? (
-    <section
-      className="xl:w-[70%] md:w-[60%] w-full border-l-[1px] border-stone-200 relative"
-      style={{
-        marginBottom: `${commentPostTextareaHeight}px`,
-        minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
-      }}
-    >
-      {!liElements && (
-        <div className="z-10 absolute top-0 left-0 w-full h-full bg-white" />
-      )}
-      <ul ref={ulRef}>
-        {commentsOfThisMatches.map((commentData) => (
-          <li
-            key={commentData.id}
-            className={clsx('sm:p-5 p-3 pt-1 border-b-[1px] border-stone-200')}
-          >
-            <div className="sm:flex mb-2">
-              <time className="text-xs text-stone-400 leading-6">
-                {dateFormatter(commentData.created_at)}
-              </time>
-              <div className="flex sm:ml-3">
-                {commentData.post_user_name ? (
-                  <>
-                    <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-                    <p
-                      className={clsx(
-                        'text-stone-500',
-                        commentData.post_user_name.length > 20
-                          ? 'text-[12px] sm:text-sm'
-                          : 'text-sm'
-                      )}
-                    >
-                      {commentData.post_user_name}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <AiOutlineUser className="mr-1 block bg-stone-300 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-                    <p className="text-sm text-stone-600">ゲスト投稿</p>
-                  </>
-                )}
-              </div>
-            </div>
-            <div
-              className="relative"
-              style={
-                document.getElementById(`comment_${commentData.id}`) &&
-                (document.getElementById(`comment_${commentData.id}`)
-                  ?.clientHeight as number) > initialCommentElHeight()
-                  ? { height: '135px', overflow: 'hidden' }
-                  : { height: 'auto' }
-              }
-            >
-              <p
-                id={`comment_${commentData.id}`}
-                className={clsx(
-                  'md:text-lg text-sm font-light sm:tracking-normal tracking-wider text-stone-800'
-                )}
-                dangerouslySetInnerHTML={{
-                  __html: commentData.comment,
-                }}
-              />
-              {document.getElementById(`comment_${commentData.id}`) &&
-                (document.getElementById(`comment_${commentData.id}`)
-                  ?.clientHeight as number) > initialCommentElHeight() && (
-                  <p className="absolute bottom-0 left-0 md:h-[25px] h-[35px] bg-white w-full">
-                    <span
-                      onClick={stretchCommentElement}
-                      className={clsx(
-                        'text-stone-500 cursor-pointer border-[1px] border-transparent text-sm absolute box-border bottom-0',
-                        'hover:border-b-stone-800 hover:text-stone-800'
-                      )}
-                    >
-                      続きを読む
-                    </span>
-                  </p>
-                )}
-            </div>
+  //コメントの有無
+  const isComments =
+    commentsOfThisMatches && Boolean(commentsOfThisMatches.length);
 
-            {/* //? ゴミ箱 */}
-            {/* {authUser && authUser.name === commentData.post_user_name && (
+  //コメントの取得に失敗
+  if (isErrorFetchComments) {
+    return (
+      <section>
+        コメントの取得に失敗しました。お手数ですがページの更新を行ってください。
+      </section>
+    );
+  }
+
+  //コメント投稿がない場合
+  if (!isComments && !isFetchingComments && !isErrorFetchComments) {
+    return NotExistsComments({
+      headerHeight,
+      matchBoxerSectionHeight,
+      commentPostTextareaHeight,
+    });
+  }
+
+  // コメント投稿あり
+  return (
+    isComments && (
+      <section
+        className="xl:w-[70%] md:w-[60%] w-full border-l-[1px] border-stone-200 relative"
+        style={{
+          marginBottom: `${commentPostTextareaHeight}px`,
+          minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
+        }}
+      >
+        {!liElements && (
+          <div className="z-10 absolute top-0 left-0 w-full h-full bg-white" />
+        )}
+        <ul ref={ulRef}>
+          {commentsOfThisMatches.map((commentData) => (
+            <li
+              key={commentData.id}
+              className={clsx(
+                'sm:p-5 p-3 pt-1 border-b-[1px] border-stone-200'
+              )}
+            >
+              <div className="sm:flex mb-2">
+                <time className="text-xs text-stone-400 leading-6">
+                  {dateFormatter(commentData.created_at)}
+                </time>
+                <div className="flex sm:ml-3">
+                  {commentData.post_user_name ? (
+                    <>
+                      <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+                      <p
+                        className={clsx(
+                          'text-stone-500',
+                          commentData.post_user_name.length > 20
+                            ? 'text-[12px] sm:text-sm'
+                            : 'text-sm'
+                        )}
+                      >
+                        {commentData.post_user_name}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <AiOutlineUser className="mr-1 block bg-stone-300 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+                      <p className="text-sm text-stone-600">ゲスト投稿</p>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div
+                className="relative"
+                style={
+                  document.getElementById(`comment_${commentData.id}`) &&
+                  (document.getElementById(`comment_${commentData.id}`)
+                    ?.clientHeight as number) > initialCommentElHeight()
+                    ? { height: '135px', overflow: 'hidden' }
+                    : { height: 'auto' }
+                }
+              >
+                <p
+                  id={`comment_${commentData.id}`}
+                  className={clsx(
+                    'md:text-lg text-sm font-light sm:tracking-normal tracking-wider text-stone-800'
+                  )}
+                  dangerouslySetInnerHTML={{
+                    __html: commentData.comment,
+                  }}
+                />
+                {document.getElementById(`comment_${commentData.id}`) &&
+                  (document.getElementById(`comment_${commentData.id}`)
+                    ?.clientHeight as number) > initialCommentElHeight() && (
+                    <p className="absolute bottom-0 left-0 md:h-[25px] h-[35px] bg-white w-full">
+                      <span
+                        onClick={stretchCommentElement}
+                        className={clsx(
+                          'text-stone-500 cursor-pointer border-[1px] border-transparent text-sm absolute box-border bottom-0',
+                          'hover:border-b-stone-800 hover:text-stone-800'
+                        )}
+                      >
+                        続きを読む
+                      </span>
+                    </p>
+                  )}
+              </div>
+
+              {/* //? ゴミ箱 */}
+              {/* {authUser && authUser.name === commentData.post_user_name && (
                   <button
                     onClick={() => commentDelete(commentData.id)}
                     className="bg-blue-300 px-3 py-1"
@@ -190,11 +216,26 @@ export const CommentsComponent = ({
                     ゴミ箱
                   </button>
                 )} */}
-          </li>
-        ))}
-      </ul>
-    </section>
-  ) : !isFetchingComments && !isErrorFetchComments ? (
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  );
+};
+
+type NotExistsCommentsPropsType = {
+  headerHeight: number | undefined;
+  matchBoxerSectionHeight: number | undefined;
+  commentPostTextareaHeight: number | undefined;
+};
+//コメント投稿なし時の表示コンポーネント
+const NotExistsComments = ({
+  headerHeight,
+  matchBoxerSectionHeight,
+  commentPostTextareaHeight,
+}: NotExistsCommentsPropsType) => {
+  return (
     <section
       className="flex justify-center items-center text-[18px] border-l-[1px] xl:w-[70%] md:w-[60%] w-full"
       style={{
@@ -208,23 +249,5 @@ export const CommentsComponent = ({
         />
       </div>
     </section>
-  ) : (
-    isErrorFetchComments && (
-      <section>
-        コメントの取得に失敗しました。お手数ですがページの更新を行ってください。
-      </section>
-    )
   );
 };
-
-// const Test = ({ height, index }: any) => {
-//   useEffect(() => {
-//     if (!height[index]) return;
-//     console.log('よばれた', height[index].clientHeight);
-//   }, [index, height]);
-//   return (
-//     <>
-//       <p>てすと</p>
-//     </>
-//   );
-// };

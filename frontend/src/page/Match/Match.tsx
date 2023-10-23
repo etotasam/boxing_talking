@@ -79,7 +79,7 @@ export const Match = () => {
       });
     } else {
       //試合が存在しない場合はリダイレクト
-      navigate(ROUTE_PATH.Home);
+      navigate(ROUTE_PATH.HOME);
       return;
     }
   }, [paramsMatchID, matches]);

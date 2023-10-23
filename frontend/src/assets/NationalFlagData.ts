@@ -15,45 +15,45 @@ import canadaFlag from '@/assets/images/flags/canada.svg';
 import venezuelaFlag from '@/assets/images/flags/venezuela.svg';
 import puertoRicoFlag from '@/assets/images/flags/puerto_rico.svg';
 
-export const Nationality = {
-  Japan: "Japan",
-  Mexico: "Mexico",
+export const NATIONALITY = {
+  JAPAN: "Japan",
+  MEXICO: "Mexico",
   USA: "USA",
-  Kazakhstan: "Kazakhstan",
+  KAZAKHSTAN: "Kazakhstan",
   UK: "UK",
-  Russia: "Russia",
-  Philippines: "Philippines",
-  Ukraine: "Ukraine",
-  Canada: "Canada",
-  Venezuela: "Venezuela",
-  SouthAfrica: "SouthAfrica",
-  China: "China",
-  PuertoRico: "PuertoRico",
+  RUSSIA: "Russia",
+  PHILIPPINES: "Philippines",
+  UKRAINE: "Ukraine",
+  CANADA: "Canada",
+  VENEZUELA: "Venezuela",
+  SOUTH_AFRICA: "SouthAfrica",
+  CHINA: "China",
+  PUERTO_RICO: "PuertoRico",
 } as const
 
 
 export const getNationalFlag = (country: NationalityType) => {
-  if (country == Nationality.Japan) return japanFlag;
-  if (country == Nationality.Philippines) return philippinesFlag;
-  if (country == Nationality.USA) return usaFlag;
-  if (country == Nationality.Mexico) return mexicoFlag;
-  if (country == Nationality.Kazakhstan) return kazakhstanFlag;
-  if (country == Nationality.UK) return ukFlag;
-  if (country == Nationality.Russia) return russiaFlag;
-  if (country == Nationality.Ukraine) return ukraineFlag;
-  if (country == Nationality.SouthAfrica) return southAfricaFlag;
-  if (country == Nationality.China) return chinaFlag;
-  if (country == Nationality.Canada) return canadaFlag;
-  if (country == Nationality.Venezuela) return venezuelaFlag;
-  if (country == Nationality.PuertoRico) return puertoRicoFlag;
+  if (country == NATIONALITY.JAPAN) return japanFlag;
+  if (country == NATIONALITY.PHILIPPINES) return philippinesFlag;
+  if (country == NATIONALITY.USA) return usaFlag;
+  if (country == NATIONALITY.MEXICO) return mexicoFlag;
+  if (country == NATIONALITY.KAZAKHSTAN) return kazakhstanFlag;
+  if (country == NATIONALITY.UK) return ukFlag;
+  if (country == NATIONALITY.RUSSIA) return russiaFlag;
+  if (country == NATIONALITY.UKRAINE) return ukraineFlag;
+  if (country == NATIONALITY.SOUTH_AFRICA) return southAfricaFlag;
+  if (country == NATIONALITY.CHINA) return chinaFlag;
+  if (country == NATIONALITY.CANADA) return canadaFlag;
+  if (country == NATIONALITY.VENEZUELA) return venezuelaFlag;
+  if (country == NATIONALITY.PUERTO_RICO) return puertoRicoFlag;
 };
 
 
 export const formatPosition = (country: NationalityType) => {
-  if (country == Nationality.UK) return '25% 30%';
-  if (country == Nationality.Russia) return '25% 75%';
-  if (country == Nationality.SouthAfrica) return '25% 30%';
-  if (country == Nationality.Mexico) return '25% 40%';
-  if (country == Nationality.China) return '25% 25%';
+  if (country == NATIONALITY.UK) return '25% 30%';
+  if (country == NATIONALITY.RUSSIA) return '25% 75%';
+  if (country == NATIONALITY.SOUTH_AFRICA) return '25% 30%';
+  if (country == NATIONALITY.MEXICO) return '25% 40%';
+  if (country == NATIONALITY.CHINA) return '25% 25%';
   return 'center';
 };

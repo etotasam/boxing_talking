@@ -12,7 +12,7 @@ import {
   ORGANIZATIONS_Type,
 } from '@/assets/types';
 // ! data
-import { Nationality } from '@/assets/NationalFlagData';
+import { NATIONALITY } from '@/assets/NationalFlagData';
 import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
 import {
   MESSAGE,
@@ -487,7 +487,7 @@ const MatchDataSetter = ({
           id="matchPlaceCountry"
         >
           <option value={undefined}></option>
-          {Object.values(Nationality).map((country) => (
+          {Object.values(NATIONALITY).map((country) => (
             <option key={country} value={country}>
               {country}
             </option>

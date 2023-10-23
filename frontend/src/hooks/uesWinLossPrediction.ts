@@ -1,6 +1,7 @@
 import { useCallback } from "react"
 import { useQuery, useMutation } from "react-query"
 import { Axios } from "@/assets/axios"
+import { API_PATH } from "@/assets/ApiPath"
 //! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal";
 import { QUERY_KEY } from "@/assets/queryKeys";
@@ -20,7 +21,7 @@ export const useAllFetchMatchPredictionOfAuthUser = () => {
   const isEitherAuth = Boolean(authUser || isGuest)
 
   const api = useCallback(async () => {
-    const res = await Axios.get<{ data: PredictionType[] | "" }>('/api/prediction').then(v => v.data)
+    const res = await Axios.get<{ data: PredictionType[] | "" }>(API_PATH.PREDICTION).then(v => v.data)
     let formattedData
     if (res.data === "") {
       formattedData = undefined
@@ -29,7 +30,7 @@ export const useAllFetchMatchPredictionOfAuthUser = () => {
     }
     return formattedData
   }, [])
-  const { data, isLoading, isRefetching, refetch } = useQuery(QUERY_KEY.prediction, api, {
+  const { data, isLoading, isRefetching, refetch } = useQuery(QUERY_KEY.PREDICTION, api, {
     staleTime: Infinity,
     enabled: isEitherAuth,
     onError: () => {
@@ -55,7 +56,7 @@ export const useVoteMatchPrediction = () => {
     prediction: "red" | "blue"
   }
   const api = useCallback(async ({ matchID, prediction }: ApiPropsType) => {
-    await Axios.post('/api/prediction', {
+    await Axios.post(API_PATH.PREDICTION, {
       match_id: matchID,
       prediction
     })

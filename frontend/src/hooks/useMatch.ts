@@ -2,6 +2,7 @@ import { useCallback } from "react"
 import { Axios } from "@/assets/axios"
 // import dayjs from "dayjs"
 import { useQuery, useMutation } from "react-query"
+import { API_PATH } from "@/assets/ApiPath"
 // ! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 import { QUERY_KEY } from "@/assets/queryKeys"
@@ -15,20 +16,20 @@ import { useLoading } from "./useLoading"
 //! 試合情報の取得(1試合)
 export const useFetchMatchById = (matchId: number) => {
   const api = useCallback(async () => {
-    const res = await Axios.get(`api/match/${matchId}/show`).then(result => result.data)
+    const res = await Axios.get(`${API_PATH.MATCH}/${matchId}/show`).then(result => result.data)
     return res.data
   }, [])
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType>([QUERY_KEY.matchSingle, { "id": matchId }], api, { keepPreviousData: true, staleTime: Infinity, enabled: true })
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType>([QUERY_KEY.MATCH_SINGLE, { "id": matchId }], api, { keepPreviousData: true, staleTime: Infinity, enabled: true })
   return { data, isLoading, isError, isRefetching, refetch }
 }
 
 //! 試合情報一覧の取得
 export const useFetchMatches = () => {
   const fetcher = useCallback(async () => {
-    const res = await Axios.get("api/match").then(result => result.data)
+    const res = await Axios.get(API_PATH.MATCH).then(result => result.data)
     return res.data
   }, [])
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.fetchMatches, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.FETCH_MATCHES, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
   return { data, isLoading, isError, isRefetching, refetch }
 }
 
@@ -37,10 +38,10 @@ export const useFetchPastMatches = () => {
   const { startLoading, resetLoadingState } = useLoading()
   const fetcher = useCallback(async () => {
     startLoading()
-    const res = await Axios.get("api/match", { params: { range: "past" } }).then(result => result.data)
+    const res = await Axios.get(API_PATH.MATCH, { params: { range: "past" } }).then(result => result.data)
     return res.data
   }, [])
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.fetchPastMatches, fetcher, {
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.FETCH_PAST_MATCHES, fetcher, {
     keepPreviousData: true, staleTime: Infinity, enabled: true, onSuccess: () => {
       resetLoadingState()
     }, onError: () => {
@@ -56,10 +57,10 @@ export const useFetchPastMatches = () => {
 //! すべての試合情報の取得(過去含めすべて)
 export const useFetchAllMatches = () => {
   const fetcher = useCallback(async () => {
-    const res = await Axios.get("api/match", { params: { range: "all" } }).then(result => result.data)
+    const res = await Axios.get(API_PATH.MATCH, { params: { range: "all" } }).then(result => result.data)
     return res.data
   }, [])
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.fetchAllMatches, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.FETCH_ALL_MATCHES, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
   return { data, isLoading, isError, isRefetching, refetch }
 }
 
@@ -75,7 +76,7 @@ export const useRegisterMatch = () => {
 
 
   const api = async ({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }: RegisterMatchPropsType) => {
-    await Axios.post("/api/match", { match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles })
+    await Axios.post(API_PATH.MATCH, { match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles })
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
@@ -122,7 +123,7 @@ export const useUpdateMatch = () => {
       match_id: arg.matchId,
       update_match_data: arg.changeData
     }
-    await Axios.patch("/api/match", updateData)
+    await Axios.patch(API_PATH.MATCH, updateData)
   }, [])
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
@@ -157,7 +158,7 @@ export const useDeleteMatch = () => {
   const { refetch: refetchAllMatches } = useFetchAllMatches()
   // const { state: matchesState, setter: setMatchesState } = useQueryState<MatchesType[]>(queryKeys.match)
   const api = useCallback(async (matchId: number) => {
-    await Axios.delete("/api/match", { data: { match_id: matchId } })
+    await Axios.delete(API_PATH.MATCH, { data: { match_id: matchId } })
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
