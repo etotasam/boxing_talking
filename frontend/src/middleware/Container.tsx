@@ -61,7 +61,7 @@ const Container = () => {
     if (isAuth === undefined || guestUser === undefined) return;
     if (!isAuth && !guestUser && pathname !== '/identification/') {
       showLoginModal();
-      navigate(ROUTE_PATH.Home);
+      navigate(ROUTE_PATH.HOME);
     } else {
       hideLoginModal();
     }

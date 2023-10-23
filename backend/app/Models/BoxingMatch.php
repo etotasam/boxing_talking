@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Boxer;
 use App\Models\Comment;
 use App\Models\TitleMatch;
 use App\Models\Organization;
@@ -46,25 +47,13 @@ class BoxingMatch extends Model
         return $this->belongsToMany(Organization::class, 'title_matches', 'match_id');
     }
 
+    public function redBoxer()
+    {
+        return $this->belongsTo(Boxer::class, 'red_boxer_id');
+    }
 
-    // ! 保有タイトルを配列にして返す
-    // protected function getTitlesAttribute($titles)
-    // {
-    //     if (empty($titles)) {
-    //         $titles = [];
-    //     } else {
-    //         $titles = explode('/', $titles);
-    //     };
-    //     return $titles;
-    // }
-
-    // ! 配列で受けた保有タイトルを文字列に変換してDBに保存する 
-    // protected function setTitlesAttribute($titles)
-    // {
-    //     $formattedTitles = implode('/', $titles);
-    //     if (empty($formattedTitles)) {
-    //         $formattedTitles = null;
-    //     }
-    //     $this->attributes['titles'] = $formattedTitles;
-    // }
+    public function blueBoxer()
+    {
+        return $this->belongsTo(Boxer::class, 'blue_boxer_id');
+    }
 }

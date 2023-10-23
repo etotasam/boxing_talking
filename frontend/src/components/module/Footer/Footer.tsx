@@ -21,7 +21,7 @@ export const Footer = () => {
       >
         <div className="flex absolute bottom-2 right-10">
           {location.pathname !== '/terms' && (
-            <Link to={ROUTE_PATH.Terms} className="text-stone-500 text-sm mr-5">
+            <Link to={ROUTE_PATH.TERMS} className="text-stone-500 text-sm mr-5">
               利用規約
             </Link>
           )}

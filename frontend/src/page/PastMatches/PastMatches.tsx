@@ -37,7 +37,7 @@ export const PastMatches = () => {
   }, []);
 
   const matchSelect = (matchId: number) => {
-    navigate(`${ROUTE_PATH.Match}?match_id=${matchId}`);
+    navigate(`${ROUTE_PATH.MATCH}?match_id=${matchId}`);
   };
 
   if (!pastMatches) return;

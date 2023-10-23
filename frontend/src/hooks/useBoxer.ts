@@ -2,6 +2,7 @@ import { useCallback } from "react"
 import { useLocation } from "react-router-dom";
 import { useQuery, useMutation } from "react-query"
 import { Axios } from "@/assets/axios"
+import { API_PATH } from "@/assets/ApiPath"
 // ! data
 import { QUERY_KEY } from "@/assets/queryKeys"
 import { ERROR_MESSAGE_FROM_BACKEND } from "@/assets/errorMessageFromBackend";
@@ -61,13 +62,13 @@ export const useFetchBoxer = () => {
   }
 
   const fetchBoxerAPI = async ({ page, limit, searchWords }: FetcherPropsType) => {
-    const res = await Axios.get<ResponseType>("/api/boxer", { params: { page, limit, ...searchWords } }).then(result => result.data)
+    const res = await Axios.get<ResponseType>(API_PATH.BOXER, { params: { page, limit, ...searchWords } }).then(result => result.data)
     return res.data
   }
   const { data: result, isLoading, isError, isPreviousData, refetch, isRefetching, } = useQuery<{
     boxers: BoxerType[],
     count: number
-  }>([QUERY_KEY.boxer, { ...queryKey }], () => fetchBoxerAPI({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), {
+  }>([QUERY_KEY.BOXER, { ...queryKey }], () => fetchBoxerAPI({ page: paramPage, limit, searchWords: { name: paramName, country: paramCountry } }), {
     keepPreviousData: true, staleTime: Infinity, onSuccess: () => { }, onError: () => { }
   })
 
@@ -89,7 +90,7 @@ export const useUpdateBoxerData = () => {
   //? params page の取得
   const { setToastModal, showToastModal } = useToastModal()
   const api = async (updateFighterData: BoxerType): Promise<void> => {
-    await Axios.patch<void>("/api/boxer", updateFighterData);
+    await Axios.patch<void>(API_PATH.BOXER, updateFighterData);
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: async () => {
@@ -101,7 +102,7 @@ export const useUpdateBoxerData = () => {
     mutate(updateFighterData, {
       onSuccess: () => {
         resetLoadingState()
-        refetchReactQueryArrayKeys([QUERY_KEY.fetchMatches, QUERY_KEY.boxer])
+        refetchReactQueryArrayKeys([QUERY_KEY.FETCH_MATCHES, QUERY_KEY.BOXER])
         setToastModal({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS });
         showToastModal()
       },
@@ -123,7 +124,7 @@ export const useRegisterBoxer = () => {
   // const { count: fightersCount } = useFetchBoxer()
   const { setToastModal } = useToastModal()
   const api = useCallback(async (newBoxerData: Omit<BoxerType, "id">): Promise<void> => {
-    await Axios.post<void>("/api/boxer", newBoxerData).then(v => v.data)
+    await Axios.post<void>(API_PATH.BOXER, newBoxerData).then(v => v.data)
     // return res
   }, []);
   const { mutate, isLoading, isError, isSuccess } = useMutation(api, {
@@ -139,7 +140,7 @@ export const useRegisterBoxer = () => {
         resetLoadingState()
         setToastModal({ message: MESSAGE.FIGHTER_REGISTER_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
-        refetchReactQueryData(QUERY_KEY.boxer)
+        refetchReactQueryData(QUERY_KEY.BOXER)
       },
       onError: (error: any) => {
         resetLoadingState()
@@ -188,7 +189,7 @@ export const useDeleteBoxer = () => {
   // const paramPage = Number(query.get("page"));
   //? api
   const api = async (boxerData: BoxerType): Promise<void> => {
-    await Axios.delete<void>('/api/boxer', { data: { boxer_id: boxerData.id, eng_name: boxerData.eng_name } }).then(v => v.data)
+    await Axios.delete<void>(API_PATH.BOXER, { data: { boxer_id: boxerData.id, eng_name: boxerData.eng_name } }).then(v => v.data)
   }
 
   const { mutate, isLoading, isError, isSuccess } = useMutation(api, {

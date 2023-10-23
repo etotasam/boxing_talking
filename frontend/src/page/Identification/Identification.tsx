@@ -27,7 +27,7 @@ export const Identification = () => {
     if (token) {
       createUser({ token });
     } else {
-      navigate(ROUTE_PATH.Home);
+      navigate(ROUTE_PATH.HOME);
     }
   }, []);
 
@@ -75,7 +75,7 @@ const SuccessRegister = () => {
           <br />
           下記よりログインしてください。
         </p>
-        <Link to={ROUTE_PATH.Home}>
+        <Link to={ROUTE_PATH.HOME}>
           <button className="mt-5 py-1 px-4 bg-stone-700 hover:bg-stone-500 text-white rounded-md">
             ログイン
           </button>
@@ -94,7 +94,7 @@ const FiledAuth = () => {
         ) : (
           <p>無効なリクエストです</p>
         )}
-        <Link to={ROUTE_PATH.Home}>
+        <Link to={ROUTE_PATH.HOME}>
           <button className="mt-5 py-1 px-4 bg-stone-700 hover:bg-stone-500 text-white rounded-md">
             Home
           </button>

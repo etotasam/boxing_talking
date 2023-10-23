@@ -30,7 +30,7 @@ export const Home = () => {
   const { visualModeToggleSwitch } = useVisualModeController();
 
   const matchSelect = (matchId: number) => {
-    navigate(`${ROUTE_PATH.Match}?match_id=${matchId}`);
+    navigate(`${ROUTE_PATH.MATCH}?match_id=${matchId}`);
   };
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -63,7 +63,7 @@ export const Home = () => {
           </ul>
 
           <div className="text-center md:my-10 my-5">
-            <Link to={ROUTE_PATH.PastMatches}>
+            <Link to={ROUTE_PATH.PAST_MATCHES}>
               <button className="py-2 px-4 bg-stone-600 hover:bg-stone-800 duration-300 text-white rounded-sm sm:w-auto w-[95%]">
                 その他過去の試合一覧
               </button>

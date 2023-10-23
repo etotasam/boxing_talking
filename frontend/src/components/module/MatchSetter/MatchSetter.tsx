@@ -21,7 +21,7 @@ import {
   MESSAGE,
   BG_COLOR_ON_TOAST_MODAL,
 } from '@/assets/statusesOnToastModal';
-import { Nationality } from '@/assets/NationalFlagData';
+import { NATIONALITY } from '@/assets/NationalFlagData';
 //! hook
 import { useToastModal } from '@/hooks/useToastModal';
 import { useUpdateMatch } from '@/hooks/useMatch';
@@ -215,7 +215,8 @@ export const MatchSetter = ({
 
       updateMatch({ matchId, changeData: onlyModifiedData });
     } catch (error: any) {
-      if (isMessageType(error.message)) {
+      //?MessageTypeには空文字も含まれている
+      if (isMessageType(error.message) && error.message) {
         showToastModalMessage({
           message: error.message,
           bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
@@ -351,7 +352,7 @@ export const MatchSetter = ({
             id="matchPlaceCountry"
           >
             <option value={undefined}></option>
-            {Object.values(Nationality).map((country) => (
+            {Object.values(NATIONALITY).map((country) => (
               <option key={country} value={country}>
                 {country}
               </option>
