@@ -27,6 +27,13 @@ interface BoxerRepositoryInterface
   public function getBoxerById(int $boxerId);
 
   /**
+   * 選手データが存在するか
+   * @param int $boxerId
+   * @return bool
+   */
+  public function isBoxerById(int $boxerId);
+
+  /**
    * 保持タイトルと一緒に選手データを取得
    * @param int $boxerId
    * @return Boxer with titles => [["organization" => Model Organization, "weightDivision" => Model WeightDivision]]
@@ -49,7 +56,7 @@ interface BoxerRepositoryInterface
 
   /**
    * @param array $updateBoxerData idと更新対象のデータの入った連想配列
-   * @return  void
+   * @return  bool
    */
   public function updateBoxer(array $updateBoxerData);
 }

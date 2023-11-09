@@ -3,10 +3,10 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { ROUTE_PATH } from '@/assets/RoutePath';
 // ! hooks
-import { useGuest, useAuthCheck } from '@/hooks/useAuth';
+import { useGuest, useAuthCheck } from '@/hooks/apiHooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
-import { useFetchMatches } from '@/hooks/useMatch';
-import { useAdmin } from '@/hooks/useAuth';
+import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
+import { useAdmin } from '@/hooks/apiHooks/useAuth';
 // import { useLoading } from "@/hooks/useLoading";
 // ! modal
 import { ToastModalContainer } from '@/components/modal/ToastModal';
@@ -18,7 +18,7 @@ import { useLoginModal } from '@/hooks/useLoginModal';
 import { useRecoilValue } from 'recoil';
 import { loadingSelector } from '@/store/loadingState';
 import { loginModalSelector } from '@/store/loginModalState';
-import { useFetchBoxer } from '@/hooks/useBoxer';
+import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
 //! component
 import { AdministratorPageLinks } from '@/components/module/AdministratorPageLinks';
 
@@ -30,7 +30,7 @@ const Container = () => {
   const { data: isAuth, isLoading: isFirstCheckingAuth } = useAuthCheck();
   const { data: guestUser } = useGuest();
   const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } =
-    useFetchBoxer();
+    useFetchBoxers();
   const { isLoading: isMatchesFetching } = useFetchMatches();
   const navigate = useNavigate();
   const { showLoginModal, hideLoginModal } = useLoginModal();
@@ -83,11 +83,11 @@ const Container = () => {
       </AnimatePresence>
       {isShowLoginModal && <LoginFormModal key={'LoginFormModal'} />}
       {/* // ? 管理者用 */}
-      {isAdmin && (
+      {/* {isAdmin && (
         <div className="fixed right-[200px] top-0">
           <AdministratorPageLinks />
         </div>
-      )}
+      )} */}
     </>
   );
 };

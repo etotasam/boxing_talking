@@ -4,8 +4,9 @@ import clsx from 'clsx';
 import { NationalityType } from '@/assets/types';
 import { getNationalFlag, formatPosition } from '@/assets/NationalFlagData';
 
-type PropsType = React.ComponentProps<'div'> & {
+type BackgroundFlagPropsType = React.ComponentProps<'div'> & {
   nationality: NationalityType;
+  isThisMatchAfterToday: boolean | undefined;
   thisMatchPredictionOfUsers?:
     | 'red'
     | 'blue'
@@ -17,7 +18,11 @@ export const BackgroundFlag = ({
   nationality,
   thisMatchPredictionOfUsers = undefined,
   children,
-}: PropsType) => {
+  isThisMatchAfterToday,
+}: BackgroundFlagPropsType) => {
+  //試合日が未来or過去の情報取得完了までは表示させない
+  if (isThisMatchAfterToday === undefined) return;
+
   return (
     <>
       <div
@@ -35,7 +40,8 @@ export const BackgroundFlag = ({
               'bg-white/100 hover:bg-white/80',
             (thisMatchPredictionOfUsers === 'red' ||
               thisMatchPredictionOfUsers === 'blue') &&
-              'bg-white/80'
+              'bg-white/80',
+            !isThisMatchAfterToday && 'bg-white/80'
           )}
         >
           {children}

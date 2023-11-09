@@ -2,8 +2,8 @@
 
 namespace App\Repositories\Interfaces;
 
-// use Illuminate\Support\Collection;
-// use App\Models\TitleMatch;
+use Illuminate\Support\Collection;
+use App\Models\TitleMatch;
 
 interface TitleMatchRepositoryInterface
 {

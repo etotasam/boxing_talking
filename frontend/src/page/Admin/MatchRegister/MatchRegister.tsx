@@ -18,17 +18,13 @@ import {
   MESSAGE,
   BG_COLOR_ON_TOAST_MODAL,
 } from '@/assets/statusesOnToastModal';
-//! layout
-import AdminLayout from '@/layout/AdminLayout';
 // ! hooks
-import { useFetchBoxer } from '@/hooks/useBoxer';
+import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
 import { BoxerType } from '@/assets/types';
-import { useRegisterMatch } from '@/hooks/useMatch';
+import { useRegisterMatch } from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
-import { usePagePath } from '@/hooks/usePagePath';
 import { useLoading } from '@/hooks/useLoading';
 //! component
-// import { FlagImage } from "@/components/atomic/FlagImage";
 import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
@@ -37,34 +33,28 @@ const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const MatchRegister = () => {
   //! hooks
-  const { setter: setPagePath } = usePagePath();
-  const { boxersData, pageCount } = useFetchBoxer();
-  // const { isSuccess: isSuccessRegisterMatch } = useRegisterMatch();
+  const { boxersData, pageCount } = useFetchBoxers();
   const [matchBoxers, setMatchBoxers] = useState<MatchBoxersType>({
     red_boxer: undefined,
     blue_boxer: undefined,
   });
   const { resetLoadingState } = useLoading();
 
-  const { pathname } = useLocation();
-
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
-    //? ページpathをRecoilに保存
-    setPagePath(pathname);
     return () => {
       resetLoadingState();
     };
   }, []);
 
   return (
-    <AdminLayout>
+    <>
       <Helmet>
         <title>試合登録 | {siteTitle}</title>
       </Helmet>
       <div className="w-full flex">
         <section className="w-[70%]">
-          <div className="sticky top-[calc(100px+20px)] mt-[20px]">
+          <div className="sticky top-[calc(100px+20px)]">
             <MatchSetUpBox boxers={matchBoxers} />
             <div className="flex mt-5">
               <div className="w-[50%] flex justify-center">
@@ -90,7 +80,7 @@ export const MatchRegister = () => {
           />
         </section>
       </div>
-    </AdminLayout>
+    </>
   );
 };
 
@@ -110,6 +100,7 @@ const MatchSetUpBox = ({ boxers }: { boxers: MatchBoxersType }) => {
     </div>
   );
 };
+
 // ! 選手
 const BoxerBox = ({ boxerData }: { boxerData: BoxerType }) => {
   return (
@@ -137,7 +128,6 @@ type MatchBoxersType = {
   red_boxer: BoxerType | undefined;
   blue_boxer: BoxerType | undefined;
 };
-
 const BoxersList = ({
   boxersData,
   matchBoxers,

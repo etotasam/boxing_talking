@@ -11,13 +11,11 @@ use App\Repositories\Interfaces\CommentRepositoryInterface;
 class CommentService
 {
 
-  protected $matchRepository;
-  protected $commentRepository;
-  public function __construct(AuthService $authService, MatchRepositoryInterface $matchRepository, CommentRepositoryInterface $commentRepository)
-  {
-    $this->authService = $authService;
-    $this->matchRepository = $matchRepository;
-    $this->commentRepository = $commentRepository;
+  public function __construct(
+    protected AuthService $authService,
+    protected MatchRepositoryInterface $matchRepository,
+    protected CommentRepositoryInterface $commentRepository
+  ) {
   }
 
   /**
@@ -40,7 +38,6 @@ class CommentService
 
   /**
    * コメントのフォーマットと保存
-   *
    * @param string $userId
    * @param int $matchId
    * @param string $comment
@@ -50,9 +47,7 @@ class CommentService
   public function postCommentExecute(string $userId, int $matchId, string $comment)
   {
     $formattedComment = preg_replace('/(\n{4,})/', "\n\n\n", $comment);
-    $postComment = $this->commentRepository->postComment($userId, $matchId, $formattedComment);
-    if ((bool) !$postComment) {
-      throw new \Exception("Comment post failed");
-    }
+    $isSuccess = $this->commentRepository->postComment($userId, $matchId, $formattedComment);
+    abort_if(!$isSuccess, 500);
   }
 }

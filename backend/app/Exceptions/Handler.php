@@ -2,8 +2,11 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -13,7 +16,11 @@ class Handler extends ExceptionHandler
      * @var array<int, class-string<Throwable>>
      */
     protected $dontReport = [
-        //
+        ModelNotFoundException::class,
+        \Illuminate\Auth\AuthenticationException::class,
+        \Illuminate\Validation\ValidationException::class,
+        \Illuminate\Auth\Access\AuthorizationException::class,
+        \Symfony\Component\HttpKernel\Exception\HttpException::class,
     ];
 
     /**
@@ -37,5 +44,21 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Throwable $exception)
+    {
+        if (!$request->is('api/*')) {
+            //apiリクエスト以外は何もしない
+            return parent::render($request, $exception);
+        } else if ($exception instanceof ModelNotFoundException) {
+            //モデルがみつからない時(Route Model Binding時)
+            return response()->json(["success" => false, "message" => "Not found"], 404);
+        } else if ($exception instanceof NotFoundHttpException) {
+            //Routeに存在しないリクエスト
+            return response()->json(["message" => "Not found"], 404);
+        } else {
+            return parent::render($request, $exception);
+        }
     }
 }

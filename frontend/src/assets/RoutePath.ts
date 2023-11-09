@@ -1,7 +1,8 @@
 export const ROUTE_PATH = {
   HOME: '/',
-  PAST_MATCHES: '/match/past',
   MATCH: '/match',
+  PAST_MATCHES: '/matches/past',
+  PAST_MATCH_SINGLE: '/match/past',
   ADMIN: '/admin',
   BOXER_EDIT: '/admin/boxer_edit',
   BOXER_REGISTER: '/admin/boxer_register',

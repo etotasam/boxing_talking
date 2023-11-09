@@ -5,12 +5,12 @@ import { useQuery, useMutation } from "react-query"
 import { API_PATH } from "@/assets/ApiPath"
 // ! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
-import { QUERY_KEY } from "@/assets/queryKeys"
+import { QUERY_KEY } from "@/assets/QueryKeys"
 // ! types
 import { MatchDataType, RegisterMatchPropsType } from "@/assets/types"
 // ! hook
-import { useToastModal } from "./useToastModal"
-import { useLoading } from "./useLoading"
+import { useToastModal } from "../useToastModal"
+import { useLoading } from "../useLoading"
 
 
 //! 試合情報の取得(1試合)
@@ -64,8 +64,6 @@ export const useFetchAllMatches = () => {
   return { data, isLoading, isError, isRefetching, refetch }
 }
 
-
-
 //! 試合の登録
 export const useRegisterMatch = () => {
   const { setToastModal, showToastModal } = useToastModal()
@@ -105,14 +103,11 @@ export const useRegisterMatch = () => {
   return { registerMatch, isLoading, isSuccess }
 }
 
-
 //! 試合の変更
-
 type ArgumentType = {
   matchId: number,
   changeData: Partial<MatchDataType>
 }
-
 export const useUpdateMatch = () => {
   const { setToastModal, showToastModal } = useToastModal()
   const { resetLoadingState, startLoading } = useLoading()

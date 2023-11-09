@@ -39,10 +39,12 @@ class TitleMatchService
    */
   public function formatForStoreToTitleMatchTable(int $matchId, array $organizationsNameArray)
   {
-    $titleMatchesArray = array_map(function ($organizationName) use ($matchId) {
+    $createTitleMatchesArray = function ($organizationName) use ($matchId) {
       $organization = OrganizationRepository::getOrganization($organizationName);
       return ["match_id" => $matchId, "organization_id" => $organization['id']];
-    }, $organizationsNameArray);
+    };
+
+    $titleMatchesArray = array_map(fn ($organizationName) => $createTitleMatchesArray($organizationName), $organizationsNameArray);
 
     return $titleMatchesArray;
   }

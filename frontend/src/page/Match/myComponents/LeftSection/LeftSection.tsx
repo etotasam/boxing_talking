@@ -1,31 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 //! types
 import { MatchDataType } from '@/assets/types';
 // ! components
-import { SelectedMatchInfo } from '@/page/Admin/MatchEdit';
-import { useEffect } from 'react';
+import { MatchInfo } from '@/page/Admin/MatchEdit';
+//! hooks
+import { useFetchComments } from '@/hooks/apiHooks/useComment';
 
 type LeftSectionType = {
   thisMatch: MatchDataType | undefined;
+  isThisMatchAfterToday: boolean | undefined;
   thisMatchPredictionOfUsers: 'red' | 'blue' | 'No prediction vote' | undefined;
 };
 
 export const LeftSection = ({
   thisMatch,
   thisMatchPredictionOfUsers,
+  isThisMatchAfterToday,
 }: LeftSectionType) => {
+  const isVotedMatchPrediction =
+    thisMatchPredictionOfUsers === 'red' ||
+    thisMatchPredictionOfUsers === 'blue';
+
+  //試合データを取得するまでは何もrenderさせない
+  if (!thisMatch) return;
+
   return (
     <div className="xl:w-[30%] w-[40%]">
       <div className="sticky top-5 flex justify-center">
         <div className="w-full max-w-[450px]">
           <div className="flex justify-center mt-5">
-            <SelectedMatchInfo matchData={thisMatch} />
+            <MatchInfo matchData={thisMatch} />
           </div>
           {/* //? 自身の投票と投票数 */}
-          {(thisMatchPredictionOfUsers === 'red' ||
-            thisMatchPredictionOfUsers === 'blue') && (
+          {(isVotedMatchPrediction || !isThisMatchAfterToday) && (
             <PredictionsBar
               thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
               thisMatch={thisMatch}
@@ -42,18 +51,22 @@ const PredictionsBar = ({
   thisMatchPredictionOfUsers,
 }: {
   thisMatch: MatchDataType | undefined;
-  thisMatchPredictionOfUsers: 'red' | 'blue';
+  thisMatchPredictionOfUsers: 'red' | 'blue' | 'No prediction vote' | undefined;
 }) => {
+  const { isSuccess: isFetchCommentsSuccess } = useFetchComments(thisMatch!.id);
   //? 勝利予想の割合計算
-  const [redCountRaito, setRedCountRaito] = useState<number>(0);
-  const [blueCountRaito, setBlueCountRaito] = useState<number>(0);
-  useEffect(() => {
+  const [redCountRatio, setRedCountRatio] = useState<number>(0);
+  const [blueCountRatio, setBlueCountRatio] = useState<number>(0);
+  const setWinPredictionRate = (): void => {
     if (!thisMatch) return;
     const totalCount = thisMatch.count_red + thisMatch.count_blue;
-    const redRaito = Math.round((thisMatch.count_red / totalCount) * 100);
-    setRedCountRaito(!isNaN(redRaito) ? redRaito : 0);
-    const blueRaito = Math.round((thisMatch.count_blue / totalCount) * 100);
-    setBlueCountRaito(!isNaN(blueRaito) ? blueRaito : 0);
+    const redRatio = Math.round((thisMatch.count_red / totalCount) * 100);
+    setRedCountRatio(!isNaN(redRatio) ? redRatio : 0);
+    const blueRatio = Math.round((thisMatch.count_blue / totalCount) * 100);
+    setBlueCountRatio(!isNaN(blueRatio) ? blueRatio : 0);
+  };
+  useEffect(() => {
+    setWinPredictionRate();
   }, [thisMatch]);
 
   return (
@@ -75,26 +88,30 @@ const PredictionsBar = ({
               </span>
             </p>
 
-            <div className="flex justify-between mt-5">
-              <span
-                className={clsx(
-                  'block pl-3 text-lg font-semibold right-0 top-0',
-                  "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1",
-                  thisMatchPredictionOfUsers === 'red' && 'text-red-500'
-                )}
-              >
-                {thisMatch.count_red}
-              </span>
-              <span
-                className={clsx(
-                  'block text-right pr-3 text-lg font-semibold right-0 top-0',
-                  "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1",
-                  thisMatchPredictionOfUsers === 'blue' && 'text-blue-500'
-                )}
-              >
-                {thisMatch.count_blue}
-              </span>
-            </div>
+            {isFetchCommentsSuccess && (
+              <div className="flex justify-between mt-5">
+                <span
+                  className={clsx(
+                    'block pl-3 text-lg font-semibold right-0 top-0',
+                    "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1",
+                    thisMatchPredictionOfUsers === 'red' && 'text-red-500'
+                  )}
+                >
+                  {thisMatch.count_red}
+                </span>
+                {
+                  <span
+                    className={clsx(
+                      'block text-right pr-3 text-lg font-semibold right-0 top-0',
+                      "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1",
+                      thisMatchPredictionOfUsers === 'blue' && 'text-blue-500'
+                    )}
+                  >
+                    {thisMatch.count_blue}
+                  </span>
+                }
+              </div>
+            )}
 
             <div className="flex mt-0">
               <div className="flex-1 flex justify-between relative">
@@ -102,9 +119,9 @@ const PredictionsBar = ({
                   initial={{
                     width: 0,
                   }}
-                  animate={{
-                    width: `${redCountRaito}%`,
-                  }}
+                  animate={
+                    isFetchCommentsSuccess && { width: `${redCountRatio}%` }
+                  }
                   transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
                   className="h-[10px] absolute top-0 left-[-1px] rounded-[50px] bg-red-600"
                 />
@@ -113,9 +130,9 @@ const PredictionsBar = ({
                   initial={{
                     width: 0,
                   }}
-                  animate={{
-                    width: `${blueCountRaito}%`,
-                  }}
+                  animate={
+                    isFetchCommentsSuccess && { width: `${blueCountRatio}%` }
+                  }
                   transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
                   className="h-[10px] absolute top-0 right-[-1px] rounded-[50px] bg-blue-600"
                 />

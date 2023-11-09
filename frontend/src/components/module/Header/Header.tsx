@@ -1,17 +1,23 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import { useLocation } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/RoutePath';
 // ! icons
+import { BsCalendar3 } from 'react-icons/bs';
 import { GiBoxingGlove } from 'react-icons/gi';
-import { AiOutlineUser } from 'react-icons/ai'; // ! types
+import { AiOutlineUser } from 'react-icons/ai';
+import { RiTimeLine } from 'react-icons/ri';
+// ! types
 import { UserType } from '@/assets/types';
 //! hooks
-import { usePagePath } from '@/hooks/usePagePath';
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
-import { useGuest, useAuth } from '@/hooks/useAuth';
+import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
+import { useWindowSize } from '@/hooks/useWindowSize';
+import { useMatchInfoModal } from '@/hooks/useMatchInfoModal';
 //! component
 import { Link } from 'react-router-dom';
 import { LogoutButton } from '@/components/atomic/LogoutButton';
+import { AdministratorPageLinks } from '../AdministratorPageLinks';
 //! env
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -23,7 +29,7 @@ export const Header = (porps: PropsType) => {
   const { userData } = porps;
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
-  const { state: pagePath } = usePagePath();
+  const { pathname } = useLocation();
 
   const { setter: setHeaderHeight } = useHeaderHeight();
 
@@ -40,14 +46,11 @@ export const Header = (porps: PropsType) => {
         ref={headerRef}
         className="h-[80px] flex relative after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
       >
-        <h1 className="md:text-[64px] sm:text-[54px] text-[32px] select-none font-thin">
+        <h1 className="md:text-[64px] sm:text-[54px] text-[32px] font-thin">
           {siteTitle}
         </h1>
-        {pagePath !== '/' && (
-          <div className="absolute bottom-2 left-2 sm:static sm:flex sm:items-end sm:mb-4 sm:ml-10">
-            <ToBoxMatchLink />
-          </div>
-        )}
+
+        <LinksComponents pathname={pathname} />
 
         <div className="absolute sm:top-1 top-2 lg:right-10 md:right-5 right-2 flex">
           {userData && (
@@ -82,17 +85,151 @@ export const Header = (porps: PropsType) => {
   );
 };
 
-const ToBoxMatchLink = () => {
+type LinksComponentsPropsType = {
+  pathname: string;
+};
+const LinksComponents = ({ pathname }: LinksComponentsPropsType) => {
+  const { device } = useWindowSize();
+
   return (
     <>
-      <Link to={ROUTE_PATH.HOME}>
-        <div className="flex bg-stone-600 duration-300 lg:hover:bg-black rounded-[25px] text-white sm:px-3 sm:py-2 px-2 py-1 [&>span]:duration-300 [&>span]:rotate-[-40deg] lg:[&>span]:hover:rotate-[230deg]">
-          <span className="text-[16px] sm:text-[18px] text-white mr-2">
-            <GiBoxingGlove />
-          </span>
-          <p className="text-[10px] sm:text-sm">試合一覧</p>
-        </div>
-      </Link>
+      <ul className="absolute bottom-2 sm:static flex sm:items-end md:mb-2 sm:mb-4">
+        {pathname !== ROUTE_PATH.HOME && (
+          <li className="md:ml-5 ml-2">
+            <ToBoxMatchLinkButton device={device} />
+          </li>
+        )}
+
+        {pathname == ROUTE_PATH.PAST_MATCH_SINGLE && (
+          <li className="md:ml-5 ml-2">
+            <ToPastMatchesPageLinkButton device={device} />
+          </li>
+        )}
+
+        {device === 'SP' &&
+          (pathname === ROUTE_PATH.MATCH ||
+            pathname === ROUTE_PATH.PAST_MATCH_SINGLE) && (
+            <li className="md:ml-5 ml-2">
+              <ViewMatchInfoButton />
+            </li>
+          )}
+
+        <li>
+          <AdministratorPageLinks />
+        </li>
+      </ul>
     </>
+  );
+};
+
+const ToBoxMatchLinkButton = (props: { device: 'PC' | 'SP' | undefined }) => {
+  const [isShowDescription, setIsShowDescription] = useState(false);
+
+  return (
+    <>
+      <div className="relative">
+        {isShowDescription && (
+          <div className="absolute top-[-22px] left-0 w-[60px] text-center py-[1px] select-none bg-white/90 border-[1px] border-stone-400 rounded-md text-xs">
+            <p>試合一覧</p>
+          </div>
+        )}
+        <Link to={ROUTE_PATH.HOME}>
+          <LinkButton
+            onMouseEnter={
+              props.device === 'PC'
+                ? () => setIsShowDescription(true)
+                : () => {}
+            }
+            onMouseLeave={
+              props.device === 'PC'
+                ? () => setIsShowDescription(false)
+                : () => {}
+            }
+          >
+            <BsCalendar3 />
+          </LinkButton>
+        </Link>
+      </div>
+    </>
+  );
+};
+
+const ToPastMatchesPageLinkButton = (props: {
+  device: 'PC' | 'SP' | undefined;
+}) => {
+  const [isShowDescription, setIsShowDescription] = useState(false);
+
+  return (
+    <>
+      <div className="relative">
+        {isShowDescription && (
+          <div className="absolute top-[-22px] left-0 w-[100px] text-center py-[1px] select-none bg-white/90 border-[1px] border-stone-400 rounded-md text-xs">
+            <p>過去の試合一覧</p>
+          </div>
+        )}
+        <Link to={ROUTE_PATH.PAST_MATCHES}>
+          <LinkButton
+            className="text-[20px] hover:text-[22px]"
+            onMouseEnter={
+              props.device === 'PC'
+                ? () => setIsShowDescription(true)
+                : () => {}
+            }
+            onMouseLeave={
+              props.device === 'PC'
+                ? () => setIsShowDescription(false)
+                : () => {}
+            }
+          >
+            <RiTimeLine />
+          </LinkButton>
+        </Link>
+      </div>
+    </>
+  );
+};
+
+const ViewMatchInfoButton = () => {
+  const { viewMatchInfoModal, hideMatchInfoModal } = useMatchInfoModal();
+
+  //コンポーネントが非表示になるタイミングでmodalも非表示にする
+  useEffect(() => {
+    return () => {
+      hideMatchInfoModal();
+    };
+  }, []);
+
+  return (
+    <>
+      <LinkButton
+        onClick={() => viewMatchInfoModal()}
+        className={'rotate-[-40deg] md:hover:rotate-[240deg]'}
+      >
+        <GiBoxingGlove />
+      </LinkButton>
+    </>
+  );
+};
+
+type LinkButtonPropsType = React.ComponentProps<'button'>;
+const LinkButton = ({
+  children,
+  onMouseEnter,
+  onMouseLeave,
+  className,
+  onClick,
+}: LinkButtonPropsType) => {
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      className={clsx(
+        'sm:w-[35px] sm:h-[35px] w-[30px] h-[30px] bg-stone-600 rounded-[50%] flex justify-center items-center text-white text-[16px] hover:text-[18px] duration-100',
+        className
+      )}
+    >
+      {children}
+    </button>
   );
 };

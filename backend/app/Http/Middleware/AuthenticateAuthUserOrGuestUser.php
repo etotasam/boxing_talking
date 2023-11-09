@@ -9,10 +9,8 @@ use App\Repositories\Interfaces\GuestRepositoryInterface;
 
 class AuthenticateAuthUserOrGuestUser
 {
-    protected $guest;
-    public function __construct(GuestRepositoryInterface $guest)
+    public function __construct(private GuestRepositoryInterface $guestRepository)
     {
-        $this->guest = $guest;
     }
     /**
      * Handle an incoming request.
@@ -24,11 +22,11 @@ class AuthenticateAuthUserOrGuestUser
     public function handle(Request $request, Closure $next)
     {
         $isAuthUser = Auth::check();
-        $isGuest = $this->guest->isGuestUser();
+        $isGuest = $this->guestRepository->isGuestUser();
         if ($isAuthUser || $isGuest) {
             return $next($request);
         } else {
-            return response()->json(["message" => "Must be auth for access"], 401);
+            return response()->json(["success" => false, "message" => "Must be auth for access"], 401);
         }
     }
 }

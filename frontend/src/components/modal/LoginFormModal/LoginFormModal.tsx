@@ -8,7 +8,7 @@ import { formTypeSelector, FORM_TYPE } from '@/store/formTypeState';
 // ! components
 import { SignUpForm } from '../SignUpForm';
 // ! hooks
-import { useLogin, useGuestLogin } from '@/hooks/useAuth';
+import { useLogin, useGuestLogin } from '@/hooks/apiHooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 // !etc
 import {

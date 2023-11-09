@@ -24,7 +24,7 @@ class AuthenticateAdmin
             if ($is_admin) {
                 return $next($request);
             } else {
-                return response()->json(["message" => "Unauthorized: Cannot access with your auth"], 401);
+                return response()->json(["success" => false, "message" => "Unauthorized: Cannot access with your auth"], 401);
             }
         }
         return response()->json(["message" => "Unauthorized"], 401);

@@ -20,14 +20,6 @@ class CommentRepository implements CommentRepositoryInterface
     return BoxingMatch::findOrFail($matchId)->comments()->orderBy('created_at', 'desc')->get();
   }
 
-  /**
-   * コメント投稿
-   * @param string $userId
-   * @param int $matchId
-   * @param string $comment
-   *
-   * @return Comment|null
-   */
   public function postComment(string $userId, int $matchId, string $comment)
   {
     $commentInstance = new Comment;

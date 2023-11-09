@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Repositories\Interfaces\GuestRepositoryInterface;
+use App\Exceptions\CustomErrorCodes;
+use Illuminate\Database\QueryException;
 
 class GuestUserService
 {
@@ -23,35 +25,37 @@ class GuestUserService
    */
   public function loginGuest($request): void
   {
-    if (Auth::check()) {
-      throw new Exception("Guest login is not allowed as already authenticated", 400);
+    //ゲストユーザーの1日の作成数に制限をかける
+    $limit = 50;
+    $countGeneratedGuestOnToday = $this->guest->getCountCreatedGuestToday();
+    if ($countGeneratedGuestOnToday > $limit) {
+      throw new Exception("Unable to generate guest user today", CustomErrorCodes::UNABLE_TO_GENERATE_GUEST_TODAY);
     }
+
     DB::beginTransaction();
     try {
       $guestUser = $this->guest->createGuestUser();
       $this->guest->loginGuestUser($guestUser);
-      if (!$this->guest->isGuestUser()) {
-        throw new Exception();
-      }
       $request->session()->regenerate();
-      DB::commit();
+    } catch (QueryException $e) {
+      \Log::error($e->getMessage());
+      abort(500);
     } catch (\Exception $e) {
       DB::rollback();
-      throw new \Exception("Failed guest login", 500);
+      throw $e;
     }
+
+    DB::commit();
   }
 
 
   public function logoutGuest(): void
   {
-    if (!$this->guest->isGuestUser()) {
-      throw new Exception('Must be guest user to guest logout', 403);
-    }
     $guestUserId = $this->guest->getGuestUser()->id;
     $this->guest->logoutGuestUser();
-    $this->guest->deleteGuestUser($guestUserId);
-    if ($this->guest->isGuestUser()) {
-      throw new Exception('Failed guest logout', 403);
+    $isDelete = $this->guest->deleteGuestUser($guestUserId);
+    if (!$isDelete) {
+      abort(500);
     }
   }
 }

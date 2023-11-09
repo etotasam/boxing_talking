@@ -12,15 +12,10 @@ trait JsonResponseController
   protected $httpStatusCode = 200;
 
   /**
-   * @var int
-   */
-  protected $errorCode;
-
-  /**
    * statusCodeの取得
    * @return int
    */
-  public function getHttpStatusCode()
+  protected function getHttpStatusCode()
   {
     return $this->httpStatusCode;
   }
@@ -30,22 +25,21 @@ trait JsonResponseController
    * @param int $statusCode
    * @return self
    */
-  public function setHttpStatusCode(int $statusCode): self
+  protected function setHttpStatusCode(int $statusCode): self
   {
     $this->httpStatusCode = $statusCode;
     return $this;
   }
-
 
   /**
    * クエリエラー
    * @param ?string $message
    * @return JsonResponse
    */
-  public function responseInvalidQuery(?string $message = null): JsonResponse
+  public function responseInvalidQuery(string $message, ?int $errorCode = null): JsonResponse
   {
     return $this->setHttpStatusCode(500)
-      ->responseWithError($message ?? "クエリが無効");
+      ->responseWithError($message, $errorCode);
   }
 
   /**
@@ -53,10 +47,10 @@ trait JsonResponseController
    * @param ?string $message
    * @return JsonResponse
    */
-  public function responseBadRequest(?string $message = null)
+  public function responseBadRequest(string $message, ?int $errorCode = null)
   {
     return $this->setHttpStatusCode(400)
-      ->responseWithError($message ?? "リクエストが無効");
+      ->responseWithError($message, $errorCode);
   }
 
   /**
@@ -64,10 +58,10 @@ trait JsonResponseController
    * @param ?string $message
    * @return JsonResponse
    */
-  public function responseUnauthorized(?string $message = null)
+  public function responseUnauthorized(string $message, ?int $errorCode = null)
   {
     return $this->setHttpStatusCode(401)
-      ->responseWithError($message ?? "無効な認証");
+      ->responseWithError($message, $errorCode);
   }
 
   /**
@@ -75,10 +69,10 @@ trait JsonResponseController
    * @param ?string $message
    * @return JsonResponse
    */
-  public function responseAccessDenied(?string $message = null)
+  public function responseAccessDenied(string $message, ?int $errorCode = null)
   {
     return $this->setHttpStatusCode(403)
-      ->responseWithError($message ?? "権限なしのエラー");
+      ->responseWithError($message, $errorCode);
   }
 
   /**
@@ -86,10 +80,10 @@ trait JsonResponseController
    * @param ?string $message
    * @return JsonResponse
    */
-  public function responseNotFound(?string $message = null)
+  public function responseNotFound(string $message, ?int $errorCode = null)
   {
     return $this->setHttpStatusCode(404)
-      ->responseWithError($message ?? "データが見つからないエラー");
+      ->responseWithError($message, $errorCode);
   }
 
   /**
@@ -97,11 +91,12 @@ trait JsonResponseController
    * @param string $message
    * @return JsonResponse
    */
-  public function responseWithError(string $message)
+  protected function responseWithError(string $message, ?int $errorCode)
   {
     return $this->responseApi([
       "success" => false,
-      "message" => $message
+      "message" => $message,
+      "errorCode" => $errorCode ?? false
     ]);
   }
 
@@ -124,7 +119,7 @@ trait JsonResponseController
    * @param array
    * @return JsonResponse
    */
-  public function responseApi(array $data)
+  protected function responseApi(array $data)
   {
     return response()->json($data, $this->getHttpStatusCode());
   }

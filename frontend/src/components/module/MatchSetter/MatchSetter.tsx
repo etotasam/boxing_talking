@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { cloneDeep, reduce } from 'lodash';
+import { cloneDeep } from 'lodash';
 import dayjs from 'dayjs';
 import _ from 'lodash';
 // ! types
@@ -9,14 +9,11 @@ import {
   WEIGHT_CLASS_Type,
   ORGANIZATIONS_Type,
   MatchDataType,
-  MessageType,
 } from '@/assets/types';
 //!type evolution
 import { isMessageType } from '@/assets/typeEvaluations';
 //! data
 import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
-//? update可能なmatchデータのプロパティ
-// import { needMatchPropertyForUpdate } from '@/assets/needMatchPropertyForUpdate';
 import {
   MESSAGE,
   BG_COLOR_ON_TOAST_MODAL,
@@ -24,7 +21,7 @@ import {
 import { NATIONALITY } from '@/assets/NationalFlagData';
 //! hook
 import { useToastModal } from '@/hooks/useToastModal';
-import { useUpdateMatch } from '@/hooks/useMatch';
+import { useUpdateMatch } from '@/hooks/apiHooks/useMatch';
 
 export const MatchSetter = ({
   selectMatch,
@@ -54,7 +51,7 @@ export const MatchSetter = ({
     }
   }, [belt]);
 
-  //? 試合の削除が成功した時…
+  //? 試合の削除が成功したらformの各データを初期化する
   useEffect(() => {
     if (!isSuccessDeleteMatch) return;
     setMatchDate('');
@@ -65,7 +62,7 @@ export const MatchSetter = ({
     setBelt([]);
   }, [isSuccessDeleteMatch]);
 
-  //? 試合データを選択(props selectMatch)した時に各値を表示出来る様にフォーマットしてセットする
+  //? 試合データを選択(props selectMatch)した時に各値をformに表示出来る様にフォーマットしてセットする
   useEffect(() => {
     if (!selectMatch) return;
     setMatchDate(selectMatch.match_date);
@@ -124,7 +121,8 @@ export const MatchSetter = ({
       throw new Error(MESSAGE.MATCH_IS_NOT_SELECTED);
     }
   };
-  // ? 他、未入力がある場合はモーダルでNOTICE
+
+  // ? 未入力がある場合はモーダルでNOTICE
   const showModalIfUndefinedFieldsExist = () => {
     if (
       !matchDate ||
@@ -139,7 +137,7 @@ export const MatchSetter = ({
     }
   };
 
-  //?更新するのに必要なデータだけを抽出
+  //?更新するのに必要なプロパティだけを抽出
   const pickMatchDataForUpdate = () => {
     const needMatchPropertyForUpdate = [
       'country',
@@ -149,6 +147,7 @@ export const MatchSetter = ({
       'titles',
       'match_date',
     ] as const;
+
     const pickData = _.pick(
       selectMatch,
       needMatchPropertyForUpdate
@@ -156,7 +155,7 @@ export const MatchSetter = ({
     return pickData;
   };
 
-  //? 現在のmatchデータと変更データを比較して、変更があるプロパティだけを抽出
+  //? 現在のmatchデータと変更データを比較して、変更があるデータだけを抽出
   const extractChangeData = (
     matchDataForUpdate: any
   ): Partial<MatchDataType> => {
@@ -197,8 +196,8 @@ export const MatchSetter = ({
     }
   };
 
-  //? Submit
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  //? 試合データ更新の実行
+  const updateMatchExecute = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       showModalIfNotSelectMatch();
@@ -233,7 +232,7 @@ export const MatchSetter = ({
     <div>
       <form
         className="w-[400px] bg-stone-200 border-[1px] border-stone-400 p-5"
-        onSubmit={onSubmit}
+        onSubmit={updateMatchExecute}
       >
         <h2 className="text-center my-5 text-[26px] tracking-[0.1em]">
           試合情報

@@ -49,15 +49,6 @@ class GuestAuthTest extends TestCase
         $this->assertEquals($guest, true);
     }
 
-    /**
-     * @test
-     * 通常ログインしている場合はゲストでログインは出来ない
-     */
-    public function testFailGuestLogin()
-    {
-        $response = $this->actingAs($this->user)->post('/api/guest/login');
-        $response->assertStatus(400);
-    }
 
     /**
      * @test

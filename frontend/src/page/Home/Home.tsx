@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/RoutePath';
 // ! components
 import { FightBox } from '@/components/module/FightBox';
@@ -7,11 +7,10 @@ import { SimpleFightBox } from '@/components/module/SimpleFightBox';
 //! icon
 import { VisualModeChangeIcon } from '@/components/atomic/VisualModeChangeIcon';
 // ! hooks
-import { useFetchMatches } from '@/hooks/useMatch';
-import { usePagePath } from '@/hooks/usePagePath';
+import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
 import { useLoading } from '@/hooks/useLoading';
 import { useWindowSize } from '@/hooks/useWindowSize';
-import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/uesWinLossPrediction';
+import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/apiHooks/uesWinLossPrediction';
 import { useVisualModeController } from '@/hooks/useVisualModeController';
 import { useSortMatches } from '@/hooks/useSortMatches';
 //! types
@@ -22,9 +21,7 @@ export const Home = () => {
   const { resetLoadingState } = useLoading();
   const { data: matchesData } = useFetchMatches();
   const { sortedMatches } = useSortMatches(matchesData);
-  const { setter: setPagePath } = usePagePath();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
   const { device } = useWindowSize();
 
   const { visualModeToggleSwitch } = useVisualModeController();
@@ -34,8 +31,6 @@ export const Home = () => {
   };
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
-    //? ページpathをRecoilに保存
-    setPagePath(pathname);
     return () => {
       resetLoadingState();
     };

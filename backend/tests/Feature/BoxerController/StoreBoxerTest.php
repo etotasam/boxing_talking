@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Boxer;
 use App\Repositories\Interfaces\TitleRepositoryInterface;
+use App\Repositories\TitleRepository;
 use App\Helpers\TestHelper;
 use Database\Seeders\OrganizationSeeder;
 use Database\Seeders\WeightDivisionSeeder;
@@ -61,9 +62,9 @@ class StoreBoxerTest extends TestCase
   public function testStoreBoxerWithFailedStoreTitle()
   {
     /**
-     * @var TitleRepositoryInterface|\Mockery\MockInterface $mockTitleRepository
+     * @var TitleRepository|\Mockery\MockInterface $mockTitleRepository
      */
-    $this->mockTitleRepository = \Mockery::mock(TitleRepositoryInterface::class);
+    $this->mockTitleRepository = \Mockery::mock(TitleRepository::class);
     $this->mockTitleRepository->makePartial();
     $this->mockTitleRepository->shouldReceive('storeTitlesHoldByTheBoxer')->andReturn(false);
     $this->app->instance(TitleRepositoryInterface::class, $this->mockTitleRepository);

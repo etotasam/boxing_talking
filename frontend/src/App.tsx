@@ -4,6 +4,7 @@ import { ROUTE_PATH } from '@/assets/RoutePath';
 // ! page
 import { Home } from '@/page/Home';
 import { Match } from '@/page/Match';
+import { PastMatch } from '@/page/PastMatch';
 import { Admin } from '@/page/Admin';
 import { BoxerRegister } from '@/page/Admin/BoxerRegister';
 import { BoxerEdit } from '@/page/Admin/BoxerEdit';
@@ -34,6 +35,10 @@ function App() {
           </Route>
           <Route element={<HeaderOnlyLayout />}>
             <Route path={ROUTE_PATH.MATCH} element={<Match />} />
+            <Route
+              path={ROUTE_PATH.PAST_MATCH_SINGLE}
+              element={<PastMatch />}
+            />
             {/* //? </HeaderOnlyLayout> */}
           </Route>
           <Route element={<AdminOnly />}>

@@ -11,38 +11,25 @@ import {
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
-//! layout
-import AdminLayout from '@/layout/AdminLayout';
 //! hooks
-import { usePagePath } from '@/hooks/usePagePath';
 import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 import { useToastModal } from '@/hooks/useToastModal';
-import { useRegisterBoxer } from '@/hooks/useBoxer';
+import { useRegisterBoxer } from '@/hooks/apiHooks/useBoxer';
 import { useLoading } from '@/hooks/useLoading';
-import { identity } from 'lodash';
 import { MessageType } from '@/assets/types';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const BoxerRegister = () => {
   // ! use hook
-  const { setter: setPagePath } = usePagePath();
   const { resetLoadingState } = useLoading();
-  const { pathname } = useLocation();
   const { state: boxerDataOnForm, setter: setEditTargetBoxerData } =
     useBoxerDataOnForm();
-  const {
-    setToastModal,
-    showToastModal,
-    hideToastModal,
-    showToastModalMessage,
-  } = useToastModal();
+  const { hideToastModal, showToastModalMessage } = useToastModal();
   const { registerBoxer, isSuccess: successRegisterBoxer } = useRegisterBoxer();
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
-    //? ページpathをRecoilに保存
-    setPagePath(pathname);
     return () => {
       resetLoadingState();
     };
@@ -92,13 +79,13 @@ export const BoxerRegister = () => {
   };
 
   return (
-    <AdminLayout>
+    <>
       <Helmet>
         <title>Boxer登録 | {siteTitle}</title>
       </Helmet>
       <div className="min-h-[calc(100vh-100px)] flex justify-center items-center">
         <BoxerEditForm isSuccess={successRegisterBoxer} onSubmit={onSubmit} />
       </div>
-    </AdminLayout>
+    </>
   );
 };

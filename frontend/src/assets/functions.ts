@@ -30,8 +30,8 @@ import { BoxerType, MatchDataType } from "@/assets/types"
 
 
 
-export const getBoxerDataWithID = ({ boxerID, boxersData }: { boxerID: number, boxersData: BoxerType[] }): BoxerType | undefined => {
-  return boxersData.find(boxer => boxer.id === boxerID)
+export const extractBoxer = ({ targetBoxerId, boxers }: { targetBoxerId: number, boxers: BoxerType[] }): BoxerType | undefined => {
+  return boxers.find(boxer => boxer.id === targetBoxerId)
 }
 
 
