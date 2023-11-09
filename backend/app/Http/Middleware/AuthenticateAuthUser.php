@@ -20,7 +20,7 @@ class AuthenticateAuthUser
         if (Auth::check()) {
             return $next($request);
         } else {
-            return response()->json(["message" => "Authenticated require for access", 401]);
+            return response()->json(["success" => false, "message" => "Require authenticated for access", 401]);
         }
     }
 }

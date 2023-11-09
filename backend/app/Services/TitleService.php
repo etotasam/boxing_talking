@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\OrganizationRepository;
 use App\Repositories\WeightDivisionRepository;
 use App\Repositories\Interfaces\TitleRepositoryInterface;
+use App\Exceptions\FailedTitleException;
 
 
 class TitleService
@@ -18,6 +19,7 @@ class TitleService
 
 
   /**
+   * titlesテーブルへ登録
    * @param int $boxerId
    * @param array $titles [["organization" => "WBA", "weight" => "ミドル"], ...]
    */
@@ -36,7 +38,7 @@ class TitleService
 
       $isSuccess = $this->titleRepository->storeTitlesHoldByTheBoxer($formattedTitles);
       if (!$isSuccess) {
-        throw new \Exception("Failed store title");
+        throw FailedTitleException::create();
       }
     }
   }

@@ -4,26 +4,20 @@ import { useQuery, useMutation } from "react-query"
 import { Axios } from "@/assets/axios"
 import { API_PATH } from "@/assets/ApiPath"
 // ! data
-import { QUERY_KEY } from "@/assets/queryKeys"
+import { QUERY_KEY } from "@/assets/QueryKeys"
 import { ERROR_MESSAGE_FROM_BACKEND } from "@/assets/errorMessageFromBackend";
-// import {  } from "@/components/module/BoxerEditForm";
-// ! recoil
-// import { useSetRecoilState } from "recoil"
-// import {loadingSelector} from "@/store/loadingState"
 // //! hooks
-import { useReactQuery } from "./useReactQuery";
-import { useLoading } from "./useLoading"
-import { useToastModal } from "./useToastModal";
-import { MESSAGE, STATUS, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal";
+import { useReactQuery } from "../useReactQuery";
+import { useLoading } from "../useLoading"
+import { useToastModal } from "../useToastModal";
+import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal";
 // //! types
 import type { BoxerType, NationalityType } from "@/assets/types"
-// ! functions
-// import { convertToBoxerData } from "@/assets/functions";
 
 
 //! 選手データ取得 and 登録済み選手の数を取得
-export const limit = 15
-export const useFetchBoxer = () => {
+const limit = 15
+export const useFetchBoxers = () => {
 
   type SearchWordType = {
     name?: string | null
@@ -86,10 +80,10 @@ export const useFetchBoxer = () => {
 // //! 選手データ更新
 export const useUpdateBoxerData = () => {
   const { startLoading, resetLoadingState } = useLoading()
-  const { refetchReactQueryArrayKeys, refetchReactQueryData } = useReactQuery()
+  const { refetchReactQueryArrayKeys } = useReactQuery()
   //? params page の取得
-  const { setToastModal, showToastModal } = useToastModal()
-  const api = async (updateFighterData: BoxerType): Promise<void> => {
+  const { showToastModalMessage } = useToastModal()
+  const api = async (updateFighterData: Pick<BoxerType, 'id'> & Partial<BoxerType>): Promise<void> => {
     await Axios.patch<void>(API_PATH.BOXER, updateFighterData);
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -97,23 +91,20 @@ export const useUpdateBoxerData = () => {
       startLoading()
     }
   })
-  const updateFighter = (updateFighterData: BoxerType) => {
-    // const convertedBoxerData = convertToBoxerData(updateFighterData)
+  const updateBoxer = (updateFighterData: Pick<BoxerType, 'id'> & Partial<BoxerType>) => {
     mutate(updateFighterData, {
       onSuccess: () => {
         resetLoadingState()
         refetchReactQueryArrayKeys([QUERY_KEY.FETCH_MATCHES, QUERY_KEY.BOXER])
-        setToastModal({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS });
-        showToastModal()
+        showToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS });
       },
       onError: () => {
         resetLoadingState()
-        setToastModal({ message: MESSAGE.FIGHTER_EDIT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR });
-        showToastModal()
+        showToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR });
       }
     })
   }
-  return { updateFighter, isLoading, isSuccess }
+  return { updateBoxer, isLoading, isSuccess }
 }
 
 // //! 選手登録
@@ -121,7 +112,6 @@ export const useRegisterBoxer = () => {
   const { refetchReactQueryData } = useReactQuery()
   const { startLoading, resetLoadingState, successful } = useLoading()
   const { showToastModal } = useToastModal()
-  // const { count: fightersCount } = useFetchBoxer()
   const { setToastModal } = useToastModal()
   const api = useCallback(async (newBoxerData: Omit<BoxerType, "id">): Promise<void> => {
     await Axios.post<void>(API_PATH.BOXER, newBoxerData).then(v => v.data)
@@ -173,20 +163,10 @@ export const useRegisterBoxer = () => {
 
 // //! 選手データ削除
 export const useDeleteBoxer = () => {
-  // const queryClient = useQueryClient()
-  const { refetch: RefetchBoxerData } = useFetchBoxer()
+  const { refetch: RefetchBoxerData } = useFetchBoxers()
   const { startLoading, resetLoadingState } = useLoading()
-  const { setToastModal, showToastModal } = useToastModal()
+  const { setToastModal, showToastModal, showToastModalMessage } = useToastModal()
 
-  // const navigate = useNavigate()
-  //? 選手の数を取得
-  // const { pageCount } = useFetchBoxer()
-  //? page数を計算
-
-  //? paramsを取得
-  // const { search } = useLocation();
-  // const query = new URLSearchParams(search);
-  // const paramPage = Number(query.get("page"));
   //? api
   const api = async (boxerData: BoxerType): Promise<void> => {
     await Axios.delete<void>(API_PATH.BOXER, { data: { boxer_id: boxerData.id, eng_name: boxerData.eng_name } }).then(v => v.data)
@@ -201,22 +181,23 @@ export const useDeleteBoxer = () => {
     mutate(boxerData, {
       onSuccess: async () => {
         resetLoadingState()
-        setToastModal({ message: MESSAGE.BOXER_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        showToastModalMessage({ message: MESSAGE.BOXER_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         //? 選手データと選手数をリフェッチ
         RefetchBoxerData()
       },
       onError: (error: any) => {
         resetLoadingState()
-        const errorMessage = error.data.message
-        if (errorMessage === ERROR_MESSAGE_FROM_BACKEND.BOXER_HAS_ALREADY_SETUP_MATCH) {
-          setToastModal({ message: MESSAGE.BOXER_IS_ALREADY_SETUP_MATCH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          showToastModal()
+        const errorCode = error.data.errorCode
+        if (errorCode === 30) {
+          showToastModalMessage({ message: MESSAGE.BOXER_IS_ALREADY_SETUP_MATCH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
           return
         }
-        if (errorMessage === ERROR_MESSAGE_FROM_BACKEND.BOXER_NOT_EXIST_IN_DB || errorMessage === ERROR_MESSAGE_FROM_BACKEND.REQUEST_DATA_IS_NOT_MATCH_BOXER_IN_DB) {
-          setToastModal({ message: MESSAGE.ILLEGAL_DATA, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          showToastModal()
+        if (errorCode === 44) {
+          showToastModalMessage({ message: MESSAGE.ILLEGAL_DATA, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          return
+        }
+        if (errorCode === 50) {
+          showToastModalMessage({ message: MESSAGE.FAILED_DELETE_BOXER, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
           return
         }
         setToastModal({ message: MESSAGE.FIGHTER_EDIT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })

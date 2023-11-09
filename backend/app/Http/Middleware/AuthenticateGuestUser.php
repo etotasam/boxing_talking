@@ -8,19 +8,18 @@ use App\Repositories\Interfaces\GuestRepositoryInterface;
 
 class AuthenticateGuestUser
 {
-  protected $guest;
-  public function __construct(GuestRepositoryInterface $guest)
+
+  public function __construct(private GuestRepositoryInterface $guestRepository)
   {
-    $this->guest = $guest;
   }
 
   public function handle(Request $request, Closure $next)
   {
 
-    if ($this->guest->isGuestUser()) {
+    if ($this->guestRepository->isGuestUser()) {
       return $next($request);
     } else {
-      return response()->json(["message" => "Guest auth require for access"]);
+      return response()->json(["message" => "Not guest"]);
     }
   }
 }

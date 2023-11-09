@@ -17,7 +17,7 @@ interface CommentRepositoryInterface
    * @param int $matchId
    * @param string $comment
    *
-   * @return Comment|null
+   * @return bool
    */
   public function postComment(string $userId, int $matchId, string $comment);
 

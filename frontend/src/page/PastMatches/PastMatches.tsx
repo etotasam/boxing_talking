@@ -1,46 +1,38 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/assets/RoutePath';
 // ! components
-import { FightBox } from '@/components/module/FightBox';
 import { SimpleFightBox } from '@/components/module/SimpleFightBox';
 //! hooks
-import { useFetchPastMatches } from '@/hooks/useMatch';
-import { usePagePath } from '@/hooks/usePagePath';
+import { useFetchPastMatches } from '@/hooks/apiHooks/useMatch';
 import { useLoading } from '@/hooks/useLoading';
-import { useVisualModeController } from '@/hooks/useVisualModeController';
-import { useWindowSize } from '@/hooks/useWindowSize';
-import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/uesWinLossPrediction';
-//! icon
-import { VisualModeChangeIcon } from '@/components/atomic/VisualModeChangeIcon';
+import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/apiHooks/uesWinLossPrediction';
 //! types
 import { MatchDataType } from '@/assets/types';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const PastMatches = () => {
-  const { setter: setPagePath } = usePagePath();
   const { resetLoadingState } = useLoading();
-  const { visualModeToggleSwitch } = useVisualModeController();
-  const { device } = useWindowSize();
-  const { pathname } = useLocation();
   const { data: pastMatches } = useFetchPastMatches();
   const navigate = useNavigate();
+
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
-    //? ページpathをRecoilに保存
-    setPagePath(pathname);
     return () => {
       resetLoadingState();
     };
   }, []);
 
   const matchSelect = (matchId: number) => {
-    navigate(`${ROUTE_PATH.MATCH}?match_id=${matchId}`);
+    navigate(`${ROUTE_PATH.PAST_MATCH_SINGLE}?match_id=${matchId}`);
   };
 
+  //? apiからデータが取得できてない時
   if (!pastMatches) return;
+
+  //? 過去の試合が見つからない時
   if (pastMatches && Boolean(!pastMatches.length))
     return (
       <>
@@ -52,27 +44,27 @@ export const PastMatches = () => {
         </div>
       </>
     );
+
+  //? 正常にデータ取得が完了した時
   return (
     <>
       <Helmet>
         <title>過去の試合 | {siteTitle}</title>
       </Helmet>
-      {device == 'PC' && (
-        <div className="absolute top-0 left-[50%] translate-x-[-50%] lg:mt-3 mt-1">
-          <VisualModeChangeIcon onClick={() => visualModeToggleSwitch()} />
-        </div>
+      {pastMatches && (
+        <>
+          <ul className="md:py-10">
+            {pastMatches.map((match) => (
+              <li
+                key={match.id}
+                className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5"
+              >
+                <MatchCard match={match} matchSelect={matchSelect} />
+              </li>
+            ))}
+          </ul>
+        </>
       )}
-
-      <ul>
-        {pastMatches.map((match) => (
-          <li
-            key={match.id}
-            className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5"
-          >
-            <MatchCard match={match} matchSelect={matchSelect} />
-          </li>
-        ))}
-      </ul>
     </>
   );
 };
@@ -84,7 +76,6 @@ type MatchesViewPropsType = {
 
 const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
   const { data: myAllPredictionVote } = useAllFetchMatchPredictionOfAuthUser();
-  const { state: visualMode } = useVisualModeController();
 
   const [isPredictionVote, setIsPredictionVote] = useState<boolean>();
 
@@ -94,24 +85,12 @@ const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
       setIsPredictionVote(bool);
     }
   }, [myAllPredictionVote]);
-  // console.log(myAllPredictionVote);
-  const { device } = useWindowSize();
 
-  if (device === 'SP' || visualMode === 'simple')
-    return (
-      <SimpleFightBox
-        isPredictionVote={isPredictionVote}
-        onClick={matchSelect}
-        matchData={match}
-      />
-    );
-
-  if (device === 'PC')
-    return (
-      <FightBox
-        onClick={matchSelect}
-        matchData={match}
-        isPredictionVote={isPredictionVote}
-      />
-    );
+  return (
+    <SimpleFightBox
+      isPredictionVote={isPredictionVote}
+      onClick={matchSelect}
+      matchData={match}
+    />
+  );
 };

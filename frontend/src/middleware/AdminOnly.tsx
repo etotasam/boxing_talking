@@ -1,9 +1,10 @@
 import { ROUTE_PATH } from '@/assets/RoutePath';
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-
+//! component
+import { HeaderContainer } from '@/components/module/Header';
 //! hooks
-import { useAdmin } from '@/hooks/useAuth';
+import { useAdmin } from '@/hooks/apiHooks/useAuth';
 // import { useLogout } from "@/hooks/useAuth";
 
 const AdminOnly = () => {
@@ -22,7 +23,14 @@ const AdminOnly = () => {
       </div>
     );
 
-  return <Outlet />;
+  return (
+    <>
+      <HeaderContainer />
+      <main>
+        <Outlet />
+      </main>
+    </>
+  );
 };
 
 export default AdminOnly;

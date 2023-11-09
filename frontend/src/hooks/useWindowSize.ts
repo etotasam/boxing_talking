@@ -9,7 +9,7 @@ export const useWindowSize = () => {
   const getViewportWidth = () => {
     const width = window.innerWidth
     // const width = document.documentElement.offsetWidth
-    const device = width > 900 ? "PC" : "SP"
+    const device = width > 950 ? "PC" : "SP"
     setDevice(device)
     setWindowSize(width)
   }

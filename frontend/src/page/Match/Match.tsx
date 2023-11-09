@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import dayjs from 'dayjs';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { RotatingLines } from 'react-loader-spinner';
 import { Helmet } from 'react-helmet-async';
@@ -10,17 +11,19 @@ import { BiSend } from 'react-icons/bi';
 //! types
 import { MatchDataType } from '@/assets/types';
 // ! hook
-import { useAuth, useGuest } from '@/hooks/useAuth';
+import { useAuth, useGuest } from '@/hooks/apiHooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
-import { useFetchMatches } from '@/hooks/useMatch';
-import { usePagePath } from '@/hooks/usePagePath';
+import {
+  useFetchMatches,
+  useFetchPastMatches,
+} from '@/hooks/apiHooks/useMatch';
 import {
   useVoteMatchPrediction,
   useAllFetchMatchPredictionOfAuthUser,
-} from '@/hooks/uesWinLossPrediction';
+} from '@/hooks/apiHooks/uesWinLossPrediction';
 import { useWindowSize } from '@/hooks/useWindowSize';
-import { usePostComment, useFetchComments } from '@/hooks/useComment';
+import { usePostComment, useFetchComments } from '@/hooks/apiHooks/useComment';
 //! component
 import { LeftSection } from './myComponents/LeftSection';
 import { CommentsComponent } from './myComponents/CommentsComponent';
@@ -35,8 +38,8 @@ const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const Match = () => {
   // ? use hook
-  const { windowSize } = useWindowSize();
-  const { pathname, search } = useLocation();
+  const { windowSize, device } = useWindowSize();
+  const { search } = useLocation();
   const query = new URLSearchParams(search);
   const paramsMatchID = Number(query.get('match_id'));
   const { data: matches } = useFetchMatches();
@@ -47,7 +50,6 @@ export const Match = () => {
   const { startLoading, resetLoadingState } = useLoading();
   const { isLoading: isFetchingComments } = useFetchComments(paramsMatchID);
   const navigate = useNavigate();
-  const { setter: setPagePath } = usePagePath();
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
   const isEitherAuth = Boolean(isGuest || authUser);
@@ -66,7 +68,7 @@ export const Match = () => {
     Record<'redCount' | 'blueCount' | 'totalCount', number>
   >({ redCount: 0, blueCount: 0, totalCount: 0 });
 
-  //? この試合の各データをuseState等にセット
+  //? 試合の存在確認and試合の各データをthisMatch(useState)等にセット
   useEffect(() => {
     if (!matches || !paramsMatchID) return;
     const match = matches?.find((match) => match.id === paramsMatchID);
@@ -80,7 +82,6 @@ export const Match = () => {
     } else {
       //試合が存在しない場合はリダイレクト
       navigate(ROUTE_PATH.HOME);
-      return;
     }
   }, [paramsMatchID, matches]);
 
@@ -88,8 +89,8 @@ export const Match = () => {
     'red' | 'blue' | 'No prediction vote' | undefined
   >();
 
-  //? 読み込み時にtopへ
-  React.useEffect(() => {
+  //? 読み込み時にscrollをtop位置へ移動
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
@@ -99,8 +100,6 @@ export const Match = () => {
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
-    //? ページpathをRecoilに保存
-    setPagePath(pathname);
     return () => {
       resetLoadingState();
     };
@@ -133,7 +132,7 @@ export const Match = () => {
     }
   }, [isSuccessVoteMatchPrediction]);
 
-  //? コメント入力欄の高さを取得
+  //? コメント入力コンポーネント(commentPostRef)の高さを取得
   useEffect(() => {
     if (commentPostRef) {
       if (commentPostRef.current) {
@@ -144,7 +143,7 @@ export const Match = () => {
     }
   }, [comment, windowSize]);
 
-  // ? コメント投稿成功時にコメント入力欄をclearメッセージモーダル
+  // ? コメント投稿成功時にコメント入力欄とその高さを初期化
   useEffect(() => {
     if (isSuccessPostComment) {
       setComment('');
@@ -164,8 +163,8 @@ export const Match = () => {
     }
   }, [isFetchingComments]);
 
-  //? コメント投稿
-  const sendComment = () => {
+  //? コメント投稿の実行
+  const storeCommentExecute = () => {
     if (isPostingComment) return;
     if (!isEitherAuth) {
       setToastModal({
@@ -188,7 +187,7 @@ export const Match = () => {
   };
 
   const textarea = textareaRef.current as unknown as HTMLTextAreaElement;
-
+  //?テキストエリアの高さを自動制御
   const autoExpandTextareaAndSetComment = (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -202,6 +201,17 @@ export const Match = () => {
     textarea.style.height = 'auto';
     textarea.style.height = `${textarea.scrollHeight}px`;
   };
+
+  //? 試合の日が当日以降かどうか
+  const [isThisMatchAfterToday, setIsThisMatchAfterToday] = useState<boolean>();
+  useEffect(() => {
+    if (!thisMatch) return;
+    const todaySubtractOneSecond = dayjs().startOf('day').add(1, 'second');
+    const isAfterToday = dayjs(thisMatch.match_date).isAfter(
+      todaySubtractOneSecond
+    );
+    setIsThisMatchAfterToday(isAfterToday);
+  }, [thisMatch]);
 
   //! DOM
   if (!windowSize) return;
@@ -224,13 +234,15 @@ export const Match = () => {
         thisMatch={thisMatch}
         thisMatchPredictionCount={thisMatchPredictionCount}
         isFetchingComments={isFetchingComments}
+        isThisMatchAfterToday={isThisMatchAfterToday}
       />
       <div className="flex w-full">
         {/* //? Left section (Match info) */}
-        {windowSize >= TAILWIND_BREAKPOINT.md && (
+        {device === 'PC' && (
           <LeftSection
             thisMatch={thisMatch}
             thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
+            isThisMatchAfterToday={isThisMatchAfterToday}
           />
         )}
         {/* //? Comments */}
@@ -248,8 +260,7 @@ export const Match = () => {
           <PostCommentTextarea
             isPostingComment={isPostingComment}
             setComment={setComment}
-            // comment={comment}
-            sendComment={sendComment}
+            storeCommentExecute={storeCommentExecute}
             textareaRef={textareaRef}
             autoExpandTextareaAndSetComment={autoExpandTextareaAndSetComment}
           />
@@ -263,7 +274,7 @@ export const Match = () => {
 type PostCommentTextareaType = {
   isPostingComment: boolean;
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
-  sendComment: () => void;
+  storeCommentExecute: () => void;
   // comment: string | undefined;
   textareaRef: React.MutableRefObject<null>;
   autoExpandTextareaAndSetComment: (
@@ -272,7 +283,7 @@ type PostCommentTextareaType = {
 };
 
 const PostCommentTextarea = ({
-  sendComment,
+  storeCommentExecute,
   textareaRef,
   autoExpandTextareaAndSetComment,
   isPostingComment,
@@ -290,7 +301,7 @@ const PostCommentTextarea = ({
         onChange={autoExpandTextareaAndSetComment}
       ></textarea>
       <button
-        onClick={sendComment}
+        onClick={storeCommentExecute}
         className={clsx(
           'absolute bottom-[5px] sm:bottom-[7px] sm:w-[50px] sm:h-[30px] w-[45px] h-[25px] text-[14px] right-[10px] border-[1px] bg-stone-600 hover:bg-cyan-800 focus:bg-cyan-800 rounded-sm duration-300 py-1 text-white text-xl flex justify-center items-center',
           isPostingComment && 'text-white/50 select-none'

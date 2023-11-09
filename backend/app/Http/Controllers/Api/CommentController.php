@@ -12,27 +12,18 @@ use App\Http\Requests\CommentRequest;
 use App\Http\Resources\CommentResource;
 use App\Repositories\Interfaces\MatchRepositoryInterface;
 use App\Repositories\Interfaces\CommentRepositoryInterface;
-
+use Illuminate\Database\QueryException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CommentController extends ApiController
 {
-    protected $matchService;
-    protected $commentService;
-    protected $authService;
-    protected $matchRepository;
-    protected $commentRepository;
     public function __construct(
-        MatchService $matchService,
-        CommentService $commentService,
-        AuthService $authService,
-        MatchRepositoryInterface $matchRepository,
-        CommentRepositoryInterface $commentRepository
+        protected MatchService $matchService,
+        protected CommentService $commentService,
+        protected AuthService $authService,
+        protected MatchRepositoryInterface $matchRepository,
+        protected CommentRepositoryInterface $commentRepository
     ) {
-        $this->matchService = $matchService;
-        $this->commentService = $commentService;
-        $this->authService = $authService;
-        $this->matchRepository = $matchRepository;
-        $this->commentRepository = $commentRepository;
     }
 
     /**
@@ -44,13 +35,11 @@ class CommentController extends ApiController
     public function index(Request $request)
     {
         $matchId = $request->query('match_id');
-        if (!$this->matchRepository->isMatch($matchId)) {
-            return $this->responseNotFound("Match is not exists");
-        }
         try {
             $commentsOnMatch = $this->commentRepository->getCommentsOnMatchByMatchId($matchId);
-        } catch (\Exception $e) {
-            $this->responseInvalidQuery("Failed get comments on the match");
+        } catch (QueryException $e) {
+            \Log::error($e->getMessage());
+            return $this->responseInvalidQuery('Invalid query');
         }
 
         return CommentResource::collection($commentsOnMatch);
@@ -58,7 +47,7 @@ class CommentController extends ApiController
 
     /**
      * 試合へのコメント投稿
-     *
+     * errorCode 41 認証なし
      * @param int match_id
      * @param string comment
      * @return JsonResponse
@@ -69,16 +58,20 @@ class CommentController extends ApiController
         $comment = $request->comment;
 
         if (!$this->matchRepository->isMatch($matchId)) {
-            return $this->responseNotFound('Cant post comment to not exists match');
+            return $this->responseNotFound('Can not find The match to post comment');
         }
-        $userId = $this->authService->getUserIdOrGuestUserId();
         try {
+            $userId = $this->authService->getUserIdOrGuestUserId();
             $this->commentService->postCommentExecute($userId, $matchId, $comment);
+        } catch (HttpException $e) {
+            return $this->responseInvalidQuery("Invalid query");
         } catch (\Exception $e) {
-            return $this->responseInvalidQuery($e->getMessage() ?? "Failed when post comment");
+            if ($e->getCode() === 41) {
+                return $this->responseUnauthorized("No auth");
+            }
         };
 
-        return $this->responseSuccessful("Success post comment");
+        return $this->responseSuccessful("Comment has been post");
     }
 
     /**

@@ -40,9 +40,15 @@ interface GuestRepositoryInterface
   public function createGuestUser();
 
   /**
-   * ゲストユーザーの作成
+   * ゲストユーザーの削除
    * @param string $guestUserId uuid
-   * @return int|null
+   * @return int 1 or 0
    */
   public function deleteGuestUser($guestUserId);
+
+  /**
+   * ゲストユーザーが本日作成された数を取得
+   * @return int
+   */
+  public function getCountCreatedGuestToday();
 }

@@ -2,7 +2,7 @@ import { useCallback } from "react"
 // import { useLocation } from "react-router-dom"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
-import { QUERY_KEY } from "@/assets/queryKeys"
+import { QUERY_KEY } from "@/assets/QueryKeys"
 import { API_PATH } from "@/assets/ApiPath"
 //! hook
 // import { useAuth } from "@/hooks/useAuth"
@@ -22,7 +22,6 @@ type CommentType = {
   created_at: string;
 }
 //! テストコメント取得
-
 export const useTestFetchComments = (matchId: number, offset: number, limit: number) => {
   const { showToastModalMessage } = useToastModal()
   const api = async () => {
@@ -63,8 +62,8 @@ export const useFetchComments = (matchId: number) => {
     return res.data
   }
 
-  const { data, isLoading, isFetching, refetch, isError } = useQuery<CommentType[]>([QUERY_KEY.COMMENT, { id: matchId }], api, {
-    staleTime: 60000, onError: (error: any) => {
+  const { data, isLoading, isFetching, refetch, isError, isSuccess } = useQuery<CommentType[]>([QUERY_KEY.COMMENT, { id: matchId }], api, {
+    staleTime: 30000, onError: (error: any) => {
       if (error.status === 419) {
         showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         return
@@ -72,12 +71,10 @@ export const useFetchComments = (matchId: number) => {
     }
   })
 
-  return { data, isLoading, isFetching, refetch, isError }
+  return { data, isLoading, isFetching, refetch, isError, isSuccess }
 }
 
-
 //! コメント投稿
-
 export const usePostComment = () => {
   // const { startLoading, resetLoadingState } = useLoading()
   const { showToastModalMessage } = useToastModal()
@@ -158,9 +155,7 @@ export const usePostComment = () => {
   return { postComment, isLoading, isSuccess, isError }
 }
 
-
 //! コメントの削除
-
 export const useDeleteComment = () => {
 
   type ApiPropsType = { commentID: number, matchID: number }

@@ -4,10 +4,10 @@ import { Axios } from "@/assets/axios"
 import { API_PATH } from "@/assets/ApiPath"
 //! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal";
-import { QUERY_KEY } from "@/assets/queryKeys";
+import { QUERY_KEY } from "@/assets/QueryKeys";
 //! hook
-import { useLoading } from "./useLoading"
-import { useToastModal } from "./useToastModal";
+import { useLoading } from "../useLoading"
+import { useToastModal } from "../useToastModal";
 import { useFetchMatches } from "./useMatch";
 import { useGuest, useAuth } from "./useAuth";
 //! types
@@ -42,7 +42,6 @@ export const useAllFetchMatchPredictionOfAuthUser = () => {
   })
   return { data, isLoading, isRefetching, refetch }
 }
-
 
 //! 試合予想の投票
 export const useVoteMatchPrediction = () => {

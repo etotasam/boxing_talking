@@ -14,6 +14,11 @@ class BoxerRepository implements BoxerRepositoryInterface
     return Boxer::findOrFail($boxerId);
   }
 
+  public function isBoxerById(int $boxerId)
+  {
+    return Boxer::where('id', $boxerId)->exists();
+  }
+
   public function getBoxerWithTitlesById(int $boxerId): ?Boxer
   {
     return Boxer::with(["titles.organization", "titles.weightDivision"])
@@ -25,32 +30,20 @@ class BoxerRepository implements BoxerRepositoryInterface
     return Boxer::create($boxerData);
   }
 
-  /**
-   * 選手の単体の削除
-   * @param int $boxerId
-   * @return bool
-   */
   public function deleteBoxer(int $boxerId)
   {
     $res = Boxer::destroy($boxerId);
     return (bool) $res;
   }
 
-  /**
-   * @param array $updateBoxerData idと更新対象のデータ
-   * @return  void
-   */
   public function updateBoxer(array $updateBoxerData)
   {
-    $boxer = Boxer::find($updateBoxerData['id']);
+    $boxer = Boxer::findOrFail($updateBoxerData['id']);
     $boxer->fill($updateBoxerData);
-    $boxer->save();
+    return $boxer->save();
   }
 
 
-  /**
-   * @return array [array $boxers, int $boxersCount]
-   */
   public function getBoxers(array $searchWordArray, ?int $reqPage, ?int $reqLimit): array
   {
     $limit = $reqLimit ?? 15;
@@ -89,7 +82,7 @@ class BoxerRepository implements BoxerRepositoryInterface
 
   protected function buildWhereClauseQueriesArray(array $arr_word): array
   {
-    $arrayQuery = array_map(function ($key, $value) {
+    $createQuery = function ($key, $value) {
       if (isset($value)) {
         if ($key == 'name' || $key == "eng_name") {
           return [$key, 'like', "%" . addcslashes($value, '%_\\') . "%"];
@@ -97,10 +90,11 @@ class BoxerRepository implements BoxerRepositoryInterface
           return [$key, 'like', $value];
         }
       }
-    }, array_keys($arr_word), array_values($arr_word));
+    };
+    $arrayQueries = array_map(fn ($key, $value) => $createQuery($key, $value), array_keys($arr_word), array_values($arr_word));
 
-    $arrayQueries = array_filter($arrayQuery);
+    // $arrayQueries = array_filter($arrayQueries);
 
-    return $arrayQueries;
+    return array_filter($arrayQueries);;
   }
 }

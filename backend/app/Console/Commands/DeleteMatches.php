@@ -41,31 +41,31 @@ class DeleteMatches extends Command
      */
     public function handle()
     {
-        $date_of_delete_target = date('Y-m-d',strtotime('-2 week'));
+        $date_of_delete_target = date('Y-m-d', strtotime('-2 week'));
         try {
-            DB::transaction(function() use ($date_of_delete_target) {
-                $matches_query = BoxingMatch::where('match_date','<', $date_of_delete_target);
+            DB::transaction(function () use ($date_of_delete_target) {
+                $matches_query = BoxingMatch::where('match_date', '<', $date_of_delete_target);
                 //? 対象matchなし
-                if($matches_query->doesntExist()) {
+                if ($matches_query->doesntExist()) {
                     return \Log::info("削除対象なし");
                 }
                 $all_comments_length = 0;
-                    foreach($matches_query->get() as $match) {
-                        //? matchに紐づくコメントの削除
-                        $comment_query = Comment::where('match_id',$match->id);
-                        if($comment_query->exists()) {
-                            $all_comments_length += $comment_query->count();
-                            $comment_query->delete();
-                        }else {
-                            $all_comments_length += 0;
-                        }
-                        //? matchに紐づくvotesの削除
-                        Vote::where('match_id', $match->id)->delete();
+                foreach ($matches_query->get() as $match) {
+                    //? matchに紐づくコメントの削除
+                    $comment_query = Comment::where('match_id', $match->id);
+                    if ($comment_query->exists()) {
+                        $all_comments_length += $comment_query->count();
+                        $comment_query->delete();
+                    } else {
+                        $all_comments_length += 0;
+                    }
+                    //? matchに紐づくvotesの削除
+                    Vote::where('match_id', $match->id)->delete();
                 }
                 $delete_matches_length = $matches_query->count();
                 //? matchの削除
                 $matches_query->delete();
-                return \Log::info($delete_matches_length . "件の試合の削除と" .$all_comments_length . "件のコメントを削除");
+                return \Log::info($delete_matches_length . "件の試合の削除と" . $all_comments_length . "件のコメントを削除");
             }, 5);
         } catch (\Exception $e) {
             return \Log::error("エラー:" . $e->getMessage());

@@ -6,7 +6,7 @@ import { clsx } from 'clsx';
 import { useSetRecoilState } from 'recoil';
 import { formTypeSelector, FORM_TYPE } from '@/store/formTypeState';
 //! hooks
-import { usePreSignUp } from '@/hooks/useAuth';
+import { usePreSignUp } from '@/hooks/apiHooks/useAuth';
 
 export const SignUpForm = () => {
   const { preSignUp, isSuccess: isSuccessPreRegister } = usePreSignUp();

@@ -4,7 +4,7 @@ import { ROUTE_PATH } from '@/assets/RoutePath';
 //! hook
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useFooterHeight } from '@/hooks/useFooterHeight';
-import { useSignUpIdentification } from '@/hooks/useAuth';
+import { useSignUpIdentification } from '@/hooks/apiHooks/useAuth';
 //! component
 import { Footer } from '@/components/module/Footer';
 import { RotatingLines } from 'react-loader-spinner';
@@ -84,6 +84,7 @@ const SuccessRegister = () => {
     </>
   );
 };
+
 const FiledAuth = () => {
   const tokenErrorMessage = useRecoilValue(tokenErrorMessageSelector);
   return (

@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-type PropsType = React.ComponentProps<"div"> & AnyType;
+type PropsType = React.ComponentProps<'div'> & AnyType;
 
 type AnyType = {
   execution: () => void;

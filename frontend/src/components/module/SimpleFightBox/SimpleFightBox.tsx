@@ -16,7 +16,7 @@ import crown from '@/assets/images/etc/champion.svg';
 //! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useWindowSize } from '@/hooks/useWindowSize';
-import { useGuest, useAuth } from '@/hooks/useAuth';
+import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
 
 type PropsType = {
   matchData: MatchDataType;
@@ -34,7 +34,7 @@ export const SimpleFightBox = ({
   const { data: isGuest } = useGuest();
   const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
   const { windowSize } = useWindowSize();
-  const [isShowPredictionIton, setIsShowPredictionIcon] = useState(false);
+  const [isShowPredictionIcon, setIsShowPredictionIcon] = useState(false);
 
   //? 未投票アイコンの表示条件設定
   useEffect(() => {
@@ -80,13 +80,13 @@ export const SimpleFightBox = ({
 
           <BoxerBox boxer={matchData.blue_boxer} />
 
-          {isShowPredictionIton &&
+          {isShowPredictionIcon &&
             windowSize !== undefined &&
             windowSize > TAILWIND_BREAKPOINT.md && <PredictionVoteIcon />}
-          {isShowPredictionIton &&
+          {isShowPredictionIcon &&
             windowSize !== undefined &&
             windowSize < TAILWIND_BREAKPOINT.md && (
-              <div className="absolute top-[10px] left-[40%] translate-x-[-50%]">
+              <div className="absolute top-[8px] left-[50%] translate-x-[-50%]">
                 <PredictionVoteIconMini />
               </div>
             )}
@@ -101,13 +101,26 @@ const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
     <>
       {/* //? 日時 */}
       <div className="py-5 text-stone-600 flex-1">
-        <div className="text-center relative">
-          <h2 className="xl:text-xl lg:text-lg text-md after:content-['(日本時間)'] after:w-full after:absolute md:after:bottom-[-60%] after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] xl:after:text-sm after:text-[12px]">
+        <div className="text-center relative flex justify-center items-center">
+          <h2 className="absolute top-[2px] md:top-0 xl:text-xl lg:text-lg text-md after:content-['(日本時間)'] after:w-full after:absolute md:after:bottom-[-60%] after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] xl:after:text-sm after:text-[12px]">
             {dayjs(matchData.match_date).format('YYYY年M月D日')}
           </h2>
-          {matchData.titles.length > 0 && (
-            <span className="absolute top-[-24px] left-[50%] translate-x-[-50%] w-[24px] h-[24px] mr-2">
-              <img src={crown} alt="" />
+          {matchData.titles.length ? (
+            <div className="absolute top-[-17px] md:top-[-22px] left-[50%] translate-x-[-50%] mr-2 flex justify-center w-full md:text-[16px] text-[14px]">
+              <div className="flex">
+                <p>{matchData.weight}級</p>
+                <img
+                  className="ml-2 md:w-[22px] md:h-[22px] w-[18px] h-[18px]"
+                  src={crown}
+                  alt=""
+                />
+              </div>
+            </div>
+          ) : (
+            <span className="absolute top-[-17px] md:top-[-22px] left-[50%] translate-x-[-50%] mr-2 w-full md:text-[16px] text-[14px]">
+              <p>
+                {matchData.weight}級 {matchData.grade}
+              </p>
             </span>
           )}
         </div>

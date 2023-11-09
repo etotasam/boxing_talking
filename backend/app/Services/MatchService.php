@@ -11,33 +11,26 @@ use App\Repositories\Interfaces\TitleMatchRepositoryInterface;
 use App\Repositories\Interfaces\WinLossPredictionRepositoryInterface;
 use App\Repositories\WinLossPredictionRepository;
 use App\Services\TitleMatchService;
+use Illuminate\Database\QueryException;
+use App\Exceptions\NonAdministratorException;
+use Illuminate\Database\Events\QueryExecuted;
 
 class MatchService
 {
 
-  protected $auth;
-  protected $titleMatchService;
-  protected $matchRepository;
-  protected $commentRepository;
-  protected $titleMatchRepository;
-  protected $predictionRepository;
   public function __construct(
-    TitleMatchService $titleMatchService,
-    MatchRepositoryInterface $matchRepository,
-    CommentRepositoryInterface $commentRepository,
-    TitleMatchRepositoryInterface $titleMatchRepository,
-    WinLossPredictionRepositoryInterface $predictionRepository,
+    protected TitleMatchService $titleMatchService,
+    protected MatchRepositoryInterface $matchRepository,
+    protected CommentRepositoryInterface $commentRepository,
+    protected TitleMatchRepositoryInterface $titleMatchRepository,
+    protected WinLossPredictionRepositoryInterface $predictionRepository,
   ) {
-    $this->titleMatchService = $titleMatchService;
-    $this->matchRepository = $matchRepository;
-    $this->commentRepository = $commentRepository;
-    $this->titleMatchRepository = $titleMatchRepository;
-    $this->predictionRepository = $predictionRepository;
   }
 
   /**
    * 試合データの保存
-   *
+   * errorCode 50 titleMatchesテーブルへの登録が失敗
+   * errorCode 51 matchesテーブルへの登録が失敗
    * @param array $matchDataForStore
    *  [
    *    'match_date' => '2023-10-18',
@@ -64,17 +57,21 @@ class MatchService
     try {
       $createdMatch = $this->matchRepository->createMatch($matchDataForStore);
       if (!$createdMatch) {
-        throw new \Exception("Failed create match");
+        throw new \Exception("", 51);
       }
 
       $titleMatchesArray = $this->titleMatchService->formatForStoreToTitleMatchTable($createdMatch['id'], $organizationsNameArray);
       $isSuccessStoreTitleMatch = $this->titleMatchRepository->insertTitleMatch($titleMatchesArray);
       if (!$isSuccessStoreTitleMatch) {
-        throw new \Exception("Failed store to title_matches");
+        throw new \Exception("", 50);
       }
-    } catch (Exception $e) {
+    } catch (QueryException $e) {
+      \Log::error($e->getMessage());
       DB::rollBack();
-      throw new \Exception($e->getMessage() ?? "Failed store match");
+      abort(500);
+    } catch (\Exception $e) {
+      DB::rollBack();
+      throw $e;
     }
 
     DB::commit();
@@ -82,9 +79,8 @@ class MatchService
 
   /**
    * 試合一覧の取得
-   *
+   * errorCode 41 admin認証なし
    * @param string|null range
-   *
    * @return \Illuminate\Support\Collection $matches
    */
   public function getMatchesExecute(string|null $range)
@@ -93,7 +89,7 @@ class MatchService
       if (Auth::user()->administrator) {
         $matches = $this->matchRepository->getAllMatches();
       } else {
-        throw new Exception("Cannot get all matches without auth administrator", 401);
+        throw NonAdministratorException::create();
       }
     } else if ($range == "past") {
       $matches = $this->matchRepository->getPastMatches();
@@ -113,11 +109,6 @@ class MatchService
    */
   public function updateMatch(int $matchId, array $updateMatchData)
   {
-    // $match = MatchRepository::get($matchId);
-    $match = $this->matchRepository->getMatchById($matchId);
-    if (!$match) {
-      throw new Exception("Match is not exists", 404);
-    }
     DB::beginTransaction();
     try {
       if (array_key_exists('titles', $updateMatchData)) {
@@ -125,14 +116,12 @@ class MatchService
         unset($updateMatchData['titles']);
       }
       if (!empty($updateMatchData)) {
-        $isUpdateSuccess = $this->matchRepository->updateMatch($matchId, $updateMatchData);
-        if (!$isUpdateSuccess) {
-          throw new \Exception();
-        }
+        $this->matchRepository->updateMatch($matchId, $updateMatchData);
       }
-    } catch (Exception $e) {
+    } catch (QueryException $e) {
       DB::rollBack();
-      throw new \Exception("Failed update match");
+      \Log::error($e->getMessage());
+      abort(500);
     }
 
     DB::commit();
@@ -156,11 +145,12 @@ class MatchService
    *
    * @return  array organizationsNameArray
    */
-  public function extractOrganizationsArray(array $matchDataForStore): array
+  protected function extractOrganizationsArray(array $matchDataForStore): array
   {
     if (array_key_exists('titles', $matchDataForStore)) {
       $organizationsArray = $matchDataForStore['titles'];
     } else {
+      \Log::error("Titles(organizations) is not exists in match data");
       throw new Exception("titles(organizations) is not exists in match data", 406);
     }
     return $organizationsArray;
@@ -169,15 +159,14 @@ class MatchService
 
   /**
    * 試合データ削除の実行メソッド
-   *
+   * @errorCode 44 targetの試合データがない
    * @param int $matchId
-   *
    * @return void
    */
   public function deleteMatchExecute(int $matchId): void
   {
     if (!$this->matchRepository->isMatch($matchId)) {
-      throw new \Exception("Not exit the match", 404);
+      throw new \Exception("", 44);
     }
     DB::beginTransaction();
     try {
@@ -185,13 +174,10 @@ class MatchService
       $this->commentRepository->deleteAllCommentOnMatch($matchId);
       $this->predictionRepository->deletePredictionOnMatch($matchId);
       // WinLossPredictionRepository::delete($matchId);
-      $isMatchDeleted = $this->matchRepository->deleteMatch($matchId);
-      if (!$isMatchDeleted) {
-        throw new \Exception();
-      }
-    } catch (\Exception $e) {
+      $this->matchRepository->deleteMatch($matchId);
+    } catch (QueryExecuted) {
       DB::rollBack();
-      throw new \Exception("Failed when delete match");
+      abort(500);
     }
 
     DB::commit();

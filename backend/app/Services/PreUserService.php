@@ -17,25 +17,16 @@ class PreUserService
   }
 
   /**
+   * preUserの作成と、確認用のメール送信
+   * @errorCode 50 preUserのcreate失敗
    * @param string $name
    * @param string $email
    * @param string $password
    */
   public function createPreUserAndSendEmail($name, $email, $password): void
   {
-    DB::beginTransaction();
-    try {
-      $preUser = $this->preUserRepository->createPreUser($name, $email, $password);
-      if (!$preUser) {
-        throw new Exception("Failed pre_user create");
-      }
-
-      MailSendJob::dispatch($preUser->id, $name, $email);
-    } catch (\Exception $e) {
-      DB::rollback();
-      throw new \Exception($e->getMessage() ?? "Failed send mail");
-    }
-
-    DB::commit();
+    $preUser = $this->preUserRepository->createPreUser($name, $email, $password);
+    abort_if(!$preUser, 500);
+    MailSendJob::dispatch($preUser->id, $name, $email);
   }
 }

@@ -9,23 +9,20 @@ import {
 } from '@/assets/statusesOnToastModal';
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
 // ! functions
-import { getBoxerDataWithID } from '@/assets/functions';
+import { extractBoxer } from '@/assets/functions';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
-import { usePagePath } from '@/hooks/usePagePath';
 import { useLoading } from '@/hooks/useLoading';
 import {
-  useFetchBoxer,
+  useFetchBoxers,
   useUpdateBoxerData,
   useDeleteBoxer,
-} from '@/hooks/useBoxer';
+} from '@/hooks/apiHooks/useBoxer';
 import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 //! types
-import { BoxerType, MessageType } from '@/assets/types';
+import { BoxerType } from '@/assets/types';
 //! type evolution
 import { isMessageType } from '@/assets/typeEvaluations';
-//! layout
-import AdminLayout from '@/layout/AdminLayout';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
@@ -38,7 +35,6 @@ const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 export const BoxerEdit = () => {
   // ? use hook
   const { resetLoadingState } = useLoading();
-  const { setter: setPagePath } = usePagePath();
   const {
     setToastModal,
     showToastModal,
@@ -47,18 +43,14 @@ export const BoxerEdit = () => {
   } = useToastModal();
   const { state: editTargetBoxerData, setter: setEditTargetBoxerData } =
     useBoxerDataOnForm();
-  const { updateFighter } = useUpdateBoxerData();
+  const { updateBoxer } = useUpdateBoxerData();
   const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
-  const { boxersData, pageCount } = useFetchBoxer();
+  const { boxersData, pageCount } = useFetchBoxers();
   //? 選択したボクサーのidが入る(選手が選択されているかの判断に使用)
   const [isSelectBoxer, setIsSelectBoxer] = useState<number>();
-  //? paramsの取得
-  const { pathname } = useLocation();
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
-    //? ページpathをRecoilに保存
-    setPagePath(pathname);
     return () => {
       resetLoadingState();
     };
@@ -89,23 +81,42 @@ export const BoxerEdit = () => {
   };
 
   //? 名前が空の時
-  const showModalIfNameUndefined = () => {
+  const showModalWhenUndefinedItem = () => {
     if (!editTargetBoxerData.name || !editTargetBoxerData.eng_name) {
       throw new Error(MESSAGE.BOXER_NAME_UNDEFINED);
     }
+
+    if (!editTargetBoxerData.country) {
+      throw new Error(MESSAGE.BOXER_COUNTRY_IS_REQUIRED);
+    }
   };
-  //? データ変更がされていない時
-  const showModalIfNotUpdateBoxerData = () => {
+
+  //? データ変更がある項目だけを抽出 and 変更がない時はモーダル表示
+  const extractUpdateDataOrShowModalWhenNotUpdateData = () => {
     if (!boxersData) return console.error('No have boxers data');
 
-    const boxer = getBoxerDataWithID({
-      boxerID: editTargetBoxerData.id,
-      boxersData: boxersData,
+    const boxer = extractBoxer({
+      targetBoxerId: editTargetBoxerData.id,
+      boxers: boxersData,
     });
-
     if (isEqual(boxer, editTargetBoxerData)) {
       throw new Error(MESSAGE.BOXER_NOT_EDIT);
     }
+
+    const updateBoxerData: Partial<BoxerType> = (
+      Object.keys(editTargetBoxerData) as Array<keyof BoxerType>
+    ).reduce((accum, key) => {
+      if (key === 'id') {
+        return { ...accum, id: editTargetBoxerData.id };
+      }
+      if (!isEqual(editTargetBoxerData[key], boxer![key])) {
+        return { ...accum, [key]: editTargetBoxerData[key] };
+      } else {
+        return { ...accum };
+      }
+    }, {});
+
+    return updateBoxerData;
   };
 
   // ! ボクサーの編集を実行
@@ -113,10 +124,16 @@ export const BoxerEdit = () => {
     e.preventDefault();
     try {
       showModalIfBoxerNotSelected();
-      showModalIfNameUndefined();
-      showModalIfNotUpdateBoxerData();
+      showModalWhenUndefinedItem();
+      const updateData =
+        extractUpdateDataOrShowModalWhenNotUpdateData() as Pick<
+          BoxerType,
+          'id'
+        > &
+          Partial<BoxerType>;
+
       //? ボクサーデータ編集実行
-      updateFighter(editTargetBoxerData);
+      updateBoxer(updateData);
     } catch (error: any) {
       if (isMessageType(error.message)) {
         showToastModalMessage({
@@ -132,13 +149,13 @@ export const BoxerEdit = () => {
   const [isShowDeleteConfirmModal, setIsShowDeleteConfirmModal] =
     useState(false);
 
-  const cancel = () => {
+  const hideDeleteConformModal = () => {
     setIsShowDeleteConfirmModal(false);
   };
 
   //?削除データの実行
-  const execution = () => {
-    setIsShowDeleteConfirmModal(false);
+  const deleteExecution = () => {
+    hideDeleteConformModal();
 
     showModalIfBoxerNotSelected();
 
@@ -147,7 +164,7 @@ export const BoxerEdit = () => {
   };
 
   return (
-    <AdminLayout>
+    <>
       <Helmet>
         <title>Boxer編集 | {siteTitle}</title>
       </Helmet>
@@ -201,11 +218,11 @@ export const BoxerEdit = () => {
         </section>
       </div>
       {isShowDeleteConfirmModal && (
-        <Confirm execution={execution} cancel={cancel}>
+        <Confirm execution={deleteExecution} cancel={hideDeleteConformModal}>
           削除しますか？
         </Confirm>
       )}
-    </AdminLayout>
+    </>
   );
 };
 

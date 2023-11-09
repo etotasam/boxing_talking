@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\WinLossPredictionController;
 use App\Http\Controllers\Api\BoxerController;
 use App\Http\Controllers\Api\HealthCheckController;
+use App\Http\Controllers\Api\TestController;
 
 
 /*
@@ -17,6 +18,7 @@ use App\Http\Controllers\Api\HealthCheckController;
 |--------------------------------------------------------------------------
 */
 
+Route::get('/test', [TestController::class, 'test']);
 
 Route::get('/user', [AuthController::class, 'fetch']);
 Route::get('/guest/user', function () {

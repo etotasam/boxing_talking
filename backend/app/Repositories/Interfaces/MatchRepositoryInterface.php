@@ -50,7 +50,7 @@ interface MatchRepositoryInterface
   /**
    * 試合の登録
    * @param array $matchData
-   * @return BoxingMatch
+   * @return BoxingMatch|false
    */
   public function createMatch(array $matchData);
 

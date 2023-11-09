@@ -4,17 +4,22 @@ namespace App\Http\Controllers\Api;
 
 
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use App\Exceptions\CustomErrorCodes;
 use App\Models\Administrator;
 use App\Services\UserService;
 use App\Services\PreUserService;
 use App\Services\GuestUserService;
-use Illuminate\Http\Request;
 use App\Http\Requests\PreCreateAuthRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
+use Firebase\JWT\ExpiredException;
+use Illuminate\Database\QueryException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use UnexpectedValueException;
 
 class AuthController extends ApiController
 {
@@ -41,11 +46,13 @@ class AuthController extends ApiController
     {
         try {
             $this->guestService->loginGuest($request);
+        } catch (HttpException) {
+            return $this->responseInvalidQuery("Failed guest login");
         } catch (Exception $e) {
-            if ($e->getCode() === 400) {
-                return $this->responseBadRequest($e->getMessage());
+            //フロントでエラーコードを使用するのでcodeも返してあげる
+            if ($e->getCode() === CustomErrorCodes::UNABLE_TO_GENERATE_GUEST_TODAY) {
+                return $this->responseAccessDenied($e->getMessage(), $e->getCode());
             }
-            return $this->responseInvalidQuery($e->getMessage() ?? "Failed guest login");
         }
 
         return $this->responseSuccessful("Success guest login");
@@ -61,10 +68,7 @@ class AuthController extends ApiController
     {
         try {
             $this->guestService->logoutGuest();
-        } catch (Exception $e) {
-            if ($e->getCode() === 403) {
-                return $this->responseAccessDenied($e->getMessage());
-            }
+        } catch (HttpException) {
             return $this->responseInvalidQuery("Failed guest logout");
         }
 
@@ -73,8 +77,7 @@ class AuthController extends ApiController
 
 
     /**
-     * pre_create
-     *
+     * 仮ユーザー作成と本登録用のメールをqueueにセット
      * @param string $name
      * @param string $email
      * @param string $password
@@ -84,8 +87,8 @@ class AuthController extends ApiController
     {
         try {
             $this->preUserService->createPreUserAndSendEmail($request->name, $request->email, $request->password);
-        } catch (Exception $e) {
-            return $this->responseInvalidQuery($e->getMessage() ?? "Failed create pre_user");
+        } catch (HttpException) {
+            return $this->responseInvalidQuery("Failed pre_user create");
         }
 
         return $this->responseSuccessful("Successful pre signup");
@@ -93,7 +96,8 @@ class AuthController extends ApiController
 
     /**
      * create
-     *
+     * @errorCode - 1050 tokenが期限切れ フロントで使うコード
+     * @errorCode - 1051 tokenが不正 フロントで使うコード
      * @param string $name
      * @param string $email
      * @param string $password
@@ -101,20 +105,23 @@ class AuthController extends ApiController
      */
     public function create(Request $request)
     {
-        try {
-            $validator = Validator::make($request->only('token'), [
-                "token" => 'required'
-            ]);
-            if ($validator->fails()) {
-                return $this->responseBadRequest($validator->errors());
-            }
+        $validator = Validator::make($request->only('token'), [
+            "token" => 'required'
+        ]);
+        if ($validator->fails()) {
+            return $this->responseBadRequest($validator->errors());
+        }
 
-            $this->userService->createUserService($request->token);
-        } catch (Exception $e) {
-            if ($e->getCode() === 403) {
-                return $this->responseAccessDenied($e->getMessage());
-            }
-            return $this->responseInvalidQuery($e->getMessage() ?? "Failed user create");
+        try {
+            $this->userService->createUserExecute($request->token);
+        } catch (HttpException) {
+            return $this->responseInvalidQuery("Failed user create");
+            //? tokenが期限切れ
+        } catch (ExpiredException $e) {
+            return $this->responseUnauthorized("Expired token", 1050);
+            //? tokenが不正
+        } catch (UnexpectedValueException $e) {
+            return $this->responseBadRequest("Invalid token", 1051);
         }
 
         return $this->responseSuccessful("Successful signup");
@@ -123,18 +130,14 @@ class AuthController extends ApiController
     /**
      * user
      *
-     * @return UserResource|null|JsonResponse
+     * @return UserResource|null
      */
     public function fetch(Request $request)
     {
-        try {
-            if (Auth::check()) {
-                return new UserResource($request->user());
-            } else {
-                return null;
-            }
-        } catch (Exception $e) {
-            return $this->responseInvalidQuery("Failed fetch user");
+        if (Auth::check()) {
+            return new UserResource($request->user());
+        } else {
+            return null;
         }
     }
 
@@ -148,16 +151,13 @@ class AuthController extends ApiController
      */
     public function login(LoginRequest $request)
     {
+        $email = $request->email;
+        $password = $request->password;
         try {
-            $email = $request->email;
-            $password = $request->password;
-            $loggedInUser = $this->userService->loginUserService($email, $password);
+            $loggedInUser = $this->userService->loginUserExecute($email, $password);
             $request->session()->regenerate(); // セッションIDの再発行
-        } catch (Exception $e) {
-            if ($e->getCode() === 401) {
-                return $this->responseUnauthorized($e->getMessage());
-            }
-            return $this->responseInvalidQuery("Failed user login");
+        } catch (AuthenticationException $e) {
+            return $this->responseUnauthorized($e->getMessage());
         }
 
         return new UserResource($loggedInUser);
@@ -170,15 +170,7 @@ class AuthController extends ApiController
      */
     public function logout()
     {
-        try {
-            $this->userService->logoutUserService();
-        } catch (Exception $e) {
-            if ($e->getCode() === 403) {
-                return $this->responseAccessDenied($e->getMessage());
-            }
-            return $this->responseInvalidQuery($e->getMessage() ?? "Failed user logout");
-        }
-
+        $this->userService->logoutUserService();
         return $this->responseSuccessful("Success user logout");
     }
 
@@ -190,14 +182,10 @@ class AuthController extends ApiController
      */
     public function admin()
     {
-        try {
-            if (!Auth::check()) {
-                return false;
-            }
-            $is_admin = Administrator::where("user_id", Auth::id())->exists();
-            return $is_admin;
-        } catch (Exception $e) {
-            return $this->responseInvalidQuery("Failed check admin auth");
+        if (!Auth::check()) {
+            return false;
         }
+        $is_admin = Administrator::where("user_id", Auth::id())->exists();
+        return $is_admin;
     }
 }

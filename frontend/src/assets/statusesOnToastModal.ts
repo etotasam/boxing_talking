@@ -5,13 +5,6 @@ export const STATUS = {
   NOT_ACCEPTABLE: 406,
 } as const
 
-export const WINDOW_WIDTH = {
-  sm: 640,
-  md: 768,
-  lg: 1024,
-  xl: 1280
-} as const
-
 export const BG_COLOR_ON_TOAST_MODAL = {
   ERROR: "red",
   SUCCESS: "green",
@@ -45,6 +38,7 @@ export const MESSAGE = {
   LOGIN_SUCCESS: "ログインしました",
   LOGIN_FAILED: "ログインに失敗しました \n Email,Passwordに誤りがある可能性があります",
   NOT_AUTHORIZED: 'ログインが必要です',
+  NOT_CREATE_GUEST_BY_LIMIT: '1日に生成できるゲストユーザー数の制限に達した為作成できません \n お手数ですが日付が変わってから再度お試しください',
   NULL: "",
 
   //? 試合の登録・試合の編集
@@ -70,6 +64,7 @@ export const MESSAGE = {
   FIGHTER_REGISTER_FAILED: "選手の登録に失敗しました",
   //? 選手編/選手登録
   BOXER_DELETED: "選手を削除しました",
+  BOXER_COUNTRY_IS_REQUIRED: "国籍の選択は必須です",
   BOXER_NOT_EDIT: "選手データに変更がありません",
   BOXER_NO_SELECTED: "対象選手を選択してください",
   BOXER_NAME_UNDEFINED: "名前の入力が必要です",
@@ -79,6 +74,7 @@ export const MESSAGE = {
 
   FIGHTER_EDIT_SUCCESS: "選手情報が更新されました",
   FIGHTER_EDIT_FAILED: "選手情報の編集に失敗しました \n 再度行ってください",
+  FAILED_DELETE_BOXER: "選手の削除に失敗しました \n 再度行ってください",
   FIGHTER_DELETING: "選手情報を削除中...",
   COMMENT_IS_NOT_ENTER: 'コメントの入力がありません',
   COMMENT_IS_TOO_LONG: 'コメントが長すぎます。\n 投稿は1000文字までです',

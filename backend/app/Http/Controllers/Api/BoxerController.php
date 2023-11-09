@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Exceptions\FailedTitleException;
+use App\Exceptions\BoxerException;
 use App\Http\Requests\BoxerRequest;
 use App\Repositories\Interfaces\BoxerRepositoryInterface;
 use App\Repositories\Interfaces\MatchRepositoryInterface;
-use App\Repositories\MatchRepository;
 use App\Services\BoxerService;
 use App\Http\Resources\BoxerCollection;
+use Illuminate\Database\QueryException;
 
 class BoxerController extends ApiController
 {
@@ -46,24 +48,33 @@ class BoxerController extends ApiController
 
         try {
             list($boxers, $boxersCount) = $this->boxerRepository->getBoxers($searchWordArray, $request->query('page'), $request->query('limit'));
-        } catch (\Exception $e) {
-            return $this->responseInvalidQuery("Failed when get boxers data");
+        } catch (QueryException $e) {
+            \Log::error($e->getMessage());
+            return $this->responseInvalidQuery("Failed get boxers");
         }
 
         return new BoxerCollection($boxers, $boxersCount);
     }
 
     /**
+     * boxer登録
      * @param array boxerData ボクサー登録用のデータ
      */
     public function store(BoxerRequest $request): JsonResponse
     {
-        return $this->boxerService->createBoxer($request->toArray());
+        try {
+            $this->boxerService->createBoxer($request->toArray());
+        } catch (FailedTitleException $e) {
+            return $this->responseInvalidQuery($e->getMessage());
+        }
+
+        return $this->responseSuccessful("Success create boxer");
     }
 
     /**
      * ボクサーの削除
-     *
+     * errorCode 30 削除対象のboxerは試合が組まれている状態
+     * errorCode 44 削除対象のboxerが存在しない
      * @param int boxer_id
      * @return JsonResponse
      */
@@ -71,39 +82,35 @@ class BoxerController extends ApiController
     {
         $boxerId = $request->boxer_id;
         if ($this->matchRepository->hasMatchBoxer($boxerId)) {
-            return $this->responseBadRequest("Boxer has already setup match");
+            return $this->responseBadRequest("Boxer has already setup match", 30);
         }
 
         try {
             $this->boxerService->deleteBoxerExecute($boxerId);
-        } catch (\Exception $e) {
-            if ($e->getCode() === 404) {
-                return $this->responseNotFound($e->getMessage());
-            }
-            return $this->responseInvalidQuery($e->getMessage() ?? "Failed delete boxer");
+        } catch (BoxerException $e) {
+            return $this->responseNotFound($e->getMessage(), 44);
         }
 
-        return $this->responseSuccessful("Boxer is deleted");
+        return $this->responseSuccessful("Success delete boxer");
     }
 
     /**
      * ボクサーデータの更新
-     *
      * @param array boxerData idと更新対象データのみ
      * @return JsonResponse
      */
     public function update(Request $request): JsonResponse
     {
         $updateBoxerData = $request->toArray();
-        $targetBoxer = $this->boxerRepository->getBoxerById($updateBoxerData['id']);
-        if (!$targetBoxer) {
-            return $this->responseNotFound("Can not find boxer");
+        if (!$this->boxerRepository->isBoxerById($updateBoxerData['id'])) {
+            return $this->responseNotFound("boxer is not found");
         }
         try {
             $this->boxerService->updateBoxerExecute($updateBoxerData);
-        } catch (\Exception $e) {
-            return $this->responseInvalidQuery("Failed boxer update");
+        } catch (FailedTitleException $e) {
+            return $this->responseInvalidQuery($e->getMessage());
         }
+
         return $this->responseSuccessful("Successful boxer update");
     }
 }

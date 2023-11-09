@@ -46,7 +46,7 @@ class UserCreateTest extends TestCase
         //?jwtトークンの有効期限切れ
         $invalidToken = JWT::encode($this->invalidPayload, $this->secretKey, 'HS256');
         $response = $this->post('/api/user/create', ["token" => $invalidToken]);
-        $response->assertStatus(500);
+        $response->assertStatus(401);
         $this->assertDatabaseMissing('users', ["id" => $this->preUser["id"], "email" => $this->preUser['email']]);
     }
     /**
@@ -57,7 +57,7 @@ class UserCreateTest extends TestCase
     {
         $invalidToken = JWT::encode($this->validPayload, "invalid secret key", 'HS256');
         $response = $this->post('/api/user/create', ["token" => $invalidToken]);
-        $response->assertStatus(500);
+        $response->assertStatus(400);
         $this->assertDatabaseMissing('users', ["id" => $this->preUser["id"], "email" => $this->preUser['email']]);
     }
     /**

@@ -1,5 +1,10 @@
 import { IoMdLogOut } from 'react-icons/io';
-import { useLogout, useGuestLogout, useAuth, useGuest } from '@/hooks/useAuth';
+import {
+  useLogout,
+  useGuestLogout,
+  useAuth,
+  useGuest,
+} from '@/hooks/apiHooks/useAuth';
 
 export const LogoutButton = () => {
   const { data: authUser } = useAuth();

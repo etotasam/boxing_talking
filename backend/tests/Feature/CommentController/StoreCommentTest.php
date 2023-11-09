@@ -11,7 +11,7 @@ use App\Models\GuestUser;
 use App\Models\BoxingMatch;
 use App\Models\Boxer;
 use App\Models\Comment;
-use App\Repositories\Interfaces\CommentRepositoryInterface;
+use App\Repositories\CommentRepository;
 
 class StoreCommentTest extends TestCase
 {
@@ -69,12 +69,12 @@ class StoreCommentTest extends TestCase
     public function testFailedPostComment()
     {
         /**
-         * @var CommentRepositoryInterface|\Mockery\MockInterface $mockCommentRepository
+         * @var CommentRepository|\Mockery\MockInterface $mockCommentRepository
          */
-        $mockCommentRepository = \Mockery::mock(CommentRepositoryInterface::class);
-        $mockCommentRepository->shouldReceive('postComment')->andReturn(null);
+        $mockCommentRepository = \Mockery::mock(CommentRepository::class);
+        $mockCommentRepository->shouldReceive('postComment')->andReturn(false);
         //モックをbind
-        $this->app->instance(CommentRepositoryInterface::class, $mockCommentRepository);
+        $this->app->instance(CommentRepository::class, $mockCommentRepository);
 
         $response = $this->actingAs($this->user)
             ->post(

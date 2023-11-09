@@ -38,4 +38,9 @@ class GuestUserRepository implements GuestRepositoryInterface
   {
     return GuestUser::destroy($guestUserId);
   }
+
+  public function getCountCreatedGuestToday()
+  {
+    return GuestUser::whereDate('created_at', today())->withTrashed()->count();
+  }
 }

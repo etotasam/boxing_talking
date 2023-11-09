@@ -1,20 +1,21 @@
 import { useCallback } from "react"
-import { QUERY_KEY } from "@/assets/queryKeys"
+import { QUERY_KEY } from "@/assets/QueryKeys"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal"
 import { tokenErrorMessageSelector } from "@/store/tokenErrorMessageState"
 import { TOKEN_ERROR_MESSAGE } from "@/assets/tokenErrorMessage"
 import { API_PATH } from "@/assets/ApiPath"
+import { CUSTOM_ERROR_CODE } from "@/assets/CustomErrorCodes"
 //! Recoil
 import { useSetRecoilState } from "recoil"
 import { authenticatingSelector } from "@/store/authenticatingState"
 // !hooks
-import { useToastModal } from "./useToastModal"
-import { useLoading } from "./useLoading"
-import { useLoginModal } from "./useLoginModal"
+import { useToastModal } from "../useToastModal"
+import { useLoading } from "../useLoading"
+import { useLoginModal } from "../useLoginModal"
 import { useAllFetchMatchPredictionOfAuthUser } from "./uesWinLossPrediction"
-import { useReactQuery } from "./useReactQuery"
+import { useReactQuery } from "../useReactQuery"
 //! types
 import type { UserType } from "@/assets/types"
 
@@ -43,7 +44,7 @@ export const useGuestLogin = () => {
   // ? react query
   // const queryClient = useQueryClient()
   // ? toast modal
-  const { setToastModal, showToastModal } = useToastModal()
+  const { showToastModalMessage } = useToastModal()
   // ? Loading state
   const { resetLoadingState, startLoading } = useLoading()
   // ? login modal (hook)
@@ -69,13 +70,15 @@ export const useGuestLogin = () => {
         refetchMatchPrediction()
         resetLoadingState()
         setReactQueryData<boolean>(QUERY_KEY.GUEST, true)
-        setToastModal({ message: MESSAGE.LOGIN_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        showToastModalMessage({ message: MESSAGE.LOGIN_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
       },
-      onError: () => {
+      onError: (error: any) => {
         resetLoadingState()
-        setToastModal({ message: MESSAGE.LOGIN_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        if (error.data.errorCode === CUSTOM_ERROR_CODE.UNABLE_TO_GENERATE_GUEST_TODAY) {
+          showToastModalMessage({ message: MESSAGE.NOT_CREATE_GUEST_BY_LIMIT, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          return
+        }
+        showToastModalMessage({ message: MESSAGE.LOGIN_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
 
       }
     })
@@ -123,9 +126,7 @@ export const useGuestLogout = () => {
   return { guestLogout, isLoading, isSuccess }
 }
 
-
 //! auth check
-
 export const useAuthCheck = () => {
 
   const api = useCallback(async () => {
@@ -143,7 +144,6 @@ export const useAuthCheck = () => {
 
   return { data, isLoading, isError }
 }
-
 
 //! auth user
 export const useAuth = () => {
@@ -200,7 +200,7 @@ export const usePreSignUp = () => {
       onError: (error: any) => {
         resetLoadingState()
         if (error.status === 422) {
-          const errorMessages = error.data.errors as any
+          const errorMessages = error.data.message as any
           if (errorMessages.email) {
             if (errorMessages.email.includes('email is already exists')) {
               setToastModal({ message: MESSAGE.EMAIL_HAS_ALREADY_EXIST, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
@@ -245,9 +245,12 @@ export const useSignUpIdentification = () => {
       setAuthenticatingState({ isLoading: false, isError: false, isSuccess: true })
       return res
     } catch (error: any) {
-      const errorMessage = error.data.message
-      if (errorMessage === "Expired token") {
+      const errorCode = error.data.errorCode
+      if (errorCode === CUSTOM_ERROR_CODE.EXPIRED_TOKEN) {
         setTokenErrorMessage(TOKEN_ERROR_MESSAGE.EXPIRED_TOKEN)
+      }
+      if (errorCode === CUSTOM_ERROR_CODE.INVALID_TOKEN) {
+        setTokenErrorMessage(TOKEN_ERROR_MESSAGE.INVALID_TOKEN)
       }
       setAuthenticatingState({ isLoading: false, isError: true, isSuccess: false })
     }
@@ -319,6 +322,7 @@ export const useLogin = () => {
   }
   return { login, isLoading, isSuccess }
 }
+
 //! ログアウト
 export const useLogout = () => {
   const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
@@ -368,7 +372,6 @@ export const useLogout = () => {
   }, [])
   return { logout, isLoading, isSuccess }
 }
-
 
 // ! 管理者判定
 export const useAdmin = () => {

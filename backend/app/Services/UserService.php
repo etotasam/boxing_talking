@@ -12,30 +12,22 @@ use App\Models\User;
 use App\Repositories\Interfaces\GuestRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\PreUserRepositoryInterface;
+use Illuminate\Auth\AuthenticationException;
 
 class UserService
 {
 
-  protected $userRepository;
-  protected $guest;
-  protected $preUserRepository;
   public function __construct(
-    UserRepositoryInterface $userRepository,
-    GuestRepositoryInterface $guest,
-    PreUserRepositoryInterface $preUserRepository,
+    protected UserRepositoryInterface $userRepository,
+    protected GuestRepositoryInterface $guest,
+    protected PreUserRepositoryInterface $preUserRepository,
   ) {
-    $this->userRepository = $userRepository;
-    $this->guest = $guest;
-    $this->preUserRepository = $preUserRepository;
   }
 
-  public function loginUserService(string $email, string $password): User
+  public function loginUserExecute(string $email, string $password): User
   {
-    if ($this->guest->isGuestUser()) {
-      $this->guest->logoutGuestUser();
-    }
     if (!Auth::attempt(compact("email", "password"))) {
-      throw new Exception("Failed Login", 401);
+      throw new AuthenticationException("Failed Login");
     }
     return Auth::user();
   }
@@ -43,45 +35,41 @@ class UserService
 
   public function logoutUserService(): void
   {
-    if (!Auth::check()) {
-      throw new Exception('Forbidden', 403);
-    };
     Auth::logout();
-    if (Auth::check()) {
-      throw new Exception('dose not logout...', 500);
-    }
   }
 
-  public function createUserService(string $token): void
+  /**
+   * 仮ユーザーからの本登録
+   * @errorCode 50 secret-keyが見つからない
+   * @errorCode 51 Usersテーブルへの登録失敗
+   * @param string $token
+   * @return void
+   */
+  public function createUserExecute(string $token): void
   {
     $secretKey = config('const.jwt_secret_key');
-    if (!isset($secretKey)) {
-      throw new Exception("cannot get secret-key", 500);
+    if (!$secretKey) {
+      \Log::error("Secret-key has not been found");
+      abort(500);
     }
     $decodedToken = JWT::decode($token, new Key($secretKey, 'HS256'));
 
     $preUserId = $decodedToken->user_id;
     $preUser = $this->preUserRepository->getPreUser($preUserId);
 
-    if (!$preUser) {
-      throw new Exception("Invalid access", 403);
-    }
-
     DB::beginTransaction();
     try {
-      $authUser = $this->userRepository->createUser([
+      $this->userRepository->createUser([
         "name" => $preUser->name,
         "email" => $preUser->email,
         "password" => $preUser->password
       ]);
-      if (!$authUser) {
-        throw new Exception("Failed signup...", 500);
-      }
 
       $preUser->delete();
     } catch (\Exception $e) {
       DB::rollback();
-      throw new \Exception($e->getMessage(), $e->getCode());
+      \Log::error($e->getMessage());
+      abort(500);
     }
 
     DB::commit();

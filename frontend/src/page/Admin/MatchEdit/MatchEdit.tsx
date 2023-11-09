@@ -9,8 +9,7 @@ import {
 } from '@/assets/statusesOnToastModal';
 //! func
 import { isMatchDatePast } from '@/assets/functions';
-//! layout
-import AdminLayout from '@/layout/AdminLayout';
+
 //! components
 // import { FightBox } from "@/components/module/FightBox";
 import { FlagImage } from '@/components/atomic/FlagImage';
@@ -18,9 +17,8 @@ import { MatchSetter } from '@/components/module/MatchSetter/MatchSetter';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { Confirm } from '@/components/modal/Confirm';
 // ! hooks
-import { useFetchAllMatches, useDeleteMatch } from '@/hooks/useMatch';
+import { useFetchAllMatches, useDeleteMatch } from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
-import { usePagePath } from '@/hooks/usePagePath';
 import { useLoading } from '@/hooks/useLoading';
 import { useSortMatches } from '@/hooks/useSortMatches';
 //! types
@@ -33,31 +31,28 @@ const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 export const MatchEdit = () => {
   // ! use hook
   const { resetLoadingState } = useLoading();
-  const { pathname } = useLocation();
   const { data: matchesData } = useFetchAllMatches();
   const { sortedMatches } = useSortMatches(matchesData);
   const { setToastModal, showToastModal } = useToastModal();
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
-  const { setter: setPagePath } = usePagePath();
 
   const [selectMatch, setSelectMatch] = useState<MatchDataType>();
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
-    //? ページpathをRecoilに保存
-    setPagePath(pathname);
     return () => {
       resetLoadingState();
     };
   }, []);
 
-  //? 試合の削除に成功した時…
+  //? 試合の削除に成功したら...
   useEffect(() => {
     if (!isSuccessDeleteMatch) return;
     setSelectMatch(undefined);
   }, [isSuccessDeleteMatch]);
 
+  //?削除ボタンを押した時の挙動(確認モーダルの表示など)
   const handleClickDeleteButton = () => {
     if (!selectMatch) {
       setToastModal({
@@ -70,6 +65,7 @@ export const MatchEdit = () => {
     setIsDeleteConfirm(true);
   };
 
+  //? 試合の削除を実行
   const deleteExecution = () => {
     if (!selectMatch) return;
     setIsDeleteConfirm(false);
@@ -77,14 +73,14 @@ export const MatchEdit = () => {
   };
 
   return (
-    <AdminLayout>
+    <>
       <Helmet>
         <title>試合編集 | {siteTitle}</title>
       </Helmet>
-      <div className="mt-[120px] flex w-full">
+      <div className="mt-[20px] flex w-full">
         <section className="w-[30%] flex justify-center">
           {selectMatch ? (
-            <SelectedMatchInfo matchData={selectMatch} />
+            <MatchInfo matchData={selectMatch} />
           ) : (
             <div className="w-[80%]">
               <div className="border-[1px] rounded-md border-stone-400 w-full min-h-[300px] flex justify-center items-center">
@@ -127,7 +123,7 @@ export const MatchEdit = () => {
           />
         </section>
       </div>
-    </AdminLayout>
+    </>
   );
 };
 
@@ -194,7 +190,7 @@ export const MatchListComponent = ({
   );
 };
 
-export const SelectedMatchInfo = ({
+export const MatchInfo = ({
   matchData,
 }: {
   matchData: MatchDataType | undefined;
@@ -244,7 +240,10 @@ export const SelectedMatchInfo = ({
           <div className="relative inline-block lg:text-lg text-sm before:content-['会場'] before:w-full before:absolute before:top-[-25px] before:left-[50%] before:translate-x-[-50%] before:text-[14px] before:text-stone-500">
             {matchData.venue}
             <span className="lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] border-[1px] overflow-hidden absolute top-[1px] lg:left-[-40px] left-[-30px]">
-              <FlagImage nationality={matchData.country} />
+              <FlagImage
+                className="inline-block border-[1px] lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] mr-3"
+                nationality={matchData.country}
+              />
             </span>
           </div>
         </div>
