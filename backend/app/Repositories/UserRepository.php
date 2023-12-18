@@ -9,7 +9,6 @@ use App\Repositories\Interfaces\UserRepositoryInterface;
 class UserRepository implements UserRepositoryInterface
 {
 
-
   public function createUser($userData)
   {
     return User::create($userData);

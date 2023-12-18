@@ -29,7 +29,7 @@ export const useFetchMatches = () => {
     const res = await Axios.get(API_PATH.MATCH).then(result => result.data)
     return res.data
   }, [])
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.FETCH_MATCHES, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.FETCH_MATCHES, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true, suspense: true })
   return { data, isLoading, isError, isRefetching, refetch }
 }
 

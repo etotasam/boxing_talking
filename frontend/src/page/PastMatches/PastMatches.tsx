@@ -81,8 +81,10 @@ const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
 
   useEffect(() => {
     if (myAllPredictionVote) {
-      const bool = myAllPredictionVote.some((ob) => ob.match_id === match.id);
-      setIsPredictionVote(bool);
+      const isPredictionThisMatch = myAllPredictionVote.some(
+        (ob) => ob.match_id === match.id
+      );
+      setIsPredictionVote(isPredictionThisMatch);
     }
   }, [myAllPredictionVote]);
 
