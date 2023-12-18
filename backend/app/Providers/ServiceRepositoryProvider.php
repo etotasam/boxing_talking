@@ -31,15 +31,15 @@ class ServiceRepositoryProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(GuestRepositoryInterface::class, GuestUserRepository::class);
-        $this->app->bind(BoxerRepositoryInterface::class, BoxerRepository::class);
-        $this->app->bind(MatchRepositoryInterface::class, MatchRepository::class);
-        $this->app->bind(CommentRepositoryInterface::class, CommentRepository::class);
-        $this->app->bind(TitleMatchRepositoryInterface::class, TitleMatchRepository::class);
-        $this->app->bind(TitleRepositoryInterface::class, TitleRepository::class);
-        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
-        $this->app->bind(PreUserRepositoryInterface::class, PreUserRepository::class);
-        $this->app->bind(WinLossPredictionRepositoryInterface::class, WinLossPredictionRepository::class);
+        $this->app->singleton(GuestRepositoryInterface::class, GuestUserRepository::class);
+        $this->app->singleton(BoxerRepositoryInterface::class, BoxerRepository::class);
+        $this->app->singleton(MatchRepositoryInterface::class, MatchRepository::class);
+        $this->app->singleton(CommentRepositoryInterface::class, CommentRepository::class);
+        $this->app->singleton(TitleMatchRepositoryInterface::class, TitleMatchRepository::class);
+        $this->app->singleton(TitleRepositoryInterface::class, TitleRepository::class);
+        $this->app->singleton(UserRepositoryInterface::class, UserRepository::class);
+        $this->app->singleton(PreUserRepositoryInterface::class, PreUserRepository::class);
+        $this->app->singleton(WinLossPredictionRepositoryInterface::class, WinLossPredictionRepository::class);
     }
 
     /**

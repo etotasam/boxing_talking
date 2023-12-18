@@ -22,7 +22,7 @@ class DeleteMatches extends Command
      *
      * @var string
      */
-    protected $description = 'delete matches, comments, votes';
+    protected $description = '過去の試合(2週間以上前)の削除と、それに紐づくコメントと投票の削除';
 
     /**
      * Create a new command instance.

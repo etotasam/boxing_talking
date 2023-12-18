@@ -5,6 +5,7 @@ namespace App\Repositories;
 use Illuminate\Support\Facades\Auth;
 use App\Models\GuestUser;
 use App\Repositories\Interfaces\GuestRepositoryInterface;
+// use Carbon\Carbon;
 
 class GuestUserRepository implements GuestRepositoryInterface
 {
@@ -43,4 +44,17 @@ class GuestUserRepository implements GuestRepositoryInterface
   {
     return GuestUser::whereDate('created_at', today())->withTrashed()->count();
   }
+
+  // public function deleteLogoutGuestUser()
+  // {
+  //   $yesterday = Carbon::yesterday()->endOfDay();
+
+  //   $deleteTargetCount =  GuestUser::onlyTrashed()->whereDate('deleted_at', '<', $yesterday)->count();
+  //   if ($deleteTargetCount) {
+  //     GuestUser::onlyTrashed()->whereDate('deleted_at', '<', $yesterday)->forceDelete();
+  //     return $deleteTargetCount . "件削除しました";
+  //   } else {
+  //     return "削除対象がありませんでした";
+  //   }
+  // }
 }

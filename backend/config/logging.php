@@ -55,6 +55,12 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        'task' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/task.log'),
+        ],
+
+
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),

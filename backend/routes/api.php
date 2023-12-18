@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\WinLossPredictionController;
 use App\Http\Controllers\Api\BoxerController;
 use App\Http\Controllers\Api\HealthCheckController;
+use App\Http\Controllers\Api\DbDataToCsvController;
 use App\Http\Controllers\Api\TestController;
 
 
@@ -18,7 +19,8 @@ use App\Http\Controllers\Api\TestController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/test', [TestController::class, 'test']);
+// Route::get('/test_test', [TestController::class, 'test_test']);
+// Route::get('/lock', [TestController::class, 'isLock']);
 
 Route::get('/user', [AuthController::class, 'fetch']);
 Route::get('/guest/user', function () {
@@ -60,4 +62,6 @@ Route::middleware('administrator')->group(function () {
     Route::patch('/match', [MatchController::class, 'update']);
     //コメント削除
     Route::delete('/comment/{comment}', [CommentController::class, 'destroy']);
+    //csv作成
+    Route::get('/csv ', [DbDataToCsvController::class, 'output']);
 });

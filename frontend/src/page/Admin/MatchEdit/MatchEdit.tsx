@@ -15,7 +15,7 @@ import { isMatchDatePast } from '@/assets/functions';
 import { FlagImage } from '@/components/atomic/FlagImage';
 import { MatchSetter } from '@/components/module/MatchSetter/MatchSetter';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
-import { Confirm } from '@/components/modal/Confirm';
+import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
 // ! hooks
 import { useFetchAllMatches, useDeleteMatch } from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
@@ -103,13 +103,12 @@ export const MatchEdit = () => {
               >
                 削除
               </button>
+              {/* 削除ダイアログ */}
               {isDeleteConfirm && (
-                <Confirm
+                <DeleteConfirm
                   execution={deleteExecution}
                   cancel={() => setIsDeleteConfirm(false)}
-                >
-                  削除しますか？
-                </Confirm>
+                />
               )}
             </div>
           </div>
@@ -255,5 +254,30 @@ export const MatchInfo = ({
         </div>
       </div>
     </div>
+  );
+};
+
+type DeleteConfirmPropsType = {
+  cancel: () => void;
+  execution: () => void;
+};
+const DeleteConfirm = ({ execution, cancel }: DeleteConfirmPropsType) => {
+  return (
+    <ConfirmDialog header={'削除してもよろしいですか？'}>
+      <div className="flex justify-between">
+        <button
+          onClick={execution}
+          className="bg-red-500 text-white py-1 px-5 rounded-md"
+        >
+          はい
+        </button>
+        <button
+          onClick={cancel}
+          className="bg-stone-500 text-white py-1 px-5 rounded-md"
+        >
+          キャンセル
+        </button>
+      </div>
+    </ConfirmDialog>
   );
 };

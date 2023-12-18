@@ -16,17 +16,11 @@ use Illuminate\Database\QueryException;
 class BoxerController extends ApiController
 {
 
-    protected $boxerService;
-    protected $boxerRepository;
-    protected $matchRepository;
     public function __construct(
-        BoxerService $boxerService,
-        BoxerRepositoryInterface $boxerRepository,
-        MatchRepositoryInterface $matchRepository
+        protected BoxerService $boxerService,
+        protected BoxerRepositoryInterface $boxerRepository,
+        protected MatchRepositoryInterface $matchRepository
     ) {
-        $this->boxerService = $boxerService;
-        $this->boxerRepository = $boxerRepository;
-        $this->matchRepository = $matchRepository;
     }
 
     /**

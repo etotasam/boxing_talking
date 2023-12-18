@@ -6,8 +6,6 @@ import { ROUTE_PATH } from '@/assets/RoutePath';
 import { useGuest, useAuthCheck } from '@/hooks/apiHooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
-import { useAdmin } from '@/hooks/apiHooks/useAuth';
-// import { useLoading } from "@/hooks/useLoading";
 // ! modal
 import { ToastModalContainer } from '@/components/modal/ToastModal';
 import { LoginFormModal } from '@/components/modal/LoginFormModal';
@@ -19,11 +17,8 @@ import { useRecoilValue } from 'recoil';
 import { loadingSelector } from '@/store/loadingState';
 import { loginModalSelector } from '@/store/loginModalState';
 import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
-//! component
-import { AdministratorPageLinks } from '@/components/module/AdministratorPageLinks';
 
 const Container = () => {
-  const { isAdmin } = useAdmin();
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
   const isShowLoginModal = useRecoilValue(loginModalSelector);
   const { isLoading: isLoadingByRecoil } = useRecoilValue(loadingSelector);
@@ -82,12 +77,6 @@ const Container = () => {
         )}
       </AnimatePresence>
       {isShowLoginModal && <LoginFormModal key={'LoginFormModal'} />}
-      {/* // ? 管理者用 */}
-      {/* {isAdmin && (
-        <div className="fixed right-[200px] top-0">
-          <AdministratorPageLinks />
-        </div>
-      )} */}
     </>
   );
 };

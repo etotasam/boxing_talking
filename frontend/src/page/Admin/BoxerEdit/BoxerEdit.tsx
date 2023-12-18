@@ -26,7 +26,7 @@ import { isMessageType } from '@/assets/typeEvaluations';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
-import { Confirm } from '@/components/modal/Confirm';
+import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 
@@ -146,11 +146,11 @@ export const BoxerEdit = () => {
     }
   };
 
-  const [isShowDeleteConfirmModal, setIsShowDeleteConfirmModal] =
+  const [isShowDeleteConfirmDialog, setIsShowDeleteConfirmDialog] =
     useState(false);
 
   const hideDeleteConformModal = () => {
-    setIsShowDeleteConfirmModal(false);
+    setIsShowDeleteConfirmDialog(false);
   };
 
   //?削除データの実行
@@ -160,7 +160,7 @@ export const BoxerEdit = () => {
     showModalIfBoxerNotSelected();
 
     deleteBoxer(editTargetBoxerData);
-    setIsShowDeleteConfirmModal(false);
+    setIsShowDeleteConfirmDialog(false);
   };
 
   return (
@@ -196,7 +196,7 @@ export const BoxerEdit = () => {
                         showToastModal();
                         return;
                       }
-                      setIsShowDeleteConfirmModal(true);
+                      setIsShowDeleteConfirmDialog(true);
                     }}
                     className="bg-red-600 text-white rounded py-2 px-10"
                   >
@@ -207,6 +207,7 @@ export const BoxerEdit = () => {
             </div>
           </div>
         </section>
+
         <section className="w-[30%] min-w-[300px] border-l-[1px] border-stone-200 mb-5">
           <PaginationBoxerList pageCount={pageCount} />
           <BoxersList
@@ -217,10 +218,14 @@ export const BoxerEdit = () => {
           />
         </section>
       </div>
-      {isShowDeleteConfirmModal && (
-        <Confirm execution={deleteExecution} cancel={hideDeleteConformModal}>
-          削除しますか？
-        </Confirm>
+
+      {/* ボクサー削除ダイアログ */}
+      {isShowDeleteConfirmDialog && (
+        <BoxerDeleteConfirmDialog
+          targetName={editTargetBoxerData.name}
+          execution={deleteExecution}
+          cancel={hideDeleteConformModal}
+        />
       )}
     </>
   );
@@ -276,5 +281,35 @@ const BoxersList = ({
         </ul>
       )}
     </>
+  );
+};
+
+type BoxerDeleteConfirmDialogPropsType = {
+  execution: () => void;
+  cancel: () => void;
+  targetName: string;
+};
+const BoxerDeleteConfirmDialog = ({
+  execution,
+  cancel,
+  targetName,
+}: BoxerDeleteConfirmDialogPropsType) => {
+  return (
+    <ConfirmDialog header={`${targetName} を削除してよろしいですか？`}>
+      <div className="flex justify-between">
+        <button
+          onClick={execution}
+          className="bg-red-500 text-white py-1 px-5 rounded-md"
+        >
+          はい
+        </button>
+        <button
+          onClick={cancel}
+          className="bg-stone-500 text-white py-1 px-5 rounded-md"
+        >
+          いいえ
+        </button>
+      </div>
+    </ConfirmDialog>
   );
 };
