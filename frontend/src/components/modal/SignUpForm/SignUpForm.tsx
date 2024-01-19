@@ -48,7 +48,7 @@ export const SignUpForm = () => {
   /**
    * Form Send (User Resist)
    * @param e Event
-   * @retruns void
+   * @return void
    */
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

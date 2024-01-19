@@ -11,6 +11,7 @@ import { initialBoxerDataOnForm } from '@/assets/boxerData';
 // ! functions
 import { extractBoxer } from '@/assets/functions';
 //! hooks
+import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import {
@@ -34,6 +35,7 @@ const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const BoxerEdit = () => {
   // ? use hook
+  const { state: headerHeight } = useHeaderHeight();
   const { resetLoadingState } = useLoading();
   const {
     setToastModal,
@@ -169,8 +171,13 @@ export const BoxerEdit = () => {
         <title>Boxer編集 | {siteTitle}</title>
       </Helmet>
       <div className="w-full flex">
-        <section className="w-[70%]">
-          <div className="flex sticky top-[calc(100px+30px)] mt-[30px]">
+        <section
+          className="w-[70%] border-r-[1px] border-stone-200"
+          style={{
+            minHeight: `calc(100vh - ${headerHeight}px)`,
+          }}
+        >
+          <div className="flex sticky top-[calc(100px+30px)]">
             {/* //? edit  */}
             <div className="w-[50%] flex justify-center">
               <div className="w-[95%] border-[1px]">
@@ -208,7 +215,7 @@ export const BoxerEdit = () => {
           </div>
         </section>
 
-        <section className="w-[30%] min-w-[300px] border-l-[1px] border-stone-200 mb-5">
+        <section className="w-[30%] min-w-[300px] pb-5">
           <PaginationBoxerList pageCount={pageCount} />
           <BoxersList
             isSelectBoxer={isSelectBoxer}

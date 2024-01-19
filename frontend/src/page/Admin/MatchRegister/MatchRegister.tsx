@@ -24,6 +24,7 @@ import { BoxerType } from '@/assets/types';
 import { useRegisterMatch } from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
+import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 //! component
 import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
@@ -32,7 +33,8 @@ import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const MatchRegister = () => {
-  //! hooks
+  //! use hook
+  const { state: headerHeight } = useHeaderHeight();
   const { boxersData, pageCount } = useFetchBoxers();
   const [matchBoxers, setMatchBoxers] = useState<MatchBoxersType>({
     red_boxer: undefined,
@@ -52,9 +54,12 @@ export const MatchRegister = () => {
       <Helmet>
         <title>試合登録 | {siteTitle}</title>
       </Helmet>
-      <div className="w-full flex">
-        <section className="w-[70%]">
-          <div className="sticky top-[calc(100px+20px)]">
+      <div
+        className="w-full flex"
+        style={{ minHeight: `calc( 100vh - ${headerHeight}px)` }}
+      >
+        <section className="w-[70%] border-r-[1px] border-stone-200">
+          <div className="sticky top-[80px]">
             <MatchSetUpBox boxers={matchBoxers} />
             <div className="flex mt-5">
               <div className="w-[50%] flex justify-center">
@@ -71,7 +76,7 @@ export const MatchRegister = () => {
             </div>
           </div>
         </section>
-        <section className="w-[30%] min-w-[300px] border-l-[1px] border-stone-200">
+        <section className="w-[30%] min-w-[300px] pb-5">
           <PaginationBoxerList pageCount={pageCount} />
           <BoxersList
             boxersData={boxersData}
@@ -185,7 +190,6 @@ const BoxersList = ({
 
   return (
     <>
-      {/* <div className="my-5"> */}
       {boxersData && (
         <ul className="flex justify-center flex-col items-center">
           {boxersData.map((boxer) => (
@@ -210,7 +214,7 @@ const BoxersList = ({
                       boxerCountry={boxer.country}
                       boxerEngName={boxer.eng_name}
                     />
-                    <h2 className="relative inline-block">{boxer.name}</h2>
+                    <h2 className="text-lg mt-2">{boxer.name}</h2>
                   </div>
                 </li>
               </label>
@@ -218,7 +222,6 @@ const BoxersList = ({
           ))}
         </ul>
       )}
-      {/* </div> */}
     </>
   );
 };
@@ -487,7 +490,7 @@ const MatchDataSetter = ({
       {/* //? 会場 */}
       <div className="flex mt-2 ml-[140px]">
         <input
-          className="w-full px-1 bourder border-black"
+          className="w-full px-1 border border-black"
           type="text"
           placeholder="試合会場入力"
           name="matachCountry"

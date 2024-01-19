@@ -13,6 +13,7 @@ import { isMatchDatePast } from '@/assets/functions';
 //! components
 // import { FightBox } from "@/components/module/FightBox";
 import { FlagImage } from '@/components/atomic/FlagImage';
+import { SubHeader } from '@/components/atomic/SubHeader';
 import { MatchSetter } from '@/components/module/MatchSetter/MatchSetter';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
@@ -21,6 +22,7 @@ import { useFetchAllMatches, useDeleteMatch } from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useSortMatches } from '@/hooks/useSortMatches';
+import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 //! types
 import { MatchDataType } from '@/assets/types';
 // ! image
@@ -30,6 +32,7 @@ const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const MatchEdit = () => {
   // ! use hook
+  const { state: headerHeight } = useHeaderHeight();
   const { resetLoadingState } = useLoading();
   const { data: matchesData } = useFetchAllMatches();
   const { sortedMatches } = useSortMatches(matchesData);
@@ -77,44 +80,54 @@ export const MatchEdit = () => {
       <Helmet>
         <title>試合編集 | {siteTitle}</title>
       </Helmet>
-      <div className="mt-[20px] flex w-full">
-        <section className="w-[30%] flex justify-center">
-          {selectMatch ? (
-            <MatchInfo matchData={selectMatch} />
-          ) : (
-            <div className="w-[80%]">
-              <div className="border-[1px] rounded-md border-stone-400 w-full min-h-[300px] flex justify-center items-center">
-                <p className="text-[26px]">Select Match...</p>
-              </div>
-            </div>
-          )}
-        </section>
-
-        <section className="w-[40%] flex ite justify-center">
-          <div className="w-[80%]">
-            <MatchSetter
-              selectMatch={selectMatch}
-              isSuccessDeleteMatch={isSuccessDeleteMatch}
-            />
-            <div className="mt-5">
-              <button
-                onClick={handleClickDeleteButton}
-                className="py-2 w-[150px] bg-red-700 text-white rounded-sm"
-              >
-                削除
-              </button>
-              {/* 削除ダイアログ */}
-              {isDeleteConfirm && (
-                <DeleteConfirm
-                  execution={deleteExecution}
-                  cancel={() => setIsDeleteConfirm(false)}
-                />
+      <div className="flex w-full">
+        <section
+          style={{ minHeight: `calc(100vh - ${headerHeight}px)` }}
+          className="w-[70%] border-r-[1px] border-stone-200"
+        >
+          <div className="flex w-full sticky top-[100px]">
+            <div className="w-[45%] flex justify-center">
+              {selectMatch ? (
+                <div className="w-full flex flex-col items-center">
+                  <MatchInfo matchData={selectMatch} />
+                  <WinnerSelector matchData={selectMatch} />
+                </div>
+              ) : (
+                <div className="w-[80%]">
+                  <div className="border-[1px] rounded-md border-stone-400 w-full min-h-[300px] flex justify-center items-center">
+                    <p className="text-[26px]">Select Match...</p>
+                  </div>
+                </div>
               )}
+            </div>
+
+            <div className="w-[55%] flex ite justify-center">
+              <div className="w-[80%]">
+                <MatchSetter
+                  selectMatch={selectMatch}
+                  isSuccessDeleteMatch={isSuccessDeleteMatch}
+                />
+                <div className="mt-5">
+                  <button
+                    onClick={handleClickDeleteButton}
+                    className="py-2 w-[150px] bg-red-700 text-white rounded-sm"
+                  >
+                    削除
+                  </button>
+                  {/* 削除ダイアログ */}
+                  {isDeleteConfirm && (
+                    <DeleteConfirm
+                      execution={deleteExecution}
+                      cancel={() => setIsDeleteConfirm(false)}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="w-[30%] flex justify-center">
+        <section className="w-[30%] pt-[20px] flex justify-center">
           <MatchListComponent
             sortedMatches={sortedMatches}
             selectMatch={selectMatch}
@@ -236,7 +249,7 @@ export const MatchInfo = ({
 
         {/* 会場 */}
         <div className="mt-[35px] text-center">
-          <div className="relative inline-block lg:text-lg text-sm before:content-['会場'] before:w-full before:absolute before:top-[-25px] before:left-[50%] before:translate-x-[-50%] before:text-[14px] before:text-stone-500">
+          <SubHeader content="会場">
             {matchData.venue}
             <span className="lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] border-[1px] overflow-hidden absolute top-[1px] lg:left-[-40px] left-[-30px]">
               <FlagImage
@@ -244,13 +257,19 @@ export const MatchInfo = ({
                 nationality={matchData.country}
               />
             </span>
-          </div>
+          </SubHeader>
         </div>
 
+        {/* 階級 */}
         <div className="mt-10 text-center">
-          <p className="relative inline-block lg:text-lg text-sm before:content-['階級'] before:w-full before:absolute before:top-[-25px] before:min-w-[100px] before:left-[50%] before:translate-x-[-50%] before:text-[14px] before:text-stone-500">
+          <SubHeader content="階級">
             {`${matchData.weight.replace('S', 'スーパー')}級`}
-          </p>
+          </SubHeader>
+        </div>
+
+        {/* 勝者 */}
+        <div className="mt-10 text-center">
+          <SubHeader content="勝者">勝者名</SubHeader>
         </div>
       </div>
     </div>
@@ -279,5 +298,25 @@ const DeleteConfirm = ({ execution, cancel }: DeleteConfirmPropsType) => {
         </button>
       </div>
     </ConfirmDialog>
+  );
+};
+
+const WinnerSelector = ({ matchData }: { matchData: MatchDataType }) => {
+  return (
+    <div className="w-full text-center">
+      <h2 className="py-3">勝者選択</h2>
+      <ul className="flex">
+        <li className="w-[50%]">
+          <button className="rounded bg-stone-600 hover:bg-red-700 text-white px-4 py-1 duration-200">
+            {matchData.red_boxer.name}
+          </button>
+        </li>
+        <li className="w-[50%]">
+          <button className="rounded bg-stone-600 hover:bg-blue-700 text-white px-4 py-1 duration-200">
+            {matchData.blue_boxer.name}
+          </button>
+        </li>
+      </ul>
+    </div>
   );
 };
