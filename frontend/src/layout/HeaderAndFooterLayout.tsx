@@ -26,9 +26,10 @@ const HeaderAndFooterLayout = () => {
     <>
       <HeaderContainer />
       <div
-        className="relative"
+        className={`relative`}
         style={{
           minHeight: `calc(100vh - (${headerHeight}px + ${footerHeight}px) - 1px)`,
+          marginTop: `${headerHeight}px`,
         }}
       >
         <Outlet />

@@ -5,11 +5,13 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { HeaderContainer } from '@/components/module/Header';
 //! hooks
 import { useAdmin } from '@/hooks/apiHooks/useAuth';
-// import { useLogout } from "@/hooks/useAuth";
+import { useHeaderHeight } from '@/hooks/useHeaderHeight';
+// import { useFooterHeight } from '@/hooks/useFooterHeight';
 
 const AdminOnly = () => {
   const navigate = useNavigate();
   const { isAdmin, isLoading } = useAdmin();
+  const { state: headerHeight } = useHeaderHeight();
 
   useEffect(() => {
     if (isLoading) return;
@@ -26,7 +28,12 @@ const AdminOnly = () => {
   return (
     <>
       <HeaderContainer />
-      <main>
+      <main
+        style={{
+          minHeight: `calc(100vh - ${headerHeight}px)`,
+          marginTop: `${headerHeight}px`,
+        }}
+      >
         <Outlet />
       </main>
     </>
