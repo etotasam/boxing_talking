@@ -30,6 +30,7 @@ class BoxingMatch extends Model
         'titles',
         'count_red',
         'count_blue',
+        'match_result',
     ];
 
     protected $hidden = [

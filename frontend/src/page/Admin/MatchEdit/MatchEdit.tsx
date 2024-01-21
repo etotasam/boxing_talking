@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import dayjs from 'dayjs';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
@@ -13,7 +13,7 @@ import { isMatchDatePast } from '@/assets/functions';
 //! components
 // import { FightBox } from "@/components/module/FightBox";
 import { FlagImage } from '@/components/atomic/FlagImage';
-import { SubHeader } from '@/components/atomic/SubHeader';
+import { SubHeadline } from '@/components/atomic/SubHeadline';
 import { MatchSetter } from '@/components/module/MatchSetter/MatchSetter';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
@@ -207,7 +207,20 @@ export const MatchInfo = ({
 }: {
   matchData: MatchDataType | undefined;
 }) => {
+  const matchResult = useRef<string | null>(null);
+
   if (!matchData) return <div>選択なし</div>;
+
+  if (matchData.match_result) {
+    if (matchData.match_result === 'red')
+      matchResult.current = matchData.red_boxer.name;
+    if (matchData.match_result === 'blue')
+      matchResult.current = matchData.red_boxer.name;
+    if (matchData.match_result === 'draw') matchResult.current = '引き分け';
+    if (matchData.match_result === 'no-contest')
+      matchResult.current = '無効試合';
+  }
+
   return (
     <div className="w-[80%]">
       {/* 日時 */}
@@ -249,7 +262,7 @@ export const MatchInfo = ({
 
         {/* 会場 */}
         <div className="mt-[35px] text-center">
-          <SubHeader content="会場">
+          <SubHeadline content="会場">
             {matchData.venue}
             <span className="lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] border-[1px] overflow-hidden absolute top-[1px] lg:left-[-40px] left-[-30px]">
               <FlagImage
@@ -257,20 +270,22 @@ export const MatchInfo = ({
                 nationality={matchData.country}
               />
             </span>
-          </SubHeader>
+          </SubHeadline>
         </div>
 
         {/* 階級 */}
         <div className="mt-10 text-center">
-          <SubHeader content="階級">
+          <SubHeadline content="階級">
             {`${matchData.weight.replace('S', 'スーパー')}級`}
-          </SubHeader>
+          </SubHeadline>
         </div>
 
         {/* 勝者 */}
-        <div className="mt-10 text-center">
-          <SubHeader content="勝者">勝者名</SubHeader>
-        </div>
+        {matchResult.current && (
+          <div className="mt-10 text-center">
+            <SubHeadline content="勝者">{matchResult.current}</SubHeadline>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -73,6 +73,7 @@ export type MatchDataType = {
   match_date: string,
   count_red: number,
   count_blue: number,
+  match_result: "red" | "blue" | "draw" | "no-contest" | undefined,
 }
 
 export type GRADE_Type = (typeof GRADE)[keyof typeof GRADE];
