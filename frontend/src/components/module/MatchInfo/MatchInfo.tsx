@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import dayjs from 'dayjs';
 // ! types
 import { MatchDataType } from '@/assets/types';
@@ -8,6 +9,20 @@ import { FlagImage } from '@/components/atomic/FlagImage';
 import { SubHeadline } from '@/components/atomic/SubHeadline';
 
 export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
+  const matchResult = useRef<string | null>(null);
+
+  if (!matchData) return <div>選択なし</div>;
+
+  if (matchData.match_result) {
+    if (matchData.match_result === 'red')
+      matchResult.current = matchData.red_boxer.name;
+    if (matchData.match_result === 'blue')
+      matchResult.current = matchData.red_boxer.name;
+    if (matchData.match_result === 'draw') matchResult.current = '引き分け';
+    if (matchData.match_result === 'no-contest')
+      matchResult.current = '無効試合';
+  }
+
   return (
     <>
       <div className="p-5 text-stone-600">
@@ -24,10 +39,12 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
         {/* //?会場 */}
         <div className="mt-[35px] text-center">
           <SubHeadline content="会場">
-            <FlagImage
-              className="inline-block border-[1px] w-[32px] h-[24px] mr-3"
-              nationality={matchData.country}
-            />
+            <span className="lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] border-[1px] overflow-hidden absolute top-[1px] lg:left-[-40px] left-[-30px]">
+              <FlagImage
+                className="inline-block border-[1px] lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] mr-3"
+                nationality={matchData.country}
+              />
+            </span>
             {matchData.venue}
           </SubHeadline>
         </div>
@@ -38,6 +55,21 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
             {`${matchData.weight.replace('S', 'スーパー')}級`}
           </SubHeadline>
         </div>
+
+        {/* 勝者 */}
+        {matchData.match_result && (
+          <div className="mt-10 text-center">
+            <SubHeadline content="試合結果">
+              <span className="flex">
+                <span className="bg-yellow-500 rounded-sm text-sm flex justify-center items-center text-white px-3 py-1 mr-2">
+                  12-KO
+                </span>
+
+                {matchResult.current}
+              </span>
+            </SubHeadline>
+          </div>
+        )}
       </div>
     </>
   );

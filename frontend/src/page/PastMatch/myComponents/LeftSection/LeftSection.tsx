@@ -4,24 +4,29 @@ import { motion } from 'framer-motion';
 //! types
 import { MatchDataType } from '@/assets/types';
 // ! components
-import { MatchInfo } from '@/page/Admin/MatchEdit';
+import { MatchInfo } from '@/components/module/MatchInfo';
 //! hooks
 import { useFetchComments } from '@/hooks/apiHooks/useComment';
 
 type LeftSectionType = {
   thisMatch: MatchDataType | undefined;
   thisMatchPredictionOfUsers: 'red' | 'blue' | 'No prediction vote' | undefined;
+  commentPostTextareaHeight: number | undefined;
 };
 
 export const LeftSection = ({
   thisMatch,
   thisMatchPredictionOfUsers,
+  commentPostTextareaHeight,
 }: LeftSectionType) => {
   //試合データが取得されるまではrenderさせない
   if (!thisMatch) return;
 
   return (
-    <div className="xl:w-[30%] w-[40%]">
+    <div
+      className="xl:w-[30%] w-[40%]"
+      // style={{ marginBottom: `${commentPostTextareaHeight! + 30}px` }}
+    >
       <div className="sticky top-5 flex justify-center">
         <div className="w-full max-w-[450px]">
           <div className="flex justify-center mt-5">

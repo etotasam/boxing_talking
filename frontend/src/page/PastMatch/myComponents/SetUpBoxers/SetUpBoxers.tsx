@@ -11,6 +11,7 @@ import { MatchInfoModal } from '@/components/modal/MatchInfoModal';
 //! hook
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useMatchInfoModal } from '@/hooks/useMatchInfoModal';
+import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 
 type SetUpBoxersType = {
   paramsMatchID: number;
@@ -35,6 +36,7 @@ export const SetUpBoxers = ({
   const boxerSectionRef = useRef<HTMLElement>(null);
   const { state: isShowMatchInfoModal, hideMatchInfoModal } =
     useMatchInfoModal();
+  const { state: headerHeight } = useHeaderHeight();
 
   //? コンポーネントの高さをRecoilに保存
   useEffect(() => {
@@ -78,6 +80,9 @@ export const SetUpBoxers = ({
             device === 'PC' && 'relative',
             device === 'SP' && 'sticky top-0'
           )}
+          // style={
+          //   device === 'PC' ? { top: `${headerHeight}px` } : { top: `0px` }
+          // }
         >
           <BoxerBox
             color="red"

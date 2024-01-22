@@ -35,6 +35,7 @@ function App() {
           </Route>
           <Route element={<HeaderOnlyLayout />}>
             <Route path={ROUTE_PATH.MATCH} element={<Match />} />
+            {/* <Route path={ROUTE_PATH.PAST_MATCH_SINGLE} element={<Match />} /> */}
             <Route
               path={ROUTE_PATH.PAST_MATCH_SINGLE}
               element={<PastMatch />}

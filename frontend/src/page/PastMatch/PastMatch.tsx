@@ -224,6 +224,7 @@ export const PastMatch = () => {
           <LeftSection
             thisMatch={thisMatch}
             thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
+            commentPostTextareaHeight={commentPostTextareaHeight}
           />
         )}
         {/* //? Comments */}

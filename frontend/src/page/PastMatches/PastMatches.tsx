@@ -27,6 +27,7 @@ export const PastMatches = () => {
 
   const matchSelect = (matchId: number) => {
     navigate(`${ROUTE_PATH.PAST_MATCH_SINGLE}?match_id=${matchId}`);
+    // navigate(`${ROUTE_PATH.MATCH}?match_id=${matchId}`);
   };
 
   //? apiからデータが取得できてない時

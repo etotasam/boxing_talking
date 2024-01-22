@@ -181,3 +181,21 @@ export const useDeleteMatch = () => {
 
   return { deleteMatch, isLoading, isSuccess }
 }
+
+//! 試合結果の登録
+// export const useMatchResultSet = () => {
+//   const { setToastModal, showToastModal } = useToastModal()
+//   const { resetLoadingState, startLoading } = useLoading()
+//   const { refetch: refetchMatches } = useFetchMatches()
+//   const { refetch: refetchAllMatches } = useFetchAllMatches()
+
+//   const api = useCallback(async (matchId: number, result: string | null) => {
+//     await Axios.delete(API_PATH.MATCH, { data: { match_id: matchId } })
+//   }, [])
+
+//   const { mutate, isLoading, isSuccess } = useMutation(api, {
+//     onMutate: () => {
+//       startLoading()
+//     }
+//   })
+// }

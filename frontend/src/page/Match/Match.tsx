@@ -4,8 +4,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { RotatingLines } from 'react-loader-spinner';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/assets/RoutePath';
-//! data
-import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 //! icon
 import { BiSend } from 'react-icons/bi';
 //! types
@@ -14,16 +12,15 @@ import { MatchDataType } from '@/assets/types';
 import { useAuth, useGuest } from '@/hooks/apiHooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
-import {
-  useFetchMatches,
-  useFetchPastMatches,
-} from '@/hooks/apiHooks/useMatch';
+import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
 import {
   useVoteMatchPrediction,
   useAllFetchMatchPredictionOfAuthUser,
 } from '@/hooks/apiHooks/uesWinLossPrediction';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { usePostComment, useFetchComments } from '@/hooks/apiHooks/useComment';
+import { useHeaderHeight } from '@/hooks/useHeaderHeight';
+import { usePostCommentHeight } from '@/hooks/usePostCommentHeight';
 //! component
 import { LeftSection } from './myComponents/LeftSection';
 import { CommentsComponent } from './myComponents/CommentsComponent';
@@ -39,7 +36,7 @@ const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 export const Match = () => {
   // ? use hook
   const { windowSize, device } = useWindowSize();
-  const { search } = useLocation();
+  const { search, pathname } = useLocation();
   const query = new URLSearchParams(search);
   const paramsMatchID = Number(query.get('match_id'));
   const { data: matches } = useFetchMatches();
@@ -53,6 +50,8 @@ export const Match = () => {
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
   const isEitherAuth = Boolean(isGuest || authUser);
+  const { state: headerHeight } = useHeaderHeight();
+  const { setter: setPostCommentHeight } = usePostCommentHeight();
 
   const {
     postComment,
@@ -68,6 +67,7 @@ export const Match = () => {
     Record<'redCount' | 'blueCount' | 'totalCount', number>
   >({ redCount: 0, blueCount: 0, totalCount: 0 });
 
+  const isPastMatch = pathname.split('/').includes('past');
   //? 試合の存在確認and試合の各データをthisMatch(useState)等にセット
   useEffect(() => {
     if (!matches || !paramsMatchID) return;
@@ -137,6 +137,10 @@ export const Match = () => {
     if (commentPostRef) {
       if (commentPostRef.current) {
         setCommentPostComponentHeight(
+          (commentPostRef.current as HTMLSelectElement).clientHeight
+        );
+        //? recoilへ保存
+        setPostCommentHeight(
           (commentPostRef.current as HTMLSelectElement).clientHeight
         );
       }
@@ -213,7 +217,6 @@ export const Match = () => {
     setIsThisMatchAfterToday(isAfterToday);
   }, [thisMatch]);
 
-  //! DOM
   if (!windowSize) return;
   return (
     <>
@@ -236,13 +239,15 @@ export const Match = () => {
         isFetchingComments={isFetchingComments}
         isThisMatchAfterToday={isThisMatchAfterToday}
       />
-      <div className="flex w-full">
+      <div className="flex w-full]">
         {/* //? Left section (Match info) */}
         {device === 'PC' && (
           <LeftSection
             thisMatch={thisMatch}
             thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
             isThisMatchAfterToday={isThisMatchAfterToday}
+            headerHeight={headerHeight}
+            commentPostEl={commentPostRef.current}
           />
         )}
         {/* //? Comments */}

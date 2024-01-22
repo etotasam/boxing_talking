@@ -121,7 +121,7 @@ export const SetUpBoxers = ({
         <section
           ref={boxerSectionRef}
           className={clsx(
-            'z-20 flex border-b-[1px] border-stone-300 sm:h-[100px] h-[75px]',
+            'flex border-b-[1px] border-stone-300 min-h-[60px]',
             device === 'PC' && 'relative',
             device === 'SP' && 'sticky top-0'
           )}

@@ -21,7 +21,7 @@ const AdminOnly = () => {
   if (isLoading)
     return (
       <div className="w-[100vw] h-[100vh] flex justify-center items-center">
-        <div>Loding...</div>
+        <div>Loading...</div>
       </div>
     );
 
