@@ -1,17 +1,12 @@
 <?php
 
-namespace AuthController;
+namespace Tests\Feature\AuthController;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 // use PHPUnit\Framework\TestCase;
 use Tests\TestCase;
 use App\Models\User;
-use App\Models\GuestUser;
-use App\Models\PreUser;
-use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Hash;
-use Firebase\JWT\JWT;
-use Illuminate\Support\Facades\Mail;
 
 class UserAuthCheckTest extends TestCase
 {
@@ -39,7 +34,7 @@ class UserAuthCheckTest extends TestCase
    * @test
    * 認証ありの場合
    */
-  public function hasAuthCheck()
+  public function testHasAuthCheck()
   {
     $this->actingAs($this->user);
     $response = $this->get('/api/user');
@@ -52,7 +47,7 @@ class UserAuthCheckTest extends TestCase
    * @test
    * 認証なしのテスト
    */
-  public function noAuthCheck()
+  public function testNoAuthCheck()
   {
     $response = $this->get('/api/user');
     $response->assertSuccessful();

@@ -1,6 +1,6 @@
 <?php
 
-namespace AuthController;
+namespace Tests\Feature\AuthController;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -32,16 +32,16 @@ class UserLoginTest extends TestCase
      * @test
      *  emailが空の場合
      */
-    public function emptyEmailInput()
+    public function testEmptyEmailInput()
     {
         $response = $this->post('/api/login', ['email' => '', 'password' => $this->rightPassword]);
         $response->assertStatus(422);
     }
     /**
      * @test
-     *  emailが存在しない
+     *  リクエストのemailがDBに存在しない
      */
-    public function emailNotExistsOnDB()
+    public function testEmailNotExistsOnDB()
     {
         $response = $this->post('/api/login', ['email' => $this->notRightEmail, 'password' => $this->rightPassword]);
         $response->assertStatus(401);
@@ -50,7 +50,7 @@ class UserLoginTest extends TestCase
      * @test
      *  パスワードの間違い
      */
-    public function passwordMistake()
+    public function testPasswordMistake()
     {
         $response = $this->post('/api/login', ['email' => $this->rightEmail, 'password' => $this->notRightPassword]);
         $response->assertStatus(401);
@@ -59,7 +59,7 @@ class UserLoginTest extends TestCase
      * @test
      * 成功
      */
-    public function loginSuccess()
+    public function testLoginSuccess()
     {
 
         $response = $this->post('/api/login', ['email' => $this->rightEmail, 'password' => $this->rightPassword]);

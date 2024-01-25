@@ -7,10 +7,15 @@ use App\Models\Boxer;
 
 class BoxerResource extends JsonResource
 {
+
+    public function __construct(private Boxer $boxer)
+    {
+        parent::__construct($boxer);
+    }
     /**
      * Transform the resource into an array.
      *
-     * @param  boxer boxer Model
+     * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      *
      */
@@ -23,18 +28,18 @@ class BoxerResource extends JsonResource
         });
 
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'eng_name' => $this->eng_name,
-            'country' => $this->country,
-            'birth' => $this->birth,
-            'height' => $this->height,
-            'reach' => $this->reach,
-            'style' => $this->style,
-            'ko' => $this->ko,
-            'win' => $this->win,
-            'draw' => $this->draw,
-            'lose' => $this->lose,
+            'id' => $this->boxer->id,
+            'name' => $this->boxer->name,
+            'eng_name' => $this->boxer->eng_name,
+            'country' => $this->boxer->country,
+            'birth' => $this->boxer->birth,
+            'height' => $this->boxer->height,
+            'reach' => $this->boxer->reach,
+            'style' => $this->boxer->style,
+            'ko' => $this->boxer->ko,
+            'win' => $this->boxer->win,
+            'draw' => $this->boxer->draw,
+            'lose' => $this->boxer->lose,
             'titles' => $titles,
         ];
     }

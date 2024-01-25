@@ -14,6 +14,7 @@ class Title extends Model
     use HasFactory;
 
     public $timestamps = false;
+    public $incrementing = false;
 
     protected $fillable = [
         'boxer_id',
@@ -21,9 +22,7 @@ class Title extends Model
         'weight_division_id',
     ];
 
-    protected $hidden = [
-        'boxer_id',
-    ];
+    protected $hidden = [];
 
 
 

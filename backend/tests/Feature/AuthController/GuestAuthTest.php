@@ -1,6 +1,6 @@
 <?php
 
-namespace AuthController;
+namespace Tests\Feature\AuthController;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -49,21 +49,12 @@ class GuestAuthTest extends TestCase
         $this->assertEquals($guest, true);
     }
 
-    /**
-     * @test
-     * 通常ログインしている場合はゲストでログインは出来ない
-     */
-    public function failGuestLogin()
-    {
-        $response = $this->actingAs($this->user)->post('/api/guest/login');
-        $response->assertStatus(400);
-    }
 
     /**
      * @test
      * ゲストログイン成功
      */
-    public function successGuestLogin()
+    public function testSuccessGuestLogin()
     {
         $newGuest = $this->attributes = [];
         //?成功

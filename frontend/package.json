@@ -1,108 +1,48 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "remake_frontend",
   "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^5.16.2",
-    "@testing-library/react": "^12.1.2",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.4.0",
-    "@types/node": "^16.11.22",
-    "@types/react": "^17.0.39",
-    "@types/react-dom": "^17.0.11",
-    "@types/react-router-dom": "^5.3.3",
-    "chart.js": "^3.7.1",
-    "chartjs-plugin-datalabels": "^2.0.0",
-    "clsx": "^1.2.1",
-    "dayjs": "^1.10.8",
-    "framer-motion": "^6.3.3",
-    "lodash": "^4.17.21",
-    "react": "^17.0.2",
-    "react-app-rewired": "^2.1.11",
-    "react-chartjs-2": "^4.0.1",
-    "react-dom": "^17.0.2",
-    "react-icons": "^4.3.1",
-    "react-loader-spinner": "^6.0.0-0",
-    "react-query": "^3.39.0",
-    "react-router-dom": "^6.2.1",
-    "react-scripts": "5.0.0",
-    "serve": "^14.1.2",
-    "typescript": "^4.5.5",
-    "web-vitals": "^2.1.4"
-  },
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
-    "eject": "react-app-rewired eject",
-    "sb": "start-storybook -p 6006 -s public",
-    "build-storybook": "build-storybook -s public"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "dependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@types/lodash": "^4.14.197",
+    "@types/node": "^20.5.7",
+    "@types/uuid": "^9.0.3",
+    "autoprefixer": "^10.4.15",
+    "axios": "^1.5.0",
+    "clsx": "^2.0.0",
+    "dayjs": "^1.11.9",
+    "framer-motion": "^10.16.2",
+    "lodash": "^4.17.21",
+    "postcss": "^8.4.29",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-helmet-async": "^1.3.0",
+    "react-icons": "^4.10.1",
+    "react-loader-spinner": "^5.4.5",
+    "react-query": "^3.39.3",
+    "react-router-dom": "^6.15.0",
+    "recoil": "^0.7.7",
+    "tailwindcss": "^3.3.3",
+    "uuid": "^9.0.0",
+    "vite-tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.16.11",
-    "@babel/preset-react": "^7.16.7",
-    "@storybook/addon-actions": "^6.5.16",
-    "@storybook/addon-essentials": "^6.5.16",
-    "@storybook/addon-interactions": "^6.5.16",
-    "@storybook/addon-links": "^6.5.16",
-    "@storybook/builder-webpack5": "^6.5.16",
-    "@storybook/manager-webpack5": "^6.5.16",
-    "@storybook/node-logger": "^6.5.16",
-    "@storybook/preset-create-react-app": "^4.1.2",
-    "@storybook/react": "^6.5.16",
-    "@storybook/testing-library": "^0.0.13",
-    "@testing-library/react-hooks": "^7.0.2",
-    "@types/lodash": "^4.14.182",
-    "@webpack-cli/generators": "^2.4.2",
-    "autoprefixer": "^10.4.2",
-    "axios": "^0.25.0",
-    "babel-jest": "^27.5.1",
-    "babel-plugin-named-exports-order": "^0.0.2",
-    "jest": "^27.5.1",
-    "msw": "^0.38.2",
-    "node-fetch": "^3.2.1",
-    "postcss": "^8.4.6",
-    "prop-types": "^15.8.1",
-    "react-test-renderer": "^17.0.2",
-    "tailwindcss": "^3.0.18",
-    "webpack": "^5.76.2"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "setupFilesAfterEnv": [
-      "./jest.setup.js"
-    ],
-    "testMatch": [
-      "**/*.test.ts",
-      "**/*.test.tsx"
-    ],
-    "verbose": true,
-    "moduleNameMapper": {
-      "^@/(.*)": "<rootDir>/src/$1"
-    }
-  },
-  "eslintConfig": {
-    "overrides": [
-      {
-        "files": [
-          "**/*.stories.*"
-        ],
-        "rules": {
-          "import/no-anonymous-default-export": "off"
-        }
-      }
-    ]
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react": "^4.0.3",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5"
   }
 }

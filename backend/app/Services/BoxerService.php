@@ -2,49 +2,139 @@
 
 namespace App\Services;
 
-use Exception;
-use App\Models\Organization;
-use App\Models\WeightDivision;
-use App\Models\Title;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\JsonResponse;
+use App\Services\TitleService;
+use App\Repositories\Interfaces\BoxerRepositoryInterface;
+use App\Repositories\Interfaces\TitleRepositoryInterface;
+use App\Exceptions\FailedTitleException;
+use App\Exceptions\BoxerException;
+use Illuminate\Database\QueryException;
 
 class BoxerService
 {
 
-  public function __construct(Organization $organization, WeightDivision $weightDivision, Title $title)
-  {
-    $this->organization = $organization;
-    $this->weightDivision = $weightDivision;
-    $this->title = $title;
+  public function __construct(
+    protected BoxerRepositoryInterface $boxerRepository,
+    protected TitleRepositoryInterface $titleRepository,
+    protected TitleService $titleService,
+  ) {
   }
 
   /**
-   * update titles
-   *
-   * @param int boxerID string
-   * @param object titles
-   * @return void
+   * @param array $boxerData ボクサー登録に必要なデータの連想配列
+   * @return JsonResponse
    */
-  public function setTitle($boxerID, $titles)
+  public function createBoxer(array $boxerData)
   {
-    Title::where('boxer_id', $boxerID)->delete();
-    if (!empty($titles)) {
-      foreach ($titles as $title) {
-        $organizationName = $title["organization"];
-        $organization = $this->organization->where("name", $organizationName)->first();
-        if (!$organization) {
-          throw new Exception("organization is not exists");
+    try {
+      DB::transaction(function () use ($boxerData) {
+        list($storedBoxer, $titles) = $this->postBoxerAndExtractTitles($boxerData);
+        //ボクサーがタイトルを保持している場合はtitlesテーブルに保存
+        $this->titleService->storeTitle($storedBoxer['id'], $titles);
+      });
+    } catch (QueryException $e) {
+      \Log::error("create boxer:" . $e->getMessage());
+      abort(500, "Invalid query");
+    } catch (FailedTitleException $e) {
+      throw $e;
+    }
+  }
+
+  /**
+   * @param int $boxerId
+   * @return null
+   */
+  public function deleteBoxerExecute(int $boxerId)
+  {
+    try {
+      DB::transaction(function () use ($boxerId) {
+        $this->titleRepository->deleteTitlesHoldByTheBoxer($boxerId); //?所持タイトルの削除(外部キー制約がある為ボクサー削除の前に実行)
+        $isDelete = $this->boxerRepository->deleteBoxer($boxerId);
+        if (!$isDelete) {
+          throw new BoxerException("boxer is not found");
         }
-        $weightDivisionWeight = $title["weight"];
-        $weightDivision = $this->weightDivision->where("weight", $weightDivisionWeight)->first();
-        if (!$weightDivision) {
-          throw new Exception("weight_division is not exists");
+      });
+    } catch (QueryException $e) {
+      \Log::error("delete boxer" . $e->getMessage());
+      abort(500, "Invalid query");
+      throw $e;
+    } catch (BoxerException $e) {
+      throw $e;
+    }
+  }
+
+  /**
+   * boxerデータのupdate
+   * @param array $updateBoxerData アップデート対象データの配列
+   * @return null|JsonResponse
+   */
+  public function updateBoxerExecute(array $updateBoxerData)
+  {
+    try {
+      DB::transaction(function () use ($updateBoxerData) {
+        if (array_key_exists('titles', $updateBoxerData)) {
+          $this->titleService->storeTitle($updateBoxerData['id'], $updateBoxerData["titles"]);
+          unset($updateBoxerData["titles"]);
+        };
+        $isUpdateBoxer = $this->boxerRepository->updateBoxer($updateBoxerData);
+      });
+    } catch (QueryException $e) {
+      \Log::error("update boxer" . $e->getMessage());
+      throw $e;
+    } catch (FailedTitleException $e) {
+      throw $e;
+    }
+  }
+
+  /**
+   * ボクサーデータのstoreと、保持タイトルがあればstore
+   *
+   * @param array $boxerData ボクサー登録に必要なデータの連想配列
+   * @return array|JsonResponse [Boxer $storedBoxer, array $titlesArray]
+   */
+  private function postBoxerAndExtractTitles(array $boxerData): array|JsonResponse
+  {
+    if (array_key_exists('titles', $boxerData)) {
+      $titlesArray = $boxerData["titles"];
+      unset($boxerData["titles"]);
+    } else {
+      \Log::error('Titles property is not exists in boxer data');
+    }
+    $storedBoxer = $this->boxerRepository->createBoxer($boxerData);
+    return [$storedBoxer, $titlesArray];
+  }
+
+  /**
+   * ボクサー検索時のワードが英語名検索かどうか日本語名の方かを振り分ける
+   */
+  public function parseRequestName(?string $requestName): array
+  {
+    if (!$requestName) {
+      return [null, null];
+    }
+
+    return $this->isEnglish($requestName) ? [$requestName, null] : [null, $requestName];
+  }
+
+  protected function isEnglish($str): bool
+  {
+    $englishRanges = [
+      ['start' => 0x0041, 'end' => 0x005A], // 大文字アルファベット (A-Z)
+      ['start' => 0x0061, 'end' => 0x007A], // 小文字アルファベット (a-z)
+    ];
+
+    if (mb_strlen($str, 'UTF-8') > 0) {
+      $firstChar = mb_substr($str, 0, 1, 'UTF-8');
+      $unicodeValue = ord($firstChar);
+
+      foreach ($englishRanges as $range) {
+        if ($unicodeValue >= $range['start'] && $unicodeValue <= $range['end']) {
+          return true;
         }
-        $this->title->create([
-          "boxer_id" => $boxerID,
-          "organization_id" => $organization["id"],
-          "weight_division_id" => $weightDivision["id"]
-        ]);
       }
     }
+
+    return false;
   }
 }

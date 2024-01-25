@@ -9,7 +9,8 @@ class Kernel extends ConsoleKernel
 {
 
     protected $commands = [
-        Commands\DeleteMatches::Class,
+        // Commands\DeleteMatches::Class,
+        Commands\DeleteGuestUser::Class,
     ];
 
     /**
@@ -20,7 +21,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('delete_matches:info')->cron('0 0 * * 0');
+        $schedule->command('delete_logout_guest_users:info')->cron('0 0 * * *');
     }
 
     /**
@@ -30,7 +31,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

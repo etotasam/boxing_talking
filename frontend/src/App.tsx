@@ -1,51 +1,78 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Check } from "@/pages/check";
-import { Match } from "@/pages/Match";
-import { Home } from "@/pages/Home";
-import { MatchRegister } from "@/pages/MatchRegister";
-import { FighterRegister } from "@/pages/FighterRegister";
-import { FighterEdit } from "@/pages/FighterEdit";
-import { MatchEdit } from "@/pages/MatchEdit";
-// import { Edit } from "@/pages/Edit";
-// import { Test } from "@/pages/Test";
-// import { Test2 } from "@/pages/Test2";
-import { UserRegisterwidthVerifyEmail } from "@/pages/UserRegisterwidthVerifyEmail";
-import { NotFound } from "@/pages/NotFound";
-//! middleware
-// import PrivateRoute from "./middleware/PrivateRoute";
-import AdminOnly from "./middleware/AdminOnly";
-import Container from "./middleware/Container";
+// import { useState } from "react";
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { ROUTE_PATH } from '@/assets/RoutePath';
+// ! page
+import { Home } from '@/page/Home';
+import { Match } from '@/page/Match';
+import { PastMatch } from '@/page/PastMatch';
+import { Admin } from '@/page/Admin';
+import { BoxerRegister } from '@/page/Admin/BoxerRegister';
+import { BoxerEdit } from '@/page/Admin/BoxerEdit';
+import { MatchRegister } from '@/page/Admin/MatchRegister';
+import { MatchEdit } from '@/page/Admin/MatchEdit';
+import { Terms } from './page/Terms/Terms';
+import { Identification } from '@/page/Identification';
+import { NotFound } from '@/page/NotFound';
+import { PastMatches } from './page/PastMatches';
+import { TestPage } from './page/TestPage';
+// ! middleware
+import AdminOnly from './middleware/AdminOnly';
+import Container from './middleware/Container';
+import './App.css';
 //! layout
-import MainLayout from "@/layout/MainLayout";
-import LayoutPlain from "./layout/LayoutPlain";
-//! lazy component
+import HeaderOnlyLayout from '@/layout/HeaderOnlyLayout';
+import HeaderAndFooterLayout from '@/layout/HeaderAndFooterLayout';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<Container />}>
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<Home />} />
-            {/* <Route element={<PrivateRoute />}></Route> */}
-            <Route path="/match" element={<Match />} />
+          <Route element={<HeaderAndFooterLayout />}>
+            <Route path={ROUTE_PATH.HOME} element={<Home />} />
+            <Route path={ROUTE_PATH.PAST_MATCHES} element={<PastMatches />} />
+            {/* //? </HeaderAndFooterLayout> */}
           </Route>
-
+          <Route element={<HeaderOnlyLayout />}>
+            <Route path={ROUTE_PATH.MATCH} element={<Match />} />
+            {/* <Route path={ROUTE_PATH.PAST_MATCH_SINGLE} element={<Match />} /> */}
+            <Route
+              path={ROUTE_PATH.PAST_MATCH_SINGLE}
+              element={<PastMatch />}
+            />
+            {/* //? </HeaderOnlyLayout> */}
+          </Route>
           <Route element={<AdminOnly />}>
-            {/* <Route path="/edit" element={<Edit />} /> */}
-            <Route path="/fighter/register" element={<FighterRegister />} />
-            <Route path="/fighter/edit" element={<FighterEdit />} />
-            <Route path="/match/delete" element={<MatchEdit />} />
-            <Route path="/match/register" element={<MatchRegister />} />
+            <Route path={ROUTE_PATH.ADMIN} element={<Admin />} />
+            <Route path={ROUTE_PATH.BOXER_EDIT} element={<BoxerEdit />} />
+            <Route
+              path={ROUTE_PATH.BOXER_REGISTER}
+              element={<BoxerRegister />}
+            />
+            <Route path={ROUTE_PATH.MATCH_EDIT} element={<MatchEdit />} />
+            <Route
+              path={ROUTE_PATH.MATCH_REGISTER}
+              element={<MatchRegister />}
+            />
+            {/* //? </AdminOnly> */}
           </Route>
+          {/* //? </container> */}
         </Route>
 
-        <Route path="/check" element={<Check />} />
-        {/* <Route path="/test" element={<Test />} />
-        <Route path="/test2" element={<Test2 />} /> */}
-        <Route path="/register/:token/:id" element={<UserRegisterwidthVerifyEmail />} />
-        <Route element={<LayoutPlain />}>
+        <Route element={<HeaderOnlyLayout />}>
+          {/* <Route path="/test_module" element={<TestModule />} /> */}
+          <Route
+            path={ROUTE_PATH.IDENTIFICATION}
+            element={<Identification />}
+          />
+          {/* //? </HeaderOnlyLayout> */}
+        </Route>
+
+        <Route element={<HeaderAndFooterLayout />}>
+          <Route path={ROUTE_PATH.TERMS} element={<Terms />} />
+          <Route path="/test" element={<TestPage />} />
           <Route path="/*" element={<NotFound />} />
+          {/* //? </HeaderAndFooterLayout> */}
         </Route>
       </Routes>
     </BrowserRouter>

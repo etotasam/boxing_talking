@@ -1,6 +1,6 @@
 
 .env*
-
+.husky
 # backend
 backend/node_modules
 backend/public/hot
@@ -16,17 +16,12 @@ backend/yarn-error.log
 backend/.idea
 backend/.vscode
 
+TestController.php
 
 # remake_frontend
 # dependencies
 remake_frontend/node_modules
 remake_frontend/.env.production
-# production
-remake_frontend/dist
-
-#testpage
-TestModule.tsx
-
 
 # frontend
 # dependencies
@@ -34,13 +29,12 @@ frontend/node_modules
 frontend/.pnp
 frontend/.pnp.js
 frontend/.env
-
 # testing
 frontend/coverage
-
 # production
 frontend/build
-
+#testpage
+TestPage
 # misc
 frontend/.DS_Store
 frontend/.env.local
@@ -52,8 +46,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-
 docker/db/
-
 
 wiki.md

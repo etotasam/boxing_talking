@@ -9,6 +9,7 @@ use App\Models\ProvisionalUser;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\WinLossPrediction;
+use App\Models\Administrator;
 use Illuminate\Support\Str;
 use \Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\DB;
@@ -35,7 +36,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'id',
+        // 'id',
         'email',
         'password',
         'created_at',
@@ -56,6 +57,11 @@ class User extends Authenticatable
     public function prediction()
     {
         return $this->hasMany(WinLossPrediction::class);
+    }
+
+    public function administrator()
+    {
+        return $this->hasOne(Administrator::class);
     }
 
     public $incrementing = false; // 自動インクリメントを無効化

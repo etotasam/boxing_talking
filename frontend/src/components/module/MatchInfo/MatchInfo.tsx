@@ -1,338 +1,103 @@
-import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-// import { NationaFlag, checkNationality } from "@/components/module/Fighter";
-import { useQueryClient } from "react-query";
-import { queryKeys } from "@/libs/queryKeys";
-import dayjs from "dayjs";
-import { WINDOW_WIDTH } from "@/libs/utils";
-//! logic
-import { getNationalFlagCssClass } from "@/libs/logic/getNationalFlagCssClass";
-//!types
-import { MatchesType } from "@/libs/hooks/useMatches";
-import { FighterType } from "@/libs/types";
-import { UserType } from "@/libs/types/user";
-import { NationalFlagCssClassType } from "@/libs/logic/getNationalFlagCssClass";
-//!component
-import { Chart } from "@/components/module/Chart";
-import { SimpleFighterComponent } from "../SimpleFighterComponent";
-import { ConfirmModal } from "@/components/modal/ConfirmModal";
-import { Spinner } from "@/components/module/Spinner";
+import dayjs from 'dayjs';
+// ! types
+import { MatchDataType } from '@/assets/types';
+// ! image
+import crown from '@/assets/images/etc/champion.svg';
+//! component
+import { FlagImage } from '@/components/atomic/FlagImage';
+import { SubHeadline } from '@/components/atomic/SubHeadline';
+import { MatchResultComponent } from '../MatchResultComponent';
 //! hooks
-import {
-  useMatchPredictVote,
-  useFetchMatchPredictVote,
-} from "@/libs/hooks/useMatchPredict";
-import { useFetchMatches } from "@/libs/hooks/useMatches";
-import { useGetWindowSize } from "@/libs/hooks/useGetWindowSize";
-//! message
-import { useToastModal, ModalBgColorType } from "@/libs/hooks/useToastModal";
-import { MESSAGE } from "@/libs/utils";
+import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 
-export enum MouseOn {
-  RED = "red",
-  BLUE = "blue",
-  NULL = "null",
-}
+export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
+  const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
 
-export const MatchInfo = () => {
-  const queryClient = useQueryClient();
-  const { search } = useLocation();
-  const query = new URLSearchParams(search);
-  const matchId = Number(query.get("id"));
-  const { data: matchesData } = useFetchMatches();
-  const getThisMatch = (
-    matches: MatchesType[],
-    id: number
-  ): MatchesType | undefined => {
-    return matches?.find((match) => match.id === id);
-  };
-  const [thisMatch, setThisMatch] = React.useState<MatchesType>();
-
-  const { matchPredictVote } = useMatchPredictVote();
-
-  const { data: userVotes } = useFetchMatchPredictVote();
-
-  const [userVoteFighterColor, setUserVoteFighterColor] =
-    useState<"red" | "blue">();
-  useEffect(() => {
-    if (!userVotes) return;
-    //? この試合のユーザーの投票結果を取得
-    const votedResultOnThisMatch = userVotes.find(
-      (el) => el.match_id === matchId
-    );
-    if (votedResultOnThisMatch) {
-      setUserVoteFighterColor(votedResultOnThisMatch.vote_for);
-    } else {
-      setUserVoteFighterColor(undefined);
-    }
-  }, [userVotes]);
-
-  //? 投票先(forontend側)
-  const [voteIs, setVoteIs] = React.useState<"red" | "blue" | undefined>();
-
-  //? 試合のデータを取得
-  React.useEffect(() => {
-    if (!matchesData) return;
-    const match = getThisMatch(matchesData, matchId);
-    setThisMatch(match);
-    if (!match) return;
-  }, [matchesData]);
-
-  const [voteFighter, setVoteFighter] =
-    useState<FighterType & { voteColor: "red" | "blue" }>();
-  //? 投票先をstateにセット&フロント側だけで表示を反映
-  const voteToFighter = async (vote: "red" | "blue", fighter: FighterType) => {
-    //? 試合当日以降は投票できないようにする
-    if (thisMatch) {
-      const nowDate = dayjs().unix();
-      const matchDate = dayjs(thisMatch.date).unix();
-      if (nowDate >= matchDate) return;
-    }
-    if (userVoteFighterColor) return;
-    setVoteFighter({ ...fighter, voteColor: vote });
-    let tempGameData: MatchesType = { ...thisMatch! };
-    if (vote === "red" && voteIs !== "red") {
-      tempGameData.count_red += 1;
-      if (voteIs === "blue") {
-        tempGameData.count_blue -= 1;
-      }
-      setVoteIs("red");
-    }
-    if (vote === "blue" && voteIs !== "blue") {
-      tempGameData.count_blue += 1;
-      if (voteIs === "red") {
-        tempGameData.count_red -= 1;
-      }
-      setVoteIs("blue");
-    }
-    setThisMatch(tempGameData);
-  };
-
-  const { setToastModalMessage } = useToastModal();
-  //? 投票API
-  const myVote = () => {
-    if (!voteFighter) return;
-    setOpenVoteConfirmModal(false);
-
-    matchPredictVote({ matchId, vote: voteFighter.voteColor });
-  };
-
-  // const {setter: setOpenVoteConfirmModal} = useQueryState("q/openVoteConfirmModal", false)
-  const [openVoteConfirmModal, setOpenVoteConfirmModal] = useState(false);
-  const voteConfirm = () => {
-    //? ログインしてない場合は拒否
-    const auth = queryClient.getQueryData<UserType>(queryKeys.auth);
-    if (!auth) {
-      setToastModalMessage({
-        message: MESSAGE.VOTE_FAILED_WITH_NO_AUTH,
-        bgColor: ModalBgColorType.NOTICE,
-      });
-      return;
-    }
-    setOpenVoteConfirmModal(true);
-  };
-
-  const [mouseOnColor, setMouseOnColor] = React.useState<MouseOn>(MouseOn.NULL);
-
-  //? chartのデータ
-  const matchData = {
-    labels: [thisMatch?.blue.name, thisMatch?.red.name],
-    datasets: [
-      {
-        labels: [thisMatch?.blue.name, thisMatch?.red.name],
-        data: [thisMatch?.count_blue, thisMatch?.count_red],
-        backgroundColor: [
-          mouseOnColor === MouseOn.BLUE ? `#0284c7` : `#38bdf8`,
-          mouseOnColor === MouseOn.RED ? `#e11d48` : `#fb7185`,
-        ],
-        // borderColor: [
-        //   mouseOnColor === MouseOn.BLUE ? `#d6d5ff` : `#717ffd`,
-        //   mouseOnColor === MouseOn.RED ? `#ffe0e0` : `#ff6868`,
-        // ],
-        borderWidth: 0,
-      },
-    ],
-  };
+  const isShowMatchResultComponent =
+    !isFightToday && isDayOverFight && matchData.result;
 
   return (
     <>
-      <h1 className="text-center text-stone-600 font-thin text-xl">
-        {thisMatch && dayjs(thisMatch.date).format("YYYY/M/D")}
-      </h1>
-      <div className="pt-3 md:flex md:px-5 lg:flex-col lg:px-0">
-        <div className="px-5 flex justify-center items-center">
-          {matchData && (
-            <Chart
-              // className="col-span-3 row-span-1"
-              setMouseOnColor={(color: MouseOn) => setMouseOnColor(color)}
-              matchData={matchData}
-            />
-          )}
+      <div className="p-5 text-stone-600">
+        {/* //? 日時 */}
+        <div className="text-center relative mt-5">
+          <MatchDate matchData={matchData} />
         </div>
-        {thisMatch && (
-          <FightersInfo
-            myVote={voteConfirm}
-            userVoteColor={userVoteFighterColor}
-            voteFighter={voteFighter}
-            thisMatch={thisMatch}
-            mouseOnColor={mouseOnColor}
-            setMouseOnColor={(color) => setMouseOnColor(color)}
-            voteToFighter={(vote, fighter) => voteToFighter(vote, fighter)}
-          />
+
+        {/* //? グレード */}
+        <div className="text-center text-xl mt-5">
+          <Grade matchData={matchData} />
+        </div>
+
+        {/* //?会場 */}
+        <div className="mt-[35px] text-center">
+          <SubHeadline content="会場">
+            <span className="lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] border-[1px] overflow-hidden absolute top-[1px] lg:left-[-40px] left-[-30px]">
+              <FlagImage
+                className="inline-block border-[1px] lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] mr-3"
+                nationality={matchData.country}
+              />
+            </span>
+            {matchData.venue}
+          </SubHeadline>
+        </div>
+
+        {/* //?階級 */}
+        <div className="mt-10 text-center">
+          <SubHeadline content="階級">
+            {`${matchData.weight.replace('S', 'スーパー')}級`}
+          </SubHeadline>
+        </div>
+
+        {/* 試合結果 */}
+        {isShowMatchResultComponent && (
+          <div className="mt-10 text-center">
+            <SubHeadline content="試合結果">
+              <MatchResultComponent matchData={matchData} />
+            </SubHeadline>
+          </div>
         )}
       </div>
-      {openVoteConfirmModal && (
-        <ConfirmModal
-          execution={myVote}
-          okBtnString={`投票する`}
-          cancel={() => setOpenVoteConfirmModal(false)}
-          message={<Message fighter={voteFighter} />}
-        />
+    </>
+  );
+};
+
+const MatchDate = ({ matchData }: { matchData: MatchDataType }) => {
+  return (
+    <>
+      <h2 className="text-2xl after:content-['(日本時間)'] after:absolute after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] after:text-sm">
+        {dayjs(matchData.match_date).format('YYYY年M月D日')}
+      </h2>
+      {Boolean(matchData.titles.length) && (
+        <span className="absolute top-[-32px] left-[50%] translate-x-[-50%] w-[32px] h-[32px] mr-2">
+          <img src={crown} alt="" />
+        </span>
       )}
     </>
   );
 };
 
-type VoteButtonPropsType = {
-  match: MatchesType | undefined;
-  userVoteColor: "red" | "blue" | undefined;
-  voteFighter: (FighterType & { voteColor: "red" | "blue" }) | undefined;
-  myVote: () => void;
-};
-
-const VoteButton = ({
-  match,
-  userVoteColor,
-  voteFighter,
-  myVote,
-}: VoteButtonPropsType) => {
-  const { isLoading: isFetchingVote, isRefetching: isRefetchingVote } =
-    useFetchMatchPredictVote();
-  const { isLoading: isVoting } = useMatchPredictVote();
-
-  const isPastMatch: boolean = dayjs(match?.date).isBefore(dayjs());
+const Grade = ({ matchData }: { matchData: MatchDataType }) => {
   return (
-    <div className="relative w-full">
-      {match && userVoteColor ? (
-        <p
-          className={`w-full rounded-lg px-2 py-1 text-center text-stone-50 ${
-            userVoteColor === "red" ? `bg-red-700` : `bg-blue-700`
-          }`}
-        >
-          {`${match[userVoteColor].name}の勝利に投票済`}
-        </p>
-      ) : voteFighter ? (
-        <button
-          className={`w-full text-white rounded px-2 py-1 duration-300 ${
-            voteFighter.voteColor === "red"
-              ? `text-red-600 border border-red-600 hover:bg-red-600 hover:text-stone-50`
-              : `text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-stone-50`
-          }`}
-          onClick={myVote}
-        >{`${voteFighter.name}の勝利に投票する`}</button>
+    <>
+      {matchData.grade === 'タイトルマッチ' ? (
+        <ul className="flex flex-col">
+          {matchData.titles
+            .sort()
+            .map(({ organization, weightDivision }, index) => (
+              <li key={index} className="mt-1">
+                <div className="relative inline-block text-[18px]">
+                  <span className="absolute top-[4px] right-[-28px] w-[18px] h-[18px] mr-2">
+                    <img src={crown} alt="" />
+                  </span>
+                  {organization}世界{weightDivision}級
+                </div>
+              </li>
+            ))}
+        </ul>
       ) : (
-        <div className="w-full text-stone-600 rounded px-2 py-1 border border-stone-600 text-center">
-          {isPastMatch
-            ? `勝敗予想の投票期限は過ぎました`
-            : `勝敗予想を投票しましょう`}
-        </div>
+        <p className="text-[30px] mt-7">{matchData.grade}</p>
       )}
-      {isVoting && <Spinner />}
-      {(isFetchingVote || isRefetchingVote) && (
-        <div className="absolute top-0 left-0 w-full h-full text-white bg-stone-500 rounded px-2 py-1 text-center">
-          読み込み中...
-        </div>
-      )}
-    </div>
-  );
-};
-
-type MessagePropsType = {
-  fighter: FighterType | undefined;
-};
-
-const Message = ({ fighter }: MessagePropsType) => {
-  const [flag, setFlag] = useState<NationalFlagCssClassType | undefined>();
-  useEffect(() => {
-    if (!fighter) return;
-    setFlag(getNationalFlagCssClass(fighter.country!));
-  }, [fighter]);
-  return (
-    <div className="w-full flex justify-center">
-      <div className={`${flag} t-flag mr-2 w-[25px] h-[25px]`}></div>
-      <p className="">{`${fighter?.name}に投票しますか？`}</p>
-    </div>
-  );
-};
-
-type FighterInfoPropsType = {
-  thisMatch: MatchesType;
-  mouseOnColor: MouseOn;
-  setMouseOnColor: (color: MouseOn) => void;
-  voteToFighter: (vote: "red" | "blue", fighter: FighterType) => void;
-  myVote: () => void;
-  userVoteColor: "red" | "blue" | undefined;
-  voteFighter: (FighterType & { voteColor: "red" | "blue" }) | undefined;
-};
-
-const FightersInfo = (props: FighterInfoPropsType) => {
-  const { width: windowWidth } = useGetWindowSize();
-  return (
-    <div className="mt-3 sm:m-0 md:p-0 w-full flex items-center px-4">
-      <div className="w-full grid grid-rows-[32px_1fr] grid-cols-[1fr_1fr] md:grid-rows-[1fr_32px_1fr] md:grid-cols-[1fr] lg:grid-rows-[32px_1fr] lg:grid-cols-[1fr_1fr]">
-        {/* //? 投票ボタン */}
-        <div className="col-span-2 md:row-start-2 lg:row-start-1">
-          <VoteButton
-            match={props.thisMatch}
-            userVoteColor={props.userVoteColor}
-            voteFighter={props.voteFighter}
-            myVote={props.myVote}
-          />
-        </div>
-
-        <div
-          className={`w-full flex items-center py-2 col-span-1 md:row-start-1 lg:row-start-2`}
-        >
-          <div
-            onClick={() => props.voteToFighter("red", props.thisMatch.red)}
-            onMouseOver={() => props.setMouseOnColor(MouseOn.RED)}
-            onMouseOut={() => props.setMouseOnColor(MouseOn.NULL)}
-            className={`w-full h-full rounded-l-xl md:rounded-xl lg:rounded-r-none cursor-pointer duration-500 ${
-              props.mouseOnColor === MouseOn.RED ? `bg-red-700` : `bg-stone-800`
-            }`}
-          >
-            <SimpleFighterComponent
-              fighter={props.thisMatch.red}
-              recordTextColor={`text-gray-200`}
-              className={`w-full text-gray-200`}
-              cornerColor={
-                windowWidth && windowWidth < WINDOW_WIDTH.md ? "red" : undefined
-              }
-            />
-          </div>
-        </div>
-
-        <div
-          className={`w-full flex items-center py-2 col-span-1 md:row-start-3 lg:row-start-2`}
-        >
-          <div
-            onClick={() => props.voteToFighter("blue", props.thisMatch.blue)}
-            onMouseOver={() => props.setMouseOnColor(MouseOn.BLUE)}
-            onMouseOut={() => props.setMouseOnColor(MouseOn.NULL)}
-            className={`w-full h-full rounded-r-xl md:rounded-xl lg:rounded-l-none cursor-pointer duration-500 ${
-              props.mouseOnColor === MouseOn.BLUE
-                ? `bg-blue-800`
-                : `bg-stone-800`
-            }`}
-          >
-            <SimpleFighterComponent
-              fighter={props.thisMatch.blue}
-              recordTextColor={`text-gray-200`}
-              className={`w-full text-gray-200`}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };

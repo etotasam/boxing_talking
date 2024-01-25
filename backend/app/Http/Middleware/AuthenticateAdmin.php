@@ -3,12 +3,13 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
-use Illuminate\Support\Facades\Auth;
 
 class AuthenticateAdmin
 {
+
     /**
      * Handle an incoming request.
      *
@@ -19,12 +20,11 @@ class AuthenticateAdmin
     public function handle(Request $request, Closure $next)
     {
         if (Auth::check()) {
-            $id = Auth::user()->id;
-            $is_admin = Administrator::where('user_id', $id)->exists();
+            $is_admin = Administrator::where('user_id', Auth::id())->exists();
             if ($is_admin) {
                 return $next($request);
             } else {
-                return response()->json(["message" => "Unauthorized: Cannot access with your auth"], 401);
+                return response()->json(["success" => false, "message" => "Unauthorized: Cannot access with your auth"], 401);
             }
         }
         return response()->json(["message" => "Unauthorized"], 401);

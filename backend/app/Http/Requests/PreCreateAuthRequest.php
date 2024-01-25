@@ -36,7 +36,7 @@ class PreCreateAuthRequest extends ApiRequest
                 'required',
                 'email',
                 'unique:users,email',
-                'unique:pre_users,email'
+                // 'unique:pre_users,email'
             ],
             'password' => [
                 'regex: /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+{}\[\]:;<>,.?~\\-]{8,24}$/'
