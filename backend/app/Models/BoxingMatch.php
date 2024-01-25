@@ -30,12 +30,11 @@ class BoxingMatch extends Model
         'titles',
         'count_red',
         'count_blue',
-        'match_result',
     ];
 
     protected $hidden = [
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     public function comments()
@@ -56,5 +55,10 @@ class BoxingMatch extends Model
     public function blueBoxer()
     {
         return $this->belongsTo(Boxer::class, 'blue_boxer_id');
+    }
+
+    public function result()
+    {
+        return $this->hasOne(MatchResult::class, "match_id");
     }
 }

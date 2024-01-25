@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import dayjs from 'dayjs';
 // ! types
 import { MatchDataType } from '@/assets/types';
@@ -7,21 +6,15 @@ import crown from '@/assets/images/etc/champion.svg';
 //! component
 import { FlagImage } from '@/components/atomic/FlagImage';
 import { SubHeadline } from '@/components/atomic/SubHeadline';
+import { MatchResultComponent } from '../MatchResultComponent';
+//! hooks
+import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 
 export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
-  const matchResult = useRef<string | null>(null);
+  const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
 
-  if (!matchData) return <div>選択なし</div>;
-
-  if (matchData.match_result) {
-    if (matchData.match_result === 'red')
-      matchResult.current = matchData.red_boxer.name;
-    if (matchData.match_result === 'blue')
-      matchResult.current = matchData.red_boxer.name;
-    if (matchData.match_result === 'draw') matchResult.current = '引き分け';
-    if (matchData.match_result === 'no-contest')
-      matchResult.current = '無効試合';
-  }
+  const isShowMatchResultComponent =
+    !isFightToday && isDayOverFight && matchData.result;
 
   return (
     <>
@@ -56,17 +49,11 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
           </SubHeadline>
         </div>
 
-        {/* 勝者 */}
-        {matchData.match_result && (
+        {/* 試合結果 */}
+        {isShowMatchResultComponent && (
           <div className="mt-10 text-center">
             <SubHeadline content="試合結果">
-              <span className="flex">
-                <span className="bg-yellow-500 rounded-sm text-sm flex justify-center items-center text-white px-3 py-1 mr-2">
-                  12-KO
-                </span>
-
-                {matchResult.current}
-              </span>
+              <MatchResultComponent matchData={matchData} />
             </SubHeadline>
           </div>
         )}

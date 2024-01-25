@@ -4,6 +4,7 @@ namespace App\Repositories\Interfaces;
 
 use Illuminate\Support\Collection;
 use App\Models\BoxingMatch;
+use App\Models\MatchResult;
 
 interface MatchRepositoryInterface
 {
@@ -71,4 +72,29 @@ interface MatchRepositoryInterface
    * @return bool
    */
   public function deleteMatch(int $matchId);
+
+
+  /**
+   * 試合結果の存在確認
+   * @param int $matchId
+   *
+   * @return bool
+   */
+  public function isMatchResult(int $matchId);
+
+  /**
+   * 試合結果の削除
+   * @param int $matchId
+   *
+   * @return bool
+   */
+  public function deleteMatchResult(int $matchId);
+
+  /**
+   * 試合結果の登録
+   * @param array $matchResultData
+   *
+   * @return MatchResult
+   */
+  public function storeMatchResult(array $matchResultData);
 }

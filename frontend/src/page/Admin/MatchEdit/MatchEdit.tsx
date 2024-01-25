@@ -20,7 +20,8 @@ import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useSortMatches } from '@/hooks/useSortMatches';
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
-import { useUpdateMatch } from '@/hooks/apiHooks/useMatch';
+import { useMatchResult } from '@/hooks/apiHooks/useMatch';
+import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 //! types
 import { MatchDataType } from '@/assets/types';
 // ! image
@@ -38,10 +39,13 @@ export const MatchEdit = () => {
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
 
   const [selectMatch, setSelectMatch] = useState<MatchDataType>();
+  const { isFightToday, isDayOverFight } = useDayOfFightChecker(selectMatch);
 
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
   const [isShowMatchResultSelectorDialog, setIsShowMatchResultSelectorDialog] =
     useState(false);
+
+  const isShowMatchResultRegisterButton = !isFightToday && isDayOverFight;
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -93,14 +97,17 @@ export const MatchEdit = () => {
                   <div className="w-[90%] border-[1px] border-stone-400">
                     <MatchInfo matchData={selectMatch} />
                   </div>
-                  <div className="mt-5">
-                    <Button
-                      onClick={() => setIsShowMatchResultSelectorDialog(true)}
-                      bgColor="bg-green-600 hover:bg-green-700"
-                    >
-                      試合結果登録
-                    </Button>
-                  </div>
+
+                  {isShowMatchResultRegisterButton && (
+                    <div className="mt-5 w-full flex justify-center">
+                      <Button
+                        onClick={() => setIsShowMatchResultSelectorDialog(true)}
+                        bgColor="w-[90%] py-3 bg-blue-900 hover:bg-blue-700 tracking-[0.3em]"
+                      >
+                        試合結果登録
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="w-[80%]">
@@ -256,21 +263,58 @@ const MatchResultSetDialog = ({
     React.SetStateAction<boolean>
   >;
 }) => {
-  const { updateMatch, isSuccess } = useUpdateMatch();
-  const matchResultSet = ({
-    result,
-  }: {
-    result: {
-      match_result: 'red' | 'blue' | 'draw' | 'no-contest' | null;
-    };
-  }) => {
-    updateMatch({ matchId: selectedMatchData!.id, changeData: result });
-  };
+  const { storeMatchResult, isSuccess } = useMatchResult();
 
   useEffect(() => {
     if (!isSuccess) return;
     setIsShowMatchResultSelectorDialog(false);
   }, [isSuccess]);
+
+  const resultObject = {
+    result: ['red', 'blue', 'draw', 'no-contest'] as const,
+    detail: ['ko', 'tko', 'ud', 'md', 'sd'] as const,
+  };
+
+  type ResultType = (typeof resultObject.result)[number] | undefined;
+  type DetailType = (typeof resultObject.detail)[number] | undefined;
+
+  const [matchResult, setMatchResult] = useState<ResultType>(undefined);
+  const [matchDetail, setMatchDetail] = useState<DetailType>(undefined);
+  const [matchRound, setRound] = useState<string>('1');
+
+  const isWinner = matchResult === 'red' || matchResult === 'blue';
+  const isKo = isWinner && (matchDetail === 'ko' || matchDetail === 'tko');
+  const validFunk = () => {
+    if (isWinner) {
+      return !!matchDetail;
+    }
+
+    return !!matchResult;
+  };
+  const isValid = validFunk();
+
+  const matchResultName = {
+    red: selectedMatchData!.red_boxer.name,
+    blue: selectedMatchData!.blue_boxer.name,
+    draw: '引き分け',
+    'no-contest': '無効試合',
+  };
+
+  const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!matchResult) return;
+    const result = matchResult;
+    const detail = isWinner ? matchDetail : undefined;
+    const round = isKo ? matchRound : undefined;
+
+    const matchResultValue = {
+      match_id: selectedMatchData!.id,
+      result: result,
+      detail: detail,
+      round: round,
+    };
+    storeMatchResult(matchResultValue);
+  };
 
   if (!selectedMatchData) return;
 
@@ -280,46 +324,80 @@ const MatchResultSetDialog = ({
       closeButton={true}
       closeDialog={() => setIsShowMatchResultSelectorDialog(false)}
     >
-      <div className="w-full text-center">
-        <div className="flex">
-          <button
-            onClick={() => matchResultSet({ result: { match_result: 'red' } })}
-            className="rounded bg-red-600 hover:bg-red-500 text-white px-4 py-1 mr-3 duration-200"
-          >
-            {selectedMatchData.red_boxer.name}
-          </button>
+      <form onSubmit={submit}>
+        <div className="">
+          {resultObject.result.map((result) => (
+            <label
+              key={result}
+              className={clsx(
+                'border-[1px] border-stone-500 rounded cursor-pointer px-2 py-1 ml-2 first:ml-0'
+              )}
+            >
+              <input
+                type="radio"
+                value={result}
+                checked={matchResult === result}
+                onChange={(e) => setMatchResult(e.target.value as ResultType)}
+              />
+              <span className="ml-2">{matchResultName[result]}</span>
+            </label>
+          ))}
+        </div>
 
-          <button
-            onClick={() => matchResultSet({ result: { match_result: 'blue' } })}
-            className="rounded bg-blue-600 hover:bg-blue-500 text-white px-4 py-1 mr-3 duration-200"
-          >
-            {selectedMatchData.blue_boxer.name}
-          </button>
+        {isWinner && (
+          <div className="mt-5">
+            {resultObject.detail.map((detail) => (
+              <label
+                key={detail}
+                className={clsx(
+                  'border-[1px] border-stone-500 rounded cursor-pointer px-2 py-1 ml-2 first:ml-0'
+                )}
+              >
+                <input
+                  type="radio"
+                  value={detail}
+                  checked={matchDetail === detail}
+                  onChange={(e) => setMatchDetail(e.target.value as DetailType)}
+                />
+                <span className="ml-2">{detail.toUpperCase()}</span>
+              </label>
+            ))}
+          </div>
+        )}
 
-          <button
-            onClick={() => matchResultSet({ result: { match_result: 'draw' } })}
-            className="rounded bg-sky-500 hover:bg-sky-300 text-white px-4 py-1 mr-3 duration-200"
-          >
-            引き分け
-          </button>
+        {isKo && (
+          <div className="mt-5">
+            <label className="border-[1px] border-stone-500 rounded px-2 py-1">
+              ラウンド:
+              <select
+                name="round"
+                defaultValue={matchRound}
+                onChange={(e) => setRound(e.target.value)}
+              >
+                {[...Array(12)].map((_, index) => (
+                  <option key={index} className="text-right" value={index + 1}>
+                    {index + 1}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        )}
 
+        <div className="w-full flex justify-center mt-[30px]">
           <button
-            onClick={() =>
-              matchResultSet({ result: { match_result: 'no-contest' } })
-            }
-            className="rounded bg-black hover:bg-stone-600 text-white px-4 py-1 mr-3 duration-200"
+            disabled={!isValid}
+            className={clsx(
+              'w-full rounded-md py-2 tracking-[0.3em]',
+              isValid
+                ? 'text-white bg-green-600 hover:bg-green-700 duration-200'
+                : 'text-white/50 bg-stone-600'
+            )}
           >
-            無効試合
-          </button>
-
-          <button
-            onClick={() => matchResultSet({ result: { match_result: null } })}
-            className="rounded bg-black hover:bg-stone-600 text-white px-4 py-1 mr-3 duration-200"
-          >
-            削除
+            試合結果登録
           </button>
         </div>
-      </div>
+      </form>
     </ConfirmDialog>
   );
 };
