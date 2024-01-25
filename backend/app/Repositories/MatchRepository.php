@@ -5,6 +5,7 @@ namespace App\Repositories;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Collection;
 use App\Models\BoxingMatch;
+use App\Models\MatchResult;
 use App\Repositories\Interfaces\MatchRepositoryInterface;
 
 class MatchRepository implements MatchRepositoryInterface
@@ -60,5 +61,21 @@ class MatchRepository implements MatchRepositoryInterface
   public function hasMatchBoxer(int $boxerId): bool
   {
     return BoxingMatch::where("red_boxer_id", $boxerId)->orWhere("blue_boxer_id", $boxerId)->exists();
+  }
+
+  public function isMatchResult(int $matchId)
+  {
+    return MatchResult::where('match_id', $matchId)->exists();
+  }
+
+  public function deleteMatchResult(int $matchId)
+  {
+    $res = MatchResult::where('match_id', $matchId)->delete();
+    return (bool) $res;
+  }
+
+  public function storeMatchResult(array $matchResultData)
+  {
+    return MatchResult::create($matchResultData);
   }
 }

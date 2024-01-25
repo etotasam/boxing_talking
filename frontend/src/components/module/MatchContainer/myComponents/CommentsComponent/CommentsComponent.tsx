@@ -11,16 +11,17 @@ import { useFetchComments } from '@/hooks/apiHooks/useComment';
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useMatchBoxerSectionHeight } from '@/hooks/useMatchBoxerSectionHeight';
 import { useRef } from 'react';
+import { usePostCommentHeight } from '@/hooks/usePostCommentHeight';
 
 type CommentsSectionType = {
   paramsMatchID: number;
-  commentPostTextareaHeight: number | undefined;
+  // commentPostTextareaHeight: number | undefined;
 };
 
 export const CommentsComponent = ({
   paramsMatchID,
-  commentPostTextareaHeight,
-}: CommentsSectionType) => {
+}: // commentPostTextareaHeight,
+CommentsSectionType) => {
   // ? use hook
   const { windowSize } = useWindowSize();
   const { state: headerHeight } = useHeaderHeight();
@@ -30,6 +31,7 @@ export const CommentsComponent = ({
     isLoading: isFetchingComments,
     isError: isErrorFetchComments,
   } = useFetchComments(paramsMatchID);
+  const { state: commentPostTextareaHeight } = usePostCommentHeight();
 
   const dateFormatter = (postDate: string): string => {
     const todayRaw = dayjs();
@@ -127,7 +129,7 @@ export const CommentsComponent = ({
   return (
     isComments && (
       <section
-        className="xl:w-[70%] md:w-[60%] w-full border-l-[1px] border-stone-200 relative"
+        className="xl:w-[70%] w-full border-l-[1px] border-stone-200 relative"
         style={{
           marginBottom: `${commentPostTextareaHeight}px`,
           minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,

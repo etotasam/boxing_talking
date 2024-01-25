@@ -5,7 +5,10 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 use App\Models\BoxingMatch;
+use App\Models\MatchResult;
 use App\Http\Resources\BoxerResource;
+use App\Http\Resources\MatchResultResource;
+
 
 class BoxingMatchResource extends JsonResource
 {
@@ -14,6 +17,7 @@ class BoxingMatchResource extends JsonResource
     {
         parent::__construct($match);
     }
+
     /**
      * Transform the resource into an array.
      *
@@ -22,6 +26,12 @@ class BoxingMatchResource extends JsonResource
      */
     public function toArray($request)
     {
+
+        $this->match->load(['redBoxer', 'blueBoxer', 'result']);
+
+        $resultResource = $this->match->result
+            ? new MatchResultResource($this->match->result)
+            : null;
         return  [
             "id" => $this->match->id,
             "red_boxer" => new BoxerResource($this->match->redBoxer),
@@ -33,7 +43,8 @@ class BoxingMatchResource extends JsonResource
             "weight" => $this->match->weight,
             "match_date" => $this->match->match_date,
             "count_red" => $this->match->count_red,
-            "count_blue" => $this->match->count_blue
+            "count_blue" => $this->match->count_blue,
+            "result" => $resultResource
         ];
     }
 

@@ -1,34 +1,85 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 //! types
 import { MatchDataType } from '@/assets/types';
 // ! components
-import { MatchInfo } from '@/page/Admin/MatchEdit';
+import { MatchInfo } from '@/components/module/MatchInfo';
 //! hooks
 import { useFetchComments } from '@/hooks/apiHooks/useComment';
+// import { usePostCommentHeight } from '@/hooks/usePostCommentHeight';
+// import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 
 type LeftSectionType = {
   thisMatch: MatchDataType | undefined;
   isThisMatchAfterToday: boolean | undefined;
   thisMatchPredictionOfUsers: 'red' | 'blue' | 'No prediction vote' | undefined;
+  headerHeight: number | undefined;
+  commentPostEl: HTMLSelectElement | null;
 };
 
 export const LeftSection = ({
   thisMatch,
   thisMatchPredictionOfUsers,
   isThisMatchAfterToday,
+  headerHeight,
+  commentPostEl,
 }: LeftSectionType) => {
   const isVotedMatchPrediction =
     thisMatchPredictionOfUsers === 'red' ||
     thisMatchPredictionOfUsers === 'blue';
 
+  //? state, hooks
+  const leftSectionRef = useRef(null);
+  const [isLeftSectionHigherThenMainEl, setIsLeftSectionHigherThenMainEl] =
+    useState<boolean | undefined>(undefined);
+  const [stickyTopPosition, setStickyTopPosition] = useState(0);
+
+  const checkElementsHeight = () => {
+    if (!headerHeight) return;
+    if (!commentPostEl) return;
+    if (!leftSectionRef.current) return;
+
+    const leftSectionHeight = (
+      leftSectionRef.current as unknown as HTMLDivElement
+    ).clientHeight;
+
+    const mainElHeight =
+      window.innerHeight - (headerHeight + commentPostEl.clientHeight);
+
+    setIsLeftSectionHigherThenMainEl(leftSectionHeight > mainElHeight);
+
+    if (!(leftSectionHeight > mainElHeight)) return;
+
+    const topPosition = -(
+      leftSectionHeight -
+      (window.innerHeight - commentPostEl.clientHeight)
+    );
+    setStickyTopPosition(topPosition);
+  };
+
+  useEffect(() => {
+    if (!leftSectionRef.current) return;
+    checkElementsHeight();
+    window.addEventListener('scroll', checkElementsHeight);
+  }, [leftSectionRef.current]);
+
   //試合データを取得するまでは何もrenderさせない
   if (!thisMatch) return;
-
   return (
     <div className="xl:w-[30%] w-[40%]">
-      <div className="sticky top-5 flex justify-center">
+      <div
+        ref={leftSectionRef}
+        className="flex justify-center"
+        style={
+          isLeftSectionHigherThenMainEl
+            ? {
+                position: 'sticky',
+                top: `${stickyTopPosition}px`,
+              }
+            : { position: 'sticky', top: `${headerHeight}px` }
+        }
+      >
         <div className="w-full max-w-[450px]">
           <div className="flex justify-center mt-5">
             <MatchInfo matchData={thisMatch} />
@@ -72,7 +123,7 @@ const PredictionsBar = ({
   return (
     <>
       {thisMatch && (
-        <div className="flex justify-center mt-5">
+        <div className="flex justify-center my-5">
           <div className="w-[80%]">
             <p className="text-center lg:text-sm text-xs font-light">
               <span

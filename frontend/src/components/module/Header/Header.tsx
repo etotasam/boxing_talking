@@ -25,11 +25,12 @@ type PropsType = {
   userData: UserType | undefined | null;
 };
 
-export const Header = (porps: PropsType) => {
-  const { userData } = porps;
+export const Header = (props: PropsType) => {
+  const { userData } = props;
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
   const { pathname } = useLocation();
+  const { device } = useWindowSize();
 
   const { setter: setHeaderHeight } = useHeaderHeight();
 
@@ -44,9 +45,15 @@ export const Header = (porps: PropsType) => {
     <>
       <header
         ref={headerRef}
-        className="h-[80px] fixed top-0 left-0 w-full flex bg-white z-10 after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
+        className="z-10 h-[80px] fixed top-0 left-0 w-full flex bg-white after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
       >
-        <h1 className="md:text-[64px] sm:text-[54px] text-[32px] font-thin">
+        <h1
+          className={clsx(
+            'sm:text-[48px] text-[32px] font-thin',
+            device === 'PC' && 'md:text-[64px]'
+            // device === 'SP' && 'md:text-[52px]'
+          )}
+        >
           {siteTitle}
         </h1>
 

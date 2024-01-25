@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import dayjs from 'dayjs';
 import clsx from 'clsx';
-import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
   BG_COLOR_ON_TOAST_MODAL,
@@ -11,9 +10,7 @@ import {
 import { isMatchDatePast } from '@/assets/functions';
 
 //! components
-// import { FightBox } from "@/components/module/FightBox";
-import { FlagImage } from '@/components/atomic/FlagImage';
-import { SubHeader } from '@/components/atomic/SubHeader';
+import { MatchInfo } from '@/components/module/MatchInfo';
 import { MatchSetter } from '@/components/module/MatchSetter/MatchSetter';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
@@ -23,10 +20,12 @@ import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useSortMatches } from '@/hooks/useSortMatches';
 import { useHeaderHeight } from '@/hooks/useHeaderHeight';
+import { useMatchResult } from '@/hooks/apiHooks/useMatch';
+import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 //! types
 import { MatchDataType } from '@/assets/types';
 // ! image
-import crown from '@/assets/images/etc/champion.svg';
+import { Button } from '@/components/atomic/Button';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -40,7 +39,13 @@ export const MatchEdit = () => {
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
 
   const [selectMatch, setSelectMatch] = useState<MatchDataType>();
+  const { isFightToday, isDayOverFight } = useDayOfFightChecker(selectMatch);
+
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
+  const [isShowMatchResultSelectorDialog, setIsShowMatchResultSelectorDialog] =
+    useState(false);
+
+  const isShowMatchResultRegisterButton = !isFightToday && isDayOverFight;
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -89,8 +94,20 @@ export const MatchEdit = () => {
             <div className="w-[45%] flex justify-center">
               {selectMatch ? (
                 <div className="w-full flex flex-col items-center">
-                  <MatchInfo matchData={selectMatch} />
-                  <WinnerSelector matchData={selectMatch} />
+                  <div className="w-[90%] border-[1px] border-stone-400">
+                    <MatchInfo matchData={selectMatch} />
+                  </div>
+
+                  {isShowMatchResultRegisterButton && (
+                    <div className="mt-5 w-full flex justify-center">
+                      <Button
+                        onClick={() => setIsShowMatchResultSelectorDialog(true)}
+                        bgColor="w-[90%] py-3 bg-blue-900 hover:bg-blue-700 tracking-[0.3em]"
+                      >
+                        試合結果登録
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="w-[80%]">
@@ -114,13 +131,6 @@ export const MatchEdit = () => {
                   >
                     削除
                   </button>
-                  {/* 削除ダイアログ */}
-                  {isDeleteConfirm && (
-                    <DeleteConfirm
-                      execution={deleteExecution}
-                      cancel={() => setIsDeleteConfirm(false)}
-                    />
-                  )}
                 </div>
               </div>
             </div>
@@ -135,6 +145,23 @@ export const MatchEdit = () => {
           />
         </section>
       </div>
+
+      {/* 試合結果のセット Dialog */}
+      {isShowMatchResultSelectorDialog && (
+        <MatchResultSetDialog
+          selectedMatchData={selectMatch}
+          setIsShowMatchResultSelectorDialog={
+            setIsShowMatchResultSelectorDialog
+          }
+        />
+      )}
+      {/* delete dialog */}
+      {isDeleteConfirm && (
+        <DeleteConfirm
+          execution={deleteExecution}
+          cancel={() => setIsDeleteConfirm(false)}
+        />
+      )}
     </>
   );
 };
@@ -202,80 +229,6 @@ export const MatchListComponent = ({
   );
 };
 
-export const MatchInfo = ({
-  matchData,
-}: {
-  matchData: MatchDataType | undefined;
-}) => {
-  if (!matchData) return <div>選択なし</div>;
-  return (
-    <div className="w-[80%]">
-      {/* 日時 */}
-      <div className="p-5 text-stone-600 border-[1px] rounded-sm border-stone-300 w-full">
-        <div className="text-center relative mt-5">
-          <h2 className="lg:text-2xl text-lg after:content-['(日本時間)'] after:absolute after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] after:text-sm">
-            {dayjs(matchData.match_date).format('YYYY年M月D日')}
-          </h2>
-          {matchData.titles.length > 0 && (
-            <span className="absolute top-[-32px] left-[50%] translate-x-[-50%] w-[32px] h-[32px] mr-2">
-              <img src={crown} alt="" />
-            </span>
-          )}
-        </div>
-
-        {/* グレード */}
-        <div className="text-center text-xl mt-5">
-          {matchData.grade === 'タイトルマッチ' ? (
-            <ul className="flex flex-col">
-              {matchData.titles
-                .sort()
-                .map(({ organization, weightDivision }, index) => (
-                  <li key={index} className="mt-1">
-                    <div className="relative inline-block lg:text-[18px] text-[16px]">
-                      <span className="absolute top-[4px] right-[-28px] w-[18px] h-[18px] mr-2">
-                        <img src={crown} alt="" />
-                      </span>
-                      {organization}世界{weightDivision}級
-                    </div>
-                  </li>
-                ))}
-            </ul>
-          ) : (
-            <p className="lg:text-[30px] text-[24px] lg:mt-10 mt-5">
-              {matchData.grade}
-            </p>
-          )}
-        </div>
-
-        {/* 会場 */}
-        <div className="mt-[35px] text-center">
-          <SubHeader content="会場">
-            {matchData.venue}
-            <span className="lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] border-[1px] overflow-hidden absolute top-[1px] lg:left-[-40px] left-[-30px]">
-              <FlagImage
-                className="inline-block border-[1px] lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] mr-3"
-                nationality={matchData.country}
-              />
-            </span>
-          </SubHeader>
-        </div>
-
-        {/* 階級 */}
-        <div className="mt-10 text-center">
-          <SubHeader content="階級">
-            {`${matchData.weight.replace('S', 'スーパー')}級`}
-          </SubHeader>
-        </div>
-
-        {/* 勝者 */}
-        <div className="mt-10 text-center">
-          <SubHeader content="勝者">勝者名</SubHeader>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 type DeleteConfirmPropsType = {
   cancel: () => void;
   execution: () => void;
@@ -301,22 +254,150 @@ const DeleteConfirm = ({ execution, cancel }: DeleteConfirmPropsType) => {
   );
 };
 
-const WinnerSelector = ({ matchData }: { matchData: MatchDataType }) => {
+const MatchResultSetDialog = ({
+  selectedMatchData,
+  setIsShowMatchResultSelectorDialog,
+}: {
+  selectedMatchData: MatchDataType | undefined;
+  setIsShowMatchResultSelectorDialog: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
+}) => {
+  const { storeMatchResult, isSuccess } = useMatchResult();
+
+  useEffect(() => {
+    if (!isSuccess) return;
+    setIsShowMatchResultSelectorDialog(false);
+  }, [isSuccess]);
+
+  const resultObject = {
+    result: ['red', 'blue', 'draw', 'no-contest'] as const,
+    detail: ['ko', 'tko', 'ud', 'md', 'sd'] as const,
+  };
+
+  type ResultType = (typeof resultObject.result)[number] | undefined;
+  type DetailType = (typeof resultObject.detail)[number] | undefined;
+
+  const [matchResult, setMatchResult] = useState<ResultType>(undefined);
+  const [matchDetail, setMatchDetail] = useState<DetailType>(undefined);
+  const [matchRound, setRound] = useState<string>('1');
+
+  const isWinner = matchResult === 'red' || matchResult === 'blue';
+  const isKo = isWinner && (matchDetail === 'ko' || matchDetail === 'tko');
+  const validFunk = () => {
+    if (isWinner) {
+      return !!matchDetail;
+    }
+
+    return !!matchResult;
+  };
+  const isValid = validFunk();
+
+  const matchResultName = {
+    red: selectedMatchData!.red_boxer.name,
+    blue: selectedMatchData!.blue_boxer.name,
+    draw: '引き分け',
+    'no-contest': '無効試合',
+  };
+
+  const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!matchResult) return;
+    const result = matchResult;
+    const detail = isWinner ? matchDetail : undefined;
+    const round = isKo ? matchRound : undefined;
+
+    const matchResultValue = {
+      match_id: selectedMatchData!.id,
+      result: result,
+      detail: detail,
+      round: round,
+    };
+    storeMatchResult(matchResultValue);
+  };
+
+  if (!selectedMatchData) return;
+
   return (
-    <div className="w-full text-center">
-      <h2 className="py-3">勝者選択</h2>
-      <ul className="flex">
-        <li className="w-[50%]">
-          <button className="rounded bg-stone-600 hover:bg-red-700 text-white px-4 py-1 duration-200">
-            {matchData.red_boxer.name}
+    <ConfirmDialog
+      header="試合結果の登録"
+      closeButton={true}
+      closeDialog={() => setIsShowMatchResultSelectorDialog(false)}
+    >
+      <form onSubmit={submit}>
+        <div className="">
+          {resultObject.result.map((result) => (
+            <label
+              key={result}
+              className={clsx(
+                'border-[1px] border-stone-500 rounded cursor-pointer px-2 py-1 ml-2 first:ml-0'
+              )}
+            >
+              <input
+                type="radio"
+                value={result}
+                checked={matchResult === result}
+                onChange={(e) => setMatchResult(e.target.value as ResultType)}
+              />
+              <span className="ml-2">{matchResultName[result]}</span>
+            </label>
+          ))}
+        </div>
+
+        {isWinner && (
+          <div className="mt-5">
+            {resultObject.detail.map((detail) => (
+              <label
+                key={detail}
+                className={clsx(
+                  'border-[1px] border-stone-500 rounded cursor-pointer px-2 py-1 ml-2 first:ml-0'
+                )}
+              >
+                <input
+                  type="radio"
+                  value={detail}
+                  checked={matchDetail === detail}
+                  onChange={(e) => setMatchDetail(e.target.value as DetailType)}
+                />
+                <span className="ml-2">{detail.toUpperCase()}</span>
+              </label>
+            ))}
+          </div>
+        )}
+
+        {isKo && (
+          <div className="mt-5">
+            <label className="border-[1px] border-stone-500 rounded px-2 py-1">
+              ラウンド:
+              <select
+                name="round"
+                defaultValue={matchRound}
+                onChange={(e) => setRound(e.target.value)}
+              >
+                {[...Array(12)].map((_, index) => (
+                  <option key={index} className="text-right" value={index + 1}>
+                    {index + 1}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        )}
+
+        <div className="w-full flex justify-center mt-[30px]">
+          <button
+            disabled={!isValid}
+            className={clsx(
+              'w-full rounded-md py-2 tracking-[0.3em]',
+              isValid
+                ? 'text-white bg-green-600 hover:bg-green-700 duration-200'
+                : 'text-white/50 bg-stone-600'
+            )}
+          >
+            試合結果登録
           </button>
-        </li>
-        <li className="w-[50%]">
-          <button className="rounded bg-stone-600 hover:bg-blue-700 text-white px-4 py-1 duration-200">
-            {matchData.blue_boxer.name}
-          </button>
-        </li>
-      </ul>
-    </div>
+        </div>
+      </form>
+    </ConfirmDialog>
   );
 };

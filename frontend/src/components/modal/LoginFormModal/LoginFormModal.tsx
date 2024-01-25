@@ -27,7 +27,7 @@ export const LoginFormModal = () => {
   return (
     <>
       <ClearFullScreenDiv
-        className="bg-stone-500/70 flex justify-center items-center"
+        className="bg-stone-500/70 flex justify-center items-center z-20"
         // onMouseDown={() => loginModalHide()}
       >
         <AnimatePresence>

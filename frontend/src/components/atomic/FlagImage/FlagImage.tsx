@@ -10,13 +10,13 @@ type PropsType = React.ComponentProps<'div'> & { nationality: NationalityType };
 export const FlagImage = ({ nationality, className }: PropsType) => {
   return (
     <>
-      <div className={clsx(className)}>
+      <span className={clsx(className)}>
         <img
           className="w-full h-full object-cover"
           src={getNationalFlag(nationality)}
           alt={nationality}
         />
-      </div>
+      </span>
     </>
   );
 };

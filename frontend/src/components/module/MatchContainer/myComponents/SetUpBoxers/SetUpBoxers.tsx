@@ -90,11 +90,15 @@ export const SetUpBoxers = ({
   //?ボクサー情報のセットと表示(modal)
   const [boxerDataForOnModal, setBoxerDataForOnModal] = useState<BoxerType>();
   const [showBoxerInfoModal, setShowBoxerInfoModal] = useState(false);
+
+  //?ボクサー情報モーダルの表示(SP時のみ)
   const viewBoxerInfo = (boxerData: BoxerType) => {
     if (device === 'PC') return;
+    if (thisMatch?.match_result) return;
     setBoxerDataForOnModal(boxerData);
     setShowBoxerInfoModal(true);
   };
+
   useEffect(() => {
     if (device === 'PC') {
       setShowBoxerInfoModal(false);
@@ -121,7 +125,7 @@ export const SetUpBoxers = ({
         <section
           ref={boxerSectionRef}
           className={clsx(
-            'z-20 flex border-b-[1px] border-stone-300 sm:h-[100px] h-[75px]',
+            'flex border-b-[1px] border-stone-300 min-h-[65px]',
             device === 'PC' && 'relative',
             device === 'SP' && 'sticky top-0'
           )}

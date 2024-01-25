@@ -27,6 +27,7 @@ export const PastMatches = () => {
 
   const matchSelect = (matchId: number) => {
     navigate(`${ROUTE_PATH.PAST_MATCH_SINGLE}?match_id=${matchId}`);
+    // navigate(`${ROUTE_PATH.MATCH}?match_id=${matchId}`);
   };
 
   //? apiからデータが取得できてない時
@@ -69,24 +70,26 @@ export const PastMatches = () => {
   );
 };
 
-type MatchesViewPropsType = {
+type MatchCardPropsType = {
   match: MatchDataType;
   matchSelect: (matchId: number) => void;
 };
 
-const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
-  const { data: myAllPredictionVote } = useAllFetchMatchPredictionOfAuthUser();
+const MatchCard = ({ match, matchSelect }: MatchCardPropsType) => {
+  const { data: usersAllPredictionVote } =
+    useAllFetchMatchPredictionOfAuthUser();
 
   const [isPredictionVote, setIsPredictionVote] = useState<boolean>();
 
+  //? ユーザの試合予想を取得
   useEffect(() => {
-    if (myAllPredictionVote) {
-      const isPredictionThisMatch = myAllPredictionVote.some(
+    if (usersAllPredictionVote) {
+      const isPredictionThisMatch = usersAllPredictionVote.some(
         (ob) => ob.match_id === match.id
       );
       setIsPredictionVote(isPredictionThisMatch);
     }
-  }, [myAllPredictionVote]);
+  }, [usersAllPredictionVote]);
 
   return (
     <SimpleFightBox

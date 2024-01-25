@@ -61,6 +61,13 @@ export type RegisterMatchPropsType = {
   titles: string[],
 }
 
+export type MatchResultType = {
+  match_id: number,
+  result: "red" | "blue" | "draw" | "no-contest",
+  detail?: "ko" | "tko" | "ud" | "md" | "sd",
+  round?: string
+}
+
 export type MatchDataType = {
   id: number,
   red_boxer: BoxerType,
@@ -73,6 +80,14 @@ export type MatchDataType = {
   match_date: string,
   count_red: number,
   count_blue: number,
+  result: MatchResultType | null,
+}
+
+export type MatchResultType = {
+  match_id: number,
+  match_result: "red" | "blue" | "draw" | "no-contest",
+  detail: "ko" | "tko" | "ud" | "md" | "sd",
+  round: number
 }
 
 export type GRADE_Type = (typeof GRADE)[keyof typeof GRADE];

@@ -46,12 +46,13 @@ class MatchController extends ApiController
      * idで指定の試合データの取得
      *
      * @param BoxingMatch $match
-     * @return BoxingMatchResource
+    //  * @return BoxingMatchResource
      */
     public function show(BoxingMatch $match)
     {
         return new BoxingMatchResource($match);
     }
+
 
     /**
      * 試合データの登録
@@ -128,5 +129,20 @@ class MatchController extends ApiController
         }
 
         return $this->responseSuccessful("Success update match");
+    }
+
+    public function result(Request $request)
+    {
+        $matchResultArray = [
+            "match_id" => $request->match_id,
+            "match_result" => $request->result,
+            "detail" => $request->detail,
+            "round" => $request->round
+        ];
+        try {
+            return $this->matchService->storeMatchResultExecute($matchResultArray);
+        } catch (HttpException $e) {
+            return $this->responseInvalidQuery($e->getMessage() ?? "Failed store match result");
+        }
     }
 }

@@ -17,4 +17,5 @@ export const API_PATH = {
   COMMENT: '/api/comment',
   //?match
   MATCH: '/api/match',
+  MATCH_RESULT: '/api/match/result',
 } as const;

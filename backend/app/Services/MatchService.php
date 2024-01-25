@@ -85,6 +85,7 @@ class MatchService
    */
   public function getMatchesExecute(string|null $range)
   {
+
     if ($range == "all") {
       if (Auth::user()->administrator) {
         $matches = $this->matchRepository->getAllMatches();
@@ -201,5 +202,73 @@ class MatchService
       $match->increment("count_blue");
     }
     $match->save();
+  }
+
+  /**
+   * @param array $matchResultArray [
+   * "match_id" => number,
+   * "match_result" => "red" | "blue" | "draw" | "no-contest",
+   * "detail" => "ko" | "tko" | "ud" | "md" | "sd",
+   * "round" => number
+   * ]
+   *
+   * @return bool | abort
+   */
+  public function storeMatchResultExecute(array $matchResultArray)
+  {
+    try {
+      // 必須項目のチェック
+      $this->validateMatchResultArray($matchResultArray);
+
+      DB::beginTransaction();
+
+      // すでに試合結果が存在する場合、削除
+      if ($this->matchRepository->isMatchResult((int)$matchResultArray['match_id'])) {
+        $isDelete = $this->matchRepository->deleteMatchResult((int)$matchResultArray['match_id']);
+        if (!$isDelete) {
+          throw new \Exception("Failed to delete existing match result");
+        }
+      }
+
+      // 新しい試合結果を保存
+      $isStore =  $this->matchRepository->storeMatchResult($matchResultArray);
+
+      if (!$isStore) {
+        throw new \Exception("Failed to store match result");
+      }
+
+      DB::commit();
+      return true;
+    } catch (\Exception $e) {
+      DB::rollBack();
+      abort(500, $e->getMessage());
+    }
+  }
+
+  private function validateMatchResultArray(array $matchResultArray)
+  {
+    if (empty($matchResultArray['match_id'])) {
+      throw new \Exception("'match_id' is required");
+    }
+
+    if (empty($matchResultArray['match_result'])) {
+      throw new \Exception("'match_result' is empty");
+    }
+
+    $isWinner = $matchResultArray['match_result'] === "red" || $matchResultArray['match_result'] === "blue";
+
+    if ($isWinner) {
+      if (empty($matchResultArray["detail"])) {
+        throw new \Exception("'detail' is required when there is a winner");
+      }
+    }
+
+    $isKo = $isWinner && $matchResultArray['detail'] === "ko" || $matchResultArray['detail'] === "tko";
+
+    if ($isKo) {
+      if (empty($matchResultArray["round"])) {
+        throw new \Exception("'round' is required when winner got KO");
+      }
+    }
   }
 }

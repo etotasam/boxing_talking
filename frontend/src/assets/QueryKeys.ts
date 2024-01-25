@@ -4,6 +4,7 @@ export const QUERY_KEY = {
   ADMIN: 'admin',
   BOXER: 'boxer',
   MATCH_SINGLE: 'match',
+  MATCH_RESULT: 'match/result',
   FETCH_MATCHES: 'matches',
   FETCH_PAST_MATCHES: 'matches/past',
   FETCH_ALL_MATCHES: 'matches/all',

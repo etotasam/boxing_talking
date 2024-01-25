@@ -56,6 +56,9 @@ export const MESSAGE = {
   MATCH_REGISTER_SUCCESS: "試合情報の登録が完了しました",
   MATCH_REGISTER_FAILED: "試合情報の登録に失敗しました \n 再度登録してください",
 
+  MATCH_RESULT_STORED: "試合結果を登録しました",
+  MATCH_RESULT_STORE_FAILED: "試合結果を登録出来ませんでした",
+
   INVALID_COUNTRY: "国の選択がありません",
 
   FIGHTER_NOT_ABLE_TO_REGISTER: "すでに登録されている選手です",

@@ -7,7 +7,7 @@ import { API_PATH } from "@/assets/ApiPath"
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 import { QUERY_KEY } from "@/assets/QueryKeys"
 // ! types
-import { MatchDataType, RegisterMatchPropsType } from "@/assets/types"
+import { MatchDataType, MatchResultType, RegisterMatchPropsType } from "@/assets/types"
 // ! hook
 import { useToastModal } from "../useToastModal"
 import { useLoading } from "../useLoading"
@@ -57,7 +57,7 @@ export const useFetchPastMatches = () => {
 //! すべての試合情報の取得(過去含めすべて)
 export const useFetchAllMatches = () => {
   const fetcher = useCallback(async () => {
-    const res = await Axios.get(API_PATH.MATCH, { params: { range: "all" } }).then(result => result.data)
+    const res = await Axios.get<{ data: MatchDataType[] }>(API_PATH.MATCH, { params: { range: "all" } }).then(result => result.data)
     return res.data
   }, [])
   const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.FETCH_ALL_MATCHES, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
@@ -180,4 +180,40 @@ export const useDeleteMatch = () => {
   }
 
   return { deleteMatch, isLoading, isSuccess }
+}
+
+//! 試合結果の登録
+export const useMatchResult = () => {
+  const { setToastModal, showToastModal } = useToastModal()
+  const { refetch: refetchMatches } = useFetchMatches()
+  const { refetch: refetchAllMatches } = useFetchAllMatches()
+  const { resetLoadingState, startLoading } = useLoading()
+
+  const api = async (resultData: MatchResultType) => {
+    await Axios.post(`${API_PATH.MATCH_RESULT}`, resultData)
+  }
+  const { mutate, isLoading, isSuccess } = useMutation(api, {
+    onMutate: () => {
+      startLoading()
+    }
+  })
+
+  const storeMatchResult = ({ match_id, result, detail, round }: MatchResultType) => {
+    mutate({ match_id, result, detail, round }, {
+      onSuccess: () => {
+        refetchMatches()
+        refetchAllMatches()
+        resetLoadingState()
+        setToastModal({ message: MESSAGE.MATCH_RESULT_STORED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+        showToastModal()
+      },
+      onError: () => {
+        resetLoadingState()
+        setToastModal({ message: MESSAGE.MATCH_RESULT_STORE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showToastModal()
+      }
+    })
+  }
+
+  return { storeMatchResult, isLoading, isSuccess }
 }

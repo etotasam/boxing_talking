@@ -5,9 +5,17 @@ import { MatchDataType } from '@/assets/types';
 import crown from '@/assets/images/etc/champion.svg';
 //! component
 import { FlagImage } from '@/components/atomic/FlagImage';
-import { SubHeader } from '@/components/atomic/SubHeader';
+import { SubHeadline } from '@/components/atomic/SubHeadline';
+import { MatchResultComponent } from '../MatchResultComponent';
+//! hooks
+import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 
 export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
+  const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
+
+  const isShowMatchResultComponent =
+    !isFightToday && isDayOverFight && matchData.result;
+
   return (
     <>
       <div className="p-5 text-stone-600">
@@ -23,21 +31,32 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
 
         {/* //?会場 */}
         <div className="mt-[35px] text-center">
-          <SubHeader content="会場">
-            <FlagImage
-              className="inline-block border-[1px] w-[32px] h-[24px] mr-3"
-              nationality={matchData.country}
-            />
+          <SubHeadline content="会場">
+            <span className="lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] border-[1px] overflow-hidden absolute top-[1px] lg:left-[-40px] left-[-30px]">
+              <FlagImage
+                className="inline-block border-[1px] lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] mr-3"
+                nationality={matchData.country}
+              />
+            </span>
             {matchData.venue}
-          </SubHeader>
+          </SubHeadline>
         </div>
 
         {/* //?階級 */}
         <div className="mt-10 text-center">
-          <SubHeader content="階級">
+          <SubHeadline content="階級">
             {`${matchData.weight.replace('S', 'スーパー')}級`}
-          </SubHeader>
+          </SubHeadline>
         </div>
+
+        {/* 試合結果 */}
+        {isShowMatchResultComponent && (
+          <div className="mt-10 text-center">
+            <SubHeadline content="試合結果">
+              <MatchResultComponent matchData={matchData} />
+            </SubHeadline>
+          </div>
+        )}
       </div>
     </>
   );
