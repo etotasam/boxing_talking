@@ -239,13 +239,13 @@ const NotExistsComments = ({
 }: NotExistsCommentsPropsType) => {
   return (
     <section
-      className="flex justify-center items-center text-[18px] border-l-[1px] xl:w-[70%] md:w-[60%] w-full"
+      className="flex justify-center text-[18px] border-l-[1px] xl:w-[70%] w-full"
       style={{
         minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
       }}
     >
-      <div className="relative">
-        <p>まだコメントがありません</p>
+      <div className="relative mt-12">
+        <p>コメント投稿はありません</p>
         <LiaCommentDotsSolid
           className={'absolute top-[-15px] right-[-30px] w-[30px] h-[30px]'}
         />

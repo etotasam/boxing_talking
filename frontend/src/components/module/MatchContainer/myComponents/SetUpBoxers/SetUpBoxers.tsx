@@ -91,10 +91,10 @@ export const SetUpBoxers = ({
   const [boxerDataForOnModal, setBoxerDataForOnModal] = useState<BoxerType>();
   const [showBoxerInfoModal, setShowBoxerInfoModal] = useState(false);
 
-  //?ボクサー情報モーダルの表示(SP時のみ)
+  //?ボクサー情報モーダルの表示(PC時と終了した試合は表示させない)
   const viewBoxerInfo = (boxerData: BoxerType) => {
     if (device === 'PC') return;
-    if (thisMatch?.match_result) return;
+    if (thisMatch?.result) return;
     setBoxerDataForOnModal(boxerData);
     setShowBoxerInfoModal(true);
   };

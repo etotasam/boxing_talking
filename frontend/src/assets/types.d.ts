@@ -110,3 +110,11 @@ export type NeedMatchPropertyForUpdateType = {
   titles: { organization: ORGANIZATIONS_Type, weightDivision: WEIGHT_CLASS_Type }[] | [];
   match_date: string;
 };
+
+
+//? type Evaluations
+
+export const isMessageType = (message: unknown): message is MessageType => {
+  const modalMessage = Object.values(MESSAGE);
+  return modalMessage.includes(message as MessageType);
+};

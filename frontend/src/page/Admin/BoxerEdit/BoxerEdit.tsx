@@ -23,7 +23,7 @@ import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 //! types
 import { BoxerType } from '@/assets/types';
 //! type evolution
-import { isMessageType } from '@/assets/typeEvaluations';
+import { isMessageType } from '@/assets/types';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
