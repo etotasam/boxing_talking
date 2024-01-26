@@ -2,25 +2,24 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/RoutePath';
 //! hook
-import { useHeaderHeight } from '@/hooks/useHeaderHeight';
-import { useFooterHeight } from '@/hooks/useFooterHeight';
 import { useSignUpIdentification } from '@/hooks/apiHooks/useAuth';
 //! component
 import { Footer } from '@/components/module/Footer';
 import { RotatingLines } from 'react-loader-spinner';
 // ! recoil
 import { useRecoilValue } from 'recoil';
-import { authenticatingSelector } from '@/store/authenticatingState';
-import { tokenErrorMessageSelector } from '@/store/tokenErrorMessageState';
+import { elementSizeState } from '@/store/elementSizeState';
+import { authCheckingState } from '@/store/authCheckingState';
+import { tokenErrorMessageState } from '@/store/tokenErrorMessageState';
 
 export const Identification = () => {
   const { createUser } = useSignUpIdentification();
-  const authenticatingState = useRecoilValue(authenticatingSelector);
+  const authCheckState = useRecoilValue(authCheckingState);
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const token = query.get('signup');
-  const { state: headerHeight } = useHeaderHeight();
-  const { state: footerHeight } = useFooterHeight();
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+  const footerHeight = useRecoilValue(elementSizeState('FOOTER_HEIGHT'));
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,9 +41,9 @@ export const Identification = () => {
         className="flex justify-center items-center"
       >
         <div className="flex justify-center items-center max-w-[600px] w-[70%] min-w-[200px] lg:h-[300px] sm:h-[250px] h-[150px] bg-white border-[1px] border-stone-600 shadow-lg">
-          {authenticatingState.isLoading && <Authenticating />}
-          {authenticatingState.isSuccess && <SuccessRegister />}
-          {authenticatingState.isError && <FiledAuth />}
+          {authCheckState.isLoading && <Authenticating />}
+          {authCheckState.isSuccess && <SuccessRegister />}
+          {authCheckState.isError && <FiledAuth />}
         </div>
       </div>
       <Footer />
@@ -86,7 +85,7 @@ const SuccessRegister = () => {
 };
 
 const FiledAuth = () => {
-  const tokenErrorMessage = useRecoilValue(tokenErrorMessageSelector);
+  const tokenErrorMessage = useRecoilValue(tokenErrorMessageState);
   return (
     <>
       <div className="text-center">

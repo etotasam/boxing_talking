@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
@@ -8,10 +8,9 @@ import { AiOutlineUser } from 'react-icons/ai';
 //! hooks
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useFetchComments } from '@/hooks/apiHooks/useComment';
-import { useHeaderHeight } from '@/hooks/useHeaderHeight';
-import { useMatchBoxerSectionHeight } from '@/hooks/useMatchBoxerSectionHeight';
-import { useRef } from 'react';
-import { usePostCommentHeight } from '@/hooks/usePostCommentHeight';
+//! recoil
+import { useRecoilValue } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
 
 type CommentsSectionType = {
   paramsMatchID: number;
@@ -24,14 +23,19 @@ export const CommentsComponent = ({
 CommentsSectionType) => {
   // ? use hook
   const { windowSize } = useWindowSize();
-  const { state: headerHeight } = useHeaderHeight();
-  const { state: matchBoxerSectionHeight } = useMatchBoxerSectionHeight();
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+  const matchBoxerSectionHeight = useRecoilValue(
+    elementSizeState('MATCH_PAGE_BOXER_SECTION_HEIGHT')
+  );
   const {
     data: commentsOfThisMatches,
     isLoading: isFetchingComments,
     isError: isErrorFetchComments,
   } = useFetchComments(paramsMatchID);
-  const { state: commentPostTextareaHeight } = usePostCommentHeight();
+
+  const commentPostTextareaHeight = useRecoilValue(
+    elementSizeState('POST_COMMENT_HEIGHT')
+  );
 
   const dateFormatter = (postDate: string): string => {
     const todayRaw = dayjs();

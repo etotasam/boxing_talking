@@ -4,7 +4,7 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { clsx } from 'clsx';
 // ! recoil
 import { useSetRecoilState } from 'recoil';
-import { formTypeSelector, FORM_TYPE } from '@/store/formTypeState';
+import { formTypeState, FORM_TYPE } from '@/store/formTypeState';
 //! hooks
 import { usePreSignUp } from '@/hooks/apiHooks/useAuth';
 
@@ -64,7 +64,7 @@ export const SignUpForm = () => {
   }, [isSuccessPreRegister]);
 
   // ! recoil
-  const setFormType = useSetRecoilState(formTypeSelector);
+  const setFormType = useSetRecoilState(formTypeState);
   const toLoginForm = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     setFormType(FORM_TYPE.LOGIN_FORM);

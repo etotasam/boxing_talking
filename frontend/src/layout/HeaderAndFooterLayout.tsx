@@ -5,15 +5,16 @@ import { Footer } from '@/components/module/Footer';
 import { HeaderContainer } from '@/components/module/Header';
 // ! hooks
 import { useLoading } from '@/hooks/useLoading';
-import { useHeaderHeight } from '@/hooks/useHeaderHeight';
-import { useFooterHeight } from '@/hooks/useFooterHeight';
+//! recoil
+import { useRecoilValue } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
 
 const HeaderAndFooterLayout = () => {
   // ! use hook
   const { resetLoadingState } = useLoading();
 
-  const { state: headerHeight } = useHeaderHeight();
-  const { state: footerHeight } = useFooterHeight();
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+  const footerHeight = useRecoilValue(elementSizeState('FOOTER_HEIGHT'));
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { isEqual } from 'lodash';
 import { Helmet } from 'react-helmet-async';
 //! data
@@ -10,8 +9,11 @@ import {
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
 // ! functions
 import { extractBoxer } from '@/assets/functions';
+//! recoil
+import { useRecoilValue, useRecoilState } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
+import { boxerDataOnFormState } from '@/store/boxerDataOnFormState';
 //! hooks
-import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import {
@@ -19,11 +21,10 @@ import {
   useUpdateBoxerData,
   useDeleteBoxer,
 } from '@/hooks/apiHooks/useBoxer';
-import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 //! types
 import { BoxerType } from '@/assets/types';
 //! type evolution
-import { isMessageType } from '@/assets/types';
+import { isMessageType } from '@/assets/typeEvaluations';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
@@ -34,8 +35,8 @@ import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const BoxerEdit = () => {
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   // ? use hook
-  const { state: headerHeight } = useHeaderHeight();
   const { resetLoadingState } = useLoading();
   const {
     setToastModal,
@@ -43,8 +44,8 @@ export const BoxerEdit = () => {
     hideToastModal,
     showToastModalMessage,
   } = useToastModal();
-  const { state: editTargetBoxerData, setter: setEditTargetBoxerData } =
-    useBoxerDataOnForm();
+  const [editTargetBoxerData, setEditTargetBoxerData] =
+    useRecoilState(boxerDataOnFormState);
   const { updateBoxer } = useUpdateBoxerData();
   const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
   const { boxersData, pageCount } = useFetchBoxers();

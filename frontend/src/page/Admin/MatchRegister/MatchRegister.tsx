@@ -24,7 +24,9 @@ import { BoxerType } from '@/assets/types';
 import { useRegisterMatch } from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
-import { useHeaderHeight } from '@/hooks/useHeaderHeight';
+//! recoil
+import { useRecoilValue } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
 //! component
 import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
@@ -33,8 +35,8 @@ import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const MatchRegister = () => {
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   //! use hook
-  const { state: headerHeight } = useHeaderHeight();
   const { boxersData, pageCount } = useFetchBoxers();
   const [matchBoxers, setMatchBoxers] = useState<MatchBoxersType>({
     red_boxer: undefined,

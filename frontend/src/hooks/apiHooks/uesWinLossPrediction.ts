@@ -4,7 +4,7 @@ import { Axios } from "@/assets/axios"
 import { API_PATH } from "@/assets/ApiPath"
 //! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal";
-import { QUERY_KEY } from "@/assets/QueryKeys";
+import { QUERY_KEY } from "@/assets/queryKeys";
 //! hook
 import { useLoading } from "../useLoading"
 import { useToastModal } from "../useToastModal";

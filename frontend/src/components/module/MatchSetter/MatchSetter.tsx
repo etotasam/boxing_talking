@@ -11,7 +11,7 @@ import {
   MatchDataType,
 } from '@/assets/types';
 //!type evolution
-import { isMessageType } from '@/assets/types';
+import { isMessageType } from '@/assets/typeEvaluations';
 //! data
 import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
 import {

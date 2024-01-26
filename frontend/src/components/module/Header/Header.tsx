@@ -10,10 +10,12 @@ import { RiTimeLine } from 'react-icons/ri';
 // ! types
 import { UserType } from '@/assets/types';
 //! hooks
-import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useMatchInfoModal } from '@/hooks/useMatchInfoModal';
+//!recoil
+import { useSetRecoilState } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
 //! component
 import { Link } from 'react-router-dom';
 import { LogoutButton } from '@/components/atomic/LogoutButton';
@@ -32,7 +34,7 @@ export const Header = (props: PropsType) => {
   const { pathname } = useLocation();
   const { device } = useWindowSize();
 
-  const { setter: setHeaderHeight } = useHeaderHeight();
+  const setHeaderHeight = useSetRecoilState(elementSizeState('HEADER_HEIGHT'));
 
   const headerRef = useRef(null);
   useEffect(() => {
