@@ -1,16 +1,17 @@
 // !Recoil
 import { useRecoilState } from "recoil"
-import { visualModeState } from "@/store/visualModeState"
+import { visualModeState, VISUAL_MODE } from "@/store/visualModeState"
+
 
 export const useVisualModeController = () => {
   const [state, setter] = useRecoilState(visualModeState)
 
   const visualModeToggleSwitch = () => {
     setter(current => {
-      if (current === "standard") {
-        return "simple"
+      if (current === VISUAL_MODE.STANDARD) {
+        return VISUAL_MODE.SIMPLE
       } else {
-        return "standard"
+        return VISUAL_MODE.STANDARD
       }
     })
   }

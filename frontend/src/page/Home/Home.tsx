@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/RoutePath';
+import { VISUAL_MODE } from '@/store/visualModeState';
+
 // ! components
 import { FightBox } from '@/components/module/FightBox';
 import { SimpleFightBox } from '@/components/module/SimpleFightBox';
@@ -91,7 +93,7 @@ const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
   }, [myAllPredictionVote]);
   const { device } = useWindowSize();
 
-  if (device === 'SP' || visualMode === 'simple')
+  if (device === 'SP' || visualMode === VISUAL_MODE.SIMPLE)
     return (
       <SimpleFightBox
         isPredictionVote={isPredictionVote}

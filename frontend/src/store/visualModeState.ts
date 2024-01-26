@@ -1,7 +1,13 @@
 import { atom } from "recoil";
 
+export const VISUAL_MODE = {
+  SIMPLE: "SIMPLE",
+  STANDARD: "STANDARD"
+} as const
 
-export const visualModeState = atom<"simple" | "standard">({
+type VisualType = typeof VISUAL_MODE[keyof typeof VISUAL_MODE]
+
+export const visualModeState = atom<VisualType>({
   key: "visualModeState",
-  default: "standard"
+  default: VISUAL_MODE.STANDARD
 })
