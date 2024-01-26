@@ -19,6 +19,7 @@ use App\Http\Resources\UserResource;
 use Firebase\JWT\ExpiredException;
 use Illuminate\Database\QueryException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Auth\AuthenticationException;
 use UnexpectedValueException;
 
 class AuthController extends ApiController
@@ -46,13 +47,12 @@ class AuthController extends ApiController
     {
         try {
             $this->guestService->loginGuest($request);
-        } catch (HttpException) {
-            return $this->responseInvalidQuery("Failed guest login");
         } catch (Exception $e) {
-            //フロントでエラーコードを使用するのでcodeも返してあげる
+            //フロントエンドでエラーコードを使用するのでcodeも返してあげる
             if ($e->getCode() === CustomErrorCodes::UNABLE_TO_GENERATE_GUEST_TODAY) {
                 return $this->responseAccessDenied($e->getMessage(), $e->getCode());
             }
+            return $this->responseInvalidQuery($e->getMessage() ?? "Failed guest login");
         }
 
         return $this->responseSuccessful("Success guest login");
@@ -68,11 +68,10 @@ class AuthController extends ApiController
     {
         try {
             $this->guestService->logoutGuest();
-        } catch (HttpException) {
-            return $this->responseInvalidQuery("Failed guest logout");
+            return $this->responseSuccessful("Success guest logout");
+        } catch (Exception $e) {
+            return $this->responseInvalidQuery($e->getMessage() ?? "Failed guest logout");
         }
-
-        return $this->responseSuccessful("Success guest logout");
     }
 
 
@@ -87,8 +86,8 @@ class AuthController extends ApiController
     {
         try {
             $this->preUserService->createPreUserAndSendEmail($request->name, $request->email, $request->password);
-        } catch (HttpException) {
-            return $this->responseInvalidQuery("Failed pre_user create");
+        } catch (Exception $e) {
+            return $this->responseInvalidQuery($e->getMessage() ?? "Failed pre_user create");
         }
 
         return $this->responseSuccessful("Successful pre signup");
@@ -114,17 +113,16 @@ class AuthController extends ApiController
 
         try {
             $this->userService->createUserExecute($request->token);
-        } catch (HttpException) {
-            return $this->responseInvalidQuery("Failed user create");
+            return $this->responseSuccessful("Successful signup");
             //? tokenが期限切れ
         } catch (ExpiredException $e) {
             return $this->responseUnauthorized("Expired token", 1050);
             //? tokenが不正
         } catch (UnexpectedValueException $e) {
             return $this->responseBadRequest("Invalid token", 1051);
+        } catch (Exception $e) {
+            return $this->responseInvalidQuery($e->getMessage());
         }
-
-        return $this->responseSuccessful("Successful signup");
     }
 
     /**
@@ -158,6 +156,8 @@ class AuthController extends ApiController
             $request->session()->regenerate(); // セッションIDの再発行
         } catch (AuthenticationException $e) {
             return $this->responseUnauthorized($e->getMessage());
+        } catch (Exception $e) {
+            return $this->responseInvalidQuery("Failed user login");
         }
 
         return new UserResource($loggedInUser);
@@ -170,7 +170,7 @@ class AuthController extends ApiController
      */
     public function logout()
     {
-        $this->userService->logoutUserService();
+        $this->userService->logoutUserExecute();
         return $this->responseSuccessful("Success user logout");
     }
 

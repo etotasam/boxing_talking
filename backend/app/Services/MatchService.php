@@ -57,21 +57,21 @@ class MatchService
     try {
       $createdMatch = $this->matchRepository->createMatch($matchDataForStore);
       if (!$createdMatch) {
-        throw new \Exception("", 51);
+        throw new Exception("Can not create match", 51);
       }
 
       $titleMatchesArray = $this->titleMatchService->formatForStoreToTitleMatchTable($createdMatch['id'], $organizationsNameArray);
       $isSuccessStoreTitleMatch = $this->titleMatchRepository->insertTitleMatch($titleMatchesArray);
       if (!$isSuccessStoreTitleMatch) {
-        throw new \Exception("", 50);
+        throw new Exception("Failed store title match", 50);
       }
     } catch (QueryException $e) {
-      \Log::error($e->getMessage());
       DB::rollBack();
-      abort(500);
-    } catch (\Exception $e) {
+      \Log::error("database error with create match or store title match data :" . $e->getMessage());
+      throw new Exception("Unexpected error on database :" . $e->getMessage(), 500);
+    } catch (Exception $e) {
       DB::rollBack();
-      throw $e;
+      throw new Exception("Failed create match or store title match data :" . $e->getMessage(), 500);
     }
 
     DB::commit();
@@ -121,8 +121,10 @@ class MatchService
       }
     } catch (QueryException $e) {
       DB::rollBack();
-      \Log::error($e->getMessage());
-      abort(500);
+      \Log::error("database error with update match :" .  $e->getMessage());
+      throw new Exception("Unexpected error on database :" .  $e->getMessage());
+    } catch (Exception $e) {
+      throw new Exception("Failed update match");
     }
 
     DB::commit();
@@ -167,7 +169,7 @@ class MatchService
   public function deleteMatchExecute(int $matchId): void
   {
     if (!$this->matchRepository->isMatch($matchId)) {
-      throw new \Exception("", 44);
+      throw new Exception("Can not found match to delete", 44);
     }
     DB::beginTransaction();
     try {
@@ -176,9 +178,13 @@ class MatchService
       $this->predictionRepository->deletePredictionOnMatch($matchId);
       // WinLossPredictionRepository::delete($matchId);
       $this->matchRepository->deleteMatch($matchId);
-    } catch (QueryExecuted) {
+    } catch (QueryException $e) {
       DB::rollBack();
-      abort(500);
+      \Log::error("database error with delete match : " . $e->getMessage());
+      throw new Exception("Unexpected error on database :" . $e->getMessage());
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw new Exception("Failed delete match :" . $e->getMessage());
     }
 
     DB::commit();
@@ -226,7 +232,7 @@ class MatchService
       if ($this->matchRepository->isMatchResult((int)$matchResultArray['match_id'])) {
         $isDelete = $this->matchRepository->deleteMatchResult((int)$matchResultArray['match_id']);
         if (!$isDelete) {
-          throw new \Exception("Failed to delete existing match result");
+          throw new Exception("Failed delete existing match result");
         }
       }
 
@@ -234,32 +240,36 @@ class MatchService
       $isStore =  $this->matchRepository->storeMatchResult($matchResultArray);
 
       if (!$isStore) {
-        throw new \Exception("Failed to store match result");
+        throw new Exception("Failed store match result");
       }
 
       DB::commit();
       return true;
+    } catch (QueryException $e) {
+      DB::rollBack();
+      \Log::error("database error with store match result :" . $e->getMessage());
+      throw new Exception("Unexpected error on database :" . $e->getMessage());
     } catch (\Exception $e) {
       DB::rollBack();
-      abort(500, $e->getMessage());
+      throw new Exception($e->getMessage());
     }
   }
 
   private function validateMatchResultArray(array $matchResultArray)
   {
     if (empty($matchResultArray['match_id'])) {
-      throw new \Exception("'match_id' is required");
+      throw new Exception("'match_id' is required");
     }
 
     if (empty($matchResultArray['match_result'])) {
-      throw new \Exception("'match_result' is empty");
+      throw new Exception("'match_result' is empty");
     }
 
     $isWinner = $matchResultArray['match_result'] === "red" || $matchResultArray['match_result'] === "blue";
 
     if ($isWinner) {
       if (empty($matchResultArray["detail"])) {
-        throw new \Exception("'detail' is required when there is a winner");
+        throw new Exception("'detail' is required when there is a winner");
       }
     }
 
@@ -267,7 +277,7 @@ class MatchService
 
     if ($isKo) {
       if (empty($matchResultArray["round"])) {
-        throw new \Exception("'round' is required when winner got KO");
+        throw new Exception("'round' is required when winner got KO");
       }
     }
   }

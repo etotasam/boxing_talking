@@ -26,7 +26,9 @@ class PreUserService
   public function createPreUserAndSendEmail($name, $email, $password): void
   {
     $preUser = $this->preUserRepository->createPreUser($name, $email, $password);
-    abort_if(!$preUser, 500);
+    if (!$preUser) {
+      throw new Exception("Failed create preUser", 500);
+    }
     MailSendJob::dispatch($preUser->id, $name, $email);
   }
 }

@@ -61,7 +61,7 @@ class WinLossPredictionController extends ApiController
             if ($e->getCode() === 404) {
                 return $this->responseNotFound($e->getMessage());
             }
-            return $this->responseInvalidQuery($e->getMessage() ?? "Failed vote prediction");
+            return $this->responseInvalidQuery($e->getMessage());
         }
 
         return $this->responseSuccessful("Success vote win-loss prediction");

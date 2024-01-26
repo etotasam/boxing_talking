@@ -50,7 +50,7 @@ class BoxerRepository implements BoxerRepositoryInterface
     $page = $reqPage ?? 1;
     $under = ($page - 1) * $limit;
 
-    list($getBoxerQuery, $getCountQuery) = $this->buildQueryForGetBoxers($searchWordArray, $under, $limit);
+    [$getBoxerQuery, $getCountQuery] = $this->buildQueryForGetBoxers($searchWordArray, $under, $limit);
     $boxers = $getBoxerQuery->with(["titles.organization", "titles.weightDivision"])->get();
     $boxersCount = (int) $getCountQuery->count();
 

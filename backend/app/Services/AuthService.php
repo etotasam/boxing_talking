@@ -40,7 +40,7 @@ class AuthService
     } else if ($this->guest->isGuestUser()) {
       $userId = (string)$this->guest->getGuestUser()->id;
     } else {
-      throw new Exception("No auth", 41);
+      throw new Exception("Can not post with no auth", 41);
     }
 
     return $userId;

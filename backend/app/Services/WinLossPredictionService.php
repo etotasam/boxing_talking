@@ -67,7 +67,7 @@ class WinLossPredictionService
       $this->matchService->matchPredictionCountUpdate($matchId, $prediction);
     } catch (\Exception $e) {
       DB::rollBack();
-      throw new \Exception($e->getMessage() ?? "Failed vote win-loss prediction");
+      throw new \Exception($e->getMessage());
     }
 
     DB::commit();
