@@ -1,10 +1,9 @@
 import React from 'react';
 import { ClearFullScreenDiv } from '@/components/atomic/ClearFullScreenDiv';
-// import { loginModalSelector } from '@/store/loginModalState';
 import { motion, AnimatePresence } from 'framer-motion';
 // ! recoil
 import { useSetRecoilState, useRecoilValue } from 'recoil';
-import { formTypeSelector, FORM_TYPE } from '@/store/formTypeState';
+import { formTypeState, FORM_TYPE } from '@/store/formTypeState';
 // ! components
 import { SignUpForm } from '../SignUpForm';
 // ! hooks
@@ -18,12 +17,8 @@ import {
 
 export const LoginFormModal = () => {
   // ! recoil
-  const formType = useRecoilValue(formTypeSelector);
-  // !loginモーダルを閉じるメソッド
-  // const setState = useSetRecoilState(loginModalSelector);
-  // const loginModalHide = () => {
-  //   setState(false);
-  // };
+  const formType = useRecoilValue(formTypeState);
+
   return (
     <>
       <ClearFullScreenDiv
@@ -48,7 +43,7 @@ const LoginForm = () => {
   const [defaultPassword, setDefaultPassword] = React.useState<string>('');
 
   // ! recoil
-  const setFormType = useSetRecoilState(formTypeSelector);
+  const setFormType = useSetRecoilState(formTypeState);
 
   // ! hooks
   const { showToastModal, setToastModal } = useToastModal();

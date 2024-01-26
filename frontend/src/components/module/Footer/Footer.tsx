@@ -1,7 +1,9 @@
+import { useEffect, useRef } from 'react';
 import { ROUTE_PATH } from '@/assets/RoutePath';
 import { Link, useLocation } from 'react-router-dom';
-import { useFooterHeight } from '@/hooks/useFooterHeight';
-import { useEffect, useRef } from 'react';
+//! recoil
+import { useSetRecoilState } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
 
 export const Footer = () => {
   const footerRef = useRef<HTMLDivElement>(null);
@@ -11,7 +13,7 @@ export const Footer = () => {
     setFooterHeight(footerRef.current.clientHeight);
   }, [footerRef.current]);
 
-  const { setter: setFooterHeight } = useFooterHeight();
+  const setFooterHeight = useSetRecoilState(elementSizeState('FOOTER_HEIGHT'));
   const location = useLocation();
   return (
     <>

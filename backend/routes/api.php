@@ -19,8 +19,7 @@ use App\Http\Controllers\Api\TestController;
 |--------------------------------------------------------------------------
 */
 
-// Route::get('/test_test', [TestController::class, 'test_test']);
-// Route::get('/lock', [TestController::class, 'isLock']);
+// Route::get('/test', [TestController::class, 'test']);
 
 Route::get('/user', [AuthController::class, 'fetch']);
 Route::get('/guest/user', function () {
@@ -36,7 +35,6 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/guest/login', [AuthController::class, 'guestLogin']);
 //? 試合
 Route::get('/match', [MatchController::class, 'index']);
-// Route::get('/match/result/{match_id}', [MatchController::class, 'result']);
 Route::get('/match/{match}/show', [MatchController::class, 'show']);
 Route::post('/match/result', [MatchController::class, 'result']);
 //? ボクサー
@@ -62,8 +60,8 @@ Route::middleware('administrator')->group(function () {
     Route::post('/match', [MatchController::class, 'store']);
     Route::delete('/match', [MatchController::class, 'destroy']);
     Route::patch('/match', [MatchController::class, 'update']);
-    //コメント削除
+    //?コメント削除
     Route::delete('/comment/{comment}', [CommentController::class, 'destroy']);
-    //csv作成
+    //?csv作成
     Route::get('/csv ', [DbDataToCsvController::class, 'output']);
 });

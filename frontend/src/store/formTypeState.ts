@@ -1,4 +1,4 @@
-import { atom, selector } from "recoil";
+import { atom } from "recoil";
 
 export const FORM_TYPE = {
   LOGIN_FORM: "LOGIN_FORM",
@@ -9,18 +9,7 @@ type StateType = typeof FORM_TYPE[keyof typeof FORM_TYPE]
 
 const initialState = FORM_TYPE.LOGIN_FORM
 
-const formTypeState = atom<StateType>({
+export const formTypeState = atom<StateType>({
   key: "formTypeState",
   default: initialState
-})
-
-export const formTypeSelector = selector({
-  key: "formTypeSelector",
-  get: ({ get }) => {
-    const state = get(formTypeState)
-    return state
-  },
-  set: ({ set }, newState) => {
-    set(formTypeState, newState)
-  }
 })

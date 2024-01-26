@@ -1,6 +1,6 @@
 // !Recoil
-import { useRecoilValue, useSetRecoilState } from "recoil"
-import { toastModalSelector } from "@/store/toastModalState"
+import { useRecoilState } from "recoil"
+import { toastModalState } from "@/store/toastModalState"
 // !types
 import { MessageType, BgColorType } from "@/assets/types";
 
@@ -9,9 +9,7 @@ import { MessageType, BgColorType } from "@/assets/types";
 export const useToastModal = () => {
 
   //? ToastModalの状態(show/hide)
-  const { isShow: isShowToastModal, message: messageOnToast, bgColor } = useRecoilValue(toastModalSelector)
-
-  const setter = useSetRecoilState(toastModalSelector)
+  const [{ isShow: isShowToastModal, message: messageOnToast, bgColor }, setter] = useRecoilState(toastModalState)
 
   /**
    * ! ToastModalを表示させる

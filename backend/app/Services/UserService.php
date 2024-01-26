@@ -33,7 +33,7 @@ class UserService
   }
 
 
-  public function logoutUserService(): void
+  public function logoutUserExecute(): void
   {
     Auth::logout();
   }
@@ -50,7 +50,7 @@ class UserService
     $secretKey = config('const.jwt_secret_key');
     if (!$secretKey) {
       \Log::error("Secret-key has not been found");
-      abort(500);
+      throw new Exception("Secret-key has not found");
     }
     $decodedToken = JWT::decode($token, new Key($secretKey, 'HS256'));
 
@@ -68,8 +68,8 @@ class UserService
       $preUser->delete();
     } catch (\Exception $e) {
       DB::rollback();
-      \Log::error($e->getMessage());
-      abort(500);
+      \Log::error("Failed create user :" . $e->getMessage());
+      throw new Exception("Failed create user :" . $e->getMessage());
     }
 
     DB::commit();

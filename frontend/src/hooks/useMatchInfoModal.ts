@@ -1,15 +1,13 @@
 // !Recoil
-import { useSetRecoilState, useRecoilValue } from "recoil"
-import { viewMatchInfoModalSelector } from "@/store/viewMatchInfoModalState"
+import { useRecoilState } from "recoil"
+import { modalState } from "@/store/modalState"
 // import { useEffect } from "react"
 
 
 
 export const useMatchInfoModal = () => {
 
-  const setter = useSetRecoilState(viewMatchInfoModalSelector)
-  const state = useRecoilValue(viewMatchInfoModalSelector)
-
+  const [state, setter] = useRecoilState(modalState("MATCH_INFO"))
 
   const hideMatchInfoModal = () => {
     setter(false)

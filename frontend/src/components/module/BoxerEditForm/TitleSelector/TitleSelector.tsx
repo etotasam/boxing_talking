@@ -2,17 +2,17 @@ import { useEffect, useState } from 'react';
 import { cloneDeep } from 'lodash';
 // ! data
 import { ORGANIZATIONS, WEIGHT_CLASS } from '@/assets/boxerData';
-
-// ! hooks
-import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
+//! recoil
+import { useRecoilState } from 'recoil';
+import { boxerDataOnFormState } from '@/store/boxerDataOnFormState';
 
 export const TitleSelector = () => {
   // ! use hook
   // ? タイトル入力欄(<input> <select>)の数を決める useState
   const [countHasBelt, setCountHasBelt] = useState(1);
 
-  const { state: boxerDataOnForm, setter: setBoxerDataOnForm } =
-    useBoxerDataOnForm();
+  const [boxerDataOnForm, setBoxerDataOnForm] =
+    useRecoilState(boxerDataOnFormState);
 
   // ? 団体と階級を選択した場合入力欄を追加
   useEffect(() => {

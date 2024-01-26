@@ -38,8 +38,10 @@ class CommentController extends ApiController
         try {
             $commentsOnMatch = $this->commentRepository->getCommentsOnMatchByMatchId($matchId);
         } catch (QueryException $e) {
-            \Log::error($e->getMessage());
-            return $this->responseInvalidQuery('Invalid query');
+            \Log::error("database error with get comments" . $e->getMessage());
+            return $this->responseInvalidQuery('Unexpected error on database :', $e->getMessage());
+        } catch (Exception $e) {
+            return $this->responseInvalidQuery('Failed get comments');
         }
 
         return CommentResource::collection($commentsOnMatch);
@@ -63,15 +65,14 @@ class CommentController extends ApiController
         try {
             $userId = $this->authService->getUserIdOrGuestUserId();
             $this->commentService->postCommentExecute($userId, $matchId, $comment);
-        } catch (HttpException $e) {
-            return $this->responseInvalidQuery("Invalid query");
         } catch (\Exception $e) {
             if ($e->getCode() === 41) {
-                return $this->responseUnauthorized("No auth");
+                return $this->responseUnauthorized($e->getMessage());
             }
+            return $this->responseInvalidQuery("Failed post comment");
         };
 
-        return $this->responseSuccessful("Comment has been post");
+        return $this->responseSuccessful("Comment has post");
     }
 
     /**

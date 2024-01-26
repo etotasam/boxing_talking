@@ -14,12 +14,14 @@ import { MatchInfo } from '@/components/module/MatchInfo';
 import { MatchSetter } from '@/components/module/MatchSetter/MatchSetter';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
+//! recoil
+import { useRecoilValue } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
 // ! hooks
 import { useFetchAllMatches, useDeleteMatch } from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useSortMatches } from '@/hooks/useSortMatches';
-import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useMatchResult } from '@/hooks/apiHooks/useMatch';
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 //! types
@@ -30,8 +32,8 @@ import { Button } from '@/components/atomic/Button';
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const MatchEdit = () => {
-  // ! use hook
-  const { state: headerHeight } = useHeaderHeight();
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+  // ? use hook
   const { resetLoadingState } = useLoading();
   const { data: matchesData } = useFetchAllMatches();
   const { sortedMatches } = useSortMatches(matchesData);

@@ -2,7 +2,7 @@ import { useCallback } from "react"
 // import { useLocation } from "react-router-dom"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
-import { QUERY_KEY } from "@/assets/QueryKeys"
+import { QUERY_KEY } from "@/assets/queryKeys"
 import { API_PATH } from "@/assets/ApiPath"
 //! hook
 // import { useAuth } from "@/hooks/useAuth"

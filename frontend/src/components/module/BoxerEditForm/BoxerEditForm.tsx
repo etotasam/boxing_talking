@@ -4,8 +4,9 @@ import { STANCE, initialBoxerDataOnForm } from '@/assets/boxerData';
 import { NATIONALITY } from '@/assets/NationalFlagData';
 //! type
 import { BoxerType } from '@/assets/types';
-// ! hooks
-import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
+//! recoil
+import { useRecoilState } from 'recoil';
+import { boxerDataOnFormState } from '@/store/boxerDataOnFormState';
 // ! component
 import { TitleSelector } from './TitleSelector';
 
@@ -20,9 +21,9 @@ type PropsType = {
 const countryUndefined = '国籍の選択';
 
 export const BoxerEditForm = (props: PropsType) => {
-  // ! use hook
-  const { state: boxerDataOnForm, setter: setBoxerDataToForm } =
-    useBoxerDataOnForm();
+  // ? recoil
+  const [boxerDataOnForm, setBoxerDataToForm] =
+    useRecoilState(boxerDataOnFormState);
 
   // ? 入力させない様にするガードモーダル
   // const { isGuard = false } = props;

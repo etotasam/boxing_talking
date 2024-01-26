@@ -23,7 +23,7 @@ class ParseRequestNameTest extends TestCase
   public function testParseRequestNameInThatCaseNull(): void
   {
     $response = $this->boxerService->parseRequestName(null);
-    list($eng_name, $name) = $response;
+    [$eng_name, $name] = $response;
     $this->assertSame(null, $name);
     $this->assertSame(null, $eng_name);
   }
@@ -36,7 +36,7 @@ class ParseRequestNameTest extends TestCase
   {
     $japaneseName = "ボクサーの名前";
     $response = $this->boxerService->parseRequestName($japaneseName);
-    list($eng_name, $name) = $response;
+    [$eng_name, $name] = $response;
     $this->assertSame($japaneseName, $name);
     $this->assertSame(null, $eng_name);
   }
@@ -47,7 +47,7 @@ class ParseRequestNameTest extends TestCase
   {
     $engName = "english name";
     $response = $this->boxerService->parseRequestName($engName);
-    list($eng_name, $name) = $response;
+    [$eng_name, $name] = $response;
     $this->assertSame(null, $name);
     $this->assertSame($engName, $eng_name);
   }

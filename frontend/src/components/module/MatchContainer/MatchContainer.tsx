@@ -15,8 +15,9 @@ import {
 } from '@/hooks/apiHooks/uesWinLossPrediction';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { usePostComment, useFetchComments } from '@/hooks/apiHooks/useComment';
-import { useHeaderHeight } from '@/hooks/useHeaderHeight';
-import { usePostCommentHeight } from '@/hooks/usePostCommentHeight';
+//! recoil
+import { useSetRecoilState, useRecoilValue } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
 //! component
 import { MatchComponent } from './MatchComponent';
 import {
@@ -46,8 +47,10 @@ export const MatchContainer = (props: PropsType) => {
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
   const isEitherAuth = Boolean(isGuest || authUser);
-  const { state: headerHeight } = useHeaderHeight();
-  const { setter: setRecoilPostCommentHeight } = usePostCommentHeight();
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+  const setRecoilPostCommentHeight = useSetRecoilState(
+    elementSizeState('POST_COMMENT_HEIGHT')
+  );
 
   const {
     postComment,

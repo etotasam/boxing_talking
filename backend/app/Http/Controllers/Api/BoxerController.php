@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Exceptions\FailedTitleException;
 use App\Exceptions\BoxerException;
 use App\Http\Requests\BoxerRequest;
 use App\Repositories\Interfaces\BoxerRepositoryInterface;
 use App\Repositories\Interfaces\MatchRepositoryInterface;
 use App\Services\BoxerService;
 use App\Http\Resources\BoxerCollection;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\QueryException;
 
 class BoxerController extends ApiController
@@ -35,19 +35,17 @@ class BoxerController extends ApiController
      */
     public function index(Request $request): BoxerCollection|JsonResponse
     {
-        list($eng_name, $name) = $this->boxerService->parseRequestName($request->query('name'));
+        [$eng_name, $name] = $this->boxerService->parseRequestName($request->query('name'));
         $country = $request->query('country') ?? null;
 
         $searchWordArray = array_filter(compact("name", "eng_name", "country"));
 
         try {
-            list($boxers, $boxersCount) = $this->boxerRepository->getBoxers($searchWordArray, $request->query('page'), $request->query('limit'));
-        } catch (QueryException $e) {
-            \Log::error($e->getMessage());
-            return $this->responseInvalidQuery("Failed get boxers");
+            [$boxers, $boxersCount] = $this->boxerRepository->getBoxers($searchWordArray, $request->query('page'), $request->query('limit'));
+            return new BoxerCollection($boxers, $boxersCount);
+        } catch (Exception $e) {
+            return $this->responseInvalidQuery("Failed get boxers :" . $e->getMessage());
         }
-
-        return new BoxerCollection($boxers, $boxersCount);
     }
 
     /**
@@ -58,11 +56,10 @@ class BoxerController extends ApiController
     {
         try {
             $this->boxerService->createBoxer($request->toArray());
-        } catch (FailedTitleException $e) {
+            return $this->responseSuccessful("Success create boxer");
+        } catch (Exception $e) {
             return $this->responseInvalidQuery($e->getMessage());
         }
-
-        return $this->responseSuccessful("Success create boxer");
     }
 
     /**
@@ -81,11 +78,12 @@ class BoxerController extends ApiController
 
         try {
             $this->boxerService->deleteBoxerExecute($boxerId);
+            return $this->responseSuccessful("Success delete boxer");
         } catch (BoxerException $e) {
             return $this->responseNotFound($e->getMessage(), 44);
+        } catch (Exception $e) {
+            return $this->responseInvalidQuery($e->getMessage());
         }
-
-        return $this->responseSuccessful("Success delete boxer");
     }
 
     /**
@@ -101,10 +99,9 @@ class BoxerController extends ApiController
         }
         try {
             $this->boxerService->updateBoxerExecute($updateBoxerData);
-        } catch (FailedTitleException $e) {
+            return $this->responseSuccessful("Successful boxer update");
+        } catch (Exception $e) {
             return $this->responseInvalidQuery($e->getMessage());
         }
-
-        return $this->responseSuccessful("Successful boxer update");
     }
 }
