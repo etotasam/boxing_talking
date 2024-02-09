@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/RoutePath';
+import { VISUAL_MODE } from '@/store/visualModeState';
+
 // ! components
 import { FightBox } from '@/components/module/FightBox';
 import { SimpleFightBox } from '@/components/module/SimpleFightBox';
@@ -59,9 +61,9 @@ export const Home = () => {
 
           <div className="text-center md:my-10 my-5">
             <Link to={ROUTE_PATH.PAST_MATCHES}>
-              <button className="py-2 px-4 bg-stone-600 hover:bg-stone-800 duration-300 text-white rounded-sm sm:w-auto w-[95%]">
+              <a className="inline-block py-2 px-4 bg-stone-600 hover:bg-stone-800 duration-300 text-white rounded-sm sm:w-auto w-[95%]">
                 その他過去の試合一覧
-              </button>
+              </a>
             </Link>
           </div>
         </>
@@ -91,7 +93,7 @@ const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
   }, [myAllPredictionVote]);
   const { device } = useWindowSize();
 
-  if (device === 'SP' || visualMode === 'simple')
+  if (device === 'SP' || visualMode === VISUAL_MODE.SIMPLE)
     return (
       <SimpleFightBox
         isPredictionVote={isPredictionVote}

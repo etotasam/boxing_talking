@@ -22,6 +22,8 @@ import { NATIONALITY } from '@/assets/NationalFlagData';
 //! hook
 import { useToastModal } from '@/hooks/useToastModal';
 import { useUpdateMatch } from '@/hooks/apiHooks/useMatch';
+//! component
+import { Button } from '@/components/atomic/Button';
 
 export const MatchSetter = ({
   selectMatch,
@@ -370,10 +372,8 @@ export const MatchSetter = ({
           />
         </div>
 
-        <div className="w-full flex justify-center">
-          <button className="bg-stone-600 tracking-[0.5em] text-white py-2 px-5 rounded mt-10 w-full">
-            登録
-          </button>
+        <div className="w-full flex justify-center mt-5">
+          <Button styleName="onForm">登録</Button>
         </div>
       </form>
     </div>

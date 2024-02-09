@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { ComponentProps } from 'react';
 import { useVisualModeController } from '@/hooks/useVisualModeController';
+import { VISUAL_MODE } from '@/store/visualModeState';
 //! icons
 import { FaExchangeAlt } from 'react-icons/fa';
 
@@ -18,8 +19,8 @@ export const VisualModeChangeIcon = ({ onClick }: PropsType) => {
         <div
           className={clsx(
             'text-white absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] duration-300',
-            visualMode === 'simple' && 'scale-x-[-1]',
-            visualMode === 'standard' && 'scale-x-1'
+            visualMode === VISUAL_MODE.SIMPLE && 'scale-x-[-1]',
+            visualMode === VISUAL_MODE.STANDARD && 'scale-x-1'
           )}
         >
           <FaExchangeAlt />

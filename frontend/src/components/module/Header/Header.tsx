@@ -32,7 +32,6 @@ export const Header = (props: PropsType) => {
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
   const { pathname } = useLocation();
-  const { device } = useWindowSize();
 
   const setHeaderHeight = useSetRecoilState(elementSizeState('HEADER_HEIGHT'));
 
@@ -47,12 +46,11 @@ export const Header = (props: PropsType) => {
     <>
       <header
         ref={headerRef}
-        className="z-10 h-[80px] fixed top-0 left-0 w-full flex bg-white after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
+        className="z-10 h-[80px] fixed top-0 left-0 w-full flex backdrop-blur-md bg-white/60 after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
       >
         <h1
           className={clsx(
-            'sm:text-[48px] text-[32px] font-thin',
-            device === 'PC' && 'md:text-[64px]'
+            'sm:text-[48px] text-[32px] font-thin text-stone-600'
           )}
         >
           {siteTitle}
@@ -108,7 +106,7 @@ const LinksComponents = ({ pathname }: LinksComponentsPropsType) => {
 
   return (
     <>
-      <ul className="absolute bottom-2 sm:static flex sm:items-end md:mb-2 sm:mb-4">
+      <ul className="absolute bottom-2 sm:static flex sm:items-end sm:mb-4">
         {pathname !== ROUTE_PATH.HOME && (
           <li className="md:ml-5 ml-2">
             <ToBoxMatchLinkButton device={device} />
@@ -240,7 +238,7 @@ const LinkButton = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className={clsx(
-        'sm:w-[35px] sm:h-[35px] w-[30px] h-[30px] bg-stone-600 rounded-[50%] flex justify-center items-center text-white text-[16px] hover:text-[18px] duration-100',
+        'sm:w-[35px] sm:h-[35px] w-[30px] h-[30px] bg-white border-stone-800 border-[1px] rounded-[50%] flex justify-center items-center text-stone-800 text-[16px] hover:text-[18px] duration-100',
         className
       )}
     >

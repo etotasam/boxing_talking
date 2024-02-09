@@ -31,6 +31,7 @@ import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
+import { Button } from '@/components/atomic/Button';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -194,7 +195,8 @@ export const BoxerEdit = () => {
                 <SearchBoxer />
                 {/* //? delete */}
                 <div className="mt-10">
-                  <button
+                  <Button
+                    styleName="delete"
                     onClick={() => {
                       if (!isSelectBoxer) {
                         setToastModal({
@@ -206,10 +208,10 @@ export const BoxerEdit = () => {
                       }
                       setIsShowDeleteConfirmDialog(true);
                     }}
-                    className="bg-red-600 text-white rounded py-2 px-10"
+                    // className="bg-red-600 text-white rounded py-2 px-10"
                   >
                     削除
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -305,18 +307,8 @@ const BoxerDeleteConfirmDialog = ({
   return (
     <ConfirmDialog header={`${targetName} を削除してよろしいですか？`}>
       <div className="flex justify-between">
-        <button
-          onClick={execution}
-          className="bg-red-500 text-white py-1 px-5 rounded-md"
-        >
-          はい
-        </button>
-        <button
-          onClick={cancel}
-          className="bg-stone-500 text-white py-1 px-5 rounded-md"
-        >
-          いいえ
-        </button>
+        <Button onClick={execution}>はい</Button>
+        <Button onClick={cancel}>いいえ</Button>
       </div>
     </ConfirmDialog>
   );

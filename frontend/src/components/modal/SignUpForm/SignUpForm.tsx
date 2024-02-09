@@ -7,6 +7,8 @@ import { useSetRecoilState } from 'recoil';
 import { formTypeState, FORM_TYPE } from '@/store/formTypeState';
 //! hooks
 import { usePreSignUp } from '@/hooks/apiHooks/useAuth';
+//! component
+import { CustomButton } from '@/components/atomic/Button';
 
 export const SignUpForm = () => {
   const { preSignUp, isSuccess: isSuccessPreRegister } = usePreSignUp();
@@ -19,6 +21,9 @@ export const SignUpForm = () => {
   const [isPassedValidateEmail, setIsPassedValidateEmail] = useState<boolean>();
   const [isPassedValidatePassword, setIsPassedValidatePassword] =
     useState<boolean>();
+  //? すべての検証状態
+  const isValidated =
+    isPassedValidateName && isPassedValidateEmail && isPassedValidatePassword;
 
   useEffect(() => {
     const state = name.length >= 3 && name.length <= 30;
@@ -65,8 +70,7 @@ export const SignUpForm = () => {
 
   // ! recoil
   const setFormType = useSetRecoilState(formTypeState);
-  const toLoginForm = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
+  const toLoginForm = () => {
     setFormType(FORM_TYPE.LOGIN_FORM);
   };
 
@@ -157,29 +161,28 @@ export const SignUpForm = () => {
             </div>
 
             <div className="relative mt-5 ">
-              <button
+              <CustomButton
+                disabled={!isValidated}
                 className={clsx(
-                  `h-[30px] w-full rounded duration-300 text-white`,
-                  isPassedValidateName &&
-                    isPassedValidateEmail &&
-                    isPassedValidatePassword
-                    ? `bg-green-500 hover:bg-green-600`
-                    : `bg-stone-500 pointer-events-none cursor-default`
+                  `w-full py-1`,
+                  isValidated
+                    ? `bg-green-700 hover:bg-green-600`
+                    : `bg-stone-500 pointer-events-none`
                 )}
               >
                 登録
-              </button>
+              </CustomButton>
             </div>
 
             <div className="text-right mt-5">
-              <button
+              <a
                 onClick={toLoginForm}
                 className={clsx(
                   `hover:border-b hover:border-blue-600 text-blue-600 text-sm cursor-pointer`
                 )}
               >
                 ログイン
-              </button>
+              </a>
             </div>
           </form>
         </motion.div>

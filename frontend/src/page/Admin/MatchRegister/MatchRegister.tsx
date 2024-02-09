@@ -31,6 +31,7 @@ import { elementSizeState } from '@/store/elementSizeState';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
+import { Button } from '@/components/atomic/Button';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -501,10 +502,8 @@ const MatchDataSetter = ({
         />
       </div>
 
-      <div className="w-full flex justify-center">
-        <button className="bg-stone-600 tracking-[0.5em] text-white py-2 px-5 rounded mt-10 w-full">
-          登録
-        </button>
+      <div className="w-full flex justify-center mt-5">
+        <Button styleName="onForm">登録</Button>
       </div>
     </form>
     // </div>
