@@ -3,14 +3,61 @@ import dayjs from 'dayjs';
 // ! image
 import crown from '@/assets/images/etc/champion.svg';
 // ! types
-import { BoxerType } from '@/assets/types';
+import { BoxerType, MatchResultType } from '@/assets/types';
 // ! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
+import { useEffect, useState } from 'react';
 
-type PropsType = React.ComponentProps<'div'> & { boxer: BoxerType };
+type PropsType = React.ComponentProps<'div'> & {
+  boxer: BoxerType;
+  matchResult: MatchResultType | null;
+  boxerColor: 'red' | 'blue';
+};
 
-export const BoxerInfo = ({ boxer, className }: PropsType) => {
+export const BoxerInfo = ({
+  boxer,
+  className,
+  matchResult,
+  boxerColor,
+}: PropsType) => {
   const currentDate = dayjs();
+  const isResult = matchResult?.result ?? false;
+  const isKo = matchResult?.detail
+    ? matchResult.detail === 'ko' || matchResult.detail === 'tko'
+    : false;
+
+  const [isWin, setIsWin] = useState<boolean>();
+  const [isLoss, setIsLoss] = useState<boolean>();
+  const [isDraw, setIsDraw] = useState<boolean>();
+
+  //? isWin, isLoss, isDrawをセットする関数
+  const setWinLoseResult = () => {
+    if (isResult === boxerColor) {
+      setIsWin(true);
+      return;
+    }
+
+    if (
+      isResult &&
+      isResult !== boxerColor &&
+      isResult !== 'draw' &&
+      isResult !== 'no-contest'
+    ) {
+      setIsLoss(true);
+      return;
+    }
+
+    if (isResult === 'draw') {
+      setIsDraw(true);
+      return;
+    }
+  };
+
+  useEffect(() => {
+    if (!isResult) return;
+    setWinLoseResult();
+  }, [isResult]);
+
   return (
     <div className={clsx('w-[300px] h-full flex justify-center', className)}>
       {/* <div className="h-[60%] border-b-[1px] border-stone-300">データ</div> */}
@@ -26,16 +73,42 @@ export const BoxerInfo = ({ boxer, className }: PropsType) => {
           </div>
           {/* //? 戦績 */}
           <ul className="flex justify-between w-full mt-7 text-white">
-            <li className="relative flex-1 bg-red-500 before:content-['WIN'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm before:text-gray-600">
+            <li
+              className={clsx(
+                "relative flex-1 bg-red-500 before:content-['WIN'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
+                isWin
+                  ? 'before:text-red-600 before:font-bold text-yellow-300'
+                  : 'before:text-gray-600'
+              )}
+            >
               {boxer.win}
-              <span className="absolute text-sm bottom-[-20px] left-[50%] text-gray-600 translate-x-[-50%] after:content-['KO']">
+              <span
+                className={clsx(
+                  "absolute text-sm bottom-[-20px] left-[50%] translate-x-[-50%] after:content-['KO']",
+                  isWin && isKo ? 'text-blue-600 font-bold' : 'text-gray-600'
+                )}
+              >
                 {boxer.ko}
               </span>
             </li>
-            <li className="relative flex-1 bg-gray-500 before:content-['DRAW'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm before:text-gray-600">
+            <li
+              className={clsx(
+                "relative flex-1 bg-gray-500 before:content-['DRAW'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
+                isDraw
+                  ? 'before:text-red-600 before:font-bold text-yellow-300'
+                  : 'before:text-gray-600'
+              )}
+            >
               {boxer.draw}
             </li>
-            <li className="relative flex-1 bg-stone-800 before:content-['LOSE'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm before:text-gray-600">
+            <li
+              className={clsx(
+                "relative flex-1 bg-stone-800 before:content-['LOSE'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
+                isLoss
+                  ? 'before:text-red-600 before:font-bold text-yellow-300'
+                  : 'before:text-gray-600'
+              )}
+            >
               {boxer.lose}
             </li>
           </ul>
@@ -88,7 +161,10 @@ export const BoxerInfo = ({ boxer, className }: PropsType) => {
           {Boolean(boxer.titles.length) && (
             <ul className="mt-3">
               {boxer.titles.map((title) => (
-                <li key={`${title.organization}_${title.weight}`} className="mt-2">
+                <li
+                  key={`${title.organization}_${title.weight}`}
+                  className="mt-2"
+                >
                   <p className="relative inline-block">
                     <span className="absolute top-[2px] left-[-23px] w-[18px] h-[18px] mr-2">
                       <img src={crown} alt="" />
