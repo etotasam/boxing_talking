@@ -74,10 +74,13 @@ const SuccessRegister = () => {
           <br />
           下記よりログインしてください。
         </p>
-        <Link to={ROUTE_PATH.HOME}>
-          <button className="mt-5 py-1 px-4 bg-stone-700 hover:bg-stone-500 text-white rounded-md">
-            ログイン
-          </button>
+        <Link
+          className="inline-block mt-5 py-1 px-4 bg-stone-700 hover:bg-stone-500 text-white rounded-md"
+          to={ROUTE_PATH.HOME}
+        >
+          {/* <span className="inline-block mt-5 py-1 px-4 bg-stone-700 hover:bg-stone-500 text-white rounded-md"> */}
+          ログイン
+          {/* </span> */}
         </Link>
       </div>
     </>
@@ -94,10 +97,13 @@ const FiledAuth = () => {
         ) : (
           <p>無効なリクエストです</p>
         )}
-        <Link to={ROUTE_PATH.HOME}>
-          <button className="mt-5 py-1 px-4 bg-stone-700 hover:bg-stone-500 text-white rounded-md">
-            Home
-          </button>
+        <Link
+          className="inline-block mt-5 py-1 px-4 bg-stone-700 hover:bg-stone-500 text-white rounded-md"
+          to={ROUTE_PATH.HOME}
+        >
+          {/* <span className="inline-block mt-5 py-1 px-4 bg-stone-700 hover:bg-stone-500 text-white rounded-md"> */}
+          Home
+          {/* </span> */}
         </Link>
       </div>
     </>

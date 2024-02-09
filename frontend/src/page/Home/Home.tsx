@@ -60,10 +60,11 @@ export const Home = () => {
           </ul>
 
           <div className="text-center md:my-10 my-5">
-            <Link to={ROUTE_PATH.PAST_MATCHES}>
-              <a className="inline-block py-2 px-4 bg-stone-600 hover:bg-stone-800 duration-300 text-white rounded-sm sm:w-auto w-[95%]">
-                その他過去の試合一覧
-              </a>
+            <Link
+              className="inline-block py-2 px-4 bg-stone-600 hover:bg-stone-800 duration-300 text-white rounded-sm sm:w-auto w-[95%]"
+              to={ROUTE_PATH.PAST_MATCHES}
+            >
+              その他過去の試合一覧
             </Link>
           </div>
         </>
