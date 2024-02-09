@@ -12,7 +12,7 @@ export const FirstLoadingModal = () => {
       <motion.div
         initial={{ opacity: 1 }}
         exit={{ opacity: 0, translateY: -30, transition: { duration: 0.3 } }}
-        className="bg-white"
+        className="bg-white text-stone-700"
       >
         <h1 className="lg:text-[50px] sm:text-[36px] text-[24px] font-thin text-center select-none">
           {siteTitle}

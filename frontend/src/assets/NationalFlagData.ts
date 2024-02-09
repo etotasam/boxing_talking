@@ -14,7 +14,7 @@ import chinaFlag from '@/assets/images/flags/china.svg';
 import canadaFlag from '@/assets/images/flags/canada.svg';
 import venezuelaFlag from '@/assets/images/flags/venezuela.svg';
 import puertoRicoFlag from '@/assets/images/flags/puerto_rico.svg';
-import saudi_arabiaFlag from '@/assets/images/flags/saudi_arabia.svg';
+import saudiArabiaFlag from '@/assets/images/flags/saudi_arabia.svg';
 import ghanaFlag from '@/assets/images/flags/ghana.svg';
 
 export const NATIONALITY = {
@@ -50,7 +50,7 @@ export const getNationalFlag = (country: NationalityType) => {
   if (country == NATIONALITY.CANADA) return canadaFlag;
   if (country == NATIONALITY.VENEZUELA) return venezuelaFlag;
   if (country == NATIONALITY.PUERTO_RICO) return puertoRicoFlag;
-  if (country == NATIONALITY.SAUDI_ARABIA) return saudi_arabiaFlag;
+  if (country == NATIONALITY.SAUDI_ARABIA) return saudiArabiaFlag;
   if (country == NATIONALITY.GHANA) return ghanaFlag;
 };
 
