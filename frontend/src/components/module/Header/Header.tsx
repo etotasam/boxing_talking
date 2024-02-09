@@ -32,7 +32,6 @@ export const Header = (props: PropsType) => {
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
   const { pathname } = useLocation();
-  const { device } = useWindowSize();
 
   const setHeaderHeight = useSetRecoilState(elementSizeState('HEADER_HEIGHT'));
 
@@ -49,7 +48,11 @@ export const Header = (props: PropsType) => {
         ref={headerRef}
         className="z-10 h-[80px] fixed top-0 left-0 w-full flex backdrop-blur-md bg-white/60 after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
       >
-        <h1 className={clsx('sm:text-[48px] text-[32px] font-thin')}>
+        <h1
+          className={clsx(
+            'sm:text-[48px] text-[32px] font-thin text-stone-600'
+          )}
+        >
           {siteTitle}
         </h1>
 

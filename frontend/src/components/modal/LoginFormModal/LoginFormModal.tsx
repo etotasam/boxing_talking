@@ -6,6 +6,7 @@ import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { formTypeState, FORM_TYPE } from '@/store/formTypeState';
 // ! components
 import { SignUpForm } from '../SignUpForm';
+import { Button } from '@/components/atomic/Button';
 // ! hooks
 import { useLogin, useGuestLogin } from '@/hooks/apiHooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
@@ -101,10 +102,7 @@ const LoginForm = () => {
     },
   };
 
-  const toCreateAccountForm = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
+  const toCreateAccountForm = () => {
     setFormType(FORM_TYPE.SIGN_ON_FORM);
   };
 
@@ -144,27 +142,21 @@ const LoginForm = () => {
             autoComplete="off"
             className="mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 border-stone-400 focus:border-green-500 duration-300 bg-transparent"
           />
-          <div className="relative mt-12 ">
-            <button className="h-[30px] w-full bg-green-600 hover:bg-green-700 rounded duration-300 text-white">
-              ログイン
-            </button>
+          <div className="relative mt-12">
+            <Button styleName="login">ログイン</Button>
           </div>
-          <div className="relative mt-3 ">
-            <button
-              type="button"
-              onClick={gustLogin}
-              className="h-[30px] w-full bg-stone-600 hover:bg-stone-700 rounded duration-300 text-white"
-            >
+          <div className="relative mt-3">
+            <Button styleName="guestLogin" onClick={gustLogin}>
               ゲストログイン
-            </button>
+            </Button>
           </div>
           <div className="text-right mt-5">
-            <button
+            <a
               onClick={toCreateAccountForm}
               className="hover:border-b hover:border-blue-600 text-blue-600 text-sm cursor-pointer"
             >
               アカウント作成
-            </button>
+            </a>
           </div>
         </form>
       </motion.div>

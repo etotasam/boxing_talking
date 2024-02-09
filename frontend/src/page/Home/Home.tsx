@@ -61,9 +61,9 @@ export const Home = () => {
 
           <div className="text-center md:my-10 my-5">
             <Link to={ROUTE_PATH.PAST_MATCHES}>
-              <button className="py-2 px-4 bg-stone-600 hover:bg-stone-800 duration-300 text-white rounded-sm sm:w-auto w-[95%]">
+              <a className="inline-block py-2 px-4 bg-stone-600 hover:bg-stone-800 duration-300 text-white rounded-sm sm:w-auto w-[95%]">
                 その他過去の試合一覧
-              </button>
+              </a>
             </Link>
           </div>
         </>

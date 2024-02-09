@@ -9,6 +9,7 @@ import { useRecoilState } from 'recoil';
 import { boxerDataOnFormState } from '@/store/boxerDataOnFormState';
 // ! component
 import { TitleSelector } from './TitleSelector';
+import { Button } from '@/components/atomic/Button';
 
 type PropsType = {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -244,11 +245,7 @@ export const BoxerEditForm = (props: PropsType) => {
         </div>
 
         <div className="relative mt-5">
-          <button
-            className={`w-full duration-300 py-2 px-2 tracking-[0.5em] rounded bg-stone-600 hover:bg-stone-700 text-white`}
-          >
-            登録
-          </button>
+          <Button styleName={'onForm'}>登録</Button>
         </div>
       </form>
     </div>
