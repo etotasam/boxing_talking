@@ -231,6 +231,7 @@ export const MatchListComponent = ({
   );
 };
 
+//? 削除確認モーダル
 type DeleteConfirmPropsType = {
   cancel: () => void;
   execution: () => void;
@@ -246,6 +247,7 @@ const DeleteConfirm = ({ execution, cancel }: DeleteConfirmPropsType) => {
   );
 };
 
+//? 試合結果登録モーダル
 const MatchResultSetDialog = ({
   selectedMatchData,
   setIsShowMatchResultSelectorDialog,
