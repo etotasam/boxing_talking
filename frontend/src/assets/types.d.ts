@@ -1,5 +1,5 @@
 // ! data
-import { STANCE, ORGANIZATIONS, WEIGHT_CLASS } from "@/assets/boxerData";
+import { STANCE, ORGANIZATIONS, WEIGHT_CLASS, GRADE } from "@/assets/boxerData";
 import { NATIONALITY } from "@/assets/NationalFlagData"
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "./statusesOnToastModal";
 import { needMatchPropertyForUpdate } from "@/assets/needMatchPropertyForUpdate"

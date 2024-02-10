@@ -70,7 +70,9 @@ export const initialBoxerDataOnForm: BoxerType = {
 };
 
 export const GRADE = {
+  // UNDEFINED: undefined,
   TITLE_MATCH: "タイトルマッチ",
+  R12: "12R",
   R10: "10R",
   R8: "8R",
   R6: "6R",
