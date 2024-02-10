@@ -1,15 +1,15 @@
 import { useCallback } from "react"
-import { QUERY_KEY } from "@/assets/QueryKeys"
+import { QUERY_KEY } from "@/assets/queryKeys"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal"
-import { tokenErrorMessageSelector } from "@/store/tokenErrorMessageState"
 import { TOKEN_ERROR_MESSAGE } from "@/assets/tokenErrorMessage"
 import { API_PATH } from "@/assets/ApiPath"
 import { CUSTOM_ERROR_CODE } from "@/assets/CustomErrorCodes"
 //! Recoil
 import { useSetRecoilState } from "recoil"
-import { authenticatingSelector } from "@/store/authenticatingState"
+import { tokenErrorMessageState } from "@/store/tokenErrorMessageState"
+import { authCheckingState } from "@/store/authCheckingState"
 // !hooks
 import { useToastModal } from "../useToastModal"
 import { useLoading } from "../useLoading"
@@ -236,8 +236,8 @@ export const usePreSignUp = () => {
 //! ユーザ登録（本登録）
 export const useSignUpIdentification = () => {
   // ? react query
-  const setAuthenticatingState = useSetRecoilState(authenticatingSelector)
-  const setTokenErrorMessage = useSetRecoilState(tokenErrorMessageSelector)
+  const setAuthenticatingState = useSetRecoilState(authCheckingState)
+  const setTokenErrorMessage = useSetRecoilState(tokenErrorMessageState)
 
   const api = useCallback(async ({ token }: { token: string }) => {
     try {

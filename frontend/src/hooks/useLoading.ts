@@ -1,7 +1,7 @@
 import { useCallback } from "react"
 // !Recoil
 import { useSetRecoilState, useRecoilValue } from "recoil"
-import { loadingSelector } from "@/store/loadingState"
+import { loadingState } from "@/store/loadingState"
 // !types
 
 
@@ -9,9 +9,8 @@ import { loadingSelector } from "@/store/loadingState"
 export const useLoading = () => {
 
   //? ToastModalの状態(show/hide)
-  // const { isShow: isShowToastModal, message: messageOnToast, bgColor } = useRecoilValue(toastModalSelector)
-  const loadingStateSetter = useSetRecoilState(loadingSelector)
-  const { isLoading } = useRecoilValue(loadingSelector)
+  const loadingStateSetter = useSetRecoilState(loadingState)
+  const { isLoading } = useRecoilValue(loadingState)
 
   /**
    * !Recoil

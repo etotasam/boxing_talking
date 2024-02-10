@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 // ! types
 // import { BoxerType } from "@/assets/types";
@@ -11,8 +10,10 @@ import {
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
+//! recoil
+import { useRecoilState } from 'recoil';
+import { boxerDataOnFormState } from '@/store/boxerDataOnFormState';
 //! hooks
-import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useRegisterBoxer } from '@/hooks/apiHooks/useBoxer';
 import { useLoading } from '@/hooks/useLoading';
@@ -23,8 +24,8 @@ const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 export const BoxerRegister = () => {
   // ! use hook
   const { resetLoadingState } = useLoading();
-  const { state: boxerDataOnForm, setter: setEditTargetBoxerData } =
-    useBoxerDataOnForm();
+  const [boxerDataOnForm, setEditTargetBoxerData] =
+    useRecoilState(boxerDataOnFormState);
   const { hideToastModal, showToastModalMessage } = useToastModal();
   const { registerBoxer, isSuccess: successRegisterBoxer } = useRegisterBoxer();
 

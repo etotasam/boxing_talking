@@ -1,19 +1,13 @@
-import { atom, selector } from "recoil";
+import { atom } from "recoil";
 
+export const VISUAL_MODE = {
+  SIMPLE: "SIMPLE",
+  STANDARD: "STANDARD"
+} as const
 
-const visualModeState = atom<"simple" | "standard">({
+type VisualType = typeof VISUAL_MODE[keyof typeof VISUAL_MODE]
+
+export const visualModeState = atom<VisualType>({
   key: "visualModeState",
-  default: "standard"
-})
-
-export const visualModeSelector = selector({
-  key: "visualModeSelector",
-
-  get: ({ get }) => {
-    const state = get(visualModeState)
-    return state
-  },
-  set: ({ set }, newState) => {
-    set(visualModeState, newState)
-  }
+  default: VISUAL_MODE.STANDARD
 })

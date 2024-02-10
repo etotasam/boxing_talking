@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { isEqual } from 'lodash';
 import { Helmet } from 'react-helmet-async';
 //! data
@@ -10,8 +9,11 @@ import {
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
 // ! functions
 import { extractBoxer } from '@/assets/functions';
+//! recoil
+import { useRecoilValue, useRecoilState } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
+import { boxerDataOnFormState } from '@/store/boxerDataOnFormState';
 //! hooks
-import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import {
@@ -19,7 +21,6 @@ import {
   useUpdateBoxerData,
   useDeleteBoxer,
 } from '@/hooks/apiHooks/useBoxer';
-import { useBoxerDataOnForm } from '@/hooks/useBoxerDataOnForm';
 //! types
 import { BoxerType } from '@/assets/types';
 //! type evolution
@@ -30,12 +31,13 @@ import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
+import { Button } from '@/components/atomic/Button';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const BoxerEdit = () => {
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   // ? use hook
-  const { state: headerHeight } = useHeaderHeight();
   const { resetLoadingState } = useLoading();
   const {
     setToastModal,
@@ -43,8 +45,8 @@ export const BoxerEdit = () => {
     hideToastModal,
     showToastModalMessage,
   } = useToastModal();
-  const { state: editTargetBoxerData, setter: setEditTargetBoxerData } =
-    useBoxerDataOnForm();
+  const [editTargetBoxerData, setEditTargetBoxerData] =
+    useRecoilState(boxerDataOnFormState);
   const { updateBoxer } = useUpdateBoxerData();
   const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
   const { boxersData, pageCount } = useFetchBoxers();
@@ -193,7 +195,8 @@ export const BoxerEdit = () => {
                 <SearchBoxer />
                 {/* //? delete */}
                 <div className="mt-10">
-                  <button
+                  <Button
+                    styleName="delete"
                     onClick={() => {
                       if (!isSelectBoxer) {
                         setToastModal({
@@ -205,10 +208,10 @@ export const BoxerEdit = () => {
                       }
                       setIsShowDeleteConfirmDialog(true);
                     }}
-                    className="bg-red-600 text-white rounded py-2 px-10"
+                    // className="bg-red-600 text-white rounded py-2 px-10"
                   >
                     削除
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -304,18 +307,8 @@ const BoxerDeleteConfirmDialog = ({
   return (
     <ConfirmDialog header={`${targetName} を削除してよろしいですか？`}>
       <div className="flex justify-between">
-        <button
-          onClick={execution}
-          className="bg-red-500 text-white py-1 px-5 rounded-md"
-        >
-          はい
-        </button>
-        <button
-          onClick={cancel}
-          className="bg-stone-500 text-white py-1 px-5 rounded-md"
-        >
-          いいえ
-        </button>
+        <Button onClick={execution}>はい</Button>
+        <Button onClick={cancel}>いいえ</Button>
       </div>
     </ConfirmDialog>
   );

@@ -32,11 +32,10 @@ class MatchController extends ApiController
     {
         try {
             $matches =  $this->matchService->getMatchesExecute($request->query('range'));
-        } catch (QueryException $e) {
-            \Log::error($e->getMessage());
-            return $this->responseInvalidQuery("Failed get matches");
         } catch (NonAdministratorException $e) {
             return $this->responseUnauthorized($e->getMessage());
+        } catch (Exception $e) {
+            return $this->responseInvalidQuery("Failed get Matches :" . $e->getMessage());
         }
 
         return BoxingMatchResource::collection($matches);
@@ -78,15 +77,8 @@ class MatchController extends ApiController
     {
         try {
             $this->matchService->storeMatch($request->toArray());
-        } catch (HttpException) {
-            return $this->responseInvalidQuery("Failed create match");
-        } catch (\Exception $e) {
-            if ($e->getCode() === 50) {
-                return $this->responseInvalidQuery("Failed create title_matches");
-            }
-            if ($e->getCode() === 51) {
-                return $this->responseInvalidQuery("Failed create matches");
-            }
+        } catch (Exception $e) {
+            return $this->responseInvalidQuery($e->getMessage());
         }
         return $this->responseSuccessful("Success store match");
     }
@@ -102,12 +94,11 @@ class MatchController extends ApiController
     {
         try {
             $this->matchService->deleteMatchExecute($request->match_id);
-        } catch (HttpException $e) {
-            return $this->responseInvalidQuery("Failed delete match");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($e->getCode() === 44) {
                 return $this->responseNotFound($e->getMessage());
             }
+            return $this->responseInvalidQuery($e->getMessage());
         }
 
         return $this->responseSuccessful("Success match delete");
@@ -124,13 +115,21 @@ class MatchController extends ApiController
     {
         try {
             $this->matchService->updateMatch($request->match_id, $request->update_match_data);
-        } catch (HttpException) {
-            return $this->responseInvalidQuery("Failed update match");
+        } catch (Exception $e) {
+            return $this->responseInvalidQuery($e->getMessage());
         }
 
         return $this->responseSuccessful("Success update match");
     }
 
+    /**
+     * @param int match_id
+     * @param string result
+     * @param string | null detail
+     * @param int | null round
+     *
+     * @return JsonResponse
+     */
     public function result(Request $request)
     {
         $matchResultArray = [
@@ -139,10 +138,12 @@ class MatchController extends ApiController
             "detail" => $request->detail,
             "round" => $request->round
         ];
+
         try {
-            return $this->matchService->storeMatchResultExecute($matchResultArray);
-        } catch (HttpException $e) {
-            return $this->responseInvalidQuery($e->getMessage() ?? "Failed store match result");
+            $this->matchService->storeMatchResultExecute($matchResultArray);
+            return $this->responseSuccessful("Successful store match result and update boxers record");
+        } catch (Exception $e) {
+            return $this->responseInvalidQuery($e->getMessage());
         }
     }
 }

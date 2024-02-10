@@ -14,24 +14,26 @@ import { MatchInfo } from '@/components/module/MatchInfo';
 import { MatchSetter } from '@/components/module/MatchSetter/MatchSetter';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
+//! recoil
+import { useRecoilValue } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
 // ! hooks
 import { useFetchAllMatches, useDeleteMatch } from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useSortMatches } from '@/hooks/useSortMatches';
-import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 import { useMatchResult } from '@/hooks/apiHooks/useMatch';
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 //! types
 import { MatchDataType } from '@/assets/types';
 // ! image
-import { Button } from '@/components/atomic/Button';
+import { Button, CustomButton } from '@/components/atomic/Button';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const MatchEdit = () => {
-  // ! use hook
-  const { state: headerHeight } = useHeaderHeight();
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+  // ? use hook
   const { resetLoadingState } = useLoading();
   const { data: matchesData } = useFetchAllMatches();
   const { sortedMatches } = useSortMatches(matchesData);
@@ -99,10 +101,10 @@ export const MatchEdit = () => {
                   </div>
 
                   {isShowMatchResultRegisterButton && (
-                    <div className="mt-5 w-full flex justify-center">
+                    <div className="mt-5 w-[90%] flex justify-center">
                       <Button
+                        styleName="matchResultRegister"
                         onClick={() => setIsShowMatchResultSelectorDialog(true)}
-                        bgColor="w-[90%] py-3 bg-blue-900 hover:bg-blue-700 tracking-[0.3em]"
                       >
                         試合結果登録
                       </Button>
@@ -125,12 +127,12 @@ export const MatchEdit = () => {
                   isSuccessDeleteMatch={isSuccessDeleteMatch}
                 />
                 <div className="mt-5">
-                  <button
+                  <Button
+                    styleName={'delete'}
                     onClick={handleClickDeleteButton}
-                    className="py-2 w-[150px] bg-red-700 text-white rounded-sm"
                   >
                     削除
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -229,6 +231,7 @@ export const MatchListComponent = ({
   );
 };
 
+//? 削除確認モーダル
 type DeleteConfirmPropsType = {
   cancel: () => void;
   execution: () => void;
@@ -237,23 +240,14 @@ const DeleteConfirm = ({ execution, cancel }: DeleteConfirmPropsType) => {
   return (
     <ConfirmDialog header={'削除してもよろしいですか？'}>
       <div className="flex justify-between">
-        <button
-          onClick={execution}
-          className="bg-red-500 text-white py-1 px-5 rounded-md"
-        >
-          はい
-        </button>
-        <button
-          onClick={cancel}
-          className="bg-stone-500 text-white py-1 px-5 rounded-md"
-        >
-          キャンセル
-        </button>
+        <Button onClick={execution}>はい</Button>
+        <Button onClick={cancel}>キャンセル</Button>
       </div>
     </ConfirmDialog>
   );
 };
 
+//? 試合結果登録モーダル
 const MatchResultSetDialog = ({
   selectedMatchData,
   setIsShowMatchResultSelectorDialog,
@@ -385,17 +379,17 @@ const MatchResultSetDialog = ({
         )}
 
         <div className="w-full flex justify-center mt-[30px]">
-          <button
+          <CustomButton
             disabled={!isValid}
             className={clsx(
-              'w-full rounded-md py-2 tracking-[0.3em]',
+              'w-full py-2',
               isValid
-                ? 'text-white bg-green-600 hover:bg-green-700 duration-200'
+                ? 'text-white bg-green-700 hover:bg-green-600 duration-200'
                 : 'text-white/50 bg-stone-600'
             )}
           >
-            試合結果登録
-          </button>
+            登録
+          </CustomButton>
         </div>
       </form>
     </ConfirmDialog>

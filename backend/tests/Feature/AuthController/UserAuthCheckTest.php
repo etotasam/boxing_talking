@@ -32,7 +32,7 @@ class UserAuthCheckTest extends TestCase
 
   /**
    * @test
-   * 認証ありの場合
+   * 認証チェック（ありの場合）で200を返す
    */
   public function testHasAuthCheck()
   {
@@ -45,9 +45,9 @@ class UserAuthCheckTest extends TestCase
 
   /**
    * @test
-   * 認証なしのテスト
+   * 認証なしの場合は何も返さない(null)
    */
-  public function testNoAuthCheck()
+  public function testAuthCheck()
   {
     $response = $this->get('/api/user');
     $response->assertSuccessful();

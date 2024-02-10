@@ -5,13 +5,14 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { HeaderContainer } from '@/components/module/Header';
 //! hooks
 import { useAdmin } from '@/hooks/apiHooks/useAuth';
-import { useHeaderHeight } from '@/hooks/useHeaderHeight';
-// import { useFooterHeight } from '@/hooks/useFooterHeight';
+//! recoil
+import { useRecoilValue } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
 
 const AdminOnly = () => {
   const navigate = useNavigate();
   const { isAdmin, isLoading } = useAdmin();
-  const { state: headerHeight } = useHeaderHeight();
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
 
   useEffect(() => {
     if (isLoading) return;

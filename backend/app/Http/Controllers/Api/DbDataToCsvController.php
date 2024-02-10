@@ -16,14 +16,17 @@ class DbDataToCsvController extends Controller
     public function output()
     {
         try {
-            $this->dataToCSV('boxers');
-            $this->dataToCSV('users');
-            $this->dataToCSV('comments');
-            $this->dataToCSV('organizations');
-            $this->dataToCSV('weight_divisions');
-            $this->dataToCSV('title_matches');
-            $this->dataToCSV('titles');
-            $this->dataToCSV('win_loss_predictions');
+            $this->createCSV('administrators');
+            $this->createCSV('boxers');
+            $this->createCSV('boxing_matches');
+            $this->createCSV('comments');
+            $this->createCSV('users');
+            $this->createCSV('match_results');
+            $this->createCSV('organizations');
+            $this->createCSV('weight_divisions');
+            $this->createCSV('title_matches');
+            $this->createCSV('titles');
+            $this->createCSV('win_loss_predictions');
         } catch (Exception $e) {
             return response()->json(["error" => $e->getMessage()]);
         }
@@ -31,26 +34,36 @@ class DbDataToCsvController extends Controller
         return response()->json(["message" => "Success save DB data to csv"]);
     }
 
-    /**
-     * @param string $tableName csv変換したいテーブル名
-     */
-    protected function dataToCSV(string $tableName)
+
+    protected function createCSV(string $tableName)
     {
         try {
             $tableData = DB::table($tableName)->get();
-            //header行の作成
-            $headerRow = implode(',', array_keys((array) $tableData->first()));
-            $csvData = $headerRow . "\n";
-            // データをCSV形式に変換
-            foreach ($tableData as $record) {
-                $csvData .= implode(',', (array) $record) . "\n";
-            }
-            // CSVファイルを保存
             $createDate = date('Ymd');
-            $filename = $createDate . '_' . $tableName . '.csv';
-            \Storage::put('csv/' . $filename, $csvData);
+            $filename = $tableName . '.csv';
+            $directoryPath = storage_path('csv/' . $createDate);
+            $filePath = $directoryPath . '/' . $filename;
+
+            // ディレクトリが存在しない場合は作成
+            if (!file_exists($directoryPath)) {
+                mkdir($directoryPath, 0755, true);
+            }
+
+            // ファイルをストリームモードで開く
+            $handle = fopen($filePath, 'w');
+
+            // header 行の書き込み
+            fputcsv($handle, array_keys((array) $tableData->first()));
+
+            // データを CSV 形式に変換して書き込む
+            foreach ($tableData as $record) {
+                fputcsv($handle, (array) $record);
+            }
+
+            // ファイルを閉じる
+            fclose($handle);
         } catch (Exception $e) {
-            throw new Exception("Failed " . $tableName . " data to csv");
+            throw new Exception("Failed " . $tableName . " data to csv :" . $e->getMessage());
         }
     }
 }

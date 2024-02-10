@@ -7,7 +7,6 @@ use Illuminate\Http\JsonResponse;
 use App\Services\TitleService;
 use App\Repositories\Interfaces\BoxerRepositoryInterface;
 use App\Repositories\Interfaces\TitleRepositoryInterface;
-use App\Exceptions\FailedTitleException;
 use App\Exceptions\BoxerException;
 use Illuminate\Database\QueryException;
 
@@ -29,15 +28,15 @@ class BoxerService
   {
     try {
       DB::transaction(function () use ($boxerData) {
-        list($storedBoxer, $titles) = $this->postBoxerAndExtractTitles($boxerData);
+        [$storedBoxer, $titles] = $this->postBoxerAndExtractTitles($boxerData);
         //ボクサーがタイトルを保持している場合はtitlesテーブルに保存
         $this->titleService->storeTitle($storedBoxer['id'], $titles);
       });
     } catch (QueryException $e) {
-      \Log::error("create boxer:" . $e->getMessage());
-      abort(500, "Invalid query");
-    } catch (FailedTitleException $e) {
-      throw $e;
+      \Log::error("database error with post boxer:" . $e->getMessage());
+      throw new Exception("Unexpected error on database :" . $e->getMessage());
+    } catch (Exception $e) {
+      throw new Exception("Failed create boxer :" . $e->getMessage());
     }
   }
 
@@ -56,11 +55,10 @@ class BoxerService
         }
       });
     } catch (QueryException $e) {
-      \Log::error("delete boxer" . $e->getMessage());
-      abort(500, "Invalid query");
-      throw $e;
+      \Log::error("database error with delete boxer" . $e->getMessage());
+      throw new Exception("Unexpected error on database :" . $e->getMessage());
     } catch (BoxerException $e) {
-      throw $e;
+      throw new BoxerException("Failed delete boxer :" . $e->getMessage());
     }
   }
 
@@ -77,13 +75,13 @@ class BoxerService
           $this->titleService->storeTitle($updateBoxerData['id'], $updateBoxerData["titles"]);
           unset($updateBoxerData["titles"]);
         };
-        $isUpdateBoxer = $this->boxerRepository->updateBoxer($updateBoxerData);
+        $this->boxerRepository->updateBoxer($updateBoxerData);
       });
     } catch (QueryException $e) {
-      \Log::error("update boxer" . $e->getMessage());
-      throw $e;
-    } catch (FailedTitleException $e) {
-      throw $e;
+      \Log::error("database error with update boxer :" . $e->getMessage());
+      throw new Exception("Unexpected error on database :" . $e->getMessage());
+    } catch (Exception $e) {
+      throw new Exception("Failed update boxer :" . $e->getMessage());
     }
   }
 

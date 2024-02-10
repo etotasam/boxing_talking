@@ -1,6 +1,7 @@
 import React from 'react';
 import { NATIONALITY } from '@/assets/NationalFlagData';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Button } from '@/components/atomic/Button';
 
 export const SearchBoxer = () => {
   const navigate = useNavigate();
@@ -60,9 +61,7 @@ export const SearchBoxer = () => {
           searchName.current = e.target.value;
         }}
       />
-      <button className="w-full py-2 mt-3 tracking-[0.5em] rounded-sm bg-stone-600 hover:bg-stone-700 text-white">
-        検索
-      </button>
+      <Button styleName="onForm">検索</Button>
     </form>
   );
 };

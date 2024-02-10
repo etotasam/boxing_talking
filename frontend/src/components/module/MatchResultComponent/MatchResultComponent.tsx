@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { MatchDataType } from '@/assets/types';
 import clsx from 'clsx';
+import { useWindowSize } from '@/hooks/useWindowSize';
 
 export const MatchResultComponent = ({
   matchData,
@@ -10,6 +11,8 @@ export const MatchResultComponent = ({
   const { result } = matchData;
   const matchResult = useRef<string | null>(null);
   const winner = useRef<string | null>(null);
+
+  const { device } = useWindowSize();
 
   const isWinner = result?.result === 'red' || result?.result === 'blue';
   const isKo =
@@ -47,8 +50,42 @@ export const MatchResultComponent = ({
 
   createResultIcon();
 
+  const winnerName = winner.current;
+
+  if (device === 'SP') {
+    return (
+      <>
+        {matchResult.current && (
+          <div className="flex justify-center">
+            <span
+              className={clsx(
+                'rounded-sm text-sm text-center text-white px-3 py-1',
+                isKo && 'bg-green-600',
+                isDecision && 'bg-sky-600',
+                result?.result === 'draw' && 'bg-stone-600',
+                result?.result === 'no-contest' && 'bg-black'
+              )}
+            >
+              {matchResult.current}
+            </span>
+          </div>
+        )}
+        {winnerName && (
+          <span
+            className={clsx(
+              'lg:text-[20px] sm:text-[16px] mt-1',
+              winnerName.length > 7 ? `text-[12px]` : `text-[16px]`
+            )}
+          >
+            {winnerName}
+          </span>
+        )}
+      </>
+    );
+  }
+
   return (
-    <span className="flex">
+    <div className="flex">
       {matchResult.current && (
         <span
           className={clsx(
@@ -63,6 +100,6 @@ export const MatchResultComponent = ({
         </span>
       )}
       {winner.current}
-    </span>
+    </div>
   );
 };

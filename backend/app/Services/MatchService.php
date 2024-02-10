@@ -9,7 +9,7 @@ use App\Repositories\Interfaces\MatchRepositoryInterface;
 use App\Repositories\Interfaces\CommentRepositoryInterface;
 use App\Repositories\Interfaces\TitleMatchRepositoryInterface;
 use App\Repositories\Interfaces\WinLossPredictionRepositoryInterface;
-use App\Repositories\WinLossPredictionRepository;
+use App\Repositories\Interfaces\BoxerRepositoryInterface;
 use App\Services\TitleMatchService;
 use Illuminate\Database\QueryException;
 use App\Exceptions\NonAdministratorException;
@@ -24,6 +24,7 @@ class MatchService
     protected CommentRepositoryInterface $commentRepository,
     protected TitleMatchRepositoryInterface $titleMatchRepository,
     protected WinLossPredictionRepositoryInterface $predictionRepository,
+    protected BoxerRepositoryInterface $boxerRepository,
   ) {
   }
 
@@ -57,21 +58,21 @@ class MatchService
     try {
       $createdMatch = $this->matchRepository->createMatch($matchDataForStore);
       if (!$createdMatch) {
-        throw new \Exception("", 51);
+        throw new Exception("Can not create match", 51);
       }
 
       $titleMatchesArray = $this->titleMatchService->formatForStoreToTitleMatchTable($createdMatch['id'], $organizationsNameArray);
       $isSuccessStoreTitleMatch = $this->titleMatchRepository->insertTitleMatch($titleMatchesArray);
       if (!$isSuccessStoreTitleMatch) {
-        throw new \Exception("", 50);
+        throw new Exception("Failed store title match", 50);
       }
     } catch (QueryException $e) {
-      \Log::error($e->getMessage());
       DB::rollBack();
-      abort(500);
-    } catch (\Exception $e) {
+      \Log::error("database error with create match or store title match data :" . $e->getMessage());
+      throw new Exception("Unexpected error on database :" . $e->getMessage(), 500);
+    } catch (Exception $e) {
       DB::rollBack();
-      throw $e;
+      throw new Exception("Failed create match or store title match data :" . $e->getMessage(), 500);
     }
 
     DB::commit();
@@ -121,8 +122,10 @@ class MatchService
       }
     } catch (QueryException $e) {
       DB::rollBack();
-      \Log::error($e->getMessage());
-      abort(500);
+      \Log::error("database error with update match :" .  $e->getMessage());
+      throw new Exception("Unexpected error on database :" .  $e->getMessage());
+    } catch (Exception $e) {
+      throw new Exception("Failed update match");
     }
 
     DB::commit();
@@ -167,7 +170,7 @@ class MatchService
   public function deleteMatchExecute(int $matchId): void
   {
     if (!$this->matchRepository->isMatch($matchId)) {
-      throw new \Exception("", 44);
+      throw new Exception("Can not found match to delete", 44);
     }
     DB::beginTransaction();
     try {
@@ -176,9 +179,13 @@ class MatchService
       $this->predictionRepository->deletePredictionOnMatch($matchId);
       // WinLossPredictionRepository::delete($matchId);
       $this->matchRepository->deleteMatch($matchId);
-    } catch (QueryExecuted) {
+    } catch (QueryException $e) {
       DB::rollBack();
-      abort(500);
+      \Log::error("database error with delete match : " . $e->getMessage());
+      throw new Exception("Unexpected error on database :" . $e->getMessage());
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw new Exception("Failed delete match :" . $e->getMessage());
     }
 
     DB::commit();
@@ -212,54 +219,160 @@ class MatchService
    * "round" => number
    * ]
    *
-   * @return bool | abort
+   * @return void
    */
   public function storeMatchResultExecute(array $matchResultArray)
   {
     try {
-      // 必須項目のチェック
+      // バリデーション。必須項目チェック
       $this->validateMatchResultArray($matchResultArray);
 
+      $matchId = (int)$matchResultArray['match_id'];
+
+      //? 試合情報の取得
+      $matchData = $this->matchRepository->getMatchById($matchId);
+      $redBoxer = $matchData->redBoxer;
+      $blueBoxer = $matchData->blueBoxer;
+      $pastResult = $matchData->result;
+
+      $redBoxerRecord = [
+        "id" => $redBoxer["id"],
+        "win" => $redBoxer["win"],
+        "lose" => $redBoxer["lose"],
+        "draw" => $redBoxer["draw"],
+        "ko" => $redBoxer["ko"]
+      ];
+      $blueBoxerRecord = [
+        "id" => $blueBoxer["id"],
+        "win" => $blueBoxer["win"],
+        "lose" => $blueBoxer["lose"],
+        "draw" => $blueBoxer["draw"],
+        "ko" => $blueBoxer["ko"]
+      ];
+
+      //? すでにmatch_resultが存在しているかどうかをチェック
+      $isMatchResult = $this->matchRepository->isMatchResult($matchId);
+      if ($isMatchResult) {
+        $this->rollbackBoxersRecordCount($pastResult->toArray(), $redBoxerRecord, $blueBoxerRecord);
+      }
+      $this->updateBoxersRecordCount($matchResultArray, $redBoxerRecord, $blueBoxerRecord);
+
       DB::beginTransaction();
+      $this->boxerRepository->updateBoxer($redBoxerRecord); //? red boxer のデータ更新
+      $this->boxerRepository->updateBoxer($blueBoxerRecord); //? blue boxer のデータ更新
 
-      // すでに試合結果が存在する場合、削除
-      if ($this->matchRepository->isMatchResult((int)$matchResultArray['match_id'])) {
-        $isDelete = $this->matchRepository->deleteMatchResult((int)$matchResultArray['match_id']);
-        if (!$isDelete) {
-          throw new \Exception("Failed to delete existing match result");
-        }
-      }
-
-      // 新しい試合結果を保存
-      $isStore =  $this->matchRepository->storeMatchResult($matchResultArray);
-
-      if (!$isStore) {
-        throw new \Exception("Failed to store match result");
-      }
+      //? 新しい試合結果を登録 of 更新
+      $this->matchRepository->updateOrCreateMatchResult($matchId, $matchResultArray);
 
       DB::commit();
-      return true;
+    } catch (QueryException $e) {
+      DB::rollBack();
+      \Log::error("database error with store match result :" . $e->getMessage());
+      throw new Exception("Unexpected error on database :" . $e->getMessage());
     } catch (\Exception $e) {
       DB::rollBack();
-      abort(500, $e->getMessage());
+      throw new Exception($e->getMessage());
     }
   }
+
+
+  /**
+   * @param array $pastResult (既存のmatchResultデータ)
+   * @param array &$redBoxerRecord (red boxer data の参照渡し)
+   * @param array &$blueBoxerRecord (blue boxer data の参照渡し)
+   *
+   * @return void
+   */
+  private function rollbackBoxersRecordCount(array $pastResult, array &$redBoxerRecord, array &$blueBoxerRecord)
+  {
+
+    //? past resultが"無効試合"ならそこで終了
+    if ($pastResult['match_result'] == "no-contest") {
+      return;
+    }
+
+    $isKo = $pastResult["detail"] == "ko" || $pastResult["detail"] == "tko";
+
+    //? pastResult の勝者が red の場合
+    if ($pastResult['match_result'] == "red") {
+      $redBoxerRecord["win"] && --$redBoxerRecord["win"]; //! redのwin数を減
+      $blueBoxerRecord["lose"] && --$blueBoxerRecord["lose"]; //! blueのlose数を減
+      if ($isKo) {
+        $redBoxerRecord["ko"] && --$redBoxerRecord["ko"]; //! redのko数を減
+      }
+    }
+    //? pastResult の勝者が blue の場合
+    if ($pastResult['match_result'] == "blue") {
+      $redBoxerRecord["lose"] && --$redBoxerRecord["lose"]; //! redのlose数を減
+      $blueBoxerRecord["win"] && --$blueBoxerRecord["win"]; //! blueのwin数を減
+      if ($isKo) {
+        $blueBoxerRecord["ko"] && --$blueBoxerRecord["ko"]; //! blueのko数を減
+      }
+    }
+
+    //? past result が draw の場合
+    if ($pastResult['match_result'] == "draw") {
+      $redBoxerRecord["draw"] && --$redBoxerRecord["draw"]; //! redのdraw数を減
+      $blueBoxerRecord["draw"] && --$blueBoxerRecord["draw"]; //! blueのdraw数を減
+    }
+  }
+
+  /**
+   * @param array $postResult (matchResultデータ)
+   * @param array &$redBoxerRecord (red boxer data の参照渡し)
+   * @param array &$blueBoxerRecord (blue boxer data の参照渡し)
+   *
+   * @return void
+   */
+  private function updateBoxersRecordCount(array $postResult, array &$redBoxerRecord, array &$blueBoxerRecord)
+  {
+    //? past resultが"無効試合"ならそこで終了
+    if ($postResult['match_result'] == "no-contest") {
+      return;
+    }
+
+    $isKo = $postResult["detail"] == "ko" || $postResult["detail"] == "tko";
+
+    //? postResult の勝者が red の場合
+    if ($postResult['match_result'] == "red") {
+      ++$redBoxerRecord["win"]; //! redのwin数を+
+      ++$blueBoxerRecord["lose"]; //! blueのlose数を+
+      if ($isKo) {
+        ++$redBoxerRecord["ko"]; //! redのko数を+
+      }
+    }
+    //? postResult の勝者が blue の場合
+    if ($postResult['match_result'] == "blue") {
+      ++$redBoxerRecord["lose"]; //! redのlose数を+
+      ++$blueBoxerRecord["win"]; //! blueのwin数を+
+      if ($isKo) {
+        ++$blueBoxerRecord["ko"]; //! blueのko数を+
+      }
+    }
+
+    //? postResult が draw の場合
+    if ($postResult['match_result'] == "draw") {
+      ++$redBoxerRecord["draw"]; //! redのdraw数を+
+      ++$blueBoxerRecord["draw"]; //! blueのdraw数を+
+    }
+  }
+
 
   private function validateMatchResultArray(array $matchResultArray)
   {
     if (empty($matchResultArray['match_id'])) {
-      throw new \Exception("'match_id' is required");
+      throw new Exception("'match_id' is required");
     }
 
     if (empty($matchResultArray['match_result'])) {
-      throw new \Exception("'match_result' is empty");
+      throw new Exception("'match_result' is empty");
     }
 
     $isWinner = $matchResultArray['match_result'] === "red" || $matchResultArray['match_result'] === "blue";
 
     if ($isWinner) {
       if (empty($matchResultArray["detail"])) {
-        throw new \Exception("'detail' is required when there is a winner");
+        throw new Exception("'detail' is required when there is a winner");
       }
     }
 
@@ -267,7 +380,7 @@ class MatchService
 
     if ($isKo) {
       if (empty($matchResultArray["round"])) {
-        throw new \Exception("'round' is required when winner got KO");
+        throw new Exception("'round' is required when winner got KO");
       }
     }
   }

@@ -24,17 +24,20 @@ import { BoxerType } from '@/assets/types';
 import { useRegisterMatch } from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
-import { useHeaderHeight } from '@/hooks/useHeaderHeight';
+//! recoil
+import { useRecoilValue } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
 //! component
 import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
+import { Button } from '@/components/atomic/Button';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const MatchRegister = () => {
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   //! use hook
-  const { state: headerHeight } = useHeaderHeight();
   const { boxersData, pageCount } = useFetchBoxers();
   const [matchBoxers, setMatchBoxers] = useState<MatchBoxersType>({
     red_boxer: undefined,
@@ -499,10 +502,8 @@ const MatchDataSetter = ({
         />
       </div>
 
-      <div className="w-full flex justify-center">
-        <button className="bg-stone-600 tracking-[0.5em] text-white py-2 px-5 rounded mt-10 w-full">
-          登録
-        </button>
+      <div className="w-full flex justify-center mt-5">
+        <Button styleName="onForm">登録</Button>
       </div>
     </form>
     // </div>

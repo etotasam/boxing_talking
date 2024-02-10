@@ -1,4 +1,4 @@
-import { atom, selector } from "recoil";
+import { atom } from "recoil";
 
 type LoadingStateType = {
   isSuccess: boolean | undefined,
@@ -13,18 +13,7 @@ const initialState: LoadingStateType = {
   isError: undefined,
 }
 
-const loadingState = atom<LoadingStateType>({
+export const loadingState = atom<LoadingStateType>({
   key: "loadingState",
   default: initialState
-})
-
-export const loadingSelector = selector({
-  key: "loadingSelector",
-  get: ({ get }) => {
-    const state = get(loadingState)
-    return state
-  },
-  set: ({ set }, newState) => {
-    set(loadingState, newState)
-  }
 })

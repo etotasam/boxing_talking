@@ -38,11 +38,12 @@ class GuestUserService
       $this->guest->loginGuestUser($guestUser);
       $request->session()->regenerate();
     } catch (QueryException $e) {
-      \Log::error($e->getMessage());
-      abort(500);
+      DB::rollback();
+      \Log::error("Database error :" . $e->getMessage());
+      throw new Exception("Unexpected error on database :" . $e->getMessage(), 500);
     } catch (\Exception $e) {
       DB::rollback();
-      throw $e;
+      throw new Exception("Unexpected error :" . $e->getMessage(), 500);
     }
 
     DB::commit();
@@ -55,7 +56,7 @@ class GuestUserService
     $this->guest->logoutGuestUser();
     $isDelete = $this->guest->deleteGuestUser($guestUserId);
     if (!$isDelete) {
-      abort(500);
+      throw new Exception("Unexpected error", 500);
     }
   }
 }

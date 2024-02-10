@@ -1,9 +1,9 @@
 // ! recoil
 import { useRecoilState } from "recoil"
-import { loginModalSelector } from "@/store/loginModalState"
+import { modalState } from "@/store/modalState"
 
 export const useLoginModal = () => {
-  const [state, setState] = useRecoilState(loginModalSelector)
+  const [state, setState] = useRecoilState(modalState("LOGIN"))
 
   const showLoginModal = () => {
     setState(true)

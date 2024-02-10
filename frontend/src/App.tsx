@@ -70,7 +70,7 @@ function App() {
 
         <Route element={<HeaderAndFooterLayout />}>
           <Route path={ROUTE_PATH.TERMS} element={<Terms />} />
-          <Route path="/test" element={<TestPage />} />
+          {/* <Route path="/test" element={<TestPage />} /> */}
           <Route path="/*" element={<NotFound />} />
           {/* //? </HeaderAndFooterLayout> */}
         </Route>

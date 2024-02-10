@@ -44,7 +44,6 @@ export const FightBox = ({
       )
     );
   }, [isPredictionVote, authUser, isGuest, isDayOverFight, isFightToday]);
-
   return (
     <>
       {matchData && (
@@ -58,13 +57,21 @@ export const FightBox = ({
           )}
         >
           <div className="w-[300px]">
-            <BoxerInfo boxer={matchData.red_boxer} />
+            <BoxerInfo
+              boxer={matchData.red_boxer}
+              matchResult={matchData.result}
+              boxerColor="red"
+            />
           </div>
 
           <MatchInfo matchData={matchData} />
 
           <div className="w-[300px]">
-            <BoxerInfo boxer={matchData.blue_boxer} />
+            <BoxerInfo
+              boxer={matchData.blue_boxer}
+              matchResult={matchData.result}
+              boxerColor="blue"
+            />
           </div>
           {isShowPredictionIcon && <PredictionVoteIcon />}
         </div>

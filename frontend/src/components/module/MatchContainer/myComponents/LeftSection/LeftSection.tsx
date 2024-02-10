@@ -7,8 +7,6 @@ import { MatchDataType } from '@/assets/types';
 import { MatchInfo } from '@/components/module/MatchInfo';
 //! hooks
 import { useFetchComments } from '@/hooks/apiHooks/useComment';
-// import { usePostCommentHeight } from '@/hooks/usePostCommentHeight';
-// import { useHeaderHeight } from '@/hooks/useHeaderHeight';
 
 type LeftSectionType = {
   thisMatch: MatchDataType | undefined;
@@ -70,15 +68,14 @@ export const LeftSection = ({
     <div className="xl:w-[30%] w-[40%]">
       <div
         ref={leftSectionRef}
-        className="flex justify-center"
-        style={
-          isLeftSectionHigherThenMainEl
-            ? {
-                position: 'sticky',
-                top: `${stickyTopPosition}px`,
-              }
-            : { position: 'sticky', top: `${headerHeight}px` }
-        }
+        className={clsx('flex justify-center')}
+        style={{
+          position: 'sticky',
+          top: `${
+            isLeftSectionHigherThenMainEl ? stickyTopPosition : headerHeight
+          }px`,
+          marginBottom: `${commentPostEl?.clientHeight ?? '0'}px`,
+        }}
       >
         <div className="w-full max-w-[450px]">
           <div className="flex justify-center mt-5">

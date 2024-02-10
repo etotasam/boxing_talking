@@ -6,6 +6,7 @@ backend/node_modules
 backend/public/hot
 backend/public/storage
 backend/storage/*.key
+backend/storage/csv
 backend/vendor/
 backend/.phpunit.result.cache
 backend/docker-compose.override.yml

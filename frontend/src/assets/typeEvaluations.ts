@@ -1,5 +1,4 @@
-import { MESSAGE } from "@/assets/statusesOnToastModal"
-//!type
+import { MESSAGE } from "./statusesOnToastModal";
 import { MessageType } from "@/assets/types"
 
 export const isMessageType = (message: unknown): message is MessageType => {

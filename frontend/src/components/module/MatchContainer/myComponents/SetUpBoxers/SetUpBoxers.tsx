@@ -4,12 +4,13 @@ import clsx from 'clsx';
 import { MdHowToVote } from 'react-icons/md';
 //! types
 import { BoxerType, MatchDataType } from '@/assets/types';
+//! recoil
+import { useSetRecoilState } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
 //! components
-import { FlagImage } from '@/components/atomic/FlagImage';
 import { BackgroundFlag } from './BackgroundFlag';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { useEffect, useRef } from 'react';
-import { useMatchBoxerSectionHeight } from '@/hooks/useMatchBoxerSectionHeight';
 import { BoxerInfoModal } from '@/components/modal/BoxerInfoModal';
 import { MatchInfoModal } from '@/components/modal/MatchInfoModal';
 //! hook
@@ -40,9 +41,12 @@ export const SetUpBoxers = ({
   isFetchingComments,
   isThisMatchAfterToday,
 }: SetUpBoxersType) => {
+  //? recoil
+  const setMatchBoxerSectionHeight = useSetRecoilState(
+    elementSizeState('MATCH_PAGE_BOXER_SECTION_HEIGHT')
+  );
   //? use hook
   const { matchVotePrediction } = useVoteMatchPrediction();
-  const { setter: setMatchBoxerSectionHeight } = useMatchBoxerSectionHeight();
   const { data: AllMatchPredictionOfAuthUserState } =
     useAllFetchMatchPredictionOfAuthUser();
   const { device } = useWindowSize();
@@ -91,10 +95,10 @@ export const SetUpBoxers = ({
   const [boxerDataForOnModal, setBoxerDataForOnModal] = useState<BoxerType>();
   const [showBoxerInfoModal, setShowBoxerInfoModal] = useState(false);
 
-  //?ボクサー情報モーダルの表示(SP時のみ)
+  //?ボクサー情報モーダルの表示(PC時と終了した試合は表示させない)
   const viewBoxerInfo = (boxerData: BoxerType) => {
     if (device === 'PC') return;
-    if (thisMatch?.match_result) return;
+    if (thisMatch?.result) return;
     setBoxerDataForOnModal(boxerData);
     setShowBoxerInfoModal(true);
   };
