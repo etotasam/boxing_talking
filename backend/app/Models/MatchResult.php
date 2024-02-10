@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\BoxingMatch;
 
 
 class MatchResult extends Model
@@ -22,4 +23,9 @@ class MatchResult extends Model
   ];
 
   protected $hidden = [];
+
+  // public function getMatch()
+  // {
+  //   $this->belongsTo(BoxingMatch::class, "match_id");
+  // }
 }

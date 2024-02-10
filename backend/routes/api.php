@@ -36,7 +36,6 @@ Route::post('/guest/login', [AuthController::class, 'guestLogin']);
 //? 試合
 Route::get('/match', [MatchController::class, 'index']);
 Route::get('/match/{match}/show', [MatchController::class, 'show']);
-Route::post('/match/result', [MatchController::class, 'result']);
 //? ボクサー
 Route::get('/boxer', [BoxerController::class, 'index']);
 //? 勝利予想
@@ -60,6 +59,7 @@ Route::middleware('administrator')->group(function () {
     Route::post('/match', [MatchController::class, 'store']);
     Route::delete('/match', [MatchController::class, 'destroy']);
     Route::patch('/match', [MatchController::class, 'update']);
+    Route::post('/match/result', [MatchController::class, 'result']);
     //?コメント削除
     Route::delete('/comment/{comment}', [CommentController::class, 'destroy']);
     //?csv作成

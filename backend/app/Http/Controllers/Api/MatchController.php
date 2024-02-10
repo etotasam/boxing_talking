@@ -122,6 +122,14 @@ class MatchController extends ApiController
         return $this->responseSuccessful("Success update match");
     }
 
+    /**
+     * @param int match_id
+     * @param string result
+     * @param string | null detail
+     * @param int | null round
+     *
+     * @return JsonResponse
+     */
     public function result(Request $request)
     {
         $matchResultArray = [
@@ -130,8 +138,10 @@ class MatchController extends ApiController
             "detail" => $request->detail,
             "round" => $request->round
         ];
+
         try {
-            return $this->matchService->storeMatchResultExecute($matchResultArray);
+            $this->matchService->storeMatchResultExecute($matchResultArray);
+            return $this->responseSuccessful("Successful store match result and update boxers record");
         } catch (Exception $e) {
             return $this->responseInvalidQuery($e->getMessage());
         }

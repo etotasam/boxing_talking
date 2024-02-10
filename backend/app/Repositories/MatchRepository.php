@@ -78,4 +78,9 @@ class MatchRepository implements MatchRepositoryInterface
   {
     return MatchResult::create($matchResultData);
   }
+
+  public function updateOrCreateMatchResult(int $matchId, array $matchResultData)
+  {
+    MatchResult::updateOrInsert(["match_id" => $matchId], $matchResultData);
+  }
 }
