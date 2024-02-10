@@ -16,6 +16,7 @@ import venezuelaFlag from '@/assets/images/flags/venezuela.svg';
 import puertoRicoFlag from '@/assets/images/flags/puerto_rico.svg';
 import saudiArabiaFlag from '@/assets/images/flags/saudi_arabia.svg';
 import ghanaFlag from '@/assets/images/flags/ghana.svg';
+import australiaFlag from '@/assets/images/flags/australia.svg';
 
 export const NATIONALITY = {
   JAPAN: "Japan",
@@ -33,6 +34,7 @@ export const NATIONALITY = {
   PUERTO_RICO: "PuertoRico",
   SAUDI_ARABIA: "SaudiArabia",
   GHANA: "Ghana",
+  AUSTRALIA: "Australia",
 } as const
 
 
@@ -52,6 +54,7 @@ export const getNationalFlag = (country: NationalityType) => {
   if (country == NATIONALITY.PUERTO_RICO) return puertoRicoFlag;
   if (country == NATIONALITY.SAUDI_ARABIA) return saudiArabiaFlag;
   if (country == NATIONALITY.GHANA) return ghanaFlag;
+  if (country == NATIONALITY.AUSTRALIA) return australiaFlag;
 };
 
 
@@ -63,5 +66,6 @@ export const formatPosition = (country: NationalityType) => {
   if (country == NATIONALITY.MEXICO) return '25% 40%';
   if (country == NATIONALITY.CHINA) return '25% 25%';
   if (country == NATIONALITY.VENEZUELA) return '25% 35%';
+  if (country == NATIONALITY.AUSTRALIA) return '25% 35%';
   return 'center';
 };

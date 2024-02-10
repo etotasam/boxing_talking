@@ -248,7 +248,7 @@ const MatchDataSetter = ({
   const [matchDate, setMatchDate] = useState<string>(
     dayjs().format('YYYY-MM-DD')
   );
-  const [matchGrade, setMatchGrade] = useState<GRADE_Type>('');
+  const [matchGrade, setMatchGrade] = useState<GRADE_Type | ''>('');
   const [matchPlaceCountry, setMatchPlaceCountry] = useState<
     NationalityType | ''
   >();
