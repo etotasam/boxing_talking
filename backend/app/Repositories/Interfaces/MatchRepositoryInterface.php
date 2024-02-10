@@ -97,4 +97,13 @@ interface MatchRepositoryInterface
    * @return MatchResult
    */
   public function storeMatchResult(array $matchResultData);
+
+  /**
+   * 試合結果の更新 or 登録
+   * @param int $matchId
+   * @param array $matchResultData
+   *
+   * @return void
+   */
+  public function updateOrCreateMatchResult(int $matchId, array $matchResultData);
 }
