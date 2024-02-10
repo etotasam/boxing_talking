@@ -253,13 +253,16 @@ class MatchService
       //? すでにmatch_resultが存在しているかどうかをチェック
       $isMatchResult = $this->matchRepository->isMatchResult($matchId);
       if ($isMatchResult) {
-        $this->rollbackBoxersRecordCount($pastResult->toArray(), $redBoxerRecord, $blueBoxerRecord);
+        [$rollbackRedBoxerRecord, $rollbackBlueBoxerRecord] = $this->rollbackBoxersRecord($pastResult->toArray(), $redBoxerRecord, $blueBoxerRecord);
+        $redBoxerRecord = $rollbackRedBoxerRecord; //! $redBoxerRecordの上書き
+        $blueBoxerRecord = $rollbackBlueBoxerRecord; //! $blueBoxerRecordの上書き
       }
-      $this->updateBoxersRecordCount($matchResultArray, $redBoxerRecord, $blueBoxerRecord);
+
+      [$newRedBoxerRecord, $newBlueBoxerRecord] = $this->updateBoxersRecord($matchResultArray, $redBoxerRecord, $blueBoxerRecord);
 
       DB::beginTransaction();
-      $this->boxerRepository->updateBoxer($redBoxerRecord); //? red boxer のデータ更新
-      $this->boxerRepository->updateBoxer($blueBoxerRecord); //? blue boxer のデータ更新
+      $this->boxerRepository->updateBoxer($newRedBoxerRecord); //? red boxer のデータ更新
+      $this->boxerRepository->updateBoxer($newBlueBoxerRecord); //? blue boxer のデータ更新
 
       //? 新しい試合結果を登録 of 更新
       $this->matchRepository->updateOrCreateMatchResult($matchId, $matchResultArray);
@@ -278,17 +281,17 @@ class MatchService
 
   /**
    * @param array $pastResult (既存のmatchResultデータ)
-   * @param array &$redBoxerRecord (red boxer data の参照渡し)
-   * @param array &$blueBoxerRecord (blue boxer data の参照渡し)
+   * @param array $redBoxerRecord (red boxer data)
+   * @param array $blueBoxerRecord (blue boxer data)
    *
-   * @return void
+   * @return array [$rollbackRedBoxerRecord, $rollbackBlueBoxerRecord]
    */
-  private function rollbackBoxersRecordCount(array $pastResult, array &$redBoxerRecord, array &$blueBoxerRecord)
+  private function rollbackBoxersRecord(array $pastResult, array $redBoxerRecord, array $blueBoxerRecord)
   {
 
     //? past resultが"無効試合"ならそこで終了
     if ($pastResult['match_result'] == "no-contest") {
-      return;
+      return [$redBoxerRecord, $blueBoxerRecord];
     }
 
     $isKo = $pastResult["detail"] == "ko" || $pastResult["detail"] == "tko";
@@ -315,20 +318,22 @@ class MatchService
       $redBoxerRecord["draw"] && --$redBoxerRecord["draw"]; //! redのdraw数を減
       $blueBoxerRecord["draw"] && --$blueBoxerRecord["draw"]; //! blueのdraw数を減
     }
+
+    return [$redBoxerRecord, $blueBoxerRecord];
   }
 
   /**
    * @param array $postResult (matchResultデータ)
-   * @param array &$redBoxerRecord (red boxer data の参照渡し)
-   * @param array &$blueBoxerRecord (blue boxer data の参照渡し)
+   * @param array $redBoxerRecord (red boxer data)
+   * @param array $blueBoxerRecord (blue boxer data)
    *
-   * @return void
+   * @return array [$newRedBoxerRecord, $newBlueBoxerRecord]
    */
-  private function updateBoxersRecordCount(array $postResult, array &$redBoxerRecord, array &$blueBoxerRecord)
+  private function updateBoxersRecord(array $postResult, array $redBoxerRecord, array $blueBoxerRecord)
   {
     //? past resultが"無効試合"ならそこで終了
     if ($postResult['match_result'] == "no-contest") {
-      return;
+      return [$redBoxerRecord, $blueBoxerRecord];
     }
 
     $isKo = $postResult["detail"] == "ko" || $postResult["detail"] == "tko";
@@ -355,6 +360,8 @@ class MatchService
       ++$redBoxerRecord["draw"]; //! redのdraw数を+
       ++$blueBoxerRecord["draw"]; //! blueのdraw数を+
     }
+
+    return [$redBoxerRecord, $blueBoxerRecord];
   }
 
 
