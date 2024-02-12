@@ -35,7 +35,7 @@ export const BackgroundFlag = ({
       >
         <div
           className={clsx(
-            'absolute top-0 left-0 w-full h-full bg-white duration-500',
+            'backdrop-blur-sm absolute top-0 left-0 w-full h-full bg-white duration-500',
             thisMatchPredictionOfUsers === 'No prediction vote' &&
               'bg-white/100 hover:bg-white/80',
             (thisMatchPredictionOfUsers === 'red' ||

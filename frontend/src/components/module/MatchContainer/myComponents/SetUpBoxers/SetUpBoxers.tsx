@@ -142,6 +142,7 @@ export const SetUpBoxers = ({
               )}
             </AnimatePresence>
           )}
+
           <BoxerBox
             color="red"
             boxer={thisMatch.red_boxer}
@@ -156,6 +157,7 @@ export const SetUpBoxers = ({
             isThisMatchAfterToday={isThisMatchAfterToday}
             onClick={() => viewBoxerInfo(thisMatch.blue_boxer)}
           />
+
           {/* //? 投票数bar */}
           {device &&
             device === 'SP' &&
