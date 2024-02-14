@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, createContext } from 'react';
 import dayjs from 'dayjs';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -6,6 +6,7 @@ import { ROUTE_PATH } from '@/assets/RoutePath';
 //! types
 import { MatchDataType } from '@/assets/types';
 // ! hook
+import { useModalState } from '@/hooks/useModalState';
 import { useAuth, useGuest } from '@/hooks/apiHooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
@@ -16,7 +17,7 @@ import {
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { usePostComment, useFetchComments } from '@/hooks/apiHooks/useComment';
 //! recoil
-import { useSetRecoilState, useRecoilValue } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 //! component
 import { MatchComponent } from './MatchComponent';
@@ -32,12 +33,15 @@ type PropsType = {
 };
 
 export const MatchContainer = (props: PropsType) => {
-  // ? use hook
+  //? window サイズの取得
   const { windowSize, device } = useWindowSize();
+  //? urlからクエリmatch_idを取得
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const paramsMatchID = Number(query.get('match_id'));
+  //? 勝敗予想投票実行時の状態hook
   const { isSuccess: isSuccessVoteMatchPrediction } = useVoteMatchPrediction();
+  //? userの勝敗予想投票をすべて取得など…
   const { data: allPredictionVoteOfUsers, refetch: refetchAllPredictionData } =
     useAllFetchMatchPredictionOfAuthUser();
   const { setToastModal, showToastModal } = useToastModal();
@@ -47,10 +51,18 @@ export const MatchContainer = (props: PropsType) => {
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
   const isEitherAuth = Boolean(isGuest || authUser);
-  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   const setRecoilPostCommentHeight = useSetRecoilState(
     elementSizeState('POST_COMMENT_HEIGHT')
   );
+
+  //?ボクサー情報のセットと表示(modal)
+  const { state: isBoxerInfoModal } = useModalState('BOXER_INFO');
+
+  //?試合情報モーダルの表示状態
+  const { state: isShowMatchInfoModal } = useModalState('MATCH_INFO');
+
+  //? 勝敗予想投票モーダル
+  const { state: isPredictionVoteModal } = useModalState('PREDICTION_VOTE');
 
   const {
     postComment,
@@ -60,30 +72,35 @@ export const MatchContainer = (props: PropsType) => {
   //? useState
   const [comment, setComment] = useState<string>();
   const [thisMatch, setThisMatch] = useState<MatchDataType>();
-  const [thisMatchPredictionCount, setThisMatchPredictionCount] = useState<
-    Record<'redCount' | 'blueCount' | 'totalCount', number>
-  >({ redCount: 0, blueCount: 0, totalCount: 0 });
+  // const [thisMatchPredictionCount, setThisMatchPredictionCount] =
+  //   useState<ThisMatchPredictionCountType>({
+  //     redCount: 0,
+  //     blueCount: 0,
+  //     totalCount: 0,
+  //   });
 
-  //? 試合の存在確認and試合の各データをthisMatch(useState)等にセット
+  //? 試合の存在確認を確認、なければリダイレクト
   useEffect(() => {
     if (!props.matches || !paramsMatchID) return;
     const match = props.matches?.find((match) => match.id === paramsMatchID);
     if (match) {
       setThisMatch(match);
-      setThisMatchPredictionCount({
-        redCount: match.count_red,
-        blueCount: match.count_blue,
-        totalCount: match.count_red + match.count_blue,
-      });
     } else {
-      //試合が存在しない場合はリダイレクト
       navigate(ROUTE_PATH.HOME);
     }
+    // setThisMatchPredictionCount({
+    //   redCount: match.count_red,
+    //   blueCount: match.count_blue,
+    //   totalCount: match.count_red + match.count_blue,
+    // });
+    // } else {
+    //試合が存在しない場合はリダイレクト
+    // navigate(ROUTE_PATH.HOME);
+    // }
   }, [paramsMatchID, props.matches]);
 
-  const [thisMatchPredictionOfUsers, setThisMatchPredictionOfUsers] = useState<
-    'red' | 'blue' | 'No prediction vote' | undefined
-  >();
+  const [thisMatchPredictionByUser, setThisMatchPredictionByUser] =
+    useState<ThisMatchPredictionByUserType>();
 
   //? 読み込み時にscrollをtop位置へ移動
   useEffect(() => {
@@ -117,14 +134,14 @@ export const MatchContainer = (props: PropsType) => {
         (data) => data.match_id === Number(paramsMatchID)
       );
       if (thisMatchPredictionVote) {
-        setThisMatchPredictionOfUsers(thisMatchPredictionVote.prediction);
+        setThisMatchPredictionByUser(thisMatchPredictionVote.prediction);
         return;
       } else {
-        setThisMatchPredictionOfUsers('No prediction vote');
+        setThisMatchPredictionByUser(false);
         return;
       }
     } else {
-      setThisMatchPredictionOfUsers(undefined);
+      setThisMatchPredictionByUser(undefined);
       return;
     }
   }, [allPredictionVoteOfUsers, paramsMatchID]);
@@ -211,6 +228,7 @@ export const MatchContainer = (props: PropsType) => {
   }, [thisMatch]);
 
   if (!windowSize) return;
+
   return (
     <>
       <Helmet>
@@ -224,22 +242,52 @@ export const MatchContainer = (props: PropsType) => {
         )}
       </Helmet>
 
-      <MatchComponent
-        isPostingComment={isPostingComment}
-        setComment={setComment}
-        paramsMatchID={paramsMatchID}
-        thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
-        thisMatch={thisMatch}
-        thisMatchPredictionCount={thisMatchPredictionCount}
-        isFetchingComments={isFetchingComments}
+      <MatchContextWrapper
+        thisMatchPredictionByUser={thisMatchPredictionByUser}
         isThisMatchAfterToday={isThisMatchAfterToday}
-        device={device}
-        headerHeight={headerHeight}
-        storeCommentExecute={storeCommentExecute}
-        commentPostRef={commentPostRef}
-        textareaRef={textareaRef}
-        autoExpandTextareaAndSetComment={autoExpandTextareaAndSetComment}
-      />
+      >
+        <MatchComponent
+          isPredictionVoteModal={isPredictionVoteModal}
+          isBoxerInfoModal={isBoxerInfoModal}
+          isShowMatchInfoModal={isShowMatchInfoModal}
+          setComment={setComment}
+          paramsMatchID={paramsMatchID}
+          thisMatch={thisMatch}
+          device={device}
+          storeCommentExecute={storeCommentExecute}
+          commentPostRef={commentPostRef}
+          textareaRef={textareaRef}
+          autoExpandTextareaAndSetComment={autoExpandTextareaAndSetComment}
+        />
+      </MatchContextWrapper>
     </>
+  );
+};
+
+//? context
+export type ThisMatchPredictionByUserType = 'red' | 'blue' | false | undefined;
+export type IsThisMatchAfterTodayType = boolean | undefined;
+export const ThisMatchPredictionByUserContext =
+  createContext<ThisMatchPredictionByUserType>(undefined);
+export const IsThisMatchAfterTodayContext =
+  createContext<IsThisMatchAfterTodayType>(undefined);
+
+type MatchContextWrapperType = {
+  children: React.ReactNode;
+  thisMatchPredictionByUser: ThisMatchPredictionByUserType;
+  isThisMatchAfterToday: IsThisMatchAfterTodayType;
+};
+
+export const MatchContextWrapper = (props: MatchContextWrapperType) => {
+  return (
+    <ThisMatchPredictionByUserContext.Provider
+      value={props.thisMatchPredictionByUser}
+    >
+      <IsThisMatchAfterTodayContext.Provider
+        value={props.isThisMatchAfterToday}
+      >
+        {props.children}
+      </IsThisMatchAfterTodayContext.Provider>
+    </ThisMatchPredictionByUserContext.Provider>
   );
 };

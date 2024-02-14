@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
 // import { useLocation } from "react-router-dom"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
@@ -11,6 +11,9 @@ import { useToastModal } from "@/hooks/useToastModal"
 //! types
 // import { UserType } from "@/assets/types"
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
+//! Recoil
+import { useRecoilState } from "recoil"
+import { apiFetchDataState } from "@/store/apiFetchDataState"
 
 
 type CommentType = {
@@ -62,7 +65,7 @@ export const useFetchComments = (matchId: number) => {
     return res.data
   }
 
-  const { data, isLoading, isFetching, refetch, isError, isSuccess } = useQuery<CommentType[]>([QUERY_KEY.COMMENT, { id: matchId }], api, {
+  const { data, isLoading: isCommentsLoading, isFetching, refetch, isError, isSuccess } = useQuery<CommentType[]>([QUERY_KEY.COMMENT, { id: matchId }], api, {
     staleTime: 30000, onError: (error: any) => {
       if (error.status === 419) {
         showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
@@ -71,12 +74,17 @@ export const useFetchComments = (matchId: number) => {
     }
   })
 
+  //?Recoilで管理
+  const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "comments/fetch", state: "isLoading" }))
+  useEffect(() => {
+    setIsLoading(isCommentsLoading)
+  }, [isCommentsLoading])
+
   return { data, isLoading, isFetching, refetch, isError, isSuccess }
 }
 
 //! コメント投稿
 export const usePostComment = () => {
-  // const { startLoading, resetLoadingState } = useLoading()
   const { showToastModalMessage } = useToastModal()
   type ApiPropsType = {
     matchId: number,
@@ -101,7 +109,7 @@ export const usePostComment = () => {
     })
   }, [])
 
-  const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
+  const { mutate, isLoading: isPostLoading, isSuccess, isError } = useMutation(api, {
     onMutate: () => {
     }
   })
@@ -152,6 +160,11 @@ export const usePostComment = () => {
       }
     })
   }
+
+  const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "comments/post", state: "isLoading" }))
+  useEffect(() => {
+    setIsLoading(isPostLoading)
+  }, [isPostLoading])
   return { postComment, isLoading, isSuccess, isError }
 }
 

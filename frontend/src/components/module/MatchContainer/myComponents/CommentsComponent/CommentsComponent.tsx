@@ -107,6 +107,9 @@ CommentsSectionType) => {
     return 0;
   };
 
+  //コメント未取得状態
+  const isCommentFirstFetching = commentsOfThisMatches === undefined;
+
   //コメントの有無
   const isComments =
     commentsOfThisMatches && Boolean(commentsOfThisMatches.length);
@@ -128,6 +131,18 @@ CommentsSectionType) => {
       commentPostTextareaHeight,
     });
   }
+
+  // コメント未取得時
+  if (isCommentFirstFetching)
+    return (
+      <section
+        className="xl:w-[70%] w-full border-l-[1px] border-stone-200 relative"
+        style={{
+          marginBottom: `${commentPostTextareaHeight}px`,
+          minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
+        }}
+      />
+    );
 
   // コメント投稿あり
   return (

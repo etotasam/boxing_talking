@@ -1,26 +1,30 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import clsx from 'clsx';
 // ! types
 import { NationalityType } from '@/assets/types';
 import { getNationalFlag, formatPosition } from '@/assets/NationalFlagData';
+//! context
+import {
+  ThisMatchPredictionByUserContext,
+  IsThisMatchAfterTodayContext,
+} from '../../..';
 
 type BackgroundFlagPropsType = React.ComponentProps<'div'> & {
   nationality: NationalityType;
-  isThisMatchAfterToday: boolean | undefined;
-  thisMatchPredictionOfUsers?:
-    | 'red'
-    | 'blue'
-    | 'No prediction vote'
-    | undefined;
 };
 
 export const BackgroundFlag = ({
   nationality,
-  thisMatchPredictionOfUsers = undefined,
   children,
-  isThisMatchAfterToday,
 }: BackgroundFlagPropsType) => {
-  //試合日が未来or過去の情報取得完了までは表示させない
+  //? この試合へのuserの勝敗予想をcontextから取得
+  const thisMatchPredictionByUser = useContext(
+    ThisMatchPredictionByUserContext
+  );
+
+  //? 試合日が未来かどうか
+  const isThisMatchAfterToday = useContext(IsThisMatchAfterTodayContext);
+  //? 試合日が未来or過去の情報取得完了までは表示させない
   if (isThisMatchAfterToday === undefined) return;
 
   return (
@@ -35,11 +39,11 @@ export const BackgroundFlag = ({
       >
         <div
           className={clsx(
-            'backdrop-blur-sm absolute top-0 left-0 w-full h-full bg-white duration-500',
-            thisMatchPredictionOfUsers === 'No prediction vote' &&
+            'absolute top-0 left-0 w-full h-full bg-white duration-500',
+            thisMatchPredictionByUser === false &&
               'bg-white/100 hover:bg-white/80',
-            (thisMatchPredictionOfUsers === 'red' ||
-              thisMatchPredictionOfUsers === 'blue') &&
+            (thisMatchPredictionByUser === 'red' ||
+              thisMatchPredictionByUser === 'blue') &&
               'bg-white/80',
             !isThisMatchAfterToday && 'bg-white/80'
           )}

@@ -1,30 +1,29 @@
 import React from 'react';
+import clsx from 'clsx';
 import { RotatingLines } from 'react-loader-spinner';
 //! icon
 import { BiSend } from 'react-icons/bi';
 //! types
 import { MatchDataType } from '@/assets/types';
 //! component
+import { BoxerInfoModal } from '@/components/modal/BoxerInfoModal';
+import { MatchInfoModal } from '@/components/modal/MatchInfoModal';
 import { LeftSection } from './myComponents/LeftSection';
 import { CommentsComponent } from './myComponents/CommentsComponent';
-import { SetUpBoxers } from './myComponents/SetUpBoxers';
-import clsx from 'clsx';
+import { PredictionVoteModalContainer } from '@/components/modal/PredictionVoteModal';
+import { BoxersContainer } from './myComponents/Boxers';
+//! hooks
+import { usePostComment } from '@/hooks/apiHooks/useComment';
 
 type PropsType = {
+  isPredictionVoteModal: boolean;
+  isBoxerInfoModal: boolean;
+  isShowMatchInfoModal: boolean;
   paramsMatchID: number;
-  thisMatchPredictionOfUsers: 'red' | 'blue' | 'No prediction vote' | undefined;
   thisMatch: MatchDataType | undefined;
-  thisMatchPredictionCount: Record<
-    'redCount' | 'blueCount' | 'totalCount',
-    number
-  >;
-  isFetchingComments: boolean;
-  isThisMatchAfterToday: boolean | undefined;
   device: 'PC' | 'SP' | undefined;
-  headerHeight: number | undefined;
   commentPostRef: React.MutableRefObject<null>;
   textareaRef: React.MutableRefObject<null>;
-  isPostingComment: boolean;
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
   storeCommentExecute: () => void;
   autoExpandTextareaAndSetComment: (
@@ -33,25 +32,22 @@ type PropsType = {
 };
 
 export const MatchComponent = (props: PropsType) => {
+  const {
+    thisMatch,
+    isBoxerInfoModal,
+    isPredictionVoteModal,
+    isShowMatchInfoModal,
+  } = props;
   return (
     <>
       {/* //? Boxer */}
-      <SetUpBoxers
-        paramsMatchID={props.paramsMatchID}
-        thisMatchPredictionOfUsers={props.thisMatchPredictionOfUsers}
-        thisMatch={props.thisMatch}
-        thisMatchPredictionCount={props.thisMatchPredictionCount}
-        isFetchingComments={props.isFetchingComments}
-        isThisMatchAfterToday={props.isThisMatchAfterToday}
-      />
+      <BoxersContainer thisMatch={thisMatch} />
+
       <div className="flex w-full]">
         {/* //? Left section (Match info) */}
         {props.device === 'PC' && (
           <LeftSection
             thisMatch={props.thisMatch}
-            thisMatchPredictionOfUsers={props.thisMatchPredictionOfUsers}
-            isThisMatchAfterToday={props.isThisMatchAfterToday}
-            headerHeight={props.headerHeight}
             commentPostEl={props.commentPostRef.current}
           />
         )}
@@ -65,7 +61,6 @@ export const MatchComponent = (props: PropsType) => {
       >
         <div className="md:w-[70%] sm:w-[85%] sm:max-w-[800px] w-[95%]">
           <PostCommentTextarea
-            isPostingComment={props.isPostingComment}
             setComment={props.setComment}
             storeCommentExecute={props.storeCommentExecute}
             textareaRef={props.textareaRef}
@@ -75,13 +70,26 @@ export const MatchComponent = (props: PropsType) => {
           />
         </div>
       </section>
+
+      {isBoxerInfoModal && (
+        //? BoxerInfoモーダル
+        <BoxerInfoModal />
+      )}
+
+      {thisMatch && isShowMatchInfoModal && (
+        <MatchInfoModal matchData={thisMatch} />
+      )}
+
+      {thisMatch && isPredictionVoteModal && (
+        //? 投票モーダル
+        <PredictionVoteModalContainer thisMatch={thisMatch} />
+      )}
     </>
   );
 };
 
 // ! post comment textarea
 type PostCommentTextareaType = {
-  isPostingComment: boolean;
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
   storeCommentExecute: () => void;
   textareaRef: React.MutableRefObject<null>;
@@ -94,8 +102,9 @@ const PostCommentTextarea = ({
   storeCommentExecute,
   textareaRef,
   autoExpandTextareaAndSetComment,
-  isPostingComment,
 }: PostCommentTextareaType) => {
+  //? コメント投稿中…の状態取得(hookの中でRecoilを使用)
+  const { isLoading: isPostingComment } = usePostComment();
   return (
     <div className="border-stone-400 bg-white relative border-[1px] sm:pl-3 sm:py-2 pl-2 py-1 rounded-sm flex justify-center items-center">
       <textarea

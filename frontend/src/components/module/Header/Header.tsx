@@ -46,7 +46,7 @@ export const Header = (props: PropsType) => {
     <>
       <header
         ref={headerRef}
-        className="z-10 h-[80px] fixed top-0 left-0 w-full flex backdrop-blur-md bg-white/60 after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
+        className="z-30 h-[80px] fixed top-0 left-0 w-full flex backdrop-blur-md bg-white/60 after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
       >
         <h1
           className={clsx(

@@ -2,10 +2,12 @@ import { atomFamily } from "recoil";
 
 const modalNames = [
   "LOGIN",
-  "MATCH_INFO"
+  "MATCH_INFO",
+  "BOXER_INFO",
+  "PREDICTION_VOTE",
 ] as const
 
-type ModalNameType = (typeof modalNames)[number]
+export type ModalNameType = (typeof modalNames)[number]
 
 export const modalState = atomFamily<boolean, ModalNameType>({
   key: "modalState",

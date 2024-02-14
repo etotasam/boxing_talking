@@ -44,6 +44,7 @@ export const FightBox = ({
       )
     );
   }, [isPredictionVote, authUser, isGuest, isDayOverFight, isFightToday]);
+
   return (
     <>
       {matchData && (
@@ -58,9 +59,8 @@ export const FightBox = ({
         >
           <div className="w-[300px]">
             <BoxerInfo
-              boxer={matchData.red_boxer}
+              boxer={{ ...matchData.red_boxer, color: 'red' }}
               matchResult={matchData.result}
-              boxerColor="red"
             />
           </div>
 
@@ -68,9 +68,8 @@ export const FightBox = ({
 
           <div className="w-[300px]">
             <BoxerInfo
-              boxer={matchData.blue_boxer}
+              boxer={{ ...matchData.blue_boxer, color: 'blue' }}
               matchResult={matchData.result}
-              boxerColor="blue"
             />
           </div>
           {isShowPredictionIcon && <PredictionVoteIcon />}

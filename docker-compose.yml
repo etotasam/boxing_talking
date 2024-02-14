@@ -46,7 +46,7 @@ services:
     container_name: node
     volumes:
       - "./frontend/:/usr/src/app"
-    command: sh -c "yarn install && yarn dev"
+    command: sh -c "npm install && npm run dev"
     ports:
       - "3000:3000"
     tty: true
