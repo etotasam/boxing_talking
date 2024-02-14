@@ -20,7 +20,7 @@ export const EngNameWithFlag = ({
           />
         </div>
       </div>
-      <p className="text-center">{boxerEngName}</p>
+      <p className="text-center font-medium tracking-wider">{boxerEngName}</p>
     </div>
   );
 };

@@ -72,9 +72,9 @@ const Container = () => {
         {(isLoading || isRefetchingBoxers) && (
           <FullScreenSpinnerModal key={'FullScreenSpinnerModal'} />
         )}
-        {(isFirstCheckingAuth || isBoxersFetching || isMatchesFetching) && (
+        {/* {(isFirstCheckingAuth || isBoxersFetching || isMatchesFetching) && (
           <FirstLoadingModal key={'FirstLoadingModal'} />
-        )}
+        )} */}
       </AnimatePresence>
       {isShowLoginModal && <LoginFormModal key={'LoginFormModal'} />}
     </>

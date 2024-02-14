@@ -54,7 +54,7 @@ export const Boxers = (props: BoxersPropsType) => {
       <div
         ref={boxersRef}
         className={clsx(
-          'flex border-b-[1px] border-stone-300 min-h-[65px]',
+          'flex border-b-[1px] border-stone-300',
           device === 'PC' && 'relative',
           device === 'SP' && 'sticky top-0'
         )}
@@ -68,16 +68,16 @@ export const Boxers = (props: BoxersPropsType) => {
             Aside: thisMatch.red_boxer.country,
             Bside: thisMatch.blue_boxer.country,
           }}
-        >
-          <BoxerBox
-            boxer={thisMatch.red_boxer}
-            onClick={() => props.showBoxerInfoModal('red')}
-          />
-          <BoxerBox
-            boxer={thisMatch.blue_boxer}
-            onClick={() => props.showBoxerInfoModal('blue')}
-          />
-        </NationalFlagBackgroundDiv>
+        />
+        <BoxerBox
+          boxer={thisMatch.red_boxer}
+          onClick={() => props.showBoxerInfoModal('red')}
+        />
+        <BoxerBox
+          boxer={thisMatch.blue_boxer}
+          onClick={() => props.showBoxerInfoModal('blue')}
+        />
+        {/* </NationalFlagBackgroundDiv> */}
         {/* //? 投票数bar */}
         {isShowPredictionBar && <PredictionBar thisMatch={thisMatch} />}
       </div>
@@ -106,7 +106,7 @@ const VotesButton = ({ showPredictionVoteModal }: VoteButtonType) => {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
         onClick={handleClick}
-        className="z-30 absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] sm:w-[50px] sm:h-[50px] w-[40px] h-[40px] bg-green-600 hover:bg-green-600/80 rounded-[50%] flex justify-center items-center text-white text-[20px] hover:text-[25px] duration-200"
+        className="z-20 absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] sm:w-[50px] sm:h-[50px] w-[40px] h-[40px] bg-green-600 hover:bg-green-600/80 rounded-[50%] flex justify-center items-center text-white text-[20px] hover:text-[25px] duration-200"
       >
         <MdHowToVote />
       </motion.button>
@@ -120,10 +120,10 @@ type BoxerBoxType = {
 };
 const BoxerBox = ({ boxer, onClick }: BoxerBoxType) => {
   return (
-    <div onClick={onClick} className={clsx('flex-1 relative h-[65px]')}>
+    <div onClick={onClick} className={clsx('flex-1 relative min-h-[80px]')}>
       <div
         className={
-          'z-20 select-none absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full flex flex-col justify-center items-center'
+          'z-10 select-none absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full flex flex-col justify-center items-center'
         }
       >
         <EngNameWithFlag
@@ -132,6 +132,7 @@ const BoxerBox = ({ boxer, onClick }: BoxerBoxType) => {
         />
         <h2
           className={clsx(
+            'font-semibold',
             boxer.name.length > 7
               ? `sm:text-[18px] text-[12px]`
               : `sm:text-[20px] text-[16px]`
@@ -169,7 +170,7 @@ const PredictionBar = ({ thisMatch }: { thisMatch: MatchDataType }) => {
           width: `${redRatio}%`,
         }}
         transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-        className="z-20 block absolute bottom-0 left-0 bg-red-600 h-1"
+        className="z-10 block absolute bottom-0 left-0 bg-red-600 h-1"
       />
       <motion.span
         initial={{
@@ -179,7 +180,7 @@ const PredictionBar = ({ thisMatch }: { thisMatch: MatchDataType }) => {
           width: `${blueRatio}%`,
         }}
         transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-        className="z-20 block absolute bottom-0 right-0 bg-blue-600 h-1"
+        className="z-10 block absolute bottom-0 right-0 bg-blue-600 h-1"
       />
     </>
   );
@@ -207,7 +208,7 @@ const Default = (props: NationalFlagBackgroundDivPropsType) => {
   const aSidePosition = formatPosition(countries.Aside);
   const bSidePosition = formatPosition(countries.Bside);
   return (
-    <div className="relative w-full h-full">
+    <div className="fixed top-0 w-full h-[250px]">
       <div
         className="absolute left-0 w-1/2 h-full"
         style={{
@@ -224,7 +225,7 @@ const Default = (props: NationalFlagBackgroundDivPropsType) => {
           backgroundPosition: bSidePosition,
         }}
       />
-      <div className="bg-white/50 w-full h-full flex backdrop-blur-[2px]">
+      <div className="bg-white/70 w-full h-full flex backdrop-blur-sm">
         {children}
       </div>
     </div>
@@ -237,14 +238,14 @@ const SameCountry = (props: NationalFlagBackgroundDivPropsType) => {
   const position = formatPosition(countries.Aside);
   return (
     <div
-      className="w-full h-full"
+      className="fixed top-0 w-full h-full max-h-[500px]"
       style={{
         backgroundImage: `url(${bgUrl})`,
         backgroundSize: 'cover',
         backgroundPosition: position,
       }}
     >
-      <div className="bg-white/50 w-full h-full flex backdrop-blur-sm">
+      <div className="bg-white/70 w-full h-full flex backdrop-blur-sm">
         {children}
       </div>
     </div>

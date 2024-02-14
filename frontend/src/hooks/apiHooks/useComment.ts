@@ -9,21 +9,12 @@ import { API_PATH } from "@/assets/ApiPath"
 import { useLoading } from "@/hooks/useLoading"
 import { useToastModal } from "@/hooks/useToastModal"
 //! types
-// import { UserType } from "@/assets/types"
+import { CommentType } from "@/assets/types"
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 //! Recoil
 import { useRecoilState } from "recoil"
 import { apiFetchDataState } from "@/store/apiFetchDataState"
 
-
-type CommentType = {
-  id: number;
-  post_user_name: string;
-  // match_id: number,
-  comment: string;
-  prediction: "red" | "blue" | undefined;
-  created_at: string;
-}
 //! テストコメント取得
 export const useTestFetchComments = (matchId: number, offset: number, limit: number) => {
   const { showToastModalMessage } = useToastModal()

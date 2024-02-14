@@ -75,7 +75,7 @@ export const LeftSection = ({ thisMatch, commentPostEl }: LeftSectionType) => {
   //?試合データを取得するまでは何もrenderさせない
   if (!thisMatch) return;
   return (
-    <div className="xl:w-[30%] w-[40%]">
+    <div className="z-10 xl:w-[30%] w-[40%] bg-white">
       <div
         ref={leftSectionRef}
         className={clsx('flex justify-center')}
@@ -87,7 +87,7 @@ export const LeftSection = ({ thisMatch, commentPostEl }: LeftSectionType) => {
           marginBottom: `${commentPostEl?.clientHeight ?? '0'}px`,
         }}
       >
-        <div className="w-full max-w-[450px]">
+        <div className="w-full max-w-[450px] bg-white">
           <div className="flex justify-center">
             <MatchInfo matchData={thisMatch} />
           </div>
@@ -154,7 +154,7 @@ const PredictionsBar = ({
                   className={clsx(
                     'block pl-3 text-lg font-semibold right-0 top-0',
                     "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1",
-                    thisMatchPredictionOfUser === 'red' && 'text-red-500'
+                    thisMatchPredictionOfUser === 'red' && 'text-red-600'
                   )}
                 >
                   {thisMatch.count_red}
@@ -164,7 +164,7 @@ const PredictionsBar = ({
                     className={clsx(
                       'block text-right pr-3 text-lg font-semibold right-0 top-0',
                       "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1",
-                      thisMatchPredictionOfUser === 'blue' && 'text-blue-500'
+                      thisMatchPredictionOfUser === 'blue' && 'text-blue-600'
                     )}
                   >
                     {thisMatch.count_blue}
@@ -183,7 +183,7 @@ const PredictionsBar = ({
                     isFetchCommentsSuccess && { width: `${redCountRatio}%` }
                   }
                   transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-                  className="h-[10px] absolute top-0 left-[-1px] rounded-[50px] bg-red-600"
+                  className="h-[10px] absolute top-0 left-[-1px] rounded-[50px] bg-red-700"
                 />
 
                 <motion.div
@@ -194,7 +194,7 @@ const PredictionsBar = ({
                     isFetchCommentsSuccess && { width: `${blueCountRatio}%` }
                   }
                   transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-                  className="h-[10px] absolute top-0 right-[-1px] rounded-[50px] bg-blue-600"
+                  className="h-[10px] absolute top-0 right-[-1px] rounded-[50px] bg-blue-700"
                 />
               </div>
             </div>

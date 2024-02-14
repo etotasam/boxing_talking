@@ -121,7 +121,7 @@ const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
         />
         <h2
           className={clsx(
-            'lg:text-[20px] sm:text-[16px] mt-1',
+            'lg:text-[20px] sm:text-[16px] mt-1 font-semibold text-stone-600',
             boxer.name.length > 7 ? `text-[12px]` : `text-[16px]`
           )}
         >

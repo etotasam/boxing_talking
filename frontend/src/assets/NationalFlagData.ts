@@ -59,13 +59,14 @@ export const getNationalFlag = (country: NationalityType) => {
 
 
 export const formatPosition = (country: NationalityType) => {
-  if (country == NATIONALITY.USA) return '25% 25%';
+  if (country == NATIONALITY.USA) return '25% 20%';
   if (country == NATIONALITY.UK) return '25% 30%';
-  if (country == NATIONALITY.RUSSIA) return '25% 75%';
+  // if (country == NATIONALITY.RUSSIA) return '25% 75%';
   if (country == NATIONALITY.SOUTH_AFRICA) return '25% 30%';
   if (country == NATIONALITY.MEXICO) return '25% 40%';
   if (country == NATIONALITY.CHINA) return '25% 25%';
   if (country == NATIONALITY.VENEZUELA) return '25% 35%';
+  if (country == NATIONALITY.GHANA) return '25% 35%';
   if (country == NATIONALITY.AUSTRALIA) return '25% 35%';
   return 'center';
 };

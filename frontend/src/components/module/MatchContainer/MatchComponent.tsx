@@ -44,7 +44,7 @@ export const MatchComponent = (props: PropsType) => {
       {/* //? Boxer */}
       <BoxersContainer thisMatch={thisMatch} />
 
-      <div className="flex w-full]">
+      <div className="flex w-full">
         {/* //? Left section (Match info) */}
         {device === 'PC' && (
           <LeftSection
@@ -58,7 +58,7 @@ export const MatchComponent = (props: PropsType) => {
 
       <section
         ref={props.commentPostRef}
-        className="fixed bottom-0 w-full flex bg-white/60 justify-center py-8 border-t-[1px] border-stone-200"
+        className="z-10 fixed bottom-0 w-full flex bg-white/60 justify-center py-8 border-t-[1px] border-stone-200"
       >
         <div className="md:w-[70%] sm:w-[85%] sm:max-w-[800px] w-[95%]">
           <PostCommentTextarea

@@ -63,7 +63,9 @@ export const BoxerInfo = ({ boxer, className, matchResult }: PropsType) => {
               boxerCountry={boxer.country}
               boxerEngName={boxer.eng_name}
             />
-            <h2 className="text-[18px] mt-1">{boxer.name}</h2>
+            <h2 className="text-[18px] mt-1 font-semibold text-stone-600">
+              {boxer.name}
+            </h2>
           </div>
           {/* //? 戦績 */}
           <ul className="flex justify-between w-full mt-7 text-white">
