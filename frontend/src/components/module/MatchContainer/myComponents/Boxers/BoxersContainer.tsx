@@ -1,4 +1,5 @@
-import { useContext } from 'react';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { useContext, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 //! component
 import { Boxers } from '.';
@@ -15,8 +16,9 @@ import {
   IsThisMatchAfterTodayContext,
 } from '../..';
 //! recoil
-import { useRecoilState } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 import { boxerInfoDataState } from '@/store/boxerInfoDataState';
+import { elementSizeState } from '@/store/elementSizeState';
 
 type ContainerPropsType = {
   thisMatch: MatchDataType | undefined;
@@ -32,8 +34,6 @@ export const BoxersContainer = (props: ContainerPropsType) => {
   const matchId = Number(query.get('match_id'));
   //? コメント投稿中かどうか(hook内でRecoilにて管理)
   const { isLoading: isFetchCommentsLoading } = useFetchComments(matchId);
-  //? 勝敗予想投票数をcontextから取得
-  // const thisMatchPredictionCount = useContext(ThisMatchPredictionCountContext)!;
   //? この試合へのuserの勝敗予想をcontextから取得
   const thisMatchPredictionByUser = useContext(
     ThisMatchPredictionByUserContext
@@ -47,7 +47,7 @@ export const BoxersContainer = (props: ContainerPropsType) => {
   const { showModal: showPredictionVoteModal } =
     useModalState('PREDICTION_VOTE');
   //? boxer info modalに表示するデータを取得(Recoil)
-  const [_, setBoxerInfoData] = useRecoilState(boxerInfoDataState);
+  const setBoxerInfoData = useSetRecoilState(boxerInfoDataState);
   //? boxer info modalにデータをセット and 表示
   const showAndSetBoxerInfoModal = (boxerColor: 'red' | 'blue') => {
     if (device !== 'SP') return;
@@ -58,12 +58,22 @@ export const BoxersContainer = (props: ContainerPropsType) => {
     showBoxerInfoModal();
   };
 
+  const setBoxerElHeight = useSetRecoilState(
+    elementSizeState('MATCH_PAGE_BOXER_SECTION_HEIGHT')
+  );
+  const boxersRef = useRef(null);
+  useEffect(() => {
+    if (!boxersRef.current) return;
+    const height = (boxersRef.current as HTMLDivElement).clientHeight;
+    setBoxerElHeight(height);
+  }, [boxersRef.current]);
+
   return (
     <Boxers
       thisMatch={thisMatch}
+      boxersRef={boxersRef}
       device={device}
       isFetchCommentsLoading={isFetchCommentsLoading}
-      // thisMatchPredictionCount={thisMatchPredictionCount}
       thisMatchPredictionByUser={thisMatchPredictionByUser}
       isThisMatchAfterToday={isThisMatchAfterToday}
       showPredictionVoteModal={showPredictionVoteModal}

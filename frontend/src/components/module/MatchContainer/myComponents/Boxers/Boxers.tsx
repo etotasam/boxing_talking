@@ -1,21 +1,22 @@
 import { clsx } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
+import { getNationalFlag, formatPosition } from '@/assets/NationalFlagData';
 //! context
 import {
   IsThisMatchAfterTodayType,
   ThisMatchPredictionByUserType,
 } from '../..';
 //! type
-import { MatchDataType, BoxerType } from '@/assets/types';
+import { MatchDataType, BoxerType, NationalityType } from '@/assets/types';
 //! hooks
 import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/apiHooks/uesWinLossPrediction';
 //! icon
 import { MdHowToVote } from 'react-icons/md';
 //! components
-import { BackgroundFlag } from './BackgroundFlag';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 
 type BoxersPropsType = {
+  boxersRef: React.MutableRefObject<null>;
   thisMatch: MatchDataType | undefined;
   showBoxerInfoModal: (boxerColor: 'red' | 'blue') => void;
   showPredictionVoteModal: () => void;
@@ -26,6 +27,8 @@ type BoxersPropsType = {
 };
 export const Boxers = (props: BoxersPropsType) => {
   const {
+    boxersRef,
+    device,
     thisMatch,
     isFetchCommentsLoading, //? コメントの取得状態
     thisMatchPredictionByUser, //? この試合へのuserの勝敗予想
@@ -38,30 +41,9 @@ export const Boxers = (props: BoxersPropsType) => {
     thisMatchPredictionByUser ?? thisMatchPredictionByUser !== undefined
   );
 
-  const thisMatchPredictionCount = {
-    redCount: thisMatch?.count_red ?? 0,
-    blueCount: thisMatch?.count_blue ?? 0,
-    totalCount: (thisMatch?.count_red ?? 0) + (thisMatch?.count_blue ?? 0),
-  };
-
-  //? 勝敗予想数を数から%に変換する関数
-  const formatPredictionCountToPercent = (predictionCount: number) => {
-    const percent = Math.round(
-      (predictionCount / thisMatchPredictionCount.totalCount) * 100
-    );
-    if (!isNaN(percent)) {
-      return percent;
-    } else {
-      return 0;
-    }
-  };
-
   //? 投票Barを表示させる条件
   const isShowPredictionBar =
-    props.device &&
-    props.device === 'SP' &&
-    !isFetchCommentsLoading &&
-    isVotePrediction;
+    device && device === 'SP' && !isFetchCommentsLoading && isVotePrediction;
 
   //? 投票ボタン表示条件
   const isShowVoteButton = isThisMatchAfterToday && !isVotePrediction;
@@ -70,54 +52,34 @@ export const Boxers = (props: BoxersPropsType) => {
   return (
     <>
       <div
+        ref={boxersRef}
         className={clsx(
           'flex border-b-[1px] border-stone-300 min-h-[65px]',
-          props.device === 'PC' && 'relative',
-          props.device === 'SP' && 'sticky top-0'
+          device === 'PC' && 'relative',
+          device === 'SP' && 'sticky top-0'
         )}
       >
         {isShowVoteButton && (
           //? 投票ボタン
           <VotesButton showPredictionVoteModal={showPredictionVoteModal} />
         )}
-        <div className="z-10 bg-white/20 backdrop-blur-sm absolute top-0 left-0 w-full h-full" />
-        <BoxerBox
-          boxer={thisMatch.red_boxer}
-          onClick={() => props.showBoxerInfoModal('red')}
-        />
-        <BoxerBox
-          boxer={thisMatch.blue_boxer}
-          onClick={() => props.showBoxerInfoModal('blue')}
-        />
+        <NationalFlagBackgroundDiv
+          countries={{
+            Aside: thisMatch.red_boxer.country,
+            Bside: thisMatch.blue_boxer.country,
+          }}
+        >
+          <BoxerBox
+            boxer={thisMatch.red_boxer}
+            onClick={() => props.showBoxerInfoModal('red')}
+          />
+          <BoxerBox
+            boxer={thisMatch.blue_boxer}
+            onClick={() => props.showBoxerInfoModal('blue')}
+          />
+        </NationalFlagBackgroundDiv>
         {/* //? 投票数bar */}
-        {isShowPredictionBar && (
-          <>
-            <motion.span
-              initial={{
-                width: 0,
-              }}
-              animate={{
-                width: `${formatPredictionCountToPercent(
-                  thisMatchPredictionCount.redCount
-                )}%`,
-              }}
-              transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-              className="z-20 block absolute bottom-0 left-0 bg-red-600 h-1"
-            />
-            <motion.span
-              initial={{
-                width: 0,
-              }}
-              animate={{
-                width: `${formatPredictionCountToPercent(
-                  thisMatchPredictionCount.blueCount
-                )}%`,
-              }}
-              transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-              className="z-20 block absolute bottom-0 right-0 bg-blue-600 h-1"
-            />
-          </>
-        )}
+        {isShowPredictionBar && <PredictionBar thisMatch={thisMatch} />}
       </div>
     </>
   );
@@ -158,28 +120,133 @@ type BoxerBoxType = {
 };
 const BoxerBox = ({ boxer, onClick }: BoxerBoxType) => {
   return (
-    <div onClick={onClick} className={clsx('flex-1 py-5 relative')}>
-      <BackgroundFlag nationality={boxer.country}>
-        <div
-          className={
-            'z-20 select-none absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full flex flex-col justify-center items-center'
-          }
+    <div onClick={onClick} className={clsx('flex-1 relative h-[65px]')}>
+      <div
+        className={
+          'z-20 select-none absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full flex flex-col justify-center items-center'
+        }
+      >
+        <EngNameWithFlag
+          boxerCountry={boxer.country}
+          boxerEngName={boxer.eng_name}
+        />
+        <h2
+          className={clsx(
+            boxer.name.length > 7
+              ? `sm:text-[18px] text-[12px]`
+              : `sm:text-[20px] text-[16px]`
+          )}
         >
-          <EngNameWithFlag
-            boxerCountry={boxer.country}
-            boxerEngName={boxer.eng_name}
-          />
-          <h2
-            className={clsx(
-              boxer.name.length > 7
-                ? `sm:text-[18px] text-[12px]`
-                : `sm:text-[20px] text-[16px]`
-            )}
-          >
-            {boxer.name}
-          </h2>
-        </div>
-      </BackgroundFlag>
+          {boxer.name}
+        </h2>
+      </div>
+    </div>
+  );
+};
+
+const PredictionBar = ({ thisMatch }: { thisMatch: MatchDataType }) => {
+  //? 勝敗予想数を数から%に変換する関数
+  const formatPredictionCountToPercent = (predictionCount: number) => {
+    const totalVoteCount = thisMatch.count_red + thisMatch.count_blue;
+    const percent = Math.round((predictionCount / totalVoteCount) * 100);
+    if (!isNaN(percent)) {
+      return percent;
+    } else {
+      return 0;
+    }
+  };
+
+  const redRatio = formatPredictionCountToPercent(thisMatch.count_red);
+  const blueRatio = formatPredictionCountToPercent(thisMatch.count_blue);
+
+  return (
+    <>
+      <motion.span
+        initial={{
+          width: 0,
+        }}
+        animate={{
+          width: `${redRatio}%`,
+        }}
+        transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
+        className="z-20 block absolute bottom-0 left-0 bg-red-600 h-1"
+      />
+      <motion.span
+        initial={{
+          width: 0,
+        }}
+        animate={{
+          width: `${blueRatio}%`,
+        }}
+        transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
+        className="z-20 block absolute bottom-0 right-0 bg-blue-600 h-1"
+      />
+    </>
+  );
+};
+
+type NationalFlagBackgroundDivPropsType = {
+  countries: { Aside: NationalityType; Bside: NationalityType };
+  children?: React.ReactNode;
+};
+export const NationalFlagBackgroundDiv = ({
+  countries,
+  children,
+}: NationalFlagBackgroundDivPropsType) => {
+  const sameCountry = countries.Aside === countries.Bside;
+
+  if (sameCountry)
+    return <SameCountry countries={countries} children={children} />;
+  return <Default countries={countries} children={children} />;
+};
+
+const Default = (props: NationalFlagBackgroundDivPropsType) => {
+  const { countries, children } = props;
+  const aSideBgUrl = getNationalFlag(countries.Aside);
+  const bSideBgUrl = getNationalFlag(countries.Bside);
+  const aSidePosition = formatPosition(countries.Aside);
+  const bSidePosition = formatPosition(countries.Bside);
+  return (
+    <div className="relative w-full h-full">
+      <div
+        className="absolute left-0 w-1/2 h-full"
+        style={{
+          backgroundImage: `url(${aSideBgUrl})`,
+          backgroundSize: 'cover',
+          backgroundPosition: aSidePosition,
+        }}
+      />
+      <div
+        className="absolute right-0 w-1/2 h-full"
+        style={{
+          backgroundImage: `url(${bSideBgUrl})`,
+          backgroundSize: 'cover',
+          backgroundPosition: bSidePosition,
+        }}
+      />
+      <div className="bg-white/50 w-full h-full flex backdrop-blur-[2px]">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+const SameCountry = (props: NationalFlagBackgroundDivPropsType) => {
+  const { countries, children } = props;
+  const bgUrl = getNationalFlag(countries.Aside);
+  const position = formatPosition(countries.Aside);
+  return (
+    <div
+      className="w-full h-full"
+      style={{
+        backgroundImage: `url(${bgUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: position,
+      }}
+    >
+      <div className="bg-white/50 w-full h-full flex backdrop-blur-sm">
+        {children}
+      </div>
     </div>
   );
 };

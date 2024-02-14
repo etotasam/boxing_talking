@@ -14,11 +14,6 @@ export default {
     (Story) => (
       <QueryClientProvider client={queryClient}>
         <MatchContextWrapper
-          thisMatchPredictionCount={{
-            redCount: 2,
-            blueCount: 3,
-            totalCount: 5,
-          }}
           thisMatchPredictionByUser={'blue'}
           isThisMatchAfterToday={true}
         >
@@ -54,7 +49,7 @@ const blueBoxer: BoxerType = {
   height: 180,
   reach: 182,
   style: 'orthodox',
-  country: 'UK',
+  country: 'Japan',
   win: 1,
   ko: 1,
   draw: 1,
@@ -85,7 +80,6 @@ export const Default: Story = {
     showPredictionVoteModal: () => {},
     device: 'PC',
     isFetchCommentsLoading: false,
-    thisMatchPredictionCount: { redCount: 12, blueCount: 11, totalCount: 23 },
     thisMatchPredictionByUser: 'red',
     isThisMatchAfterToday: true,
   },

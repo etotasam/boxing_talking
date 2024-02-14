@@ -1,7 +1,5 @@
-import React from 'react';
 import { ClearFullScreenDiv } from '@/components/atomic/ClearFullScreenDiv';
 import { BoxerInfo } from '@/components/module/BoxerInfo';
-import { BoxerType } from '@/assets/types';
 import { useRecoilState } from 'recoil';
 import { boxerInfoDataState } from '@/store/boxerInfoDataState';
 import { useModalState } from '@/hooks/useModalState';

@@ -27,7 +27,9 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
 
   return (
     <>
-      <div className={clsx('text-stone-600', isTitleMatch ? 'pt-9' : 'py-5')}>
+      <div
+        className={clsx('text-stone-600', isTitleMatch ? 'pt-9 pb-5' : 'py-5')}
+      >
         {/* //? 日時 */}
         <div className="text-center relative">
           <MatchDate matchData={matchData} />

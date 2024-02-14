@@ -132,7 +132,7 @@ const PredictionsBar = ({
   return (
     <>
       {thisMatch && (
-        <div className="flex justify-center my-5">
+        <div className="flex justify-center mb-5">
           <div className="w-[80%]">
             <p className="text-center lg:text-sm text-xs font-light">
               <span

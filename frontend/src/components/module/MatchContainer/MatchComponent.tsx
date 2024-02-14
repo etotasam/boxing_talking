@@ -33,6 +33,7 @@ type PropsType = {
 
 export const MatchComponent = (props: PropsType) => {
   const {
+    device,
     thisMatch,
     isBoxerInfoModal,
     isPredictionVoteModal,
@@ -45,9 +46,9 @@ export const MatchComponent = (props: PropsType) => {
 
       <div className="flex w-full]">
         {/* //? Left section (Match info) */}
-        {props.device === 'PC' && (
+        {device === 'PC' && (
           <LeftSection
-            thisMatch={props.thisMatch}
+            thisMatch={thisMatch}
             commentPostEl={props.commentPostRef.current}
           />
         )}
@@ -71,12 +72,12 @@ export const MatchComponent = (props: PropsType) => {
         </div>
       </section>
 
-      {isBoxerInfoModal && (
+      {isBoxerInfoModal && device === 'SP' && (
         //? BoxerInfoモーダル
         <BoxerInfoModal />
       )}
 
-      {thisMatch && isShowMatchInfoModal && (
+      {thisMatch && isShowMatchInfoModal && device === 'SP' && (
         <MatchInfoModal matchData={thisMatch} />
       )}
 

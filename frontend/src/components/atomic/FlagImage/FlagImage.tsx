@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 // ! types
 import { NationalityType } from '@/assets/types';
-// ! Nationaly
+// ! Nationally
 import { getNationalFlag } from '@/assets/NationalFlagData';
 
 type PropsType = React.ComponentProps<'div'> & { nationality: NationalityType };

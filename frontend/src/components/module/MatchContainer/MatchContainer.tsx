@@ -72,12 +72,6 @@ export const MatchContainer = (props: PropsType) => {
   //? useState
   const [comment, setComment] = useState<string>();
   const [thisMatch, setThisMatch] = useState<MatchDataType>();
-  // const [thisMatchPredictionCount, setThisMatchPredictionCount] =
-  //   useState<ThisMatchPredictionCountType>({
-  //     redCount: 0,
-  //     blueCount: 0,
-  //     totalCount: 0,
-  //   });
 
   //? 試合の存在確認を確認、なければリダイレクト
   useEffect(() => {
@@ -88,15 +82,6 @@ export const MatchContainer = (props: PropsType) => {
     } else {
       navigate(ROUTE_PATH.HOME);
     }
-    // setThisMatchPredictionCount({
-    //   redCount: match.count_red,
-    //   blueCount: match.count_blue,
-    //   totalCount: match.count_red + match.count_blue,
-    // });
-    // } else {
-    //試合が存在しない場合はリダイレクト
-    // navigate(ROUTE_PATH.HOME);
-    // }
   }, [paramsMatchID, props.matches]);
 
   const [thisMatchPredictionByUser, setThisMatchPredictionByUser] =

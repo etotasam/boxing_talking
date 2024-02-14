@@ -2,6 +2,7 @@ import { ClearFullScreenDiv } from '@/components/atomic/ClearFullScreenDiv';
 import { MatchInfo } from '@/components/module/MatchInfo';
 import { MatchDataType } from '@/assets/types';
 import { useModalState } from '@/hooks/useModalState';
+import { useWindowSize } from '@/hooks/useWindowSize';
 
 export const MatchInfoModal = ({
   matchData,
@@ -9,7 +10,12 @@ export const MatchInfoModal = ({
   matchData: MatchDataType | undefined;
 }) => {
   const { hideModal } = useModalState('MATCH_INFO');
+  const { device } = useWindowSize();
   if (matchData === undefined) return;
+
+  if (device === 'PC') {
+    hideModal;
+  }
 
   return (
     <>

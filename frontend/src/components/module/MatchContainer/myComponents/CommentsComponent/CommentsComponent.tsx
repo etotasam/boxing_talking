@@ -123,12 +123,16 @@ CommentsSectionType) => {
     );
   }
 
+  // 除外する高さ
+  const excludeHeight =
+    (headerHeight ?? 0) +
+    (matchBoxerSectionHeight ?? 0) +
+    (commentPostTextareaHeight ?? 0);
+
   //コメント投稿がない場合
   if (!isComments && !isFetchingComments && !isErrorFetchComments) {
     return NotExistsComments({
-      headerHeight,
-      matchBoxerSectionHeight,
-      commentPostTextareaHeight,
+      excludeHeight,
     });
   }
 
@@ -139,7 +143,7 @@ CommentsSectionType) => {
         className="xl:w-[70%] w-full border-l-[1px] border-stone-200 relative"
         style={{
           marginBottom: `${commentPostTextareaHeight}px`,
-          minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
+          minHeight: `calc(100vh - ${excludeHeight}px - 1px)`,
         }}
       />
     );
@@ -151,7 +155,7 @@ CommentsSectionType) => {
         className="xl:w-[70%] w-full border-l-[1px] border-stone-200 relative"
         style={{
           marginBottom: `${commentPostTextareaHeight}px`,
-          minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
+          minHeight: `calc(100vh - ${excludeHeight}px - 1px)`,
         }}
       >
         {!liElements && (
@@ -246,21 +250,15 @@ CommentsSectionType) => {
 };
 
 type NotExistsCommentsPropsType = {
-  headerHeight: number | undefined;
-  matchBoxerSectionHeight: number | undefined;
-  commentPostTextareaHeight: number | undefined;
+  excludeHeight: number | undefined;
 };
 //コメント投稿なし時の表示コンポーネント
-const NotExistsComments = ({
-  headerHeight,
-  matchBoxerSectionHeight,
-  commentPostTextareaHeight,
-}: NotExistsCommentsPropsType) => {
+const NotExistsComments = ({ excludeHeight }: NotExistsCommentsPropsType) => {
   return (
     <section
       className="flex justify-center text-[18px] border-l-[1px] xl:w-[70%] w-full"
       style={{
-        minHeight: `calc(100vh - (${headerHeight}px + ${matchBoxerSectionHeight}px + ${commentPostTextareaHeight}px) - 1px)`,
+        minHeight: `calc(100vh - ${excludeHeight}px - 1px)`,
       }}
     >
       <div className="relative mt-12">
