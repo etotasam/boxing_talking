@@ -9,17 +9,11 @@ import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { useEffect, useState } from 'react';
 
 type PropsType = React.ComponentProps<'div'> & {
-  boxer: BoxerType;
-  matchResult: MatchResultType | null;
-  boxerColor: 'red' | 'blue';
+  boxer: BoxerType & { color: 'red' | 'blue' };
+  matchResult?: MatchResultType | null;
 };
 
-export const BoxerInfo = ({
-  boxer,
-  className,
-  matchResult,
-  boxerColor,
-}: PropsType) => {
+export const BoxerInfo = ({ boxer, className, matchResult }: PropsType) => {
   const currentDate = dayjs();
   const isResult = matchResult?.result ?? false;
   const isKo = matchResult?.detail
@@ -32,14 +26,14 @@ export const BoxerInfo = ({
 
   //? isWin, isLoss, isDrawをセットする関数
   const setWinLoseResult = () => {
-    if (isResult === boxerColor) {
+    if (isResult === boxer.color) {
       setIsWin(true);
       return;
     }
 
     if (
       isResult &&
-      isResult !== boxerColor &&
+      isResult !== boxer.color &&
       isResult !== 'draw' &&
       isResult !== 'no-contest'
     ) {
@@ -69,7 +63,9 @@ export const BoxerInfo = ({
               boxerCountry={boxer.country}
               boxerEngName={boxer.eng_name}
             />
-            <h2 className="text-[18px] mt-1">{boxer.name}</h2>
+            <h2 className="text-[18px] mt-1 font-semibold text-stone-600">
+              {boxer.name}
+            </h2>
           </div>
           {/* //? 戦績 */}
           <ul className="flex justify-between w-full mt-7 text-white">

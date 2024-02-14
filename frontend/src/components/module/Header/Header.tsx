@@ -46,7 +46,10 @@ export const Header = (props: PropsType) => {
     <>
       <header
         ref={headerRef}
-        className="z-10 h-[80px] fixed top-0 left-0 w-full flex backdrop-blur-md bg-white/60 after:w-full after:absolute after:bottom-0 after:left-0 after:h-[3px] after:bg-red-500"
+        className={clsx(
+          'z-30 h-[80px] fixed top-0 left-0 w-full flex backdrop-blur-md bg-white/60',
+          'after:w-full after:absolute after:bottom-0 after:left-0 after:h-[1px] after:bg-stone-300'
+        )}
       >
         <h1
           className={clsx(
@@ -113,7 +116,7 @@ const LinksComponents = ({ pathname }: LinksComponentsPropsType) => {
           </li>
         )}
 
-        {pathname == ROUTE_PATH.PAST_MATCH_SINGLE && (
+        {pathname !== ROUTE_PATH.PAST_MATCHES && (
           <li className="md:ml-5 ml-2">
             <ToPastMatchesPageLinkButton device={device} />
           </li>
@@ -238,7 +241,7 @@ const LinkButton = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className={clsx(
-        'sm:w-[35px] sm:h-[35px] w-[30px] h-[30px] bg-white border-stone-800 border-[1px] rounded-[50%] flex justify-center items-center text-stone-800 text-[16px] hover:text-[18px] duration-100',
+        'sm:w-[40px] sm:h-[40px] w-[30px] h-[30px] bg-stone-600 hover:bg-black border-[1px] rounded-[50%] flex justify-center items-center text-white text-[16px] hover:text-[18px] duration-300',
         className
       )}
     >

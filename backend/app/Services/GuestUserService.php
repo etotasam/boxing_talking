@@ -25,6 +25,12 @@ class GuestUserService
    */
   public function loginGuest($request): void
   {
+
+    // すでにログインしている場合はエラー
+    if (Auth::guard('guest')->check() || Auth::check()) {
+      throw new Exception("you already logged in");
+    }
+
     //ゲストユーザーの1日の作成数に制限をかける
     $limit = 50;
     $countGeneratedGuestOnToday = $this->guest->getCountCreatedGuestToday();

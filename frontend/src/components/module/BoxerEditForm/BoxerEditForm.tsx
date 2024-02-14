@@ -88,11 +88,13 @@ export const BoxerEditForm = (props: PropsType) => {
             id="country"
           >
             <option value={undefined}>{countryUndefined}</option>
-            {Object.values(NATIONALITY).map((nationalName) => (
-              <option key={nationalName} value={nationalName}>
-                {nationalName}
-              </option>
-            ))}
+            {Object.values(NATIONALITY)
+              .sort()
+              .map((nationalName) => (
+                <option key={nationalName} value={nationalName}>
+                  {nationalName}
+                </option>
+              ))}
           </select>
         </div>
         {/* //? birth */}

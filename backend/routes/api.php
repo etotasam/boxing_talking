@@ -44,10 +44,16 @@ Route::get('/prediction', [WinLossPredictionController::class, 'index']);
 Route::get('/comment', [CommentController::class, 'index']);
 // !ゲストユーザーか通常の認証が必須
 Route::middleware('auth.user_or_guest')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/guest/logout', [AuthController::class, 'guestLogout']);
     Route::post('/prediction', [WinLossPredictionController::class, 'store']);
     Route::post('/comment', [CommentController::class, 'store']);
+});
+//! ログインユーザー
+Route::middleware('auth.user')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+// !ゲストユーザー
+Route::middleware('auth.guest')->group(function () {
+    Route::post('/guest/logout', [AuthController::class, 'guestLogout']);
 });
 // !管理者
 Route::middleware('administrator')->group(function () {

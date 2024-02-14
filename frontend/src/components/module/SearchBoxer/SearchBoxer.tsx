@@ -45,11 +45,13 @@ export const SearchBoxer = () => {
           id="country"
         >
           <option value={undefined}></option>
-          {Object.values(NATIONALITY).map((nationalName) => (
-            <option key={nationalName} value={nationalName}>
-              {nationalName}
-            </option>
-          ))}
+          {Object.values(NATIONALITY)
+            .sort()
+            .map((nationalName) => (
+              <option key={nationalName} value={nationalName}>
+                {nationalName}
+              </option>
+            ))}
         </select>
       </div>
 

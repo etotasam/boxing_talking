@@ -1,31 +1,37 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+//! recoil
+import { useRecoilValue } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
 //! types
 import { MatchDataType } from '@/assets/types';
 // ! components
 import { MatchInfo } from '@/components/module/MatchInfo';
 //! hooks
 import { useFetchComments } from '@/hooks/apiHooks/useComment';
+//! context
+import {
+  ThisMatchPredictionByUserContext,
+  IsThisMatchAfterTodayContext,
+} from '../..';
 
 type LeftSectionType = {
   thisMatch: MatchDataType | undefined;
-  isThisMatchAfterToday: boolean | undefined;
-  thisMatchPredictionOfUsers: 'red' | 'blue' | 'No prediction vote' | undefined;
-  headerHeight: number | undefined;
   commentPostEl: HTMLSelectElement | null;
 };
 
-export const LeftSection = ({
-  thisMatch,
-  thisMatchPredictionOfUsers,
-  isThisMatchAfterToday,
-  headerHeight,
-  commentPostEl,
-}: LeftSectionType) => {
+export const LeftSection = ({ thisMatch, commentPostEl }: LeftSectionType) => {
+  //? この試合へのuserの勝敗予想をcontextから取得
+  const thisMatchPredictionOfUser = useContext(
+    ThisMatchPredictionByUserContext
+  );
+  //? userがこの試合への勝敗予想は投票済みかどうか
   const isVotedMatchPrediction =
-    thisMatchPredictionOfUsers === 'red' ||
-    thisMatchPredictionOfUsers === 'blue';
+    thisMatchPredictionOfUser === 'red' || thisMatchPredictionOfUser === 'blue';
+
+  //? headerの高さを取得(Recoil)
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
 
   //? state, hooks
   const leftSectionRef = useRef(null);
@@ -33,7 +39,8 @@ export const LeftSection = ({
     useState<boolean | undefined>(undefined);
   const [stickyTopPosition, setStickyTopPosition] = useState(0);
 
-  const checkElementsHeight = () => {
+  //? このコンポーネントの高さをuseState`setIsLeftSectionHigherThenMainEl`にセット
+  const checkElementsHeight = (): void => {
     if (!headerHeight) return;
     if (!commentPostEl) return;
     if (!leftSectionRef.current) return;
@@ -62,10 +69,13 @@ export const LeftSection = ({
     window.addEventListener('scroll', checkElementsHeight);
   }, [leftSectionRef.current]);
 
-  //試合データを取得するまでは何もrenderさせない
+  //? 試合日が未来かどうか
+  const isThisMatchAfterToday = useContext(IsThisMatchAfterTodayContext);
+
+  //?試合データを取得するまでは何もrenderさせない
   if (!thisMatch) return;
   return (
-    <div className="xl:w-[30%] w-[40%]">
+    <div className="z-10 xl:w-[30%] w-[40%] bg-white">
       <div
         ref={leftSectionRef}
         className={clsx('flex justify-center')}
@@ -77,14 +87,14 @@ export const LeftSection = ({
           marginBottom: `${commentPostEl?.clientHeight ?? '0'}px`,
         }}
       >
-        <div className="w-full max-w-[450px]">
-          <div className="flex justify-center mt-5">
+        <div className="w-full max-w-[450px] bg-white">
+          <div className="flex justify-center">
             <MatchInfo matchData={thisMatch} />
           </div>
-          {/* //? 自身の投票と投票数 */}
+          {/* //? userの投票と投票数 */}
           {(isVotedMatchPrediction || !isThisMatchAfterToday) && (
             <PredictionsBar
-              thisMatchPredictionOfUsers={thisMatchPredictionOfUsers}
+              // thisMatchPredictionOfUser={thisMatchPredictionOfUser}
               thisMatch={thisMatch}
             />
           )}
@@ -96,11 +106,13 @@ export const LeftSection = ({
 
 const PredictionsBar = ({
   thisMatch,
-  thisMatchPredictionOfUsers,
 }: {
   thisMatch: MatchDataType | undefined;
-  thisMatchPredictionOfUsers: 'red' | 'blue' | 'No prediction vote' | undefined;
 }) => {
+  //? この試合へのuserの勝敗予想をcontextから取得
+  const thisMatchPredictionOfUser = useContext(
+    ThisMatchPredictionByUserContext
+  );
   const { isSuccess: isFetchCommentsSuccess } = useFetchComments(thisMatch!.id);
   //? 勝利予想の割合計算
   const [redCountRatio, setRedCountRatio] = useState<number>(0);
@@ -120,7 +132,7 @@ const PredictionsBar = ({
   return (
     <>
       {thisMatch && (
-        <div className="flex justify-center my-5">
+        <div className="flex justify-center mb-5">
           <div className="w-[80%]">
             <p className="text-center lg:text-sm text-xs font-light">
               <span
@@ -129,9 +141,9 @@ const PredictionsBar = ({
                   'after:absolute after:bottom-[-10px] after:left-[50%] after:translate-x-[-50%] after:border-b-[1px] after:border-stone-600 after:w-[115%]'
                 )}
               >
-                {thisMatchPredictionOfUsers === 'red' &&
+                {thisMatchPredictionOfUser === 'red' &&
                   `${thisMatch.red_boxer.name}の勝利に投票しました`}
-                {thisMatchPredictionOfUsers === 'blue' &&
+                {thisMatchPredictionOfUser === 'blue' &&
                   `${thisMatch.blue_boxer.name}の勝利に投票しました`}
               </span>
             </p>
@@ -142,7 +154,7 @@ const PredictionsBar = ({
                   className={clsx(
                     'block pl-3 text-lg font-semibold right-0 top-0',
                     "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1",
-                    thisMatchPredictionOfUsers === 'red' && 'text-red-500'
+                    thisMatchPredictionOfUser === 'red' && 'text-red-600'
                   )}
                 >
                   {thisMatch.count_red}
@@ -152,7 +164,7 @@ const PredictionsBar = ({
                     className={clsx(
                       'block text-right pr-3 text-lg font-semibold right-0 top-0',
                       "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1",
-                      thisMatchPredictionOfUsers === 'blue' && 'text-blue-500'
+                      thisMatchPredictionOfUser === 'blue' && 'text-blue-600'
                     )}
                   >
                     {thisMatch.count_blue}
@@ -171,7 +183,7 @@ const PredictionsBar = ({
                     isFetchCommentsSuccess && { width: `${redCountRatio}%` }
                   }
                   transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-                  className="h-[10px] absolute top-0 left-[-1px] rounded-[50px] bg-red-600"
+                  className="h-[10px] absolute top-0 left-[-1px] rounded-[50px] bg-red-700"
                 />
 
                 <motion.div
@@ -182,7 +194,7 @@ const PredictionsBar = ({
                     isFetchCommentsSuccess && { width: `${blueCountRatio}%` }
                   }
                   transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-                  className="h-[10px] absolute top-0 right-[-1px] rounded-[50px] bg-blue-600"
+                  className="h-[10px] absolute top-0 right-[-1px] rounded-[50px] bg-blue-700"
                 />
               </div>
             </div>

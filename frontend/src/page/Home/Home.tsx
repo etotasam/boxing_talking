@@ -7,7 +7,7 @@ import { VISUAL_MODE } from '@/store/visualModeState';
 import { FightBox } from '@/components/module/FightBox';
 import { SimpleFightBox } from '@/components/module/SimpleFightBox';
 //! icon
-import { VisualModeChangeIcon } from '@/components/atomic/VisualModeChangeIcon';
+import { VisualModeChangeButton } from '@/components/atomic/VisualModeChangeButton';
 // ! hooks
 import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
 import { useLoading } from '@/hooks/useLoading';
@@ -44,7 +44,9 @@ export const Home = () => {
         <>
           {device == 'PC' && (
             <div className="absolute top-0 left-[50%] translate-x-[-50%] lg:mt-3 mt-1">
-              <VisualModeChangeIcon onClick={() => visualModeToggleSwitch()} />
+              <VisualModeChangeButton
+                onClick={() => visualModeToggleSwitch()}
+              />
             </div>
           )}
 

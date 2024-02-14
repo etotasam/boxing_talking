@@ -59,7 +59,7 @@ const LinkButton = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className={clsx(
-        'sm:w-[35px] sm:h-[35px] w-[30px] h-[30px] rounded-[50%] flex justify-center items-center text-[16px] duration-100',
+        'sm:w-[40px] sm:h-[40px] w-[30px] h-[30px] rounded-[50%] flex justify-center items-center text-[16px] duration-100',
         pathname === link.path
           ? 'bg-stone-300 text-stone-800'
           : 'bg-blue-600 text-white hover:text-[18px]'

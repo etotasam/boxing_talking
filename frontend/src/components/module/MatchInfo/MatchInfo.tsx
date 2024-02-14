@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import dayjs from 'dayjs';
 // ! types
 import { MatchDataType } from '@/assets/types';
@@ -16,11 +17,21 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
   const isShowMatchResultComponent =
     !isFightToday && isDayOverFight && matchData.result;
 
+  const isTitleMatch = matchData.grade === 'タイトルマッチ';
+
+  // const isLongText = matchData.venue.length > 10;
+
+  const isLongText = (text: string): boolean => {
+    return text.length > 10;
+  };
+
   return (
     <>
-      <div className="p-5 text-stone-600">
+      <div
+        className={clsx('text-stone-600', isTitleMatch ? 'pt-9 pb-5' : 'py-5')}
+      >
         {/* //? 日時 */}
-        <div className="text-center relative mt-5">
+        <div className="text-center relative">
           <MatchDate matchData={matchData} />
         </div>
 
@@ -30,7 +41,7 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
         </div>
 
         {/* //?会場 */}
-        <div className="mt-[35px] text-center">
+        <div className={'mt-[35px] text-center text-[8px]'}>
           <SubHeadline content="会場">
             <span className="lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] border-[1px] overflow-hidden absolute top-[1px] lg:left-[-40px] left-[-30px]">
               <FlagImage
@@ -38,7 +49,11 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
                 nationality={matchData.country}
               />
             </span>
-            {matchData.venue}
+            <span
+              className={clsx(isLongText(matchData.venue) && 'text-[15px]')}
+            >
+              {matchData.venue}
+            </span>
           </SubHeadline>
         </div>
 
@@ -49,8 +64,8 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
           </SubHeadline>
         </div>
 
-        {/* 試合結果 */}
         {isShowMatchResultComponent && (
+          //?試合結果
           <div className="mt-10 text-center">
             <SubHeadline content="試合結果">
               <MatchResultComponent matchData={matchData} />

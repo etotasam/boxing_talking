@@ -6,7 +6,7 @@ import { VISUAL_MODE } from '@/store/visualModeState';
 import { FaExchangeAlt } from 'react-icons/fa';
 
 type PropsType = ComponentProps<'button'>;
-export const VisualModeChangeIcon = ({ onClick }: PropsType) => {
+export const VisualModeChangeButton = ({ onClick }: PropsType) => {
   const { state: visualMode } = useVisualModeController();
   return (
     <>

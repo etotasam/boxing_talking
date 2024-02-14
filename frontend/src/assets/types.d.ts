@@ -74,7 +74,7 @@ export type MatchDataType = {
   blue_boxer: BoxerType,
   country: NationalityType,
   venue: string,
-  grade: string,
+  grade: GRADE_Type,
   titles: { organization: ORGANIZATIONS_Type, weightDivision: WEIGHT_CLASS_Type }[] | [],
   weight: WEIGHT_CLASS_Type,
   match_date: string,
@@ -110,3 +110,14 @@ export type NeedMatchPropertyForUpdateType = {
   titles: { organization: ORGANIZATIONS_Type, weightDivision: WEIGHT_CLASS_Type }[] | [];
   match_date: string;
 };
+
+
+//? コメント
+
+export type CommentType = {
+  id: number;
+  post_user_name: string;
+  comment: string;
+  prediction: "red" | "blue" | undefined;
+  created_at: string;
+}
