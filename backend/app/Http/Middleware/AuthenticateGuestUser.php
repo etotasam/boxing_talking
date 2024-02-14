@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use App\Repositories\Interfaces\GuestRepositoryInterface;
 
-class AuthenticateGuestUser
+class AuthenticateGuestUser extends MyJsonResponse
 {
 
   public function __construct(private GuestRepositoryInterface $guestRepository)
@@ -19,7 +19,7 @@ class AuthenticateGuestUser
     if ($this->guestRepository->isGuestUser()) {
       return $next($request);
     } else {
-      return response()->json(["message" => "Not guest"]);
+      return $this->responseUnauthorized("Not guest");
     }
   }
 }

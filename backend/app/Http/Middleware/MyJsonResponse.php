@@ -3,11 +3,13 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Traits\JsonResponseController;
 
-class AuthenticateAuthUser extends MyJsonResponse
+class MyJsonResponse
 {
+    use JsonResponseController;
+
     /**
      * Handle an incoming request.
      *
@@ -17,10 +19,6 @@ class AuthenticateAuthUser extends MyJsonResponse
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check()) {
-            return $next($request);
-        } else {
-            return $this->responseUnauthorized("Require authenticated for access");
-        }
+        return $next($request);
     }
 }
