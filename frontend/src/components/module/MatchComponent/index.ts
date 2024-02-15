@@ -1,0 +1,1 @@
+export { MatchContainer as MatchComponent } from "./MatchContainer"

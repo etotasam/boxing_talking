@@ -88,7 +88,7 @@ export const useGuestLogin = () => {
 
 //! ゲストログアウト
 export const useGuestLogout = () => {
-  // const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
   // ? react query
   const queryClient = useQueryClient()
   // ? toast message modal
@@ -109,6 +109,7 @@ export const useGuestLogout = () => {
     mutate({}, {
       onSuccess: () => {
         // ? ユーザー情報のキャッシュをclear
+        refetchMatchPrediction()
         queryClient.setQueryData<boolean>(QUERY_KEY.GUEST, false)
         successful()
         setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })

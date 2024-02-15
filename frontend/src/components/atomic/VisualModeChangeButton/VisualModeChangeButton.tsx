@@ -13,7 +13,7 @@ export const VisualModeChangeButton = ({ onClick }: PropsType) => {
       <button
         onClick={onClick}
         className={clsx(
-          'w-[40px] h-[40px] text-[18px] hover:text-[20px] rounded-[50%] duration-100 cursor-pointer bg-cyan-600/80 hover:bg-cyan-600/70'
+          'w-[40px] h-[40px] text-[18px] hover:text-[20px] rounded-[50%] duration-100 cursor-pointer bg-stone-600 hover:bg-stone-800'
         )}
       >
         <div

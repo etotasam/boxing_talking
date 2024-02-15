@@ -1,2 +1,1 @@
-export * from "./PredictionVoteModal"
-export * from "./PredictionVoteModalContainer"
+export { PredictionVoteModalContainer as PredictionVoteModal } from "./PredictionVoteModalContainer"

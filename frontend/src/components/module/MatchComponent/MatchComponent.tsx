@@ -10,8 +10,8 @@ import { BoxerInfoModal } from '@/components/modal/BoxerInfoModal';
 import { MatchInfoModal } from '@/components/modal/MatchInfoModal';
 import { LeftSection } from './myComponents/LeftSection';
 import { CommentsComponent } from './myComponents/CommentsComponent';
-import { PredictionVoteModalContainer } from '@/components/modal/PredictionVoteModal';
-import { BoxersContainer } from './myComponents/Boxers';
+import { PredictionVoteModal } from '@/components/modal/PredictionVoteModal';
+import { Boxers } from './myComponents/Boxers';
 //! hooks
 import { usePostComment } from '@/hooks/apiHooks/useComment';
 
@@ -42,7 +42,7 @@ export const MatchComponent = (props: PropsType) => {
   return (
     <>
       {/* //? Boxer */}
-      <BoxersContainer thisMatch={thisMatch} />
+      <Boxers thisMatch={thisMatch} />
 
       <div className="flex w-full">
         {/* //? Left section (Match info) */}
@@ -83,7 +83,7 @@ export const MatchComponent = (props: PropsType) => {
 
       {thisMatch && isPredictionVoteModal && (
         //? 投票モーダル
-        <PredictionVoteModalContainer thisMatch={thisMatch} />
+        <PredictionVoteModal thisMatch={thisMatch} />
       )}
     </>
   );

@@ -2,7 +2,7 @@
 import { useContext, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 //! component
-import { Boxers } from '.';
+import { Boxers } from './Boxers';
 //! hooks
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useFetchComments } from '@/hooks/apiHooks/useComment';

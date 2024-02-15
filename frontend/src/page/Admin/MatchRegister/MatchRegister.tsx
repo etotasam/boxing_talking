@@ -503,7 +503,7 @@ const MatchDataSetter = ({
       </div>
 
       <div className="w-full flex justify-center mt-5">
-        <Button styleName="onForm">登録</Button>
+        <Button styleName="wide">登録</Button>
       </div>
     </form>
     // </div>

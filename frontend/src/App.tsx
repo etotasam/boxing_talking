@@ -30,6 +30,7 @@ function App() {
         <Route element={<Container />}>
           <Route element={<HeaderAndFooterLayout />}>
             <Route path={ROUTE_PATH.HOME} element={<Home />} />
+            <Route path="/test" element={<Home />} />
             <Route path={ROUTE_PATH.PAST_MATCHES} element={<PastMatches />} />
             {/* //? </HeaderAndFooterLayout> */}
           </Route>
@@ -70,7 +71,6 @@ function App() {
 
         <Route element={<HeaderAndFooterLayout />}>
           <Route path={ROUTE_PATH.TERMS} element={<Terms />} />
-          {/* <Route path="/test" element={<TestPage />} /> */}
           <Route path="/*" element={<NotFound />} />
           {/* //? </HeaderAndFooterLayout> */}
         </Route>

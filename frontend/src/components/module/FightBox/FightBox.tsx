@@ -1,50 +1,21 @@
-import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 // ! types
 import { MatchDataType } from '@/assets/types';
 // ! components
 import { BoxerInfo } from '../BoxerInfo';
-import { PredictionVoteIcon } from '@/components/atomic/PredictionVoteIcon';
+import { PredictionIcon } from '@/components/atomic/PredictionIcon';
 import { MatchInfo } from '../MatchInfo';
 //! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
-import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
 
 type PropsType = {
   matchData: MatchDataType;
   onClick: (matchId: number) => void;
   className?: string;
-  isPredictionVote: boolean | undefined;
 };
 
-export const FightBox = ({
-  matchData,
-  onClick,
-  isPredictionVote,
-}: PropsType) => {
-  const { data: authUser } = useAuth();
-  const { data: isGuest } = useGuest();
+export const FightBox = ({ matchData, onClick }: PropsType) => {
   const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
-  const [isShowPredictionIcon, setIsShowPredictionIcon] = useState(false);
-
-  //? 未投票アイコンの表示条件設定
-  useEffect(() => {
-    if (isPredictionVote === undefined) return;
-    if (authUser === undefined) return;
-    if (isGuest === undefined) return;
-    if (isDayOverFight === undefined) return;
-    if (isFightToday === undefined) return;
-    setIsShowPredictionIcon(
-      Boolean(
-        (authUser || isGuest) &&
-          !isPredictionVote &&
-          isPredictionVote !== undefined &&
-          !isDayOverFight &&
-          !isFightToday
-      )
-    );
-  }, [isPredictionVote, authUser, isGuest, isDayOverFight, isFightToday]);
-
   return (
     <>
       {matchData && (
@@ -72,7 +43,7 @@ export const FightBox = ({
               matchResult={matchData.result}
             />
           </div>
-          {isShowPredictionIcon && <PredictionVoteIcon />}
+          <PredictionIcon matchData={matchData} />
         </div>
       )}
     </>

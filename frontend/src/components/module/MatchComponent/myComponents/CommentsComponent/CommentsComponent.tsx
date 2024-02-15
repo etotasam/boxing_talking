@@ -103,7 +103,9 @@ CommentsSectionType) => {
         )}
         <ul ref={ulRef}>
           {commentsOfThisMatches.map((commentData) => (
-            <CommentSingle commentData={commentData} />
+            <li key={commentData.id}>
+              <CommentSingle commentData={commentData} />
+            </li>
           ))}
         </ul>
       </section>
@@ -147,8 +149,7 @@ const CommentSingle = ({ commentData }: { commentData: CommentType }) => {
   const timeSincePost = dateFormatter(commentData.created_at);
 
   return (
-    <motion.li
-      key={commentData.id}
+    <motion.div
       className={clsx('sm:p-5 p-3 pt-1 border-b-[1px] border-stone-200')}
     >
       <div className="sm:flex mb-2">
@@ -223,7 +224,7 @@ const CommentSingle = ({ commentData }: { commentData: CommentType }) => {
                     ゴミ箱
                   </button>
                 )} */}
-    </motion.li>
+    </motion.div>
   );
 };
 

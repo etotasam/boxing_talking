@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/assets/RoutePath';
@@ -7,9 +7,6 @@ import { SimpleFightBox } from '@/components/module/SimpleFightBox';
 //! hooks
 import { useFetchPastMatches } from '@/hooks/apiHooks/useMatch';
 import { useLoading } from '@/hooks/useLoading';
-import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/apiHooks/uesWinLossPrediction';
-//! types
-import { MatchDataType } from '@/assets/types';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -58,44 +55,14 @@ export const PastMatches = () => {
             {pastMatches.map((match) => (
               <li
                 key={match.id}
-                className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5"
+                className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5 first:mt-0"
               >
-                <MatchCard match={match} matchSelect={matchSelect} />
+                <SimpleFightBox matchData={match} onClick={matchSelect} />
               </li>
             ))}
           </ul>
         </>
       )}
     </>
-  );
-};
-
-type MatchCardPropsType = {
-  match: MatchDataType;
-  matchSelect: (matchId: number) => void;
-};
-
-const MatchCard = ({ match, matchSelect }: MatchCardPropsType) => {
-  const { data: usersAllPredictionVote } =
-    useAllFetchMatchPredictionOfAuthUser();
-
-  const [isPredictionVote, setIsPredictionVote] = useState<boolean>();
-
-  //? ユーザの試合予想を取得
-  useEffect(() => {
-    if (usersAllPredictionVote) {
-      const isPredictionThisMatch = usersAllPredictionVote.some(
-        (ob) => ob.match_id === match.id
-      );
-      setIsPredictionVote(isPredictionThisMatch);
-    }
-  }, [usersAllPredictionVote]);
-
-  return (
-    <SimpleFightBox
-      isPredictionVote={isPredictionVote}
-      onClick={matchSelect}
-      matchData={match}
-    />
   );
 };
