@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { useQuery, useMutation } from "react-query"
+import { useQuery, useMutation, } from "react-query"
 import { Axios } from "@/assets/axios"
 import { API_PATH } from "@/assets/ApiPath"
 //! data
@@ -14,6 +14,7 @@ import { useGuest, useAuth } from "./useAuth";
 import { PredictionType } from "@/assets/types"
 
 
+
 //! ユーザーの勝敗予想の取得
 export const useAllFetchMatchPredictionOfAuthUser = () => {
   const { data: authUser } = useAuth()
@@ -22,12 +23,7 @@ export const useAllFetchMatchPredictionOfAuthUser = () => {
 
   const api = useCallback(async () => {
     const res = await Axios.get<{ data: PredictionType[] | "" }>(API_PATH.PREDICTION).then(v => v.data)
-    let formattedData
-    if (res.data === "") {
-      formattedData = undefined
-    } else {
-      formattedData = res.data
-    }
+    const formattedData = res.data === "" ? undefined : res.data
     return formattedData
   }, [])
   const { data, isLoading, isRefetching, refetch } = useQuery(QUERY_KEY.PREDICTION, api, {
@@ -51,22 +47,23 @@ export const useVoteMatchPrediction = () => {
   const { setToastModal, showToastModal } = useToastModal()
   const { startLoading, resetLoadingState } = useLoading()
   type ApiPropsType = {
-    matchID: number,
+    matchId: number,
     prediction: "red" | "blue"
   }
-  const api = useCallback(async ({ matchID, prediction }: ApiPropsType) => {
+
+  const api = useCallback(async ({ matchId, prediction }: ApiPropsType) => {
     await Axios.post(API_PATH.PREDICTION, {
-      match_id: matchID,
+      match_id: matchId,
       prediction
     })
   }, [])
-  const { mutate, isLoading, isSuccess } = useMutation(api, {
+  const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
     onMutate: () => {
       startLoading()
     }
   })
-  const matchVotePrediction = ({ matchID, prediction }: ApiPropsType) => {
-    mutate({ matchID, prediction }, {
+  const matchVotePrediction = ({ matchId, prediction }: ApiPropsType) => {
+    mutate({ matchId, prediction }, {
       onSuccess: () => {
         refetchAllFetchMatchPredictionOfAuthUser()
         refetchMatches()
@@ -92,5 +89,6 @@ export const useVoteMatchPrediction = () => {
     })
   }
 
-  return { matchVotePrediction, isLoading, isSuccess }
+  return { matchVotePrediction, isLoading, isSuccess, isError }
 }
+

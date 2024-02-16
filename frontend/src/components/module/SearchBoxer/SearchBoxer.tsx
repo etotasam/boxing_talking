@@ -63,7 +63,7 @@ export const SearchBoxer = () => {
           searchName.current = e.target.value;
         }}
       />
-      <Button styleName="onForm">検索</Button>
+      <Button styleName="wide">検索</Button>
     </form>
   );
 };

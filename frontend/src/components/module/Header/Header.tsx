@@ -59,11 +59,11 @@ export const Header = (props: PropsType) => {
           {siteTitle}
         </h1>
 
-        <LinksComponents pathname={pathname} />
+        <LinksComponent pathname={pathname} />
 
         <UserName userData={userData} />
 
-        {Boolean(isGuest || authUser) && (
+        {(isGuest || authUser) && (
           <div className="absolute sm:bottom-5 bottom-3 lg:right-10 md:right-5 right-2 flex justify-center">
             <LogoutButton />
           </div>
@@ -104,7 +104,7 @@ const UserName = ({ userData }: { userData: UserType | undefined | null }) => {
 type LinksComponentsPropsType = {
   pathname: string;
 };
-const LinksComponents = ({ pathname }: LinksComponentsPropsType) => {
+const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
   const { device } = useWindowSize();
 
   return (

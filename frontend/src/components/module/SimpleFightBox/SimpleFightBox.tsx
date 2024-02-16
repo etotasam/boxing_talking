@@ -5,34 +5,32 @@ import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 import { MatchDataType } from '@/assets/types';
 import { BoxerType } from '@/assets/types';
 // ! components
-import { MatchResultComponent } from '../MatchResultComponent';
+import { MatchResult } from '../MatchResult';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
-import { useEffect, useState } from 'react';
-import {
-  PredictionVoteIcon,
-  PredictionVoteIconMini,
-} from '@/components/atomic/PredictionVoteIcon';
+import { PredictionIcon } from '@/components/atomic/PredictionIcon';
 // ! image
 import crown from '@/assets/images/etc/champion.svg';
 //! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useWindowSize } from '@/hooks/useWindowSize';
-import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
 
 type PropsType = {
   matchData: MatchDataType;
   onClick: (matchId: number) => void;
   className?: string;
-  isPredictionVote: boolean | undefined;
 };
 
 export const SimpleFightBox = ({
   matchData,
   onClick,
-  isPredictionVote,
-}: PropsType) => {
+}: // isPredictionVote,
+PropsType) => {
   const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
   const isMatchResult = !!matchData.result;
+
+  const { windowSize = 0 } = useWindowSize();
+  const predictionIconType: 'DEFAULT' | 'MINI' =
+    windowSize > TAILWIND_BREAKPOINT.md ? 'DEFAULT' : 'MINI';
   return (
     <>
       {matchData && (
@@ -52,10 +50,7 @@ export const SimpleFightBox = ({
 
           <BoxerBox boxer={matchData.blue_boxer} />
 
-          <PredictionIconComponent
-            matchData={matchData}
-            isPredictionVote={isPredictionVote}
-          />
+          <PredictionIcon matchData={matchData} iconType={predictionIconType} />
         </div>
       )}
     </>
@@ -101,7 +96,7 @@ const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
           )}
           {isMatchResult && (
             <div className="mt-[50px]">
-              <MatchResultComponent matchData={matchData} />
+              <MatchResult matchData={matchData} />
             </div>
           )}
         </div>
@@ -111,6 +106,14 @@ const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
 };
 
 const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
+  //名前が10文字以上で"・"を含む場合、最後の部分を取り出してフォーマット
+  let formattedName: string | undefined;
+  if (boxer.name.length > 10 && boxer.name.includes('・')) {
+    const nameParts = boxer.name.split('・');
+    const extractedName: string = nameParts[nameParts.length - 1];
+    formattedName = extractedName;
+  }
+  const boxerName = formattedName ?? boxer.name;
   return (
     <div className="md:w-[300px] flex justify-center items-center flex-1">
       {/* //? 名前 */}
@@ -122,65 +125,12 @@ const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
         <h2
           className={clsx(
             'lg:text-[20px] sm:text-[16px] mt-1 font-semibold text-stone-600',
-            boxer.name.length > 7 ? `text-[12px]` : `text-[16px]`
+            boxerName.length > 7 ? `text-[12px]` : `text-[16px]`
           )}
         >
-          {boxer.name}
+          {boxerName}
         </h2>
       </div>
     </div>
-  );
-};
-
-type PredictionIconComponentPropsType = {
-  isPredictionVote: boolean | undefined;
-  matchData: MatchDataType;
-};
-const PredictionIconComponent = (props: PredictionIconComponentPropsType) => {
-  const { data: authUser } = useAuth();
-  const { data: isGuest } = useGuest();
-  const { isFightToday, isDayOverFight } = useDayOfFightChecker(
-    props.matchData
-  );
-  const { windowSize } = useWindowSize();
-  const [isShowPredictionIcon, setIsShowPredictionIcon] = useState(false);
-
-  const getConditionOfShowPredictionIcon = () => {
-    if (props.isPredictionVote === undefined) return false;
-    if (authUser === undefined) return false;
-    if (isGuest === undefined) return false;
-    if (windowSize === undefined) return false;
-    if (isDayOverFight === undefined) return false;
-    if (isFightToday === undefined) return false;
-
-    const isAuthOrGuest = Boolean(authUser || isGuest);
-    const isNotVote = !props.isPredictionVote;
-    const isPastMatch = !isDayOverFight && !isFightToday;
-
-    return isAuthOrGuest && isNotVote && isPastMatch;
-  };
-
-  //? 未投票アイコンの表示条件設定
-  useEffect(() => {
-    setIsShowPredictionIcon(getConditionOfShowPredictionIcon());
-  }, [
-    props.isPredictionVote,
-    authUser,
-    isGuest,
-    windowSize,
-    isDayOverFight,
-    isFightToday,
-  ]);
-  return (
-    <>
-      {isShowPredictionIcon && windowSize! > TAILWIND_BREAKPOINT.md && (
-        <PredictionVoteIcon />
-      )}
-      {isShowPredictionIcon && windowSize! < TAILWIND_BREAKPOINT.md && (
-        <div className="absolute top-[8px] left-[50%] translate-x-[-50%]">
-          <PredictionVoteIconMini />
-        </div>
-      )}
-    </>
   );
 };

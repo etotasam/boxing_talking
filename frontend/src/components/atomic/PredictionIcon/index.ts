@@ -1,0 +1,1 @@
+export { PredictionIconWrapper as PredictionIcon } from "./PredictionIconWrapper"

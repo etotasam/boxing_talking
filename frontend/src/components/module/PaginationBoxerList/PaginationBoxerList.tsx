@@ -25,34 +25,60 @@ export const PaginationBoxerList = ({ pageCount }: PropsType) => {
 
   const pages = pagesArray();
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      // behavior: 'smooth',
+    });
+  };
+
   return (
     <>
-      {pagesArray().length > 1 && (
+      {Boolean(pages.length) && (
         <ul className="w-full py-3 flex justify-center sticky top-[80px] right-[100px] bg-white/80 border-b-[1px] border-stone-300 z-10">
           {pages.map((page) =>
             paramPage === page ? (
-              <li
-                key={page}
-                className="px-2 bg-stone-400 text-white rounded-sm mr-2"
-              >
-                {page}
-              </li>
+              <CurrentPageNumber page={page} />
             ) : (
-              <li
-                key={page}
-                className="bg-stone-700 text-white rounded-sm mr-2"
-              >
-                <Link
-                  className="inline-block px-2"
-                  to={`${pathname}?page=${page}${formattedParams}`}
-                >
-                  {page}
-                </Link>
-              </li>
+              <ToPageNumber
+                onClick={scrollToTop}
+                page={page}
+                pathname={pathname}
+                formattedParams={formattedParams}
+              />
             )
           )}
         </ul>
       )}
     </>
+  );
+};
+
+const CurrentPageNumber = ({ page }: { page: number }) => {
+  return (
+    <li key={page} className="px-2 bg-stone-400 text-white rounded-sm mr-2">
+      {page}
+    </li>
+  );
+};
+
+type ToPageNumberType = {
+  page: number;
+  onClick: () => void;
+  pathname: string;
+  formattedParams: string;
+};
+const ToPageNumber = (props: ToPageNumberType) => {
+  const { page, onClick, pathname, formattedParams } = props;
+  return (
+    <li key={page} className="bg-stone-700 text-white rounded-sm mr-2">
+      <Link
+        onClick={onClick}
+        className="inline-block px-2"
+        to={`${pathname}?page=${page}${formattedParams}`}
+      >
+        {page}
+      </Link>
+    </li>
   );
 };

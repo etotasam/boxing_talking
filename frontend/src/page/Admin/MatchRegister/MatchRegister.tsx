@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
-import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 // ! types
 import {
@@ -503,7 +502,7 @@ const MatchDataSetter = ({
       </div>
 
       <div className="w-full flex justify-center mt-5">
-        <Button styleName="onForm">登録</Button>
+        <Button styleName="wide">登録</Button>
       </div>
     </form>
     // </div>

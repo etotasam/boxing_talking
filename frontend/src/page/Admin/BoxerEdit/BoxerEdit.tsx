@@ -7,8 +7,7 @@ import {
   MESSAGE,
 } from '@/assets/statusesOnToastModal';
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
-// ! functions
-import { extractBoxer } from '@/assets/functions';
+
 //! recoil
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
@@ -22,9 +21,7 @@ import {
   useDeleteBoxer,
 } from '@/hooks/apiHooks/useBoxer';
 //! types
-import { BoxerType } from '@/assets/types';
-//! type evolution
-import { isMessageType } from '@/assets/typeEvaluations';
+import { BoxerType, MessageType } from '@/assets/types';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
@@ -36,22 +33,16 @@ import { Button } from '@/components/atomic/Button';
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const BoxerEdit = () => {
-  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   // ? use hook
   const { resetLoadingState } = useLoading();
-  const {
-    setToastModal,
-    showToastModal,
-    hideToastModal,
-    showToastModalMessage,
-  } = useToastModal();
+  const { hideToastModal, showToastModalMessage } = useToastModal();
   const [editTargetBoxerData, setEditTargetBoxerData] =
     useRecoilState(boxerDataOnFormState);
   const { updateBoxer } = useUpdateBoxerData();
   const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
-  const { boxersData, pageCount } = useFetchBoxers();
+  const { boxersData } = useFetchBoxers();
   //? 選択したボクサーのidが入る(選手が選択されているかの判断に使用)
-  const [isSelectBoxer, setIsSelectBoxer] = useState<number>();
+  const [selectBoxerNumber, setIsSelectBoxerNumber] = useState<number>();
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -64,7 +55,7 @@ export const BoxerEdit = () => {
   useEffect(() => {
     if (isDeleteBoxerSuccess) {
       setEditTargetBoxerData(initialBoxerDataOnForm);
-      setIsSelectBoxer(undefined);
+      setIsSelectBoxerNumber(undefined);
     }
   }, [isDeleteBoxerSuccess]);
 
@@ -77,94 +68,124 @@ export const BoxerEdit = () => {
     };
   }, []);
 
+  //? errorToastをMessageを受け取って表示させる
+  const showErrorToastWithMessage = (errorMessage: MessageType) => {
+    showToastModalMessage({
+      message: errorMessage,
+      bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
+    });
+  };
+
   // ? 選手が選択されていない時
-  const showModalIfBoxerNotSelected = () => {
-    if (!isSelectBoxer) {
-      throw new Error(MESSAGE.BOXER_NO_SELECTED);
+  const showErrorToastWhenNoSelectedBoxer = () => {
+    if (!selectBoxerNumber) {
+      showErrorToastWithMessage(MESSAGE.BOXER_NO_SELECTED);
+      return;
     }
   };
-
-  //? 名前が空の時
-  const showModalWhenUndefinedItem = () => {
+  //? 選手名が空の時
+  const showErrorToastWhenEmptyBoxerName = () => {
     if (!editTargetBoxerData.name || !editTargetBoxerData.eng_name) {
-      throw new Error(MESSAGE.BOXER_NAME_UNDEFINED);
-    }
-
-    if (!editTargetBoxerData.country) {
-      throw new Error(MESSAGE.BOXER_COUNTRY_IS_REQUIRED);
+      showErrorToastWithMessage(MESSAGE.BOXER_NAME_UNDEFINED);
+      return;
     }
   };
 
-  //? データ変更がある項目だけを抽出 and 変更がない時はモーダル表示
-  const extractUpdateDataOrShowModalWhenNotUpdateData = () => {
-    if (!boxersData) return console.error('No have boxers data');
+  //? 国籍が未選択
+  const showErrorToastWhenNoSelectedCountry = () => {
+    if (!editTargetBoxerData.country) {
+      showErrorToastWithMessage(MESSAGE.BOXER_COUNTRY_IS_REQUIRED);
+      return;
+    }
+  };
 
-    const boxer = extractBoxer({
+  //? update対象のboxerデータを取得
+  const extractBoxer = ({
+    targetBoxerId,
+    boxers,
+  }: {
+    targetBoxerId: number;
+    boxers: BoxerType[];
+  }): BoxerType | undefined => {
+    return boxers.find((boxer) => boxer.id === targetBoxerId);
+  };
+
+  //? 対象boxerデータに変更がない場合エラーモーダル表示
+  const showErrorModalWhenNoChangeInData = ({
+    targetBoxerData,
+    message,
+  }: {
+    targetBoxerData: BoxerType | undefined;
+    message: MessageType;
+  }) => {
+    if (isEqual(targetBoxerData, editTargetBoxerData)) {
+      showErrorToastWithMessage(message);
+      return;
+    }
+  };
+
+  //? boxerの変更があるデータだけを抽出
+  const extractChangeData = (
+    boxer: BoxerType
+  ): Pick<BoxerType, 'id'> & Partial<BoxerType> => {
+    const changeData = (
+      Object.keys(editTargetBoxerData) as Array<keyof BoxerType>
+    ).reduce((accumulator, key) => {
+      if (key === 'id') {
+        return { ...accumulator, id: editTargetBoxerData.id };
+      }
+      if (!isEqual(editTargetBoxerData[key], boxer![key])) {
+        return { ...accumulator, [key]: editTargetBoxerData[key] };
+      } else {
+        return { ...accumulator };
+      }
+    }, {}) as Pick<BoxerType, 'id'> & Partial<BoxerType>;
+
+    return changeData;
+  };
+
+  //? ボクサーの編集を実行
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!boxersData) return console.error('No have boxers data');
+    //入力エラーがある時に処理終了とエラーメッセージ表示
+    showErrorToastWhenNoSelectedBoxer();
+    showErrorToastWhenEmptyBoxerName();
+    showErrorToastWhenNoSelectedCountry();
+
+    //編集対象ターゲットのデータ(変更前のデータ)
+    const targetBoxerCurrentData = extractBoxer({
       targetBoxerId: editTargetBoxerData.id,
       boxers: boxersData,
     });
-    if (isEqual(boxer, editTargetBoxerData)) {
-      throw new Error(MESSAGE.BOXER_NOT_EDIT);
-    }
 
-    const updateBoxerData: Partial<BoxerType> = (
-      Object.keys(editTargetBoxerData) as Array<keyof BoxerType>
-    ).reduce((accum, key) => {
-      if (key === 'id') {
-        return { ...accum, id: editTargetBoxerData.id };
-      }
-      if (!isEqual(editTargetBoxerData[key], boxer![key])) {
-        return { ...accum, [key]: editTargetBoxerData[key] };
-      } else {
-        return { ...accum };
-      }
-    }, {});
+    if (!targetBoxerCurrentData) return;
 
-    return updateBoxerData;
+    //対象ボクサーデータに変更がない場合エラー
+    showErrorModalWhenNoChangeInData({
+      targetBoxerData: targetBoxerCurrentData,
+      message: MESSAGE.BOXER_NOT_EDIT,
+    });
+
+    const updateBoxerData = extractChangeData(targetBoxerCurrentData);
+    //ボクサーデータ編集実行
+    updateBoxer(updateBoxerData);
   };
 
-  // ! ボクサーの編集を実行
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      showModalIfBoxerNotSelected();
-      showModalWhenUndefinedItem();
-      const updateData =
-        extractUpdateDataOrShowModalWhenNotUpdateData() as Pick<
-          BoxerType,
-          'id'
-        > &
-          Partial<BoxerType>;
-
-      //? ボクサーデータ編集実行
-      updateBoxer(updateData);
-    } catch (error: any) {
-      if (isMessageType(error.message)) {
-        showToastModalMessage({
-          message: error.message,
-          bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-        });
-      } else {
-        console.error('Failed boxer edit');
-      }
-    }
-  };
-
-  const [isShowDeleteConfirmDialog, setIsShowDeleteConfirmDialog] =
+  const [isShowDeleteConfirmModal, setIsShowDeleteConfirmModal] =
     useState(false);
 
   const hideDeleteConformModal = () => {
-    setIsShowDeleteConfirmDialog(false);
+    setIsShowDeleteConfirmModal(false);
   };
 
   //?削除データの実行
   const deleteExecution = () => {
     hideDeleteConformModal();
 
-    showModalIfBoxerNotSelected();
+    showErrorToastWhenNoSelectedBoxer();
 
     deleteBoxer(editTargetBoxerData);
-    setIsShowDeleteConfirmDialog(false);
   };
 
   return (
@@ -173,65 +194,23 @@ export const BoxerEdit = () => {
         <title>Boxer編集 | {siteTitle}</title>
       </Helmet>
       <div className="w-full flex">
-        <section
-          className="w-[70%] border-r-[1px] border-stone-200"
-          style={{
-            minHeight: `calc(100vh - ${headerHeight}px)`,
-          }}
-        >
-          <div className="flex sticky top-[calc(100px+30px)]">
-            {/* //? edit  */}
-            <div className="w-[50%] flex justify-center">
-              <div className="w-[95%] border-[1px]">
-                <BoxerEditForm
-                  editTargetBoxerData={editTargetBoxerData}
-                  onSubmit={onSubmit}
-                />
-              </div>
-            </div>
-            {/* //? search */}
-            <div className="w-[50%] flex justify-center">
-              <div className="w-[95%]">
-                <SearchBoxer />
-                {/* //? delete */}
-                <div className="mt-10">
-                  <Button
-                    styleName="delete"
-                    onClick={() => {
-                      if (!isSelectBoxer) {
-                        setToastModal({
-                          message: MESSAGE.BOXER_NO_SELECTED,
-                          bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
-                        });
-                        showToastModal();
-                        return;
-                      }
-                      setIsShowDeleteConfirmDialog(true);
-                    }}
-                    // className="bg-red-600 text-white rounded py-2 px-10"
-                  >
-                    削除
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <BoxerInfoAndEditBox
+          editTargetBoxerData={editTargetBoxerData}
+          selectBoxerNumber={selectBoxerNumber}
+          onSubmit={onSubmit}
+          setIsShowDeleteConfirmModal={setIsShowDeleteConfirmModal}
+        />
 
-        <section className="w-[30%] min-w-[300px] pb-5">
-          <PaginationBoxerList pageCount={pageCount} />
-          <BoxersList
-            isSelectBoxer={isSelectBoxer}
-            setIsSelectBoxer={setIsSelectBoxer}
-            boxersData={boxersData}
-            setEditTargetBoxerData={setEditTargetBoxerData}
-          />
-        </section>
+        <BoxerList
+          selectBoxerNumber={selectBoxerNumber}
+          setIsSelectBoxerNumber={setIsSelectBoxerNumber}
+          setEditTargetBoxerData={setEditTargetBoxerData}
+        />
       </div>
 
-      {/* ボクサー削除ダイアログ */}
-      {isShowDeleteConfirmDialog && (
-        <BoxerDeleteConfirmDialog
+      {/* //? ボクサー削除モーダル */}
+      {isShowDeleteConfirmModal && (
+        <BoxerDeleteConfirmModal
           targetName={editTargetBoxerData.name}
           execution={deleteExecution}
           cancel={hideDeleteConformModal}
@@ -241,16 +220,106 @@ export const BoxerEdit = () => {
   );
 };
 
+type BoxerListType = {
+  selectBoxerNumber: number | undefined;
+  setIsSelectBoxerNumber: React.Dispatch<
+    React.SetStateAction<number | undefined>
+  >;
+  setEditTargetBoxerData: (boxer: BoxerType) => void;
+};
+const BoxerList = (props: BoxerListType) => {
+  const { selectBoxerNumber, setIsSelectBoxerNumber, setEditTargetBoxerData } =
+    props;
+  const { boxersData, pageCount } = useFetchBoxers();
+  return (
+    <section className="w-[30%] min-w-[300px] pb-5">
+      <PaginationBoxerList pageCount={pageCount} />
+      <BoxersList
+        selectBoxerNumber={selectBoxerNumber}
+        setIsSelectBoxerNumber={setIsSelectBoxerNumber}
+        boxersData={boxersData}
+        setEditTargetBoxerData={setEditTargetBoxerData}
+      />
+    </section>
+  );
+};
+
+type BoxerInfoAndEditBoxType = {
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  editTargetBoxerData: BoxerType;
+  selectBoxerNumber: number | undefined;
+  setIsShowDeleteConfirmModal: React.Dispatch<React.SetStateAction<boolean>>;
+};
+const BoxerInfoAndEditBox = (props: BoxerInfoAndEditBoxType) => {
+  const {
+    onSubmit,
+    editTargetBoxerData,
+    selectBoxerNumber,
+    setIsShowDeleteConfirmModal,
+  } = props;
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+
+  const { setToastModal, showToastModal } = useToastModal();
+  return (
+    <section
+      className="w-[70%] border-r-[1px] border-stone-200"
+      style={{
+        minHeight: `calc(100vh - ${headerHeight}px)`,
+      }}
+    >
+      <div className="flex sticky top-[calc(100px+30px)]">
+        {/* //? edit  */}
+        <div className="w-[50%] flex justify-center">
+          <div className="w-[95%] border-[1px]">
+            <BoxerEditForm
+              editTargetBoxerData={editTargetBoxerData}
+              onSubmit={onSubmit}
+            />
+          </div>
+        </div>
+        {/* //? search */}
+        <div className="w-[50%] flex justify-center">
+          <div className="w-[95%]">
+            <SearchBoxer />
+            {/* //? delete */}
+            <div className="mt-10">
+              <Button
+                styleName="delete"
+                onClick={() => {
+                  if (!selectBoxerNumber) {
+                    setToastModal({
+                      message: MESSAGE.BOXER_NO_SELECTED,
+                      bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
+                    });
+                    showToastModal();
+                    return;
+                  }
+                  setIsShowDeleteConfirmModal(true);
+                }}
+                // className="bg-red-600 text-white rounded py-2 px-10"
+              >
+                削除
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 type BoxerListPropsType = {
   boxersData: BoxerType[] | undefined;
   setEditTargetBoxerData: (boxer: BoxerType) => void;
-  isSelectBoxer: number | undefined;
-  setIsSelectBoxer: React.Dispatch<React.SetStateAction<number | undefined>>;
+  selectBoxerNumber: number | undefined;
+  setIsSelectBoxerNumber: React.Dispatch<
+    React.SetStateAction<number | undefined>
+  >;
 };
 
 const BoxersList = ({
-  isSelectBoxer,
-  setIsSelectBoxer,
+  selectBoxerNumber,
+  setIsSelectBoxerNumber,
   boxersData,
   setEditTargetBoxerData,
 }: BoxerListPropsType) => {
@@ -266,9 +335,9 @@ const BoxersList = ({
                 id={`${boxer.id}_${boxer.name}`}
                 type="radio"
                 name="boxer"
-                checked={boxer.id === isSelectBoxer}
+                checked={boxer.id === selectBoxerNumber}
                 onChange={() => {
-                  setIsSelectBoxer(boxer.id ? boxer.id : undefined);
+                  setIsSelectBoxerNumber(boxer.id ? boxer.id : undefined);
                   setEditTargetBoxerData(boxer);
                 }}
               />
@@ -299,7 +368,7 @@ type BoxerDeleteConfirmDialogPropsType = {
   cancel: () => void;
   targetName: string;
 };
-const BoxerDeleteConfirmDialog = ({
+const BoxerDeleteConfirmModal = ({
   execution,
   cancel,
   targetName,

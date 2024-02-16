@@ -93,7 +93,6 @@ export const usePostComment = () => {
 
   const queryClient = useQueryClient()
   const api = useCallback(async ({ matchId, comment }: ApiPropsType) => {
-    // try {
     await Axios.post(API_PATH.COMMENT, {
       match_id: matchId,
       comment: comment

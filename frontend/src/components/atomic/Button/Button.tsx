@@ -20,7 +20,7 @@ const styleNames = {
       'w-full py-2 bg-blue-900 hover:bg-blue-700 tracking-[0.3em]'
     ),
   },
-  onForm: {
+  wide: {
     className: clsx(
       commonStyle,
       'w-full py-2 bg-stone-600 hover:bg-stone-700 tracking-[0.3em]'

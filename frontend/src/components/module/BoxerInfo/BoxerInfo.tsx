@@ -73,7 +73,7 @@ export const BoxerInfo = ({ boxer, className, matchResult }: PropsType) => {
               className={clsx(
                 "relative flex-1 bg-red-500 before:content-['WIN'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
                 isWin
-                  ? 'before:text-red-600 before:font-bold text-yellow-300'
+                  ? 'before:text-red-700 before:font-bold text-yellow-300'
                   : 'before:text-gray-600'
               )}
             >
@@ -81,7 +81,7 @@ export const BoxerInfo = ({ boxer, className, matchResult }: PropsType) => {
               <span
                 className={clsx(
                   "absolute text-sm bottom-[-20px] left-[50%] translate-x-[-50%] after:content-['KO']",
-                  isWin && isKo ? 'text-blue-600 font-bold' : 'text-gray-600'
+                  isWin && isKo ? 'text-red-700 font-bold' : 'text-gray-600'
                 )}
               >
                 {boxer.ko}
@@ -91,7 +91,7 @@ export const BoxerInfo = ({ boxer, className, matchResult }: PropsType) => {
               className={clsx(
                 "relative flex-1 bg-gray-500 before:content-['DRAW'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
                 isDraw
-                  ? 'before:text-red-600 before:font-bold text-yellow-300'
+                  ? 'before:text-blue-700 before:font-bold text-yellow-300'
                   : 'before:text-gray-600'
               )}
             >
@@ -101,7 +101,7 @@ export const BoxerInfo = ({ boxer, className, matchResult }: PropsType) => {
               className={clsx(
                 "relative flex-1 bg-stone-800 before:content-['LOSE'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
                 isLoss
-                  ? 'before:text-red-600 before:font-bold text-yellow-300'
+                  ? 'before:text-red-400 before:font-bold text-yellow-300'
                   : 'before:text-gray-600'
               )}
             >
@@ -146,7 +146,7 @@ export const BoxerInfo = ({ boxer, className, matchResult }: PropsType) => {
               <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">
                 スタイル
               </p>
-              <p className="flex-1">
+              <p className="flex-1 text-sm">
                 {boxer.style === 'orthodox' && 'オーソドックス'}
                 {boxer.style === 'southpaw' && 'サウスポー'}
                 {boxer.style === 'unknown' && '-'}
@@ -161,8 +161,8 @@ export const BoxerInfo = ({ boxer, className, matchResult }: PropsType) => {
                   key={`${title.organization}_${title.weight}`}
                   className="mt-2"
                 >
-                  <p className="relative inline-block">
-                    <span className="absolute top-[2px] left-[-23px] w-[18px] h-[18px] mr-2">
+                  <p className="relative inline-block font-semibold text-[15px] text-stone-600">
+                    <span className="absolute top-[2px] left-[-22px] w-[18px] h-[18px]">
                       <img src={crown} alt="" />
                     </span>
                     {`${title.organization}世界${title.weight}級王者`}

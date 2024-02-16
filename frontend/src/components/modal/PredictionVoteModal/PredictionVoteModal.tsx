@@ -1,47 +1,108 @@
-import { MatchDataType } from '@/assets/types';
+import { Button } from '@/components/atomic/Button';
+import { InfoModal } from '../InfoModal';
+import { FlagImage } from '@/components/atomic/FlagImage';
+import { RiCloseLine } from 'react-icons/ri';
+import { NationalityType } from '@/assets/types';
+import clsx from 'clsx';
+// ! image
+import crown from '@/assets/images/etc/champion.svg';
+
+type BoxersDataType = {
+  red: {
+    name: string;
+    country: NationalityType;
+    title: number;
+  };
+  blue: {
+    name: string;
+    country: NationalityType;
+    title: number;
+  };
+};
 
 type PredictionVoteModalType = {
-  thisMatch: MatchDataType;
+  boxersData: BoxersDataType;
   voteExecution: (color: 'red' | 'blue') => void;
-  cancel: () => void;
+  close: () => void;
 };
 export const PredictionVoteModal = ({
-  thisMatch,
+  boxersData,
   voteExecution,
-  cancel,
+  close,
 }: PredictionVoteModalType) => {
   return (
-    <>
-      <div className="z-20 fixed top-0 left-0 w-full h-[100vh] flex justify-center items-center">
-        <div className="px-10 py-5 bg-white border-[1px] border-stone-400 shadow-lg shadow-stone-500/50">
-          <p className="text-center text-stone-600">
-            どちらが勝つと思いますか？
-          </p>
-          <div className="flex justify-between mt-5">
-            <button
+    <InfoModal>
+      <div className="relative px-10 pt-2 pb-5 min-w-[350px]">
+        <h2 className="text-center text-stone-600 font-bold text-lg tracking-widest">
+          勝者は？
+        </h2>
+        <div className="mt-5 w-full">
+          <div className="w-full flex justify-center">
+            <BoxerButton
+              boxerData={boxersData.red}
               onClick={() => voteExecution('red')}
-              className="bg-white border-[1px] border-stone-400 text-stone-600 duration-300 py-1 px-5 mr-5 rounded-[25px] text-sm"
-            >
-              {thisMatch.red_boxer.name}
-            </button>
-            <button
-              onClick={() => voteExecution('blue')}
-              className="bg-white border-[1px] border-stone-400 text-stone-600 duration-300 py-1 px-5 ml-5 rounded-[25px] text-sm"
-            >
-              {thisMatch.blue_boxer.name}
-            </button>
+            />
           </div>
 
-          <div className="mt-5 flex justify-center items-center">
+          <div className="w-full flex justify-center mt-7">
+            <BoxerButton
+              boxerData={boxersData.blue}
+              onClick={() => voteExecution('blue')}
+            />
+          </div>
+        </div>
+
+        {/* <div className="mt-5 flex justify-center items-center">
             <button
-              onClick={cancel}
+              onClick={close}
               className="max-w-[500px] w-full  bg-stone-600 text-white  py-1 rounded-sm"
             >
               わからない
             </button>
-          </div>
-        </div>
+          </div> */}
       </div>
-    </>
+      <RiCloseLine
+        onClick={close}
+        className="absolute top-[3px] right-[3px] text-stone-600 font-bold text-[25px] cursor-pointer"
+      />
+    </InfoModal>
   );
+};
+
+type BoxerButtonType = {
+  boxerData: { name: string; country: NationalityType; title: number };
+  onClick: () => void;
+};
+const BoxerButton = ({ onClick, boxerData }: BoxerButtonType) => {
+  const fullName = boxerData.name;
+  let targetName: string | null = null;
+  if (fullName.includes('・') && fullName.length > 10) {
+    const parts = fullName.split('・');
+    targetName = parts[parts.length - 1];
+  }
+
+  return (
+    <Button
+      onClick={onClick}
+      styleName="wide"
+      // className="px-5 py-1 bg-stone-700 text-white whitespace-nowrap"
+    >
+      <div className={clsx('flex items-center justify-center px-5')}>
+        <span className="relative flex justify-center overflow-hidden w-[18px] h-[18px] rounded-[50%] mr-2">
+          <FlagImage
+            className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full h-full"
+            nationality={boxerData.country}
+          />
+        </span>
+        {targetName ?? boxerData.name}
+        {[...Array(boxerData.title)].map((_, i) => (
+          <CrowImg key={`${boxerData.name}${i}`} />
+        ))}
+      </div>
+    </Button>
+  );
+};
+
+const CrowImg = () => {
+  return <img className="w-[18px] h-[18px] ml-1" src={crown} alt="" />;
 };

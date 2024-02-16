@@ -17,7 +17,7 @@ import { FirstLoadingModal } from '@/components/modal/FirstLoadingModal';
 
 const Container = () => {
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
-  const { isLoading } = useLoading();
+  const { isLoading: isAnyLoading } = useLoading();
   const { data: isAuth, isLoading: isFirstCheckingAuth } = useAuthCheck();
   const { data: guestUser } = useGuest();
   const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } =
@@ -69,12 +69,12 @@ const Container = () => {
         {isShowToastModal && (
           <ToastModalContainer key={'ToastModalContainer'} />
         )}
-        {(isLoading || isRefetchingBoxers) && (
+        {(isAnyLoading || isRefetchingBoxers) && (
           <FullScreenSpinnerModal key={'FullScreenSpinnerModal'} />
         )}
-        {/* {(isFirstCheckingAuth || isBoxersFetching || isMatchesFetching) && (
+        {(isFirstCheckingAuth || isBoxersFetching || isMatchesFetching) && (
           <FirstLoadingModal key={'FirstLoadingModal'} />
-        )} */}
+        )}
       </AnimatePresence>
       {isShowLoginModal && <LoginFormModal key={'LoginFormModal'} />}
     </>

@@ -13,8 +13,8 @@ export const useSortMatches = (matchesData: MatchDataType[] | undefined) => {
     if (!matchesData) return;
     const multipleArrayMatchData = matchesData.reduce(
       (accumulator: MatchDataType[][], current) => {
-        const isFightPast = isMatchDatePast(current);
-        if (isFightPast) {
+        const isPastDateOfFight = isMatchDatePast(current);
+        if (isPastDateOfFight) {
           return [[...accumulator[0]], [current, ...accumulator[1]]];
         } else {
           return [[...accumulator[0], current], [...accumulator[1]]];
