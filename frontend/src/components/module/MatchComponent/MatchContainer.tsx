@@ -84,6 +84,7 @@ export const MatchContainer = (props: PropsType) => {
     }
   }, [paramsMatchID, props.matches]);
 
+  //? userこの試合の勝敗予想の有無(falseは未投票、undefinedはデータ未取得状態)
   const [thisMatchPredictionByUser, setThisMatchPredictionByUser] =
     useState<ThisMatchPredictionByUserType>();
 
@@ -118,6 +119,8 @@ export const MatchContainer = (props: PropsType) => {
       const thisMatchPredictionVote = allPredictionVoteOfUsers.find(
         (data) => data.match_id === Number(paramsMatchID)
       );
+
+      //? 投票をしていない場合は'false'をセットする(undefinedはデータ未取得,falseは未投票)
       if (thisMatchPredictionVote) {
         setThisMatchPredictionByUser(thisMatchPredictionVote.prediction);
         return;
@@ -125,9 +128,6 @@ export const MatchContainer = (props: PropsType) => {
         setThisMatchPredictionByUser(false);
         return;
       }
-    } else {
-      setThisMatchPredictionByUser(undefined);
-      return;
     }
   }, [allPredictionVoteOfUsers, paramsMatchID]);
 

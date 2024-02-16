@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useContext, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 //! component
 import { Boxers } from './Boxers';
@@ -12,9 +12,8 @@ import { MatchDataType } from '@/assets/types';
 //! context
 import {
   ThisMatchPredictionByUserContext,
-  // ThisMatchPredictionCountContext,
   IsThisMatchAfterTodayContext,
-} from '../..';
+} from '../../MatchContainer';
 //! recoil
 import { useSetRecoilState } from 'recoil';
 import { boxerInfoDataState } from '@/store/boxerInfoDataState';
@@ -34,12 +33,6 @@ export const BoxersContainer = (props: ContainerPropsType) => {
   const matchId = Number(query.get('match_id'));
   //? コメント投稿中かどうか(hook内でRecoilにて管理)
   const { isLoading: isFetchCommentsLoading } = useFetchComments(matchId);
-  //? この試合へのuserの勝敗予想をcontextから取得
-  const thisMatchPredictionByUser = useContext(
-    ThisMatchPredictionByUserContext
-  );
-  //? この試合が未来かどうかをcontextから取得
-  const isThisMatchAfterToday = useContext(IsThisMatchAfterTodayContext);
 
   //? モーダルの開閉状態(boxer info)
   const { showModal: showBoxerInfoModal } = useModalState('BOXER_INFO');
@@ -69,15 +62,25 @@ export const BoxersContainer = (props: ContainerPropsType) => {
   }, [boxersRef.current]);
 
   return (
-    <Boxers
-      thisMatch={thisMatch}
-      boxersRef={boxersRef}
-      device={device}
-      isFetchCommentsLoading={isFetchCommentsLoading}
-      thisMatchPredictionByUser={thisMatchPredictionByUser}
-      isThisMatchAfterToday={isThisMatchAfterToday}
-      showPredictionVoteModal={showPredictionVoteModal}
-      showBoxerInfoModal={(boxerColor) => showAndSetBoxerInfoModal(boxerColor)}
-    />
+    <IsThisMatchAfterTodayContext.Consumer>
+      {(isThisMatchAfterToday) => (
+        <ThisMatchPredictionByUserContext.Consumer>
+          {(thisMatchPredictionByUser) => (
+            <Boxers
+              thisMatch={thisMatch}
+              boxersRef={boxersRef}
+              device={device}
+              isFetchCommentsLoading={isFetchCommentsLoading}
+              thisMatchPredictionByUser={thisMatchPredictionByUser}
+              isThisMatchAfterToday={isThisMatchAfterToday}
+              showPredictionVoteModal={showPredictionVoteModal}
+              showBoxerInfoModal={(boxerColor) =>
+                showAndSetBoxerInfoModal(boxerColor)
+              }
+            />
+          )}
+        </ThisMatchPredictionByUserContext.Consumer>
+      )}
+    </IsThisMatchAfterTodayContext.Consumer>
   );
 };

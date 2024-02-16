@@ -67,6 +67,7 @@ export const BoxerRegister = () => {
 
       const { id, ...formattedBoxerDataOnForm } = boxerDataOnForm;
       registerBoxer(formattedBoxerDataOnForm);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.message) {
         showToastModalMessage({

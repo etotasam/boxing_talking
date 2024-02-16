@@ -28,8 +28,7 @@ PropsType) => {
   const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
   const isMatchResult = !!matchData.result;
 
-  const { windowSize: size } = useWindowSize();
-  const windowSize = size ?? 0;
+  const { windowSize = 0 } = useWindowSize();
   const predictionIconType: 'DEFAULT' | 'MINI' =
     windowSize > TAILWIND_BREAKPOINT.md ? 'DEFAULT' : 'MINI';
   return (
@@ -107,6 +106,14 @@ const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
 };
 
 const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
+  //名前が10文字以上で"・"を含む場合、最後の部分を取り出してフォーマット
+  let formattedName: string | undefined;
+  if (boxer.name.length > 10 && boxer.name.includes('・')) {
+    const nameParts = boxer.name.split('・');
+    const extractedName: string = nameParts[nameParts.length - 1];
+    formattedName = extractedName;
+  }
+  const boxerName = formattedName ?? boxer.name;
   return (
     <div className="md:w-[300px] flex justify-center items-center flex-1">
       {/* //? 名前 */}
@@ -118,10 +125,10 @@ const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
         <h2
           className={clsx(
             'lg:text-[20px] sm:text-[16px] mt-1 font-semibold text-stone-600',
-            boxer.name.length > 7 ? `text-[12px]` : `text-[16px]`
+            boxerName.length > 7 ? `text-[12px]` : `text-[16px]`
           )}
         >
-          {boxer.name}
+          {boxerName}
         </h2>
       </div>
     </div>

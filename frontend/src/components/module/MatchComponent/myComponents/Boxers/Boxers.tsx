@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { clsx } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { getNationalFlag, formatPosition } from '@/assets/NationalFlagData';
@@ -5,7 +6,7 @@ import { getNationalFlag, formatPosition } from '@/assets/NationalFlagData';
 import {
   IsThisMatchAfterTodayType,
   ThisMatchPredictionByUserType,
-} from '../..';
+} from '../../MatchContainer';
 //! type
 import { MatchDataType, BoxerType, NationalityType } from '@/assets/types';
 //! hooks
@@ -30,10 +31,11 @@ export const Boxers = (props: BoxersPropsType) => {
     boxersRef,
     device,
     thisMatch,
-    isFetchCommentsLoading, //? コメントの取得状態
-    thisMatchPredictionByUser, //? この試合へのuserの勝敗予想
-    isThisMatchAfterToday, //? 試合日が未来かどうか
-    showPredictionVoteModal, //? 勝敗予想投票モーダルの表示
+    isFetchCommentsLoading, // コメントの取得状態
+    thisMatchPredictionByUser, // この試合へのuserの勝敗予想
+    isThisMatchAfterToday, // 試合日が未来かどうか
+    showPredictionVoteModal, // 勝敗予想投票モーダルの表示
+    showBoxerInfoModal, //boxer情報モーダルの表示(SP時のみ)
   } = props;
 
   //? userがこの試合への勝敗予想をいているかどうか
@@ -50,38 +52,18 @@ export const Boxers = (props: BoxersPropsType) => {
 
   if (!thisMatch) return;
   return (
-    <>
-      <div
-        ref={boxersRef}
-        className={clsx(
-          'flex border-b-[1px] border-stone-300',
-          device === 'PC' && 'relative',
-          device === 'SP' && 'sticky top-0'
-        )}
-      >
-        {isShowVoteButton && (
-          //? 投票ボタン
-          <VotesButton showPredictionVoteModal={showPredictionVoteModal} />
-        )}
-        <NationalFlagBackgroundDiv
-          countries={{
-            Aside: thisMatch.red_boxer.country,
-            Bside: thisMatch.blue_boxer.country,
-          }}
-        />
-        <BoxerBox
-          boxer={thisMatch.red_boxer}
-          onClick={() => props.showBoxerInfoModal('red')}
-        />
-        <BoxerBox
-          boxer={thisMatch.blue_boxer}
-          onClick={() => props.showBoxerInfoModal('blue')}
-        />
-        {/* </NationalFlagBackgroundDiv> */}
-        {/* //? 投票数bar */}
-        {isShowPredictionBar && <PredictionBar thisMatch={thisMatch} />}
-      </div>
-    </>
+    <BoxersWrapper device={device} boxersRef={boxersRef}>
+      {/* //? 投票ボタン */}
+      {isShowVoteButton && (
+        <VotesButton showPredictionVoteModal={showPredictionVoteModal} />
+      )}
+      <BoxersNameBoxWithBgNationalFlag
+        thisMatch={thisMatch}
+        onClick={showBoxerInfoModal}
+      />
+      {/* //? 投票数bar */}
+      {isShowPredictionBar && <PredictionBar thisMatch={thisMatch} />}
+    </BoxersWrapper>
   );
 };
 
@@ -118,7 +100,7 @@ type BoxerBoxType = {
   boxer: BoxerType;
   onClick: () => void;
 };
-const BoxerBox = ({ boxer, onClick }: BoxerBoxType) => {
+const BoxerNameBox = ({ boxer, onClick }: BoxerBoxType) => {
   return (
     <div onClick={onClick} className={clsx('flex-1 relative min-h-[80px]')}>
       <div
@@ -186,6 +168,34 @@ const PredictionBar = ({ thisMatch }: { thisMatch: MatchDataType }) => {
   );
 };
 
+type BoxersNameBoxWithBgNationalFlagType = {
+  thisMatch: MatchDataType;
+  onClick: (boxerColor: 'red' | 'blue') => void;
+};
+const BoxersNameBoxWithBgNationalFlag = (
+  props: BoxersNameBoxWithBgNationalFlagType
+) => {
+  const { thisMatch, onClick } = props;
+  return (
+    <>
+      <NationalFlagBackgroundDiv
+        countries={{
+          Aside: thisMatch.red_boxer.country,
+          Bside: thisMatch.blue_boxer.country,
+        }}
+      />
+      <BoxerNameBox
+        boxer={thisMatch.red_boxer}
+        onClick={() => onClick('red')}
+      />
+      <BoxerNameBox
+        boxer={thisMatch.blue_boxer}
+        onClick={() => onClick('blue')}
+      />
+    </>
+  );
+};
+
 type NationalFlagBackgroundDivPropsType = {
   countries: { Aside: NationalityType; Bside: NationalityType };
   children?: React.ReactNode;
@@ -194,10 +204,11 @@ export const NationalFlagBackgroundDiv = ({
   countries,
   children,
 }: NationalFlagBackgroundDivPropsType) => {
-  const sameCountry = countries.Aside === countries.Bside;
+  const isSameCountryOfBoxers = countries.Aside === countries.Bside;
 
-  if (sameCountry)
+  if (isSameCountryOfBoxers) {
     return <SameCountry countries={countries} children={children} />;
+  }
   return <Default countries={countries} children={children} />;
 };
 
@@ -248,6 +259,27 @@ const SameCountry = (props: NationalFlagBackgroundDivPropsType) => {
       <div className="bg-white/70 w-full h-full flex backdrop-blur-sm">
         {children}
       </div>
+    </div>
+  );
+};
+
+type WrapperPropsType = {
+  boxersRef: React.MutableRefObject<null>;
+  device: 'PC' | 'SP' | undefined;
+  children: ReactNode;
+};
+const BoxersWrapper = (props: WrapperPropsType) => {
+  const { boxersRef, device, children } = props;
+  return (
+    <div
+      ref={boxersRef}
+      className={clsx(
+        'flex border-b-[1px] border-stone-300',
+        device === 'PC' && 'relative',
+        device === 'SP' && 'sticky top-0'
+      )}
+    >
+      {children}
     </div>
   );
 };

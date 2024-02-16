@@ -1,8 +1,8 @@
 import React from 'react';
 import clsx from 'clsx';
-import { RotatingLines } from 'react-loader-spinner';
 //! icon
-import { BiSend } from 'react-icons/bi';
+import { FaRegCommentDots } from 'react-icons/fa6';
+import { RotatingLines } from 'react-loader-spinner';
 //! types
 import { MatchDataType } from '@/assets/types';
 //! component
@@ -89,7 +89,7 @@ export const MatchComponent = (props: PropsType) => {
   );
 };
 
-// ! post comment textarea
+// ! コメント投稿テキストエリア
 type PostCommentTextareaType = {
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
   storeCommentExecute: () => void;
@@ -110,7 +110,7 @@ const PostCommentTextarea = ({
     <div className="border-stone-400 bg-white relative border-[1px] sm:pl-3 sm:py-2 pl-2 py-1 rounded-sm flex justify-center items-center">
       <textarea
         ref={textareaRef}
-        className="w-full resize-none outline-0 leading-[28px] pr-[100px] bg-white"
+        className="w-full resize-none outline-0 leading-[34px] pr-[100px] bg-white"
         placeholder="コメント投稿..."
         wrap={'hard'}
         name=""
@@ -121,7 +121,7 @@ const PostCommentTextarea = ({
       <button
         onClick={storeCommentExecute}
         className={clsx(
-          'absolute bottom-[5px] sm:bottom-[7px] sm:w-[50px] sm:h-[30px] w-[45px] h-[25px] text-[14px] right-[10px] border-[1px] bg-stone-600 hover:bg-cyan-800 focus:bg-cyan-800 rounded-sm duration-300 py-1 text-white text-xl flex justify-center items-center',
+          'absolute bottom-[3px] sm:bottom-[4px] sm:w-[40px] sm:h-[40px] w-[35px] h-[35px] text-[14px] right-[4px] border-[1px] bg-stone-600 hover:bg-cyan-800 focus:bg-cyan-800 rounded-md duration-300 py-1 text-white text-xl flex justify-center items-center',
           isPostingComment && 'text-white/50 select-none'
         )}
       >
@@ -130,7 +130,7 @@ const PostCommentTextarea = ({
             <RotatingLines width="100%" strokeColor="white" />
           </span>
         ) : (
-          <BiSend />
+          <FaRegCommentDots />
         )}
       </button>
     </div>

@@ -2,7 +2,7 @@ import { Boxers } from './Boxers';
 import { StoryObj, Meta } from '@storybook/react';
 import { MatchDataType, BoxerType } from '@/assets/types';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { MatchContextWrapper } from '../..';
+import { MatchContextWrapper } from '../../MatchContainer';
 const queryClient = new QueryClient();
 // import { action } from '@storybook/addon-actions';
 

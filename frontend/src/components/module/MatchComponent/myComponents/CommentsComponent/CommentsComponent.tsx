@@ -1,10 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
-import { motion } from 'framer-motion';
 import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 //!icon
-import { LiaCommentDotsSolid } from 'react-icons/lia';
+import { FaRegCommentDots } from 'react-icons/fa';
 import { AiOutlineUser } from 'react-icons/ai';
 //! hooks
 import { useWindowSize } from '@/hooks/useWindowSize';
@@ -17,126 +16,73 @@ import { CommentType } from '@/assets/types';
 
 type CommentsSectionType = {
   paramsMatchID: number;
-  // commentPostTextareaHeight: number | undefined;
 };
 
-export const CommentsComponent = ({
-  paramsMatchID,
-}: // commentPostTextareaHeight,
-CommentsSectionType) => {
-  // ? use hook
-
-  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
-  const matchBoxerSectionHeight = useRecoilValue(
-    elementSizeState('MATCH_PAGE_BOXER_SECTION_HEIGHT')
-  );
+export const CommentsComponent = ({ paramsMatchID }: CommentsSectionType) => {
+  //?コメントの取得
   const {
     data: commentsOfThisMatches,
     isLoading: isFetchingComments,
     isError: isErrorFetchComments,
   } = useFetchComments(paramsMatchID);
 
-  const commentPostTextareaHeight = useRecoilValue(
-    elementSizeState('POST_COMMENT_HEIGHT')
-  );
-
-  const [liElements, setLiElements] = React.useState<Element[]>();
-  const ulRef = useRef(null);
-  useEffect(() => {
-    if (!ulRef.current) return;
-    const childElements = (ulRef.current as HTMLUListElement).children;
-    const childArray = Array.from(childElements);
-    setLiElements(childArray);
-  }, [ulRef.current, commentsOfThisMatches]);
-
-  //コメント未取得状態
+  //?コメント未取得状態
   const isCommentFirstFetching = commentsOfThisMatches === undefined;
 
-  //コメントの有無
+  //?コメントの有無
   const isComments =
     commentsOfThisMatches && Boolean(commentsOfThisMatches.length);
 
-  //コメントの取得に失敗
+  //! コメント未取得状態のDOM
+  if (isCommentFirstFetching) return <CommentsComponentWrapper />;
+
+  //!コメントの取得に失敗した場合のDOM
   if (isErrorFetchComments) {
     return (
-      <section className="bg-white">
-        コメントの取得に失敗しました。お手数ですがページの更新を行ってください。
-      </section>
+      <CommentsComponentWrapper>
+        <div className="w-full h-full flex justify-center items-center">
+          <p className="relative">
+            コメントの取得に失敗しました。お手数ですがページの更新を行ってください。
+          </p>
+        </div>
+      </CommentsComponentWrapper>
     );
   }
 
-  // 除外する高さ
-  const excludeHeight = (headerHeight ?? 0) + (matchBoxerSectionHeight ?? 0);
-  //  +    (commentPostTextareaHeight ?? 0);
-
-  //! コメント投稿がない時のdom
+  //! コメント投稿がない時のDOM
   if (!isComments && !isFetchingComments && !isErrorFetchComments) {
-    return NotExistsComments({
-      excludeHeight,
-    });
+    return (
+      <CommentsComponentWrapper>
+        <div className="w-full h-full flex justify-center items-center">
+          <p className="relative">
+            コメント投稿はありません
+            <FaRegCommentDots
+              className={'absolute top-[-5px] right-[-22px] w-[20px] h-[20px]'}
+            />
+          </p>
+        </div>
+      </CommentsComponentWrapper>
+    );
   }
 
-  //! コメント未取得時のdom
-  if (isCommentFirstFetching)
+  //! コメント投稿ありのDOM
+  if (isComments) {
     return (
-      <section
-        className="bg-white xl:w-[70%] w-full border-l-[1px] border-stone-200 relative"
-        style={{
-          paddingBottom: `${commentPostTextareaHeight}px`,
-          minHeight: `calc(100vh - ${excludeHeight}px - 1px)`,
-        }}
-      />
-    );
-
-  //! コメント投稿ありのdom
-  return (
-    isComments && (
-      <section
-        className="xl:w-[70%] w-full border-l-[1px] bg-white border-stone-200 relative"
-        style={{
-          paddingBottom: `${commentPostTextareaHeight}px`,
-          minHeight: `calc(100vh - ${excludeHeight}px - 1px)`,
-        }}
-      >
-        {!liElements && (
-          <div className="z-10 absolute top-0 left-0 w-full h-full bg-white" />
-        )}
-        <ul ref={ulRef}>
+      <CommentsComponentWrapper>
+        <ul>
           {commentsOfThisMatches.map((commentData) => (
             <li key={commentData.id}>
-              <CommentSingle commentData={commentData} />
+              <CommentBox commentData={commentData} />
             </li>
           ))}
         </ul>
-      </section>
-    )
-  );
+      </CommentsComponentWrapper>
+    );
+  }
 };
 
-type NotExistsCommentsPropsType = {
-  excludeHeight: number | undefined;
-};
-//コメント投稿なし時の表示コンポーネント
-const NotExistsComments = ({ excludeHeight }: NotExistsCommentsPropsType) => {
-  return (
-    <section
-      className="z-10 flex justify-center bg-white text-[18px] border-l-[1px] xl:w-[70%] w-full"
-      style={{
-        minHeight: `calc(100vh - ${excludeHeight}px - 1px)`,
-      }}
-    >
-      <div className="relative mt-12">
-        <p>コメント投稿はありません</p>
-        <LiaCommentDotsSolid
-          className={'absolute top-[-15px] right-[-30px] w-[30px] h-[30px]'}
-        />
-      </div>
-    </section>
-  );
-};
-
-//! コメント
-const CommentSingle = ({ commentData }: { commentData: CommentType }) => {
+//! コメントbox
+const CommentBox = ({ commentData }: { commentData: CommentType }) => {
   const { windowSize } = useWindowSize();
   //? ひとつのコメントのmin height
   const initialCommentElHeight = () => {
@@ -149,9 +95,7 @@ const CommentSingle = ({ commentData }: { commentData: CommentType }) => {
   const timeSincePost = dateFormatter(commentData.created_at);
 
   return (
-    <motion.div
-      className={clsx('sm:p-5 p-3 pt-1 border-b-[1px] border-stone-200')}
-    >
+    <div className={clsx('sm:p-5 p-3 pt-1 border-b-[1px] border-stone-200')}>
       <div className="sm:flex mb-2">
         <time className="text-xs text-stone-400 leading-6">
           {timeSincePost}
@@ -224,7 +168,7 @@ const CommentSingle = ({ commentData }: { commentData: CommentType }) => {
                     ゴミ箱
                   </button>
                 )} */}
-    </motion.div>
+    </div>
   );
 };
 
@@ -243,11 +187,9 @@ const dateFormatter = (postDate: string): string => {
 
   const today = dayjs().startOf('day');
   const targetDate = dayjs(postDate).startOf('day');
-  // const hourTime = dayjs(postDate).format('H:mm');
 
   const differenceInDays = today.diff(targetDate, 'day');
 
-  // if (differenceInDays === 0) return `今日 ${hourTime}`;
   if (differenceInDays === 1) return `1日前`;
   if (differenceInDays === 2) return `2日前`;
   if (differenceInDays === 3) return `3日前`;
@@ -279,4 +221,37 @@ const stretchCommentElement = (
     (handleClickElement.parentElement as HTMLParagraphElement).style.display =
       'none';
   }
+};
+
+//! ラッパー
+type CommentsComponentWrapperType = {
+  children?: ReactNode;
+};
+//? Recoilから取得
+const CommentsComponentWrapper = (props: CommentsComponentWrapperType) => {
+  const commentPostTextareaHeight = useRecoilValue(
+    elementSizeState('POST_COMMENT_HEIGHT')
+  );
+
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+
+  const matchBoxerSectionHeight = useRecoilValue(
+    elementSizeState('MATCH_PAGE_BOXER_SECTION_HEIGHT')
+  );
+
+  //? コンポーネントの高さを指定する為に除外する高さ
+  const excludeHeight = (headerHeight ?? 0) + (matchBoxerSectionHeight ?? 0);
+
+  const { children } = props;
+  return (
+    <section
+      className="xl:w-[70%] w-full border-l-[1px] bg-white border-stone-200 relative"
+      style={{
+        paddingBottom: `${commentPostTextareaHeight}px`,
+        minHeight: `calc(100vh - ${excludeHeight}px - 1px)`,
+      }}
+    >
+      {children}
+    </section>
+  );
 };

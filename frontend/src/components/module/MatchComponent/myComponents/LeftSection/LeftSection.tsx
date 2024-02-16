@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useEffect, useRef, useContext, ReactNode } from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 //! recoil
@@ -14,7 +14,7 @@ import { useFetchComments } from '@/hooks/apiHooks/useComment';
 import {
   ThisMatchPredictionByUserContext,
   IsThisMatchAfterTodayContext,
-} from '../..';
+} from '../../MatchContainer';
 
 type LeftSectionType = {
   thisMatch: MatchDataType | undefined;
@@ -30,77 +30,22 @@ export const LeftSection = ({ thisMatch, commentPostEl }: LeftSectionType) => {
   const isVotedMatchPrediction =
     thisMatchPredictionOfUser === 'red' || thisMatchPredictionOfUser === 'blue';
 
-  //? headerの高さを取得(Recoil)
-  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
-
-  //? state, hooks
-  const leftSectionRef = useRef(null);
-  const [isLeftSectionHigherThenMainEl, setIsLeftSectionHigherThenMainEl] =
-    useState<boolean | undefined>(undefined);
-  const [stickyTopPosition, setStickyTopPosition] = useState(0);
-
-  //? このコンポーネントの高さをuseState`setIsLeftSectionHigherThenMainEl`にセット
-  const checkElementsHeight = (): void => {
-    if (!headerHeight) return;
-    if (!commentPostEl) return;
-    if (!leftSectionRef.current) return;
-
-    const leftSectionHeight = (
-      leftSectionRef.current as unknown as HTMLDivElement
-    ).clientHeight;
-
-    const mainElHeight =
-      window.innerHeight - (headerHeight + commentPostEl.clientHeight);
-
-    setIsLeftSectionHigherThenMainEl(leftSectionHeight > mainElHeight);
-
-    if (!(leftSectionHeight > mainElHeight)) return;
-
-    const topPosition = -(
-      leftSectionHeight -
-      (window.innerHeight - commentPostEl.clientHeight)
-    );
-    setStickyTopPosition(topPosition);
-  };
-
-  useEffect(() => {
-    if (!leftSectionRef.current) return;
-    checkElementsHeight();
-    window.addEventListener('scroll', checkElementsHeight);
-  }, [leftSectionRef.current]);
-
   //? 試合日が未来かどうか
   const isThisMatchAfterToday = useContext(IsThisMatchAfterTodayContext);
+
+  //? 勝敗予想投票数の表示条件
+  const isShowPredictionBar = isVotedMatchPrediction || !isThisMatchAfterToday;
 
   //?試合データを取得するまでは何もrenderさせない
   if (!thisMatch) return;
   return (
-    <div className="z-10 xl:w-[30%] w-[40%] bg-white">
-      <div
-        ref={leftSectionRef}
-        className={clsx('flex justify-center')}
-        style={{
-          position: 'sticky',
-          top: `${
-            isLeftSectionHigherThenMainEl ? stickyTopPosition : headerHeight
-          }px`,
-          marginBottom: `${commentPostEl?.clientHeight ?? '0'}px`,
-        }}
-      >
-        <div className="w-full max-w-[450px] bg-white">
-          <div className="flex justify-center">
-            <MatchInfo matchData={thisMatch} />
-          </div>
-          {/* //? userの投票と投票数 */}
-          {(isVotedMatchPrediction || !isThisMatchAfterToday) && (
-            <PredictionsBar
-              // thisMatchPredictionOfUser={thisMatchPredictionOfUser}
-              thisMatch={thisMatch}
-            />
-          )}
-        </div>
+    <LeftSectionWrapper commentPostEl={commentPostEl}>
+      <div className="flex justify-center">
+        <MatchInfo matchData={thisMatch} />
       </div>
-    </div>
+
+      {isShowPredictionBar && <PredictionsBar thisMatch={thisMatch} />}
+    </LeftSectionWrapper>
   );
 };
 
@@ -202,5 +147,68 @@ const PredictionsBar = ({
         </div>
       )}
     </>
+  );
+};
+
+type LeftSectionWrapperType = {
+  commentPostEl: HTMLSelectElement | null;
+  children: ReactNode;
+};
+const LeftSectionWrapper = (props: LeftSectionWrapperType) => {
+  const { commentPostEl, children } = props;
+  const leftSectionRef = useRef(null);
+  //? headerの高さを取得(Recoil)
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+  //? state, hooks
+  const [isLeftSectionHigherThenMainEl, setIsLeftSectionHigherThenMainEl] =
+    useState<boolean | undefined>(undefined);
+  const [stickyTopPosition, setStickyTopPosition] = useState(0);
+
+  //? LeftSectionコンポーネントの高さをuseState`setIsLeftSectionHigherThenMainEl`にセット
+  const checkElementsHeight = (): void => {
+    if (!headerHeight) return;
+    if (!commentPostEl) return;
+    if (!leftSectionRef.current) return;
+
+    const leftSectionHeight = (
+      leftSectionRef.current as unknown as HTMLDivElement
+    ).clientHeight;
+
+    const mainElHeight =
+      window.innerHeight - (headerHeight + commentPostEl.clientHeight);
+
+    setIsLeftSectionHigherThenMainEl(leftSectionHeight > mainElHeight);
+
+    if (!(leftSectionHeight > mainElHeight)) return;
+
+    const topPosition = -(
+      leftSectionHeight -
+      (window.innerHeight - commentPostEl.clientHeight)
+    );
+    setStickyTopPosition(topPosition);
+  };
+
+  useEffect(() => {
+    if (!leftSectionRef.current) return;
+    checkElementsHeight();
+    window.addEventListener('scroll', checkElementsHeight);
+  }, [leftSectionRef.current]);
+
+  return (
+    <div className="z-10 xl:w-[30%] w-[40%] bg-white">
+      <div
+        ref={leftSectionRef}
+        className={clsx('flex justify-center')}
+        style={{
+          position: 'sticky',
+          top: `${
+            isLeftSectionHigherThenMainEl ? stickyTopPosition : headerHeight
+          }px`,
+          marginBottom: `${commentPostEl?.clientHeight ?? '0'}px`,
+        }}
+      >
+        <div className="w-full max-w-[450px] bg-white">{children}</div>
+      </div>
+    </div>
   );
 };
