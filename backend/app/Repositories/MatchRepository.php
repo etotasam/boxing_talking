@@ -18,13 +18,13 @@ class MatchRepository implements MatchRepositoryInterface
 
   public function getPastMatches()
   {
-    $fetchRange = date('Y-m-d', strtotime('-1 week'));
+    $fetchRange = date('Y-m-d', strtotime('-2 week'));
     return BoxingMatch::where('match_date', '<', $fetchRange)->orderBy('match_date', 'desc')->get();
   }
 
   public function getMatches()
   {
-    $fetchRange = date('Y-m-d', strtotime('-1 week'));
+    $fetchRange = date('Y-m-d', strtotime('-2 week'));
     return BoxingMatch::where('match_date', '>=', $fetchRange)->orderBy('match_date')->get();
   }
 
