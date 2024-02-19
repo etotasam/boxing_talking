@@ -11,7 +11,7 @@ import { isMatchDatePast } from '@/assets/functions';
 
 //! components
 import { MatchInfo } from '@/components/module/MatchInfo';
-import { MatchSetter } from '@/components/module/MatchSetter/MatchSetter';
+import { MatchSetForm } from '@/components/module/MatchSetForm';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
 //! recoil
@@ -40,8 +40,8 @@ export const MatchEdit = () => {
   const { setToastModal, showToastModal } = useToastModal();
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
 
-  const [selectMatch, setSelectMatch] = useState<MatchDataType>();
-  const { isFightToday, isDayOverFight } = useDayOfFightChecker(selectMatch);
+  const [selectedMatch, setSelectMatch] = useState<MatchDataType>();
+  const { isFightToday, isDayOverFight } = useDayOfFightChecker(selectedMatch);
 
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
   const [isShowMatchResultSelectorDialog, setIsShowMatchResultSelectorDialog] =
@@ -64,7 +64,7 @@ export const MatchEdit = () => {
 
   //?削除ボタンを押した時の挙動(確認モーダルの表示など)
   const handleClickDeleteButton = () => {
-    if (!selectMatch) {
+    if (!selectedMatch) {
       setToastModal({
         message: MESSAGE.MATCH_IS_NOT_SELECTED,
         bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
@@ -77,9 +77,9 @@ export const MatchEdit = () => {
 
   //? 試合の削除を実行
   const deleteExecution = () => {
-    if (!selectMatch) return;
+    if (!selectedMatch) return;
     setIsDeleteConfirm(false);
-    deleteMatch(selectMatch.id);
+    deleteMatch(selectedMatch.id);
   };
 
   return (
@@ -94,10 +94,10 @@ export const MatchEdit = () => {
         >
           <div className="flex w-full sticky top-[100px]">
             <div className="w-[45%] flex justify-center">
-              {selectMatch ? (
+              {selectedMatch ? (
                 <div className="w-full flex flex-col items-center">
                   <div className="w-[90%] border-[1px] border-stone-400">
-                    <MatchInfo matchData={selectMatch} />
+                    <MatchInfo matchData={selectedMatch} />
                   </div>
 
                   {isShowMatchResultRegisterButton && (
@@ -122,8 +122,8 @@ export const MatchEdit = () => {
 
             <div className="w-[55%] flex ite justify-center">
               <div className="w-[80%]">
-                <MatchSetter
-                  selectMatch={selectMatch}
+                <MatchSetForm
+                  selectedMatch={selectedMatch}
                   isSuccessDeleteMatch={isSuccessDeleteMatch}
                 />
                 <div className="mt-5">
@@ -142,7 +142,7 @@ export const MatchEdit = () => {
         <section className="w-[30%] pt-[20px] flex justify-center">
           <MatchListComponent
             sortedMatches={sortedMatches}
-            selectMatch={selectMatch}
+            selectedMatch={selectedMatch}
             setSelectMatch={setSelectMatch}
           />
         </section>
@@ -151,7 +151,7 @@ export const MatchEdit = () => {
       {/* 試合結果のセット Dialog */}
       {isShowMatchResultSelectorDialog && (
         <MatchResultSetDialog
-          selectedMatchData={selectMatch}
+          selectedMatchData={selectedMatch}
           setIsShowMatchResultSelectorDialog={
             setIsShowMatchResultSelectorDialog
           }
@@ -170,7 +170,7 @@ export const MatchEdit = () => {
 
 type MatchComponentType = {
   sortedMatches: MatchDataType[] | undefined;
-  selectMatch: MatchDataType | undefined;
+  selectedMatch: MatchDataType | undefined;
   setSelectMatch: React.Dispatch<
     React.SetStateAction<MatchDataType | undefined>
   >;
@@ -178,7 +178,7 @@ type MatchComponentType = {
 
 export const MatchListComponent = ({
   sortedMatches,
-  selectMatch,
+  selectedMatch,
   setSelectMatch,
 }: MatchComponentType) => {
   return (
@@ -191,7 +191,7 @@ export const MatchListComponent = ({
               onClick={() => setSelectMatch(match)}
               className={clsx(
                 'text-center border-[1px] border-stone-400 p-3 mb-5 w-full cursor-pointer hover:bg-yellow-50',
-                match.id === selectMatch?.id
+                match.id === selectedMatch?.id
                   ? `bg-yellow-100 hover:bg-yellow-100`
                   : isMatchDatePast(match) && 'bg-stone-100'
               )}

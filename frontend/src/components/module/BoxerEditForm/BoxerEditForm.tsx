@@ -3,9 +3,9 @@ import { cloneDeep } from 'lodash';
 // ! data
 import { STANCE, initialBoxerDataOnForm } from '@/assets/boxerData';
 import { ORGANIZATIONS, WEIGHT_CLASS } from '@/assets/boxerData';
-import { NATIONALITY } from '@/assets/NationalFlagData';
+import { COUNTRY } from '@/assets/NationalFlagData';
 //! type
-import { BoxerType, NationalityType, StanceType } from '@/assets/types';
+import { BoxerType, CountryType, StanceType } from '@/assets/types';
 //! recoil
 import { SetterOrUpdater, useRecoilState } from 'recoil';
 import { boxerDataOnFormState } from '@/store/boxerDataOnFormState';
@@ -130,13 +130,13 @@ const Country = (props: DataEntryItemType) => {
         value={boxerDataOnForm?.country}
         onChange={(e) => {
           setBoxerDataToForm((current: BoxerType) => {
-            return { ...current, country: e.target.value as NationalityType };
+            return { ...current, country: e.target.value as CountryType };
           });
         }}
         id="country"
       >
         {/* <option value={undefined}>{countryUndefined}</option> */}
-        {Object.values(NATIONALITY)
+        {Object.values(COUNTRY)
           .sort()
           .map((nationalName) => (
             <option key={nationalName} value={nationalName}>

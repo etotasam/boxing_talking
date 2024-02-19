@@ -1,5 +1,5 @@
 import React from 'react';
-import { NATIONALITY } from '@/assets/NationalFlagData';
+import { COUNTRY } from '@/assets/NationalFlagData';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/atomic/Button';
 
@@ -45,7 +45,7 @@ export const SearchBoxer = () => {
           id="country"
         >
           <option value={undefined}></option>
-          {Object.values(NATIONALITY)
+          {Object.values(COUNTRY)
             .sort()
             .map((nationalName) => (
               <option key={nationalName} value={nationalName}>

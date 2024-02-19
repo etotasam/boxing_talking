@@ -8,7 +8,7 @@ import {
   ThisMatchPredictionByUserType,
 } from '../../MatchContainer';
 //! type
-import { MatchDataType, BoxerType, NationalityType } from '@/assets/types';
+import { MatchDataType, BoxerType, CountryType } from '@/assets/types';
 //! hooks
 import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/apiHooks/uesWinLossPrediction';
 //! icon
@@ -197,7 +197,7 @@ const BoxersNameBoxWithBgNationalFlag = (
 };
 
 type NationalFlagBackgroundDivPropsType = {
-  countries: { Aside: NationalityType; Bside: NationalityType };
+  countries: { Aside: CountryType; Bside: CountryType };
   children?: React.ReactNode;
 };
 export const NationalFlagBackgroundDiv = ({

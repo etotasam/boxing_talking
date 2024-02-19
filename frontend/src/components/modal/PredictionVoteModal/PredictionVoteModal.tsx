@@ -2,7 +2,7 @@ import { Button } from '@/components/atomic/Button';
 import { InfoModal } from '../InfoModal';
 import { FlagImage } from '@/components/atomic/FlagImage';
 import { RiCloseLine } from 'react-icons/ri';
-import { NationalityType } from '@/assets/types';
+import { CountryType } from '@/assets/types';
 import clsx from 'clsx';
 // ! image
 import crown from '@/assets/images/etc/champion.svg';
@@ -10,12 +10,12 @@ import crown from '@/assets/images/etc/champion.svg';
 type BoxersDataType = {
   red: {
     name: string;
-    country: NationalityType;
+    country: CountryType;
     title: number;
   };
   blue: {
     name: string;
-    country: NationalityType;
+    country: CountryType;
     title: number;
   };
 };
@@ -70,7 +70,7 @@ export const PredictionVoteModal = ({
 };
 
 type BoxerButtonType = {
-  boxerData: { name: string; country: NationalityType; title: number };
+  boxerData: { name: string; country: CountryType; title: number };
   onClick: () => void;
 };
 const BoxerButton = ({ onClick, boxerData }: BoxerButtonType) => {

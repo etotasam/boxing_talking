@@ -1,8 +1,7 @@
 // ! data
 import { STANCE, ORGANIZATIONS, WEIGHT_CLASS, GRADE } from "@/assets/boxerData";
-import { NATIONALITY } from "@/assets/NationalFlagData"
+import { COUNTRY } from "@/assets/NationalFlagData"
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "./statusesOnToastModal";
-import { needMatchPropertyForUpdate } from "@/assets/needMatchPropertyForUpdate"
 
 export type UserType = {
   name: string | undefined,
@@ -12,7 +11,8 @@ export type MessageType = typeof MESSAGE[keyof typeof MESSAGE]
 export type BgColorType = typeof BG_COLOR_ON_TOAST_MODAL[keyof typeof BG_COLOR_ON_TOAST_MODAL]
 
 // ? 国旗
-export type NationalityType = typeof NATIONALITY[keyof typeof NATIONALITY]
+export type CountryType = typeof COUNTRY[keyof typeof COUNTRY]
+
 
 // ? ボクサー情報
 export type BoxerType = {
@@ -23,7 +23,7 @@ export type BoxerType = {
   height: number;
   reach: number;
   style: StanceType;
-  country: NationalityType;
+  country: CountryType;
   win: number;
   ko: number;
   draw: number;
@@ -55,7 +55,7 @@ export type RegisterMatchPropsType = {
   blue_boxer_id: number,
   match_date: string,
   grade: string,
-  country: NationalityType,
+  country: CountryType,
   venue: string,
   weight: string,
   titles: string[],
@@ -68,15 +68,17 @@ export type MatchResultType = {
   round?: string
 }
 
+export type MatchTitlesType = { organization: OrganizationsType, weightDivision: WeightClassType }[]
+
 export type MatchDataType = {
   id: number,
   red_boxer: BoxerType,
   blue_boxer: BoxerType,
-  country: NationalityType,
+  country: CountryType,
   venue: string,
-  grade: GRADE_Type,
-  titles: { organization: ORGANIZATIONS_Type, weightDivision: WEIGHT_CLASS_Type }[] | [],
-  weight: WEIGHT_CLASS_Type,
+  grade: GradeType,
+  titles: MatchTitlesType | [],
+  weight: WeightClassType,
   match_date: string,
   count_red: number,
   count_blue: number,
@@ -90,9 +92,9 @@ export type MatchResultType = {
   round: number
 }
 
-export type GRADE_Type = (typeof GRADE)[keyof typeof GRADE];
-export type WEIGHT_CLASS_Type = (typeof WEIGHT_CLASS)[keyof typeof WEIGHT_CLASS];
-export type ORGANIZATIONS_Type = (typeof ORGANIZATIONS)[keyof typeof ORGANIZATIONS];
+export type GradeType = typeof GRADE[keyof typeof GRADE];
+export type WeightClassType = typeof WEIGHT_CLASS[keyof typeof WEIGHT_CLASS];
+export type OrganizationsType = typeof ORGANIZATIONS[keyof typeof ORGANIZATIONS];
 
 
 export type PredictionType = {
@@ -103,11 +105,11 @@ export type PredictionType = {
 
 
 export type NeedMatchPropertyForUpdateType = {
-  country: NationalityType;
-  grade: GRADE_Type;
+  country: CountryType;
+  grade: GradeType;
   venue: string;
   weight: number;
-  titles: { organization: ORGANIZATIONS_Type, weightDivision: WEIGHT_CLASS_Type }[] | [];
+  titles: { organization: OrganizationsType, weightDivision: WeightClassType }[] | [];
   match_date: string;
 };
 
@@ -121,3 +123,13 @@ export type CommentType = {
   prediction: "red" | "blue" | undefined;
   created_at: string;
 }
+
+
+export type MatchUpdateFormType = {
+  match_date: string;
+  grade: GradeType | undefined;
+  country: CountryType | undefined;
+  venue: string;
+  weight: WeightClassType | undefined;
+  titles: OrganizationsType[] | [];
+};

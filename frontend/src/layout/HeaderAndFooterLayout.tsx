@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 // ! components
 import { Footer } from '@/components/module/Footer';
-import { HeaderContainer } from '@/components/module/Header';
+import { Header } from '@/components/module/Header';
 // ! hooks
 import { useLoading } from '@/hooks/useLoading';
 //! recoil
@@ -25,7 +25,7 @@ const HeaderAndFooterLayout = () => {
 
   return (
     <>
-      <HeaderContainer />
+      <Header />
       <div
         className={`relative`}
         style={{

@@ -22,10 +22,29 @@ type LeftSectionType = {
 };
 
 export const LeftSection = ({ thisMatch, commentPostEl }: LeftSectionType) => {
+  //?試合データを取得するまでは何もrenderさせない
+  if (!thisMatch) return;
+  return (
+    <LeftSectionWrapper commentPostEl={commentPostEl}>
+      <div className="flex justify-center">
+        <MatchInfo matchData={thisMatch} />
+      </div>
+
+      <PredictionsBarBox thisMatch={thisMatch} />
+    </LeftSectionWrapper>
+  );
+};
+
+const PredictionsBarBox = ({
+  thisMatch,
+}: {
+  thisMatch: MatchDataType | undefined;
+}) => {
   //? この試合へのuserの勝敗予想をcontextから取得
   const thisMatchPredictionOfUser = useContext(
     ThisMatchPredictionByUserContext
   );
+
   //? userがこの試合への勝敗予想は投票済みかどうか
   const isVotedMatchPrediction =
     thisMatchPredictionOfUser === 'red' || thisMatchPredictionOfUser === 'blue';
@@ -36,32 +55,107 @@ export const LeftSection = ({ thisMatch, commentPostEl }: LeftSectionType) => {
   //? 勝敗予想投票数の表示条件
   const isShowPredictionBar = isVotedMatchPrediction || !isThisMatchAfterToday;
 
-  //?試合データを取得するまでは何もrenderさせない
+  const { isSuccess: isFetchCommentsSuccess } = useFetchComments(thisMatch!.id);
+
+  if (!isShowPredictionBar) return;
   if (!thisMatch) return;
   return (
-    <LeftSectionWrapper commentPostEl={commentPostEl}>
-      <div className="flex justify-center">
-        <MatchInfo matchData={thisMatch} />
+    <>
+      <div className="flex justify-center mb-5">
+        <div className="w-[80%]">
+          <PredictionBox
+            thisMatch={thisMatch}
+            isFetchCommentsSuccess={isFetchCommentsSuccess}
+          />
+        </div>
       </div>
-
-      {isShowPredictionBar && <PredictionsBar thisMatch={thisMatch} />}
-    </LeftSectionWrapper>
+    </>
   );
 };
 
-const PredictionsBar = ({
+type PredictionBoxType = {
+  isFetchCommentsSuccess: boolean;
+  thisMatch: MatchDataType;
+};
+const PredictionBox = (props: PredictionBoxType) => {
+  const { isFetchCommentsSuccess, thisMatch } = props;
+  if (!isFetchCommentsSuccess) return;
+  return (
+    <>
+      <UsersPredictionVoteDestination thisMatch={thisMatch} />
+      <PredictionVoteCount thisMatch={thisMatch} />
+      <PredictionBar thisMatch={thisMatch} />
+    </>
+  );
+};
+
+const UsersPredictionVoteDestination = ({
   thisMatch,
 }: {
-  thisMatch: MatchDataType | undefined;
+  thisMatch: MatchDataType;
 }) => {
+  const thisMatchPredictionOfUser = useContext(
+    ThisMatchPredictionByUserContext
+  );
+  if (!thisMatchPredictionOfUser) return;
+  return (
+    <p className="text-center lg:text-sm text-xs font-light">
+      <span
+        className={clsx(
+          'relative',
+          'after:absolute after:bottom-[-10px] after:left-[50%] after:translate-x-[-50%] after:border-b-[1px] after:border-stone-600 after:w-[115%]'
+        )}
+      >
+        {thisMatchPredictionOfUser === 'red' &&
+          `${thisMatch.red_boxer.name}の勝利に投票しました`}
+        {thisMatchPredictionOfUser === 'blue' &&
+          `${thisMatch.blue_boxer.name}の勝利に投票しました`}
+      </span>
+    </p>
+  );
+};
+
+const PredictionVoteCount = ({ thisMatch }: { thisMatch: MatchDataType }) => {
   //? この試合へのuserの勝敗予想をcontextから取得
   const thisMatchPredictionOfUser = useContext(
     ThisMatchPredictionByUserContext
   );
-  const { isSuccess: isFetchCommentsSuccess } = useFetchComments(thisMatch!.id);
-  //? 勝利予想の割合計算
+
+  return (
+    <div className="flex justify-between mt-5">
+      <span
+        className={clsx(
+          'block pl-3 text-lg font-semibold right-0 top-0',
+          "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1",
+          thisMatchPredictionOfUser === 'red' && 'text-red-600'
+        )}
+      >
+        {thisMatch.count_red}
+      </span>
+      {
+        <span
+          className={clsx(
+            'block text-right pr-3 text-lg font-semibold right-0 top-0',
+            "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1",
+            thisMatchPredictionOfUser === 'blue' && 'text-blue-600'
+          )}
+        >
+          {thisMatch.count_blue}
+        </span>
+      }
+    </div>
+  );
+};
+
+type PredictionBarType = {
+  thisMatch: MatchDataType;
+};
+const PredictionBar = (props: PredictionBarType) => {
+  const { thisMatch } = props;
+
   const [redCountRatio, setRedCountRatio] = useState<number>(0);
   const [blueCountRatio, setBlueCountRatio] = useState<number>(0);
+
   const setWinPredictionRate = (): void => {
     if (!thisMatch) return;
     const totalCount = thisMatch.count_red + thisMatch.count_blue;
@@ -75,78 +169,27 @@ const PredictionsBar = ({
   }, [thisMatch]);
 
   return (
-    <>
-      {thisMatch && (
-        <div className="flex justify-center mb-5">
-          <div className="w-[80%]">
-            <p className="text-center lg:text-sm text-xs font-light">
-              <span
-                className={clsx(
-                  'relative',
-                  'after:absolute after:bottom-[-10px] after:left-[50%] after:translate-x-[-50%] after:border-b-[1px] after:border-stone-600 after:w-[115%]'
-                )}
-              >
-                {thisMatchPredictionOfUser === 'red' &&
-                  `${thisMatch.red_boxer.name}の勝利に投票しました`}
-                {thisMatchPredictionOfUser === 'blue' &&
-                  `${thisMatch.blue_boxer.name}の勝利に投票しました`}
-              </span>
-            </p>
+    <div className="flex mt-0">
+      <div className="flex-1 flex justify-between relative">
+        <motion.div
+          initial={{
+            width: 0,
+          }}
+          animate={{ width: `${redCountRatio}%` }}
+          transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
+          className="h-[10px] absolute top-0 left-[-1px] rounded-[50px] bg-red-700"
+        />
 
-            {isFetchCommentsSuccess && (
-              <div className="flex justify-between mt-5">
-                <span
-                  className={clsx(
-                    'block pl-3 text-lg font-semibold right-0 top-0',
-                    "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1",
-                    thisMatchPredictionOfUser === 'red' && 'text-red-600'
-                  )}
-                >
-                  {thisMatch.count_red}
-                </span>
-                {
-                  <span
-                    className={clsx(
-                      'block text-right pr-3 text-lg font-semibold right-0 top-0',
-                      "after:content-['票'] after:text-xs after:text-stone-500 after:ml-1",
-                      thisMatchPredictionOfUser === 'blue' && 'text-blue-600'
-                    )}
-                  >
-                    {thisMatch.count_blue}
-                  </span>
-                }
-              </div>
-            )}
-
-            <div className="flex mt-0">
-              <div className="flex-1 flex justify-between relative">
-                <motion.div
-                  initial={{
-                    width: 0,
-                  }}
-                  animate={
-                    isFetchCommentsSuccess && { width: `${redCountRatio}%` }
-                  }
-                  transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-                  className="h-[10px] absolute top-0 left-[-1px] rounded-[50px] bg-red-700"
-                />
-
-                <motion.div
-                  initial={{
-                    width: 0,
-                  }}
-                  animate={
-                    isFetchCommentsSuccess && { width: `${blueCountRatio}%` }
-                  }
-                  transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-                  className="h-[10px] absolute top-0 right-[-1px] rounded-[50px] bg-blue-700"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+        <motion.div
+          initial={{
+            width: 0,
+          }}
+          animate={{ width: `${blueCountRatio}%` }}
+          transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
+          className="h-[10px] absolute top-0 right-[-1px] rounded-[50px] bg-blue-700"
+        />
+      </div>
+    </div>
   );
 };
 

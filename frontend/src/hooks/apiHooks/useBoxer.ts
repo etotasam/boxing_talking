@@ -11,7 +11,7 @@ import { useLoading } from "../useLoading"
 import { useToastModal } from "../useToastModal";
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal";
 // //! types
-import type { BoxerType, NationalityType } from "@/assets/types"
+import type { BoxerType, CountryType } from "@/assets/types"
 
 
 //! 選手データ取得 and 登録済み選手の数を取得
@@ -20,7 +20,7 @@ export const useFetchBoxers = () => {
 
   type SearchWordType = {
     name?: string | null
-    country?: NationalityType | null
+    country?: CountryType | null
   }
   type FetcherPropsType = {
     page: number,
@@ -32,7 +32,7 @@ export const useFetchBoxers = () => {
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const paramName = (query.get("name"));
-  const paramCountry = (query.get("country")) as NationalityType | null;
+  const paramCountry = (query.get("country")) as CountryType | null;
   let paramPage = Number(query.get("page"));
 
   if (!paramPage) {
