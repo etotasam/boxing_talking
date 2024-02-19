@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, pickBy, isEqual, pick } from 'lodash';
 import dayjs from 'dayjs';
-import _ from 'lodash';
 // ! types
 import {
-  NationalityType,
-  GRADE_Type,
-  WEIGHT_CLASS_Type,
-  ORGANIZATIONS_Type,
+  CountryType,
+  GradeType,
+  WeightClassType,
+  OrganizationsType,
   MatchDataType,
+  MatchUpdateFormType,
 } from '@/assets/types';
 //!type evolution
 import { isMessageType } from '@/assets/typeEvaluations';
@@ -18,71 +18,79 @@ import {
   MESSAGE,
   BG_COLOR_ON_TOAST_MODAL,
 } from '@/assets/statusesOnToastModal';
-import { NATIONALITY } from '@/assets/NationalFlagData';
+import { COUNTRY } from '@/assets/NationalFlagData';
 //! hook
 import { useToastModal } from '@/hooks/useToastModal';
 import { useUpdateMatch } from '@/hooks/apiHooks/useMatch';
 //! component
 import { Button } from '@/components/atomic/Button';
 
-export const MatchSetter = ({
-  selectMatch,
+export const MatchSetForm = ({
+  selectedMatch,
   isSuccessDeleteMatch,
 }: {
-  selectMatch: MatchDataType | undefined;
+  selectedMatch: MatchDataType | undefined;
   isSuccessDeleteMatch?: boolean;
 }) => {
   //? use hook
   const { hideToastModal, showToastModalMessage } = useToastModal();
   const { updateMatch } = useUpdateMatch();
-  const [matchDate, setMatchDate] = useState('');
-  const [matchGrade, setMatchGrade] = useState<GRADE_Type>();
-  const [matchPlaceCountry, setMatchPlaceCountry] = useState<
-    NationalityType | ''
-  >();
-  const [matchVenue, setMatchVenue] = useState('');
-  const [matchWeight, setMatchWeight] = useState<WEIGHT_CLASS_Type | ''>();
-  const [belt, setBelt] = useState<ORGANIZATIONS_Type[] | []>([]);
-  const [title, setTitle] = useState(false);
+
+  type formDataKeysType = keyof typeof initialFormData;
+  const initialFormData = {
+    match_date: '',
+    grade: undefined,
+    country: undefined,
+    venue: '',
+    weight: undefined,
+    titles: [] as OrganizationsType[] | [],
+  } as const;
+
+  const [originalFormData, setOriginalFormData] =
+    useState<MatchUpdateFormType>();
+  const [formData, setFormData] =
+    useState<MatchUpdateFormType>(initialFormData);
+  const [isTitle, setIsTitle] = useState(false);
   const [counter, setCounter] = useState(1);
 
-  //? belt配列にnull,空文字が含まれていたら削除する
+  //? matchTitles配列にnull,空文字が含まれていたら削除する
   useEffect(() => {
-    if (belt.some((title) => !title)) {
-      setBelt(belt.filter((organization) => !!organization));
+    if (formData.titles.some((title) => !title)) {
+      setFormData((current) => {
+        const titles = formData.titles.filter((data) => !!data);
+        return { ...current, titles };
+      });
     }
-  }, [belt]);
+  }, [formData.titles]);
 
   //? 試合の削除が成功したらformの各データを初期化する
   useEffect(() => {
     if (!isSuccessDeleteMatch) return;
-    setMatchDate('');
-    setMatchGrade(undefined);
-    setMatchPlaceCountry('');
-    setMatchVenue('');
-    setMatchWeight('');
-    setBelt([]);
+    setFormData(initialFormData);
   }, [isSuccessDeleteMatch]);
 
-  //? 試合データを選択(props selectMatch)した時に各値をformに表示出来る様にフォーマットしてセットする
+  //? 試合データを選択(props selectedMatch)した時に各値をformに表示出来る様にフォーマットしてセットする
   useEffect(() => {
-    if (!selectMatch) return;
-    setMatchDate(selectMatch.match_date);
-    setMatchGrade(selectMatch.grade);
-    setMatchPlaceCountry(selectMatch.country);
-    setMatchVenue(selectMatch.venue);
-    setMatchWeight(selectMatch.weight);
-    setTitle(false);
-    if (selectMatch.titles.length) {
-      setTitle(true);
-      const organizations = selectMatch.titles
+    if (!selectedMatch) return;
+    const pickData = pickDataForUpdate();
+
+    setFormData(pickData);
+    setOriginalFormData(pickData);
+
+    if (selectedMatch.titles.length) {
+      setIsTitle(true);
+      const organizations = selectedMatch.titles
         .map((title) => {
           return title.organization;
         })
-        .filter((v) => v !== undefined) as ORGANIZATIONS_Type[] | [];
-      setBelt(organizations);
+        .filter((v) => v !== undefined) as OrganizationsType[] | [];
+      setFormData((current) => {
+        return { ...current, titles: organizations };
+      });
+    } else {
+      setIsTitle(false);
     }
-  }, [selectMatch]);
+  }, [selectedMatch]);
 
   // ? アンマウント時にはトーストモーダルを隠す
   useEffect(() => {
@@ -90,36 +98,41 @@ export const MatchSetter = ({
       hideToastModal();
     };
   }, []);
-  // ? gradeがタイトルマッチ以外の時は belt (WBA WBCとか...)を空にする
+  // ? gradeがタイトルマッチ以外の時は matchTitles (WBA WBCとか...)を空にする
   useEffect(() => {
-    if (!title) return setBelt([]);
-  }, [title]);
+    if (!isTitle) {
+      setFormData((current) => {
+        return { ...current, titles: [] };
+      });
+    }
+  }, [isTitle]);
 
   // ? WBA WBC WBO IBFを選ぶ<select>の数を管理
   useEffect(() => {
-    if (belt.length >= 4) {
+    const matchTitles = formData.titles;
+    if (matchTitles.length >= 4) {
       setCounter(4);
       return;
     }
-    if (!belt.length) {
+    if (!matchTitles.length) {
       setCounter(1);
     } else {
-      setCounter(belt.length + 1);
+      setCounter(matchTitles.length + 1);
     }
-  }, [belt]);
+  }, [formData.titles]);
 
-  //?試合のグレードがタイトルマッチ以外の時はorganization(WBA,WBCとか…)を選べない様にする
+  //?グレードがタイトルマッチ以外の時はorganization(WBA,WBCとか…)を選べない様にする
   useEffect(() => {
-    if (matchGrade === GRADE.TITLE_MATCH) {
-      setTitle(true);
+    if (formData.grade === GRADE.TITLE_MATCH) {
+      setIsTitle(true);
     } else {
-      setTitle(false);
+      setIsTitle(false);
     }
-  }, [matchGrade]);
+  }, [formData.grade]);
 
   //? 試合が選択されていない場合モーダル表示
   const showModalIfNotSelectMatch = () => {
-    if (!selectMatch) {
+    if (!selectedMatch) {
       throw new Error(MESSAGE.MATCH_IS_NOT_SELECTED);
     }
   };
@@ -127,94 +140,72 @@ export const MatchSetter = ({
   // ? 未入力がある場合はモーダルでNOTICE
   const showModalIfUndefinedFieldsExist = () => {
     if (
-      !matchDate ||
-      !matchGrade ||
-      !matchPlaceCountry ||
-      !matchVenue ||
-      !matchWeight
+      !formData.match_date ||
+      !formData.grade ||
+      !formData.country ||
+      !formData.venue ||
+      !formData.weight
     ) {
       throw new Error(MESSAGE.MATCH_HAS_NOT_ENTRIES);
-    } else if (matchGrade === GRADE.TITLE_MATCH && !belt.length) {
+    } else if (
+      formData.grade === GRADE.TITLE_MATCH &&
+      !formData.titles.length
+    ) {
       throw new Error(MESSAGE.MATCH_HAS_NOT_ENTRIES);
     }
   };
 
-  //?更新するのに必要なプロパティだけを抽出
-  const pickMatchDataForUpdate = () => {
-    const needMatchPropertyForUpdate = [
-      'country',
-      'grade',
-      'venue',
-      'weight',
-      'titles',
-      'match_date',
-    ] as const;
-
-    const pickData = _.pick(
-      selectMatch,
-      needMatchPropertyForUpdate
-    ) as Partial<MatchDataType>;
-    return pickData;
+  //?更新するのに必要なデータだけを抽出
+  const pickDataForUpdate = (): MatchUpdateFormType => {
+    const pickKeys = Object.keys(initialFormData) as formDataKeysType[];
+    const pickData = pick(selectedMatch, pickKeys);
+    const titles: OrganizationsType[] | [] = pickData.titles!.map((obj) => {
+      return obj.organization;
+    });
+    const formattedPickData = { ...pickData, titles } as MatchUpdateFormType;
+    return formattedPickData;
   };
 
   //? 現在のmatchデータと変更データを比較して、変更があるデータだけを抽出
-  const extractChangeData = (
-    matchDataForUpdate: any
-  ): Partial<MatchDataType> => {
-    //データをセット
-    const modificationData = {
-      country: matchPlaceCountry,
-      grade: matchGrade,
-      match_date: matchDate,
-      venue: matchVenue,
-      weight: matchWeight,
-      titles: belt,
-    };
-
-    const updateMatchData = _.omitBy(modificationData, (value, key): any => {
-      if (Array.isArray(value)) {
-        const titles = matchDataForUpdate[key].map(
-          ({
-            organization,
-          }: {
-            organization: ORGANIZATIONS_Type;
-            weightDivision: WEIGHT_CLASS_Type;
-          }) => {
-            return organization;
-          }
-        );
-        return _.isEqual(value, titles);
-      } else {
-        return matchDataForUpdate[key] === value;
+  const pickModifiedData = (): Partial<MatchUpdateFormType> => {
+    //? 変更のあるデータだけを抽出
+    const extractData: Partial<MatchUpdateFormType> = pickBy(
+      formData,
+      (value, key) => {
+        const formDataKey = key as formDataKeysType;
+        if (formDataKey === 'titles') {
+          return !isEqual(value, originalFormData!.titles);
+        } else {
+          return originalFormData![formDataKey] !== value;
+        }
       }
-    });
-    return updateMatchData;
+    );
+    return extractData;
   };
 
   //?データ変更が無い時モーダル表示
-  const showModalIfDataNotChanged = (onlyModifiedData: any) => {
-    if (!Object.keys(onlyModifiedData).length) {
+  const showModalIfDataNotChanged = (
+    modifiedData: Partial<MatchUpdateFormType>
+  ) => {
+    if (!Object.keys(modifiedData).length) {
       throw new Error(MESSAGE.MATCH_IS_NOT_MODIFIED);
     }
   };
 
-  //? 試合データ更新の実行
   const updateMatchExecute = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       showModalIfNotSelectMatch();
       showModalIfUndefinedFieldsExist();
 
-      const matchDataForUpdate = pickMatchDataForUpdate();
-
       //? 現在のmatchデータと変更データを比較して、変更があるプロパティだけを抽出
-      const onlyModifiedData = extractChangeData(matchDataForUpdate);
+      const modifiedData = pickModifiedData();
 
-      showModalIfDataNotChanged(onlyModifiedData);
+      showModalIfDataNotChanged(modifiedData);
 
-      const matchId = selectMatch!.id;
+      const matchId = selectedMatch!.id;
 
-      updateMatch({ matchId, changeData: onlyModifiedData });
+      updateMatch({ matchId, changeData: modifiedData });
     } catch (error: any) {
       //?MessageTypeには空文字も含まれている
       if (isMessageType(error.message) && error.message) {
@@ -251,9 +242,11 @@ export const MatchSetter = ({
             id="match-date"
             type="date"
             min={dayjs().format('YYYY-MM-DD')}
-            value={matchDate || dayjs().format('YYYY-MM-DD')}
+            value={formData.match_date || dayjs().format('YYYY-MM-DD')}
             onChange={(e) => {
-              setMatchDate(e.target.value);
+              setFormData((current) => {
+                return { ...current, match_date: e.target.value };
+              });
             }}
           />
         </div>
@@ -266,9 +259,11 @@ export const MatchSetter = ({
           <select
             className="w-[150px]"
             name="matchGrade"
-            value={matchGrade}
+            value={formData.grade}
             onChange={(e) => {
-              setMatchGrade(e.target.value as GRADE_Type);
+              setFormData((current) => {
+                return { ...current, grade: e.target.value as GradeType };
+              });
             }}
             id="matchGrade"
           >
@@ -281,7 +276,7 @@ export const MatchSetter = ({
           </select>
         </div>
 
-        {title && (
+        {isTitle && (
           <ul className="ml-[140px]">
             {/* //? タイトル */}
             {[...Array(counter)].map((_, i) => (
@@ -289,12 +284,16 @@ export const MatchSetter = ({
                 <select
                   className="w-[150px]"
                   name="matchBelt"
-                  value={belt[i] ? belt[i] : ''}
+                  value={formData.titles[i] ?? ''}
                   onChange={(e) => {
-                    setBelt((current) => {
+                    setFormData((current) => {
                       const cloneCurrent = cloneDeep(current);
-                      cloneCurrent[i] = e.target.value as ORGANIZATIONS_Type;
-                      return cloneCurrent.filter((v) => !!v);
+                      cloneCurrent.titles[i] = e.target
+                        .value as OrganizationsType;
+                      return {
+                        ...cloneCurrent,
+                        titles: cloneCurrent.titles.filter((v) => !!v),
+                      };
                     });
                   }}
                   id="matchBelt"
@@ -319,9 +318,15 @@ export const MatchSetter = ({
           <select
             className="w-[150px]"
             name="matchWeight"
-            value={matchWeight}
+            value={formData.weight}
             onChange={(e) => {
-              setMatchWeight(e.target.value as WEIGHT_CLASS_Type);
+              setFormData((current) => {
+                return {
+                  ...current,
+                  weight: e.target.value as WeightClassType,
+                };
+              });
+              // setMatchWeight(e.target.value as WeightClassType);
             }}
             id="matchWeight"
           >
@@ -346,14 +351,20 @@ export const MatchSetter = ({
           <select
             className="w-[150px]"
             name="matchPlaceCountry"
-            value={matchPlaceCountry}
+            value={formData.country}
             onChange={(e) => {
-              setMatchPlaceCountry(e.target.value as NationalityType);
+              setFormData((current) => {
+                return {
+                  ...current,
+                  country: e.target.value as CountryType,
+                };
+              });
+              // setMatchPlaceCountry(e.target.value as CountryType);
             }}
             id="matchPlaceCountry"
           >
             <option value={undefined}></option>
-            {Object.values(NATIONALITY).map((country) => (
+            {Object.values(COUNTRY).map((country) => (
               <option key={country} value={country}>
                 {country}
               </option>
@@ -367,8 +378,13 @@ export const MatchSetter = ({
             type="text"
             placeholder="試合会場入力"
             name="matchCountry"
-            value={matchVenue}
-            onChange={(e) => setMatchVenue(e.target.value)}
+            value={formData.venue}
+            onChange={(e) => {
+              setFormData((current) => {
+                return { ...current, venue: e.target.value };
+              });
+              // setMatchVenue(e.target.value)
+            }}
           />
         </div>
 

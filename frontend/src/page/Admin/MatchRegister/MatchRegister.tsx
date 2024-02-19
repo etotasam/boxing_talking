@@ -4,14 +4,14 @@ import { cloneDeep } from 'lodash';
 import { Helmet } from 'react-helmet-async';
 // ! types
 import {
-  NationalityType,
+  CountryType,
   RegisterMatchPropsType,
-  GRADE_Type,
-  WEIGHT_CLASS_Type,
-  ORGANIZATIONS_Type,
+  GradeType,
+  WeightClassType,
+  OrganizationsType,
 } from '@/assets/types';
 // ! data
-import { NATIONALITY } from '@/assets/NationalFlagData';
+import { COUNTRY } from '@/assets/NationalFlagData';
 import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
 import {
   MESSAGE,
@@ -247,13 +247,13 @@ const MatchDataSetter = ({
   const [matchDate, setMatchDate] = useState<string>(
     dayjs().format('YYYY-MM-DD')
   );
-  const [matchGrade, setMatchGrade] = useState<GRADE_Type | ''>('');
+  const [matchGrade, setMatchGrade] = useState<GradeType | ''>('');
   const [matchPlaceCountry, setMatchPlaceCountry] = useState<
-    NationalityType | ''
+    CountryType | ''
   >();
   const [matchVenue, setMatchVenue] = useState<string>('');
-  const [matchWeight, setMatchWeight] = useState<WEIGHT_CLASS_Type | ''>();
-  const [belt, setBelt] = useState<ORGANIZATIONS_Type[]>([]);
+  const [matchWeight, setMatchWeight] = useState<WeightClassType | ''>();
+  const [belt, setBelt] = useState<OrganizationsType[]>([]);
   const [title, setTitle] = useState(false);
   const [counter, setCounter] = useState(1);
 
@@ -397,7 +397,7 @@ const MatchDataSetter = ({
           name="matchGrade"
           value={matchGrade}
           onChange={(e) => {
-            setMatchGrade(e.target.value as GRADE_Type);
+            setMatchGrade(e.target.value as GradeType);
           }}
           id="matchGrade"
         >
@@ -422,7 +422,7 @@ const MatchDataSetter = ({
                 onChange={(e) => {
                   setBelt((current) => {
                     const clone = cloneDeep(current);
-                    clone[i] = e.target.value as ORGANIZATIONS_Type;
+                    clone[i] = e.target.value as OrganizationsType;
                     return clone;
                   });
                 }}
@@ -450,7 +450,7 @@ const MatchDataSetter = ({
           name="matchWeight"
           value={matchWeight}
           onChange={(e) => {
-            setMatchWeight(e.target.value as WEIGHT_CLASS_Type);
+            setMatchWeight(e.target.value as WeightClassType);
           }}
           id="matchWeight"
         >
@@ -477,12 +477,12 @@ const MatchDataSetter = ({
           name="matchPlaceCountry"
           value={matchPlaceCountry}
           onChange={(e) => {
-            setMatchPlaceCountry(e.target.value as NationalityType);
+            setMatchPlaceCountry(e.target.value as CountryType);
           }}
           id="matchPlaceCountry"
         >
           <option value={undefined}></option>
-          {Object.values(NATIONALITY).map((country) => (
+          {Object.values(COUNTRY).map((country) => (
             <option key={country} value={country}>
               {country}
             </option>

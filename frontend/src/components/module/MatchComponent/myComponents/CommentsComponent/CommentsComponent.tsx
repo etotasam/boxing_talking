@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef } from 'react';
+import React, { ReactNode } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
@@ -83,6 +83,49 @@ export const CommentsComponent = ({ paramsMatchID }: CommentsSectionType) => {
 
 //! コメントbox
 const CommentBox = ({ commentData }: { commentData: CommentType }) => {
+  return (
+    <div className={clsx('sm:p-5 p-3 pt-1 border-b-[1px] border-stone-200')}>
+      <PostTimeAndUserName commentData={commentData} />
+      <Comment commentData={commentData} />
+    </div>
+  );
+};
+
+const PostTimeAndUserName = ({ commentData }: { commentData: CommentType }) => {
+  //? 投稿時間（投稿からの経過時間）
+  const timeSincePost = dateFormatter(commentData.created_at);
+  return (
+    <div className="sm:flex mb-2">
+      {/* //? post time */}
+      <time className="text-xs text-stone-400 leading-6">{timeSincePost}</time>
+      {/* //? post name */}
+      <div className="flex sm:ml-3">
+        {commentData.post_user_name ? (
+          <>
+            <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+            <p
+              className={clsx(
+                'text-stone-500',
+                commentData.post_user_name.length > 20
+                  ? 'text-[12px] sm:text-sm'
+                  : 'text-sm'
+              )}
+            >
+              {commentData.post_user_name}
+            </p>
+          </>
+        ) : (
+          <>
+            <AiOutlineUser className="mr-1 block bg-stone-300 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+            <p className="text-sm text-stone-600">ゲスト</p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const Comment = ({ commentData }: { commentData: CommentType }) => {
   const { windowSize } = useWindowSize();
   //? ひとつのコメントのmin height
   const initialCommentElHeight = () => {
@@ -91,83 +134,41 @@ const CommentBox = ({ commentData }: { commentData: CommentType }) => {
     if (windowSize < TAILWIND_BREAKPOINT.sm) return 100;
     return 0;
   };
-  //? 投稿時間（投稿からの経過時間）
-  const timeSincePost = dateFormatter(commentData.created_at);
-
   return (
-    <div className={clsx('sm:p-5 p-3 pt-1 border-b-[1px] border-stone-200')}>
-      <div className="sm:flex mb-2">
-        <time className="text-xs text-stone-400 leading-6">
-          {timeSincePost}
-        </time>
-        <div className="flex sm:ml-3">
-          {commentData.post_user_name ? (
-            <>
-              <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-              <p
-                className={clsx(
-                  'text-stone-500',
-                  commentData.post_user_name.length > 20
-                    ? 'text-[12px] sm:text-sm'
-                    : 'text-sm'
-                )}
-              >
-                {commentData.post_user_name}
-              </p>
-            </>
-          ) : (
-            <>
-              <AiOutlineUser className="mr-1 block bg-stone-300 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-              <p className="text-sm text-stone-600">ゲスト投稿</p>
-            </>
-          )}
-        </div>
-      </div>
-      <div
-        className="relative"
-        style={
-          document.getElementById(`comment_${commentData.id}`) &&
-          (document.getElementById(`comment_${commentData.id}`)
-            ?.clientHeight as number) > initialCommentElHeight()
-            ? { height: '135px', overflow: 'hidden' }
-            : { height: 'auto' }
-        }
-      >
-        <p
-          id={`comment_${commentData.id}`}
-          className={clsx(
-            'md:text-lg text-sm font-light sm:tracking-normal tracking-wider text-stone-800'
-          )}
-          dangerouslySetInnerHTML={{
-            __html: commentData.comment,
-          }}
-        />
-        {document.getElementById(`comment_${commentData.id}`) &&
-          (document.getElementById(`comment_${commentData.id}`)
-            ?.clientHeight as number) > initialCommentElHeight() && (
-            <p className="absolute bottom-0 left-0 md:h-[25px] h-[35px] bg-white w-full">
-              <span
-                onClick={stretchCommentElement}
-                className={clsx(
-                  'text-stone-500 cursor-pointer border-[1px] border-transparent text-sm absolute box-border bottom-0',
-                  'hover:border-b-stone-800 hover:text-stone-800'
-                )}
-              >
-                続きを読む
-              </span>
-            </p>
-          )}
-      </div>
-
-      {/* //? ゴミ箱 */}
-      {/* {authUser && authUser.name === commentData.post_user_name && (
-                  <button
-                    onClick={() => commentDelete(commentData.id)}
-                    className="bg-blue-300 px-3 py-1"
-                  >
-                    ゴミ箱
-                  </button>
-                )} */}
+    <div
+      className="relative"
+      style={
+        document.getElementById(`comment_${commentData.id}`) &&
+        (document.getElementById(`comment_${commentData.id}`)
+          ?.clientHeight as number) > initialCommentElHeight()
+          ? { height: '135px', overflow: 'hidden' }
+          : { height: 'auto' }
+      }
+    >
+      <p
+        id={`comment_${commentData.id}`}
+        className={clsx(
+          'md:text-lg text-sm font-light sm:tracking-normal tracking-wider text-stone-800'
+        )}
+        dangerouslySetInnerHTML={{
+          __html: commentData.comment,
+        }}
+      />
+      {document.getElementById(`comment_${commentData.id}`) &&
+        (document.getElementById(`comment_${commentData.id}`)
+          ?.clientHeight as number) > initialCommentElHeight() && (
+          <p className="absolute bottom-0 left-0 md:h-[25px] h-[35px] bg-white w-full">
+            <span
+              onClick={stretchCommentElement}
+              className={clsx(
+                'text-stone-500 cursor-pointer border-[1px] border-transparent text-sm absolute box-border bottom-0',
+                'hover:border-b-stone-800 hover:text-stone-800'
+              )}
+            >
+              続きを読む
+            </span>
+          </p>
+        )}
     </div>
   );
 };

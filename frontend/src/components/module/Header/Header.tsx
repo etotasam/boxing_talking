@@ -13,6 +13,8 @@ import { UserType } from '@/assets/types';
 import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useMatchInfoModal } from '@/hooks/useMatchInfoModal';
+import { useAdmin } from '@/hooks/apiHooks/useAuth';
+
 //!recoil
 import { useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
@@ -20,17 +22,8 @@ import { elementSizeState } from '@/store/elementSizeState';
 import { Link } from 'react-router-dom';
 import { LogoutButton } from '@/components/atomic/LogoutButton';
 import { AdministratorPageLinks } from '../AdministratorPageLinks';
-//! env
-const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
-type PropsType = {
-  userData: UserType | undefined | null;
-};
-
-export const Header = (props: PropsType) => {
-  const { userData } = props;
-  const { data: isGuest } = useGuest();
-  const { data: authUser } = useAuth();
+export const Header = () => {
   const { pathname } = useLocation();
 
   const setHeaderHeight = useSetRecoilState(elementSizeState('HEADER_HEIGHT'));
@@ -51,53 +44,85 @@ export const Header = (props: PropsType) => {
           'after:w-full after:absolute after:bottom-0 after:left-0 after:h-[1px] after:bg-stone-300'
         )}
       >
-        <h1
-          className={clsx(
-            'sm:text-[48px] text-[32px] font-thin text-stone-600'
-          )}
-        >
-          {siteTitle}
-        </h1>
+        <SiteTitle />
 
         <LinksComponent pathname={pathname} />
 
-        <UserName userData={userData} />
-
-        {(isGuest || authUser) && (
-          <div className="absolute sm:bottom-5 bottom-3 lg:right-10 md:right-5 right-2 flex justify-center">
-            <LogoutButton />
-          </div>
-        )}
+        <AuthInfo />
       </header>
     </>
   );
 };
 
-const UserName = ({ userData }: { userData: UserType | undefined | null }) => {
+const SiteTitle = () => {
+  const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
+  return (
+    <h1 className={clsx('sm:text-[48px] text-[32px] font-thin text-stone-600')}>
+      {siteTitle}
+    </h1>
+  );
+};
+
+const AuthInfo = () => {
+  return (
+    <>
+      <UserName />
+      <LogoutBox />
+    </>
+  );
+};
+
+const LogoutBox = () => {
   const { data: isGuest } = useGuest();
+  const { data: authUser } = useAuth();
+  return (
+    <>
+      {(isGuest || authUser) && (
+        <div className="absolute sm:bottom-5 bottom-3 lg:right-10 md:right-5 right-2 flex justify-center">
+          <LogoutButton />
+        </div>
+      )}
+    </>
+  );
+};
+
+const UserName = () => {
+  const { data: isGuest } = useGuest();
+  const { data: authUser } = useAuth();
+
+  if (!isGuest && !authUser) return;
+
   return (
     <div className="absolute sm:top-1 top-2 lg:right-10 md:right-5 right-2 flex">
-      {userData && (
-        <>
-          <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-          <p
-            className={clsx(
-              userData.name!.length > 20
-                ? 'sm:text-[16px] text-xs'
-                : 'sm:text-[18px] text-sm'
-            )}
-          >
-            {userData.name}
-          </p>
-        </>
-      )}
-      {isGuest && (
-        <>
-          <AiOutlineUser className="mr-1 block bg-stone-400 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-          <p className="text-sm">ゲストログイン</p>
-        </>
-      )}
+      {authUser ? <UserIcon userData={authUser} /> : isGuest && <GuestIcon />}
     </div>
+  );
+};
+
+const UserIcon = ({ userData }: { userData: UserType | undefined | null }) => {
+  if (!userData) return;
+  return (
+    <>
+      <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+      <p
+        className={clsx(
+          userData.name!.length > 20
+            ? 'sm:text-[16px] text-xs'
+            : 'sm:text-[18px] text-sm'
+        )}
+      >
+        {userData.name}
+      </p>
+    </>
+  );
+};
+
+const GuestIcon = () => {
+  return (
+    <>
+      <AiOutlineUser className="mr-1 block bg-stone-400 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+      <p className="text-sm">ゲスト</p>
+    </>
   );
 };
 
@@ -106,6 +131,7 @@ type LinksComponentsPropsType = {
 };
 const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
   const { device } = useWindowSize();
+  const { isAdmin } = useAdmin();
 
   return (
     <>
@@ -130,9 +156,11 @@ const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
             </li>
           )}
 
-        <li>
-          <AdministratorPageLinks />
-        </li>
+        {isAdmin && (
+          <li>
+            <AdministratorPageLinks />
+          </li>
+        )}
       </ul>
     </>
   );

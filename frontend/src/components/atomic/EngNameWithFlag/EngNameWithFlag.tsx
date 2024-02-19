@@ -1,13 +1,13 @@
 // import React from "react";
 import { FlagImage } from '@/components/atomic/FlagImage';
 
-import { NationalityType } from '@/assets/types';
+import { CountryType } from '@/assets/types';
 
 export const EngNameWithFlag = ({
   boxerCountry,
   boxerEngName,
 }: {
-  boxerCountry: NationalityType;
+  boxerCountry: CountryType;
   boxerEngName: string;
 }) => {
   return (

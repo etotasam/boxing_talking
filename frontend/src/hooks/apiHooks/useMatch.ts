@@ -7,7 +7,7 @@ import { API_PATH } from "@/assets/ApiPath"
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 import { QUERY_KEY } from "@/assets/queryKeys"
 // ! types
-import { MatchDataType, MatchResultType, RegisterMatchPropsType } from "@/assets/types"
+import { MatchDataType, MatchResultType, RegisterMatchPropsType, MatchUpdateFormType } from "@/assets/types"
 // ! hook
 import { useToastModal } from "../useToastModal"
 import { useLoading } from "../useLoading"
@@ -106,7 +106,7 @@ export const useRegisterMatch = () => {
 //! 試合の変更
 type ArgumentType = {
   matchId: number,
-  changeData: Partial<MatchDataType>
+  changeData: Partial<MatchUpdateFormType>
 }
 export const useUpdateMatch = () => {
   const { setToastModal, showToastModal } = useToastModal()

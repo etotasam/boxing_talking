@@ -1,5 +1,5 @@
 import { BoxerType } from "./types";
-import { NATIONALITY } from "./NationalFlagData";
+import { COUNTRY } from "./NationalFlagData";
 
 export const STANCE = {
   SOUTHPAW: "southpaw",
@@ -41,7 +41,7 @@ export const initialBoxerData: BoxerType = {
   id: NaN,
   name: "",
   eng_name: "",
-  country: NATIONALITY.JAPAN,
+  country: COUNTRY.JAPAN,
   birth: "1990-01-01",
   height: 165,
   reach: 165,
@@ -57,7 +57,7 @@ export const initialBoxerDataOnForm: BoxerType = {
   id: NaN,
   name: "",
   eng_name: "",
-  country: NATIONALITY.JAPAN,
+  country: COUNTRY.JAPAN,
   birth: "1990-01-01",
   height: 165,
   reach: 165,
