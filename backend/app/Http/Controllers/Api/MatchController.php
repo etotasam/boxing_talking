@@ -12,7 +12,7 @@ use App\Models\BoxingMatch;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\QueryException;
 use App\Exceptions\NonAdministratorException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use App\Http\Requests\BoxingMatchesRequest;
 
 class MatchController extends ApiController
 {
@@ -111,8 +111,10 @@ class MatchController extends ApiController
      * @param  array update_match_data
      * @return JsonResponse
      */
-    public function update(Request $request)
+    public function update(BoxingMatchesRequest $request)
     {
+        \Log::debug($request);
+        // return "通る";
         try {
             $this->matchService->updateMatch($request->match_id, $request->update_match_data);
         } catch (Exception $e) {
