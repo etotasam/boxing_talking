@@ -129,7 +129,7 @@ export type MatchUpdateFormType = {
   match_date: string;
   grade: GradeType | undefined;
   country: CountryType | undefined;
-  venue: string;
+  venue: string | undefined;
   weight: WeightClassType | undefined;
   titles: OrganizationsType[] | [];
 };

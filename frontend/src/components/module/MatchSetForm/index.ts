@@ -1,1 +1,1 @@
-export * from "./MatchSetForm"
+export { MatchSetFormContainer as MatchSetForm } from "./MatchSetFormContainer"
