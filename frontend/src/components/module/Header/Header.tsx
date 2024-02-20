@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/RoutePath';
+import { ROUTE_PATH } from '@/assets/routePath';
 // ! icons
 import { BsCalendar3 } from 'react-icons/bs';
 import { GiBoxingGlove } from 'react-icons/gi';

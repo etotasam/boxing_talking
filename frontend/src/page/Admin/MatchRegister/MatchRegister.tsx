@@ -11,7 +11,7 @@ import {
   OrganizationsType,
 } from '@/assets/types';
 // ! data
-import { COUNTRY } from '@/assets/NationalFlagData';
+import { COUNTRY } from '@/assets/nationalFlagData';
 import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
 import {
   MESSAGE,

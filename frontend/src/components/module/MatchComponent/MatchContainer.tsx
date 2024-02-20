@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, createContext } from 'react';
 import dayjs from 'dayjs';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ROUTE_PATH } from '@/assets/RoutePath';
+import { ROUTE_PATH } from '@/assets/routePath';
 //! types
 import { MatchDataType } from '@/assets/types';
 // ! hook

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { ROUTE_PATH } from '@/assets/RoutePath';
+import { ROUTE_PATH } from '@/assets/routePath';
 import { Link, useLocation } from 'react-router-dom';
 //! recoil
 import { useSetRecoilState } from 'recoil';

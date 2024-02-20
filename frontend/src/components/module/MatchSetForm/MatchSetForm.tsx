@@ -10,7 +10,7 @@ import {
 } from '@/assets/types';
 //! data
 import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
-import { COUNTRY } from '@/assets/NationalFlagData';
+import { COUNTRY } from '@/assets/nationalFlagData';
 //! component
 import { Button } from '@/components/atomic/Button';
 

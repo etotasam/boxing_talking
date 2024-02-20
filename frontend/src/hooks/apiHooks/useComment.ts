@@ -3,7 +3,7 @@ import { useCallback, useEffect } from "react"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { QUERY_KEY } from "@/assets/queryKeys"
-import { API_PATH } from "@/assets/ApiPath"
+import { API_PATH } from "@/assets/apiPath"
 //! hook
 // import { useAuth } from "@/hooks/useAuth"
 import { useLoading } from "@/hooks/useLoading"

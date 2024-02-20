@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/RoutePath';
+import { ROUTE_PATH } from '@/assets/routePath';
 import { VISUAL_MODE } from '@/store/visualModeState';
 // ! components
 import { FightBox } from '@/components/module/FightBox';

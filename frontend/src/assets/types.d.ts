@@ -1,6 +1,6 @@
 // ! data
 import { STANCE, ORGANIZATIONS, WEIGHT_CLASS, GRADE } from "@/assets/boxerData";
-import { COUNTRY } from "@/assets/NationalFlagData"
+import { COUNTRY } from "@/assets/nationalFlagData"
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "./statusesOnToastModal";
 
 export type UserType = {

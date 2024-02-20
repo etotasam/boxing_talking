@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/RoutePath';
+import { ROUTE_PATH } from '@/assets/routePath';
 import { Link } from 'react-router-dom';
 // ! icons
 import { FaUserEdit } from 'react-icons/fa';

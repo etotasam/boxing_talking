@@ -1,7 +1,7 @@
 import { useCallback } from "react"
 import { useQuery, useMutation, } from "react-query"
 import { Axios } from "@/assets/axios"
-import { API_PATH } from "@/assets/ApiPath"
+import { API_PATH } from "@/assets/apiPath"
 //! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal";
 import { QUERY_KEY } from "@/assets/queryKeys";
@@ -91,4 +91,3 @@ export const useVoteMatchPrediction = () => {
 
   return { matchVotePrediction, isLoading, isSuccess, isError }
 }
-

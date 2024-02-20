@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useCallback } from "react"
 import { QUERY_KEY } from "@/assets/queryKeys"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal"
 import { TOKEN_ERROR_MESSAGE } from "@/assets/tokenErrorMessage"
-import { API_PATH } from "@/assets/ApiPath"
-import { CUSTOM_ERROR_CODE } from "@/assets/CustomErrorCodes"
+import { API_PATH } from "@/assets/apiPath"
+import { CUSTOM_ERROR_CODE } from "@/assets/customErrorCodes"
 //! Recoil
 import { useSetRecoilState } from "recoil"
 import { tokenErrorMessageState } from "@/store/tokenErrorMessageState"
@@ -53,7 +55,8 @@ export const useGuestLogin = () => {
 
   //? ReactQuery controller
   const { setReactQueryData } = useReactQuery()
-  const api = useCallback(async ({ _ }: { _?: unknown }): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const api = useCallback(async (_: unknown): Promise<void> => {
     await Axios.post<void>(API_PATH.GUEST_LOGIN).then(result => result.data)
   }, [])
 
@@ -96,7 +99,8 @@ export const useGuestLogout = () => {
   // ? Loading state
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? api
-  const api = useCallback(async ({ _ }: { _?: unknown }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const api = useCallback(async (_: unknown) => {
     await Axios.post<void>(API_PATH.GUEST_LOGOUT).then(result => result.data)
   }, [])
 
@@ -334,7 +338,8 @@ export const useLogout = () => {
   // ? Loading state
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? api
-  const api = useCallback(async ({ _ }: { _?: any }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const api = useCallback(async (_: any) => {
     await Axios.post<void>(API_PATH.USER_LOGOUT).then(result => result.data)
   }, [])
 

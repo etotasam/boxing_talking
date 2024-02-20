@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { clsx } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
-import { getNationalFlag, formatPosition } from '@/assets/NationalFlagData';
+import { getNationalFlag, formatPosition } from '@/assets/nationalFlagData';
 //! context
 import {
   IsThisMatchAfterTodayType,

@@ -1,6 +1,6 @@
 // import { useState } from "react";
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/RoutePath';
+import { ROUTE_PATH } from '@/assets/routePath';
 // ! page
 import { Home } from '@/page/Home';
 import { Match } from '@/page/Match';
@@ -14,7 +14,7 @@ import { Terms } from './page/Terms/Terms';
 import { Identification } from '@/page/Identification';
 import { NotFound } from '@/page/NotFound';
 import { PastMatches } from './page/PastMatches';
-import { TestPage } from './page/TestPage';
+// import { TestPage } from './page/TestPage';
 // ! middleware
 import AdminOnly from './middleware/AdminOnly';
 import Container from './middleware/Container';

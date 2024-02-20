@@ -2,7 +2,7 @@ import { useCallback } from "react"
 import { Axios } from "@/assets/axios"
 // import dayjs from "dayjs"
 import { useQuery, useMutation } from "react-query"
-import { API_PATH } from "@/assets/ApiPath"
+import { API_PATH } from "@/assets/apiPath"
 // ! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 import { QUERY_KEY } from "@/assets/queryKeys"
@@ -138,6 +138,8 @@ export const useUpdateMatch = () => {
         resetLoadingState()
         setToastModal({ message: MESSAGE.MATCH_UPDATE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
+      },
+      onSettled: (data) => {
       }
     })
   }
