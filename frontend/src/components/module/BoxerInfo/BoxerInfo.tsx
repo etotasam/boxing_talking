@@ -19,7 +19,7 @@ export const BoxerInfo = ({
   matchResult = null,
 }: BoxerInfoPropsType) => {
   return (
-    <div className={clsx('w-[300px] h-full flex justify-center', className)}>
+    <div className={clsx('w-full h-full flex justify-center', className)}>
       <div className="text-center w-full px-5 py-5">
         {/* //? 名前 */}
         <BoxerName boxer={boxer} />

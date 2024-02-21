@@ -19,7 +19,7 @@ import { PredictionType } from "@/assets/types"
 export const useAllFetchMatchPredictionOfAuthUser = () => {
   const { data: authUser } = useAuth()
   const { data: isGuest } = useGuest()
-  const isEitherAuth = Boolean(authUser || isGuest)
+  const isAuthOrGuest = Boolean(authUser || isGuest)
 
   const api = useCallback(async () => {
     const res = await Axios.get<{ data: PredictionType[] | "" }>(API_PATH.PREDICTION).then(v => v.data)
@@ -28,7 +28,7 @@ export const useAllFetchMatchPredictionOfAuthUser = () => {
   }, [])
   const { data, isLoading, isRefetching, refetch } = useQuery(QUERY_KEY.PREDICTION, api, {
     staleTime: Infinity,
-    enabled: isEitherAuth,
+    enabled: isAuthOrGuest,
     onError: () => {
       // queryClient.setQueryData(queryKeys.vote, [])
     },

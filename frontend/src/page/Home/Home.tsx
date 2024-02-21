@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/routePath';
 import { VISUAL_MODE } from '@/store/visualModeState';
 // ! components
-import { FightBox } from '@/components/module/FightBox';
+import { MatchCard } from '@/components/module/MatchCard';
 import { SimpleFightBox } from '@/components/module/SimpleFightBox';
 //! icon
 import { VisualModeChangeButton } from '@/components/atomic/VisualModeChangeButton';
@@ -52,7 +52,7 @@ export const Home = () => {
             key={match.id}
             className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5 first:mt-0"
           >
-            <MatchCard match={match} matchSelect={matchSelect} />
+            <MatchBox match={match} matchSelect={matchSelect} />
           </li>
         ))}
       </ul>
@@ -74,7 +74,7 @@ type MatchesViewPropsType = {
   matchSelect: (matchId: number) => void;
 };
 
-const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
+const MatchBox = ({ match, matchSelect }: MatchesViewPropsType) => {
   const { state: visualMode } = useVisualModeController();
   const { device } = useWindowSize();
 
@@ -82,5 +82,5 @@ const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
     return <SimpleFightBox onClick={matchSelect} matchData={match} />;
 
   if (device === 'PC')
-    return <FightBox onClick={matchSelect} matchData={match} />;
+    return <MatchCard onClick={matchSelect} matchData={match} />;
 };

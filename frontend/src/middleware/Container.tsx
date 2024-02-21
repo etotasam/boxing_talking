@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { ROUTE_PATH } from '@/assets/routePath';
 // ! hooks
-import { useGuest, useAuthCheck } from '@/hooks/apiHooks/useAuth';
+import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
 import { useLoginModal } from '@/hooks/useLoginModal';
@@ -18,8 +18,8 @@ import { FirstLoadingModal } from '@/components/modal/FirstLoadingModal';
 const Container = () => {
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
   const { isLoading: isAnyLoading } = useLoading();
-  const { data: isAuth, isLoading: isFirstCheckingAuth } = useAuthCheck();
-  const { data: guestUser } = useGuest();
+  const { data: isAuth, isLoading: isFirstCheckingAuth } = useAuth();
+  const { data: isGuest } = useGuest();
   const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } =
     useFetchBoxers();
   const { isLoading: isMatchesFetching } = useFetchMatches();
@@ -35,7 +35,7 @@ const Container = () => {
   const waitTime = 5000;
   const waitId = React.useRef<NodeJS.Timeout>();
   //? メッセージモーダルのタイマーセット
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isShowToastModal) return;
     (async () => {
       if (waitId.current) clearTimeout(waitId.current);
@@ -53,14 +53,15 @@ const Container = () => {
 
   //? authコントロール
   useEffect(() => {
-    if (isAuth === undefined || guestUser === undefined) return;
-    if (!isAuth && !guestUser && pathname !== '/identification/') {
+    const isAuthChecking = isAuth === undefined || isGuest === undefined;
+    if (isAuthChecking) return;
+    if (!isAuth && !isGuest && pathname !== '/identification/') {
       showLoginModal();
       navigate(ROUTE_PATH.HOME);
     } else {
       hideLoginModal();
     }
-  }, [isAuth, guestUser, pathname]);
+  }, [isAuth, isGuest, pathname]);
 
   return (
     <>

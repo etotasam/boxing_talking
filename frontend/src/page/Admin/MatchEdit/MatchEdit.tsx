@@ -18,7 +18,12 @@ import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 // ! hooks
-import { useFetchAllMatches, useDeleteMatch } from '@/hooks/apiHooks/useMatch';
+import {
+  useFetchAllMatches,
+  useFetchPastMatches,
+  useFetchMatches,
+  useDeleteMatch,
+} from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useSortMatches } from '@/hooks/useSortMatches';
@@ -35,8 +40,11 @@ export const MatchEdit = () => {
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   // ? use hook
   const { resetLoadingState } = useLoading();
-  const { data: matchesData } = useFetchAllMatches();
+  const { data: matchesData } = useFetchMatches();
+  const { data: pastMatchesData } = useFetchPastMatches();
   const { sortedMatches } = useSortMatches(matchesData);
+  const allMatches = sortedMatches &&
+    pastMatchesData && [...sortedMatches, ...pastMatchesData];
   const { setToastModal, showToastModal } = useToastModal();
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
 
@@ -141,7 +149,7 @@ export const MatchEdit = () => {
 
         <section className="w-[30%] pt-[20px] flex justify-center">
           <MatchListComponent
-            sortedMatches={sortedMatches}
+            sortedMatches={allMatches}
             selectedMatch={selectedMatch}
             setSelectMatch={setSelectMatch}
           />

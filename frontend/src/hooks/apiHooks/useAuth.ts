@@ -30,10 +30,10 @@ export const useGuest = () => {
       const res = await Axios.get(API_PATH.GUEST).then(result => result.data);
       return Boolean(res);
     } catch (error) {
-      return null
+      return false
     }
   }, [])
-  const { data, isLoading, isError } = useQuery<boolean | null>(QUERY_KEY.GUEST, api, {
+  const { data, isLoading, isError } = useQuery<boolean>(QUERY_KEY.GUEST, api, {
     retry: false,
     staleTime: Infinity
   })
@@ -131,26 +131,7 @@ export const useGuestLogout = () => {
   return { guestLogout, isLoading, isSuccess }
 }
 
-//! auth check
-export const useAuthCheck = () => {
-
-  const api = useCallback(async () => {
-    try {
-      const res = await Axios.get(`/api/auth/user`).then(result => result.data)
-      return Boolean(res)
-    } catch (error) {
-      return null
-    }
-  }, [])
-  const { data, isLoading, isError } = useQuery<boolean | null>(QUERY_KEY.AUTH, api, {
-    retry: false,
-    staleTime: Infinity
-  })
-
-  return { data, isLoading, isError }
-}
-
-//! auth user
+//! auth check (user)
 export const useAuth = () => {
   const queryClient = useQueryClient()
 

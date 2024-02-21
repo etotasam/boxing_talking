@@ -50,7 +50,7 @@ export const MatchContainer = (props: PropsType) => {
   const navigate = useNavigate();
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
-  const isEitherAuth = Boolean(isGuest || authUser);
+  const isAuthOrGuest = Boolean(isGuest || authUser);
   const setRecoilPostCommentHeight = useSetRecoilState(
     elementSizeState('POST_COMMENT_HEIGHT')
   );
@@ -161,7 +161,7 @@ export const MatchContainer = (props: PropsType) => {
   //? コメント投稿の実行
   const storeCommentExecute = () => {
     if (isPostingComment) return;
-    if (!isEitherAuth) {
+    if (!isAuthOrGuest) {
       setToastModal({
         message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH,
         bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,

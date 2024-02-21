@@ -33,7 +33,7 @@ export const useFetchMatches = () => {
   return { data, isLoading, isError, isRefetching, refetch }
 }
 
-//! 過去の試合情報一覧の取得(試合後一週間以上経っている試合全部)
+//! 過去の試合情報一覧の取得(試合後2週間以上経っている試合全部)
 export const useFetchPastMatches = () => {
   const { startLoading, resetLoadingState } = useLoading()
   const fetcher = useCallback(async () => {
@@ -139,7 +139,7 @@ export const useUpdateMatch = () => {
         setToastModal({ message: MESSAGE.MATCH_UPDATE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
       },
-      onSettled: (data) => {
+      onSettled: () => {
       }
     })
   }
