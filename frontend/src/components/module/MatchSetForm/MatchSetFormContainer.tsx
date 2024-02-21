@@ -179,11 +179,12 @@ export const MatchSetFormContainer = (props: MatchSetFormContainer) => {
       const matchId = selectedMatch!.id;
 
       updateMatch({ matchId, changeData: modifiedData });
-    } catch (error: any) {
+    } catch (error: unknown) {
       //?MessageTypeには空文字も含まれている
-      if (isMessageType(error.message) && error.message) {
+      const e = error as Error;
+      if (isMessageType(e.message) && e.message) {
         showToastModalMessage({
-          message: error.message,
+          message: e.message,
           bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
         });
       } else {

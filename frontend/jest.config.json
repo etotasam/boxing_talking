@@ -1,0 +1,25 @@
+{
+  "preset": "ts-jest",
+  "testEnvironment": "jest-environment-jsdom",
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  },
+  "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
+  "transform": {
+    "^.+\\.(ts|tsx)$": "ts-jest",
+    "\\.(svg)$": "jest-transformer-svg"
+  },
+  "testMatch": [
+    "**/__tests__/**/*.test.[jt]s?(x)",
+    "**/?(*.)+(spec|test).[jt]s?(x)"
+  ],
+  "globals": {
+    "ts-jest": {
+      "diagnostics": {
+        "ignoreCodes": [6133]
+      }
+    }
+  },
+
+  "extensionsToTreatAsEsm": [".ts"]
+}
