@@ -40,16 +40,16 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
         </div>
 
         {/* //?会場 */}
-        <div className={'mt-[35px] text-center text-[8px]'}>
+        <div className={'mt-7 text-center text-[8px]'}>
           <SubHeadline content="会場">
-            <span className="lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] overflow-hidden absolute top-[1px] lg:left-[-40px] left-[-30px]">
+            <span className="lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] overflow-hidden absolute top-[1px] lg:left-[-35px] left-[-30px]">
               <FlagImage
-                className="inline-block border-[1px] lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] mr-3"
+                className="inline-block border-[1px] lg:w-[24px] lg:h-[18px] w-[24px] h-[18px]"
                 nationality={matchData.country}
               />
             </span>
             <span
-              className={clsx(isLongText(matchData.venue) && 'text-[15px]')}
+              className={clsx(isLongText(matchData.venue) && 'text-[14px]')}
             >
               {matchData.venue}
             </span>
@@ -57,7 +57,7 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
         </div>
 
         {/* //?階級 */}
-        <div className="mt-10 text-center">
+        <div className="mt-7 text-center">
           <SubHeadline content="階級">
             {`${matchData.weight.replace('S', 'スーパー')}級`}
           </SubHeadline>
@@ -65,7 +65,7 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
 
         {isShowMatchResultComponent && (
           //?試合結果
-          <div className="mt-10 text-center">
+          <div className="mt-7 text-center">
             <SubHeadline content="試合結果">
               <MatchResult matchData={matchData} />
             </SubHeadline>
@@ -84,7 +84,7 @@ const MatchDate = ({ matchData }: { matchData: MatchDataType }) => {
       </h2>
       {Boolean(matchData.titles.length) && (
         <span className="absolute top-[-32px] left-[50%] translate-x-[-50%] w-[32px] h-[32px] mr-2">
-          <img src={crown} alt="" />
+          <img src={crown} alt="crown" />
         </span>
       )}
     </>
@@ -100,8 +100,8 @@ const Grade = ({ matchData }: { matchData: MatchDataType }) => {
             .sort()
             .map(({ organization, weightDivision }, index) => (
               <li key={index} className="mt-1">
-                <div className="relative inline-block tracking-widest font-[550] text-[18px]">
-                  <span className="absolute top-[4px] right-[-28px] w-[18px] h-[18px] mr-2">
+                <div className="relative inline-block tracking-widest text-[18px]">
+                  <span className="absolute top-[4px] right-[-28px] w-[20px] h-[20px] mr-2">
                     <img src={crown} alt="" />
                   </span>
                   {organization}世界{weightDivision}級

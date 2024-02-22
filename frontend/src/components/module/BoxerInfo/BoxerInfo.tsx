@@ -13,11 +13,8 @@ type BoxerInfoPropsType = React.ComponentProps<'div'> & {
   matchResult?: MatchResultType | null;
 };
 
-export const BoxerInfo = ({
-  boxer,
-  className,
-  matchResult = null,
-}: BoxerInfoPropsType) => {
+export const BoxerInfo = (props: BoxerInfoPropsType) => {
+  const { className, boxer, matchResult = null } = props;
   return (
     <div className={clsx('w-full h-full flex justify-center', className)}>
       <div className="text-center w-full px-5 py-5">
@@ -41,9 +38,7 @@ const BoxerName = ({ boxer }: { boxer: BoxerType }) => {
         boxerCountry={boxer.country}
         boxerEngName={boxer.eng_name}
       />
-      <h2 className="text-[18px] mt-1 font-semibold text-stone-600">
-        {boxer.name}
-      </h2>
+      <h2 className={clsx('text-[18px] mt-1')}>{boxer.name}</h2>
     </div>
   );
 };
@@ -95,7 +90,7 @@ const BoxerResume = (props: BoxerResumeType) => {
     setWinLoseResult();
   }, [isResult]);
   return (
-    <ul className="flex justify-between w-full mt-7 text-white">
+    <ul className="flex justify-between w-full mt-5 text-white">
       <li
         className={clsx(
           "relative flex-1 bg-red-500 before:content-['WIN'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
@@ -142,14 +137,14 @@ const BoxerStatus = (props: { boxer: BoxerType }) => {
   const { boxer } = props;
   const currentDate = dayjs();
   return (
-    <ul className="mt-8">
-      <li className="flex justify-between mt-1">
+    <ul className="mt-5">
+      <li className="flex justify-between">
         <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">
           年齢
         </p>
         <p className="flex-1">{currentDate.diff(dayjs(boxer.birth), 'year')}</p>
       </li>
-      <li className="flex justify-between mt-1">
+      <li className="flex justify-between">
         <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">
           身長
         </p>
@@ -161,7 +156,7 @@ const BoxerStatus = (props: { boxer: BoxerType }) => {
           <p className="flex-1">-</p>
         )}
       </li>
-      <li className="flex justify-between mt-1">
+      <li className="flex justify-between">
         <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">
           リーチ
         </p>
@@ -173,7 +168,7 @@ const BoxerStatus = (props: { boxer: BoxerType }) => {
           <p className="flex-1">-</p>
         )}
       </li>
-      <li className="flex justify-between mt-1">
+      <li className="flex justify-between">
         <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">
           スタイル
         </p>
@@ -192,10 +187,10 @@ const Titles = (props: Pick<BoxerType, 'titles'>) => {
   return (
     <>
       {Boolean(titles.length) && (
-        <ul className="mt-3">
+        <ul className="mt-1">
           {titles.map((title) => (
-            <li key={`${title.organization}_${title.weight}`} className="mt-2">
-              <p className="relative inline-block font-semibold text-[15px] text-stone-600">
+            <li key={`${title.organization}_${title.weight}`} className="mt-1">
+              <p className="relative inline-block text-[15px] text-stone-600">
                 <span className="absolute top-[2px] left-[-22px] w-[18px] h-[18px]">
                   <img src={crown} alt="" />
                 </span>

@@ -147,9 +147,7 @@ const Comment = ({ commentData }: { commentData: CommentType }) => {
     >
       <p
         id={`comment_${commentData.id}`}
-        className={clsx(
-          'md:text-lg text-sm font-light sm:tracking-normal tracking-wider text-stone-800'
-        )}
+        className={clsx('sm:tracking-normal tracking-wider text-stone-700')}
         dangerouslySetInnerHTML={{
           __html: commentData.comment,
         }}

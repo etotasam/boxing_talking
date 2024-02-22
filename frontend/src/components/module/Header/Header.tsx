@@ -269,7 +269,7 @@ const LinkButton = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className={clsx(
-        'sm:w-[40px] sm:h-[40px] w-[30px] h-[30px] bg-stone-600 hover:bg-black border-[1px] rounded-[50%] flex justify-center items-center text-white text-[16px] hover:text-[18px] duration-300',
+        'sm:w-[40px] sm:h-[40px] w-[30px] h-[30px] bg-stone-600 hover:bg-black rounded-[50%] flex justify-center items-center text-white text-[16px] hover:text-[18px] duration-300',
         className
       )}
     >

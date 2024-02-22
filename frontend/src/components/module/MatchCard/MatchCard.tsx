@@ -7,8 +7,7 @@ import { PredictionIcon } from '@/components/atomic/PredictionIcon';
 import { MatchInfo } from '../MatchInfo';
 //! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
-//! image
-import img from '@/assets/images/etc/boxer.jpg';
+
 type PropsType = {
   matchData: MatchDataType;
   onClick: (matchId: number) => void;
@@ -23,23 +22,24 @@ export const MatchCard = ({ matchData, onClick }: PropsType) => {
         <div
           onClick={() => onClick(matchData.id)}
           className={clsx(
-            'relative flex justify-between w-[80%] max-w-[1024px] min-w-[900px] cursor-pointer border-[1px] rounded-lg',
-            'hover:border-stone-500 md:duration-300',
+            'text-stone-600 bg-white/80 hover:bg-stone-100 relative flex justify-between w-[80%] max-w-[1024px] min-w-[900px] cursor-pointer box-border border-[2px] border-transparent hover:border-gray-500 rounded-lg duration-300',
             isDayOverFight && 'bg-stone-100 border-stone-300',
-            isFightToday && 'border-red-300 bg-red-50',
-            !isDayOverFight && !isFightToday && 'border-stone-400'
+            isFightToday && 'border-red-300 bg-red-50'
+            // !isDayOverFight && !isFightToday && 'border-stone-400'
           )}
         >
-          <div className="w-[300px]">
+          <div className="w-[300px] z-10">
             <BoxerInfo
               boxer={{ ...matchData.red_boxer, color: 'red' }}
               matchResult={matchData.result}
             />
           </div>
 
-          <MatchInfo matchData={matchData} />
+          <div className="z-10">
+            <MatchInfo matchData={matchData} />
+          </div>
 
-          <div className="w-[300px]">
+          <div className="w-[300px] z-10">
             <BoxerInfo
               boxer={{ ...matchData.blue_boxer, color: 'blue' }}
               matchResult={matchData.result}

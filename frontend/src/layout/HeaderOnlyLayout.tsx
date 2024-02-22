@@ -8,7 +8,7 @@ import { Header } from '@/components/module/Header';
 const HeaderOnlyLayout = () => {
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   return (
-    <div className="text-stone-700 font-sans">
+    <div className="text-stone-700">
       <Header />
       <main
         style={{

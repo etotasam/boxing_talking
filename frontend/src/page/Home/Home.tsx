@@ -15,6 +15,10 @@ import { useVisualModeController } from '@/hooks/useVisualModeController';
 import { useSortMatches } from '@/hooks/useSortMatches';
 //! types
 import { MatchDataType } from '@/assets/types';
+//! image
+import boxerImg from '@/assets/images/etc/boxerImg.jpg';
+import ringImg from '@/assets/images/etc/ring.jpg';
+import groveImg from '@/assets/images/etc/grove.jpg';
 
 export const Home = () => {
   // ! use hook
@@ -45,6 +49,18 @@ export const Home = () => {
           <VisualModeChangeButton onClick={() => visualModeToggleSwitch()} />
         </div>
       )}
+
+      <div
+        className="fixed top-0 w-full h-[100vh] bg-stone-800"
+        style={{
+          backgroundImage: `url(${boxerImg})`,
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          backgroundColor: '#0e0e0e',
+        }}
+      >
+        <div className="w-full h-full backdrop-blur-[2px]" />
+      </div>
 
       <ul className="md:py-10">
         {sortedMatches.map((match) => (
