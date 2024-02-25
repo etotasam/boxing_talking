@@ -20,12 +20,12 @@ type PropsType = {
   className?: string;
 };
 
-export const SimpleFightBox = ({
+export const SimpleMatchCard = ({
   matchData,
   onClick,
 }: // isPredictionVote,
 PropsType) => {
-  const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
+  // const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
   const isMatchResult = !!matchData.result;
 
   const { windowSize = 0 } = useWindowSize();
@@ -37,11 +37,12 @@ PropsType) => {
         <div
           onClick={() => onClick(matchData.id)}
           className={clsx(
-            'relative flex justify-between md:w-[90%] w-full max-w-[1024px] cursor-pointer  border-b-[1px]  md:rounded-sm md:hover:bg-yellow-100 md:hover:border-white md:duration-300  md:border-[1px]',
-            isMatchResult ? 'md:pt-2 md:pb-1 py-1' : 'md:py-4 py-8',
-            isDayOverFight && 'bg-stone-100 border-stone-300',
-            isFightToday && 'border-red-300 bg-red-50',
-            !isDayOverFight && !isFightToday && 'border-stone-400'
+            'relative flex justify-between w-full max-w-[1024px] cursor-pointer border-t-[1px] bg-white/70 text-stone-200',
+            'md:w-[90%] md:border-t-0 md:rounded-lg md:bg-stone-200/60 md:hover:bg-stone-200 md:duration-300  md:text-stone-700',
+            isMatchResult ? 'md:pt-2 md:pb-1 py-1' : 'md:py-4 py-8'
+            // isDayOverFight && 'bg-stone-200/80 border-stone-300',
+            // isFightToday && 'border-red-300 bg-red-50'
+            // !isDayOverFight && !isFightToday && 'border-stone-400'
           )}
         >
           <BoxerBox boxer={matchData.red_boxer} />
@@ -64,12 +65,7 @@ const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
   return (
     <>
       {/* //? 日時 */}
-      <div
-        className={clsx(
-          'text-stone-600 flex-1',
-          isMatchResult ? 'pt-5 pb-2' : 'py-5'
-        )}
-      >
+      <div className={clsx('flex-1', isMatchResult ? 'pt-5 pb-2' : 'py-5')}>
         <div className="text-center relative flex justify-center items-center">
           <h2 className="absolute top-[2px] md:top-0 xl:text-xl lg:text-lg text-md after:content-['(日本時間)'] after:w-full after:absolute md:after:bottom-[-60%] after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] xl:after:text-sm after:text-[12px]">
             {dayjs(matchData.match_date).format('YYYY年M月D日')}
@@ -124,7 +120,7 @@ const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
         />
         <h2
           className={clsx(
-            'lg:text-[20px] sm:text-[16px] mt-1 font-semibold text-stone-600',
+            'lg:text-[20px] sm:text-[16px] mt-1 font-semibold',
             boxerName.length > 7 ? `text-[12px]` : `text-[16px]`
           )}
         >

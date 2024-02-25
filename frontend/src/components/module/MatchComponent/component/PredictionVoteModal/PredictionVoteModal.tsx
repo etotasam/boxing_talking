@@ -1,5 +1,5 @@
 import { Button } from '@/components/atomic/Button';
-import { InfoModal } from '../InfoModal';
+import { InfoModal } from '../../../../modal/InfoModal';
 import { FlagImage } from '@/components/atomic/FlagImage';
 import { RiCloseLine } from 'react-icons/ri';
 import { CountryType } from '@/assets/types';
@@ -33,8 +33,8 @@ export const PredictionVoteModal = ({
   return (
     <InfoModal>
       <div className="relative px-10 pt-2 pb-5 min-w-[350px]">
-        <h2 className="text-center text-stone-600 font-bold text-lg tracking-widest">
-          勝者は？
+        <h2 className="text-center text-neutral-600 font-bold text-sm tracking-widest">
+          勝者に投票
         </h2>
         <div className="mt-5 w-full">
           <div className="w-full flex justify-center">

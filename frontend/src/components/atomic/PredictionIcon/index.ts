@@ -1,1 +1,1 @@
-export { PredictionIconWrapper as PredictionIcon } from "./PredictionIconWrapper"
+export { PredictionIconWrapper as PredictionIcon } from "./PredictionIcon"

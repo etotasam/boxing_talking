@@ -1,0 +1,1 @@
+export { RegisterMatchFormContainer as RegisterMatchForm } from "./RegisterMatchFormContainer"

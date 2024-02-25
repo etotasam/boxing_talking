@@ -13,9 +13,8 @@ import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
 import { COUNTRY } from '@/assets/nationalFlagData';
 //! component
 import { Button } from '@/components/atomic/Button';
-
 type PropsType = {
-  updateMatchExecute: (e: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   formData: MatchUpdateFormType;
   isTitle: boolean;
   onChange: <T>(value: Record<string, T>) => void;
@@ -23,14 +22,13 @@ type PropsType = {
 };
 
 export const MatchSetForm = (props: PropsType) => {
-  const { updateMatchExecute, formData, isTitle, onChange, onChangeTitle } =
-    props;
+  const { onSubmit, formData, isTitle, onChange, onChangeTitle } = props;
   // ! DOM
   return (
     <div>
       <form
         className="w-[400px] bg-stone-200 border-[1px] border-stone-400 p-5"
-        onSubmit={updateMatchExecute}
+        onSubmit={onSubmit}
       >
         <h2 className="text-center my-5 text-[26px] tracking-[0.1em]">
           試合情報
@@ -100,7 +98,7 @@ const GradeSection = (props: GradeSectionType) => {
       <select
         className="w-[150px]"
         name="matchGrade"
-        value={grade}
+        value={grade ?? ''}
         onChange={(e) => onChange({ grade: e.target.value as GradeType })}
         id="matchGrade"
       >
@@ -215,7 +213,7 @@ const PlaceSection = (props: PlaceSectionType) => {
         <select
           className="w-[150px]"
           name="matchPlaceCountry"
-          value={country}
+          value={country ?? ''}
           onChange={(e) =>
             onChange({
               country: e.target.value as CountryType,
@@ -260,7 +258,7 @@ const WeightSection = (props: WeightSectionType) => {
       <select
         className="w-[150px]"
         name="matchWeight"
-        value={weight}
+        value={weight ?? ''}
         onChange={(e) =>
           onChange({
             weight: e.target.value as WeightClassType,

@@ -26,9 +26,7 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
 
   return (
     <>
-      <div
-        className={clsx('text-stone-600', isTitleMatch ? 'pt-9 pb-5' : 'py-5')}
-      >
+      <div className={clsx('')}>
         {/* //? 日時 */}
         <div className="text-center relative">
           <MatchDate matchData={matchData} />
@@ -100,17 +98,19 @@ const Grade = ({ matchData }: { matchData: MatchDataType }) => {
             .sort()
             .map(({ organization, weightDivision }, index) => (
               <li key={index} className="mt-1">
-                <div className="relative inline-block tracking-widest text-[18px]">
+                <div className="text-shadow text-yellow-500 relative inline-block tracking-widest text-[18px]">
                   <span className="absolute top-[4px] right-[-28px] w-[20px] h-[20px] mr-2">
                     <img src={crown} alt="" />
                   </span>
-                  {organization}世界{weightDivision}級
+                  {organization}
+                  世界
+                  {weightDivision}級
                 </div>
               </li>
             ))}
         </ul>
       ) : (
-        <p className="text-[30px] mt-7">{matchData.grade}</p>
+        <div className="text-2xl">{matchData.grade}</div>
       )}
     </>
   );

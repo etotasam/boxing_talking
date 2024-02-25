@@ -9,6 +9,7 @@ import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
 import { useLoginModal } from '@/hooks/useLoginModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
+import { useRecoilValue } from 'recoil';
 // ! modal
 import { ToastModalContainer } from '@/components/modal/ToastModal';
 import { LoginFormModal } from '@/components/modal/LoginFormModal';
@@ -65,7 +66,6 @@ const Container = () => {
 
   return (
     <>
-      <Outlet />
       <AnimatePresence>
         {isShowToastModal && (
           <ToastModalContainer key={'ToastModalContainer'} />
@@ -78,6 +78,7 @@ const Container = () => {
         )}
       </AnimatePresence>
       {isShowLoginModal && <LoginFormModal key={'LoginFormModal'} />}
+      <Outlet />
     </>
   );
 };

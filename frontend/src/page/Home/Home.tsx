@@ -1,10 +1,13 @@
 import { useEffect } from 'react';
+import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/routePath';
 import { VISUAL_MODE } from '@/store/visualModeState';
+//! layout
+import HeaderAndFooterLayout from '@/layout/HeaderAndFooterLayout';
 // ! components
 import { MatchCard } from '@/components/module/MatchCard';
-import { SimpleFightBox } from '@/components/module/SimpleFightBox';
+import { SimpleMatchCard } from '@/components/module/SimpleMatchCard';
 //! icon
 import { VisualModeChangeButton } from '@/components/atomic/VisualModeChangeButton';
 // ! hooks
@@ -15,10 +18,6 @@ import { useVisualModeController } from '@/hooks/useVisualModeController';
 import { useSortMatches } from '@/hooks/useSortMatches';
 //! types
 import { MatchDataType } from '@/assets/types';
-//! image
-import boxerImg from '@/assets/images/etc/boxerImg.jpg';
-import ringImg from '@/assets/images/etc/ring.jpg';
-import groveImg from '@/assets/images/etc/grove.jpg';
 
 export const Home = () => {
   // ! use hook
@@ -40,8 +39,6 @@ export const Home = () => {
     };
   }, []);
 
-  if (!sortedMatches) return;
-
   return (
     <>
       {device == 'PC' && (
@@ -50,28 +47,22 @@ export const Home = () => {
         </div>
       )}
 
-      <div
-        className="fixed top-0 w-full h-[100vh] bg-stone-800"
-        style={{
-          backgroundImage: `url(${boxerImg})`,
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover',
-          backgroundColor: '#0e0e0e',
-        }}
-      >
-        <div className="w-full h-full backdrop-blur-[2px]" />
-      </div>
-
-      <ul className="md:py-10">
-        {sortedMatches.map((match) => (
-          <li
-            key={match.id}
-            className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5 first:mt-0"
-          >
-            <MatchBox match={match} matchSelect={matchSelect} />
-          </li>
-        ))}
-      </ul>
+      <HeaderAndFooterLayout>
+        <>
+          {sortedMatches && (
+            <ul className={clsx('md:py-10')}>
+              {sortedMatches.map((match) => (
+                <li
+                  key={match.id}
+                  className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5 first:mt-0"
+                >
+                  <MatchBox match={match} onClick={matchSelect} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      </HeaderAndFooterLayout>
 
       {/* <div className="text-center md:my-10 my-5">
         <Link
@@ -87,16 +78,15 @@ export const Home = () => {
 
 type MatchesViewPropsType = {
   match: MatchDataType;
-  matchSelect: (matchId: number) => void;
+  onClick: (matchId: number) => void;
 };
 
-const MatchBox = ({ match, matchSelect }: MatchesViewPropsType) => {
+const MatchBox = ({ match, onClick }: MatchesViewPropsType) => {
   const { state: visualMode } = useVisualModeController();
   const { device } = useWindowSize();
 
   if (device === 'SP' || visualMode === VISUAL_MODE.SIMPLE)
-    return <SimpleFightBox onClick={matchSelect} matchData={match} />;
+    return <SimpleMatchCard onClick={onClick} matchData={match} />;
 
-  if (device === 'PC')
-    return <MatchCard onClick={matchSelect} matchData={match} />;
+  if (device === 'PC') return <MatchCard onClick={onClick} matchData={match} />;
 };

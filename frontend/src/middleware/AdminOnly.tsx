@@ -30,6 +30,7 @@ const AdminOnly = () => {
     <>
       <Header />
       <main
+        className="bg-white"
         style={{
           minHeight: `calc(100vh - ${headerHeight}px)`,
           marginTop: `${headerHeight}px`,

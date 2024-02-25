@@ -38,7 +38,7 @@ export const useToastModal = () => {
   }
 
   /**
-   * ! messageと背景をセットする
+   * ! messageと背景カラーをセットする
    * @param {{ Message, bgColor }} セットしたいデータ
    * @returns {void}
    */

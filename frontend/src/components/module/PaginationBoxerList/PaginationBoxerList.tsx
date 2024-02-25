@@ -35,7 +35,7 @@ export const PaginationBoxerList = ({ pageCount }: PropsType) => {
   return (
     <>
       {Boolean(pages.length) && (
-        <ul className="w-full py-3 flex justify-center sticky top-[80px] right-[100px] bg-white/80 border-b-[1px] border-stone-300 z-10">
+        <ul className="w-full py-3 flex justify-center sticky top-0 bg-white/80 border-b-[1px] border-stone-300 z-10">
           {pages.map((page) =>
             paramPage === page ? (
               <CurrentPageNumber key={page} page={page} />

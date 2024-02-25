@@ -1,92 +1,68 @@
-import React, { ReactNode } from 'react';
+import React, { useRef } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
-//!icon
-import { FaRegCommentDots } from 'react-icons/fa';
-import { AiOutlineUser } from 'react-icons/ai';
 //! hooks
-import { useWindowSize } from '@/hooks/useWindowSize';
 import { useFetchComments } from '@/hooks/apiHooks/useComment';
+import { useWindowSize } from '@/hooks/useWindowSize';
 //! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 //! type
 import { CommentType } from '@/assets/types';
+//!icon
+import { MdErrorOutline } from 'react-icons/md';
+import { FaRegPenToSquare } from 'react-icons/fa6';
+import { AiOutlineUser } from 'react-icons/ai';
+//! components
 
-type CommentsSectionType = {
-  paramsMatchID: number;
+type PropsType = {
+  matchId: number;
 };
-
-export const CommentsComponent = ({ paramsMatchID }: CommentsSectionType) => {
-  //?コメントの取得
+export const Comments = (props: PropsType) => {
+  const { matchId } = props;
   const {
-    data: commentsOfThisMatches,
+    data: comments,
     isLoading: isFetchingComments,
     isError: isErrorFetchComments,
-  } = useFetchComments(paramsMatchID);
+  } = useFetchComments(matchId);
 
-  //?コメント未取得状態
-  const isCommentFirstFetching = commentsOfThisMatches === undefined;
+  const isComments = comments !== undefined && comments.length;
 
-  //?コメントの有無
-  const isComments =
-    commentsOfThisMatches && Boolean(commentsOfThisMatches.length);
+  const isNotComments = comments !== undefined && !comments.length;
 
-  //! コメント未取得状態のDOM
-  if (isCommentFirstFetching) return <CommentsComponentWrapper />;
+  //?エラー時
+  if (isErrorFetchComments) return <ErrorFallback />;
 
-  //!コメントの取得に失敗した場合のDOM
-  if (isErrorFetchComments) {
-    return (
-      <CommentsComponentWrapper>
-        <div className="w-full h-full flex justify-center items-center">
-          <p className="relative">
-            コメントの取得に失敗しました。お手数ですがページの更新を行ってください。
-          </p>
-        </div>
-      </CommentsComponentWrapper>
-    );
-  }
+  //? コメントがない時
+  if (isNotComments) return <NoCommentFallback />;
 
-  //! コメント投稿がない時のDOM
-  if (!isComments && !isFetchingComments && !isErrorFetchComments) {
-    return (
-      <CommentsComponentWrapper>
-        <div className="w-full h-full flex justify-center items-center">
-          <p className="relative">
-            コメント投稿はありません
-            <FaRegCommentDots
-              className={'absolute top-[-5px] right-[-22px] w-[20px] h-[20px]'}
-            />
-          </p>
-        </div>
-      </CommentsComponentWrapper>
-    );
-  }
-
-  //! コメント投稿ありのDOM
+  //? コメントあり
   if (isComments) {
     return (
-      <CommentsComponentWrapper>
-        <ul>
-          {commentsOfThisMatches.map((commentData) => (
-            <li key={commentData.id}>
-              <CommentBox commentData={commentData} />
-            </li>
+      <CommentsWrapper>
+        <div className="sm:w-[80%] w-[92%] max-w-[750px] mt-3">
+          {comments?.map((comment) => (
+            <div key={comment.id} className="pb-3">
+              <CommentBox comment={comment} />
+            </div>
           ))}
-        </ul>
-      </CommentsComponentWrapper>
+        </div>
+      </CommentsWrapper>
     );
   }
 };
 
 //! コメントbox
-const CommentBox = ({ commentData }: { commentData: CommentType }) => {
+const CommentBox = ({ comment }: { comment: CommentType }) => {
   return (
-    <div className={clsx('sm:p-5 p-3 pt-1 border-b-[1px] border-stone-200')}>
-      <PostTimeAndUserName commentData={commentData} />
-      <Comment commentData={commentData} />
+    <div
+      className={clsx(
+        'sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded-lg'
+      )}
+    >
+      <PostTimeAndUserName commentData={comment} />
+      <Comment commentData={comment} />
     </div>
   );
 };
@@ -97,7 +73,7 @@ const PostTimeAndUserName = ({ commentData }: { commentData: CommentType }) => {
   return (
     <div className="sm:flex mb-2">
       {/* //? post time */}
-      <time className="text-xs text-stone-400 leading-6">{timeSincePost}</time>
+      <time className="text-xs text-stone-500 leading-6">{timeSincePost}</time>
       {/* //? post name */}
       <div className="flex sm:ml-3">
         {commentData.post_user_name ? (
@@ -105,7 +81,7 @@ const PostTimeAndUserName = ({ commentData }: { commentData: CommentType }) => {
             <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
             <p
               className={clsx(
-                'text-stone-500',
+                '',
                 commentData.post_user_name.length > 20
                   ? 'text-[12px] sm:text-sm'
                   : 'text-sm'
@@ -147,7 +123,7 @@ const Comment = ({ commentData }: { commentData: CommentType }) => {
     >
       <p
         id={`comment_${commentData.id}`}
-        className={clsx('sm:tracking-normal tracking-wider text-stone-700')}
+        className={clsx('sm:tracking-normal tracking-wider')}
         dangerouslySetInnerHTML={{
           __html: commentData.comment,
         }}
@@ -222,35 +198,83 @@ const stretchCommentElement = (
   }
 };
 
-//! ラッパー
-type CommentsComponentWrapperType = {
-  children?: ReactNode;
+type CommentsWrapperType = {
+  children?: React.ReactNode;
 };
-//? Recoilから取得
-const CommentsComponentWrapper = (props: CommentsComponentWrapperType) => {
-  const commentPostTextareaHeight = useRecoilValue(
+const CommentsWrapper = (props: CommentsWrapperType) => {
+  const el = useRef<HTMLDivElement>(null);
+  const postCommentElHeight = useRecoilValue(
     elementSizeState('POST_COMMENT_HEIGHT')
   );
+  const headerElHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
 
-  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+  const { device } = useWindowSize();
 
-  const matchBoxerSectionHeight = useRecoilValue(
-    elementSizeState('MATCH_PAGE_BOXER_SECTION_HEIGHT')
-  );
-
-  //? コンポーネントの高さを指定する為に除外する高さ
-  const excludeHeight = (headerHeight ?? 0) + (matchBoxerSectionHeight ?? 0);
+  const scrollToTop = () => {
+    if (el.current) {
+      el.current.style.scrollBehavior = 'smooth';
+      el.current.scrollTop = 0;
+    }
+  };
 
   const { children } = props;
   return (
-    <section
-      className="xl:w-[70%] w-full border-l-[1px] bg-white border-stone-200 relative"
-      style={{
-        paddingBottom: `${commentPostTextareaHeight}px`,
-        minHeight: `calc(100vh - ${excludeHeight}px - 1px)`,
-      }}
-    >
-      {children}
-    </section>
+    <>
+      <div
+        ref={el}
+        className={clsx(
+          'relative w-full flex justify-center',
+          device === 'PC' ? 'my-scroll-y' : 'overflow-auto'
+        )}
+        style={{
+          paddingTop: `${headerElHeight}px`,
+          height: `calc(100vh - (${postCommentElHeight}px) - 1px)`,
+        }}
+      >
+        {children}
+      </div>
+    </>
+  );
+};
+
+//!コメントなしのcomponent
+const NoCommentFallback = () => {
+  return (
+    <CommentsWrapper>
+      <div className="w-full flex justify-center items-center">
+        <div className="">
+          <div className="w-full flex justify-center">
+            <div className="relative w-[60px] h-[60px] border-[5px] rounded-[50%] border-neutral-200/60">
+              <span className="text-neutral-200/80 text-[30px] absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+                <FaRegPenToSquare />
+              </span>
+            </div>
+          </div>
+
+          <p className="mt-3 text-neutral-200/80">まだコメントはありません</p>
+        </div>
+      </div>
+    </CommentsWrapper>
+  );
+};
+
+//!エラー時のcomponent
+const ErrorFallback = () => {
+  return (
+    <CommentsWrapper>
+      <div className="w-full flex justify-center items-center">
+        <div className="">
+          <div className="w-full flex justify-center">
+            <span className="text-neutral-200/60 text-[70px]">
+              <MdErrorOutline />
+            </span>
+          </div>
+
+          <p className="mt-3 text-neutral-200/80">
+            コメントの取得に失敗しました！
+          </p>
+        </div>
+      </div>
+    </CommentsWrapper>
   );
 };

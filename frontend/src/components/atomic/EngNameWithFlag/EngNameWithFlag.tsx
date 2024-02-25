@@ -14,7 +14,7 @@ export const EngNameWithFlag = ({
   return (
     <div
       className={clsx(
-        'sm:flex sm:items-center sm:justify-center w-full sm:text-sm text-[12px] text-stone-600'
+        'sm:flex sm:items-center sm:justify-center w-full sm:text-sm text-[12px]'
       )}
     >
       <div className="flex justify-center">

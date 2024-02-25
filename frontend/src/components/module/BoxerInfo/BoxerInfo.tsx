@@ -7,6 +7,8 @@ import { BoxerType, MatchResultType } from '@/assets/types';
 // ! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { useEffect, useState } from 'react';
+//! hooks
+import { useWindowSize } from '@/hooks/useWindowSize';
 
 type BoxerInfoPropsType = React.ComponentProps<'div'> & {
   boxer: BoxerType & { color: 'red' | 'blue' };
@@ -15,6 +17,7 @@ type BoxerInfoPropsType = React.ComponentProps<'div'> & {
 
 export const BoxerInfo = (props: BoxerInfoPropsType) => {
   const { className, boxer, matchResult = null } = props;
+  const { device } = useWindowSize();
   return (
     <div className={clsx('w-full h-full flex justify-center', className)}>
       <div className="text-center w-full px-5 py-5">

@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/routePath';
+//! layout
+import HeaderOnlyLayout from '@/layout/HeaderOnlyLayout';
 //! hook
 import { useSignUpIdentification } from '@/hooks/apiHooks/useAuth';
 //! component
@@ -33,7 +35,7 @@ export const Identification = () => {
   if (!token) return;
 
   return (
-    <>
+    <HeaderOnlyLayout>
       <div
         style={{
           minHeight: `calc(100vh - (${headerHeight}px + ${footerHeight}px) - 1px)`,
@@ -47,7 +49,7 @@ export const Identification = () => {
         </div>
       </div>
       <Footer />
-    </>
+    </HeaderOnlyLayout>
   );
 };
 

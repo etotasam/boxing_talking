@@ -10,8 +10,7 @@
     "preview": "vite preview",
     "st": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test": "jest --config ./jest.config.json",
-    "cypress": "cypress open"
+    "cy": "cypress open"
   },
   "dependencies": {
     "@tailwindcss/container-queries": "^0.1.1",

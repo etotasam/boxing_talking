@@ -1,138 +1,91 @@
-import React from 'react';
 import clsx from 'clsx';
-//! icon
-import { FaRegCommentDots } from 'react-icons/fa6';
-import { RotatingLines } from 'react-loader-spinner';
-//! types
+import { motion, AnimatePresence } from 'framer-motion';
+//! type
 import { MatchDataType } from '@/assets/types';
+//! layout
+import HeaderOnlyLayout from '@/layout/HeaderOnlyLayout';
 //! component
-import { BoxerInfoModal } from '@/components/modal/BoxerInfoModal';
-import { MatchInfoModal } from '@/components/modal/MatchInfoModal';
-import { LeftSection } from './myComponents/LeftSection';
-import { CommentsComponent } from './myComponents/CommentsComponent';
-import { PredictionVoteModal } from '@/components/modal/PredictionVoteModal';
-import { Boxers } from './myComponents/Boxers';
-//! hooks
-import { usePostComment } from '@/hooks/apiHooks/useComment';
+import { PostComment } from './component/PostComment';
+import { Comments } from './component/Comments';
+import { LeftSection } from './component/LeftSection';
+import { PredictionVoteModal } from './component/PredictionVoteModal';
+//! image
+import ringImg from '@/assets/images/etc/ring.jpg';
+//! icons
+import { RotatingLines } from 'react-loader-spinner';
+//! recoil
+import { useRecoilValue } from 'recoil';
+import { apiFetchDataState } from '@/store/apiFetchDataState';
 
 type PropsType = {
-  isPredictionVoteModal: boolean;
-  isBoxerInfoModal: boolean;
-  isShowMatchInfoModal: boolean;
-  paramsMatchID: number;
-  thisMatch: MatchDataType | undefined;
-  device: 'PC' | 'SP' | undefined;
-  commentPostRef: React.MutableRefObject<null>;
-  textareaRef: React.MutableRefObject<null>;
-  setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
-  storeCommentExecute: () => void;
-  autoExpandTextareaAndSetComment: (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => void;
+  matchData: MatchDataType;
+  device: 'PC' | 'SP';
+  isShowPredictionModal: boolean;
 };
-
 export const MatchComponent = (props: PropsType) => {
-  const {
-    device,
-    thisMatch,
-    isBoxerInfoModal,
-    isPredictionVoteModal,
-    isShowMatchInfoModal,
-  } = props;
-  return (
-    <>
-      {/* //? Boxer */}
-      <Boxers thisMatch={thisMatch} />
+  const { matchData, device, isShowPredictionModal } = props;
 
-      <div className="flex w-full">
-        {/* //? Left section (Match info) */}
-        {device === 'PC' && (
-          <LeftSection
-            thisMatch={thisMatch}
-            commentPostEl={props.commentPostRef.current}
-          />
-        )}
-        {/* //? Comments */}
-        <CommentsComponent paramsMatchID={props.paramsMatchID} />
+  return (
+    <HeaderOnlyLayout>
+      <div
+        className="bg-fixed w-[100vw] h-[100vh]"
+        style={{ backgroundImage: `url(${ringImg})`, backgroundSize: 'cover' }}
+      >
+        <div className="flex w-full h-full bg-fixed backdrop-blur-sm bg-stone-950/90">
+          {device === 'PC' && (
+            <section className="w-[30%]">
+              <LeftSection matchData={matchData} />
+            </section>
+          )}
+
+          <section
+            className={clsx('relative', device === 'PC' ? 'w-[70%]' : 'w-full')}
+          >
+            <Comments matchId={matchData.id} />
+            <PostComment />
+            <CommentLoadingModal />
+          </section>
+        </div>
       </div>
 
-      <section
-        ref={props.commentPostRef}
-        className="z-10 fixed bottom-0 w-full flex bg-white/60 justify-center py-8 border-t-[1px] border-stone-200"
-      >
-        <div className="md:w-[70%] sm:w-[85%] sm:max-w-[800px] w-[95%]">
-          <PostCommentTextarea
-            setComment={props.setComment}
-            storeCommentExecute={props.storeCommentExecute}
-            textareaRef={props.textareaRef}
-            autoExpandTextareaAndSetComment={
-              props.autoExpandTextareaAndSetComment
-            }
-          />
-        </div>
-      </section>
-
-      {isBoxerInfoModal && device === 'SP' && (
-        //? BoxerInfoモーダル
-        <BoxerInfoModal />
-      )}
-
-      {thisMatch && isShowMatchInfoModal && device === 'SP' && (
-        <MatchInfoModal matchData={thisMatch} />
-      )}
-
-      {thisMatch && isPredictionVoteModal && (
-        //? 投票モーダル
-        <PredictionVoteModal thisMatch={thisMatch} />
-      )}
-    </>
+      {isShowPredictionModal && <PredictionVoteModal thisMatch={matchData} />}
+    </HeaderOnlyLayout>
   );
 };
 
-// ! コメント投稿テキストエリア
-type PostCommentTextareaType = {
-  setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
-  storeCommentExecute: () => void;
-  textareaRef: React.MutableRefObject<null>;
-  autoExpandTextareaAndSetComment: (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => void;
-};
+const CommentLoadingModal = () => {
+  const isCommentFetching = useRecoilValue(
+    apiFetchDataState({ dataName: 'comments/fetch', state: 'isLoading' })
+  );
 
-const PostCommentTextarea = ({
-  storeCommentExecute,
-  textareaRef,
-  autoExpandTextareaAndSetComment,
-}: PostCommentTextareaType) => {
-  //? コメント投稿中…の状態取得(hookの中でRecoilを使用)
-  const { isLoading: isPostingComment } = usePostComment();
+  const text = 'コメント取得中...';
   return (
-    <div className="border-stone-400 bg-white relative border-[1px] sm:pl-3 sm:py-2 pl-2 py-1 rounded-sm flex justify-center items-center">
-      <textarea
-        ref={textareaRef}
-        className="w-full resize-none outline-0 leading-[34px] pr-[100px] bg-white"
-        placeholder="コメント投稿..."
-        wrap={'hard'}
-        name=""
-        id=""
-        rows={1}
-        onChange={autoExpandTextareaAndSetComment}
-      ></textarea>
-      <button
-        onClick={storeCommentExecute}
-        className={clsx(
-          'absolute bottom-[3px] sm:bottom-[4px] sm:w-[40px] sm:h-[40px] w-[35px] h-[35px] text-[14px] right-[4px] border-[1px] bg-stone-600 hover:bg-cyan-800 focus:bg-cyan-800 rounded-md duration-300 py-1 text-white text-xl flex justify-center items-center',
-          isPostingComment && 'text-white/50 select-none'
-        )}
-      >
-        {isPostingComment ? (
-          <span className="sm:w-[20px] sm:h-[20px] w-[15px] h-[15px]">
-            <RotatingLines width="100%" strokeColor="white" />
-          </span>
-        ) : (
-          <FaRegCommentDots />
-        )}
-      </button>
-    </div>
+    <AnimatePresence>
+      {isCommentFetching && (
+        <motion.div
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="absolute top-0 left-0 w-full h-full bg-black/60 flex justify-center items-center"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="flex select-none"
+          >
+            <RotatingLines
+              strokeColor="#f5f5f5"
+              strokeWidth="3"
+              animationDuration="1"
+              width="20"
+            />
+            <span className="ml-1 text-neutral-200/60 text-sm">{text}</span>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

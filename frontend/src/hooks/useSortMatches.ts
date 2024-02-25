@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useMemo } from "react"
 import { flatten } from 'lodash';
 //!types
 import { MatchDataType } from "@/assets/types"
@@ -7,10 +7,9 @@ import { isMatchDatePast } from "@/assets/functions";
 
 //? 試合データの並び替え（試合日が今日以降のと過去のを分ける）
 export const useSortMatches = (matchesData: MatchDataType[] | undefined) => {
-  const [sortedMatches, setSortedMatches] =
-    useState<MatchDataType[]>();
-  useEffect(() => {
-    if (!matchesData) return;
+
+  const sortedMatches = useMemo((): MatchDataType[] | undefined => {
+    if (!matchesData) return
     const multipleArrayMatchData = matchesData.reduce(
       (accumulator: MatchDataType[][], current) => {
         const isPastDateOfFight = isMatchDatePast(current);
@@ -22,9 +21,8 @@ export const useSortMatches = (matchesData: MatchDataType[] | undefined) => {
       },
       [[], []]
     );
-
-    setSortedMatches(flatten(multipleArrayMatchData));
-  }, [matchesData]);
+    return flatten(multipleArrayMatchData)
+  }, [matchesData])
 
   return { sortedMatches }
 }

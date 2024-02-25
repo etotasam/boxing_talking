@@ -5,8 +5,6 @@ import { MatchDataType } from '@/assets/types';
 import { BoxerInfo } from '../BoxerInfo';
 import { PredictionIcon } from '@/components/atomic/PredictionIcon';
 import { MatchInfo } from '../MatchInfo';
-//! hook
-import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 
 type PropsType = {
   matchData: MatchDataType;
@@ -15,31 +13,30 @@ type PropsType = {
 };
 
 export const MatchCard = ({ matchData, onClick }: PropsType) => {
-  const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
   return (
     <>
       {matchData && (
         <div
           onClick={() => onClick(matchData.id)}
           className={clsx(
-            'text-stone-600 bg-white/80 hover:bg-stone-100 relative flex justify-between w-[80%] max-w-[1024px] min-w-[900px] cursor-pointer box-border border-[2px] border-transparent hover:border-gray-500 rounded-lg duration-300',
-            isDayOverFight && 'bg-stone-100 border-stone-300',
-            isFightToday && 'border-red-300 bg-red-50'
-            // !isDayOverFight && !isFightToday && 'border-stone-400'
+            'text-stone-700 relative flex justify-between w-[80%] max-w-[1024px] min-w-[900px] cursor-pointer rounded-lg duration-300 hover:bg-stone-100 bg-white/70',
+            ' box-border border-[2px] border-transparent hover:border-gray-500'
           )}
         >
-          <div className="w-[300px] z-10">
+          <div className="w-[300px]">
             <BoxerInfo
               boxer={{ ...matchData.red_boxer, color: 'red' }}
               matchResult={matchData.result}
             />
           </div>
 
-          <div className="z-10">
+          <div
+            className={clsx('pb-7', matchData.titles.length ? 'pt-10' : 'pt-7')}
+          >
             <MatchInfo matchData={matchData} />
           </div>
 
-          <div className="w-[300px] z-10">
+          <div className="w-[300px]">
             <BoxerInfo
               boxer={{ ...matchData.blue_boxer, color: 'blue' }}
               matchResult={matchData.result}

@@ -1,9 +1,11 @@
 import { Helmet } from 'react-helmet-async';
+//! layout
+import TermsLayout from '@/layout/TermsLayout';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 export const Terms = () => {
   return (
-    <>
+    <TermsLayout>
       <Helmet>
         <title>利用規約 | {siteTitle}</title>
       </Helmet>
@@ -124,6 +126,6 @@ export const Terms = () => {
           </p>
         </div>
       </div>
-    </>
+    </TermsLayout>
   );
 };

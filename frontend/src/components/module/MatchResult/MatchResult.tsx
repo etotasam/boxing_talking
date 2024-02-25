@@ -106,11 +106,11 @@ const SPType = (props: ResultDataType) => {
 const PCType = (props: ResultDataType) => {
   const { isKo, isDecision, result, winnerName, matchResult } = props;
   return (
-    <div className="flex">
+    <div className="flex mt-1">
       {matchResult && (
         <span
           className={clsx(
-            'rounded-sm text-sm flex justify-center items-center text-white px-2 py-1 mr-2 tracking-normal font-[550]',
+            'rounded-sm text-sm flex justify-center items-center text-white px-2 pb-[2px] mr-2 tracking-normal font-[550]',
             isKo && 'bg-green-600',
             isDecision && 'bg-sky-600',
             result?.result === 'draw' && 'bg-stone-600',

@@ -5,4 +5,36 @@
 body {
   font-family: 'Zen Kaku Gothic New', sans-serif;
   font-weight: 450;
+  overflow: hidden;
+  background-color: #1b1b1b;
+}
+
+body::-webkit-scrollbar {
+  width: 0px;
+}
+
+.my-scroll-y {
+  overflow: auto;
+}
+
+.my-scroll-y::-webkit-scrollbar {
+  width: 10px;
+  background-color: #000000d3;
+  border-radius: 50px;
+}
+
+.my-scroll-y::-webkit-scrollbar-thumb {
+  background-color: #545454;
+  border-radius: 50px;
+}
+
+.my-scroll-y::-webkit-scrollbar-thumb:hover {
+  background-color: #cfcfcf;
+}
+
+.text-shadow {
+  text-shadow: 0px 0px 3px rgba(30, 30, 30, 5);
+}
+.shadow-blur {
+  text-shadow: 0px 0px 8px rgba(0, 0, 0, 5);
 }
