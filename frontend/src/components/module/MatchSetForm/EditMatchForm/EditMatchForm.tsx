@@ -20,9 +20,12 @@ import { isMessageType } from '@/assets/typeEvaluations';
 //! component
 import { MatchSetFormContainer } from '../MatchSetFormContainer';
 //! context
-import { FormDataContext } from '../FormDataContextWrapper';
+import {
+  FormDataContext,
+  FormDataContextWrapper,
+} from '../FormDataContextWrapper';
 
-export const EditMatchForm = (props: {
+const EditMatchForm = (props: {
   selectedMatch: MatchDataType | undefined;
   isSuccessDeleteMatch: boolean;
 }) => {
@@ -184,5 +187,19 @@ export const EditMatchForm = (props: {
 
   return (
     <MatchSetFormContainer onSubmit={updateMatchExecute} title={isTitle} />
+  );
+};
+
+export const EditMatchFormWrapper = (props: {
+  selectedMatch: MatchDataType | undefined;
+  isSuccessDeleteMatch: boolean;
+}) => {
+  return (
+    <FormDataContextWrapper>
+      <EditMatchForm
+        selectedMatch={props.selectedMatch}
+        isSuccessDeleteMatch={props.isSuccessDeleteMatch}
+      />
+    </FormDataContextWrapper>
   );
 };

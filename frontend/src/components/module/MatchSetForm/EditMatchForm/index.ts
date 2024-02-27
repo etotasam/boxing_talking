@@ -1,1 +1,1 @@
-export { EditMatchFormContainer as EditMatchForm } from "./EditMatchFormContainer"
+export { EditMatchFormWrapper as EditMatchForm } from "./EditMatchForm"

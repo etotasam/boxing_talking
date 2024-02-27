@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useEffect, useContext } from 'react';
 import dayjs from 'dayjs';
 import {
   MESSAGE,
@@ -15,19 +15,19 @@ import { FormDataContext } from '../FormDataContextWrapper';
 import { isMessageType } from '@/assets/typeEvaluations';
 //! component
 import { MatchSetFormContainer } from '../MatchSetFormContainer';
+//! context
+import { FormDataContextWrapper } from '../FormDataContextWrapper';
 
-export const RegisterMatchForm = ({
-  boxers,
-  resetSelectedBoxers,
-}: {
+type RegisterMatchFormType = {
   boxers: Record<'red_boxer_id' | 'blue_boxer_id', number | undefined>;
   resetSelectedBoxers: () => void;
-}) => {
+};
+const RegisterMatchForm = (props: RegisterMatchFormType) => {
+  const { boxers, resetSelectedBoxers } = props;
   const { showToastModalMessage } = useToastModal();
   const { registerMatch, isSuccess: isSuccessRegisterMatch } =
     useRegisterMatch();
 
-  type formDataKeysType = keyof typeof initialFormData;
   const initialFormData = {
     match_date: dayjs().format('YYYY-MM-DD'),
     grade: undefined,
@@ -85,4 +85,18 @@ export const RegisterMatchForm = ({
   };
 
   return <MatchSetFormContainer onSubmit={register} />;
+};
+
+export const RegisterMatchFormWrapper = ({
+  boxers,
+  resetSelectedBoxers,
+}: RegisterMatchFormType) => {
+  return (
+    <FormDataContextWrapper>
+      <RegisterMatchForm
+        boxers={boxers}
+        resetSelectedBoxers={resetSelectedBoxers}
+      />
+    </FormDataContextWrapper>
+  );
 };

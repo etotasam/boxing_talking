@@ -54,7 +54,9 @@ export const MatchSetForm = (props: PropsType) => {
         />
 
         <div className="w-full flex justify-center mt-5">
-          <Button styleName="wide">登録</Button>
+          <Button data-testid="submitButton" styleName="wide">
+            登録
+          </Button>
         </div>
       </form>
     </div>
@@ -101,6 +103,7 @@ const GradeSection = (props: GradeSectionType) => {
         value={grade ?? ''}
         onChange={(e) => onChange({ grade: e.target.value as GradeType })}
         id="matchGrade"
+        data-testid="matchGrade"
       >
         <option value={undefined}></option>
         {Object.values(GRADE).map((grade) => (
@@ -159,6 +162,7 @@ const TitlesSection = React.memo(
                 onChangeTitle(e.target.value as OrganizationsType, i)
               }
               id="matchBelt"
+              data-testid={`matchTitle_${i}`}
             >
               <option value={undefined}></option>
 
@@ -237,7 +241,8 @@ const PlaceSection = (props: PlaceSectionType) => {
           type="text"
           placeholder="試合会場入力"
           name="matchCountry"
-          value={venue}
+          data-testid="matchVenue"
+          value={venue ?? ''}
           onChange={(e) => onChange({ venue: e.target.value })}
         />
       </div>
@@ -266,6 +271,7 @@ const WeightSection = (props: WeightSectionType) => {
           })
         }
         id="matchWeight"
+        data-testid="matchWeight"
       >
         <option value={undefined}></option>
         {Object.values(WEIGHT_CLASS).map((weight) => (
