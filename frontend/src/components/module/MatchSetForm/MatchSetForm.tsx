@@ -220,6 +220,7 @@ const PlaceSection = (props: PlaceSectionType) => {
             })
           }
           id="matchPlaceCountry"
+          data-testid="matchPlaceCountry"
         >
           <option value={undefined}></option>
           {Object.values(COUNTRY).map((country) => (

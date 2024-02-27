@@ -1,42 +1,29 @@
-import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+// import { screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '../../../../jest-setup';
 import userEvent from '@testing-library/user-event';
-
-// import { COUNTRY } from '@/assets/nationalFlagData';
+import { COUNTRY } from '@/assets/nationalFlagData';
 //! component
-import { MatchSetForm } from './MatchSetForm';
-
-const updateMatchExecute = () => {};
-const formData = {
-  match_date: '',
-  grade: undefined,
-  country: undefined,
-  venue: '',
-  weight: undefined,
-  titles: [],
-};
-const isTitle = false;
-const onChange = () => {};
-const onChangeTitle = () => {};
-
-const props = {
-  updateMatchExecute,
-  formData,
-  isTitle,
-  onChange,
-  onChangeTitle,
-};
+import { MatchSetFormContainer } from './MatchSetFormContainer';
+//! context
+import { FormDataContextWrapper } from './FormDataContextWrapper';
 
 describe('Rendering', () => {
-  it('レンダリングテスト', () => {
-    render(<MatchSetForm {...props} />);
+  it('レンダリングテスト', async () => {
+    render(
+      <FormDataContextWrapper>
+        <MatchSetFormContainer onSubmit={() => {}} />
+      </FormDataContextWrapper>
+    );
 
-    const selectElement = document.getElementById('matchPlaceCountry');
+    const selectElement = screen.getByTestId(
+      'matchPlaceCountry'
+    ) as HTMLSelectElement;
+
     expect(selectElement).toBeInTheDocument();
+    userEvent.selectOptions(selectElement, COUNTRY.MEXICO);
 
-    const button = screen.getByText('登録');
-    expect(button).toBeInTheDocument();
-
-    // expect(options).toHaveLength(Object.values(COUNTRY).length);
+    await waitFor(() => {
+      expect(selectElement.value).toEqual(COUNTRY.MEXICO);
+    });
   });
 });

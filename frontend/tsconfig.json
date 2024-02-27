@@ -29,7 +29,7 @@
   },
   "include": [
     "src",
-    "cypress"
+    "jest-setup.ts"
   ],
   "references": [
     {
@@ -37,6 +37,6 @@
     }
   ],
   "types": [
-    "@testing-library/jest-dom"
+    "jest"
   ],
 }

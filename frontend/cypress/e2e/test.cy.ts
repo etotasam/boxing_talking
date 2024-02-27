@@ -6,6 +6,7 @@ const apiBase = "http://localhost:8080"
 
 describe('The Home Page', () => {
   beforeEach(() => {
+
     cy.request({
       method: "POST",
       url: `${apiBase}${API_PATH.USER_LOGIN}`,
