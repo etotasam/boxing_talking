@@ -1,10 +1,13 @@
 import { useEffect } from 'react';
+import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/RoutePath';
+import { ROUTE_PATH } from '@/assets/routePath';
 import { VISUAL_MODE } from '@/store/visualModeState';
+//! layout
+import HeaderAndFooterLayout from '@/layout/HeaderAndFooterLayout';
 // ! components
-import { FightBox } from '@/components/module/FightBox';
-import { SimpleFightBox } from '@/components/module/SimpleFightBox';
+import { MatchCard } from '@/components/module/MatchCard';
+import { SimpleMatchCard } from '@/components/module/SimpleMatchCard';
 //! icon
 import { VisualModeChangeButton } from '@/components/atomic/VisualModeChangeButton';
 // ! hooks
@@ -36,8 +39,6 @@ export const Home = () => {
     };
   }, []);
 
-  if (!sortedMatches) return;
-
   return (
     <>
       {device == 'PC' && (
@@ -46,16 +47,22 @@ export const Home = () => {
         </div>
       )}
 
-      <ul className="md:py-10">
-        {sortedMatches.map((match) => (
-          <li
-            key={match.id}
-            className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5 first:mt-0"
-          >
-            <MatchCard match={match} matchSelect={matchSelect} />
-          </li>
-        ))}
-      </ul>
+      <HeaderAndFooterLayout>
+        <>
+          {sortedMatches && (
+            <ul className={clsx('md:py-10')}>
+              {sortedMatches.map((match) => (
+                <li
+                  key={match.id}
+                  className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5 first:mt-0"
+                >
+                  <MatchBox match={match} onClick={matchSelect} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      </HeaderAndFooterLayout>
 
       {/* <div className="text-center md:my-10 my-5">
         <Link
@@ -71,16 +78,15 @@ export const Home = () => {
 
 type MatchesViewPropsType = {
   match: MatchDataType;
-  matchSelect: (matchId: number) => void;
+  onClick: (matchId: number) => void;
 };
 
-const MatchCard = ({ match, matchSelect }: MatchesViewPropsType) => {
+const MatchBox = ({ match, onClick }: MatchesViewPropsType) => {
   const { state: visualMode } = useVisualModeController();
   const { device } = useWindowSize();
 
   if (device === 'SP' || visualMode === VISUAL_MODE.SIMPLE)
-    return <SimpleFightBox onClick={matchSelect} matchData={match} />;
+    return <SimpleMatchCard onClick={onClick} matchData={match} />;
 
-  if (device === 'PC')
-    return <FightBox onClick={matchSelect} matchData={match} />;
+  if (device === 'PC') return <MatchCard onClick={onClick} matchData={match} />;
 };

@@ -35,12 +35,13 @@ export const PaginationBoxerList = ({ pageCount }: PropsType) => {
   return (
     <>
       {Boolean(pages.length) && (
-        <ul className="w-full py-3 flex justify-center sticky top-[80px] right-[100px] bg-white/80 border-b-[1px] border-stone-300 z-10">
+        <ul className="w-full py-3 flex justify-center sticky top-0 bg-white/80 border-b-[1px] border-stone-300 z-10">
           {pages.map((page) =>
             paramPage === page ? (
-              <CurrentPageNumber page={page} />
+              <CurrentPageNumber key={page} page={page} />
             ) : (
               <ToPageNumber
+                key={page}
                 onClick={scrollToTop}
                 page={page}
                 pathname={pathname}
@@ -56,9 +57,7 @@ export const PaginationBoxerList = ({ pageCount }: PropsType) => {
 
 const CurrentPageNumber = ({ page }: { page: number }) => {
   return (
-    <li key={page} className="px-2 bg-stone-400 text-white rounded-sm mr-2">
-      {page}
-    </li>
+    <li className="px-2 bg-stone-400 text-white rounded-sm mr-2">{page}</li>
   );
 };
 
@@ -71,7 +70,7 @@ type ToPageNumberType = {
 const ToPageNumber = (props: ToPageNumberType) => {
   const { page, onClick, pathname, formattedParams } = props;
   return (
-    <li key={page} className="bg-stone-700 text-white rounded-sm mr-2">
+    <li className="bg-stone-700 text-white rounded-sm mr-2">
       <Link
         onClick={onClick}
         className="inline-block px-2"

@@ -2,7 +2,7 @@ import { useCallback } from "react"
 import { Axios } from "@/assets/axios"
 // import dayjs from "dayjs"
 import { useQuery, useMutation } from "react-query"
-import { API_PATH } from "@/assets/ApiPath"
+import { API_PATH } from "@/assets/apiPath"
 // ! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 import { QUERY_KEY } from "@/assets/queryKeys"
@@ -29,11 +29,11 @@ export const useFetchMatches = () => {
     const res = await Axios.get(API_PATH.MATCH).then(result => result.data)
     return res.data
   }, [])
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.FETCH_MATCHES, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true, suspense: true })
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.FETCH_MATCHES, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
   return { data, isLoading, isError, isRefetching, refetch }
 }
 
-//! 過去の試合情報一覧の取得(試合後一週間以上経っている試合全部)
+//! 過去の試合情報一覧の取得(試合後2週間以上経っている試合全部)
 export const useFetchPastMatches = () => {
   const { startLoading, resetLoadingState } = useLoading()
   const fetcher = useCallback(async () => {
@@ -42,9 +42,7 @@ export const useFetchPastMatches = () => {
     return res.data
   }, [])
   const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.FETCH_PAST_MATCHES, fetcher, {
-    keepPreviousData: true, staleTime: Infinity, enabled: true, onSuccess: () => {
-      resetLoadingState()
-    }, onError: () => {
+    keepPreviousData: true, staleTime: Infinity, enabled: true, onSettled: () => {
       resetLoadingState()
     }
   })
@@ -138,6 +136,8 @@ export const useUpdateMatch = () => {
         resetLoadingState()
         setToastModal({ message: MESSAGE.MATCH_UPDATE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
+      },
+      onSettled: () => {
       }
     })
   }

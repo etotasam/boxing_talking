@@ -12,9 +12,9 @@ const dataName = [
 
 type DataFetchStateType = (typeof dataFetchState)[number]
 type DataNameType = (typeof dataName)[number]
-type ApiFetchDataStateType = { dataName: DataNameType, state: DataFetchStateType }
 
-export const apiFetchDataState = atomFamily<boolean, ApiFetchDataStateType>({
+
+export const apiFetchDataState = atomFamily<boolean, { dataName: DataNameType, state: DataFetchStateType }>({
   key: "apiFetchDataState",
   default: undefined
 })

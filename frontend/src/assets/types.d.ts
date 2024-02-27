@@ -1,6 +1,6 @@
 // ! data
 import { STANCE, ORGANIZATIONS, WEIGHT_CLASS, GRADE } from "@/assets/boxerData";
-import { COUNTRY } from "@/assets/NationalFlagData"
+import { COUNTRY } from "@/assets/nationalFlagData"
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "./statusesOnToastModal";
 
 export type UserType = {
@@ -50,16 +50,18 @@ export type FightInfoType = {
   class: string,
 }
 //? 登録用 matchデータ
-export type RegisterMatchPropsType = {
-  red_boxer_id: number,
-  blue_boxer_id: number,
-  match_date: string,
-  grade: string,
-  country: CountryType,
-  venue: string,
-  weight: string,
-  titles: string[],
-}
+export type RegisterMatchPropsType = Record<'red_boxer_id' | 'blue_boxer_id', number | undefined>
+  & MatchFormDataType
+// export type RegisterMatchPropsType = {
+//   red_boxer_id: number,
+//   blue_boxer_id: number,
+//   match_date: string,
+//   grade: string,
+//   country: CountryType,
+//   venue: string,
+//   weight: string,
+//   titles: string[],
+// }
 
 export type MatchResultType = {
   match_id: number,
@@ -129,7 +131,16 @@ export type MatchUpdateFormType = {
   match_date: string;
   grade: GradeType | undefined;
   country: CountryType | undefined;
-  venue: string;
+  venue: string | undefined;
   weight: WeightClassType | undefined;
   titles: OrganizationsType[] | [];
 };
+
+export type MatchFormDataType = {
+  match_date: string;
+  grade: GradeType | undefined;
+  country: CountryType | undefined;
+  venue: string | undefined;
+  weight: WeightClassType | undefined;
+  titles: OrganizationsType[] | [];
+}

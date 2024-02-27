@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
@@ -8,17 +8,20 @@ import {
 } from '@/assets/statusesOnToastModal';
 //! func
 import { isMatchDatePast } from '@/assets/functions';
-
 //! components
 import { MatchInfo } from '@/components/module/MatchInfo';
-import { MatchSetForm } from '@/components/module/MatchSetForm';
+import { EditMatchForm } from '@/components/module/MatchSetForm/EditMatchForm';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
 //! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 // ! hooks
-import { useFetchAllMatches, useDeleteMatch } from '@/hooks/apiHooks/useMatch';
+import {
+  useFetchPastMatches,
+  useFetchMatches,
+  useDeleteMatch,
+} from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useSortMatches } from '@/hooks/useSortMatches';
@@ -35,8 +38,11 @@ export const MatchEdit = () => {
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   // ? use hook
   const { resetLoadingState } = useLoading();
-  const { data: matchesData } = useFetchAllMatches();
+  const { data: matchesData } = useFetchMatches();
+  const { data: pastMatchesData } = useFetchPastMatches();
   const { sortedMatches } = useSortMatches(matchesData);
+  const allMatches = sortedMatches &&
+    pastMatchesData && [...sortedMatches, ...pastMatchesData];
   const { setToastModal, showToastModal } = useToastModal();
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
 
@@ -96,7 +102,7 @@ export const MatchEdit = () => {
             <div className="w-[45%] flex justify-center">
               {selectedMatch ? (
                 <div className="w-full flex flex-col items-center">
-                  <div className="w-[90%] border-[1px] border-stone-400">
+                  <div className="w-[90%] border-[1px] pt-10 pb-5 border-stone-400">
                     <MatchInfo matchData={selectedMatch} />
                   </div>
 
@@ -122,7 +128,7 @@ export const MatchEdit = () => {
 
             <div className="w-[55%] flex ite justify-center">
               <div className="w-[80%]">
-                <MatchSetForm
+                <EditMatchForm
                   selectedMatch={selectedMatch}
                   isSuccessDeleteMatch={isSuccessDeleteMatch}
                 />
@@ -139,9 +145,12 @@ export const MatchEdit = () => {
           </div>
         </section>
 
-        <section className="w-[30%] pt-[20px] flex justify-center">
+        <section
+          style={{ maxHeight: `calc(100vh - ${headerHeight}px)` }}
+          className="w-[30%] pt-[20px] flex justify-center overflow-auto"
+        >
           <MatchListComponent
-            sortedMatches={sortedMatches}
+            sortedMatches={allMatches}
             selectedMatch={selectedMatch}
             setSelectMatch={setSelectMatch}
           />
@@ -183,7 +192,7 @@ export const MatchListComponent = ({
 }: MatchComponentType) => {
   return (
     <>
-      <ul className="w-[95%]">
+      <ul className="w-[95%] ">
         {sortedMatches &&
           sortedMatches.map((match) => (
             <li

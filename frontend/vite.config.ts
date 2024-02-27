@@ -1,4 +1,5 @@
-import { defineConfig } from 'vite'
+/// <reference types="vitest" />
+import { defineConfig, UserConfigExport } from 'vite'
 import react from '@vitejs/plugin-react'
 // import * as path from 'path'
 import tsconfigPaths from 'vite-tsconfig-paths'
@@ -10,5 +11,8 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
-  }
-})
+  },
+  test: {
+    globals: true,
+  },
+} as UserConfigExport)

@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash';
 // ! data
 import { STANCE, initialBoxerDataOnForm } from '@/assets/boxerData';
 import { ORGANIZATIONS, WEIGHT_CLASS } from '@/assets/boxerData';
-import { COUNTRY } from '@/assets/NationalFlagData';
+import { COUNTRY } from '@/assets/nationalFlagData';
 //! type
 import { BoxerType, CountryType, StanceType } from '@/assets/types';
 //! recoil

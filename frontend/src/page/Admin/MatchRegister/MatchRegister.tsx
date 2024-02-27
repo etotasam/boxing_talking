@@ -1,27 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash';
 import { Helmet } from 'react-helmet-async';
-// ! types
-import {
-  CountryType,
-  RegisterMatchPropsType,
-  GradeType,
-  WeightClassType,
-  OrganizationsType,
-} from '@/assets/types';
-// ! data
-import { COUNTRY } from '@/assets/NationalFlagData';
-import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
-import {
-  MESSAGE,
-  BG_COLOR_ON_TOAST_MODAL,
-} from '@/assets/statusesOnToastModal';
 // ! hooks
 import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
 import { BoxerType } from '@/assets/types';
-import { useRegisterMatch } from '@/hooks/apiHooks/useMatch';
-import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 //! recoil
 import { useRecoilValue } from 'recoil';
@@ -30,7 +11,8 @@ import { elementSizeState } from '@/store/elementSizeState';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
-import { Button } from '@/components/atomic/Button';
+// import { RegisterMatchForm } from '@/components/module/MatchSetForm';
+import { RegisterMatchForm } from '@/components/module/MatchSetForm/RegisterMatchForm';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -38,10 +20,13 @@ export const MatchRegister = () => {
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   //! use hook
   const { boxersData, pageCount } = useFetchBoxers();
-  const [matchBoxers, setMatchBoxers] = useState<MatchBoxersType>({
+
+  const initialMatchBoxers = {
     red_boxer: undefined,
     blue_boxer: undefined,
-  });
+  };
+  const [matchBoxers, setMatchBoxers] =
+    useState<MatchBoxersType>(initialMatchBoxers);
   const { resetLoadingState } = useLoading();
 
   //? 初期設定(クリーンアップとか)
@@ -65,9 +50,12 @@ export const MatchRegister = () => {
             <MatchSetUpBox boxers={matchBoxers} />
             <div className="flex mt-5">
               <div className="w-[50%] flex justify-center">
-                <MatchDataSetter
-                  matchBoxers={matchBoxers}
-                  setMatchBoxers={setMatchBoxers}
+                <RegisterMatchForm
+                  boxers={{
+                    red_boxer_id: matchBoxers.red_boxer?.id,
+                    blue_boxer_id: matchBoxers.blue_boxer?.id,
+                  }}
+                  resetSelectedBoxers={() => setMatchBoxers(initialMatchBoxers)}
                 />
               </div>
               <div className="w-[50%] flex justify-center">
@@ -78,7 +66,10 @@ export const MatchRegister = () => {
             </div>
           </div>
         </section>
-        <section className="w-[30%] min-w-[300px] pb-5">
+        <section
+          style={{ maxHeight: `calc( 100vh - ${headerHeight}px)` }}
+          className="relative w-[30%] min-w-[300px] pb-5 overflow-auto"
+        >
           <PaginationBoxerList pageCount={pageCount} />
           <BoxersList
             boxersData={boxersData}
@@ -225,286 +216,5 @@ const BoxersList = ({
         </ul>
       )}
     </>
-  );
-};
-
-// ! 試合情報セッター
-type MatchDataSetterPropsType = {
-  matchBoxers: MatchBoxersType;
-  setMatchBoxers: React.Dispatch<React.SetStateAction<MatchBoxersType>>;
-};
-
-// ! 試合データ入力
-const MatchDataSetter = ({
-  matchBoxers,
-  setMatchBoxers,
-}: MatchDataSetterPropsType) => {
-  //? use hook
-  const { showToastModal, setToastModal, hideToastModal } = useToastModal();
-  const { registerMatch, isSuccess: isSuccessRegisterMatch } =
-    useRegisterMatch();
-  // const matchDate = useRef("");
-  const [matchDate, setMatchDate] = useState<string>(
-    dayjs().format('YYYY-MM-DD')
-  );
-  const [matchGrade, setMatchGrade] = useState<GradeType | ''>('');
-  const [matchPlaceCountry, setMatchPlaceCountry] = useState<
-    CountryType | ''
-  >();
-  const [matchVenue, setMatchVenue] = useState<string>('');
-  const [matchWeight, setMatchWeight] = useState<WeightClassType | ''>();
-  const [belt, setBelt] = useState<OrganizationsType[]>([]);
-  const [title, setTitle] = useState(false);
-  const [counter, setCounter] = useState(1);
-
-  useEffect(() => {
-    if (!isSuccessRegisterMatch) return;
-    setMatchDate(dayjs().format('YYYY-MM-DD'));
-    setMatchGrade('');
-    setMatchPlaceCountry('');
-    setMatchVenue('');
-    setMatchWeight('');
-    setBelt([]);
-    setTitle(false);
-    setCounter(1);
-
-    setMatchBoxers({ red_boxer: undefined, blue_boxer: undefined });
-  }, [isSuccessRegisterMatch]);
-
-  // ? アンマウント時にはトーストモーダルを隠す
-  useEffect(() => {
-    return () => {
-      hideToastModal();
-    };
-  }, []);
-  // ? gradeがタイトルマッチ以外の時は belt (WBA WBCとか...)を空にする
-  useEffect(() => {
-    if (!title) return setBelt([]);
-  }, [title]);
-
-  // ? WBA WBC WBO IBFを選ぶ<select>の数を管理
-  useEffect(() => {
-    if (belt.length > 3) return;
-    if (!belt.length) {
-      setCounter(1);
-    } else {
-      setCounter(belt.length + 1);
-    }
-  }, [belt]);
-
-  useEffect(() => {
-    if (matchGrade === GRADE.TITLE_MATCH) {
-      setTitle(true);
-    } else {
-      setTitle(false);
-    }
-  }, [matchGrade]);
-
-  //? 試合登録
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    // ? 選手を選択していない場合モーダルでNOTICE
-    if (Object.values(matchBoxers).includes(undefined)) {
-      setToastModal({
-        message: MESSAGE.MATCH_NOT_SELECTED_BOXER,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      showToastModal();
-      return;
-    }
-
-    // ? 他、未入力がある場合はモーダルでNOTICE
-    if (
-      !matchDate ||
-      !matchGrade ||
-      !matchPlaceCountry ||
-      !matchVenue ||
-      !matchWeight
-    ) {
-      setToastModal({
-        message: MESSAGE.MATCH_HAS_NOT_ENTRIES,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      showToastModal();
-      return;
-    } else if (matchGrade === GRADE.TITLE_MATCH && !belt.length) {
-      setToastModal({
-        message: MESSAGE.MATCH_HAS_NOT_ENTRIES,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      showToastModal();
-      return;
-    }
-
-    // let formattedBelt;
-    // if (belt.length) {
-    //   formattedBelt = belt.map((title) => {
-    //     return `${title}世界${matchWeight}級`;
-    //   });
-    // } else {
-    //   formattedBelt = cloneDeep(belt);
-    // }
-
-    const matchData: RegisterMatchPropsType = {
-      red_boxer_id: matchBoxers.red_boxer!.id!,
-      blue_boxer_id: matchBoxers.blue_boxer!.id!,
-      match_date: matchDate,
-      grade: matchGrade!,
-      country: matchPlaceCountry,
-      venue: matchVenue,
-      weight: matchWeight!,
-      titles: belt,
-    };
-    registerMatch(matchData);
-  };
-
-  return (
-    // <div className="bg-stone-200 flex justify-center items-center py-5 mt-5">
-    <form
-      className="w-[400px] bg-stone-200 border-[1px] border-stone-400 p-5"
-      onSubmit={onSubmit}
-    >
-      <h2 className="text-center my-5 text-[26px] tracking-[0.1em]">
-        試合情報
-      </h2>
-      {/* //? Match Date */}
-      <div className="flex">
-        {/* <div className="w-[100px] text-right"> */}
-        <label className="w-[130px] text-right mr-3" htmlFor="match-date">
-          試合日
-        </label>
-        {/* </div> */}
-        <input
-          className="w-[150px] p-1"
-          id="match-date"
-          type="date"
-          min={dayjs().format('YYYY-MM-DD')}
-          value={matchDate}
-          onChange={(e) => {
-            setMatchDate(e.target.value);
-          }}
-        />
-      </div>
-
-      {/* //? Match Grade */}
-      <div className="flex mt-5">
-        <label className="w-[130px] text-right mr-3" htmlFor="matchGrade">
-          Match Grade:
-        </label>
-        <select
-          className="w-[150px]"
-          name="matchGrade"
-          value={matchGrade}
-          onChange={(e) => {
-            setMatchGrade(e.target.value as GradeType);
-          }}
-          id="matchGrade"
-        >
-          <option value={undefined}></option>
-          {Object.values(GRADE).map((grade) => (
-            <option key={grade} value={grade}>
-              {grade}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {title && (
-        <ul className="ml-[140px]">
-          {/* //? タイトル */}
-          {Array.from({ length: counter }, (_, index) => index).map((_, i) => (
-            <li className="mt-1" key={i}>
-              <select
-                className="w-[150px]"
-                name="matchBelt"
-                value={belt[i]}
-                onChange={(e) => {
-                  setBelt((current) => {
-                    const clone = cloneDeep(current);
-                    clone[i] = e.target.value as OrganizationsType;
-                    return clone;
-                  });
-                }}
-                id="matchBelt"
-              >
-                <option value={undefined}></option>
-                {Object.values(ORGANIZATIONS).map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                ))}
-              </select>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {/* //? Weight */}
-      <div className="flex mt-5">
-        <label className="w-[130px] text-right mr-3" htmlFor="matchWeight">
-          契約ウエイト:
-        </label>
-        <select
-          className="w-[150px]"
-          name="matchWeight"
-          value={matchWeight}
-          onChange={(e) => {
-            setMatchWeight(e.target.value as WeightClassType);
-          }}
-          id="matchWeight"
-        >
-          <option value={undefined}></option>
-          {Object.values(WEIGHT_CLASS).map((weight) => (
-            <option key={weight} value={weight}>
-              {weight}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* //? Match Place */}
-      <div className="flex mt-5">
-        <label
-          className="w-[130px] text-right mr-3"
-          htmlFor="matchPlaceCountry"
-        >
-          会場:
-        </label>
-        {/* //? 国旗用 国の選択 */}
-        <select
-          className="w-[150px]"
-          name="matchPlaceCountry"
-          value={matchPlaceCountry}
-          onChange={(e) => {
-            setMatchPlaceCountry(e.target.value as CountryType);
-          }}
-          id="matchPlaceCountry"
-        >
-          <option value={undefined}></option>
-          {Object.values(COUNTRY).map((country) => (
-            <option key={country} value={country}>
-              {country}
-            </option>
-          ))}
-        </select>
-      </div>
-      {/* //? 会場 */}
-      <div className="flex mt-2 ml-[140px]">
-        <input
-          className="w-full px-1 border border-black"
-          type="text"
-          placeholder="試合会場入力"
-          name="matachCountry"
-          value={matchVenue}
-          onChange={(e) => setMatchVenue(e.target.value)}
-        />
-      </div>
-
-      <div className="w-full flex justify-center mt-5">
-        <Button styleName="wide">登録</Button>
-      </div>
-    </form>
-    // </div>
   );
 };

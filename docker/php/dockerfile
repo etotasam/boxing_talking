@@ -1,5 +1,6 @@
 FROM php:fpm
 
+
 RUN apt-get update \
     && apt-get install -y \
     git \
@@ -14,5 +15,6 @@ RUN docker-php-ext-install pdo_mysql
 
 # node.js install
 RUN apt-get install -y nodejs npm && npm install n -g && n 16.13.2
+
 
 WORKDIR /var/www/html

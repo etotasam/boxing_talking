@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/RoutePath';
+import { ROUTE_PATH } from '@/assets/routePath';
 // ! icons
 import { BsCalendar3 } from 'react-icons/bs';
 import { GiBoxingGlove } from 'react-icons/gi';
@@ -39,9 +39,10 @@ export const Header = () => {
     <>
       <header
         ref={headerRef}
+        style={{ width: `calc(100% - 10px)` }}
         className={clsx(
-          'z-30 h-[80px] fixed top-0 left-0 w-full flex backdrop-blur-md bg-white/60',
-          'after:w-full after:absolute after:bottom-0 after:left-0 after:h-[1px] after:bg-stone-300'
+          'z-30 h-[80px] fixed top-0 left-0 flex backdrop-blur-sm text-stone-200'
+          // 'after:w-full after:absolute after:bottom-0 after:left-0 after:h-[1px] after:bg-stone-300'
         )}
       >
         <SiteTitle />
@@ -57,7 +58,7 @@ export const Header = () => {
 const SiteTitle = () => {
   const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
   return (
-    <h1 className={clsx('sm:text-[48px] text-[32px] font-thin text-stone-600')}>
+    <h1 className={clsx('shadow-blur sm:text-[48px] text-[32px] font-thin')}>
       {siteTitle}
     </h1>
   );
@@ -138,13 +139,13 @@ const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
       <ul className="absolute bottom-2 sm:static flex sm:items-end sm:mb-4">
         {pathname !== ROUTE_PATH.HOME && (
           <li className="md:ml-5 ml-2">
-            <ToBoxMatchLinkButton device={device} />
+            <ToBoxMatchLinkButton />
           </li>
         )}
 
         {pathname !== ROUTE_PATH.PAST_MATCHES && (
           <li className="md:ml-5 ml-2">
-            <ToPastMatchesPageLinkButton device={device} />
+            <ToPastMatchesPageLinkButton />
           </li>
         )}
 
@@ -166,28 +167,25 @@ const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
   );
 };
 
-const ToBoxMatchLinkButton = (props: { device: 'PC' | 'SP' | undefined }) => {
+const ToBoxMatchLinkButton = () => {
   const [isShowDescription, setIsShowDescription] = useState(false);
+  const { device } = useWindowSize();
 
   return (
     <>
       <div className="relative">
         {isShowDescription && (
-          <div className="absolute top-[-22px] left-0 w-[60px] text-center py-[1px] select-none bg-white/90 border-[1px] border-stone-400 rounded-md text-xs">
+          <div className="absolute top-[-22px] left-0 w-[60px] text-center py-[1px] select-none bg-white/90 text-stone-700 rounded-md text-xs">
             <p>試合一覧</p>
           </div>
         )}
         <Link to={ROUTE_PATH.HOME}>
           <LinkButton
             onMouseEnter={
-              props.device === 'PC'
-                ? () => setIsShowDescription(true)
-                : () => {}
+              device === 'PC' ? () => setIsShowDescription(true) : () => {}
             }
             onMouseLeave={
-              props.device === 'PC'
-                ? () => setIsShowDescription(false)
-                : () => {}
+              device === 'PC' ? () => setIsShowDescription(false) : () => {}
             }
           >
             <BsCalendar3 />
@@ -198,16 +196,15 @@ const ToBoxMatchLinkButton = (props: { device: 'PC' | 'SP' | undefined }) => {
   );
 };
 
-const ToPastMatchesPageLinkButton = (props: {
-  device: 'PC' | 'SP' | undefined;
-}) => {
+const ToPastMatchesPageLinkButton = () => {
   const [isShowDescription, setIsShowDescription] = useState(false);
+  const { device } = useWindowSize();
 
   return (
     <>
       <div className="relative">
         {isShowDescription && (
-          <div className="absolute top-[-22px] left-0 w-[100px] text-center py-[1px] select-none bg-white/90 border-[1px] border-stone-400 rounded-md text-xs">
+          <div className="absolute top-[-22px] left-0 w-[100px] text-center py-[1px] select-none bg-white/90 text-stone-700 rounded-md text-xs">
             <p>過去の試合一覧</p>
           </div>
         )}
@@ -215,14 +212,10 @@ const ToPastMatchesPageLinkButton = (props: {
           <LinkButton
             className="text-[20px] hover:text-[22px]"
             onMouseEnter={
-              props.device === 'PC'
-                ? () => setIsShowDescription(true)
-                : () => {}
+              device === 'PC' ? () => setIsShowDescription(true) : () => {}
             }
             onMouseLeave={
-              props.device === 'PC'
-                ? () => setIsShowDescription(false)
-                : () => {}
+              device === 'PC' ? () => setIsShowDescription(false) : () => {}
             }
           >
             <RiTimeLine />
@@ -269,7 +262,7 @@ const LinkButton = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className={clsx(
-        'sm:w-[40px] sm:h-[40px] w-[30px] h-[30px] bg-stone-600 hover:bg-black border-[1px] rounded-[50%] flex justify-center items-center text-white text-[16px] hover:text-[18px] duration-300',
+        'sm:w-[40px] sm:h-[40px] w-[30px] h-[30px] bg-stone-600 hover:bg-black rounded-[50%] flex justify-center items-center text-white text-[16px] hover:text-[18px] duration-300',
         className
       )}
     >

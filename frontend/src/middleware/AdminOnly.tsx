@@ -1,4 +1,4 @@
-import { ROUTE_PATH } from '@/assets/RoutePath';
+import { ROUTE_PATH } from '@/assets/routePath';
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 //! component
@@ -30,6 +30,7 @@ const AdminOnly = () => {
     <>
       <Header />
       <main
+        className="bg-white"
         style={{
           minHeight: `calc(100vh - ${headerHeight}px)`,
           marginTop: `${headerHeight}px`,

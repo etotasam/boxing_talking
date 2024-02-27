@@ -1,6 +1,6 @@
 // import { useState } from "react";
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/RoutePath';
+import { ROUTE_PATH } from '@/assets/routePath';
 // ! page
 import { Home } from '@/page/Home';
 import { Match } from '@/page/Match';
@@ -14,35 +14,22 @@ import { Terms } from './page/Terms/Terms';
 import { Identification } from '@/page/Identification';
 import { NotFound } from '@/page/NotFound';
 import { PastMatches } from './page/PastMatches';
-import { TestPage } from './page/TestPage';
+// import { TestPage } from './page/TestPage';
 // ! middleware
 import AdminOnly from './middleware/AdminOnly';
 import Container from './middleware/Container';
 import './App.css';
-//! layout
-import HeaderOnlyLayout from '@/layout/HeaderOnlyLayout';
-import HeaderAndFooterLayout from '@/layout/HeaderAndFooterLayout';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<Container />}>
-          <Route element={<HeaderAndFooterLayout />}>
-            <Route path={ROUTE_PATH.HOME} element={<Home />} />
-            <Route path="/test" element={<Home />} />
-            <Route path={ROUTE_PATH.PAST_MATCHES} element={<PastMatches />} />
-            {/* //? </HeaderAndFooterLayout> */}
-          </Route>
-          <Route element={<HeaderOnlyLayout />}>
-            <Route path={ROUTE_PATH.MATCH} element={<Match />} />
-            {/* <Route path={ROUTE_PATH.PAST_MATCH_SINGLE} element={<Match />} /> */}
-            <Route
-              path={ROUTE_PATH.PAST_MATCH_SINGLE}
-              element={<PastMatch />}
-            />
-            {/* //? </HeaderOnlyLayout> */}
-          </Route>
+          <Route path={ROUTE_PATH.HOME} element={<Home />} />
+          <Route path={ROUTE_PATH.PAST_MATCHES} element={<PastMatches />} />
+          <Route path={ROUTE_PATH.MATCH} element={<Match />} />
+          <Route path={ROUTE_PATH.PAST_MATCH_SINGLE} element={<PastMatch />} />
+
           <Route element={<AdminOnly />}>
             <Route path={ROUTE_PATH.ADMIN} element={<Admin />} />
             <Route path={ROUTE_PATH.BOXER_EDIT} element={<BoxerEdit />} />
@@ -60,20 +47,10 @@ function App() {
           {/* //? </container> */}
         </Route>
 
-        <Route element={<HeaderOnlyLayout />}>
-          {/* <Route path="/test_module" element={<TestModule />} /> */}
-          <Route
-            path={ROUTE_PATH.IDENTIFICATION}
-            element={<Identification />}
-          />
-          {/* //? </HeaderOnlyLayout> */}
-        </Route>
+        <Route path={ROUTE_PATH.TERMS} element={<Terms />} />
+        <Route path={ROUTE_PATH.IDENTIFICATION} element={<Identification />} />
 
-        <Route element={<HeaderAndFooterLayout />}>
-          <Route path={ROUTE_PATH.TERMS} element={<Terms />} />
-          <Route path="/*" element={<NotFound />} />
-          {/* //? </HeaderAndFooterLayout> */}
-        </Route>
+        <Route path="/*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

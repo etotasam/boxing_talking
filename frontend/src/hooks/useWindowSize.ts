@@ -1,17 +1,22 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 // !Recoil
+import { useRecoilState } from "recoil"
+import { elementSizeState } from "@/store/elementSizeState"
+import { deviceState } from "@/store/deviceState"
 
 export const useWindowSize = () => {
 
-  const [device, setDevice] = useState<"PC" | "SP">()
-  const [windowSize, setWindowSize] = useState<number>()
+  const [windowSize, setWindowSize] = useRecoilState<number | undefined>(elementSizeState('WINDOW_WIDTH'))
+  const [device, setDevice] = useRecoilState(deviceState)
+
 
   const getViewportWidth = () => {
     const width = window.innerWidth
-    // const width = document.documentElement.offsetWidth
-    const device = width > 950 ? "PC" : "SP"
-    setDevice(device)
-    setWindowSize(width)
+    if (width) {
+      const newDevice = width > 950 ? "PC" : "SP"
+      setDevice(newDevice)
+      setWindowSize(width)
+    }
   }
 
   useEffect(() => {

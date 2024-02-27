@@ -231,8 +231,13 @@ const BoxerList = (props: BoxerListType) => {
   const { selectBoxerNumber, setIsSelectBoxerNumber, setEditTargetBoxerData } =
     props;
   const { boxersData, pageCount } = useFetchBoxers();
+
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   return (
-    <section className="w-[30%] min-w-[300px] pb-5">
+    <section
+      style={{ maxHeight: `calc( 100vh - ${headerHeight}px)` }}
+      className="w-[30%] min-w-[300px] pb-5 overflow-auto"
+    >
       <PaginationBoxerList pageCount={pageCount} />
       <BoxersList
         selectBoxerNumber={selectBoxerNumber}
