@@ -4,9 +4,8 @@ import { expect, test, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { WEIGHT_CLASS, GRADE } from '@/assets/boxerData';
 import { COUNTRY } from '@/assets/nationalFlagData';
-// import { useRegisterMatch } from '@/hooks/apiHooks/useMatch';
 
-import { EditMatchFormWrapper } from './EditMatchForm';
+import { EditMatchFormWrapper } from '../EditMatchForm';
 
 // elementの取得
 const getSelectElement = (testId: string) => {
@@ -33,7 +32,7 @@ const noSelectBoxerProps = {
   selectedMatch: undefined,
   isSuccessDeleteMatch: false,
 };
-describe('EditMatchForm', () => {
+describe('EditMatchFormのテスト', () => {
   test('対象試合が未選択時はsubmit押下しても送信しない', async () => {
     render(<EditMatchFormWrapper {...noSelectBoxerProps} />);
 

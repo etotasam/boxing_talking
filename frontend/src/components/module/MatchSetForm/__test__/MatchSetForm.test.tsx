@@ -1,12 +1,12 @@
 import { render, screen, waitFor } from 'test-setup';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
+import { WEIGHT_CLASS, GRADE } from '@/assets/boxerData';
 
 //! component
-import { MatchSetFormContainer } from './MatchSetFormContainer';
+import { MatchSetFormContainer } from '../MatchSetFormContainer';
 //! context
-import { FormDataContextWrapper } from './FormDataContextWrapper';
+import { FormDataContextWrapper } from '../FormDataContextWrapper';
 import { COUNTRY } from '@/assets/nationalFlagData';
 
 const onSubmitFunc = vi.fn();
@@ -52,13 +52,30 @@ const setAllFormData = () => {
   return { grade, weight, country, venue };
 };
 
-describe('match set form', () => {
-  test('grade 未設定の時は送信出来ない', async () => {
-    rendering();
+// mock
+const showToastModalMessageMock = vi.fn();
+vi.mock('@/hooks/useToastModal', () => {
+  return {
+    useToastModal: vi.fn(() => {
+      return {
+        hideToastModal: vi.fn(),
+        showToastModalMessage: showToastModalMessageMock,
+      };
+    }),
+  };
+});
 
+describe('MatchSetFormのテスト', () => {
+  beforeEach(() => {
+    rendering();
+    vi.clearAllMocks();
+  });
+
+  test('grade 未設定の時は送信出来ない', async () => {
     const { grade, weight, country, venue } = setAllFormData();
-    userEvent.selectOptions(grade, '');
     await userEvent.type(venue, inputtedVenue);
+
+    userEvent.selectOptions(grade, '');
 
     submitButtonClick();
 
@@ -68,13 +85,12 @@ describe('match set form', () => {
       expect(country.value).toEqual(selectedCountry);
       expect(venue.value).toEqual(inputtedVenue);
 
-      expect(onSubmitFunc).not.toHaveBeenCalled();
+      expect(showToastModalMessageMock).toBeCalled();
+      expect(onSubmitFunc).not.toBeCalled();
     });
   });
 
   test('weight 未設定の時は送信出来ない', async () => {
-    rendering();
-
     const { grade, weight, country, venue } = setAllFormData();
     await userEvent.type(venue, inputtedVenue);
 
@@ -88,13 +104,12 @@ describe('match set form', () => {
       expect(country.value).toEqual(selectedCountry);
       expect(venue.value).toEqual(inputtedVenue);
 
-      expect(onSubmitFunc).not.toHaveBeenCalled();
+      expect(showToastModalMessageMock).toBeCalled();
+      expect(onSubmitFunc).not.toBeCalled();
     });
   });
 
   test('country 未設定の時は送信出来ない', async () => {
-    rendering();
-
     const { grade, weight, country, venue } = setAllFormData();
     await userEvent.type(venue, inputtedVenue);
 
@@ -108,13 +123,12 @@ describe('match set form', () => {
       expect(weight.value).toEqual(selectedWeight);
       expect(venue.value).toEqual(inputtedVenue);
 
-      expect(onSubmitFunc).not.toHaveBeenCalled();
+      expect(showToastModalMessageMock).toBeCalled();
+      expect(onSubmitFunc).not.toBeCalled();
     });
   });
 
   test('venue 未設定の時は送信出来ない', async () => {
-    rendering();
-
     const { grade, weight, country, venue } = setAllFormData();
 
     submitButtonClick();
@@ -125,13 +139,12 @@ describe('match set form', () => {
       expect(grade.value).toEqual(selectedGrade);
       expect(weight.value).toEqual(selectedWeight);
 
-      expect(onSubmitFunc).not.toHaveBeenCalled();
+      expect(showToastModalMessageMock).toBeCalled();
+      expect(onSubmitFunc).not.toBeCalled();
     });
   });
 
   test('grade がタイトルマッチで団体が未選択時は送信出来ない', async () => {
-    rendering();
-
     const { grade, weight, country, venue } = setAllFormData();
 
     userEvent.selectOptions(grade, GRADE.TITLE_MATCH);
@@ -147,13 +160,13 @@ describe('match set form', () => {
       expect(weight.value).toEqual(selectedWeight);
 
       submitButtonClick();
-      expect(onSubmitFunc).not.toHaveBeenCalled();
+
+      expect(showToastModalMessageMock).toBeCalled();
+      expect(onSubmitFunc).not.toBeCalled();
     });
   });
 
   test('データを満たしている場合はsubmit送信', async () => {
-    rendering();
-
     const { grade, weight, country, venue } = setAllFormData();
     await userEvent.type(venue, inputtedVenue);
 
@@ -164,7 +177,9 @@ describe('match set form', () => {
       expect(weight.value).toEqual(selectedWeight);
       expect(country.value).toEqual(selectedCountry);
       expect(venue.value).toEqual(inputtedVenue);
-      expect(onSubmitFunc).toHaveBeenCalled();
+
+      expect(showToastModalMessageMock).not.toBeCalled();
+      expect(onSubmitFunc).toBeCalled();
     });
   });
 });

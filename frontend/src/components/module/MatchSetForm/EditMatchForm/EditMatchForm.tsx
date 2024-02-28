@@ -1,15 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
-import {
-  MESSAGE,
-  BG_COLOR_ON_TOAST_MODAL,
-} from '@/assets/statusesOnToastModal';
-import { pickBy, isEqual, pick } from 'lodash';
+import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from '@/assets/statusesOnToastModal';
+import { pick } from 'lodash';
 //! type
-import {
-  MatchDataType,
-  MatchUpdateFormType,
-  OrganizationsType,
-} from '@/assets/types';
+import { MatchDataType, MatchUpdateFormType, OrganizationsType } from '@/assets/types';
 //! hook
 import { useToastModal } from '@/hooks/useToastModal';
 import { useUpdateMatch } from '@/hooks/apiHooks/useMatch';
@@ -20,10 +13,9 @@ import { isMessageType } from '@/assets/typeEvaluations';
 //! component
 import { MatchSetFormContainer } from '../MatchSetFormContainer';
 //! context
-import {
-  FormDataContext,
-  FormDataContextWrapper,
-} from '../FormDataContextWrapper';
+import { FormDataContext, FormDataContextWrapper } from '../FormDataContextWrapper';
+//! functions
+import { pickModifiedData } from './functions';
 
 const EditMatchForm = (props: {
   selectedMatch: MatchDataType | undefined;
@@ -34,7 +26,6 @@ const EditMatchForm = (props: {
   const { hideToastModal, showToastModalMessage } = useToastModal();
   const { updateMatch } = useUpdateMatch();
 
-  type formDataKeysType = keyof typeof initialFormData;
   const initialFormData = {
     match_date: '',
     grade: undefined,
@@ -44,8 +35,7 @@ const EditMatchForm = (props: {
     titles: [] as OrganizationsType[] | [],
   } as const;
 
-  const [originalFormData, setOriginalFormData] =
-    useState<MatchUpdateFormType>();
+  const [originalFormData, setOriginalFormData] = useState<MatchUpdateFormType>();
   const [isTitle, setIsTitle] = useState(false);
   const { formData, setFormData } = useContext(FormDataContext);
 
@@ -120,9 +110,10 @@ const EditMatchForm = (props: {
     }
   };
 
+  type FormDataKeys = keyof MatchUpdateFormType;
   //?更新するのに必要なデータだけを抽出
   const pickDataForUpdate = (): MatchUpdateFormType => {
-    const pickKeys = Object.keys(initialFormData) as formDataKeysType[];
+    const pickKeys = Object.keys(initialFormData) as FormDataKeys[];
     const pickData = pick(selectedMatch, pickKeys);
     const titles: OrganizationsType[] | [] = pickData.titles!.map((obj) => {
       return obj.organization;
@@ -131,30 +122,9 @@ const EditMatchForm = (props: {
     return formattedPickData;
   };
 
-  //? 現在のmatchデータと変更データを比較して、変更があるデータだけを抽出
-  const pickModifiedData = (
-    data: MatchUpdateFormType
-  ): Partial<MatchUpdateFormType> => {
-    //? 変更のあるデータだけを抽出
-    const extractData: Partial<MatchUpdateFormType> = pickBy(
-      data,
-      (value, key) => {
-        const formDataKey = key as formDataKeysType;
-        if (formDataKey === 'titles') {
-          return !isEqual(value, originalFormData!.titles);
-        } else {
-          return originalFormData![formDataKey] !== value;
-        }
-      }
-    );
-    return extractData;
-  };
-
   //?データ変更が無い時モーダル表示
-  const showModalIfDataNotChanged = (
-    modifiedData: Partial<MatchUpdateFormType>
-  ) => {
-    if (!Object.keys(modifiedData).length) {
+  const showModalIfDataNotChanged = (modifiedFormData: Partial<MatchUpdateFormType>) => {
+    if (!Object.keys(modifiedFormData).length) {
       throw new Error(MESSAGE.MATCH_IS_NOT_MODIFIED);
     }
   };
@@ -164,13 +134,16 @@ const EditMatchForm = (props: {
       showModalIfNotSelectMatch();
 
       //? 現在のmatchデータと変更データを比較して、変更があるプロパティだけを抽出
-      const modifiedData = pickModifiedData(formData);
+      const modifiedFormData = pickModifiedData({
+        modifiedFormData: formData,
+        originFormData: originalFormData!,
+      });
 
-      showModalIfDataNotChanged(modifiedData);
+      showModalIfDataNotChanged(modifiedFormData);
 
       const matchId = selectedMatch!.id;
 
-      updateMatch({ matchId, changeData: modifiedData });
+      updateMatch({ matchId, changeData: modifiedFormData });
     } catch (error: unknown) {
       //?MessageTypeには空文字も含まれている
       const e = error as Error;
@@ -185,9 +158,7 @@ const EditMatchForm = (props: {
     }
   };
 
-  return (
-    <MatchSetFormContainer onSubmit={updateMatchExecute} title={isTitle} />
-  );
+  return <MatchSetFormContainer onSubmit={updateMatchExecute} title={isTitle} />;
 };
 
 export const EditMatchFormWrapper = (props: {
