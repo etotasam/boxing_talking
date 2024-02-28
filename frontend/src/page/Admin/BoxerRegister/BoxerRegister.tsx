@@ -3,10 +3,7 @@ import { Helmet } from 'react-helmet-async';
 // ! types
 // import { BoxerType } from "@/assets/types";
 // ! data
-import {
-  BG_COLOR_ON_TOAST_MODAL,
-  MESSAGE,
-} from '@/assets/statusesOnToastModal';
+import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
@@ -24,8 +21,7 @@ const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 export const BoxerRegister = () => {
   // ! use hook
   const { resetLoadingState } = useLoading();
-  const [boxerDataOnForm, setEditTargetBoxerData] =
-    useRecoilState(boxerDataOnFormState);
+  const [boxerDataOnForm, setEditTargetBoxerData] = useRecoilState(boxerDataOnFormState);
   const { hideToastModal, showToastModalMessage } = useToastModal();
   const { registerBoxer, isSuccess: successRegisterBoxer } = useRegisterBoxer();
 
@@ -53,7 +49,7 @@ export const BoxerRegister = () => {
   };
   //? 名前が未入力
   const showModelIfNameUndefined = () => {
-    if (!boxerDataOnForm.name || !boxerDataOnForm.eng_name) {
+    if (!boxerDataOnForm.name || !boxerDataOnForm.engName) {
       throw Error(MESSAGE.BOXER_NAME_UNDEFINED);
     }
   };

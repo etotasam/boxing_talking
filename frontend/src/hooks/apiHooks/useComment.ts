@@ -53,7 +53,7 @@ export const useFetchComments = (matchId: number) => {
   const api = async () => {
     const res = await Axios.get(API_PATH.COMMENT, {
       params: {
-        match_id: matchId,
+        matchId,
       },
     }).then(v => v.data)
     return res.data
@@ -98,8 +98,8 @@ export const usePostComment = () => {
   const queryClient = useQueryClient()
   const api = useCallback(async ({ matchId, comment }: ApiPropsType) => {
     await Axios.post(API_PATH.COMMENT, {
-      match_id: matchId,
-      comment: comment
+      matchId,
+      comment
     })
   }, [])
 
@@ -141,8 +141,8 @@ export const usePostComment = () => {
             }
           }
           //? 試合が存在しない
-          if (errors.match_id) {
-            if ((errors.match_id as string[]).includes('match_id is require')) {
+          if (errors.matchId) {
+            if ((errors.matchId as string[]).includes('match_id is require')) {
               showToastModalMessage({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
               return
             }

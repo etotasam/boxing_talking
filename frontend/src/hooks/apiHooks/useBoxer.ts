@@ -168,7 +168,7 @@ export const useDeleteBoxer = () => {
 
   //? api
   const api = async (boxerData: BoxerType): Promise<void> => {
-    await Axios.delete<void>(API_PATH.BOXER, { data: { boxer_id: boxerData.id, eng_name: boxerData.eng_name } }).then(v => v.data)
+    await Axios.delete<void>(API_PATH.BOXER, { data: { boxerId: boxerData.id, engName: boxerData.engName } }).then(v => v.data)
   }
 
   const { mutate, isLoading, isError, isSuccess } = useMutation(api, {

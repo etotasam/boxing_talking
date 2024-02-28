@@ -27,7 +27,7 @@ const EditMatchForm = (props: {
   const { updateMatch } = useUpdateMatch();
 
   const initialFormData = {
-    match_date: '',
+    matchDate: '',
     grade: undefined,
     country: undefined,
     venue: '',

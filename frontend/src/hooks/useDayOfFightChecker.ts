@@ -13,7 +13,7 @@ export const useDayOfFightChecker = (matchData: MatchDataType | undefined) => {
 
   useEffect(() => {
     if (!matchData) return;
-    const matchDate = dayjs(matchData.match_date);
+    const matchDate = dayjs(matchData.matchDate);
 
     const today = dayjs().startOf('day');
 

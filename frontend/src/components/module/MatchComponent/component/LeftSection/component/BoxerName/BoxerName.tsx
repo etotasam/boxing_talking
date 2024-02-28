@@ -1,11 +1,7 @@
 import { MatchDataType, CountryType } from '@/assets/types';
 import { FlagImage } from '@/components/atomic/FlagImage';
 
-export const BoxerNameWrapper = ({
-  matchData,
-}: {
-  matchData: MatchDataType;
-}) => {
+export const BoxerNameWrapper = ({ matchData }: { matchData: MatchDataType }) => {
   return (
     // <div className="z-[-20] bg-white relative h-[40px] mt-[10px]">
     //   <div className="z-[-10] absolute top-[-10px] w-full h-[60px] backdrop-blur-[2px] "></div>
@@ -20,12 +16,12 @@ const BoxersNameBox = ({ matchData }: { matchData: MatchDataType }) => {
   return (
     <>
       <div className="flex justify-center">
-        <CountryFlag country={matchData.red_boxer.country} />
-        <span className="pb-1">{matchData.red_boxer.eng_name}</span>
+        <CountryFlag country={matchData.redBoxer.country} />
+        <span className="pb-1">{matchData.redBoxer.engName}</span>
       </div>
       <div className="flex justify-center">
-        <span className="pb-1">{matchData.blue_boxer.eng_name}</span>
-        <CountryFlag country={matchData.blue_boxer.country} />
+        <span className="pb-1">{matchData.blueBoxer.engName}</span>
+        <CountryFlag country={matchData.blueBoxer.country} />
       </div>
     </>
   );

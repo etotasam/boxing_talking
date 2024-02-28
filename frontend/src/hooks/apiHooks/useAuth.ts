@@ -262,7 +262,6 @@ export const useSignUpIdentification = () => {
 export const useLogin = () => {
   const { refetch: refetchAdmin } = useAdmin()
   // ? react query
-  // const queryClient = useQueryClient()
   // ? toast modal
   const { setToastModal, showToastModal } = useToastModal()
   // ? Loading state
@@ -335,18 +334,10 @@ export const useLogout = () => {
         // ? ユーザー情報のキャッシュをclear
         queryClient.setQueryData(QUERY_KEY.AUTH, null)
         queryClient.invalidateQueries(QUERY_KEY.ADMIN)
-        //? 勝敗予想のキャッシュをclearしてリフェッチ
-        // queryClient.removeQueries(QUERY_KEY.prediction)
-        // queryClient.setQueryData(QUERY_KEY.prediction, undefined)
         refetchMatchPrediction()
         successful()
         setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
         showToastModal()
-        // //? ユーザの勝敗予想データのキャッシュを削除
-        // queryClient.setQueryData(QUERY_KEY.vote, [])
-        // //? auth を削除
-        // queryClient.setQueryData<boolean>(QUERY_KEY.AUTH, false)
-        // navigate("/")
         resetLoadingState()
       },
       onError: () => {

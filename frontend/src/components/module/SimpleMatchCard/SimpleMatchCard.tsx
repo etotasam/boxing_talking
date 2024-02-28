@@ -45,11 +45,11 @@ PropsType) => {
             // !isDayOverFight && !isFightToday && 'border-stone-400'
           )}
         >
-          <BoxerBox boxer={matchData.red_boxer} />
+          <BoxerBox boxer={matchData.redBoxer} />
 
           <MatchInfo matchData={matchData} />
 
-          <BoxerBox boxer={matchData.blue_boxer} />
+          <BoxerBox boxer={matchData.blueBoxer} />
 
           <PredictionIcon matchData={matchData} iconType={predictionIconType} />
         </div>
@@ -68,7 +68,7 @@ const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
       <div className={clsx('flex-1', isMatchResult ? 'pt-5 pb-2' : 'py-5')}>
         <div className="text-center relative flex justify-center items-center">
           <h2 className="absolute top-[2px] md:top-0 xl:text-xl lg:text-lg text-md after:content-['(日本時間)'] after:w-full after:absolute md:after:bottom-[-60%] after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] xl:after:text-sm after:text-[12px]">
-            {dayjs(matchData.match_date).format('YYYY年M月D日')}
+            {dayjs(matchData.matchDate).format('YYYY年M月D日')}
           </h2>
           {isTitleMatch ? (
             //? タイトルマッチ
@@ -114,10 +114,7 @@ const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
     <div className="md:w-[300px] flex justify-center items-center flex-1">
       {/* //? 名前 */}
       <div className="flex flex-col justify-center items-center">
-        <EngNameWithFlag
-          boxerCountry={boxer.country}
-          boxerEngName={boxer.eng_name}
-        />
+        <EngNameWithFlag boxerCountry={boxer.country} boxerEngName={boxer.engName} />
         <h2
           className={clsx(
             'lg:text-[20px] sm:text-[16px] mt-1 font-semibold',

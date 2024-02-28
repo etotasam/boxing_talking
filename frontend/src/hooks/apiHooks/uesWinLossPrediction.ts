@@ -53,7 +53,7 @@ export const useVoteMatchPrediction = () => {
 
   const api = useCallback(async ({ matchId, prediction }: ApiPropsType) => {
     await Axios.post(API_PATH.PREDICTION, {
-      match_id: matchId,
+      matchId: matchId,
       prediction
     })
   }, [])

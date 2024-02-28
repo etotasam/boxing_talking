@@ -2,10 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { isEqual } from 'lodash';
 import { Helmet } from 'react-helmet-async';
 //! data
-import {
-  BG_COLOR_ON_TOAST_MODAL,
-  MESSAGE,
-} from '@/assets/statusesOnToastModal';
+import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
 
 //! recoil
@@ -15,11 +12,7 @@ import { boxerDataOnFormState } from '@/store/boxerDataOnFormState';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
-import {
-  useFetchBoxers,
-  useUpdateBoxerData,
-  useDeleteBoxer,
-} from '@/hooks/apiHooks/useBoxer';
+import { useFetchBoxers, useUpdateBoxerData, useDeleteBoxer } from '@/hooks/apiHooks/useBoxer';
 //! types
 import { BoxerType, MessageType } from '@/assets/types';
 //! component
@@ -36,8 +29,7 @@ export const BoxerEdit = () => {
   // ? use hook
   const { resetLoadingState } = useLoading();
   const { hideToastModal, showToastModalMessage } = useToastModal();
-  const [editTargetBoxerData, setEditTargetBoxerData] =
-    useRecoilState(boxerDataOnFormState);
+  const [editTargetBoxerData, setEditTargetBoxerData] = useRecoilState(boxerDataOnFormState);
   const { updateBoxer } = useUpdateBoxerData();
   const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
   const { boxersData } = useFetchBoxers();
@@ -85,7 +77,7 @@ export const BoxerEdit = () => {
   };
   //? 選手名が空の時
   const showErrorToastWhenEmptyBoxerName = () => {
-    if (!editTargetBoxerData.name || !editTargetBoxerData.eng_name) {
+    if (!editTargetBoxerData.name || !editTargetBoxerData.engName) {
       showErrorToastWithMessage(MESSAGE.BOXER_NAME_UNDEFINED);
       return;
     }
@@ -125,21 +117,20 @@ export const BoxerEdit = () => {
   };
 
   //? boxerの変更があるデータだけを抽出
-  const extractChangeData = (
-    boxer: BoxerType
-  ): Pick<BoxerType, 'id'> & Partial<BoxerType> => {
-    const changeData = (
-      Object.keys(editTargetBoxerData) as Array<keyof BoxerType>
-    ).reduce((accumulator, key) => {
-      if (key === 'id') {
-        return { ...accumulator, id: editTargetBoxerData.id };
-      }
-      if (!isEqual(editTargetBoxerData[key], boxer![key])) {
-        return { ...accumulator, [key]: editTargetBoxerData[key] };
-      } else {
-        return { ...accumulator };
-      }
-    }, {}) as Pick<BoxerType, 'id'> & Partial<BoxerType>;
+  const extractChangeData = (boxer: BoxerType): Pick<BoxerType, 'id'> & Partial<BoxerType> => {
+    const changeData = (Object.keys(editTargetBoxerData) as Array<keyof BoxerType>).reduce(
+      (accumulator, key) => {
+        if (key === 'id') {
+          return { ...accumulator, id: editTargetBoxerData.id };
+        }
+        if (!isEqual(editTargetBoxerData[key], boxer![key])) {
+          return { ...accumulator, [key]: editTargetBoxerData[key] };
+        } else {
+          return { ...accumulator };
+        }
+      },
+      {}
+    ) as Pick<BoxerType, 'id'> & Partial<BoxerType>;
 
     return changeData;
   };
@@ -172,8 +163,7 @@ export const BoxerEdit = () => {
     updateBoxer(updateBoxerData);
   };
 
-  const [isShowDeleteConfirmModal, setIsShowDeleteConfirmModal] =
-    useState(false);
+  const [isShowDeleteConfirmModal, setIsShowDeleteConfirmModal] = useState(false);
 
   const hideDeleteConformModal = () => {
     setIsShowDeleteConfirmModal(false);
@@ -222,14 +212,11 @@ export const BoxerEdit = () => {
 
 type BoxerListType = {
   selectBoxerNumber: number | undefined;
-  setIsSelectBoxerNumber: React.Dispatch<
-    React.SetStateAction<number | undefined>
-  >;
+  setIsSelectBoxerNumber: React.Dispatch<React.SetStateAction<number | undefined>>;
   setEditTargetBoxerData: (boxer: BoxerType) => void;
 };
 const BoxerList = (props: BoxerListType) => {
-  const { selectBoxerNumber, setIsSelectBoxerNumber, setEditTargetBoxerData } =
-    props;
+  const { selectBoxerNumber, setIsSelectBoxerNumber, setEditTargetBoxerData } = props;
   const { boxersData, pageCount } = useFetchBoxers();
 
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
@@ -256,12 +243,7 @@ type BoxerInfoAndEditBoxType = {
   setIsShowDeleteConfirmModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 const BoxerInfoAndEditBox = (props: BoxerInfoAndEditBoxType) => {
-  const {
-    onSubmit,
-    editTargetBoxerData,
-    selectBoxerNumber,
-    setIsShowDeleteConfirmModal,
-  } = props;
+  const { onSubmit, editTargetBoxerData, selectBoxerNumber, setIsShowDeleteConfirmModal } = props;
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
 
   const { setToastModal, showToastModal } = useToastModal();
@@ -276,10 +258,7 @@ const BoxerInfoAndEditBox = (props: BoxerInfoAndEditBoxType) => {
         {/* //? edit  */}
         <div className="w-[50%] flex justify-center">
           <div className="w-[95%] border-[1px]">
-            <BoxerEditForm
-              editTargetBoxerData={editTargetBoxerData}
-              onSubmit={onSubmit}
-            />
+            <BoxerEditForm editTargetBoxerData={editTargetBoxerData} onSubmit={onSubmit} />
           </div>
         </div>
         {/* //? search */}
@@ -317,9 +296,7 @@ type BoxerListPropsType = {
   boxersData: BoxerType[] | undefined;
   setEditTargetBoxerData: (boxer: BoxerType) => void;
   selectBoxerNumber: number | undefined;
-  setIsSelectBoxerNumber: React.Dispatch<
-    React.SetStateAction<number | undefined>
-  >;
+  setIsSelectBoxerNumber: React.Dispatch<React.SetStateAction<number | undefined>>;
 };
 
 const BoxersList = ({
@@ -334,7 +311,7 @@ const BoxersList = ({
       {boxersData && (
         <ul className="flex justify-center flex-col items-center">
           {boxersData.map((boxer) => (
-            <div className="w-[300px] relative" key={boxer.eng_name}>
+            <div className="w-[300px] relative" key={boxer.engName}>
               <input
                 className="absolute top-[50%] left-5 translate-y-[-50%] cursor-pointer"
                 id={`${boxer.id}_${boxer.name}`}
@@ -346,16 +323,10 @@ const BoxersList = ({
                   setEditTargetBoxerData(boxer);
                 }}
               />
-              <label
-                className={'w-[90%] cursor-pointer'}
-                htmlFor={`${boxer.id}_${boxer.name}`}
-              >
+              <label className={'w-[90%] cursor-pointer'} htmlFor={`${boxer.id}_${boxer.name}`}>
                 <li className="w-[300px] mt-3 border-[1px] border-stone-300 rounded-md p-3">
                   <div className="text-center">
-                    <EngNameWithFlag
-                      boxerCountry={boxer.country}
-                      boxerEngName={boxer.eng_name}
-                    />
+                    <EngNameWithFlag boxerCountry={boxer.country} boxerEngName={boxer.engName} />
                     <h2 className="text-lg mt-2">{boxer.name}</h2>
                   </div>
                 </li>

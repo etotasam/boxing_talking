@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
-import {
-  BG_COLOR_ON_TOAST_MODAL,
-  MESSAGE,
-} from '@/assets/statusesOnToastModal';
+import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
 //! func
 import { isMatchDatePast } from '@/assets/functions';
 //! components
@@ -17,11 +14,7 @@ import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 // ! hooks
-import {
-  useFetchPastMatches,
-  useFetchMatches,
-  useDeleteMatch,
-} from '@/hooks/apiHooks/useMatch';
+import { useFetchPastMatches, useFetchMatches, useDeleteMatch } from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useSortMatches } from '@/hooks/useSortMatches';
@@ -41,8 +34,7 @@ export const MatchEdit = () => {
   const { data: matchesData } = useFetchMatches();
   const { data: pastMatchesData } = useFetchPastMatches();
   const { sortedMatches } = useSortMatches(matchesData);
-  const allMatches = sortedMatches &&
-    pastMatchesData && [...sortedMatches, ...pastMatchesData];
+  const allMatches = sortedMatches && pastMatchesData && [...sortedMatches, ...pastMatchesData];
   const { setToastModal, showToastModal } = useToastModal();
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
 
@@ -50,8 +42,7 @@ export const MatchEdit = () => {
   const { isFightToday, isDayOverFight } = useDayOfFightChecker(selectedMatch);
 
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
-  const [isShowMatchResultSelectorDialog, setIsShowMatchResultSelectorDialog] =
-    useState(false);
+  const [isShowMatchResultSelectorDialog, setIsShowMatchResultSelectorDialog] = useState(false);
 
   const isShowMatchResultRegisterButton = !isFightToday && isDayOverFight;
 
@@ -133,10 +124,7 @@ export const MatchEdit = () => {
                   isSuccessDeleteMatch={isSuccessDeleteMatch}
                 />
                 <div className="mt-5">
-                  <Button
-                    styleName={'delete'}
-                    onClick={handleClickDeleteButton}
-                  >
+                  <Button styleName={'delete'} onClick={handleClickDeleteButton}>
                     削除
                   </Button>
                 </div>
@@ -161,17 +149,12 @@ export const MatchEdit = () => {
       {isShowMatchResultSelectorDialog && (
         <MatchResultSetDialog
           selectedMatchData={selectedMatch}
-          setIsShowMatchResultSelectorDialog={
-            setIsShowMatchResultSelectorDialog
-          }
+          setIsShowMatchResultSelectorDialog={setIsShowMatchResultSelectorDialog}
         />
       )}
       {/* delete dialog */}
       {isDeleteConfirm && (
-        <DeleteConfirm
-          execution={deleteExecution}
-          cancel={() => setIsDeleteConfirm(false)}
-        />
+        <DeleteConfirm execution={deleteExecution} cancel={() => setIsDeleteConfirm(false)} />
       )}
     </>
   );
@@ -180,9 +163,7 @@ export const MatchEdit = () => {
 type MatchComponentType = {
   sortedMatches: MatchDataType[] | undefined;
   selectedMatch: MatchDataType | undefined;
-  setSelectMatch: React.Dispatch<
-    React.SetStateAction<MatchDataType | undefined>
-  >;
+  setSelectMatch: React.Dispatch<React.SetStateAction<MatchDataType | undefined>>;
 };
 
 export const MatchListComponent = ({
@@ -205,32 +186,30 @@ export const MatchListComponent = ({
                   : isMatchDatePast(match) && 'bg-stone-100'
               )}
             >
-              <h2 className="text-[18px]">
-                {dayjs(match.match_date).format('YYYY年M月D日')}
-              </h2>
+              <h2 className="text-[18px]">{dayjs(match.matchDate).format('YYYY年M月D日')}</h2>
               <div className="flex mt-3">
                 <div className="flex-1">
                   {/* //? 国旗 */}
                   <div className="flex justify-center">
                     <EngNameWithFlag
-                      boxerCountry={match.red_boxer.country}
-                      boxerEngName={match.red_boxer.eng_name}
+                      boxerCountry={match.redBoxer.country}
+                      boxerEngName={match.redBoxer.engName}
                     />
                   </div>
                   {/* //? 名前 */}
-                  <p className="">{match.red_boxer.name}</p>
+                  <p className="">{match.redBoxer.name}</p>
                 </div>
 
                 <div className="flex-1">
                   {/* //? 国旗 */}
                   <div className="flex justify-center">
                     <EngNameWithFlag
-                      boxerCountry={match.blue_boxer.country}
-                      boxerEngName={match.blue_boxer.eng_name}
+                      boxerCountry={match.blueBoxer.country}
+                      boxerEngName={match.blueBoxer.engName}
                     />
                   </div>
                   {/* //? 名前 */}
-                  <p className="">{match.blue_boxer.name}</p>
+                  <p className="">{match.blueBoxer.name}</p>
                 </div>
               </div>
             </li>
@@ -262,9 +241,7 @@ const MatchResultSetDialog = ({
   setIsShowMatchResultSelectorDialog,
 }: {
   selectedMatchData: MatchDataType | undefined;
-  setIsShowMatchResultSelectorDialog: React.Dispatch<
-    React.SetStateAction<boolean>
-  >;
+  setIsShowMatchResultSelectorDialog: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const { storeMatchResult, isSuccess } = useMatchResult();
 
@@ -297,8 +274,8 @@ const MatchResultSetDialog = ({
   const isValid = validFunk();
 
   const matchResultName = {
-    red: selectedMatchData!.red_boxer.name,
-    blue: selectedMatchData!.blue_boxer.name,
+    red: selectedMatchData!.redBoxer.name,
+    blue: selectedMatchData!.blueBoxer.name,
     draw: '引き分け',
     'no-contest': '無効試合',
   };
@@ -311,7 +288,7 @@ const MatchResultSetDialog = ({
     const round = isKo ? matchRound : undefined;
 
     const matchResultValue = {
-      match_id: selectedMatchData!.id,
+      matchId: selectedMatchData!.id,
       result: result,
       detail: detail,
       round: round,

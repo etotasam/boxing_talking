@@ -1,5 +1,4 @@
-import React from 'react';
-import { Suspense, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/assets/routePath';
@@ -10,9 +9,6 @@ import { SimpleMatchCard } from '@/components/module/SimpleMatchCard';
 //! hooks
 import { useFetchPastMatches } from '@/hooks/apiHooks/useMatch';
 import { useLoading } from '@/hooks/useLoading';
-//! type
-import { MatchDataType } from '@/assets/types';
-import { PastMatch } from '../PastMatch';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 

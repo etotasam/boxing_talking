@@ -71,8 +71,8 @@ export const useRegisterMatch = () => {
   const { resetLoadingState, startLoading } = useLoading()
 
 
-  const api = async ({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }: RegisterMatchPropsType) => {
-    await Axios.post(API_PATH.MATCH, { match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles })
+  const api = async ({ matchDate, redBoxerId, blueBoxerId, grade, country, venue, weight, titles }: RegisterMatchPropsType) => {
+    await Axios.post(API_PATH.MATCH, { matchDate, redBoxerId, blueBoxerId, grade, country, venue, weight, titles })
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
@@ -80,8 +80,8 @@ export const useRegisterMatch = () => {
     }
   })
 
-  const registerMatch = ({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }: RegisterMatchPropsType) => {
-    mutate({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }, {
+  const registerMatch = ({ matchDate, redBoxerId, blueBoxerId, grade, country, venue, weight, titles }: RegisterMatchPropsType) => {
+    mutate({ matchDate, redBoxerId, blueBoxerId, grade, country, venue, weight, titles }, {
       onSuccess: () => {
         refetchMatches()
         refetchAllMatches()
@@ -113,8 +113,8 @@ export const useUpdateMatch = () => {
   const { refetch: refetchAllMatches } = useFetchAllMatches()
   const api = useCallback(async (arg: ArgumentType) => {
     const updateData = {
-      match_id: arg.matchId,
-      update_match_data: arg.changeData
+      matchId: arg.matchId,
+      updateMatchData: arg.changeData
     }
     await Axios.patch(API_PATH.MATCH, updateData)
   }, [])
@@ -153,7 +153,7 @@ export const useDeleteMatch = () => {
   const { refetch: refetchAllMatches } = useFetchAllMatches()
   // const { state: matchesState, setter: setMatchesState } = useQueryState<MatchesType[]>(queryKeys.match)
   const api = useCallback(async (matchId: number) => {
-    await Axios.delete(API_PATH.MATCH, { data: { match_id: matchId } })
+    await Axios.delete(API_PATH.MATCH, { data: { matchId } })
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -198,8 +198,8 @@ export const useMatchResult = () => {
     }
   })
 
-  const storeMatchResult = ({ match_id, result, detail, round }: MatchResultType) => {
-    mutate({ match_id, result, detail, round }, {
+  const storeMatchResult = ({ matchId, result, detail, round }: MatchResultType) => {
+    mutate({ matchId, result, detail, round }, {
       onSuccess: () => {
         refetchMatches()
         refetchAllMatches()

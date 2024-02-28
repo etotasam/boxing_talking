@@ -69,25 +69,23 @@ const CommentBox = ({ comment }: { comment: CommentType }) => {
 
 const PostTimeAndUserName = ({ commentData }: { commentData: CommentType }) => {
   //? 投稿時間（投稿からの経過時間）
-  const timeSincePost = dateFormatter(commentData.created_at);
+  const timeSincePost = dateFormatter(commentData.createdAt);
   return (
     <div className="sm:flex mb-2">
       {/* //? post time */}
       <time className="text-xs text-stone-500 leading-6">{timeSincePost}</time>
       {/* //? post name */}
       <div className="flex sm:ml-3">
-        {commentData.post_user_name ? (
+        {commentData.postUserName ? (
           <>
             <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
             <p
               className={clsx(
                 '',
-                commentData.post_user_name.length > 20
-                  ? 'text-[12px] sm:text-sm'
-                  : 'text-sm'
+                commentData.postUserName.length > 20 ? 'text-[12px] sm:text-sm' : 'text-sm'
               )}
             >
-              {commentData.post_user_name}
+              {commentData.postUserName}
             </p>
           </>
         ) : (
@@ -115,8 +113,8 @@ const Comment = ({ commentData }: { commentData: CommentType }) => {
       className="relative"
       style={
         document.getElementById(`comment_${commentData.id}`) &&
-        (document.getElementById(`comment_${commentData.id}`)
-          ?.clientHeight as number) > initialCommentElHeight()
+        (document.getElementById(`comment_${commentData.id}`)?.clientHeight as number) >
+          initialCommentElHeight()
           ? { height: '135px', overflow: 'hidden' }
           : { height: 'auto' }
       }
@@ -129,8 +127,8 @@ const Comment = ({ commentData }: { commentData: CommentType }) => {
         }}
       />
       {document.getElementById(`comment_${commentData.id}`) &&
-        (document.getElementById(`comment_${commentData.id}`)
-          ?.clientHeight as number) > initialCommentElHeight() && (
+        (document.getElementById(`comment_${commentData.id}`)?.clientHeight as number) >
+          initialCommentElHeight() && (
           <p className="absolute bottom-0 left-0 md:h-[25px] h-[35px] bg-white w-full">
             <span
               onClick={stretchCommentElement}
@@ -183,18 +181,14 @@ const dateFormatter = (postDate: string): string => {
   }
 };
 
-const stretchCommentElement = (
-  event: React.MouseEvent<HTMLParagraphElement, MouseEvent>
-) => {
+const stretchCommentElement = (event: React.MouseEvent<HTMLParagraphElement, MouseEvent>) => {
   const handleClickElement = event.target as HTMLSpanElement;
-  const parentElement = (
-    handleClickElement.parentElement as HTMLParagraphElement
-  ).parentElement as HTMLDivElement;
+  const parentElement = (handleClickElement.parentElement as HTMLParagraphElement)
+    .parentElement as HTMLDivElement;
 
   (parentElement as HTMLDivElement).style.height = 'auto';
   if (handleClickElement) {
-    (handleClickElement.parentElement as HTMLParagraphElement).style.display =
-      'none';
+    (handleClickElement.parentElement as HTMLParagraphElement).style.display = 'none';
   }
 };
 
@@ -203,9 +197,7 @@ type CommentsWrapperType = {
 };
 const CommentsWrapper = (props: CommentsWrapperType) => {
   const el = useRef<HTMLDivElement>(null);
-  const postCommentElHeight = useRecoilValue(
-    elementSizeState('POST_COMMENT_HEIGHT')
-  );
+  const postCommentElHeight = useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT'));
   const headerElHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
 
   const { device } = useWindowSize();
@@ -270,9 +262,7 @@ const ErrorFallback = () => {
             </span>
           </div>
 
-          <p className="mt-3 text-neutral-200/80">
-            コメントの取得に失敗しました！
-          </p>
+          <p className="mt-3 text-neutral-200/80">コメントの取得に失敗しました！</p>
         </div>
       </div>
     </CommentsWrapper>

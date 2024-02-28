@@ -40,7 +40,7 @@ export const WEIGHT_CLASS = {
 export const initialBoxerData: BoxerType = {
   id: NaN,
   name: "",
-  eng_name: "",
+  engName: "",
   country: COUNTRY.JAPAN,
   birth: "1990-01-01",
   height: 165,
@@ -56,7 +56,7 @@ export const initialBoxerData: BoxerType = {
 export const initialBoxerDataOnForm: BoxerType = {
   id: NaN,
   name: "",
-  eng_name: "",
+  engName: "",
   country: COUNTRY.JAPAN,
   birth: "1990-01-01",
   height: 165,

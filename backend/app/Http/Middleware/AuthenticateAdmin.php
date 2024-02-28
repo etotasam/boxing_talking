@@ -20,8 +20,8 @@ class AuthenticateAdmin extends MyJsonResponse
     public function handle(Request $request, Closure $next)
     {
         if (Auth::check()) {
-            $is_admin = Administrator::where('user_id', Auth::id())->exists();
-            if ($is_admin) {
+            $isAdmin = Administrator::where('user_id', Auth::id())->exists();
+            if ($isAdmin) {
                 return $next($request);
             } else {
                 return $this->responseUnauthorized("Unauthorized: Cannot access with your auth");

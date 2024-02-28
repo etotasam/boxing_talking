@@ -12,24 +12,20 @@ export const MatchResult = ({ matchData }: { matchData: MatchDataType }) => {
 
   const { device } = useWindowSize();
 
-  const isWinner: boolean =
-    result?.result === 'red' || result?.result === 'blue';
-  const isKo: boolean =
-    isWinner && (result?.detail === 'ko' || result?.detail === 'tko');
-  const isDecision: boolean =
-    isWinner && result?.detail !== 'ko' && result?.detail !== 'tko';
+  const isWinner: boolean = result?.result === 'red' || result?.result === 'blue';
+  const isKo: boolean = isWinner && (result?.detail === 'ko' || result?.detail === 'tko');
+  const isDecision: boolean = isWinner && result?.detail !== 'ko' && result?.detail !== 'tko';
 
   const createResultIcon = (): void => {
     if (!result) return;
 
     if (isWinner) {
-      if (result.result === 'red') winner.current = matchData.red_boxer.name;
-      if (result.result === 'blue') winner.current = matchData.blue_boxer.name;
+      if (result.result === 'red') winner.current = matchData.redBoxer.name;
+      if (result.result === 'blue') winner.current = matchData.blueBoxer.name;
 
       if (isKo) {
         if (result.detail === 'ko') matchResult.current = `${result.round}R KO`;
-        if (result.detail === 'tko')
-          matchResult.current = `${result.round}R TKO`;
+        if (result.detail === 'tko') matchResult.current = `${result.round}R TKO`;
         return;
       }
       if (isDecision) {

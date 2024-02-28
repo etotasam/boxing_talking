@@ -191,7 +191,7 @@ class AuthController extends ApiController
         if (!Auth::check()) {
             return false;
         }
-        $is_admin = Administrator::where("user_id", Auth::id())->exists();
-        return $is_admin;
+        $isAdmin = Administrator::where("user_id", Auth::id())->exists();
+        return $isAdmin;
     }
 }

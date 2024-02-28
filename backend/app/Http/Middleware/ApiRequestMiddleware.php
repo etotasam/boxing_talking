@@ -4,6 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
 
 class ApiRequestMiddleware
 {
@@ -19,18 +21,17 @@ class ApiRequestMiddleware
         $requestData = $request->all();
         $snakeCaseData = $this->recursiveSnakeCase($requestData);
         $request->replace($snakeCaseData);
-        \Log::debug($request);
 
         return $next($request);
     }
 
     /**
      * keyをスネークケースに変換
-     * 
+     *
      * @param array
-     * @return 
+     * @return
      */
-    private function recursiveSnakeCase(array $data): array
+    private function recursiveSnakeCase(JsonResource | array $data): array
     {
         return collect($data)->map(function ($value, $key) {
             $snakeKey = \Str::snake($key);
