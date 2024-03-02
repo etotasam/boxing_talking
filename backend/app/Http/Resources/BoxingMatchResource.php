@@ -3,11 +3,10 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Collection;
 use App\Models\BoxingMatch;
-use App\Models\MatchResult;
 use App\Http\Resources\BoxerResource;
 use App\Http\Resources\MatchResultResource;
+use App\Http\Resources\MatchTitleBeltsResource;
 
 
 class BoxingMatchResource extends JsonResource
@@ -38,31 +37,13 @@ class BoxingMatchResource extends JsonResource
             "blueBoxer" => new BoxerResource($this->match->blueBoxer),
             "country" => $this->match->country,
             "venue" => $this->match->venue,
-            "grade" => $this->match->grade,
-            "titles" => $this->formatTitles($this->match->organization),
-            "weight" => $this->match->weight,
+            "grade" => $this->match->getGrade->grade,
+            "titles" => new MatchTitleBeltsResource($this->match),
+            "weight" => $this->match->getWeight->weight,
             "matchDate" => $this->match->match_date,
             "countRed" => $this->match->count_red,
             "countBlue" => $this->match->count_blue,
             "result" => $resultResource
         ];
-    }
-
-    /**
-     * @param Collection $organizations
-     */
-    private function formatTitles($organizations): array
-    {
-        $organizationsArray = !empty($organizations) ? $this->formatTitlesInCaseExists($organizations)->toArray() : [];
-        return $organizationsArray;
-    }
-
-    private function formatTitlesInCaseExists(Collection $organizations): Collection
-    {
-        $organizationsArray =  $organizations->map(function ($organization) {
-            $title = ["organization" => $organization->name, 'weightDivision' => $this->weight];
-            return $title;
-        });
-        return $organizationsArray;
     }
 }
