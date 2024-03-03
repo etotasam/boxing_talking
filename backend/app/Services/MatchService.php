@@ -142,8 +142,11 @@ class MatchService
         $this->titleMatchService->updateTitleMatchExecute($matchId, $updateMatchData['titles']);
         unset($updateMatchData['titles']);
       }
-      if (!empty($updateMatchData)) {
-        $this->matchRepository->updateMatch($matchId, $updateMatchData);
+
+      $formattedUpdateData = $this->formatMatchDataForUpdate($updateMatchData);
+
+      if (!empty($formattedUpdateData)) {
+        $this->matchRepository->updateMatch($matchId, $formattedUpdateData);
       }
     } catch (QueryException $e) {
       DB::rollBack();
@@ -154,6 +157,27 @@ class MatchService
     }
 
     DB::commit();
+  }
+
+  /**
+   * @param array $matchData only MatchData for update
+   * @return array formatted update data
+   */
+  private function formatMatchDataForUpdate(array $matchData): array
+  {
+    if (array_key_exists('grade', $matchData)) {
+      $gradeId = $this->gradeRepository->getGradeId($matchData["grade"]);
+      unset($matchData["grade"]);
+      $matchData["grade_id"] = $gradeId;
+    }
+
+    if (array_key_exists('weight', $matchData)) {
+      $weightId = $this->weightRepository->getWeightId($matchData["weight"]);
+      unset($matchData["weight"]);
+      $matchData["weight_id"] = $weightId;
+    }
+
+    return $matchData;
   }
 
   /**

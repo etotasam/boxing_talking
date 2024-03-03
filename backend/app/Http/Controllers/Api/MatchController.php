@@ -117,8 +117,6 @@ class MatchController extends ApiController
      */
     public function update(BoxingMatchesRequest $request)
     {
-        \Log::debug($request);
-        // return "通る";
         try {
             $this->matchService->updateMatch($request->match_id, $request->update_match_data);
         } catch (Exception $e) {
@@ -136,7 +134,7 @@ class MatchController extends ApiController
      *
      * @return JsonResponse
      */
-    public function result(Request $request)
+    public function resultStore(Request $request)
     {
         $matchResultArray = [
             "match_id" => $request->match_id,
