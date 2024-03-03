@@ -65,7 +65,7 @@ Route::middleware('administrator')->group(function () {
     Route::post('/match', [MatchController::class, 'store']);
     Route::delete('/match', [MatchController::class, 'destroy']);
     Route::patch('/match', [MatchController::class, 'update']);
-    Route::post('/match/result', [MatchController::class, 'result']);
+    Route::post('/match/result', [MatchController::class, 'resultStore']);
     //?コメント削除
     Route::delete('/comment/{comment}', [CommentController::class, 'destroy']);
     //?csv作成
