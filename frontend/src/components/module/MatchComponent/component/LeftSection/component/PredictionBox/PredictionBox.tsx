@@ -13,29 +13,20 @@ import { useModalState } from '@/hooks/useModalState';
 //! icon
 import { MdHowToVote } from 'react-icons/md';
 
-export const PredictionsBox = ({
-  matchData,
-}: {
-  matchData: MatchDataType | undefined;
-}) => {
+export const PredictionsBox = ({ matchData }: { matchData: MatchDataType | undefined }) => {
   //? この試合へのuserの勝敗予想をcontextから取得
-  const thisMatchPredictionOfUser = useContext(
-    ThisMatchPredictionByUserContext
-  );
+  const thisMatchPredictionOfUser = useContext(ThisMatchPredictionByUserContext);
 
   //? userがこの試合への勝敗予想は投票済みかどうか
-  const isVoted =
-    thisMatchPredictionOfUser === 'red' || thisMatchPredictionOfUser === 'blue';
+  const isVoted = thisMatchPredictionOfUser === 'red' || thisMatchPredictionOfUser === 'blue';
 
   //? 試合日が未来かどうか
   const isThisMatchAfterToday = useContext(IsThisMatchAfterTodayContext);
 
   //? 勝敗予想投票数の表示条件
-  const isShowPredictionBar =
-    (isVoted || isThisMatchAfterToday === false) && !!matchData;
+  const isShowPredictionBar = (isVoted || isThisMatchAfterToday === false) && !!matchData;
 
-  const isShowVoteBox =
-    !isVoted && isThisMatchAfterToday === true && !!matchData;
+  const isShowVoteBox = !isVoted && isThisMatchAfterToday === true && !!matchData;
 
   return (
     <>
@@ -60,9 +51,7 @@ const PredictionBox = ({ matchData }: { matchData: MatchDataType }) => {
 
 const PredictionVoteCount = ({ matchData }: { matchData: MatchDataType }) => {
   //? この試合へのuserの勝敗予想をcontextから取得
-  const thisMatchPredictionOfUser = useContext(
-    ThisMatchPredictionByUserContext
-  );
+  const thisMatchPredictionOfUser = useContext(ThisMatchPredictionByUserContext);
 
   return (
     <div className="flex justify-between text-stone-300">
@@ -73,7 +62,7 @@ const PredictionVoteCount = ({ matchData }: { matchData: MatchDataType }) => {
           thisMatchPredictionOfUser === 'red' && 'text-red-400'
         )}
       >
-        {matchData.count_red}
+        {matchData.countRed}
       </span>
       {
         <span
@@ -83,7 +72,7 @@ const PredictionVoteCount = ({ matchData }: { matchData: MatchDataType }) => {
             thisMatchPredictionOfUser === 'blue' && 'text-blue-500'
           )}
         >
-          {matchData.count_blue}
+          {matchData.countBlue}
         </span>
       }
     </div>
@@ -101,10 +90,10 @@ const PredictionBar = (props: PredictionBarType) => {
 
   const setWinPredictionRate = (): void => {
     if (!matchData) return;
-    const totalCount = matchData.count_red + matchData.count_blue;
-    const redRatio = Math.round((matchData.count_red / totalCount) * 100);
+    const totalCount = matchData.countRed + matchData.countBlue;
+    const redRatio = Math.round((matchData.countRed / totalCount) * 100);
     setRedCountRatio(!isNaN(redRatio) ? redRatio : 0);
-    const blueRatio = Math.round((matchData.count_blue / totalCount) * 100);
+    const blueRatio = Math.round((matchData.countBlue / totalCount) * 100);
     setBlueCountRatio(!isNaN(blueRatio) ? blueRatio : 0);
   };
   useEffect(() => {

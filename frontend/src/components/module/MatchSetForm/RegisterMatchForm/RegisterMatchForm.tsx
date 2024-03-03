@@ -1,9 +1,6 @@
 import { useEffect, useContext } from 'react';
 import dayjs from 'dayjs';
-import {
-  MESSAGE,
-  BG_COLOR_ON_TOAST_MODAL,
-} from '@/assets/statusesOnToastModal';
+import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from '@/assets/statusesOnToastModal';
 //! type
 import { MatchFormDataType, OrganizationsType } from '@/assets/types';
 //! hook
@@ -19,17 +16,16 @@ import { MatchSetFormContainer } from '../MatchSetFormContainer';
 import { FormDataContextWrapper } from '../FormDataContextWrapper';
 
 type RegisterMatchFormType = {
-  boxers: Record<'red_boxer_id' | 'blue_boxer_id', number | undefined>;
+  boxers: Record<'redBoxerId' | 'blueBoxerId', number | undefined>;
   resetSelectedBoxers: () => void;
 };
 const RegisterMatchForm = (props: RegisterMatchFormType) => {
   const { boxers, resetSelectedBoxers } = props;
   const { showToastModalMessage } = useToastModal();
-  const { registerMatch, isSuccess: isSuccessRegisterMatch } =
-    useRegisterMatch();
+  const { registerMatch, isSuccess: isSuccessRegisterMatch } = useRegisterMatch();
 
   const initialFormData = {
-    match_date: dayjs().format('YYYY-MM-DD'),
+    matchDate: dayjs().format('YYYY-MM-DD'),
     grade: undefined,
     country: undefined,
     venue: '',
@@ -52,10 +48,7 @@ const RegisterMatchForm = (props: RegisterMatchFormType) => {
     }
   };
 
-  type RegisterMatchType = Record<
-    'red_boxer_id' | 'blue_boxer_id',
-    number | undefined
-  > &
+  type RegisterMatchType = Record<'redBoxerId' | 'blueBoxerId', number | undefined> &
     MatchFormDataType;
 
   //? 試合登録
@@ -65,8 +58,8 @@ const RegisterMatchForm = (props: RegisterMatchFormType) => {
       showModalNotSelectedBoxers();
 
       const matchData: RegisterMatchType = {
-        red_boxer_id: boxers.red_boxer_id!,
-        blue_boxer_id: boxers.blue_boxer_id!,
+        redBoxerId: boxers.redBoxerId!,
+        blueBoxerId: boxers.blueBoxerId!,
         ...formData,
       };
 
@@ -93,10 +86,7 @@ export const RegisterMatchFormWrapper = ({
 }: RegisterMatchFormType) => {
   return (
     <FormDataContextWrapper>
-      <RegisterMatchForm
-        boxers={boxers}
-        resetSelectedBoxers={resetSelectedBoxers}
-      />
+      <RegisterMatchForm boxers={boxers} resetSelectedBoxers={resetSelectedBoxers} />
     </FormDataContextWrapper>
   );
 };

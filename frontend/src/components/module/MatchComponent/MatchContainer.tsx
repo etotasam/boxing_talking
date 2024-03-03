@@ -70,7 +70,7 @@ export const MatchContainer = (props: PropsType) => {
     //? 投票データの取得が完了しているかどうか。ログインしていない場合このデータは取得しない設定にしてる
     if (allPredictionVoteOfUsers !== undefined) {
       const thisMatchPredictionVote = allPredictionVoteOfUsers.find(
-        (data) => data.match_id === Number(matchId)
+        (data) => data.matchId === Number(matchId)
       );
 
       //? 投票をしていない場合は'false'をセットする(undefinedはデータ未取得,falseは未投票)
@@ -96,9 +96,7 @@ export const MatchContainer = (props: PropsType) => {
   useEffect(() => {
     if (!thisMatch) return;
     const todaySubtractOneSecond = dayjs().startOf('day').add(1, 'second');
-    const isAfterToday = dayjs(thisMatch.match_date).isAfter(
-      todaySubtractOneSecond
-    );
+    const isAfterToday = dayjs(thisMatch.matchDate).isAfter(todaySubtractOneSecond);
     setIsThisMatchAfterToday(isAfterToday);
   }, [thisMatch]);
 
@@ -111,8 +109,7 @@ export const MatchContainer = (props: PropsType) => {
       <Helmet>
         {thisMatch ? (
           <title>
-            {thisMatch?.red_boxer.name} vs {thisMatch?.blue_boxer.name} |{' '}
-            {siteTitle}
+            {thisMatch?.redBoxer.name} vs {thisMatch?.blueBoxer.name} | {siteTitle}
           </title>
         ) : (
           <title> The Match | {siteTitle}</title>
@@ -137,9 +134,7 @@ export const MatchContainer = (props: PropsType) => {
 export type ThisMatchPredictionByUserType = 'red' | 'blue' | false | undefined;
 export const ThisMatchPredictionByUserContext =
   createContext<ThisMatchPredictionByUserType>(undefined);
-export const IsThisMatchAfterTodayContext = createContext<boolean | undefined>(
-  undefined
-);
+export const IsThisMatchAfterTodayContext = createContext<boolean | undefined>(undefined);
 
 type MatchContextWrapperType = {
   children: React.ReactNode;
@@ -149,12 +144,8 @@ type MatchContextWrapperType = {
 
 export const MatchContextWrapper = (props: MatchContextWrapperType) => {
   return (
-    <ThisMatchPredictionByUserContext.Provider
-      value={props.thisMatchPredictionByUser}
-    >
-      <IsThisMatchAfterTodayContext.Provider
-        value={props.isThisMatchAfterToday}
-      >
+    <ThisMatchPredictionByUserContext.Provider value={props.thisMatchPredictionByUser}>
+      <IsThisMatchAfterTodayContext.Provider value={props.isThisMatchAfterToday}>
         {props.children}
       </IsThisMatchAfterTodayContext.Provider>
     </ThisMatchPredictionByUserContext.Provider>

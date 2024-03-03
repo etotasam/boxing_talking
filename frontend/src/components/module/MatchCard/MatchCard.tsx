@@ -25,20 +25,18 @@ export const MatchCard = ({ matchData, onClick }: PropsType) => {
         >
           <div className="w-[300px]">
             <BoxerInfo
-              boxer={{ ...matchData.red_boxer, color: 'red' }}
+              boxer={{ ...matchData.redBoxer, color: 'red' }}
               matchResult={matchData.result}
             />
           </div>
 
-          <div
-            className={clsx('pb-7', matchData.titles.length ? 'pt-10' : 'pt-7')}
-          >
+          <div className={clsx('pb-7', matchData.titles.length ? 'pt-10' : 'pt-7')}>
             <MatchInfo matchData={matchData} />
           </div>
 
           <div className="w-[300px]">
             <BoxerInfo
-              boxer={{ ...matchData.blue_boxer, color: 'blue' }}
+              boxer={{ ...matchData.blueBoxer, color: 'blue' }}
               matchResult={matchData.result}
             />
           </div>

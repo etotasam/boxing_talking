@@ -14,9 +14,7 @@ import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
   const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
 
-  const isShowMatchResultComponent = Boolean(
-    !isFightToday && isDayOverFight && matchData.result
-  );
+  const isShowMatchResultComponent = Boolean(!isFightToday && isDayOverFight && matchData.result);
 
   const isTitleMatch: boolean = matchData.grade === 'タイトルマッチ';
 
@@ -46,9 +44,7 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
                 nationality={matchData.country}
               />
             </span>
-            <span
-              className={clsx(isLongText(matchData.venue) && 'text-[14px]')}
-            >
+            <span className={clsx(isLongText(matchData.venue) && 'text-[14px]')}>
               {matchData.venue}
             </span>
           </SubHeadline>
@@ -78,7 +74,7 @@ const MatchDate = ({ matchData }: { matchData: MatchDataType }) => {
   return (
     <>
       <h2 className="text-2xl after:content-['(日本時間)'] after:absolute after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] after:text-sm">
-        {dayjs(matchData.match_date).format('YYYY年M月D日')}
+        {dayjs(matchData.matchDate).format('YYYY年M月D日')}
       </h2>
       {Boolean(matchData.titles.length) && (
         <span className="absolute top-[-32px] left-[50%] translate-x-[-50%] w-[32px] h-[32px] mr-2">
@@ -94,20 +90,18 @@ const Grade = ({ matchData }: { matchData: MatchDataType }) => {
     <>
       {matchData.grade === 'タイトルマッチ' ? (
         <ul className="flex flex-col">
-          {matchData.titles
-            .sort()
-            .map(({ organization, weightDivision }, index) => (
-              <li key={index} className="mt-1">
-                <div className="text-shadow text-yellow-500 relative inline-block tracking-widest text-[18px]">
-                  <span className="absolute top-[4px] right-[-28px] w-[20px] h-[20px] mr-2">
-                    <img src={crown} alt="" />
-                  </span>
-                  {organization}
-                  世界
-                  {weightDivision}級
-                </div>
-              </li>
-            ))}
+          {matchData.titles.sort().map(({ organization, weightDivision }, index) => (
+            <li key={index} className="mt-1">
+              <div className="text-shadow text-yellow-500 relative inline-block tracking-widest text-[18px]">
+                <span className="absolute top-[4px] right-[-28px] w-[20px] h-[20px] mr-2">
+                  <img src={crown} alt="" />
+                </span>
+                {organization}
+                世界
+                {weightDivision}級
+              </div>
+            </li>
+          ))}
         </ul>
       ) : (
         <div className="text-2xl">{matchData.grade}</div>

@@ -30,28 +30,17 @@ export const MatchSetForm = (props: PropsType) => {
         className="w-[400px] bg-stone-200 border-[1px] border-stone-400 p-5"
         onSubmit={onSubmit}
       >
-        <h2 className="text-center my-5 text-[26px] tracking-[0.1em]">
-          試合情報
-        </h2>
+        <h2 className="text-center my-5 text-[26px] tracking-[0.1em]">試合情報</h2>
         {/* //? Match Date */}
-        <DateSection date={formData.match_date} onChange={onChange} />
+        <DateSection date={formData.matchDate} onChange={onChange} />
 
         <GradeSection grade={formData.grade} onChange={onChange} />
 
-        {isTitle && (
-          <TitlesSection
-            titles={formData.titles}
-            onChangeTitle={onChangeTitle}
-          />
-        )}
+        {isTitle && <TitlesSection titles={formData.titles} onChangeTitle={onChangeTitle} />}
 
         <WeightSection weight={formData.weight} onChange={onChange} />
 
-        <PlaceSection
-          onChange={onChange}
-          country={formData.country}
-          venue={formData.venue}
-        />
+        <PlaceSection onChange={onChange} country={formData.country} venue={formData.venue} />
 
         <div className="w-full flex justify-center mt-5">
           <Button data-testid="submitButton" styleName="wide">
@@ -65,7 +54,7 @@ export const MatchSetForm = (props: PropsType) => {
 
 type DateSectionType = {
   date: string;
-  onChange: (value: { match_date: string }) => void;
+  onChange: (value: { matchDate: string }) => void;
 };
 const DateSection = (props: DateSectionType) => {
   const { date, onChange } = props;
@@ -80,7 +69,7 @@ const DateSection = (props: DateSectionType) => {
         type="date"
         min={dayjs().format('YYYY-MM-DD')}
         value={date || dayjs().format('YYYY-MM-DD')}
-        onChange={(e) => onChange({ match_date: e.target.value })}
+        onChange={(e) => onChange({ matchDate: e.target.value })}
       />
     </div>
   );
@@ -158,9 +147,7 @@ const TitlesSection = React.memo(
               className="w-[150px]"
               name="matchBelt"
               value={titles[i] ?? ''}
-              onChange={(e) =>
-                onChangeTitle(e.target.value as OrganizationsType, i)
-              }
+              onChange={(e) => onChangeTitle(e.target.value as OrganizationsType, i)}
               id="matchBelt"
               data-testid={`matchTitle_${i}`}
             >
@@ -171,18 +158,14 @@ const TitlesSection = React.memo(
                 <option value={ORGANIZATIONS.WBC}>{ORGANIZATIONS.WBC}</option>
               )}
               {titles[i] === ORGANIZATIONS.WBC && (
-                <option value={ORGANIZATIONS.WBC_INTERIM}>
-                  {ORGANIZATIONS.WBC_INTERIM}
-                </option>
+                <option value={ORGANIZATIONS.WBC_INTERIM}>{ORGANIZATIONS.WBC_INTERIM}</option>
               )}
 
               {titles[i] === ORGANIZATIONS.WBO_INTERIM && (
                 <option value={ORGANIZATIONS.WBO}>{ORGANIZATIONS.WBO}</option>
               )}
               {titles[i] === ORGANIZATIONS.WBO && (
-                <option value={ORGANIZATIONS.WBO_INTERIM}>
-                  {ORGANIZATIONS.WBO_INTERIM}
-                </option>
+                <option value={ORGANIZATIONS.WBO_INTERIM}>{ORGANIZATIONS.WBO_INTERIM}</option>
               )}
               {organizationNames.map((v) => (
                 <option key={v} value={v}>
@@ -207,10 +190,7 @@ const PlaceSection = (props: PlaceSectionType) => {
   return (
     <>
       <div className="flex mt-5">
-        <label
-          className="w-[130px] text-right mr-3"
-          htmlFor="matchPlaceCountry"
-        >
+        <label className="w-[130px] text-right mr-3" htmlFor="matchPlaceCountry">
           会場:
         </label>
         {/* //? 国旗用 国の選択 */}

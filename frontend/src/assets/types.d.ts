@@ -18,7 +18,7 @@ export type CountryType = typeof COUNTRY[keyof typeof COUNTRY]
 export type BoxerType = {
   id: number,
   name: string;
-  eng_name: string;
+  engName: string;
   birth: string;
   height: number;
   reach: number;
@@ -50,7 +50,7 @@ export type FightInfoType = {
   class: string,
 }
 //? 登録用 matchデータ
-export type RegisterMatchPropsType = Record<'red_boxer_id' | 'blue_boxer_id', number | undefined>
+export type RegisterMatchPropsType = Record<'redBoxerId' | 'blueBoxerId', number | undefined>
   & MatchFormDataType
 // export type RegisterMatchPropsType = {
 //   red_boxer_id: number,
@@ -64,7 +64,7 @@ export type RegisterMatchPropsType = Record<'red_boxer_id' | 'blue_boxer_id', nu
 // }
 
 export type MatchResultType = {
-  match_id: number,
+  matchId: number,
   result: "red" | "blue" | "draw" | "no-contest",
   detail?: "ko" | "tko" | "ud" | "md" | "sd",
   round?: string
@@ -74,22 +74,22 @@ export type MatchTitlesType = { organization: OrganizationsType, weightDivision:
 
 export type MatchDataType = {
   id: number,
-  red_boxer: BoxerType,
-  blue_boxer: BoxerType,
+  redBoxer: BoxerType,
+  blueBoxer: BoxerType,
   country: CountryType,
   venue: string,
   grade: GradeType,
   titles: MatchTitlesType | [],
   weight: WeightClassType,
-  match_date: string,
-  count_red: number,
-  count_blue: number,
+  matchDate: string,
+  countRed: number,
+  countBlue: number,
   result: MatchResultType | null,
 }
 
 export type MatchResultType = {
-  match_id: number,
-  match_result: "red" | "blue" | "draw" | "no-contest",
+  matchId: number,
+  matchResult: "red" | "blue" | "draw" | "no-contest",
   detail: "ko" | "tko" | "ud" | "md" | "sd",
   round: number
 }
@@ -101,7 +101,7 @@ export type OrganizationsType = typeof ORGANIZATIONS[keyof typeof ORGANIZATIONS]
 
 export type PredictionType = {
   id: number,
-  match_id: number,
+  matchId: number,
   prediction: "red" | "blue"
 }
 
@@ -112,7 +112,7 @@ export type NeedMatchPropertyForUpdateType = {
   venue: string;
   weight: number;
   titles: { organization: OrganizationsType, weightDivision: WeightClassType }[] | [];
-  match_date: string;
+  matchDate: string;
 };
 
 
@@ -120,15 +120,15 @@ export type NeedMatchPropertyForUpdateType = {
 
 export type CommentType = {
   id: number;
-  post_user_name: string;
+  postUserName: string;
   comment: string;
   prediction: "red" | "blue" | undefined;
-  created_at: string;
+  createdAt: string;
 }
 
 
 export type MatchUpdateFormType = {
-  match_date: string;
+  matchDate: string;
   grade: GradeType | undefined;
   country: CountryType | undefined;
   venue: string | undefined;
@@ -137,7 +137,7 @@ export type MatchUpdateFormType = {
 };
 
 export type MatchFormDataType = {
-  match_date: string;
+  matchDate: string;
   grade: GradeType | undefined;
   country: CountryType | undefined;
   venue: string | undefined;

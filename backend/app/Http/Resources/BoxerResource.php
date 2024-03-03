@@ -30,7 +30,7 @@ class BoxerResource extends JsonResource
         return [
             'id' => $this->boxer->id,
             'name' => $this->boxer->name,
-            'eng_name' => $this->boxer->eng_name,
+            'engName' => $this->boxer->eng_name,
             'country' => $this->boxer->country,
             'birth' => $this->boxer->birth,
             'height' => $this->boxer->height,

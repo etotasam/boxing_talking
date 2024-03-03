@@ -1,12 +1,8 @@
-import { useState, useEffect } from 'react';
-import { MdHowToVote } from 'react-icons/md';
 import { motion } from 'framer-motion';
 //!type
 import { MatchDataType } from '@/assets/types';
 //! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
-//! icon
-import { RiBoxingFill } from 'react-icons/ri';
 
 type IconType = 'DEFAULT' | 'MINI';
 

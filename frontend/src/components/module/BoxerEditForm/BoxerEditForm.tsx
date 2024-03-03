@@ -22,8 +22,7 @@ type PropsType = {
 
 export const BoxerEditForm = (props: PropsType) => {
   // ? recoil
-  const [boxerDataOnForm, setBoxerDataToForm] =
-    useRecoilState(boxerDataOnFormState);
+  const [boxerDataOnForm, setBoxerDataToForm] = useRecoilState(boxerDataOnFormState);
 
   //? 登録が完了したらformのデータを初期化
   useEffect(() => {
@@ -35,40 +34,19 @@ export const BoxerEditForm = (props: PropsType) => {
     <div className="p-10 bg-stone-200 border-stone-400 border-[1px]">
       <h1 className="text-3xl text-center">選手情報</h1>
       <form className="flex flex-col" onSubmit={props.onSubmit}>
-        <Name
-          boxerDataOnForm={boxerDataOnForm}
-          setBoxerDataToForm={setBoxerDataToForm}
-        />
+        <Name boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
 
-        <Country
-          boxerDataOnForm={boxerDataOnForm}
-          setBoxerDataToForm={setBoxerDataToForm}
-        />
+        <Country boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
 
-        <Birth
-          boxerDataOnForm={boxerDataOnForm}
-          setBoxerDataToForm={setBoxerDataToForm}
-        />
+        <Birth boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
 
-        <Height
-          boxerDataOnForm={boxerDataOnForm}
-          setBoxerDataToForm={setBoxerDataToForm}
-        />
+        <Height boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
 
-        <Reach
-          boxerDataOnForm={boxerDataOnForm}
-          setBoxerDataToForm={setBoxerDataToForm}
-        />
+        <Reach boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
 
-        <Stance
-          boxerDataOnForm={boxerDataOnForm}
-          setBoxerDataToForm={setBoxerDataToForm}
-        />
+        <Stance boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
 
-        <BoxerResume
-          boxerDataOnForm={boxerDataOnForm}
-          setBoxerDataToForm={setBoxerDataToForm}
-        />
+        <BoxerResume boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
 
         <Titles />
 
@@ -93,11 +71,11 @@ const Name = (props: DataEntryItemType) => {
         className="mt-3 px-1 rounded border-black"
         type="text"
         placeholder="名前(英字表示)"
-        name="eng_name"
-        value={boxerDataOnForm?.eng_name}
+        name="engName"
+        value={boxerDataOnForm?.engName}
         onChange={(e) =>
           setBoxerDataToForm((current: BoxerType) => {
-            return { ...current, eng_name: e.target.value };
+            return { ...current, engName: e.target.value };
           })
         }
       />
@@ -319,8 +297,7 @@ const Titles = () => {
   // ? タイトル入力欄(<input> <select>)の数を決める useState
   const [hasTitleCount, setHasTitleCount] = useState(1);
 
-  const [boxerDataOnForm, setBoxerDataOnForm] =
-    useRecoilState(boxerDataOnFormState);
+  const [boxerDataOnForm, setBoxerDataOnForm] = useRecoilState(boxerDataOnFormState);
 
   // ? 団体と階級を選択した場合入力欄を追加
   useEffect(() => {
@@ -346,11 +323,7 @@ const Titles = () => {
             {/* //? 団体選択 */}
             <div className="mt-3 flex p-1">
               <select
-                value={
-                  boxerDataOnForm.titles[i]
-                    ? boxerDataOnForm.titles[i].organization
-                    : ''
-                }
+                value={boxerDataOnForm.titles[i] ? boxerDataOnForm.titles[i].organization : ''}
                 onChange={(e) =>
                   setBoxerDataOnForm((boxerDataOnForm) => {
                     const cloneBoxerDataOnForm = cloneDeep(boxerDataOnForm);
@@ -367,11 +340,7 @@ const Titles = () => {
                 }
               >
                 <option value=""></option>
-                {(
-                  Object.keys(ORGANIZATIONS) as Array<
-                    keyof typeof ORGANIZATIONS
-                  >
-                ).map((key) => (
+                {(Object.keys(ORGANIZATIONS) as Array<keyof typeof ORGANIZATIONS>).map((key) => (
                   <option key={key} value={ORGANIZATIONS[key]}>
                     {ORGANIZATIONS[key]}
                   </option>
@@ -381,11 +350,7 @@ const Titles = () => {
             {/* //? 階級選択 */}
             <div className="mt-3 flex p-1">
               <select
-                value={
-                  boxerDataOnForm.titles[i]
-                    ? boxerDataOnForm.titles[i].weight
-                    : ''
-                }
+                value={boxerDataOnForm.titles[i] ? boxerDataOnForm.titles[i].weight : ''}
                 onChange={(e) =>
                   setBoxerDataOnForm((boxerDataOnForm) => {
                     const cloneBoxerDataOnForm = cloneDeep(boxerDataOnForm);
@@ -402,9 +367,7 @@ const Titles = () => {
                 }
               >
                 <option value=""></option>
-                {(
-                  Object.keys(WEIGHT_CLASS) as Array<keyof typeof WEIGHT_CLASS>
-                ).map((key) => (
+                {(Object.keys(WEIGHT_CLASS) as Array<keyof typeof WEIGHT_CLASS>).map((key) => (
                   <option key={key} value={WEIGHT_CLASS[key]}>
                     {WEIGHT_CLASS[key]}
                   </option>

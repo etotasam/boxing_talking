@@ -5,7 +5,7 @@ import { WEIGHT_CLASS, GRADE } from '@/assets/boxerData';
 import { COUNTRY } from '@/assets/nationalFlagData';
 
 const originData = {
-  match_date: '2024-2-28',
+  matchDate: '2024-2-28',
   grade: GRADE.R12,
   country: COUNTRY.AUSTRALIA,
   venue: 'match venue',

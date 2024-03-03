@@ -13,6 +13,8 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\QueryException;
 use App\Exceptions\NonAdministratorException;
 use App\Http\Requests\BoxingMatchesRequest;
+use App\Repositories\Interfaces\WeightDivisionRepositoryInterface;
+use App\Repositories\Interfaces\GradeRepositoryInterface;
 
 class MatchController extends ApiController
 {
@@ -20,6 +22,8 @@ class MatchController extends ApiController
     public function __construct(
         private MatchService $matchService,
         private AuthService $authService,
+        private WeightDivisionRepositoryInterface $weightRepository,
+        private GradeRepositoryInterface $gradeRepository,
     ) {
     }
 

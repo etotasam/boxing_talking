@@ -25,8 +25,7 @@ export const MatchRegister = () => {
     red_boxer: undefined,
     blue_boxer: undefined,
   };
-  const [matchBoxers, setMatchBoxers] =
-    useState<MatchBoxersType>(initialMatchBoxers);
+  const [matchBoxers, setMatchBoxers] = useState<MatchBoxersType>(initialMatchBoxers);
   const { resetLoadingState } = useLoading();
 
   //? 初期設定(クリーンアップとか)
@@ -41,10 +40,7 @@ export const MatchRegister = () => {
       <Helmet>
         <title>試合登録 | {siteTitle}</title>
       </Helmet>
-      <div
-        className="w-full flex"
-        style={{ minHeight: `calc( 100vh - ${headerHeight}px)` }}
-      >
+      <div className="w-full flex" style={{ minHeight: `calc( 100vh - ${headerHeight}px)` }}>
         <section className="w-[70%] border-r-[1px] border-stone-200">
           <div className="sticky top-[80px]">
             <MatchSetUpBox boxers={matchBoxers} />
@@ -52,8 +48,8 @@ export const MatchRegister = () => {
               <div className="w-[50%] flex justify-center">
                 <RegisterMatchForm
                   boxers={{
-                    red_boxer_id: matchBoxers.red_boxer?.id,
-                    blue_boxer_id: matchBoxers.blue_boxer?.id,
+                    redBoxerId: matchBoxers.red_boxer?.id,
+                    blueBoxerId: matchBoxers.blue_boxer?.id,
                   }}
                   resetSelectedBoxers={() => setMatchBoxers(initialMatchBoxers)}
                 />
@@ -105,10 +101,7 @@ const BoxerBox = ({ boxerData }: { boxerData: BoxerType }) => {
     <>
       <div className="w-[300px] mt-3 border-[1px] border-stone-300 rounded-md p-3">
         <div className="text-center">
-          <EngNameWithFlag
-            boxerCountry={boxerData.country}
-            boxerEngName={boxerData.eng_name}
-          />
+          <EngNameWithFlag boxerCountry={boxerData.country} boxerEngName={boxerData.engName} />
           <h2 className="relative inline-block">{boxerData.name}</h2>
         </div>
       </div>
@@ -126,11 +119,7 @@ type MatchBoxersType = {
   red_boxer: BoxerType | undefined;
   blue_boxer: BoxerType | undefined;
 };
-const BoxersList = ({
-  boxersData,
-  matchBoxers,
-  setMatchBoxers,
-}: BoxerListType) => {
+const BoxersList = ({ boxersData, matchBoxers, setMatchBoxers }: BoxerListType) => {
   const isChecked = (id: number) => {
     return Object.values(matchBoxers).some((boxer) => boxer && boxer.id === id);
   };
@@ -138,8 +127,7 @@ const BoxersList = ({
   // ? ボクサーを選択出来るかどうかの判断（チェックボックスの状態を確認）
   const canCheck = (id: number) => {
     //? red,blueのどちらか一方でも選択されていなければチェックをつける事ができる
-    if (Object.values(matchBoxers).some((boxer) => boxer === undefined))
-      return false;
+    if (Object.values(matchBoxers).some((boxer) => boxer === undefined)) return false;
     //? 選択している選手はチェックをはずす事ができる
     if (Object.values(matchBoxers).some((boxer) => boxer && boxer.id === id)) {
       return false;
@@ -147,10 +135,7 @@ const BoxersList = ({
     return true;
   };
 
-  const handleCheckboxChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    boxer: BoxerType
-  ) => {
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, boxer: BoxerType) => {
     if (e.target.checked) {
       //? redが空いていれば入れる
       if (matchBoxers.red_boxer === undefined) {
@@ -170,14 +155,15 @@ const BoxersList = ({
     }
 
     //? checked状態のobjectをクリックした時はチェックを外す
-    const selectedBoxerState = (
-      Object.keys(matchBoxers) as Array<keyof MatchBoxersType>
-    ).reduce((acc, key) => {
-      if (matchBoxers[key]?.id === boxer.id) {
-        return { ...acc, [key]: undefined };
-      }
-      return { ...acc };
-    }, matchBoxers);
+    const selectedBoxerState = (Object.keys(matchBoxers) as Array<keyof MatchBoxersType>).reduce(
+      (acc, key) => {
+        if (matchBoxers[key]?.id === boxer.id) {
+          return { ...acc, [key]: undefined };
+        }
+        return { ...acc };
+      },
+      matchBoxers
+    );
     setMatchBoxers(selectedBoxerState);
   };
 
@@ -185,8 +171,8 @@ const BoxersList = ({
     <>
       {boxersData && (
         <ul className="flex justify-center flex-col items-center">
-          {boxersData.map((boxer) => (
-            <div className="relative" key={boxer.eng_name}>
+          {boxersData.map((boxer, i) => (
+            <div className="relative" key={`${boxer.engName}_${i}`}>
               <input
                 className="absolute top-[50%] left-5 translate-y-[-50%] cursor-pointer"
                 id={`${boxer.id}_${boxer.name}`}
@@ -197,16 +183,10 @@ const BoxersList = ({
                 disabled={canCheck(boxer.id)}
                 onChange={(e) => handleCheckboxChange(e, boxer)}
               />
-              <label
-                className={'w-[90%] cursor-pointer'}
-                htmlFor={`${boxer.id}_${boxer.name}`}
-              >
+              <label className={'w-[90%] cursor-pointer'} htmlFor={`${boxer.id}_${boxer.name}`}>
                 <li className="w-[300px] mt-3 border-[1px] border-stone-300 rounded-md p-3">
                   <div className="text-center">
-                    <EngNameWithFlag
-                      boxerCountry={boxer.country}
-                      boxerEngName={boxer.eng_name}
-                    />
+                    <EngNameWithFlag boxerCountry={boxer.country} boxerEngName={boxer.engName} />
                     <h2 className="text-lg mt-2">{boxer.name}</h2>
                   </div>
                 </li>

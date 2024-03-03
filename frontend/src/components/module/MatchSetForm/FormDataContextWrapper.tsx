@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { MatchUpdateFormType, OrganizationsType } from '@/assets/types';
 
 const initialFormData: MatchUpdateFormType = {
-  match_date: dayjs().format('YYYY-MM-DD'),
+  matchDate: dayjs().format('YYYY-MM-DD'),
   grade: undefined,
   country: undefined,
   venue: '',
@@ -17,17 +17,8 @@ export const FormDataContext = createContext<{
   setFormData: React.Dispatch<React.SetStateAction<MatchUpdateFormType>>;
 }>({ formData: initialFormData, setFormData: () => {} });
 
-export const FormDataContextWrapper = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  const [formData, setFormData] =
-    useState<MatchUpdateFormType>(initialFormData);
+export const FormDataContextWrapper = ({ children }: { children: React.ReactNode }) => {
+  const [formData, setFormData] = useState<MatchUpdateFormType>(initialFormData);
   const value = { formData, setFormData };
-  return (
-    <FormDataContext.Provider value={value}>
-      {children}
-    </FormDataContext.Provider>
-  );
+  return <FormDataContext.Provider value={value}>{children}</FormDataContext.Provider>;
 };
