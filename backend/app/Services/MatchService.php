@@ -10,6 +10,8 @@ use App\Repositories\Interfaces\CommentRepositoryInterface;
 use App\Repositories\Interfaces\TitleMatchRepositoryInterface;
 use App\Repositories\Interfaces\WinLossPredictionRepositoryInterface;
 use App\Repositories\Interfaces\BoxerRepositoryInterface;
+use App\Repositories\Interfaces\GradeRepositoryInterface;
+use App\Repositories\Interfaces\WeightDivisionRepositoryInterface;
 use App\Services\TitleMatchService;
 use Illuminate\Database\QueryException;
 use App\Exceptions\NonAdministratorException;
@@ -25,6 +27,8 @@ class MatchService
     protected TitleMatchRepositoryInterface $titleMatchRepository,
     protected WinLossPredictionRepositoryInterface $predictionRepository,
     protected BoxerRepositoryInterface $boxerRepository,
+    protected GradeRepositoryInterface $gradeRepository,
+    protected WeightDivisionRepositoryInterface $weightRepository,
   ) {
   }
 
@@ -49,14 +53,12 @@ class MatchService
    *
    * @return void
    */
-  public function storeMatch(array $matchDataForStore)
+  public function storeMatch(array $requestMatchData)
   {
-    $organizationsNameArray = $this->extractOrganizationsArray($matchDataForStore);
-    unset($matchDataForStore['titles']);
-
     DB::beginTransaction();
     try {
-      $createdMatch = $this->matchRepository->createMatch($matchDataForStore);
+      [$organizationsNameArray, $formattedMatchData] = $this->formatMatchDataForStore($requestMatchData);
+      $createdMatch = $this->matchRepository->createMatch($formattedMatchData);
       if (!$createdMatch) {
         throw new Exception("Can not create match", 51);
       }
@@ -76,6 +78,29 @@ class MatchService
     }
 
     DB::commit();
+  }
+
+
+  /**
+   * @param array $matchData match data before format
+   * @return array [$organizationsNameArray, $formattedMatchArray] organizationsName array & formatted match data for store
+   */
+  private function formatMatchDataForStore(array $matchData): array
+  {
+
+    $organizationsNameArray = $this->extractOrganizationsArray($matchData);
+
+
+    $grade = $matchData['grade'];
+    $gradeId = $this->gradeRepository->getGradeId($grade);
+    $weight = $matchData['weight'];
+    $weightId = $this->weightRepository->getWeightId($weight);
+
+    unset($matchData['weight'], $matchData['grade'], $matchData['titles']);
+
+    $formattedMatchData = array_merge($matchData, ["grade_id" => $gradeId], ["weight_id" => $weightId]);
+
+    return [$organizationsNameArray, $formattedMatchData];
   }
 
   /**
