@@ -9,6 +9,8 @@ use App\Models\Boxer;
 use App\Services\BoxerService;
 use App\Services\TitleService;
 use App\Repositories\Interfaces\TitleRepositoryInterface;
+use App\Repositories\OrganizationRepository;
+use App\Repositories\WeightDivisionRepository;
 use App\Repositories\TitleRepository;
 use Database\Seeders\OrganizationSeeder;
 use Database\Seeders\WeightDivisionSeeder;
@@ -82,7 +84,7 @@ class StoreTitleMethodTest extends TestCase
     $mockTitleRepository = \Mockery::mock(TitleRepository::class);
     $mockTitleRepository->makePartial();
     $mockTitleRepository->shouldReceive('storeTitlesHoldByTheBoxer')->andReturn(false);
-    $this->titleService = (new TitleService($mockTitleRepository));
+    $this->titleService = (new TitleService($mockTitleRepository, new OrganizationRepository, new WeightDivisionRepository));
 
 
     //新たに登録するタイトル(formatはフロント側から送れてくる形式)

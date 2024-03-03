@@ -75,6 +75,7 @@ class BoxerService
           $this->titleService->storeTitle($updateBoxerData['id'], $updateBoxerData["titles"]);
           unset($updateBoxerData["titles"]);
         };
+        \Log::debug($updateBoxerData);
         $this->boxerRepository->updateBoxer($updateBoxerData);
       });
     } catch (QueryException $e) {

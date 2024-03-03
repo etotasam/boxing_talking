@@ -14,6 +14,13 @@ interface WinLossPredictionRepositoryInterface
   public function getPredictionByUser();
 
   /**
+   * 試合の投票数の取得
+   * @param int $matchId
+   * @return array ["red" => int, "blue" => int]
+   */
+  public function getMatchPrediction(int $matchId);
+
+  /**
    * 試合への投票
    *
    * @param string $userId

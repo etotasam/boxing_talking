@@ -21,13 +21,22 @@ class WinLossPredictionRepository implements WinLossPredictionRepositoryInterfac
       return Auth::guard('guest')->user()->prediction;
     }
     return null;
-    // if (!$isUser && !$isGuest) {
-    // }
   }
 
   public function deletePredictionOnMatch($matchId)
   {
     WinLossPrediction::where("match_id", $matchId)->delete();
+  }
+
+  public function getMatchPrediction($matchId)
+  {
+    $voteCounts = WinLossPrediction::where('match_id', $matchId)
+      ->select('prediction', \DB::raw('COUNT(*) as count'))
+      ->groupBy('prediction')
+      ->pluck('count', 'prediction')
+      ->toArray();
+
+    return $voteCounts;
   }
 
   public function storePrediction(string $userId, int $matchId, string $prediction)

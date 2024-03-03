@@ -52,16 +52,6 @@ export type FightInfoType = {
 //? 登録用 matchデータ
 export type RegisterMatchPropsType = Record<'redBoxerId' | 'blueBoxerId', number | undefined>
   & MatchFormDataType
-// export type RegisterMatchPropsType = {
-//   red_boxer_id: number,
-//   blue_boxer_id: number,
-//   match_date: string,
-//   grade: string,
-//   country: CountryType,
-//   venue: string,
-//   weight: string,
-//   titles: string[],
-// }
 
 export type MatchResultType = {
   matchId: number,
@@ -143,4 +133,13 @@ export type MatchFormDataType = {
   venue: string | undefined;
   weight: WeightClassType | undefined;
   titles: OrganizationsType[] | [];
+}
+
+
+//? 試合予想投票数
+
+export type MatchPredictionsType = {
+  totalVotes: number,
+  red: number,
+  blue: number
 }

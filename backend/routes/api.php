@@ -40,6 +40,7 @@ Route::get('/match/{match}/show', [MatchController::class, 'show']);
 Route::get('/boxer', [BoxerController::class, 'index']);
 //? 勝利予想
 Route::get('/prediction', [WinLossPredictionController::class, 'index']);
+Route::get('/match/prediction', [WinLossPredictionController::class, 'fetchOnMatch']);
 //? コメント
 Route::get('/comment', [CommentController::class, 'index']);
 // !ゲストユーザーか通常の認証が必須

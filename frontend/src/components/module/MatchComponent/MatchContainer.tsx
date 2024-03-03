@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/assets/routePath';
 //! types
-import { MatchDataType } from '@/assets/types';
+import { MatchDataType, MatchPredictionsType } from '@/assets/types';
 // ! hook
 import { useModalState } from '@/hooks/useModalState';
 import { useWindowSize } from '@/hooks/useWindowSize';
@@ -12,6 +12,7 @@ import { useLoading } from '@/hooks/useLoading';
 import {
   useVoteMatchPrediction,
   useAllFetchMatchPredictionOfAuthUser,
+  useMatchPredictions,
 } from '@/hooks/apiHooks/uesWinLossPrediction';
 //! component
 import { MatchComponent } from './MatchComponent';
@@ -30,8 +31,10 @@ export const MatchContainer = (props: PropsType) => {
   //? 勝敗予想投票実行時の状態hook
   const { isSuccess: isSuccessVoteMatchPrediction } = useVoteMatchPrediction();
   //? userの勝敗予想投票をすべて取得など…
-  const { data: allPredictionVoteOfUsers, refetch: refetchAllPredictionData } =
-    useAllFetchMatchPredictionOfAuthUser();
+  const { data: allPredictionVoteOfUsers } = useAllFetchMatchPredictionOfAuthUser();
+  const { data: matchPredictions, refetch: refetchMatchPredictions } = useMatchPredictions(
+    Number(matchId)
+  );
   const { resetLoadingState } = useLoading();
   const navigate = useNavigate();
   const { device } = useWindowSize();
@@ -87,7 +90,7 @@ export const MatchContainer = (props: PropsType) => {
   //? コメント投稿に成功したら投票してねモーダルを消す&勝敗予想を再取得
   useEffect(() => {
     if (isSuccessVoteMatchPrediction) {
-      refetchAllPredictionData();
+      refetchMatchPredictions();
     }
   }, [isSuccessVoteMatchPrediction]);
 
@@ -119,6 +122,7 @@ export const MatchContainer = (props: PropsType) => {
       <MatchContextWrapper
         thisMatchPredictionByUser={thisMatchPredictionByUser}
         isThisMatchAfterToday={isThisMatchAfterToday}
+        matchPredictions={matchPredictions}
       >
         <MatchComponent
           matchData={thisMatch}
@@ -140,14 +144,19 @@ type MatchContextWrapperType = {
   children: React.ReactNode;
   thisMatchPredictionByUser: ThisMatchPredictionByUserType;
   isThisMatchAfterToday: boolean | undefined;
+  matchPredictions: MatchPredictionsType | undefined;
 };
+
+export const MatchPredictionsContext = createContext<MatchPredictionsType | undefined>(undefined);
 
 export const MatchContextWrapper = (props: MatchContextWrapperType) => {
   return (
-    <ThisMatchPredictionByUserContext.Provider value={props.thisMatchPredictionByUser}>
-      <IsThisMatchAfterTodayContext.Provider value={props.isThisMatchAfterToday}>
-        {props.children}
-      </IsThisMatchAfterTodayContext.Provider>
-    </ThisMatchPredictionByUserContext.Provider>
+    <MatchPredictionsContext.Provider value={props.matchPredictions}>
+      <ThisMatchPredictionByUserContext.Provider value={props.thisMatchPredictionByUser}>
+        <IsThisMatchAfterTodayContext.Provider value={props.isThisMatchAfterToday}>
+          {props.children}
+        </IsThisMatchAfterTodayContext.Provider>
+      </ThisMatchPredictionByUserContext.Provider>
+    </MatchPredictionsContext.Provider>
   );
 };

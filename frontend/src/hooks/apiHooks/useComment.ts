@@ -60,7 +60,7 @@ export const useFetchComments = (matchId: number) => {
   }
 
   const { data, isLoading: isCommentsLoading, isFetching, refetch, isError, isSuccess } = useQuery<CommentType[]>([QUERY_KEY.COMMENT, { id: matchId }], api, {
-    staleTime: 30000, onError: (error: unknown) => {
+    staleTime: 5 * 60 * 1000, onError: (error: unknown) => {
       if ((error as AxiosError).status === 419) {
         showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         return

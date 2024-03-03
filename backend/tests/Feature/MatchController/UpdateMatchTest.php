@@ -9,6 +9,10 @@ use App\Helpers\TestHelper;
 use App\Models\Boxer;
 use App\Models\BoxingMatch;
 use App\Services\TitleMatchService;
+use Database\Seeders\WeightDivisionSeeder;
+use Database\Seeders\OrganizationSeeder;
+use Database\Seeders\GradeSeeder;
+
 
 class UpdateMatchTest extends TestCase
 {
@@ -26,6 +30,11 @@ class UpdateMatchTest extends TestCase
   protected function setUp(): void
   {
     parent::setUp();
+    $this->seed([
+      WeightDivisionSeeder::class,
+      GradeSeeder::class,
+    ]);
+
     $this->mockTitleMatchService = \Mockery::mock(TitleMatchService::class);
     Boxer::factory()->count(2)->create(); // boxer_idの1と2を作成
     $this->match = BoxingMatch::factory()->create(['country' => 'Japan', 'red_boxer_id' => 1, 'blue_boxer_id' => 2]);

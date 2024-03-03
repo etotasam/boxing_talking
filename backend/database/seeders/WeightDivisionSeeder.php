@@ -27,6 +27,11 @@ class WeightDivisionSeeder extends Seeder
             ['weight' => "Sフェザー"],
             ['weight' => "フェザー"],
             ['weight' => "Sバンタム"],
+            ['weight' => "バンタム"],
+            ['weight' => "Sフライ"],
+            ['weight' => "フライ"],
+            ['weight' => "Lフライ"],
+            ['weight' => "ミニマム"],
         ]);
     }
 }

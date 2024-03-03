@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\WinLossPredictionService;
 use App\Http\Resources\WinLossPredictionResource;
+use App\Http\Resources\MatchPredictionsResource;
 use App\Repositories\Interfaces\WinLossPredictionRepositoryInterface;
 
 class WinLossPredictionController extends ApiController
@@ -40,6 +41,21 @@ class WinLossPredictionController extends ApiController
         }
 
         return $responsePrediction;
+    }
+
+    /**
+     * 試合の投票数の取得
+     * @param int match_id
+     * @return MatchPredictionsResource|JsonResponse
+     */
+    public function fetchOnMatch(Request $request)
+    {
+        try {
+            $matchPredictions = $this->predictionRepository->getMatchPrediction($request->match_id);
+            return new MatchPredictionsResource($matchPredictions);
+        } catch (\Exception $e) {
+            return $this->responseInvalidQuery($e->getMessage() ?? "Failed get match predictions");
+        }
     }
 
     /**

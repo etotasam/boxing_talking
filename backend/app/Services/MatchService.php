@@ -91,6 +91,7 @@ class MatchService
     $organizationsNameArray = $this->extractOrganizationsArray($matchData);
 
 
+
     $grade = $matchData['grade'];
     $gradeId = $this->gradeRepository->getGradeId($grade);
     $weight = $matchData['weight'];
@@ -123,7 +124,6 @@ class MatchService
     } else {
       $matches = $this->matchRepository->getMatches();
     }
-
     return $matches;
   }
 

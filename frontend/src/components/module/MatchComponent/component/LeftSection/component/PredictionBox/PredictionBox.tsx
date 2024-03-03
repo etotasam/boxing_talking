@@ -2,103 +2,110 @@ import { useContext, useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 //! type
-import { MatchDataType } from '@/assets/types';
+import { MatchDataType, MatchPredictionsType } from '@/assets/types';
 //! context
 import {
   ThisMatchPredictionByUserContext,
   IsThisMatchAfterTodayContext,
+  MatchPredictionsContext,
 } from '@/components/module/MatchComponent/MatchContainer';
 //! hooks
 import { useModalState } from '@/hooks/useModalState';
 //! icon
 import { MdHowToVote } from 'react-icons/md';
+//! recoil
+import { useRecoilValue } from 'recoil';
+import { apiFetchDataState } from '@/store/apiFetchDataState';
 
 export const PredictionsBox = ({ matchData }: { matchData: MatchDataType | undefined }) => {
   //? この試合へのuserの勝敗予想をcontextから取得
   const thisMatchPredictionOfUser = useContext(ThisMatchPredictionByUserContext);
 
   //? userがこの試合への勝敗予想は投票済みかどうか
-  const isVoted = thisMatchPredictionOfUser === 'red' || thisMatchPredictionOfUser === 'blue';
+  const isVoted =
+    thisMatchPredictionOfUser !== undefined &&
+    (thisMatchPredictionOfUser === 'red' || thisMatchPredictionOfUser === 'blue');
+
+  //? userが投票中…
+  const isPostingPrediction = useRecoilValue(
+    apiFetchDataState({ dataName: 'userPrediction/post', state: 'isLoading' })
+  );
+
+  //? ユーザーの予想のリフェッチ中…
+  const isPredictionRefetching = useRecoilValue(
+    apiFetchDataState({ dataName: 'userPrediction/fetch', state: 'isFetching' })
+  );
+
+  //? 試合予想投票数の初期取得中…
+  const isMatchPredictionLoading = useRecoilValue(
+    apiFetchDataState({ dataName: 'matchPrediction/fetch', state: 'isLoading' })
+  );
 
   //? 試合日が未来かどうか
   const isThisMatchAfterToday = useContext(IsThisMatchAfterTodayContext);
 
-  //? 勝敗予想投票数の表示条件
-  const isShowPredictionBar = (isVoted || isThisMatchAfterToday === false) && !!matchData;
+  //? 試合予想数
+  const matchPredictions = useContext(MatchPredictionsContext);
 
-  const isShowVoteBox = !isVoted && isThisMatchAfterToday === true && !!matchData;
+  //? 勝敗予想投票数の表示条件
+  const isShowPredictionBar =
+    (isVoted || isThisMatchAfterToday === false) && matchPredictions && !!matchData;
+
+  //? 予想投票数などを表示する条件
+  const isShowPredictionBox =
+    (!!matchData && isVoted && !isMatchPredictionLoading) || !isThisMatchAfterToday;
+
+  const isShowVoteBox = thisMatchPredictionOfUser === false;
 
   return (
     <>
-      <div className="h-[50px]">
-        {isShowPredictionBar && <PredictionBox matchData={matchData} />}
-        {isShowVoteBox && <VoteBox />}
+      <div className="h-[25px] my-2">
+        {isShowPredictionBox ? (
+          <PredictionBox matchPredictions={matchPredictions!} />
+        ) : (
+          isShowVoteBox && <VoteBox />
+        )}
       </div>
     </>
   );
 };
 
-const PredictionBox = ({ matchData }: { matchData: MatchDataType }) => {
+const PredictionBox = ({ matchPredictions }: { matchPredictions: MatchPredictionsType }) => {
   return (
     <div className="flex justify-center">
       <div className="w-[95%]">
-        <PredictionVoteCount matchData={matchData} />
-        <PredictionBar matchData={matchData} />
+        <PredictionBar matchPredictions={matchPredictions} />
       </div>
     </div>
   );
 };
 
-const PredictionVoteCount = ({ matchData }: { matchData: MatchDataType }) => {
-  //? この試合へのuserの勝敗予想をcontextから取得
-  const thisMatchPredictionOfUser = useContext(ThisMatchPredictionByUserContext);
-
-  return (
-    <div className="flex justify-between text-stone-300">
-      <span
-        className={clsx(
-          'block pl-3 text-lg font-semibold right-0 top-0',
-          "after:content-['票'] after:text-xs after:text-stone-300 after:ml-1",
-          thisMatchPredictionOfUser === 'red' && 'text-red-400'
-        )}
-      >
-        {matchData.countRed}
-      </span>
-      {
-        <span
-          className={clsx(
-            'block text-right pr-3 text-lg font-semibold right-0 top-0',
-            "after:content-['票'] after:text-xs after:text-stone-300 after:ml-1",
-            thisMatchPredictionOfUser === 'blue' && 'text-blue-500'
-          )}
-        >
-          {matchData.countBlue}
-        </span>
-      }
-    </div>
-  );
-};
-
 type PredictionBarType = {
-  matchData: MatchDataType;
+  matchPredictions: MatchPredictionsType;
 };
 const PredictionBar = (props: PredictionBarType) => {
-  const { matchData } = props;
+  const { matchPredictions } = props;
+  const thisMatchPredictionOfUser = useContext(ThisMatchPredictionByUserContext);
 
   const [redCountRatio, setRedCountRatio] = useState<number>(0);
   const [blueCountRatio, setBlueCountRatio] = useState<number>(0);
 
   const setWinPredictionRate = (): void => {
-    if (!matchData) return;
-    const totalCount = matchData.countRed + matchData.countBlue;
-    const redRatio = Math.round((matchData.countRed / totalCount) * 100);
+    if (!matchPredictions) return;
+    const totalCount = matchPredictions.totalVotes;
+    const redRatio = Math.round((matchPredictions.red / totalCount) * 1000) / 10;
     setRedCountRatio(!isNaN(redRatio) ? redRatio : 0);
-    const blueRatio = Math.round((matchData.countBlue / totalCount) * 100);
+    const blueRatio = Math.round((matchPredictions.blue / totalCount) * 1000) / 10;
     setBlueCountRatio(!isNaN(blueRatio) ? blueRatio : 0);
   };
+
   useEffect(() => {
+    if (!matchPredictions) return;
     setWinPredictionRate();
-  }, [matchData]);
+  }, [matchPredictions]);
+
+  if (!thisMatchPredictionOfUser) return;
+  if (!matchPredictions) return;
 
   return (
     <div className="flex">
@@ -109,8 +116,20 @@ const PredictionBar = (props: PredictionBarType) => {
           }}
           animate={{ width: `${redCountRatio}%` }}
           transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-          className="h-[10px] absolute top-0 left-[-1px] rounded-[50px] bg-red-500"
-        />
+          className="h-[25px] absolute top-0 left-[-1px] rounded-sm bg-red-800"
+        >
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 1.5 }}
+            className={clsx(
+              'text-[26px] absolute bottom-[5px] left-3',
+              thisMatchPredictionOfUser === 'red' ? 'text-yellow-400 font-bold' : 'text-stone-300'
+            )}
+          >
+            {matchPredictions.red}
+          </motion.span>
+        </motion.div>
 
         <motion.div
           initial={{
@@ -118,8 +137,20 @@ const PredictionBar = (props: PredictionBarType) => {
           }}
           animate={{ width: `${blueCountRatio}%` }}
           transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
-          className="h-[10px] absolute top-0 right-[-1px] rounded-[50px] bg-blue-500"
-        />
+          className="h-[25px] absolute top-0 right-[-1px] rounded-sm bg-blue-800"
+        >
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 1.5 }}
+            className={clsx(
+              'text-[26px] absolute bottom-[5px] right-3',
+              thisMatchPredictionOfUser === 'blue' ? 'text-yellow-400 font-bold' : 'text-stone-300'
+            )}
+          >
+            {matchPredictions.blue}
+          </motion.span>
+        </motion.div>
       </div>
     </div>
   );

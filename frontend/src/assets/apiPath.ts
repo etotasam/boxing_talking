@@ -13,6 +13,7 @@ export const API_PATH = {
   BOXER: '/api/boxer',
   //?prediction
   PREDICTION: '/api/prediction',
+  MATCH_PREDICTION: '/api/match/prediction',
   //?comment
   COMMENT: '/api/comment',
   //?match

@@ -38,28 +38,13 @@ export const PredictionVoteModal = ({
         </h2>
         <div className="mt-5 w-full">
           <div className="w-full flex justify-center">
-            <BoxerButton
-              boxerData={boxersData.red}
-              onClick={() => voteExecution('red')}
-            />
+            <BoxerButton boxerData={boxersData.red} onClick={() => voteExecution('red')} />
           </div>
 
           <div className="w-full flex justify-center mt-7">
-            <BoxerButton
-              boxerData={boxersData.blue}
-              onClick={() => voteExecution('blue')}
-            />
+            <BoxerButton boxerData={boxersData.blue} onClick={() => voteExecution('blue')} />
           </div>
         </div>
-
-        {/* <div className="mt-5 flex justify-center items-center">
-            <button
-              onClick={close}
-              className="max-w-[500px] w-full  bg-stone-600 text-white  py-1 rounded-sm"
-            >
-              わからない
-            </button>
-          </div> */}
       </div>
       <RiCloseLine
         onClick={close}

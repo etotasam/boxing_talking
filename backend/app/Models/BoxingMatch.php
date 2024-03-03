@@ -9,6 +9,7 @@ use App\Models\Comment;
 use App\Models\Grade;
 use App\Models\WeightDivision;
 use App\Models\Organization;
+use App\Models\MatchPrediction;
 use Illuminate\Support\Facades\Log;
 
 class BoxingMatch extends Model
@@ -29,8 +30,8 @@ class BoxingMatch extends Model
         'venue',
         'weight_id',
         'titles',
-        'count_red',
-        'count_blue',
+        // 'count_red',
+        // 'count_blue',
     ];
 
     protected $hidden = [

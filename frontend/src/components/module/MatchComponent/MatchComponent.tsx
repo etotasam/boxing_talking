@@ -38,9 +38,7 @@ export const MatchComponent = (props: PropsType) => {
             </section>
           )}
 
-          <section
-            className={clsx('relative', device === 'PC' ? 'w-[70%]' : 'w-full')}
-          >
+          <section className={clsx('relative', device === 'PC' ? 'w-[70%]' : 'w-full')}>
             <Comments matchId={matchData.id} />
             <PostComment />
             <CommentLoadingModal />
@@ -76,12 +74,7 @@ const CommentLoadingModal = () => {
             transition={{ duration: 0.3 }}
             className="flex select-none"
           >
-            <RotatingLines
-              strokeColor="#f5f5f5"
-              strokeWidth="3"
-              animationDuration="1"
-              width="20"
-            />
+            <RotatingLines strokeColor="#f5f5f5" strokeWidth="3" animationDuration="1" width="20" />
             <span className="ml-1 text-neutral-200/60 text-sm">{text}</span>
           </motion.div>
         </motion.div>

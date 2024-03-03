@@ -33,15 +33,9 @@ function App() {
           <Route element={<AdminOnly />}>
             <Route path={ROUTE_PATH.ADMIN} element={<Admin />} />
             <Route path={ROUTE_PATH.BOXER_EDIT} element={<BoxerEdit />} />
-            <Route
-              path={ROUTE_PATH.BOXER_REGISTER}
-              element={<BoxerRegister />}
-            />
+            <Route path={ROUTE_PATH.BOXER_REGISTER} element={<BoxerRegister />} />
             <Route path={ROUTE_PATH.MATCH_EDIT} element={<MatchEdit />} />
-            <Route
-              path={ROUTE_PATH.MATCH_REGISTER}
-              element={<MatchRegister />}
-            />
+            <Route path={ROUTE_PATH.MATCH_REGISTER} element={<MatchRegister />} />
             {/* //? </AdminOnly> */}
           </Route>
           {/* //? </container> */}
@@ -49,6 +43,7 @@ function App() {
 
         <Route path={ROUTE_PATH.TERMS} element={<Terms />} />
         <Route path={ROUTE_PATH.IDENTIFICATION} element={<Identification />} />
+        {/* <Route path={'/test'} element={<TestPage />} /> */}
 
         <Route path="/*" element={<NotFound />} />
       </Routes>
