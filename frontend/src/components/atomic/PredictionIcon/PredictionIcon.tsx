@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { MatchDataType } from '@/assets/types';
 //! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
-import { useAllFetchMatchPredictionOfAuthUser } from '@/hooks/apiHooks/uesWinLossPrediction';
+import { useFetchUsersPrediction } from '@/hooks/apiHooks/uesWinLossPrediction';
 
 type IconType = 'DEFAULT' | 'MINI';
 
@@ -15,19 +15,19 @@ type PropsType = {
 };
 
 export const PredictionIconWrapper = ({ matchData, iconType = 'DEFAULT' }: PropsType) => {
-  const { data: allPrediction } = useAllFetchMatchPredictionOfAuthUser();
+  const { data: allPrediction } = useFetchUsersPrediction();
 
-  const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
+  const { isDayOnFight, isDayAfterFight } = useDayOfFightChecker(matchData.matchDate);
 
   const [isHide, setIsHide] = useState(true);
   useEffect(() => {
     if (!Array.isArray(allPrediction)) return setIsHide(true);
-    if (isDayOverFight === undefined || isDayOverFight === true) return setIsHide(true);
-    if (isFightToday === undefined || isFightToday === true) return setIsHide(true);
+    if (isDayAfterFight === undefined || isDayAfterFight === true) return setIsHide(true);
+    if (isDayOnFight === undefined || isDayOnFight === true) return setIsHide(true);
 
     const isVoteToThisMatch = allPrediction.some((obj) => obj.matchId === matchData.id);
     setIsHide(isVoteToThisMatch);
-  }, [allPrediction, isDayOverFight, isFightToday]);
+  }, [allPrediction, isDayAfterFight, isDayOnFight]);
 
   if (isHide) return;
 

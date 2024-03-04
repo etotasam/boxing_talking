@@ -1,8 +1,8 @@
 import React, { useEffect, useState, createContext } from 'react';
-import dayjs from 'dayjs';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/assets/routePath';
+
 //! types
 import { MatchDataType, MatchPredictionsType } from '@/assets/types';
 // ! hook
@@ -11,7 +11,7 @@ import { useWindowSize } from '@/hooks/useWindowSize';
 import { useLoading } from '@/hooks/useLoading';
 import {
   useVoteMatchPrediction,
-  useAllFetchMatchPredictionOfAuthUser,
+  useFetchUsersPrediction,
   useMatchPredictions,
 } from '@/hooks/apiHooks/uesWinLossPrediction';
 //! component
@@ -31,10 +31,9 @@ export const MatchContainer = (props: PropsType) => {
   //? 勝敗予想投票実行時の状態hook
   const { isSuccess: isSuccessVoteMatchPrediction } = useVoteMatchPrediction();
   //? userの勝敗予想投票をすべて取得など…
-  const { data: allPredictionVoteOfUsers } = useAllFetchMatchPredictionOfAuthUser();
-  const { data: matchPredictions, refetch: refetchMatchPredictions } = useMatchPredictions(
-    Number(matchId)
-  );
+  const { data: allPredictionVoteOfUsers } = useFetchUsersPrediction();
+  const { data: matchPredictions, refetch: refetchMatchPredictions } = useMatchPredictions(Number(matchId));
+
   const { resetLoadingState } = useLoading();
   const navigate = useNavigate();
   const { device } = useWindowSize();
@@ -53,8 +52,7 @@ export const MatchContainer = (props: PropsType) => {
   }, [matchId, props.matches]);
 
   //? userこの試合の勝敗予想の有無(falseは未投票、undefinedはデータ未取得状態)
-  const [thisMatchPredictionByUser, setThisMatchPredictionByUser] =
-    useState<ThisMatchPredictionByUserType>();
+  const [thisMatchPredictionByUser, setThisMatchPredictionByUser] = useState<UsersPredictionType>();
 
   //? 読み込み時にscrollをtop位置へ移動
   useEffect(() => {
@@ -72,9 +70,7 @@ export const MatchContainer = (props: PropsType) => {
   useEffect(() => {
     //? 投票データの取得が完了しているかどうか。ログインしていない場合このデータは取得しない設定にしてる
     if (allPredictionVoteOfUsers !== undefined) {
-      const thisMatchPredictionVote = allPredictionVoteOfUsers.find(
-        (data) => data.matchId === Number(matchId)
-      );
+      const thisMatchPredictionVote = allPredictionVoteOfUsers.find((data) => data.matchId === Number(matchId));
 
       //? 投票をしていない場合は'false'をセットする(undefinedはデータ未取得,falseは未投票)
       if (thisMatchPredictionVote) {
@@ -95,13 +91,13 @@ export const MatchContainer = (props: PropsType) => {
   }, [isSuccessVoteMatchPrediction]);
 
   //? 試合の日が当日以降かどうか
-  const [isThisMatchAfterToday, setIsThisMatchAfterToday] = useState<boolean>();
-  useEffect(() => {
-    if (!thisMatch) return;
-    const todaySubtractOneSecond = dayjs().startOf('day').add(1, 'second');
-    const isAfterToday = dayjs(thisMatch.matchDate).isAfter(todaySubtractOneSecond);
-    setIsThisMatchAfterToday(isAfterToday);
-  }, [thisMatch]);
+  // const [isThisMatchAfterToday, setIsThisMatchAfterToday] = useState<boolean>();
+  // useEffect(() => {
+  //   if (!thisMatch) return;
+  //   const todaySubtractOneSecond = dayjs().startOf('day').add(1, 'second');
+  //   const isAfterToday = dayjs(thisMatch.matchDate).isAfter(todaySubtractOneSecond);
+  //   setIsThisMatchAfterToday(isAfterToday);
+  // }, [thisMatch]);
 
   const { state: isShowPredictionModal } = useModalState('PREDICTION_VOTE');
 
@@ -121,29 +117,22 @@ export const MatchContainer = (props: PropsType) => {
 
       <MatchContextWrapper
         thisMatchPredictionByUser={thisMatchPredictionByUser}
-        isThisMatchAfterToday={isThisMatchAfterToday}
+        // isThisMatchAfterToday={isThisMatchAfterToday}
         matchPredictions={matchPredictions}
       >
-        <MatchComponent
-          matchData={thisMatch}
-          device={device}
-          isShowPredictionModal={isShowPredictionModal}
-        />
+        <MatchComponent matchData={thisMatch} device={device} isShowPredictionModal={isShowPredictionModal} />
       </MatchContextWrapper>
     </>
   );
 };
 
 //? context
-export type ThisMatchPredictionByUserType = 'red' | 'blue' | false | undefined;
-export const ThisMatchPredictionByUserContext =
-  createContext<ThisMatchPredictionByUserType>(undefined);
-export const IsThisMatchAfterTodayContext = createContext<boolean | undefined>(undefined);
+export type UsersPredictionType = 'red' | 'blue' | false | undefined;
+export const UsersPredictionContext = createContext<UsersPredictionType>(undefined);
 
 type MatchContextWrapperType = {
   children: React.ReactNode;
-  thisMatchPredictionByUser: ThisMatchPredictionByUserType;
-  isThisMatchAfterToday: boolean | undefined;
+  thisMatchPredictionByUser: UsersPredictionType;
   matchPredictions: MatchPredictionsType | undefined;
 };
 
@@ -152,11 +141,9 @@ export const MatchPredictionsContext = createContext<MatchPredictionsType | unde
 export const MatchContextWrapper = (props: MatchContextWrapperType) => {
   return (
     <MatchPredictionsContext.Provider value={props.matchPredictions}>
-      <ThisMatchPredictionByUserContext.Provider value={props.thisMatchPredictionByUser}>
-        <IsThisMatchAfterTodayContext.Provider value={props.isThisMatchAfterToday}>
-          {props.children}
-        </IsThisMatchAfterTodayContext.Provider>
-      </ThisMatchPredictionByUserContext.Provider>
+      <UsersPredictionContext.Provider value={props.thisMatchPredictionByUser}>
+        {props.children}
+      </UsersPredictionContext.Provider>
     </MatchPredictionsContext.Provider>
   );
 };

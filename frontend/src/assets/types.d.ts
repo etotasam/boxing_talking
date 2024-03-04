@@ -72,8 +72,6 @@ export type MatchDataType = {
   titles: MatchTitlesType | [],
   weight: WeightClassType,
   matchDate: string,
-  countRed: number,
-  countBlue: number,
   result: MatchResultType | null,
 }
 

@@ -39,12 +39,12 @@ export const MatchEdit = () => {
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
 
   const [selectedMatch, setSelectMatch] = useState<MatchDataType>();
-  const { isFightToday, isDayOverFight } = useDayOfFightChecker(selectedMatch);
+  const { isDayOnFight, isDayAfterFight } = useDayOfFightChecker(selectedMatch?.matchDate);
 
   const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
   const [isShowMatchResultSelectorDialog, setIsShowMatchResultSelectorDialog] = useState(false);
 
-  const isShowMatchResultRegisterButton = !isFightToday && isDayOverFight;
+  const isShowMatchResultRegisterButton = !isDayOnFight && isDayAfterFight;
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {

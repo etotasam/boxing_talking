@@ -18,7 +18,7 @@ import { apiFetchDataState } from "@/store/apiFetchDataState"
 
 
 //! ユーザーの勝敗予想の取得
-export const useAllFetchMatchPredictionOfAuthUser = () => {
+export const useFetchUsersPrediction = () => {
   const { data: authUser } = useAuth()
   const { data: isGuest } = useGuest()
   const isAuthOrGuest = Boolean(authUser || isGuest)
@@ -28,7 +28,7 @@ export const useAllFetchMatchPredictionOfAuthUser = () => {
     const formattedData = res.data === "" ? undefined : res.data
     return formattedData
   }, [])
-  const { data, isLoading: isUserPredictionLoading, isRefetching: isUserPredictionRefetching, refetch } = useQuery(QUERY_KEY.PREDICTION, api, {
+  const { data, isLoading: isUserPredictionLoading, isRefetching, refetch } = useQuery(QUERY_KEY.PREDICTION, api, {
     staleTime: Infinity,
     enabled: isAuthOrGuest,
     onError: () => {
@@ -40,15 +40,12 @@ export const useAllFetchMatchPredictionOfAuthUser = () => {
   })
 
   const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/fetch", state: "isLoading" }))
-  const [isRefetching, setIsRefetching] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/fetch", state: "isFetching" }))
+
 
   useEffect(() => {
     setIsLoading(isUserPredictionLoading)
   }, [isUserPredictionLoading])
 
-  useEffect(() => {
-    setIsRefetching(isUserPredictionRefetching)
-  }, [isUserPredictionRefetching])
 
   return { data, isLoading, isRefetching, refetch }
 }
@@ -56,7 +53,7 @@ export const useAllFetchMatchPredictionOfAuthUser = () => {
 //! 試合予想の投票
 export const useVoteMatchPrediction = () => {
   // const queryClient = useQueryClient()
-  const { refetch: refetchAllFetchMatchPredictionOfAuthUser } = useAllFetchMatchPredictionOfAuthUser()
+  const { refetch: refetchAllFetchMatchPredictionOfAuthUser } = useFetchUsersPrediction()
   // const { refetch: refetchMatches } = useFetchMatches()
   const { setToastModal, showToastModal } = useToastModal()
   const { startLoading, resetLoadingState } = useLoading()
@@ -83,8 +80,6 @@ export const useVoteMatchPrediction = () => {
       },
       onSuccess: () => {
         refetchAllFetchMatchPredictionOfAuthUser()
-        // refetchMatches()
-
         setToastModal({ message: MESSAGE.SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
         showToastModal()
       },
@@ -129,7 +124,7 @@ export const useMatchPredictions = (matchId: number) => {
   }, [])
 
   const { data, isLoading: isMatchPredictionLoading, isRefetching, refetch } = useQuery([QUERY_KEY.MATCH_PREDICTIONS, { id: matchId }], api, {
-    staleTime: 1000 * 60,
+    staleTime: 5 * 60 * 1000,
     onError: () => {
     },
     onSettled: () => {

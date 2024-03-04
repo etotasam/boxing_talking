@@ -12,9 +12,9 @@ type PropsType = {
 };
 
 export const TodayIcon = ({ matchData, iconType = 'DEFAULT' }: PropsType) => {
-  const { isFightToday } = useDayOfFightChecker(matchData);
+  const { isDayOnFight } = useDayOfFightChecker(matchData.matchDate);
 
-  if (!isFightToday) return;
+  if (!isDayOnFight) return;
 
   if (iconType === 'DEFAULT') return <Icon />;
   if (iconType === 'MINI') return <IconMini />;

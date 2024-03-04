@@ -12,9 +12,9 @@ import { MatchResult } from '../MatchResult';
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 
 export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
-  const { isFightToday, isDayOverFight } = useDayOfFightChecker(matchData);
+  const { isDayOnFight, isDayAfterFight } = useDayOfFightChecker(matchData.matchDate);
 
-  const isShowMatchResultComponent = Boolean(!isFightToday && isDayOverFight && matchData.result);
+  const isShowMatchResultComponent = Boolean(!isDayOnFight && isDayAfterFight && matchData.result);
 
   const isTitleMatch: boolean = matchData.grade === 'タイトルマッチ';
 
@@ -97,7 +97,6 @@ const Grade = ({ matchData }: { matchData: MatchDataType }) => {
                   <img src={crown} alt="" />
                 </span>
                 {organization}
-                世界
                 {weightDivision}級
               </div>
             </li>

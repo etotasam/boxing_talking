@@ -7,7 +7,8 @@ import { elementSizeState } from '@/store/elementSizeState';
 import { MatchDataType } from '@/assets/types';
 // ! components
 import { BoxerName } from './component/BoxerName';
-import { MatchInfo } from '@/components/module/MatchInfo';
+import { MatchInfoBox } from './component/MatchInfoBox';
+import { MatchResultBox } from './component/MatchResultBox';
 import { PredictionsBox } from './component/PredictionBox';
 //! image
 import leftImg from '@/assets/images/etc/leftImg.jpg';
@@ -27,15 +28,12 @@ export const LeftSection = ({ matchData }: LeftSectionType) => {
       <div className="flex justify-center w-full">
         <div className=" z-10 w-full">
           <BoxerName matchData={matchData} />
-          <PredictionsBox matchData={matchData} />
-          <div
-            className={clsx(
-              'relative w-full p-5 flex justify-center text-stone-200',
-              isTitleMatch ? 'pt-8' : 'pt-1'
-            )}
-          >
-            <MatchInfo matchData={matchData} />
+          <PredictionsBox matchDate={matchData.matchDate} />
+          <div className={clsx('relative w-full flex justify-center text-stone-200')}>
+            <MatchInfoBox matchData={matchData} />
           </div>
+
+          {matchData.result && <MatchResultBox matchData={matchData} />}
         </div>
       </div>
     </LeftSectionWrapper>

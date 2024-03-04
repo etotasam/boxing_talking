@@ -16,7 +16,7 @@ import { authCheckingState } from "@/store/authCheckingState"
 import { useToastModal } from "../useToastModal"
 import { useLoading } from "../useLoading"
 import { useLoginModal } from "../useLoginModal"
-import { useAllFetchMatchPredictionOfAuthUser } from "./uesWinLossPrediction"
+import { useFetchUsersPrediction } from "./uesWinLossPrediction"
 import { useReactQuery } from "../useReactQuery"
 //! types
 import type { UserType } from "@/assets/types"
@@ -51,7 +51,7 @@ export const useGuestLogin = () => {
   const { resetLoadingState, startLoading } = useLoading()
   // ? login modal (hook)
   const { hideLoginModal } = useLoginModal()
-  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+  const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
 
   //? ReactQuery controller
   const { setReactQueryData } = useReactQuery()
@@ -91,7 +91,7 @@ export const useGuestLogin = () => {
 
 //! ゲストログアウト
 export const useGuestLogout = () => {
-  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+  const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
   // ? react query
   const queryClient = useQueryClient()
   // ? toast message modal
@@ -268,7 +268,7 @@ export const useLogin = () => {
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? login modal (hook)
   const { hideLoginModal } = useLoginModal()
-  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+  const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
   //? ReactQuery controller
   const { setReactQueryData } = useReactQuery()
 
@@ -310,7 +310,7 @@ export const useLogin = () => {
 
 //! ログアウト
 export const useLogout = () => {
-  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+  const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
   // ? react query
   const queryClient = useQueryClient()
   // ? toast message modal
