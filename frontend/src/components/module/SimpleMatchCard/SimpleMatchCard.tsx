@@ -6,11 +6,8 @@ import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 import { MatchDataType } from '@/assets/types';
 import { BoxerType } from '@/assets/types';
 // ! components
-import { MatchResult } from '../MatchResult';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
-import { PredictionIcon } from '@/components/atomic/PredictionIcon';
 // ! image
-import crown from '@/assets/images/etc/champion.svg';
 import { GiImperialCrown } from 'react-icons/gi';
 import { MdHowToVote } from 'react-icons/md';
 
@@ -40,59 +37,23 @@ PropsType) => {
         <div
           onClick={() => onClick(matchData.id)}
           className={clsx(
-            'relative flex justify-between w-full max-w-[1024px] cursor-pointer border-t-[1px]  text-stone-300',
+            'relative flex justify-between w-full max-w-[1024px] cursor-pointer last-of-type:border-b-[1px] border-t-[1px] border-neutral-700  text-stone-300',
             'md:w-[80%] md:border-t-0 md:rounded-lg md:bg-stone-200/60 md:hover:bg-stone-200 md:duration-300  md:text-stone-700'
             // isMatchResult ? 'md:pt-2 md:pb-1 py-1' : 'md:py-4 py-8'
           )}
         >
           <BoxerBox boxer={matchData.redBoxer} />
 
-          <NewMatchInfo matchData={matchData} />
+          <MatchInfo matchData={matchData} />
 
           <BoxerBox boxer={matchData.blueBoxer} />
 
           {/* <PredictionIcon matchData={matchData} iconType={predictionIconType} /> */}
+          <div className="absolute top-1 left-1">
+            <VoteIcon matchData={matchData} />
+          </div>
         </div>
       )}
-    </>
-  );
-};
-
-const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
-  const isTitleMatch = matchData.titles.length;
-  const isMatchResult = !!matchData.result;
-
-  return (
-    <>
-      {/* //? 日時 */}
-      <div className={clsx('flex-1', isMatchResult ? 'pt-5 pb-2' : 'py-5')}>
-        <div className="text-center relative flex justify-center items-center">
-          <h2 className="absolute top-[2px] md:top-0 xl:text-xl lg:text-lg text-md after:content-['(日本時間)'] after:w-full after:absolute md:after:bottom-[-60%] after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] xl:after:text-sm after:text-[12px]">
-            {dayjs(matchData.matchDate).format('YYYY年M月D日')}
-          </h2>
-          {isTitleMatch ? (
-            //? タイトルマッチ
-            <div className="absolute top-[-17px] md:top-[-22px] left-[50%] translate-x-[-50%] mr-2 flex justify-center w-full md:text-[16px] text-[14px]">
-              <div className="flex">
-                <p>{matchData.weight}級</p>
-                <img className="ml-2 md:w-[22px] md:h-[22px] w-[18px] h-[18px]" src={crown} alt="" />
-              </div>
-            </div>
-          ) : (
-            //? ノンタイトルマッチ
-            <span className="absolute top-[-17px] md:top-[-22px] left-[50%] translate-x-[-50%] mr-2 w-full md:text-[16px] text-[14px]">
-              <p>
-                {matchData.weight}級 {matchData.grade}
-              </p>
-            </span>
-          )}
-          {isMatchResult && (
-            <div className="mt-[50px]">
-              <MatchResult matchData={matchData} />
-            </div>
-          )}
-        </div>
-      </div>
     </>
   );
 };
@@ -124,27 +85,28 @@ const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
   );
 };
 
-const NewMatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
+const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
   const isTitleMatch = matchData.titles.length;
-  const isMatchResult = !!matchData.result;
   const { isDayOnFight } = useDayOfFightChecker(matchData.matchDate);
 
   return (
-    <div className={clsx('flex-1 py-2')}>
+    <div className={clsx('flex-1 py-3 relative')}>
       {isTitleMatch ? <GradeTitleMatch matchData={matchData} /> : <GradeNonTitleMatch matchData={matchData} />}
       {/* //? 日時 */}
 
-      <div className={clsx('mt-2')}>
-        <h2 className={clsx('text-center tracking-wide', isDayOnFight && 'text-yellow-500 font-bold')}>
+      <div className={clsx('mt-1')}>
+        <time
+          dateTime={dayjs(matchData.matchDate).toISOString()}
+          className={clsx('block text-center tracking-wide', isDayOnFight && 'text-yellow-500 font-bold')}
+        >
           {dayjs(matchData.matchDate).format('YYYY年M月D日')}
-        </h2>
+        </time>
         {/* {isMatchResult && (
               <div className={clsx('')}>
                 <MatchResult matchData={matchData} />
               </div>
             )} */}
       </div>
-      <VoteIcon matchData={matchData} />
     </div>
   );
 };
@@ -153,9 +115,9 @@ const GradeTitleMatch = ({ matchData }: { matchData: MatchDataType }) => {
   const isOneTitle = matchData.titles.length === 1;
   const isUnificationMatch = matchData.titles.length > 1;
   return (
-    <div className={clsx('text-sm')}>
+    <div className={clsx('text-xs')}>
       <div className={clsx('flex justify-center whitespace-nowrap')}>
-        <p className="flex relative h-[20px]">
+        <div className="flex items-end">
           {matchData.weight}級
           {isOneTitle && (
             <span className="relative ml-1">
@@ -165,12 +127,12 @@ const GradeTitleMatch = ({ matchData }: { matchData: MatchDataType }) => {
               </span>
             </span>
           )}
-        </p>
+        </div>
       </div>
       {isUnificationMatch && (
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-1">
           {matchData.titles.map((title) => (
-            <div className="relative ml-2 first-of-type:ml-0">
+            <div key={title.organization} className="relative ml-2 first-of-type:ml-0">
               <GiImperialCrown className={'text-yellow-500 w-[20px] h-[20px]'} />
               <span className="text-[10px] absolute top-[80%] left-[50%] translate-x-[-50%] translate-y-[-50%] shadow-blur">
                 {title.organization}
@@ -185,7 +147,7 @@ const GradeTitleMatch = ({ matchData }: { matchData: MatchDataType }) => {
 
 const GradeNonTitleMatch = ({ matchData }: { matchData: MatchDataType }) => {
   return (
-    <div className={clsx('text-center text-sm whitespace-nowrap')}>
+    <div className={clsx('text-center text-xs whitespace-nowrap')}>
       <p>
         {matchData.weight}級 {matchData.grade}
       </p>
@@ -195,19 +157,29 @@ const GradeNonTitleMatch = ({ matchData }: { matchData: MatchDataType }) => {
 
 const VoteIcon = ({ matchData }: { matchData: MatchDataType }) => {
   const { isDayOnFight, isDayAfterFight } = useDayOfFightChecker(matchData.matchDate);
-  const { data: allPrediction } = useFetchUsersPrediction();
+  const { data: usersPredictions } = useFetchUsersPrediction();
 
-  const [isShow, setIsShow] = useState(true);
+  const [isHide, setIsHide] = useState(true);
   useEffect(() => {
-    if (!Array.isArray(allPrediction)) return setIsShow(true);
-    if (isDayAfterFight === undefined || isDayAfterFight === true) return setIsShow(true);
-    if (isDayOnFight === undefined || isDayOnFight === true) return setIsShow(true);
+    //? ユーザーの投票をfetch出来てない時は隠す
+    if (usersPredictions === undefined) return setIsHide(true);
+    //? 過去の試合には表示しない
+    if (isDayAfterFight === undefined || isDayAfterFight === true) return setIsHide(true);
+    //? 当日は表示しない
+    if (isDayOnFight === undefined || isDayOnFight === true) return setIsHide(true);
+    //? ユーザーのこの試合への投票の有無で表示を決定させる
 
-    const isVoteToThisMatch = allPrediction.some((obj) => obj.matchId === matchData.id);
-    setIsShow(isVoteToThisMatch);
-  }, [allPrediction, isDayAfterFight, isDayOnFight]);
+    const isVote = usersPredictions.some((obj) => obj.matchId === matchData.id);
+    setIsHide(isVote);
+  }, [usersPredictions, isDayAfterFight, isDayOnFight]);
 
-  if (!isShow) return;
+  if (isHide) return;
 
-  return <>{<MdHowToVote />}</>;
+  return (
+    <>
+      <div className="bg-green-600 p-1 rounded-[50%] text-neutral-900 text-xs">
+        <MdHowToVote />
+      </div>
+    </>
+  );
 };

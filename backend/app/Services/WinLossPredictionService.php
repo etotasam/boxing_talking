@@ -64,7 +64,6 @@ class WinLossPredictionService
     DB::beginTransaction();
     try {
       $this->predictionRepository->storePrediction($userId, $matchId, $prediction);
-      // $this->matchService->matchPredictionCountUpdate($matchId, $prediction);
     } catch (\Exception $e) {
       DB::rollBack();
       throw new \Exception($e->getMessage());

@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import { motion, useAnimationControls, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/routePath';
 import { VISUAL_MODE } from '@/store/visualModeState';
@@ -23,7 +24,7 @@ export const Home = () => {
   // ! use hook
   const { resetLoadingState } = useLoading();
   const { data: matchesData } = useFetchMatches();
-  const { sortedMatches } = useSortMatches(matchesData);
+  const { beforeMatches, afterMatches } = useSortMatches(matchesData);
   const navigate = useNavigate();
   const { device } = useWindowSize();
 
@@ -39,6 +40,25 @@ export const Home = () => {
     };
   }, []);
 
+  const [isOpen, setIsOpen] = useState(false);
+  const controls = useAnimationControls();
+  const openPastMatches = () => {
+    controls.start({ height: 'auto', opacity: 1 }).then(() => {
+      setIsOpen(true);
+    });
+  };
+
+  const closePastMatches = () => {
+    controls.start({ height: 0, opacity: 0 }).then(() => {
+      setIsOpen(false);
+    });
+  };
+
+  const onClick = () => {
+    if (isOpen) return closePastMatches();
+    openPastMatches();
+  };
+
   return (
     <>
       {device == 'PC' && (
@@ -49,9 +69,9 @@ export const Home = () => {
 
       <HeaderAndFooterLayout>
         <>
-          {sortedMatches && (
+          {!!beforeMatches.length && (
             <ul className={clsx('md:py-10')}>
-              {sortedMatches.map((match) => (
+              {beforeMatches.map((match) => (
                 <li
                   key={match.id}
                   className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5 first:mt-0"
@@ -60,6 +80,27 @@ export const Home = () => {
                 </li>
               ))}
             </ul>
+          )}
+
+          {!!afterMatches.length && (
+            <>
+              <div className="py-3 flex justify-center">
+                <div className="w-[80%] bg-white rounded-lg py-4 text-neutral-800 text-xs text-center tracking-widest">
+                  最新の過去試合
+                </div>
+              </div>
+
+              <ul className={clsx('md:py-10')}>
+                {afterMatches.map((match) => (
+                  <li
+                    key={match.id}
+                    className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5 first:mt-0"
+                  >
+                    <MatchBox match={match} onClick={matchSelect} />
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </>
       </HeaderAndFooterLayout>

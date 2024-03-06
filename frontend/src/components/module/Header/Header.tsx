@@ -25,6 +25,7 @@ import { AdministratorPageLinks } from '../AdministratorPageLinks';
 
 export const Header = () => {
   const { pathname } = useLocation();
+  const { device } = useWindowSize();
 
   const setHeaderHeight = useSetRecoilState(elementSizeState('HEADER_HEIGHT'));
 
@@ -39,11 +40,8 @@ export const Header = () => {
     <>
       <header
         ref={headerRef}
-        style={{ width: `calc(100% - 10px)` }}
-        className={clsx(
-          'z-30 h-[80px] fixed top-0 left-0 flex backdrop-blur-sm text-stone-200'
-          // 'after:w-full after:absolute after:bottom-0 after:left-0 after:h-[1px] after:bg-stone-300'
-        )}
+        style={device === 'SP' ? { width: `100%` } : { width: `calc(100% - 10px)` }}
+        className={clsx('z-30 h-[80px] fixed top-0 left-0 flex backdrop-blur-sm text-stone-200')}
       >
         <SiteTitle />
 
@@ -57,11 +55,7 @@ export const Header = () => {
 
 const SiteTitle = () => {
   const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
-  return (
-    <h1 className={clsx('shadow-blur sm:text-[48px] text-[32px] font-thin')}>
-      {siteTitle}
-    </h1>
-  );
+  return <h1 className={clsx('shadow-blur sm:text-[48px] text-[32px] font-thin')}>{siteTitle}</h1>;
 };
 
 const AuthInfo = () => {
@@ -105,13 +99,7 @@ const UserIcon = ({ userData }: { userData: UserType | undefined | null }) => {
   return (
     <>
       <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-      <p
-        className={clsx(
-          userData.name!.length > 20
-            ? 'sm:text-[16px] text-xs'
-            : 'sm:text-[18px] text-sm'
-        )}
-      >
+      <p className={clsx(userData.name!.length > 20 ? 'sm:text-[16px] text-xs' : 'sm:text-[18px] text-sm')}>
         {userData.name}
       </p>
     </>
@@ -149,13 +137,11 @@ const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
           </li>
         )}
 
-        {device === 'SP' &&
-          (pathname === ROUTE_PATH.MATCH ||
-            pathname === ROUTE_PATH.PAST_MATCH_SINGLE) && (
-            <li className="md:ml-5 ml-2">
-              <ViewMatchInfoButton />
-            </li>
-          )}
+        {device === 'SP' && (pathname === ROUTE_PATH.MATCH || pathname === ROUTE_PATH.PAST_MATCH_SINGLE) && (
+          <li className="md:ml-5 ml-2">
+            <ViewMatchInfoButton />
+          </li>
+        )}
 
         {isAdmin && (
           <li>
@@ -181,12 +167,8 @@ const ToBoxMatchLinkButton = () => {
         )}
         <Link to={ROUTE_PATH.HOME}>
           <LinkButton
-            onMouseEnter={
-              device === 'PC' ? () => setIsShowDescription(true) : () => {}
-            }
-            onMouseLeave={
-              device === 'PC' ? () => setIsShowDescription(false) : () => {}
-            }
+            onMouseEnter={device === 'PC' ? () => setIsShowDescription(true) : () => {}}
+            onMouseLeave={device === 'PC' ? () => setIsShowDescription(false) : () => {}}
           >
             <BsCalendar3 />
           </LinkButton>
@@ -211,12 +193,8 @@ const ToPastMatchesPageLinkButton = () => {
         <Link to={ROUTE_PATH.PAST_MATCHES}>
           <LinkButton
             className="text-[20px] hover:text-[22px]"
-            onMouseEnter={
-              device === 'PC' ? () => setIsShowDescription(true) : () => {}
-            }
-            onMouseLeave={
-              device === 'PC' ? () => setIsShowDescription(false) : () => {}
-            }
+            onMouseEnter={device === 'PC' ? () => setIsShowDescription(true) : () => {}}
+            onMouseLeave={device === 'PC' ? () => setIsShowDescription(false) : () => {}}
           >
             <RiTimeLine />
           </LinkButton>
@@ -238,10 +216,7 @@ const ViewMatchInfoButton = () => {
 
   return (
     <>
-      <LinkButton
-        onClick={() => viewMatchInfoModal()}
-        className={'rotate-[-40deg] md:hover:rotate-[240deg]'}
-      >
+      <LinkButton onClick={() => viewMatchInfoModal()} className={'rotate-[-40deg] md:hover:rotate-[240deg]'}>
         <GiBoxingGlove />
       </LinkButton>
     </>
@@ -249,13 +224,7 @@ const ViewMatchInfoButton = () => {
 };
 
 type LinkButtonPropsType = React.ComponentProps<'button'>;
-const LinkButton = ({
-  children,
-  onMouseEnter,
-  onMouseLeave,
-  className,
-  onClick,
-}: LinkButtonPropsType) => {
+const LinkButton = ({ children, onMouseEnter, onMouseLeave, className, onClick }: LinkButtonPropsType) => {
   return (
     <button
       onClick={onClick}

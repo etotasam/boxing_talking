@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import clsx from 'clsx';
 // ! components
 import { Footer } from '@/components/module/Footer';
 import { Header } from '@/components/module/Header';
@@ -10,8 +10,9 @@ import { useWindowSize } from '@/hooks/useWindowSize';
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 //! image
-import boxerImg from '@/assets/images/etc/boxerImg.jpg';
-import clsx from 'clsx';
+import topImg_1 from '@/assets/images/etc/boxerImg.jpg';
+import manOnTheRing from '@/assets/images/etc/man_on_the_ring.jpg';
+import boxingMatch from '@/assets/images/etc/boxing_match.jpg';
 
 const HeaderAndFooterLayout = ({ children }: { children: React.ReactNode }) => {
   // ! use hook
@@ -51,19 +52,17 @@ const Background = ({ children }: { children: React.ReactNode }) => {
   const { device } = useWindowSize();
   return (
     <div
-      className={clsx(
-        'bg-fixed w-full h-[100vh]',
-        device === 'PC' ? 'my-scroll-y' : 'overflow-auto'
-      )}
+      className={clsx('bg-fixed w-full h-[100vh]', device === 'PC' ? 'my-scroll-y' : 'overflow-auto')}
       style={{
-        backgroundImage: `url(${boxerImg})`,
+        backgroundImage: `url(${boxingMatch})`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
+        backgroundPosition: 'center',
       }}
     >
       <div
         className={clsx(
-          'bg-fixed w-full h-[100vh] bg-neutral-900/70 backdrop-blur-[2px]',
+          'bg-fixed w-full h-[100vh] bg-neutral-900/90 backdrop-blur-[1px]',
           device === 'PC' ? 'my-scroll-y' : 'overflow-auto'
         )}
       >

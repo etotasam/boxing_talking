@@ -13,22 +13,19 @@ import { useToastModal } from '@/hooks/useToastModal';
 // !etc
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from '@/assets/statusesOnToastModal';
 
-export const LoginFormModal = () => {
+export const LoginFormModal = ({ isShow }: { isShow: boolean }) => {
   // ! recoil
   const formType = useRecoilValue(formTypeState);
 
   return (
-    <>
-      <ClearFullScreenDiv
-        className="z-40 bg-white/20 flex justify-center items-center"
-        // onMouseDown={() => loginModalHide()}
-      >
-        <AnimatePresence>
+    <AnimatePresence>
+      {isShow && (
+        <ClearFullScreenDiv className="z-40 bg-white/20 flex justify-center items-center">
           {formType === FORM_TYPE.LOGIN_FORM && <LoginForm />}
           {formType === FORM_TYPE.SIGN_ON_FORM && <SignUpForm />}
-        </AnimatePresence>
-      </ClearFullScreenDiv>
-    </>
+        </ClearFullScreenDiv>
+      )}
+    </AnimatePresence>
   );
 };
 

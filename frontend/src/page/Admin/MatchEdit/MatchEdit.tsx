@@ -33,8 +33,8 @@ export const MatchEdit = () => {
   const { resetLoadingState } = useLoading();
   const { data: matchesData } = useFetchMatches();
   const { data: pastMatchesData } = useFetchPastMatches();
-  const { sortedMatches } = useSortMatches(matchesData);
-  const allMatches = sortedMatches && pastMatchesData && [...sortedMatches, ...pastMatchesData];
+  const { beforeMatches, afterMatches } = useSortMatches(matchesData);
+  const allMatches = pastMatchesData && [...beforeMatches, ...afterMatches, ...pastMatchesData];
   const { setToastModal, showToastModal } = useToastModal();
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
 
@@ -99,10 +99,7 @@ export const MatchEdit = () => {
 
                   {isShowMatchResultRegisterButton && (
                     <div className="mt-5 w-[90%] flex justify-center">
-                      <Button
-                        styleName="matchResultRegister"
-                        onClick={() => setIsShowMatchResultSelectorDialog(true)}
-                      >
+                      <Button styleName="matchResultRegister" onClick={() => setIsShowMatchResultSelectorDialog(true)}>
                         試合結果登録
                       </Button>
                     </div>
@@ -119,10 +116,7 @@ export const MatchEdit = () => {
 
             <div className="w-[55%] flex ite justify-center">
               <div className="w-[80%]">
-                <EditMatchForm
-                  selectedMatch={selectedMatch}
-                  isSuccessDeleteMatch={isSuccessDeleteMatch}
-                />
+                <EditMatchForm selectedMatch={selectedMatch} isSuccessDeleteMatch={isSuccessDeleteMatch} />
                 <div className="mt-5">
                   <Button styleName={'delete'} onClick={handleClickDeleteButton}>
                     削除
@@ -153,9 +147,7 @@ export const MatchEdit = () => {
         />
       )}
       {/* delete dialog */}
-      {isDeleteConfirm && (
-        <DeleteConfirm execution={deleteExecution} cancel={() => setIsDeleteConfirm(false)} />
-      )}
+      {isDeleteConfirm && <DeleteConfirm execution={deleteExecution} cancel={() => setIsDeleteConfirm(false)} />}
     </>
   );
 };
@@ -166,11 +158,7 @@ type MatchComponentType = {
   setSelectMatch: React.Dispatch<React.SetStateAction<MatchDataType | undefined>>;
 };
 
-export const MatchListComponent = ({
-  sortedMatches,
-  selectedMatch,
-  setSelectMatch,
-}: MatchComponentType) => {
+export const MatchListComponent = ({ sortedMatches, selectedMatch, setSelectMatch }: MatchComponentType) => {
   return (
     <>
       <ul className="w-[95%] ">
@@ -191,10 +179,7 @@ export const MatchListComponent = ({
                 <div className="flex-1">
                   {/* //? 国旗 */}
                   <div className="flex justify-center">
-                    <EngNameWithFlag
-                      boxerCountry={match.redBoxer.country}
-                      boxerEngName={match.redBoxer.engName}
-                    />
+                    <EngNameWithFlag boxerCountry={match.redBoxer.country} boxerEngName={match.redBoxer.engName} />
                   </div>
                   {/* //? 名前 */}
                   <p className="">{match.redBoxer.name}</p>
@@ -203,10 +188,7 @@ export const MatchListComponent = ({
                 <div className="flex-1">
                   {/* //? 国旗 */}
                   <div className="flex justify-center">
-                    <EngNameWithFlag
-                      boxerCountry={match.blueBoxer.country}
-                      boxerEngName={match.blueBoxer.engName}
-                    />
+                    <EngNameWithFlag boxerCountry={match.blueBoxer.country} boxerEngName={match.blueBoxer.engName} />
                   </div>
                   {/* //? 名前 */}
                   <p className="">{match.blueBoxer.name}</p>
@@ -309,9 +291,7 @@ const MatchResultSetDialog = ({
           {resultObject.result.map((result) => (
             <label
               key={result}
-              className={clsx(
-                'border-[1px] border-stone-500 rounded cursor-pointer px-2 py-1 ml-2 first:ml-0'
-              )}
+              className={clsx('border-[1px] border-stone-500 rounded cursor-pointer px-2 py-1 ml-2 first:ml-0')}
             >
               <input
                 type="radio"
@@ -329,9 +309,7 @@ const MatchResultSetDialog = ({
             {resultObject.detail.map((detail) => (
               <label
                 key={detail}
-                className={clsx(
-                  'border-[1px] border-stone-500 rounded cursor-pointer px-2 py-1 ml-2 first:ml-0'
-                )}
+                className={clsx('border-[1px] border-stone-500 rounded cursor-pointer px-2 py-1 ml-2 first:ml-0')}
               >
                 <input
                   type="radio"
@@ -349,11 +327,7 @@ const MatchResultSetDialog = ({
           <div className="mt-5">
             <label className="border-[1px] border-stone-500 rounded px-2 py-1">
               ラウンド:
-              <select
-                name="round"
-                defaultValue={matchRound}
-                onChange={(e) => setRound(e.target.value)}
-              >
+              <select name="round" defaultValue={matchRound} onChange={(e) => setRound(e.target.value)}>
                 {[...Array(12)].map((_, index) => (
                   <option key={index} className="text-right" value={index + 1}>
                     {index + 1}
@@ -369,9 +343,7 @@ const MatchResultSetDialog = ({
             disabled={!isValid}
             className={clsx(
               'w-full py-2',
-              isValid
-                ? 'text-white bg-green-700 hover:bg-green-600 duration-200'
-                : 'text-white/50 bg-stone-600'
+              isValid ? 'text-white bg-green-700 hover:bg-green-600 duration-200' : 'text-white/50 bg-stone-600'
             )}
           >
             登録

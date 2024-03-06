@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
 import { ROUTE_PATH } from '@/assets/routePath';
 // ! hooks
 import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
@@ -9,7 +8,6 @@ import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
 import { useLoginModal } from '@/hooks/useLoginModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
-import { useRecoilValue } from 'recoil';
 // ! modal
 import { ToastModalContainer } from '@/components/modal/ToastModal';
 import { LoginFormModal } from '@/components/modal/LoginFormModal';
@@ -59,18 +57,16 @@ const Container = () => {
     }
   }, [isAuth, isGuest, pathname]);
 
+  const isShowFullScreenSpinnerCondition = isAnyLoading || isRefetchingBoxers;
+
+  const isShowFirstLoadingCondition = isFirstCheckingAuth || isBoxersFetching || isMatchesFetching;
+
   return (
     <>
-      <AnimatePresence>
-        {isShowToastModal && <ToastModalContainer key={'ToastModalContainer'} />}
-        {(isAnyLoading || isRefetchingBoxers) && (
-          <FullScreenSpinnerModal key={'FullScreenSpinnerModal'} />
-        )}
-        {(isFirstCheckingAuth || isBoxersFetching || isMatchesFetching) && (
-          <FirstLoadingModal key={'FirstLoadingModal'} />
-        )}
-      </AnimatePresence>
-      {isShowLoginModal && <LoginFormModal key={'LoginFormModal'} />}
+      <LoginFormModal isShow={isShowLoginModal} key={'LoginFormModal'} />
+      <ToastModalContainer isShow={isShowToastModal} key={'ToastModalContainer'} />
+      <FullScreenSpinnerModal isShow={isShowFullScreenSpinnerCondition} key={'FullScreenSpinnerModal'} />
+      <FirstLoadingModal isShow={isShowFirstLoadingCondition} key={'FirstLoadingModal'} />
       <Outlet />
     </>
   );

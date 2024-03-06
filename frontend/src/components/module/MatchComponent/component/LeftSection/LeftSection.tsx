@@ -12,6 +12,7 @@ import { MatchResultBox } from './component/MatchResultBox';
 import { PredictionsBox } from './component/PredictionBox';
 //! image
 import leftImg from '@/assets/images/etc/leftImg.jpg';
+import black_grove from '@/assets/images/etc/black_grove.jpg';
 
 type LeftSectionType = {
   matchData: MatchDataType | undefined;
@@ -52,16 +53,15 @@ const LeftSectionWrapper = (props: LeftSectionWrapperType) => {
   return (
     <div
       ref={leftSectionRef}
-      className={clsx(
-        'bg-fixed justify-center w-full h-[100vh] border-r-[1px] border-stone-900 overflow-auto'
-      )}
+      className={clsx('justify-center w-full h-[100vh] overflow-auto')}
       style={{
         paddingTop: `${headerHeight}px`,
-        backgroundImage: `url(${leftImg})`,
-        backgroundSize: 'contain',
+        backgroundImage: `url(${black_grove})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
       }}
     >
-      <div className="fixed top-0 backdrop-blur-sm bg-neutral-900/90 w-[30%] h-full" />
+      <div className="fixed top-0 backdrop-blur-sm bg-neutral-900/80 w-[30%] h-full border-neutral-800 border-r-[1px]" />
       {children}
     </div>
   );

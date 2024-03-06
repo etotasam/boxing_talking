@@ -21,11 +21,7 @@ type PropsType = {
 };
 export const Comments = (props: PropsType) => {
   const { matchId } = props;
-  const {
-    data: comments,
-    isLoading: isFetchingComments,
-    isError: isErrorFetchComments,
-  } = useFetchComments(matchId);
+  const { data: comments, isLoading: isFetchingComments, isError: isErrorFetchComments } = useFetchComments(matchId);
 
   const isComments = comments !== undefined && comments.length;
 
@@ -37,10 +33,9 @@ export const Comments = (props: PropsType) => {
   //? コメントがない時
   if (isNotComments) return <NoCommentFallback />;
 
-  //? コメントあり
-  if (isComments) {
-    return (
-      <CommentsWrapper>
+  return (
+    <CommentsWrapper>
+      {isComments && (
         <div className="sm:w-[80%] w-[92%] max-w-[750px] mt-3">
           {comments?.map((comment) => (
             <div key={comment.id} className="pb-3">
@@ -48,19 +43,15 @@ export const Comments = (props: PropsType) => {
             </div>
           ))}
         </div>
-      </CommentsWrapper>
-    );
-  }
+      )}
+    </CommentsWrapper>
+  );
 };
 
 //! コメントbox
 const CommentBox = ({ comment }: { comment: CommentType }) => {
   return (
-    <div
-      className={clsx(
-        'sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded-lg'
-      )}
-    >
+    <div className={clsx('sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded-lg')}>
       <PostTimeAndUserName commentData={comment} />
       <Comment commentData={comment} />
     </div>
@@ -79,12 +70,7 @@ const PostTimeAndUserName = ({ commentData }: { commentData: CommentType }) => {
         {commentData.postUserName ? (
           <>
             <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-            <p
-              className={clsx(
-                '',
-                commentData.postUserName.length > 20 ? 'text-[12px] sm:text-sm' : 'text-sm'
-              )}
-            >
+            <p className={clsx('', commentData.postUserName.length > 20 ? 'text-[12px] sm:text-sm' : 'text-sm')}>
               {commentData.postUserName}
             </p>
           </>
@@ -113,8 +99,7 @@ const Comment = ({ commentData }: { commentData: CommentType }) => {
       className="relative"
       style={
         document.getElementById(`comment_${commentData.id}`) &&
-        (document.getElementById(`comment_${commentData.id}`)?.clientHeight as number) >
-          initialCommentElHeight()
+        (document.getElementById(`comment_${commentData.id}`)?.clientHeight as number) > initialCommentElHeight()
           ? { height: '135px', overflow: 'hidden' }
           : { height: 'auto' }
       }
@@ -127,8 +112,7 @@ const Comment = ({ commentData }: { commentData: CommentType }) => {
         }}
       />
       {document.getElementById(`comment_${commentData.id}`) &&
-        (document.getElementById(`comment_${commentData.id}`)?.clientHeight as number) >
-          initialCommentElHeight() && (
+        (document.getElementById(`comment_${commentData.id}`)?.clientHeight as number) > initialCommentElHeight() && (
           <p className="absolute bottom-0 left-0 md:h-[25px] h-[35px] bg-white w-full">
             <span
               onClick={stretchCommentElement}
@@ -183,8 +167,7 @@ const dateFormatter = (postDate: string): string => {
 
 const stretchCommentElement = (event: React.MouseEvent<HTMLParagraphElement, MouseEvent>) => {
   const handleClickElement = event.target as HTMLSpanElement;
-  const parentElement = (handleClickElement.parentElement as HTMLParagraphElement)
-    .parentElement as HTMLDivElement;
+  const parentElement = (handleClickElement.parentElement as HTMLParagraphElement).parentElement as HTMLDivElement;
 
   (parentElement as HTMLDivElement).style.height = 'auto';
   if (handleClickElement) {
@@ -214,10 +197,7 @@ const CommentsWrapper = (props: CommentsWrapperType) => {
     <>
       <div
         ref={el}
-        className={clsx(
-          'relative w-full flex justify-center',
-          device === 'PC' ? 'my-scroll-y' : 'overflow-auto'
-        )}
+        className={clsx('relative w-full flex justify-center', device === 'PC' ? 'my-scroll-y' : 'overflow-auto')}
         style={{
           paddingTop: `${headerElHeight}px`,
           height: `calc(100vh - (${postCommentElHeight}px) - 1px)`,
@@ -236,8 +216,8 @@ const NoCommentFallback = () => {
       <div className="w-full flex justify-center items-center">
         <div className="">
           <div className="w-full flex justify-center">
-            <div className="relative w-[60px] h-[60px] border-[5px] rounded-[50%] border-neutral-200/60">
-              <span className="text-neutral-200/80 text-[30px] absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+            <div className="relative w-[60px] h-[60px] border-[5px] rounded-[50%] border-neutral-200/30">
+              <span className="text-neutral-200/30 text-[30px] absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
                 <FaRegPenToSquare />
               </span>
             </div>

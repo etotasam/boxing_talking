@@ -24,8 +24,9 @@ export const useFetchUsersPrediction = () => {
   const isAuthOrGuest = Boolean(authUser || isGuest)
 
   const api = useCallback(async () => {
-    const res = await Axios.get<{ data: PredictionType[] | "" }>(API_PATH.PREDICTION).then(v => v.data)
-    const formattedData = res.data === "" ? undefined : res.data
+    const res = await Axios.get<{ data: PredictionType[] | null }>(API_PATH.PREDICTION).then(v => v.data)
+    // console.log(res.data);
+    const formattedData = res.data === null ? undefined : res.data
     return formattedData
   }, [])
   const { data, isLoading: isUserPredictionLoading, isRefetching, refetch } = useQuery(QUERY_KEY.PREDICTION, api, {

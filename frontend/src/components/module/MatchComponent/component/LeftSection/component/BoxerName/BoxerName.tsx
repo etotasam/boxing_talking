@@ -15,7 +15,7 @@ export const BoxerNameWrapper = ({ matchData }: { matchData: MatchDataType }) =>
 const BoxersNameBox = ({ matchData }: { matchData: MatchDataType }) => {
   return (
     <>
-      <div className="flex justify-center">
+      <div className="flex justify-center text-sm">
         <span className="pb-1">{matchData.redBoxer.name}</span>
         <CountryFlag country={matchData.redBoxer.country} />
       </div>
