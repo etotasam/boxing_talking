@@ -13,6 +13,7 @@ import { ToastModalContainer } from '@/components/modal/ToastModal';
 import { LoginFormModal } from '@/components/modal/LoginFormModal';
 import { FullScreenSpinnerModal } from '@/components/modal/FullScreenSpinnerModal';
 import { FirstLoadingModal } from '@/components/modal/FirstLoadingModal';
+import { MenuModal } from '@/components/module/MenuModal';
 
 const Container = () => {
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
@@ -65,8 +66,12 @@ const Container = () => {
     <>
       <LoginFormModal isShow={isShowLoginModal} key={'LoginFormModal'} />
       <ToastModalContainer isShow={isShowToastModal} key={'ToastModalContainer'} />
-      <FullScreenSpinnerModal isShow={isShowFullScreenSpinnerCondition} key={'FullScreenSpinnerModal'} />
+      <FullScreenSpinnerModal
+        isShow={isShowFullScreenSpinnerCondition}
+        key={'FullScreenSpinnerModal'}
+      />
       <FirstLoadingModal isShow={isShowFirstLoadingCondition} key={'FirstLoadingModal'} />
+      <MenuModal />
       <Outlet />
     </>
   );

@@ -9,6 +9,7 @@ import { PostComment } from './component/PostComment';
 import { Comments } from './component/Comments';
 import { LeftSection } from './component/LeftSection';
 import { PredictionVoteModal } from './component/PredictionVoteModal';
+
 //! image
 import ringImg from '@/assets/images/etc/ring.jpg';
 import GGG from '@/assets/images/etc/GGG.jpg';
@@ -80,8 +81,16 @@ const CommentLoadingModal = ({ isShow }: { isShow: boolean }) => {
   );
 };
 
-const RightSectionWrapper = ({ children, device }: { children: ReactNode; device: 'PC' | 'SP' }) => {
-  const isCommentsFetching = useRecoilValue(apiFetchDataState({ dataName: 'comments/fetch', state: 'isLoading' }));
+const RightSectionWrapper = ({
+  children,
+  device,
+}: {
+  children: ReactNode;
+  device: 'PC' | 'SP';
+}) => {
+  const isCommentsFetching = useRecoilValue(
+    apiFetchDataState({ dataName: 'comments/fetch', state: 'isLoading' })
+  );
   return (
     <section
       className={clsx('relative', device === 'PC' ? 'w-[70%]' : 'w-full')}

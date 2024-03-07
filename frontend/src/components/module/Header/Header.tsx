@@ -14,7 +14,6 @@ import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useMatchInfoModal } from '@/hooks/useMatchInfoModal';
 import { useAdmin } from '@/hooks/apiHooks/useAuth';
-
 //!recoil
 import { useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
@@ -22,6 +21,7 @@ import { elementSizeState } from '@/store/elementSizeState';
 import { Link } from 'react-router-dom';
 import { LogoutButton } from '@/components/atomic/LogoutButton';
 import { AdministratorPageLinks } from '../AdministratorPageLinks';
+import { Hamburger } from './component/Hamburger';
 
 export const Header = () => {
   const { pathname } = useLocation();
@@ -45,7 +45,8 @@ export const Header = () => {
       >
         <SiteTitle />
 
-        <LinksComponent pathname={pathname} />
+        {device === 'PC' && <LinksComponent pathname={pathname} />}
+        {device === 'SP' && <Hamburger />}
 
         <AuthInfo />
       </header>
@@ -59,20 +60,23 @@ const SiteTitle = () => {
 };
 
 const AuthInfo = () => {
+  const { device } = useWindowSize();
   return (
     <>
       <UserName />
-      <LogoutBox />
+      <LogoutBox isShow={device === 'PC'} />
     </>
   );
 };
 
-const LogoutBox = () => {
+const LogoutBox = ({ isShow }: { isShow: boolean }) => {
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
+
+  const isShowCondition = isShow && (isGuest || authUser);
   return (
     <>
-      {(isGuest || authUser) && (
+      {isShowCondition && (
         <div className="absolute sm:bottom-5 bottom-3 lg:right-10 md:right-5 right-2 flex justify-center">
           <LogoutButton />
         </div>
@@ -99,7 +103,11 @@ const UserIcon = ({ userData }: { userData: UserType | undefined | null }) => {
   return (
     <>
       <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-      <p className={clsx(userData.name!.length > 20 ? 'sm:text-[16px] text-xs' : 'sm:text-[18px] text-sm')}>
+      <p
+        className={clsx(
+          userData.name!.length > 20 ? 'sm:text-[16px] text-xs' : 'sm:text-[18px] text-sm'
+        )}
+      >
         {userData.name}
       </p>
     </>
@@ -137,11 +145,12 @@ const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
           </li>
         )}
 
-        {device === 'SP' && (pathname === ROUTE_PATH.MATCH || pathname === ROUTE_PATH.PAST_MATCH_SINGLE) && (
-          <li className="md:ml-5 ml-2">
-            <ViewMatchInfoButton />
-          </li>
-        )}
+        {device === 'SP' &&
+          (pathname === ROUTE_PATH.MATCH || pathname === ROUTE_PATH.PAST_MATCH_SINGLE) && (
+            <li className="md:ml-5 ml-2">
+              <ViewMatchInfoButton />
+            </li>
+          )}
 
         {isAdmin && (
           <li>
@@ -216,7 +225,10 @@ const ViewMatchInfoButton = () => {
 
   return (
     <>
-      <LinkButton onClick={() => viewMatchInfoModal()} className={'rotate-[-40deg] md:hover:rotate-[240deg]'}>
+      <LinkButton
+        onClick={() => viewMatchInfoModal()}
+        className={'rotate-[-40deg] md:hover:rotate-[240deg]'}
+      >
         <GiBoxingGlove />
       </LinkButton>
     </>
@@ -224,7 +236,13 @@ const ViewMatchInfoButton = () => {
 };
 
 type LinkButtonPropsType = React.ComponentProps<'button'>;
-const LinkButton = ({ children, onMouseEnter, onMouseLeave, className, onClick }: LinkButtonPropsType) => {
+const LinkButton = ({
+  children,
+  onMouseEnter,
+  onMouseLeave,
+  className,
+  onClick,
+}: LinkButtonPropsType) => {
   return (
     <button
       onClick={onClick}
