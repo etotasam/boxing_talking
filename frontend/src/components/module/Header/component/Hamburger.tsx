@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, useAnimationControls } from 'framer-motion';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
-
+//! hook
+import { useMenuModal } from '@/hooks/useMenuModal';
 //!recoil
 import { useRecoilState } from 'recoil';
 import { modalState } from '@/store/modalState';
 
-export const Hamburger = React.memo(() => {
+export const Hamburger = () => {
   const { pathname } = useLocation();
   const hamburgerTopControls = useAnimationControls();
   const hamburgerBottomControls = useAnimationControls();
 
-  const [isShowMenuModal, setIsShowMenuModal] = useRecoilState(modalState('MENU'));
+  const { state: isShowMenuModal, toggle: toggleMenuModal, hide: hideMenuModal } = useMenuModal();
 
   //? ページ遷移時（再描画）にハンバーガーのアニメーションを制御する為に使用
   const [isHamburgerOpen, setsHamburgerOpen] = useRecoilState(modalState('MENU_OPEN_BUTTON_STATE'));
@@ -55,7 +56,7 @@ export const Hamburger = React.memo(() => {
   };
 
   useEffect(() => {
-    setIsShowMenuModal(false);
+    hideMenuModal();
   }, [pathname]);
 
   useEffect(() => {
@@ -67,11 +68,11 @@ export const Hamburger = React.memo(() => {
 
   const onClick = () => {
     if (isAnimeInProcess) return;
-    setIsShowMenuModal((v) => !v);
+    toggleMenuModal();
   };
 
-  return (
-    <div onClick={onClick} className="absolute bottom-2 left-[50%] translate-x-[-50%]">
+  const HamburgerIcon = useMemo(
+    () => (
       <div className="relative w-5 h-5">
         <motion.span
           animate={hamburgerTopControls}
@@ -86,6 +87,13 @@ export const Hamburger = React.memo(() => {
           className={clsx('absolute w-5 h-[2px] bg-white')}
         />
       </div>
+    ),
+    [isShowMenuModal]
+  );
+
+  return (
+    <div onClick={onClick} className="z-30 absolute bottom-2 left-[50%] translate-x-[-50%]">
+      {HamburgerIcon}
     </div>
   );
-});
+};

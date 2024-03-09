@@ -1,21 +1,46 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/assets/routePath';
+import { useInView } from 'react-intersection-observer';
 //! layout
 import HeaderAndFooterLayout from '@/layout/HeaderAndFooterLayout';
 // ! components
 import { SimpleMatchCard } from '@/components/module/SimpleMatchCard';
 //! hooks
-import { useFetchPastMatches } from '@/hooks/apiHooks/useMatch';
+import { useFetchPastMatches, useInfinityFetch } from '@/hooks/apiHooks/useMatch';
 import { useLoading } from '@/hooks/useLoading';
+//! anime
+import { RotatingLines } from 'react-loader-spinner';
+import { MatchDataType } from '@/assets/types';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const PastMatches = () => {
+  const [page, setPage] = useState(1);
   const { resetLoadingState } = useLoading();
-  const { data: pastMatches } = useFetchPastMatches();
+  const { data, isRefetching } = useInfinityFetch({ page, limit: 20 });
+  const [pastMatches, setPastMatches] = useState<MatchDataType[]>();
+
+  const maxPage = data?.page;
   const navigate = useNavigate();
+
+  const { ref: footerRef, inView } = useInView();
+
+  useEffect(() => {
+    if (page >= (maxPage ?? 1)) return;
+    if (inView) {
+      setPage((v) => ++v);
+    }
+  }, [inView, maxPage]);
+
+  useEffect(() => {
+    if (!data) return;
+    setPastMatches((current) => {
+      if (!current) return data.matches;
+      return [...current, ...data.matches];
+    });
+  }, [data]);
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -61,6 +86,8 @@ export const PastMatches = () => {
             ))}
           </ul>
         )}
+        {isRefetching && <MatchFetchingElement />}
+        {!isRefetching && <div className="" ref={footerRef}></div>}
       </HeaderAndFooterLayout>
     </>
   );
@@ -81,3 +108,11 @@ export const PastMatches = () => {
 // const Loading = () => {
 //   return <div className="w-[100vw] h-[100vh] bg-red-400">Loading...</div>;
 // };
+
+const MatchFetchingElement = () => {
+  return (
+    <div className="h-[80px] flex justify-center items-center">
+      <RotatingLines strokeColor="#f5f5f5" strokeWidth="4" animationDuration="1" width="30" />
+    </div>
+  );
+};

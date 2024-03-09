@@ -13,7 +13,7 @@ import { ToastModalContainer } from '@/components/modal/ToastModal';
 import { LoginFormModal } from '@/components/modal/LoginFormModal';
 import { FullScreenSpinnerModal } from '@/components/modal/FullScreenSpinnerModal';
 import { FirstLoadingModal } from '@/components/modal/FirstLoadingModal';
-import { MenuModal } from '@/components/module/MenuModal';
+import { MenuModal } from '@/components/modal/MenuModal';
 
 const Container = () => {
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();

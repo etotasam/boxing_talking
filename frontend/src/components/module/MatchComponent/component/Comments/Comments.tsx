@@ -14,14 +14,17 @@ import { CommentType } from '@/assets/types';
 import { MdErrorOutline } from 'react-icons/md';
 import { FaRegPenToSquare } from 'react-icons/fa6';
 import { AiOutlineUser } from 'react-icons/ai';
-//! components
 
 type PropsType = {
   matchId: number;
 };
 export const Comments = (props: PropsType) => {
   const { matchId } = props;
-  const { data: comments, isLoading: isFetchingComments, isError: isErrorFetchComments } = useFetchComments(matchId);
+  const {
+    data: comments,
+    isLoading: isFetchingComments,
+    isError: isErrorFetchComments,
+  } = useFetchComments(matchId);
 
   const isComments = comments !== undefined && comments.length;
 
@@ -51,7 +54,11 @@ export const Comments = (props: PropsType) => {
 //! コメントbox
 const CommentBox = ({ comment }: { comment: CommentType }) => {
   return (
-    <div className={clsx('sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded-lg')}>
+    <div
+      className={clsx(
+        'sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded-lg'
+      )}
+    >
       <PostTimeAndUserName commentData={comment} />
       <Comment commentData={comment} />
     </div>
@@ -62,22 +69,29 @@ const PostTimeAndUserName = ({ commentData }: { commentData: CommentType }) => {
   //? 投稿時間（投稿からの経過時間）
   const timeSincePost = dateFormatter(commentData.createdAt);
   return (
-    <div className="sm:flex mb-2">
+    <div className="flex items-center mb-2">
       {/* //? post time */}
       <time className="text-xs text-stone-500 leading-6">{timeSincePost}</time>
       {/* //? post name */}
-      <div className="flex sm:ml-3">
+      <div className="ml-3">
         {commentData.postUserName ? (
           <>
-            <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-            <p className={clsx('', commentData.postUserName.length > 20 ? 'text-[12px] sm:text-sm' : 'text-sm')}>
+            <p
+              className={clsx(
+                'flex',
+                commentData.postUserName.length > 20 ? 'text-[12px] sm:text-sm' : 'text-sm'
+              )}
+            >
+              <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
               {commentData.postUserName}
             </p>
           </>
         ) : (
           <>
-            <AiOutlineUser className="mr-1 block bg-stone-300 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-            <p className="text-sm text-stone-600">ゲスト</p>
+            <p className="flex text-sm text-stone-600">
+              <AiOutlineUser className="mr-1 block bg-stone-300 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+              ゲスト
+            </p>
           </>
         )}
       </div>
@@ -99,20 +113,22 @@ const Comment = ({ commentData }: { commentData: CommentType }) => {
       className="relative"
       style={
         document.getElementById(`comment_${commentData.id}`) &&
-        (document.getElementById(`comment_${commentData.id}`)?.clientHeight as number) > initialCommentElHeight()
+        (document.getElementById(`comment_${commentData.id}`)?.clientHeight as number) >
+          initialCommentElHeight()
           ? { height: '135px', overflow: 'hidden' }
           : { height: 'auto' }
       }
     >
       <p
         id={`comment_${commentData.id}`}
-        className={clsx('sm:tracking-normal tracking-wider')}
+        className={clsx('text-neutral-300')}
         dangerouslySetInnerHTML={{
           __html: commentData.comment,
         }}
       />
       {document.getElementById(`comment_${commentData.id}`) &&
-        (document.getElementById(`comment_${commentData.id}`)?.clientHeight as number) > initialCommentElHeight() && (
+        (document.getElementById(`comment_${commentData.id}`)?.clientHeight as number) >
+          initialCommentElHeight() && (
           <p className="absolute bottom-0 left-0 md:h-[25px] h-[35px] bg-white w-full">
             <span
               onClick={stretchCommentElement}
@@ -167,7 +183,8 @@ const dateFormatter = (postDate: string): string => {
 
 const stretchCommentElement = (event: React.MouseEvent<HTMLParagraphElement, MouseEvent>) => {
   const handleClickElement = event.target as HTMLSpanElement;
-  const parentElement = (handleClickElement.parentElement as HTMLParagraphElement).parentElement as HTMLDivElement;
+  const parentElement = (handleClickElement.parentElement as HTMLParagraphElement)
+    .parentElement as HTMLDivElement;
 
   (parentElement as HTMLDivElement).style.height = 'auto';
   if (handleClickElement) {
@@ -197,7 +214,10 @@ const CommentsWrapper = (props: CommentsWrapperType) => {
     <>
       <div
         ref={el}
-        className={clsx('relative w-full flex justify-center', device === 'PC' ? 'my-scroll-y' : 'overflow-auto')}
+        className={clsx(
+          'relative w-full flex justify-center',
+          device === 'PC' ? 'my-scroll-y' : 'overflow-auto'
+        )}
         style={{
           paddingTop: `${headerElHeight}px`,
           height: `calc(100vh - (${postCommentElHeight}px) - 1px)`,

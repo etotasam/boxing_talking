@@ -14,7 +14,7 @@ import { Terms } from './page/Terms/Terms';
 import { Identification } from '@/page/Identification';
 import { NotFound } from '@/page/NotFound';
 import { PastMatches } from './page/PastMatches';
-// import { TestPage } from './page/TestPage';
+import { TestPage } from './page/TestPage';
 // ! middleware
 import AdminOnly from './middleware/AdminOnly';
 import Container from './middleware/Container';
@@ -43,7 +43,7 @@ function App() {
 
         <Route path={ROUTE_PATH.TERMS} element={<Terms />} />
         <Route path={ROUTE_PATH.IDENTIFICATION} element={<Identification />} />
-        {/* <Route path={'/test'} element={<TestPage />} /> */}
+        <Route path={'/test'} element={<TestPage />} />
 
         <Route path="/*" element={<NotFound />} />
       </Routes>

@@ -18,6 +18,7 @@ use App\Repositories\Interfaces\GradeRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
 
+
 class MatchController extends ApiController
 {
 
@@ -151,5 +152,25 @@ class MatchController extends ApiController
         } catch (Exception $e) {
             return $this->responseInvalidQuery($e->getMessage());
         }
+    }
+
+
+    /**
+     * @param ini page
+     * @param ini limit
+     */
+    public function infinity(Request $request)
+    {
+
+        $page = $request->page;
+        $limit = $request->limit;
+        $under = ($page - 1) * $limit;
+        $fetchRange = date('Y-m-d', strtotime('-2 week'));
+        $matchCount = BoxingMatch::where('match_date', '<', $fetchRange)->count();
+        $matchPages = ceil($matchCount / $limit) ?? 0;
+
+        $matches = BoxingMatch::where('match_date', '<', $fetchRange)->orderBy('match_date', 'desc')->offset($under)->limit($limit)->get();
+
+        return ["matches" => BoxingMatchResource::collection($matches), "page" => $matchPages];
     }
 }

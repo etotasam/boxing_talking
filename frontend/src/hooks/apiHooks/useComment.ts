@@ -17,35 +17,6 @@ import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 import { useRecoilState } from "recoil"
 import { apiFetchDataState } from "@/store/apiFetchDataState"
 
-//! テストコメント取得
-// export const useTestFetchComments = (matchId: number, offset: number, limit: number) => {
-//   const { showToastModalMessage } = useToastModal()
-//   const api = async () => {
-//     try {
-//       return await Axios.get("/api/comment/test", {
-//         params: {
-//           match_id: matchId,
-//           offset,
-//           limit
-//         },
-//       }).then(v => v.data)
-//     } catch (error) {
-//       return null
-//     }
-//   }
-
-// const { data, isLoading, isFetching, refetch, isError } = useQuery<CommentType[]>([QUERY_KEY.COMMENT, { id: matchId }], api, {
-//   staleTime: 60000, onError: (error: unknown) => {
-//     if ((error as AxiosError).status === 419) {
-//       showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-//       return
-//     }
-//   }
-// })
-
-// return { data, isLoading, isFetching, refetch, isError }
-// }
-
 //! コメント取得
 export const useFetchComments = (matchId: number) => {
   const { showToastModalMessage } = useToastModal()

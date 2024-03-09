@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/routePath';
-// ! icons
+import { motion, AnimatePresence } from 'framer-motion';
+//! icon
+import { IoLogOutSharp } from 'react-icons/io5';
 import { BsCalendar3 } from 'react-icons/bs';
 import { GiBoxingGlove } from 'react-icons/gi';
 import { AiOutlineUser } from 'react-icons/ai';
@@ -14,6 +16,8 @@ import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useMatchInfoModal } from '@/hooks/useMatchInfoModal';
 import { useAdmin } from '@/hooks/apiHooks/useAuth';
+import { useLogout, useGuestLogout } from '@/hooks/apiHooks/useAuth';
+import { useMenuModal } from '@/hooks/useMenuModal';
 //!recoil
 import { useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
@@ -41,7 +45,7 @@ export const Header = () => {
       <header
         ref={headerRef}
         style={device === 'SP' ? { width: `100%` } : { width: `calc(100% - 10px)` }}
-        className={clsx('z-30 h-[80px] fixed top-0 left-0 flex backdrop-blur-sm text-stone-200')}
+        className={clsx('z-10 h-[80px] fixed top-0 left-0 flex backdrop-blur-sm text-stone-200')}
       >
         <SiteTitle />
 
@@ -61,10 +65,12 @@ const SiteTitle = () => {
 
 const AuthInfo = () => {
   const { device } = useWindowSize();
+  const { state: isShowMenu } = useMenuModal();
   return (
     <>
       <UserName />
       <LogoutBox isShow={device === 'PC'} />
+      <LogoutIcon isShow={isShowMenu} />
     </>
   );
 };
@@ -102,12 +108,8 @@ const UserIcon = ({ userData }: { userData: UserType | undefined | null }) => {
   if (!userData) return;
   return (
     <>
-      <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-      <p
-        className={clsx(
-          userData.name!.length > 20 ? 'sm:text-[16px] text-xs' : 'sm:text-[18px] text-sm'
-        )}
-      >
+      <p className={clsx('text-[10px] flex items-center')}>
+        <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
         {userData.name}
       </p>
     </>
@@ -117,8 +119,10 @@ const UserIcon = ({ userData }: { userData: UserType | undefined | null }) => {
 const GuestIcon = () => {
   return (
     <>
-      <AiOutlineUser className="mr-1 block bg-stone-400 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-      <p className="text-sm">ゲスト</p>
+      <p className="text-[10px] flex items-center">
+        <AiOutlineUser className="mr-1 block bg-stone-400 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+        ゲスト
+      </p>
     </>
   );
 };
@@ -255,5 +259,35 @@ const LinkButton = ({
     >
       {children}
     </button>
+  );
+};
+
+const LogoutIcon = ({ isShow }: { isShow: boolean }) => {
+  const { logout } = useLogout();
+  const { guestLogout } = useGuestLogout();
+  const { data: authUser } = useAuth();
+  const { data: isGuest } = useGuest();
+
+  const userLogout = () => {
+    if (authUser) {
+      logout();
+    }
+    if (isGuest) {
+      guestLogout();
+    }
+  };
+
+  if (!isShow) return;
+  return (
+    <motion.button
+      onClick={userLogout}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="fixed top-[50px] right-2 flex items-center text-[8px] px-[3px] py-[2px] bg-neutral-800 text-neutral-400"
+    >
+      <IoLogOutSharp className={'text-xl mr-1'} />
+      ログアウト
+    </motion.button>
   );
 };

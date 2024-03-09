@@ -11,9 +11,7 @@ type PostCommentType = {
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
   storeCommentExecute: () => void;
   textareaRef: React.MutableRefObject<null>;
-  autoExpandTextareaAndSetComment: (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => void;
+  autoExpandTextareaAndSetComment: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 };
 export const PostComment = (props: PostCommentType) => {
   const {
@@ -42,9 +40,7 @@ type PostCommentTextareaType = {
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
   storeCommentExecute: () => void;
   textareaRef: React.MutableRefObject<null>;
-  autoExpandTextareaAndSetComment: (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => void;
+  autoExpandTextareaAndSetComment: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 };
 
 const PostCommentTextarea = ({
@@ -55,7 +51,12 @@ const PostCommentTextarea = ({
   //? コメント投稿中…の状態取得(hookの中でRecoilを使用)
   const { isLoading: isPostingComment } = usePostComment();
   return (
-    <div className="border-neutral-600 bg-neutral-800 text-neutral-200 relative border-[1px] pr-[60px] sm:pl-5 sm:py-2 pl-2 py-1 rounded-xl flex justify-center items-center">
+    <div
+      className={clsx(
+        'border-neutral-600 bg-neutral-800 text-neutral-200 relative border-[1px] pr-[43px] pl-2 py-1 rounded-lg flex justify-center items-center',
+        'sm:pl-5 sm:py-2 sm:pr-[55px]'
+      )}
+    >
       <textarea
         ref={textareaRef}
         className="w-full resize-none outline-0 placeholder:text-stone-600 leading-[34px] bg-neutral-800"
@@ -69,7 +70,9 @@ const PostCommentTextarea = ({
       <button
         onClick={storeCommentExecute}
         className={clsx(
-          'absolute bottom-[5px] right-[15px] sm:bottom-[4px] sm:w-[40px] sm:h-[40px] w-[35px] h-[35px] text-[14px] border-[1px] border-neutral-500 bg-neutral-700 hover:bg-cyan-800 focus:bg-cyan-800 rounded-md duration-300 py-1 text-stone-300 text-xl flex justify-center items-center',
+          'absolute bottom-[6px] right-[6px]',
+          'w-[30px] h-[30px] ml-[5px] text-[14px] border-[1px] border-neutral-500 bg-neutral-700  hover:bg-cyan-800 focus:bg-cyan-800 rounded-md duration-300 py-1 text-stone-300 text-xl flex justify-center items-center',
+          'sm:w-[35px] sm:h-[35px] sm:bottom-[8px] sm:right-[8px]',
           isPostingComment && 'text-white/50 select-none'
         )}
       >

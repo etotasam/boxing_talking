@@ -14,7 +14,7 @@ import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal"
 import type { BoxerType, CountryType } from "@/assets/types"
 
 
-//! 選手データ取得 and 登録済み選手の数を取得
+//! boxerデータ取得 and 登録済み選手の数を取得
 const limit = 15
 export const useFetchBoxers = () => {
 
@@ -76,7 +76,7 @@ export const useFetchBoxers = () => {
   return { boxersData, boxersCount, pageCount, isLoading, isError, isPreviousData, refetch, isRefetching }
 }
 
-// //! 選手データ更新
+// //! boxerデータ更新
 export const useUpdateBoxerData = () => {
   const { startLoading, resetLoadingState } = useLoading()
   const { refetchReactQueryArrayKeys } = useReactQuery()
@@ -106,7 +106,7 @@ export const useUpdateBoxerData = () => {
   return { updateBoxer, isLoading, isSuccess }
 }
 
-// //! 選手登録
+// //! boxer登録
 export const useRegisterBoxer = () => {
   const { refetchReactQueryData } = useReactQuery()
   const { startLoading, resetLoadingState, successful } = useLoading()
@@ -160,7 +160,7 @@ export const useRegisterBoxer = () => {
   return { registerBoxer, isLoading, isError, isSuccess }
 }
 
-// //! 選手データ削除
+// //! boxerデータ削除
 export const useDeleteBoxer = () => {
   const { refetch: RefetchBoxerData } = useFetchBoxers()
   const { startLoading, resetLoadingState } = useLoading()
