@@ -1,10 +1,12 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
+import { useInView } from 'react-intersection-observer';
 //! hooks
 import { useFetchComments } from '@/hooks/apiHooks/useComment';
 import { useWindowSize } from '@/hooks/useWindowSize';
+import { useInfinityFetchComments } from '@/hooks/useInfinityFetchComments';
 //! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
@@ -14,6 +16,7 @@ import { CommentType } from '@/assets/types';
 import { MdErrorOutline } from 'react-icons/md';
 import { FaRegPenToSquare } from 'react-icons/fa6';
 import { AiOutlineUser } from 'react-icons/ai';
+import { RotatingLines } from 'react-loader-spinner';
 
 type PropsType = {
   matchId: number;
@@ -22,9 +25,22 @@ export const Comments = (props: PropsType) => {
   const { matchId } = props;
   const {
     data: comments,
-    isLoading: isFetchingComments,
+    refetch,
+    isNextComments,
     isError: isErrorFetchComments,
-  } = useFetchComments(matchId);
+  } = useInfinityFetchComments(matchId);
+  // const {
+  //   data: comments,
+  //   isLoading: isFetchingComments,
+  //   isError: isErrorFetchComments,
+  // } = useFetchComments(matchId);
+  const { inView, ref } = useInView();
+
+  useEffect(() => {
+    if (inView) {
+      refetch();
+    }
+  }, [inView]);
 
   const isComments = comments !== undefined && comments.length;
 
@@ -45,6 +61,11 @@ export const Comments = (props: PropsType) => {
               <CommentBox comment={comment} />
             </div>
           ))}
+          {isNextComments && (
+            <div ref={ref} className="pb-3">
+              <CommentsLoadingEl />
+            </div>
+          )}
         </div>
       )}
     </CommentsWrapper>
@@ -266,5 +287,17 @@ const ErrorFallback = () => {
         </div>
       </div>
     </CommentsWrapper>
+  );
+};
+
+const CommentsLoadingEl = () => {
+  return (
+    <div
+      className={clsx(
+        'flex justify-center items-center sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded-lg'
+      )}
+    >
+      <RotatingLines strokeColor="#ffffff" strokeWidth="3" animationDuration="1" width="30" />
+    </div>
   );
 };

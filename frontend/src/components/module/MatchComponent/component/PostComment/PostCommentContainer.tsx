@@ -3,10 +3,7 @@ import { PostComment } from './PostComment';
 import { useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 import { useLocation } from 'react-router-dom';
-import {
-  BG_COLOR_ON_TOAST_MODAL,
-  MESSAGE,
-} from '@/assets/statusesOnToastModal';
+import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 import { usePostComment, useFetchComments } from '@/hooks/apiHooks/useComment';
@@ -30,11 +27,9 @@ export const PostCommentContainer = (props: PropsType) => {
   const { data: authUser } = useAuth();
   const isAuthOrGuest = Boolean(isGuest || authUser);
 
-  const setRecoilPostCommentHeight = useSetRecoilState(
-    elementSizeState('POST_COMMENT_HEIGHT')
-  );
+  const setRecoilPostCommentHeight = useSetRecoilState(elementSizeState('POST_COMMENT_HEIGHT'));
 
-  const { isLoading: isFetchingComments } = useFetchComments(matchId);
+  // const { isLoading: isFetchingComments } = useFetchComments(matchId);
 
   const { setToastModal, showToastModal } = useToastModal();
   const [comment, setComment] = useState<string>();
@@ -49,17 +44,13 @@ export const PostCommentContainer = (props: PropsType) => {
   //? コメント入力Elementの高さの初期値をRecoilへ
   useEffect(() => {
     if (!commentPostRef.current) return;
-    setRecoilPostCommentHeight(
-      (commentPostRef.current as HTMLSelectElement).clientHeight
-    );
+    setRecoilPostCommentHeight((commentPostRef.current as HTMLSelectElement).clientHeight);
   }, [commentPostRef.current]);
 
   const textareaRef = useRef(null);
   const textarea = textareaRef.current as unknown as HTMLTextAreaElement;
   //?テキストエリアの高さを自動制御
-  const autoExpandTextareaAndSetComment = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  const autoExpandTextareaAndSetComment = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setComment(e.target.value);
     if (!textarea) return;
     if (textarea.scrollHeight > 250) {
@@ -80,8 +71,7 @@ export const PostCommentContainer = (props: PropsType) => {
     if (isSuccessPostComment) {
       setComment('');
       //? textareaの高さをリセットと中身を削除
-      (textareaRef.current as unknown as HTMLTextAreaElement).style.height =
-        'auto';
+      (textareaRef.current as unknown as HTMLTextAreaElement).style.height = 'auto';
       (textareaRef.current as unknown as HTMLTextAreaElement).value = '';
     }
     //? postCommentの高さを初期化

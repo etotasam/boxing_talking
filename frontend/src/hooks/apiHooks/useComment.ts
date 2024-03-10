@@ -33,7 +33,7 @@ export const useFetchCommentsState = (matchId: number) => {
   return { data }
 }
 
-//! コメント取得
+//! コメント取得(limitで取得数、createdAtより以前)
 export const useFetchCommentsNew = ({ matchId, createdAt, page }: { matchId: number, createdAt: string, page: number, limit?: number }) => {
   const api = async () => {
     const res = await Axios.get(API_PATH.COMMENT_NEW, {
@@ -47,11 +47,11 @@ export const useFetchCommentsNew = ({ matchId, createdAt, page }: { matchId: num
     return res.data
   }
 
-  const { data, refetch, isRefetching } = useQuery<CommentType[]>([QUERY_KEY.COMMENT_NEW, { matchId }], api, {
+  const { data, refetch, isRefetching, isError } = useQuery<CommentType[]>([QUERY_KEY.COMMENT_NEW, { matchId }], api, {
     cacheTime: 0, enabled: false, keepPreviousData: false
   })
 
-  return { data, refetch, isRefetching }
+  return { data, refetch, isRefetching, isError }
 }
 
 //! コメント取得

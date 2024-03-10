@@ -2,18 +2,23 @@ import { useFetchCommentsNew, useFetchCommentsState } from '@/hooks/apiHooks/use
 import { useEffect } from 'react';
 import { useQueryState } from '@/hooks/apiHooks/useQueryState';
 import { CommentType } from '@/assets/types';
+//! Recoil
+import { useSetRecoilState } from "recoil"
+import { apiFetchDataState } from "@/store/apiFetchDataState"
 
-
-type PropsType = {
-  matchId: number
-}
-export const useInfinityFetchComments = (props: PropsType) => {
-  const { matchId } = props
+export const useInfinityFetchComments = (matchId: number) => {
 
   const [commentsData, setCommentsData] = useQueryState<{ page: number; comments: CommentType[] }>([
     'comments',
     { matchId },
   ]);
+
+  const setIsLoading = useSetRecoilState(apiFetchDataState({ dataName: "comments/fetch", state: "isLoading" }))
+
+  useEffect(() => {
+    setIsLoading(!commentsData)
+  }, [commentsData])
+
 
   const { data: commentState } = useFetchCommentsState(matchId);
 
@@ -21,6 +26,7 @@ export const useInfinityFetchComments = (props: PropsType) => {
     refetch: commentsRefetch,
     data: FetchedComments,
     isRefetching,
+    isError
   } = useFetchCommentsNew({
     matchId,
     createdAt: commentState ? commentState.resentPostTime : '',
@@ -51,6 +57,9 @@ export const useInfinityFetchComments = (props: PropsType) => {
     }
   };
 
+
+  const isNextComments = (commentState && commentsData && (commentState.maxPage > commentsData.page)) || isRefetching
+
   const data = commentsData ? commentsData.comments : undefined
-  return { data, refetch }
+  return { data, refetch, isError, isRefetching, isNextComments }
 }

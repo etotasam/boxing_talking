@@ -1,7 +1,6 @@
 import { useContext, useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-
 //! type
 import { MatchPredictionsType } from '@/assets/types';
 //! context
@@ -93,7 +92,7 @@ const PredictionBar = (props: PredictionBarType) => {
   const [redCountRatio, setRedCountRatio] = useState<number>(0);
   const [blueCountRatio, setBlueCountRatio] = useState<number>(0);
 
-  const setWinPredictionRate = (): void => {
+  const makeWinPredictionRate = (): void => {
     if (!matchPredictions) return;
     const totalCount = matchPredictions.totalVotes;
     const redRatio = Math.round((matchPredictions.red / totalCount) * 1000) / 10;
@@ -102,11 +101,16 @@ const PredictionBar = (props: PredictionBarType) => {
     setBlueCountRatio(!isNaN(blueRatio) ? blueRatio : 0);
   };
 
+  //? コメント取得中かどうか(first fetch)
+  const isFetchingComments = useRecoilValue(
+    apiFetchDataState({ dataName: 'comments/fetch', state: 'isLoading' })
+  );
+
   useEffect(() => {
     if (!matchPredictions) return;
-
-    setWinPredictionRate();
-  }, [matchPredictions]);
+    if (isFetchingComments) return;
+    makeWinPredictionRate();
+  }, [matchPredictions, isFetchingComments]);
 
   if (usersPrediction === undefined) return;
   if (!matchPredictions) return;
