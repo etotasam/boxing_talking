@@ -39,6 +39,10 @@ class BoxingMatch extends Model
         'updated_at',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
+
     public function comments()
     {
         return $this->hasMany(Comment::class, 'match_id');

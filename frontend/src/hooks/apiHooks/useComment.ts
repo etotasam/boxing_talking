@@ -17,6 +17,43 @@ import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 import { useRecoilState } from "recoil"
 import { apiFetchDataState } from "@/store/apiFetchDataState"
 
+
+const LIMIT = 10
+//! コメントのmax page
+export const useFetchCommentsState = (matchId: number) => {
+  const api = async () => {
+    const res = await Axios.get<{ maxPage: number, resentPostTime: string }>(API_PATH.COMMENT_STATE, { params: { matchId, limit: LIMIT } }).then(v => v.data)
+    return res
+  }
+
+  const { data } = useQuery([QUERY_KEY.COMMENT_STATE, { matchId }], api, {
+    keepPreviousData: true, enabled: true, staleTime: Infinity
+  })
+
+  return { data }
+}
+
+//! コメント取得
+export const useFetchCommentsNew = ({ matchId, createdAt, page }: { matchId: number, createdAt: string, page: number, limit?: number }) => {
+  const api = async () => {
+    const res = await Axios.get(API_PATH.COMMENT_NEW, {
+      params: {
+        matchId,
+        createdAt,
+        page,
+        limit: LIMIT
+      },
+    }).then(v => v.data)
+    return res.data
+  }
+
+  const { data, refetch, isRefetching } = useQuery<CommentType[]>([QUERY_KEY.COMMENT_NEW, { matchId }], api, {
+    cacheTime: 0, enabled: false, keepPreviousData: false
+  })
+
+  return { data, refetch, isRefetching }
+}
+
 //! コメント取得
 export const useFetchComments = (matchId: number) => {
   const { showToastModalMessage } = useToastModal()

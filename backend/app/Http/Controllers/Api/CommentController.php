@@ -14,6 +14,8 @@ use App\Repositories\Interfaces\MatchRepositoryInterface;
 use App\Repositories\Interfaces\CommentRepositoryInterface;
 use Illuminate\Database\QueryException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use App\Models\Comment;
+use DateTime;
 
 class CommentController extends ApiController
 {
@@ -24,6 +26,61 @@ class CommentController extends ApiController
         protected MatchRepositoryInterface $matchRepository,
         protected CommentRepositoryInterface $commentRepository
     ) {
+    }
+
+    /**
+     * @param int limit
+     * @param int match_id
+     * 
+     * @return array ["maxPage" => int, "resentPostTime" => string]
+     */
+    public function state(Request $request)
+    {
+        $matchId = $request->match_id;
+        $limit = $request->limit;
+        try {
+            $resentComment = Comment::latest()->first();
+            $timestamp = strtotime($resentComment->created_at);
+            $formattedCreatedAt = date('Y-m-d H:i:s', $timestamp);
+
+            $commentsCount = Comment::where('match_id', $matchId)->count();
+            $maxPage = ceil($commentsCount / $limit);
+
+            return ["maxPage" => $maxPage, "resentPostTime" => $formattedCreatedAt];
+        } catch (\Exception $e) {
+            return $this->responseInvalidQuery('Failed fetch comments count');
+        }
+    }
+
+    /**
+     * 指定の範囲の試合コメントを取得
+     *
+     * @param int match_id
+     * @param int page
+     * @param int limit
+     * @param string create_at
+     *
+     * @return CommentResource[]|JsonResponse
+     */
+    public function fetch(Request $request)
+    {
+        $matchId = $request->match_id;
+        $page = $request->page;
+        $limit = $request->limit;
+        $createdAt = $request->created_at;
+        $timestamp = strtotime($createdAt);
+        $formattedCreatedAt = date('Y-m-d H:i:s', $timestamp);
+        $offset = ($page - 1) * $limit;
+
+        try {
+            $comments = Comment::where(function ($q) use ($matchId, $formattedCreatedAt) {
+                $q->where('match_id', $matchId);
+                $q->where('created_at', "<=", $formattedCreatedAt);
+            })->orderBy('created_at', 'desc')->offset($offset)->limit($limit)->get();
+            return CommentResource::collection($comments);
+        } catch (\Exception $e) {
+            return $this->responseInvalidQuery('Failed fetch comments new');
+        }
     }
 
     /**

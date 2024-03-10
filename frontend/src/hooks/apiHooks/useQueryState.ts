@@ -5,6 +5,7 @@ export const useQueryState = <T>(key: QueryKey, initialState?: T): [T, React.Dis
   const state = useQuery(key, {
     enabled: false,
     staleTime: Infinity,
+    keepPreviousData: true,
     ...((initialState !== undefined) ? { initialData: initialState } : {})
   }).data as T
 
