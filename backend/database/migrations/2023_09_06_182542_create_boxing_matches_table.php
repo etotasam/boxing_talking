@@ -23,10 +23,7 @@ class CreateBoxingMatchesTable extends Migration
             $table->foreign('blue_boxer_id')->references('id')->on('boxers');
             $table->string('venue');
             $table->string('grade');
-            $table->text('titles')->nullable();
             $table->string('weight');
-            $table->integer("count_red")->default(0);
-            $table->integer("count_blue")->default(0);
             $table->timestamps();
         });
     }

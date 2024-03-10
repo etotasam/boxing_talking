@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/routePath';
-// ! icons
+import { motion, AnimatePresence } from 'framer-motion';
+//! icon
+import { IoLogOutSharp } from 'react-icons/io5';
 import { BsCalendar3 } from 'react-icons/bs';
 import { GiBoxingGlove } from 'react-icons/gi';
 import { AiOutlineUser } from 'react-icons/ai';
@@ -14,7 +16,8 @@ import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useMatchInfoModal } from '@/hooks/useMatchInfoModal';
 import { useAdmin } from '@/hooks/apiHooks/useAuth';
-
+import { useLogout, useGuestLogout } from '@/hooks/apiHooks/useAuth';
+import { useMenuModal } from '@/hooks/useMenuModal';
 //!recoil
 import { useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
@@ -22,9 +25,11 @@ import { elementSizeState } from '@/store/elementSizeState';
 import { Link } from 'react-router-dom';
 import { LogoutButton } from '@/components/atomic/LogoutButton';
 import { AdministratorPageLinks } from '../AdministratorPageLinks';
+import { Hamburger } from './component/Hamburger';
 
 export const Header = () => {
   const { pathname } = useLocation();
+  const { device } = useWindowSize();
 
   const setHeaderHeight = useSetRecoilState(elementSizeState('HEADER_HEIGHT'));
 
@@ -39,15 +44,13 @@ export const Header = () => {
     <>
       <header
         ref={headerRef}
-        style={{ width: `calc(100% - 10px)` }}
-        className={clsx(
-          'z-30 h-[80px] fixed top-0 left-0 flex backdrop-blur-sm text-stone-200'
-          // 'after:w-full after:absolute after:bottom-0 after:left-0 after:h-[1px] after:bg-stone-300'
-        )}
+        style={device === 'SP' ? { width: `100%` } : { width: `calc(100% - 10px)` }}
+        className={clsx('z-10 h-[80px] fixed top-0 left-0 flex backdrop-blur-sm text-stone-200')}
       >
         <SiteTitle />
 
-        <LinksComponent pathname={pathname} />
+        {device === 'PC' && <LinksComponent pathname={pathname} />}
+        {device === 'SP' && <Hamburger />}
 
         <AuthInfo />
       </header>
@@ -57,28 +60,29 @@ export const Header = () => {
 
 const SiteTitle = () => {
   const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
-  return (
-    <h1 className={clsx('shadow-blur sm:text-[48px] text-[32px] font-thin')}>
-      {siteTitle}
-    </h1>
-  );
+  return <h1 className={clsx('shadow-blur sm:text-[48px] text-[32px] font-thin')}>{siteTitle}</h1>;
 };
 
 const AuthInfo = () => {
+  const { device } = useWindowSize();
+  const { state: isShowMenu } = useMenuModal();
   return (
     <>
       <UserName />
-      <LogoutBox />
+      <LogoutBox isShow={device === 'PC'} />
+      <LogoutIcon isShow={isShowMenu} />
     </>
   );
 };
 
-const LogoutBox = () => {
+const LogoutBox = ({ isShow }: { isShow: boolean }) => {
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
+
+  const isShowCondition = isShow && (isGuest || authUser);
   return (
     <>
-      {(isGuest || authUser) && (
+      {isShowCondition && (
         <div className="absolute sm:bottom-5 bottom-3 lg:right-10 md:right-5 right-2 flex justify-center">
           <LogoutButton />
         </div>
@@ -104,14 +108,8 @@ const UserIcon = ({ userData }: { userData: UserType | undefined | null }) => {
   if (!userData) return;
   return (
     <>
-      <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-      <p
-        className={clsx(
-          userData.name!.length > 20
-            ? 'sm:text-[16px] text-xs'
-            : 'sm:text-[18px] text-sm'
-        )}
-      >
+      <p className={clsx('text-[10px] flex items-center')}>
+        <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
         {userData.name}
       </p>
     </>
@@ -121,8 +119,10 @@ const UserIcon = ({ userData }: { userData: UserType | undefined | null }) => {
 const GuestIcon = () => {
   return (
     <>
-      <AiOutlineUser className="mr-1 block bg-stone-400 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-      <p className="text-sm">ゲスト</p>
+      <p className="text-[10px] flex items-center">
+        <AiOutlineUser className="mr-1 block bg-stone-400 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+        ゲスト
+      </p>
     </>
   );
 };
@@ -150,8 +150,7 @@ const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
         )}
 
         {device === 'SP' &&
-          (pathname === ROUTE_PATH.MATCH ||
-            pathname === ROUTE_PATH.PAST_MATCH_SINGLE) && (
+          (pathname === ROUTE_PATH.MATCH || pathname === ROUTE_PATH.PAST_MATCH_SINGLE) && (
             <li className="md:ml-5 ml-2">
               <ViewMatchInfoButton />
             </li>
@@ -181,12 +180,8 @@ const ToBoxMatchLinkButton = () => {
         )}
         <Link to={ROUTE_PATH.HOME}>
           <LinkButton
-            onMouseEnter={
-              device === 'PC' ? () => setIsShowDescription(true) : () => {}
-            }
-            onMouseLeave={
-              device === 'PC' ? () => setIsShowDescription(false) : () => {}
-            }
+            onMouseEnter={device === 'PC' ? () => setIsShowDescription(true) : () => {}}
+            onMouseLeave={device === 'PC' ? () => setIsShowDescription(false) : () => {}}
           >
             <BsCalendar3 />
           </LinkButton>
@@ -211,12 +206,8 @@ const ToPastMatchesPageLinkButton = () => {
         <Link to={ROUTE_PATH.PAST_MATCHES}>
           <LinkButton
             className="text-[20px] hover:text-[22px]"
-            onMouseEnter={
-              device === 'PC' ? () => setIsShowDescription(true) : () => {}
-            }
-            onMouseLeave={
-              device === 'PC' ? () => setIsShowDescription(false) : () => {}
-            }
+            onMouseEnter={device === 'PC' ? () => setIsShowDescription(true) : () => {}}
+            onMouseLeave={device === 'PC' ? () => setIsShowDescription(false) : () => {}}
           >
             <RiTimeLine />
           </LinkButton>
@@ -268,5 +259,35 @@ const LinkButton = ({
     >
       {children}
     </button>
+  );
+};
+
+const LogoutIcon = ({ isShow }: { isShow: boolean }) => {
+  const { logout } = useLogout();
+  const { guestLogout } = useGuestLogout();
+  const { data: authUser } = useAuth();
+  const { data: isGuest } = useGuest();
+
+  const userLogout = () => {
+    if (authUser) {
+      logout();
+    }
+    if (isGuest) {
+      guestLogout();
+    }
+  };
+
+  if (!isShow) return;
+  return (
+    <motion.button
+      onClick={userLogout}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="fixed top-[50px] right-2 flex items-center text-[8px] px-[3px] py-[2px] bg-neutral-800 text-neutral-400"
+    >
+      <IoLogOutSharp className={'text-xl mr-1'} />
+      ログアウト
+    </motion.button>
   );
 };

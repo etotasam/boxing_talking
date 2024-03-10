@@ -9,6 +9,8 @@ use App\Models\Organization;
 use App\Models\Boxer;
 use App\Helpers\TestHelper;
 use Database\Seeders\OrganizationSeeder;
+use Database\Seeders\WeightDivisionSeeder;
+use Database\Seeders\GradeSeeder;
 
 class StoreMatchTest extends TestCase
 {
@@ -21,6 +23,10 @@ class StoreMatchTest extends TestCase
   protected function setUp(): void
   {
     parent::setUp();
+    $this->seed([
+      GradeSeeder::class,
+      WeightDivisionSeeder::class
+    ]);
     $boxers = [];
     foreach ($this->boxerNames as $name) {
       $boxer = Boxer::factory()->create(['name' => $name]);
@@ -28,13 +34,13 @@ class StoreMatchTest extends TestCase
     }
 
     $this->storeMatchData = [
-      'match_date' => '2023-10-01',
+      'match_date' => '2024-10-01',
       'country' => "Japan",
       'red_boxer_id' => 1,
       'blue_boxer_id' => 2,
       'venue' => 'ラスベガス',
-      'grade' => 'タイトルマッチ',
-      'weight' => 'ヘビー',
+      'grade' => 'タイトルマッチ', #grade_id 1
+      'weight' => 'ヘビー',     #weight_id 1
       'titles' => ['WBA', 'WBC', 'IBF']
     ];
 
@@ -55,12 +61,12 @@ class StoreMatchTest extends TestCase
    */
   public function testStoreMatchWithTitleMatch()
   {
-    //adminユーザとして実行
+    //?adminユーザとして実行
     $this->actingAs(TestHelper::createAdminUser());
 
     $response = $this->post('/api/match', $this->storeMatchData);
     $response->assertStatus(200);
-    //title_matchesにセットされているか
+    //?title_matchesにセットされているか
     $organizationIdArray = array_map(function ($organizationName) {
       $organization = Organization::where('name', $organizationName)->first();
       return $organization->id;
@@ -69,9 +75,11 @@ class StoreMatchTest extends TestCase
     foreach ($organizationIdArray as $id) {
       $this->assertDatabaseHas('title_matches', ['match_id' => 1, 'organization_id' => $id]);
     }
-    //matchesにセットされているか
-    unset($this->storeMatchData['titles']);
-    $this->assertDatabaseHas('boxing_matches', $this->storeMatchData);
+
+    $formattedMatchData = $this->formatMatchDataForStore($this->storeMatchData);
+
+    //?matchesにセットされている
+    $this->assertDatabaseHas('boxing_matches', $formattedMatchData);
   }
 
   /**
@@ -80,20 +88,21 @@ class StoreMatchTest extends TestCase
    */
   public function testStoreMatchWithNonTitleMatch()
   {
-    //adminユーザとして実行
+    //?adminユーザとして実行
     $this->actingAs(TestHelper::createAdminUser());
 
-    //titles配列を空にする
+    //?titles配列を空にする
     $this->storeMatchData['titles'] = [];
 
-    //matchデータ自体はstoreされる
+    //?matchデータ自体はstoreされる
     $response = $this->post('/api/match', $this->storeMatchData);
     $response->assertStatus(200);
-    //storeしたmatchIdはtitle_matchesにはstoreされていない
+    //?storeしたmatchIdはtitle_matchesにはstoreされていない
     $this->assertDatabaseMissing('title_matches', ['match_id' => 1]);
-    //boxing_matchesテーブルにセットされている
-    unset($this->storeMatchData['titles']);
-    $this->assertDatabaseHas('boxing_matches', $this->storeMatchData);
+
+    $formattedMatchData = $this->formatMatchDataForStore($this->storeMatchData);
+    //?boxing_matchesテーブルにセットされている
+    $this->assertDatabaseHas('boxing_matches', $formattedMatchData);
   }
 
   /**
@@ -103,10 +112,25 @@ class StoreMatchTest extends TestCase
   {
     $response = $this->post('/api/match', $this->storeMatchData);
     $response->assertStatus(401);
-    //titles_matchesにもsoreされていない
+    //?titles_matchesにもsoreされていない
     $this->assertDatabaseMissing('title_matches', ['match_id' => 1]);
-    //boxing_matchesにもsoreされていない
-    unset($this->storeMatchData['titles']);
-    $this->assertDatabaseMissing('boxing_matches', $this->storeMatchData);
+
+    $formattedMatchData = $this->formatMatchDataForStore($this->storeMatchData);
+    //?boxing_matchesにもsoreされていない
+    $this->assertDatabaseMissing('boxing_matches', $formattedMatchData);
+  }
+
+
+
+  /**
+   * @param array $matchData
+   * @return array formatted match data for store
+   */
+  private function formatMatchDataForStore(array $matchData): array
+  {
+    unset($matchData['titles'], $matchData['grade'], $matchData['weight']);
+    $formattedMatchData = array_merge($matchData, ["grade_id" => 1], ["weight_id" => 1]); # grade_id=1 タイトルマッチ weight_id=1 ヘビー
+
+    return $formattedMatchData;
   }
 }

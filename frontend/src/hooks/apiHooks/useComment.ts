@@ -17,34 +17,42 @@ import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 import { useRecoilState } from "recoil"
 import { apiFetchDataState } from "@/store/apiFetchDataState"
 
-//! テストコメント取得
-// export const useTestFetchComments = (matchId: number, offset: number, limit: number) => {
-//   const { showToastModalMessage } = useToastModal()
-//   const api = async () => {
-//     try {
-//       return await Axios.get("/api/comment/test", {
-//         params: {
-//           match_id: matchId,
-//           offset,
-//           limit
-//         },
-//       }).then(v => v.data)
-//     } catch (error) {
-//       return null
-//     }
-//   }
 
-// const { data, isLoading, isFetching, refetch, isError } = useQuery<CommentType[]>([QUERY_KEY.COMMENT, { id: matchId }], api, {
-//   staleTime: 60000, onError: (error: unknown) => {
-//     if ((error as AxiosError).status === 419) {
-//       showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-//       return
-//     }
-//   }
-// })
+const LIMIT = 10
+//! コメントのmax page
+export const useFetchCommentsState = (matchId: number) => {
+  const api = async () => {
+    const res = await Axios.get<{ maxPage: number, resentPostTime: string }>(API_PATH.COMMENT_STATE, { params: { matchId, limit: LIMIT } }).then(v => v.data)
+    return res
+  }
 
-// return { data, isLoading, isFetching, refetch, isError }
-// }
+  const { data } = useQuery([QUERY_KEY.COMMENT_STATE, { matchId }], api, {
+    keepPreviousData: true, enabled: true, staleTime: Infinity
+  })
+
+  return { data }
+}
+
+//! コメント取得
+export const useFetchCommentsNew = ({ matchId, createdAt, page }: { matchId: number, createdAt: string, page: number, limit?: number }) => {
+  const api = async () => {
+    const res = await Axios.get(API_PATH.COMMENT_NEW, {
+      params: {
+        matchId,
+        createdAt,
+        page,
+        limit: LIMIT
+      },
+    }).then(v => v.data)
+    return res.data
+  }
+
+  const { data, refetch, isRefetching } = useQuery<CommentType[]>([QUERY_KEY.COMMENT_NEW, { matchId }], api, {
+    cacheTime: 0, enabled: false, keepPreviousData: false
+  })
+
+  return { data, refetch, isRefetching }
+}
 
 //! コメント取得
 export const useFetchComments = (matchId: number) => {
@@ -60,7 +68,7 @@ export const useFetchComments = (matchId: number) => {
   }
 
   const { data, isLoading: isCommentsLoading, isFetching, refetch, isError, isSuccess } = useQuery<CommentType[]>([QUERY_KEY.COMMENT, { id: matchId }], api, {
-    staleTime: 30000, onError: (error: unknown) => {
+    staleTime: 5 * 60 * 1000, onError: (error: unknown) => {
       if ((error as AxiosError).status === 419) {
         showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         return

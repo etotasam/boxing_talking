@@ -171,7 +171,7 @@ const Titles = (props: Pick<BoxerType, 'titles'>) => {
                 <span className="absolute top-[2px] left-[-22px] w-[18px] h-[18px]">
                   <img src={crown} alt="" />
                 </span>
-                {`${title.organization}世界${title.weight}級王者`}
+                {`${title.organization}${title.weight}級王者`}
               </p>
             </li>
           ))}

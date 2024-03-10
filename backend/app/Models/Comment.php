@@ -8,7 +8,7 @@ use App\Models\User;
 
 class Comment extends Model
 {
-    use HasFactory;
+    use HasFactory, SerializeDate;
 
     /**
      * The attributes that are mass assignable.
@@ -24,6 +24,11 @@ class Comment extends Model
     protected $hidden = [
         // 'created_at',
         'updated_at'
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function postUser()

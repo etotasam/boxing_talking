@@ -6,12 +6,12 @@ export const STATUS = {
 } as const
 
 export const BG_COLOR_ON_TOAST_MODAL = {
-  ERROR: "red",
-  SUCCESS: "green",
-  DELETE: "gray",
-  NOTICE: "blue",
+  ERROR: "error",
+  SUCCESS: "success",
+  DELETE: "delete",
+  NOTICE: "notice",
   NULL: "null",
-  GRAY: "stone"
+  GRAY: "gray"
 } as const
 
 
@@ -19,6 +19,7 @@ export const BG_COLOR_ON_TOAST_MODAL = {
 
 export const MESSAGE = {
 
+  NULL: "",
   //? user登録
   SIGNUP_LACK_INPUT: "入力情報が不足しています",
   NAME_IS_REQUIRED: "登録には名前が必要です",
@@ -38,8 +39,8 @@ export const MESSAGE = {
   LOGIN_SUCCESS: "ログインしました",
   LOGIN_FAILED: "ログインに失敗しました \n Email,Passwordに誤りがある可能性があります",
   NOT_AUTHORIZED: 'ログインが必要です',
-  NOT_CREATE_GUEST_BY_LIMIT: '1日に生成できるゲストユーザー数の制限に達した為作成できません \n お手数ですが日付が変わってから再度お試しください',
-  NULL: "",
+  NOT_CREATE_GUEST_BY_LIMIT: '1日のゲスト数上限 \n お手数ですが日付が変わってから再度お試しください',
+
 
   //? 試合の登録・試合の編集
   MATCH_IS_NOT_MODIFIED: "試合情報の変更がありません",

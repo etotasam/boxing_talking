@@ -13,9 +13,13 @@ export const API_PATH = {
   BOXER: '/api/boxer',
   //?prediction
   PREDICTION: '/api/prediction',
+  MATCH_PREDICTION: '/api/match/prediction',
   //?comment
   COMMENT: '/api/comment',
+  COMMENT_NEW: '/api/comment/new',
+  COMMENT_STATE: '/api/comment/state',
   //?match
   MATCH: '/api/match',
+  // MATCH_INFINITY: '/api/match/infinity',
   MATCH_RESULT: '/api/match/result',
 } as const;

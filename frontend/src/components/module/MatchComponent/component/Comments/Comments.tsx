@@ -14,7 +14,6 @@ import { CommentType } from '@/assets/types';
 import { MdErrorOutline } from 'react-icons/md';
 import { FaRegPenToSquare } from 'react-icons/fa6';
 import { AiOutlineUser } from 'react-icons/ai';
-//! components
 
 type PropsType = {
   matchId: number;
@@ -37,10 +36,9 @@ export const Comments = (props: PropsType) => {
   //? コメントがない時
   if (isNotComments) return <NoCommentFallback />;
 
-  //? コメントあり
-  if (isComments) {
-    return (
-      <CommentsWrapper>
+  return (
+    <CommentsWrapper>
+      {isComments && (
         <div className="sm:w-[80%] w-[92%] max-w-[750px] mt-3">
           {comments?.map((comment) => (
             <div key={comment.id} className="pb-3">
@@ -48,9 +46,9 @@ export const Comments = (props: PropsType) => {
             </div>
           ))}
         </div>
-      </CommentsWrapper>
-    );
-  }
+      )}
+    </CommentsWrapper>
+  );
 };
 
 //! コメントbox
@@ -71,27 +69,29 @@ const PostTimeAndUserName = ({ commentData }: { commentData: CommentType }) => {
   //? 投稿時間（投稿からの経過時間）
   const timeSincePost = dateFormatter(commentData.createdAt);
   return (
-    <div className="sm:flex mb-2">
+    <div className="flex items-center mb-2">
       {/* //? post time */}
       <time className="text-xs text-stone-500 leading-6">{timeSincePost}</time>
       {/* //? post name */}
-      <div className="flex sm:ml-3">
+      <div className="ml-3">
         {commentData.postUserName ? (
           <>
-            <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
             <p
               className={clsx(
-                '',
+                'flex',
                 commentData.postUserName.length > 20 ? 'text-[12px] sm:text-sm' : 'text-sm'
               )}
             >
+              <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
               {commentData.postUserName}
             </p>
           </>
         ) : (
           <>
-            <AiOutlineUser className="mr-1 block bg-stone-300 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-            <p className="text-sm text-stone-600">ゲスト</p>
+            <p className="flex text-sm text-stone-600">
+              <AiOutlineUser className="mr-1 block bg-stone-300 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
+              ゲスト
+            </p>
           </>
         )}
       </div>
@@ -121,7 +121,7 @@ const Comment = ({ commentData }: { commentData: CommentType }) => {
     >
       <p
         id={`comment_${commentData.id}`}
-        className={clsx('sm:tracking-normal tracking-wider')}
+        className={clsx('text-neutral-300')}
         dangerouslySetInnerHTML={{
           __html: commentData.comment,
         }}
@@ -236,8 +236,8 @@ const NoCommentFallback = () => {
       <div className="w-full flex justify-center items-center">
         <div className="">
           <div className="w-full flex justify-center">
-            <div className="relative w-[60px] h-[60px] border-[5px] rounded-[50%] border-neutral-200/60">
-              <span className="text-neutral-200/80 text-[30px] absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+            <div className="relative w-[60px] h-[60px] border-[5px] rounded-[50%] border-neutral-200/30">
+              <span className="text-neutral-200/30 text-[30px] absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
                 <FaRegPenToSquare />
               </span>
             </div>

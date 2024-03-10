@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/assets/routePath';
+import { useInView } from 'react-intersection-observer';
 //! layout
 import HeaderAndFooterLayout from '@/layout/HeaderAndFooterLayout';
 // ! components
@@ -15,6 +16,7 @@ const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 export const PastMatches = () => {
   const { resetLoadingState } = useLoading();
   const { data: pastMatches } = useFetchPastMatches();
+
   const navigate = useNavigate();
 
   //? 初期設定(クリーンアップとか)
@@ -26,7 +28,6 @@ export const PastMatches = () => {
 
   const matchSelect = (matchId: number) => {
     navigate(`${ROUTE_PATH.PAST_MATCH_SINGLE}?match_id=${matchId}`);
-    // navigate(`${ROUTE_PATH.MATCH}?match_id=${matchId}`);
   };
 
   //? 過去の試合が見つからない時
@@ -65,19 +66,3 @@ export const PastMatches = () => {
     </>
   );
 };
-
-// export default PastMatches;
-
-// const PastMatchesComponent = React.lazy(() => import('./PastMatches'));
-
-// export const PastMatchesWrapper = React.memo(() => {
-//   return (
-//     <Suspense fallback={<Loading />}>
-//       <PastMatchesComponent />
-//     </Suspense>
-//   );
-// });
-
-// const Loading = () => {
-//   return <div className="w-[100vw] h-[100vh] bg-red-400">Loading...</div>;
-// };

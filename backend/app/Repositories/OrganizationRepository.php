@@ -4,17 +4,13 @@ namespace App\Repositories;
 
 use Exception;
 use App\Models\Organization;
+use App\Repositories\Interfaces\OrganizationRepositoryInterface;
 
-class OrganizationRepository
+class OrganizationRepository implements OrganizationRepositoryInterface
 {
 
-
-  /**
-   * @param string organizationName
-   * @return Organization
-   */
-  public static function getOrganization($organizationName)
+  public static function getOrganizationId($organizationName)
   {
-    return Organization::where("name", $organizationName)->first();
+    return Organization::where("name", $organizationName)->first()->id;
   }
 }

@@ -36,5 +36,5 @@ body::-webkit-scrollbar {
   text-shadow: 0px 0px 3px rgba(30, 30, 30, 5);
 }
 .shadow-blur {
-  text-shadow: 0px 0px 8px rgba(0, 0, 0, 5);
+  text-shadow: 0px 0px 5px rgba(0, 0, 0, 10);
 }

@@ -15,6 +15,9 @@ use App\Exceptions\NonAdministratorException;
 use App\Http\Requests\BoxingMatchesRequest;
 use App\Repositories\Interfaces\WeightDivisionRepositoryInterface;
 use App\Repositories\Interfaces\GradeRepositoryInterface;
+use Illuminate\Support\Facades\DB;
+
+
 
 class MatchController extends ApiController
 {

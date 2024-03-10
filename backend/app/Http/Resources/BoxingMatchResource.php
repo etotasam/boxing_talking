@@ -26,7 +26,7 @@ class BoxingMatchResource extends JsonResource
     public function toArray($request)
     {
 
-        $this->match->load(['redBoxer', 'blueBoxer', 'result']);
+        $this->match->load(['redBoxer', 'blueBoxer', 'result', 'getWeight', 'getGrade']);
 
         $resultResource = $this->match->result
             ? new MatchResultResource($this->match->result)
@@ -41,8 +41,6 @@ class BoxingMatchResource extends JsonResource
             "titles" => new MatchTitleBeltsResource($this->match),
             "weight" => $this->match->getWeight->weight,
             "matchDate" => $this->match->match_date,
-            "countRed" => $this->match->count_red,
-            "countBlue" => $this->match->count_blue,
             "result" => $resultResource
         ];
     }

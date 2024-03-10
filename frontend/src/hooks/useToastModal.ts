@@ -5,7 +5,6 @@ import { toastModalState } from "@/store/toastModalState"
 import { MessageType, BgColorType } from "@/assets/types";
 
 
-
 export const useToastModal = () => {
 
   //? ToastModalの状態(show/hide)

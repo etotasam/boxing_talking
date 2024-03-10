@@ -4,28 +4,36 @@ import dayjs from 'dayjs';
 
 
 
-export const useDayOfFightChecker = (matchData: MatchDataType | undefined) => {
+export const useDayOfFightChecker = (matchDateString: string | undefined) => {
 
 
-  const [isFightToday, setIsFightToday] = useState<boolean>();
-  const [isDayOverFight, setIsDayOverFight] = useState<boolean>();
+  const [isDayOnFight, setIsDayOnFight] = useState<boolean>();
+  const [isDayAfterFight, setIsDayAfterFight] = useState<boolean>();
+  const [isDayBeforeFight, setIsDayBeforeFight] = useState<boolean>()
   //?試合日が今日、もしくは過ぎているか
 
   useEffect(() => {
-    if (!matchData) return;
-    const matchDate = dayjs(matchData.matchDate);
+    if (!matchDateString) return;
+    const matchDate = dayjs(matchDateString);
 
     const today = dayjs().startOf('day');
 
-    const isFightToday = matchDate.isSame(today);
-    setIsFightToday(isFightToday);
+    //? 試合日が今日かどうか
+    const isDayOnFight = matchDate.isSame(today);
+    setIsDayOnFight(isDayOnFight);
 
+    //? 過去の試合かどうか(試合日当日は含まれない)
     const dayAfterFight = dayjs(matchDate)
       .startOf('day')
       .add(1, 'day')
       .subtract(1, 'second');
-    setIsDayOverFight(today.isAfter(dayAfterFight));
-  }, [matchData]);
 
-  return { isFightToday, isDayOverFight }
+    const isDayAfterFight = today.isAfter(dayAfterFight)
+    setIsDayAfterFight(isDayAfterFight);
+
+    //? 試合前かどうか(試合日当日は含まれない)
+    setIsDayBeforeFight(!isDayOnFight && !today.isAfter(dayAfterFight));
+  }, [matchDateString]);
+
+  return { isDayOnFight, isDayAfterFight, isDayBeforeFight }
 }

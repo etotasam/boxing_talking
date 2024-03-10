@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class DropColumnAdministrator extends Migration
+class DropGradeColumnOnBoxingMatchesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class DropColumnAdministrator extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('administrator');
+        Schema::table('boxing_matches', function (Blueprint $table) {
+            $table->dropColumn("grade");
         });
     }
 
@@ -25,8 +25,8 @@ class DropColumnAdministrator extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean("administrator")->after("password")->default(0);
+        Schema::table('boxing_matches', function (Blueprint $table) {
+            $table->string("grade");
         });
     }
 }

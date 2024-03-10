@@ -8,6 +8,8 @@ use Illuminate\Foundation\Testing\WithFaker;
 use App\Helpers\TestHelper;
 use App\Models\BoxingMatch;
 use App\Models\Boxer;
+use Database\Seeders\WeightDivisionSeeder;
+use Database\Seeders\GradeSeeder;
 
 class IndexMatchTest extends TestCase
 {
@@ -18,6 +20,11 @@ class IndexMatchTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->seed([
+            GradeSeeder::class,
+            WeightDivisionSeeder::class
+        ]);
 
         $boxerNames = ["boxer1", "boxer2", "boxer3", "boxer4"];
         $boxers = [];

@@ -40,8 +40,11 @@ Route::get('/match/{match}/show', [MatchController::class, 'show']);
 Route::get('/boxer', [BoxerController::class, 'index']);
 //? 勝利予想
 Route::get('/prediction', [WinLossPredictionController::class, 'index']);
+Route::get('/match/prediction', [WinLossPredictionController::class, 'fetchOnMatch']);
 //? コメント
 Route::get('/comment', [CommentController::class, 'index']);
+Route::get('/comment/new', [CommentController::class, 'fetch']);
+Route::get('/comment/state', [CommentController::class, 'state']);
 // !ゲストユーザーか通常の認証が必須
 Route::middleware('auth.user_or_guest')->group(function () {
     Route::post('/prediction', [WinLossPredictionController::class, 'store']);

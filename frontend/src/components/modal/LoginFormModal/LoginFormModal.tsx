@@ -11,27 +11,21 @@ import { Button } from '@/components/atomic/Button';
 import { useLogin, useGuestLogin } from '@/hooks/apiHooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 // !etc
-import {
-  MESSAGE,
-  BG_COLOR_ON_TOAST_MODAL,
-} from '@/assets/statusesOnToastModal';
+import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from '@/assets/statusesOnToastModal';
 
-export const LoginFormModal = () => {
+export const LoginFormModal = ({ isShow }: { isShow: boolean }) => {
   // ! recoil
   const formType = useRecoilValue(formTypeState);
 
   return (
-    <>
-      <ClearFullScreenDiv
-        className="z-40 bg-stone-500/70 flex justify-center items-center"
-        // onMouseDown={() => loginModalHide()}
-      >
-        <AnimatePresence>
+    <AnimatePresence>
+      {isShow && (
+        <ClearFullScreenDiv className="z-40 bg-white/20 flex justify-center items-center">
           {formType === FORM_TYPE.LOGIN_FORM && <LoginForm />}
           {formType === FORM_TYPE.SIGN_ON_FORM && <SignUpForm />}
-        </AnimatePresence>
-      </ClearFullScreenDiv>
-    </>
+        </ClearFullScreenDiv>
+      )}
+    </AnimatePresence>
   );
 };
 
@@ -71,8 +65,7 @@ const LoginForm = () => {
     setDefaultEmail(email.current);
     setDefaultPassword(password.current);
     // ? emailのバリデーション
-    const emailPattern =
-      /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
+    const emailPattern = /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
     if (!emailPattern.test(email.current)) {
       setToastModal({
         message: MESSAGE.EMAIL_FAILED_VALIDATE,
@@ -123,9 +116,7 @@ const LoginForm = () => {
         variants={variants}
         className="relative sm:w-[70%] sm:max-w-[450px] w-[80%] max-w-[350px] py-10"
       >
-        <h1 className="w-full text-center text-stone-500 font-light text-xl mb-5">
-          ログイン
-        </h1>
+        <h1 className="w-full text-center text-stone-500 font-light text-xl mb-5">ログイン</h1>
         <form onSubmit={toLogin} className=" flex flex-col w-full">
           <input
             type="text"

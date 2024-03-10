@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class RemoveTitlesColumnOnBoxingMatchesTable extends Migration
+class DropWeightColumnOnBoxingMatchesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class RemoveTitlesColumnOnBoxingMatchesTable extends Migration
     public function up()
     {
         Schema::table('boxing_matches', function (Blueprint $table) {
-            $table->dropColumn('titles');
+            $table->dropColumn("weight");
         });
     }
 
@@ -26,7 +26,7 @@ class RemoveTitlesColumnOnBoxingMatchesTable extends Migration
     public function down()
     {
         Schema::table('boxing_matches', function (Blueprint $table) {
-            $table->text('titles')->nullable();
+            $table->string("weight");
         });
     }
 }

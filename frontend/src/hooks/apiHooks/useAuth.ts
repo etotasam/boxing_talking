@@ -13,10 +13,11 @@ import { useSetRecoilState } from "recoil"
 import { tokenErrorMessageState } from "@/store/tokenErrorMessageState"
 import { authCheckingState } from "@/store/authCheckingState"
 // !hooks
+import { useMenuModal } from "../useMenuModal"
 import { useToastModal } from "../useToastModal"
 import { useLoading } from "../useLoading"
 import { useLoginModal } from "../useLoginModal"
-import { useAllFetchMatchPredictionOfAuthUser } from "./uesWinLossPrediction"
+import { useFetchUsersPrediction } from "./uesWinLossPrediction"
 import { useReactQuery } from "../useReactQuery"
 //! types
 import type { UserType } from "@/assets/types"
@@ -51,7 +52,7 @@ export const useGuestLogin = () => {
   const { resetLoadingState, startLoading } = useLoading()
   // ? login modal (hook)
   const { hideLoginModal } = useLoginModal()
-  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+  const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
 
   //? ReactQuery controller
   const { setReactQueryData } = useReactQuery()
@@ -91,12 +92,10 @@ export const useGuestLogin = () => {
 
 //! ゲストログアウト
 export const useGuestLogout = () => {
-  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
-  // ? react query
+  const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
   const queryClient = useQueryClient()
-  // ? toast message modal
-  const { setToastModal, showToastModal } = useToastModal()
-  // ? Loading state
+  const { showToastModalMessage } = useToastModal()
+  const { hide: hideMenuModal } = useMenuModal()
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? api
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -116,14 +115,14 @@ export const useGuestLogout = () => {
         refetchMatchPrediction()
         queryClient.setQueryData<boolean>(QUERY_KEY.GUEST, false)
         successful()
-        setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
-        showToastModal()
-        resetLoadingState()
+        showToastModalMessage({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
+        hideMenuModal()
       },
       onError: () => {
         hasError()
-        setToastModal({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showToastModalMessage({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+      },
+      onSettled: () => {
         resetLoadingState()
       }
     })
@@ -268,7 +267,7 @@ export const useLogin = () => {
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? login modal (hook)
   const { hideLoginModal } = useLoginModal()
-  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+  const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
   //? ReactQuery controller
   const { setReactQueryData } = useReactQuery()
 
@@ -310,25 +309,24 @@ export const useLogin = () => {
 
 //! ログアウト
 export const useLogout = () => {
-  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
-  // ? react query
+  const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
   const queryClient = useQueryClient()
-  // ? toast message modal
-  const { setToastModal, showToastModal } = useToastModal()
-  // ? Loading state
+  const { showToastModalMessage } = useToastModal()
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
+  const { hide: hideMenuModal } = useMenuModal()
   // ? api
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const api = useCallback(async (_: any) => {
+  const api = async (_: any) => {
     await Axios.post<void>(API_PATH.USER_LOGOUT).then(result => result.data)
-  }, [])
+  }
+
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
       startLoading()
     }
   })
-  const logout = useCallback(() => {
+  const logout = () => {
     mutate({}, {
       onSuccess: () => {
         // ? ユーザー情報のキャッシュをclear
@@ -336,18 +334,18 @@ export const useLogout = () => {
         queryClient.invalidateQueries(QUERY_KEY.ADMIN)
         refetchMatchPrediction()
         successful()
-        setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
-        showToastModal()
-        resetLoadingState()
+        showToastModalMessage({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
+        hideMenuModal()
       },
       onError: () => {
         hasError()
-        setToastModal({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showToastModalMessage({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+      },
+      onSettled: () => {
         resetLoadingState()
       }
     })
-  }, [])
+  }
   return { logout, isLoading, isSuccess }
 }
 

@@ -14,7 +14,8 @@ import { Terms } from './page/Terms/Terms';
 import { Identification } from '@/page/Identification';
 import { NotFound } from '@/page/NotFound';
 import { PastMatches } from './page/PastMatches';
-// import { TestPage } from './page/TestPage';
+import { TestPage } from './page/TestPage';
+import { NextTestPage } from './page/NextTestPage';
 // ! middleware
 import AdminOnly from './middleware/AdminOnly';
 import Container from './middleware/Container';
@@ -33,15 +34,9 @@ function App() {
           <Route element={<AdminOnly />}>
             <Route path={ROUTE_PATH.ADMIN} element={<Admin />} />
             <Route path={ROUTE_PATH.BOXER_EDIT} element={<BoxerEdit />} />
-            <Route
-              path={ROUTE_PATH.BOXER_REGISTER}
-              element={<BoxerRegister />}
-            />
+            <Route path={ROUTE_PATH.BOXER_REGISTER} element={<BoxerRegister />} />
             <Route path={ROUTE_PATH.MATCH_EDIT} element={<MatchEdit />} />
-            <Route
-              path={ROUTE_PATH.MATCH_REGISTER}
-              element={<MatchRegister />}
-            />
+            <Route path={ROUTE_PATH.MATCH_REGISTER} element={<MatchRegister />} />
             {/* //? </AdminOnly> */}
           </Route>
           {/* //? </container> */}
@@ -49,6 +44,8 @@ function App() {
 
         <Route path={ROUTE_PATH.TERMS} element={<Terms />} />
         <Route path={ROUTE_PATH.IDENTIFICATION} element={<Identification />} />
+        <Route path={'/test'} element={<TestPage />} />
+        <Route path={'/next_test'} element={<NextTestPage />} />
 
         <Route path="/*" element={<NotFound />} />
       </Routes>

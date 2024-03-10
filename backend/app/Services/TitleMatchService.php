@@ -2,17 +2,19 @@
 
 namespace App\Services;
 
-use App\Repositories\OrganizationRepository;
+// use App\Repositories\OrganizationRepository;
 use App\Repositories\Interfaces\TitleMatchRepositoryInterface;
+use App\Repositories\Interfaces\OrganizationRepositoryInterface;
 
 
 class TitleMatchService
 {
 
-  protected $titleMatchRepository;
-  public function __construct(TitleMatchRepositoryInterface $titleMatchRepository)
-  {
-    $this->titleMatchRepository = $titleMatchRepository;
+
+  public function __construct(
+    private TitleMatchRepositoryInterface $titleMatchRepository,
+    private OrganizationRepositoryInterface $organizationRepository,
+  ) {
   }
 
 
@@ -40,8 +42,8 @@ class TitleMatchService
   public function formatForStoreToTitleMatchTable(int $matchId, array $organizationsNameArray)
   {
     $createTitleMatchesArray = function ($organizationName) use ($matchId) {
-      $organization = OrganizationRepository::getOrganization($organizationName);
-      return ["match_id" => $matchId, "organization_id" => $organization['id']];
+      $organizationId = $this->organizationRepository->getOrganizationId($organizationName);
+      return ["match_id" => $matchId, "organization_id" => $organizationId];
     };
 
     $titleMatchesArray = array_map(fn ($organizationName) => $createTitleMatchesArray($organizationName), $organizationsNameArray);

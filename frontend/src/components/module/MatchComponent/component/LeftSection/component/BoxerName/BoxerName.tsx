@@ -5,7 +5,7 @@ export const BoxerNameWrapper = ({ matchData }: { matchData: MatchDataType }) =>
   return (
     // <div className="z-[-20] bg-white relative h-[40px] mt-[10px]">
     //   <div className="z-[-10] absolute top-[-10px] w-full h-[60px] backdrop-blur-[2px] "></div>
-    <div className="h-[40px] text-white flex justify-between items-center px-5">
+    <div className="h-[40px] text-white flex justify-between items-center px-2">
       <BoxersNameBox matchData={matchData} />
     </div>
     // </div>
@@ -15,13 +15,13 @@ export const BoxerNameWrapper = ({ matchData }: { matchData: MatchDataType }) =>
 const BoxersNameBox = ({ matchData }: { matchData: MatchDataType }) => {
   return (
     <>
-      <div className="flex justify-center">
+      <div className="flex justify-center text-sm">
+        <span className="pb-1">{matchData.redBoxer.name}</span>
         <CountryFlag country={matchData.redBoxer.country} />
-        <span className="pb-1">{matchData.redBoxer.engName}</span>
       </div>
       <div className="flex justify-center">
-        <span className="pb-1">{matchData.blueBoxer.engName}</span>
         <CountryFlag country={matchData.blueBoxer.country} />
+        <span className="pb-1">{matchData.blueBoxer.name}</span>
       </div>
     </>
   );

@@ -22,7 +22,6 @@ class CreateBoxersTable extends Migration
             $table->integer('height')->default(170);
             $table->integer('reach')->default(170);
             $table->string('style', 20)->charset('utf8');
-            $table->text('title_hold');
             $table->integer('ko');
             $table->integer('win');
             $table->integer('draw');

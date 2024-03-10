@@ -21,6 +21,8 @@ class MatchTitleBeltsResource extends JsonResource
      */
     public function toArray($request)
     {
+        $this->match->load(['titleBelts']);
+
         return $this->formatTitles(collect($this->match->titleBelts));
     }
 
