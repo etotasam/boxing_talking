@@ -19,7 +19,7 @@ use App\Http\Controllers\Api\TestController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/test', [TestController::class, 'test']);
+// Route::get('/test', [TestController::class, 'test']);
 
 Route::get('/user', [AuthController::class, 'fetch']);
 Route::get('/guest/user', function () {
@@ -35,7 +35,6 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/guest/login', [AuthController::class, 'guestLogin']);
 //? 試合
 Route::get('/match', [MatchController::class, 'index']);
-Route::get('/match/infinity', [MatchController::class, 'infinity']);
 Route::get('/match/{match}/show', [MatchController::class, 'show']);
 //? ボクサー
 Route::get('/boxer', [BoxerController::class, 'index']);

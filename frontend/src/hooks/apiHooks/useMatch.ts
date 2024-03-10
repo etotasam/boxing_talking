@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react"
+import { useCallback } from "react"
 import { Axios } from "@/assets/axios"
 // import dayjs from "dayjs"
 import { useQuery, useMutation } from "react-query"
@@ -216,30 +216,4 @@ export const useMatchResult = () => {
   }
 
   return { storeMatchResult, isLoading, isSuccess }
-}
-
-
-export const useInfinityFetch = ({ page, limit }: { page?: number, limit?: number }) => {
-  const { resetLoadingState, startLoading } = useLoading()
-
-  const limitNum = limit ?? 15
-  const pageNum = page ?? 1
-  const api = async () => {
-    const res = await Axios.get<{ page: number, matches: MatchDataType[] }>(API_PATH.MATCH_INFINITY, { params: { page: pageNum, limit: limitNum } }).then(result => result.data)
-    return res ?? []
-  }
-
-  const { data, refetch, isLoading, isRefetching } = useQuery([API_PATH.MATCH_INFINITY, { page: pageNum }], api, {
-    keepPreviousData: true, staleTime: Infinity, onSettled: () => {
-      resetLoadingState()
-    }
-  })
-
-  useEffect(() => {
-    if (isLoading) {
-      startLoading()
-    }
-  }, [isLoading])
-
-  return { data, refetch, isLoading, isRefetching }
 }

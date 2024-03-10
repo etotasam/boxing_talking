@@ -8,39 +8,16 @@ import HeaderAndFooterLayout from '@/layout/HeaderAndFooterLayout';
 // ! components
 import { SimpleMatchCard } from '@/components/module/SimpleMatchCard';
 //! hooks
-import { useFetchPastMatches, useInfinityFetch } from '@/hooks/apiHooks/useMatch';
+import { useFetchPastMatches } from '@/hooks/apiHooks/useMatch';
 import { useLoading } from '@/hooks/useLoading';
-//! anime
-import { RotatingLines } from 'react-loader-spinner';
-import { MatchDataType } from '@/assets/types';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const PastMatches = () => {
-  const [page, setPage] = useState(1);
   const { resetLoadingState } = useLoading();
-  const { data, isRefetching } = useInfinityFetch({ page, limit: 20 });
-  const [pastMatches, setPastMatches] = useState<MatchDataType[]>();
+  const { data: pastMatches } = useFetchPastMatches();
 
-  const maxPage = data?.page;
   const navigate = useNavigate();
-
-  const { ref: footerRef, inView } = useInView();
-
-  useEffect(() => {
-    if (page >= (maxPage ?? 1)) return;
-    if (inView) {
-      setPage((v) => ++v);
-    }
-  }, [inView, maxPage]);
-
-  useEffect(() => {
-    if (!data) return;
-    setPastMatches((current) => {
-      if (!current) return data.matches;
-      return [...current, ...data.matches];
-    });
-  }, [data]);
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -51,7 +28,6 @@ export const PastMatches = () => {
 
   const matchSelect = (matchId: number) => {
     navigate(`${ROUTE_PATH.PAST_MATCH_SINGLE}?match_id=${matchId}`);
-    // navigate(`${ROUTE_PATH.MATCH}?match_id=${matchId}`);
   };
 
   //? 過去の試合が見つからない時
@@ -86,33 +62,7 @@ export const PastMatches = () => {
             ))}
           </ul>
         )}
-        {isRefetching && <MatchFetchingElement />}
-        {!isRefetching && <div className="" ref={footerRef}></div>}
       </HeaderAndFooterLayout>
     </>
-  );
-};
-
-// export default PastMatches;
-
-// const PastMatchesComponent = React.lazy(() => import('./PastMatches'));
-
-// export const PastMatchesWrapper = React.memo(() => {
-//   return (
-//     <Suspense fallback={<Loading />}>
-//       <PastMatchesComponent />
-//     </Suspense>
-//   );
-// });
-
-// const Loading = () => {
-//   return <div className="w-[100vw] h-[100vh] bg-red-400">Loading...</div>;
-// };
-
-const MatchFetchingElement = () => {
-  return (
-    <div className="h-[80px] flex justify-center items-center">
-      <RotatingLines strokeColor="#f5f5f5" strokeWidth="4" animationDuration="1" width="30" />
-    </div>
   );
 };
