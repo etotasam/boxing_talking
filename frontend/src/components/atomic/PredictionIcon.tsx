@@ -14,7 +14,7 @@ type PropsType = {
   iconType?: IconType;
 };
 
-export const PredictionIconWrapper = ({ matchData, iconType = 'DEFAULT' }: PropsType) => {
+export const PredictionIcon = ({ matchData, iconType = 'DEFAULT' }: PropsType) => {
   const { data: allPrediction } = useFetchUsersPrediction();
 
   const { isDayOnFight, isDayAfterFight } = useDayOfFightChecker(matchData.matchDate);
@@ -31,11 +31,11 @@ export const PredictionIconWrapper = ({ matchData, iconType = 'DEFAULT' }: Props
 
   if (isHide) return;
 
-  if (iconType === 'DEFAULT') return <PredictionIcon />;
+  if (iconType === 'DEFAULT') return <PredictionIconDefault />;
   if (iconType === 'MINI') return <PredictionIconMini />;
 };
 
-const PredictionIcon = () => {
+const PredictionIconDefault = () => {
   return (
     <>
       <motion.div

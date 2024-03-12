@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { formTypeState, FORM_TYPE } from '@/store/formTypeState';
 // ! components
-import { SignUpForm } from '../SignUpForm';
+import { SignUpForm } from './SignUpForm';
 import { Button } from '@/components/atomic/Button';
 // ! hooks
 import { useLogin, useGuestLogin } from '@/hooks/apiHooks/useAuth';

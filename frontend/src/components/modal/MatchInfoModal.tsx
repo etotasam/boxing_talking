@@ -4,11 +4,7 @@ import { MatchDataType } from '@/assets/types';
 import { useModalState } from '@/hooks/useModalState';
 import { useWindowSize } from '@/hooks/useWindowSize';
 
-export const MatchInfoModal = ({
-  matchData,
-}: {
-  matchData: MatchDataType | undefined;
-}) => {
+export const MatchInfoModal = ({ matchData }: { matchData: MatchDataType | undefined }) => {
   const { hideModal } = useModalState('MATCH_INFO');
   const { device } = useWindowSize();
   if (matchData === undefined) return;

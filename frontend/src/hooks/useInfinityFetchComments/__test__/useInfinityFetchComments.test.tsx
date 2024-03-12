@@ -71,7 +71,7 @@ describe('useInfinityFetchComments', () => {
     });
   });
 
-  test('refetchした時は2page目のコメントを取得して、取得したコメントはmergeされる', async () => {
+  test('refetchした時は2page目(次のページ)のコメントを取得して、取得したコメントはmergeされる', async () => {
     const matchId = 1;
     const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper });
 

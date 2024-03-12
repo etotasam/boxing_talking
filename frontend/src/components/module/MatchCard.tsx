@@ -2,9 +2,9 @@ import clsx from 'clsx';
 // ! types
 import { MatchDataType } from '@/assets/types';
 // ! components
-import { BoxerInfo } from '../BoxerInfo';
+import { BoxerInfo } from './BoxerInfo';
 import { PredictionIcon } from '@/components/atomic/PredictionIcon';
-import { MatchInfo } from '../MatchInfo';
+import { MatchInfo } from './MatchInfo';
 
 type PropsType = {
   matchData: MatchDataType;
@@ -24,7 +24,10 @@ export const MatchCard = ({ matchData, onClick }: PropsType) => {
           )}
         >
           <div className="w-[300px]">
-            <BoxerInfo boxer={{ ...matchData.redBoxer, color: 'red' }} matchResult={matchData.result} />
+            <BoxerInfo
+              boxer={{ ...matchData.redBoxer, color: 'red' }}
+              matchResult={matchData.result}
+            />
           </div>
 
           <div className={clsx('pb-7', matchData.titles.length ? 'pt-10' : 'pt-7')}>
@@ -32,7 +35,10 @@ export const MatchCard = ({ matchData, onClick }: PropsType) => {
           </div>
 
           <div className="w-[300px]">
-            <BoxerInfo boxer={{ ...matchData.blueBoxer, color: 'blue' }} matchResult={matchData.result} />
+            <BoxerInfo
+              boxer={{ ...matchData.blueBoxer, color: 'blue' }}
+              matchResult={matchData.result}
+            />
           </div>
           <PredictionIcon matchData={matchData} />
         </div>

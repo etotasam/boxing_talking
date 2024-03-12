@@ -1,1 +1,0 @@
-export { BoxerNameWrapper as BoxerName } from "./BoxerName"

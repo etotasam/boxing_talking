@@ -7,7 +7,7 @@ import crown from '@/assets/images/etc/champion.svg';
 //! component
 import { FlagImage } from '@/components/atomic/FlagImage';
 import { SubHeadline } from '@/components/atomic/SubHeadline';
-import { MatchResult } from '../MatchResult';
+import { MatchResult } from './MatchResult';
 //! hooks
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 
