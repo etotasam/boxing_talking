@@ -53,6 +53,30 @@ class CommentController extends ApiController
     }
 
     /**
+     * 新しいコメントの取得
+     * created_at以降に投稿されたコメントの取得
+     *
+     * @param int match_id
+     * @param string created_at
+     *
+     * @return CommentResource[]|JsonResponse
+     */
+    public function new(Request $request)
+    {
+        $matchId = $request->match_id;
+        $createdAt = $request->created_at;
+        try {
+            $comments = $this->commentService->fetchNewComments($matchId, $createdAt);
+            return CommentResource::collection($comments);
+        } catch (\QueryException $e) {
+            \Log::error("Error on database by fetch new comments" . $e->getMessage());
+            return $this->responseInvalidQuery('Unexpected error');
+        } catch (\Exception) {
+            return $this->responseInvalidQuery('Failed fetch new comments');
+        }
+    }
+
+    /**
      * 指定の範囲の試合コメントを取得
      *
      * @param int match_id
@@ -62,24 +86,21 @@ class CommentController extends ApiController
      *
      * @return CommentResource[]|JsonResponse
      */
-    public function fetch(Request $request)
+    public function index(Request $request)
     {
         $matchId = $request->match_id;
         $page = $request->page;
         $limit = $request->limit;
         $createdAt = $request->created_at;
-        $timestamp = strtotime($createdAt);
-        $formattedCreatedAt = date('Y-m-d H:i:s', $timestamp);
-        $offset = ($page - 1) * $limit;
 
         try {
-            $comments = Comment::where(function ($q) use ($matchId, $formattedCreatedAt) {
-                $q->where('match_id', $matchId);
-                $q->where('created_at', "<=", $formattedCreatedAt);
-            })->orderBy('created_at', 'desc')->offset($offset)->limit($limit)->get();
+            $comments = $this->commentService->fetchComments($matchId, $page, $limit, $createdAt);
             return CommentResource::collection($comments);
-        } catch (\Exception $e) {
-            return $this->responseInvalidQuery('Failed fetch comments new');
+        } catch (QueryException $e) {
+            \Log::error("Error on database by fetch comments" . $e->getMessage());
+            return $this->responseInvalidQuery('Unexpected error');
+        } catch (\Exception) {
+            return $this->responseInvalidQuery('Failed get comments');
         }
     }
 
@@ -89,14 +110,14 @@ class CommentController extends ApiController
      * @param int match_id
      * @return CommentResource[]|JsonResponse
      */
-    public function index(Request $request)
+    public function old(Request $request)
     {
         $matchId = $request->query('match_id');
         try {
             $commentsOnMatch = $this->commentRepository->getCommentsOnMatchByMatchId($matchId);
         } catch (QueryException $e) {
-            \Log::error("database error with get comments" . $e->getMessage());
-            return $this->responseInvalidQuery('Unexpected error on database :', $e->getMessage());
+            \Log::error("Database error with get comments" . $e->getMessage());
+            return $this->responseInvalidQuery('Unexpected error');
         } catch (Exception $e) {
             return $this->responseInvalidQuery('Failed get comments');
         }

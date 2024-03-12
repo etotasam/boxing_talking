@@ -4,7 +4,6 @@ import dayjs from 'dayjs';
 import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 import { useInView } from 'react-intersection-observer';
 //! hooks
-import { useFetchComments } from '@/hooks/apiHooks/useComment';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useInfinityFetchComments } from '@/hooks/useInfinityFetchComments';
 //! recoil
@@ -29,11 +28,7 @@ export const Comments = (props: PropsType) => {
     isNextComments,
     isError: isErrorFetchComments,
   } = useInfinityFetchComments(matchId);
-  // const {
-  //   data: comments,
-  //   isLoading: isFetchingComments,
-  //   isError: isErrorFetchComments,
-  // } = useFetchComments(matchId);
+
   const { inView, ref } = useInView();
 
   useEffect(() => {

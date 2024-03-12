@@ -6,16 +6,11 @@ import { useLocation } from 'react-router-dom';
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
-import { usePostComment, useFetchComments } from '@/hooks/apiHooks/useComment';
+import { usePostComment } from '@/hooks/apiHooks/useComment';
 import { useAuth, useGuest } from '@/hooks/apiHooks/useAuth';
 import { useLoading } from '@/hooks/useLoading';
 
-type PropsType = {
-  // commentPostRef: React.MutableRefObject<null>;
-};
-export const PostCommentContainer = (props: PropsType) => {
-  // const {} = props;
-
+export const PostCommentContainer = () => {
   //? urlからクエリmatch_idを取得
   const { search } = useLocation();
   const query = new URLSearchParams(search);
@@ -28,8 +23,6 @@ export const PostCommentContainer = (props: PropsType) => {
   const isAuthOrGuest = Boolean(isGuest || authUser);
 
   const setRecoilPostCommentHeight = useSetRecoilState(elementSizeState('POST_COMMENT_HEIGHT'));
-
-  // const { isLoading: isFetchingComments } = useFetchComments(matchId);
 
   const { setToastModal, showToastModal } = useToastModal();
   const [comment, setComment] = useState<string>();

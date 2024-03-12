@@ -1,4 +1,4 @@
-import { useFetchCommentsNew, useFetchCommentsState } from '@/hooks/apiHooks/useComment';
+import { useFetchNewComments, useFetchComments, useFetchCommentsState } from '@/hooks/apiHooks/useComment';
 import { useEffect } from 'react';
 import { useQueryState } from '@/hooks/apiHooks/useQueryState';
 import { CommentType } from '@/assets/types';
@@ -8,31 +8,35 @@ import { apiFetchDataState } from "@/store/apiFetchDataState"
 
 export const useInfinityFetchComments = (matchId: number) => {
 
+  //? どこまで取得したかのpage数と取得したコメントはmergeしてキャッシュしておく
   const [commentsData, setCommentsData] = useQueryState<{ page: number; comments: CommentType[] }>([
     'comments',
     { matchId },
   ]);
 
+  //? データがまだ取得出来てない場合loadingモーダルを表示する為のエフェクトとrecoil
   const setIsLoading = useSetRecoilState(apiFetchDataState({ dataName: "comments/fetch", state: "isLoading" }))
-
   useEffect(() => {
     setIsLoading(!commentsData)
   }, [commentsData])
 
 
+  //? 取得するコメントの数に基づくmaxPage数と最後の投稿のcreateAtタイムを取得
   const { data: commentState } = useFetchCommentsState(matchId);
 
+  //? コメントの取得
   const {
     refetch: commentsRefetch,
     data: FetchedComments,
     isRefetching,
     isError
-  } = useFetchCommentsNew({
+  } = useFetchComments({
     matchId,
     createdAt: commentState ? commentState.resentPostTime : '',
     page: commentsData ? commentsData.page + 1 : 1,
   });
 
+  //? 取得したデータをcommentsDataにmergeしてキャッシュする
   useEffect(() => {
     if (!FetchedComments) return;
     if (!commentState) return;
@@ -43,11 +47,13 @@ export const useInfinityFetchComments = (matchId: number) => {
     });
   }, [FetchedComments]);
 
+  //? 初期fetchの実行 useQueryのenabledはfalseにしているのでページ読み込み完了後に実行させてる
   useEffect(() => {
     if (!commentState) return;
     if (commentsData && commentsData.comments) return;
     commentsRefetch();
   }, [commentState]);
+
 
   const refetch = () => {
     if (commentState) {
@@ -61,5 +67,31 @@ export const useInfinityFetchComments = (matchId: number) => {
   const isNextComments = (commentState && commentsData && (commentState.maxPage > commentsData.page)) || isRefetching
 
   const data = commentsData ? commentsData.comments : undefined
+  // const resentPostTime = commentState ? commentState.resentPostTime : undefined
   return { data, refetch, isError, isRefetching, isNextComments }
+}
+
+
+
+export const useFetchNewCommentsContainer = ({ matchId, resentPostTime }: { matchId: number, resentPostTime: string | undefined }) => {
+
+  //? ここに新しいコメントをキャッシュしておく
+  const [newCommentsData, setNewCommentsData] = useQueryState<CommentType[] | undefined>([
+    'comments/new',
+    { matchId },
+  ]);
+
+  const newestPostTime = newCommentsData ? newCommentsData[0].createdAt : resentPostTime ?? ""
+  const { data, refetch } = useFetchNewComments({ matchId, createdAt: newestPostTime })
+
+  useEffect(() => {
+    if (!data) return
+    setNewCommentsData(current => {
+      if (!current) return data
+      return [...data, ...current]
+    })
+  }, [data])
+
+  return { data, refetch }
+
 }

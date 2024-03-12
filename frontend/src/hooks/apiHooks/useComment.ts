@@ -34,9 +34,9 @@ export const useFetchCommentsState = (matchId: number) => {
 }
 
 //! コメント取得(limitで取得数、createdAtより以前)
-export const useFetchCommentsNew = ({ matchId, createdAt, page }: { matchId: number, createdAt: string, page: number, limit?: number }) => {
+export const useFetchComments = ({ matchId, createdAt, page }: { matchId: number, createdAt: string, page: number, limit?: number }) => {
   const api = async () => {
-    const res = await Axios.get(API_PATH.COMMENT_NEW, {
+    const res = await Axios.get(API_PATH.COMMENT, {
       params: {
         matchId,
         createdAt,
@@ -47,19 +47,38 @@ export const useFetchCommentsNew = ({ matchId, createdAt, page }: { matchId: num
     return res.data
   }
 
-  const { data, refetch, isRefetching, isError } = useQuery<CommentType[]>([QUERY_KEY.COMMENT_NEW, { matchId }], api, {
+  const { data, refetch, isRefetching, isError } = useQuery<CommentType[]>([QUERY_KEY.COMMENT, { matchId }], api, {
     cacheTime: 0, enabled: false, keepPreviousData: false
   })
 
   return { data, refetch, isRefetching, isError }
 }
 
-//! コメント取得
-export const useFetchComments = (matchId: number) => {
+//! 新しいコメントの取得
+export const useFetchNewComments = ({ matchId, createdAt }: { matchId: number, createdAt: string }) => {
+  const api = async () => {
+    const res = await Axios.get(API_PATH.COMMENT_NEW, {
+      params: {
+        matchId,
+        createdAt
+      },
+    }).then(v => v.data)
+    return res.data
+  }
+
+  const { data, refetch, isRefetching, isError } = useQuery<CommentType[]>([QUERY_KEY.COMMENT_NEW, { matchId }], api, {
+    cacheTime: 0, enabled: false, keepPreviousData: false, refetchInterval: 1000 * 60, refetchIntervalInBackground: true
+  })
+
+  return { data, refetch, isRefetching, isError }
+}
+
+//! コメント取得(旧)
+export const useFetchCommentsOld = (matchId: number) => {
   const { showToastModalMessage } = useToastModal()
 
   const api = async () => {
-    const res = await Axios.get(API_PATH.COMMENT, {
+    const res = await Axios.get(API_PATH.COMMENT_OLD, {
       params: {
         matchId,
       },
@@ -67,7 +86,7 @@ export const useFetchComments = (matchId: number) => {
     return res.data
   }
 
-  const { data, isLoading: isCommentsLoading, isFetching, refetch, isError, isSuccess } = useQuery<CommentType[]>([QUERY_KEY.COMMENT, { id: matchId }], api, {
+  const { data, isLoading: isCommentsLoading, isFetching, refetch, isError, isSuccess } = useQuery<CommentType[]>([QUERY_KEY.COMMENT_OLD, { id: matchId }], api, {
     staleTime: 5 * 60 * 1000, onError: (error: unknown) => {
       if ((error as AxiosError).status === 419) {
         showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
