@@ -1,3 +1,4 @@
+import { isEqual } from "lodash"
 import { useFetchNewComments, useFetchComments, useFetchCommentsState } from '@/hooks/apiHooks/useComment';
 import { useEffect } from 'react';
 import { useQueryState } from '@/hooks/apiHooks/useQueryState';
@@ -5,12 +6,13 @@ import { CommentType } from '@/assets/types';
 //! Recoil
 import { useSetRecoilState } from "recoil"
 import { apiFetchDataState } from "@/store/apiFetchDataState"
+import dayjs from "dayjs";
 
 export const useInfinityFetchComments = (matchId: number) => {
 
   //? どこまで取得したかのpage数と取得したコメントはmergeしてキャッシュしておく
   const [commentsData, setCommentsData] = useQueryState<{ page: number; comments: CommentType[] }>([
-    'comments',
+    'cache/comments',
     { matchId },
   ]);
 
@@ -73,25 +75,28 @@ export const useInfinityFetchComments = (matchId: number) => {
 
 
 
-export const useFetchNewCommentsContainer = ({ matchId, resentPostTime }: { matchId: number, resentPostTime: string | undefined }) => {
+export const useFetchNewCommentsContainer = ({ matchId, resentPostTime }: { matchId: number, resentPostTime: string | null }) => {
 
   //? ここに新しいコメントをキャッシュしておく
   const [newCommentsData, setNewCommentsData] = useQueryState<CommentType[] | undefined>([
-    'comments/new',
+    'cache/comments/new',
     { matchId },
   ]);
 
-  const newestPostTime = newCommentsData ? newCommentsData[0].createdAt : resentPostTime ?? ""
-  const { data, refetch } = useFetchNewComments({ matchId, createdAt: newestPostTime })
-
+  const newestPostTime = (newCommentsData && !!newCommentsData.length) ? newCommentsData[0].createdAt : resentPostTime
+  const { data: newComments, refetch, isStale } = useFetchNewComments({ matchId, createdAt: newestPostTime })
   useEffect(() => {
-    if (!data) return
+    if (!newComments) return
+    if (!newComments.length) return
     setNewCommentsData(current => {
-      if (!current) return data
-      return [...data, ...current]
+      if (!current) return newComments
+      return [...newComments, ...current]
     })
-  }, [data])
+  }, [newComments])
 
-  return { data, refetch }
+  // console.log("new", newComments);
+  // console.log("cache", newCommentsData);
+  const data = newCommentsData ?? []
+  return { data, refetch, isStale }
 
 }

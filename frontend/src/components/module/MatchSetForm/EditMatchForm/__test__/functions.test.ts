@@ -14,8 +14,8 @@ const originData = {
 };
 
 
-describe('pickModifiedDataのテスト', () => {
-  test('変更されたデータのみを抽出している', () => {
+describe('EditMatchForm/pickModifiedDataのテスト', () => {
+  test('変更されたデータのみを抽出する', () => {
     const modifiedData = { grade: GRADE.R10, venue: "change venue" }
     const formData = { ...originData, ...modifiedData }
     const picData = pickModifiedData({

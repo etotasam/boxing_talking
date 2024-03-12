@@ -3,11 +3,16 @@ import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 import { useInView } from 'react-intersection-observer';
+import { motion } from 'framer-motion';
 //! hooks
 import { useWindowSize } from '@/hooks/useWindowSize';
-import { useInfinityFetchComments } from '@/hooks/useInfinityFetchComments';
+import {
+  useInfinityFetchComments,
+  useFetchNewCommentsContainer,
+} from '@/hooks/useInfinityFetchComments';
 //! recoil
 import { useRecoilValue } from 'recoil';
+import { apiFetchDataState } from '@/store/apiFetchDataState';
 import { elementSizeState } from '@/store/elementSizeState';
 //! type
 import { CommentType } from '@/assets/types';
@@ -24,22 +29,44 @@ export const Comments = (props: PropsType) => {
   const { matchId } = props;
   const {
     data: comments,
-    refetch,
+    refetch: refetchComments,
     isNextComments,
     isError: isErrorFetchComments,
   } = useInfinityFetchComments(matchId);
 
-  const { inView, ref } = useInView();
+  const {
+    data: newComments,
+    refetch: refetchNewComments,
+    isStale,
+  } = useFetchNewCommentsContainer({
+    matchId,
+    resentPostTime: comments && !!comments.length ? comments[0].createdAt : null,
+  });
+
+  //? コメント投稿が成功したら新しいコメントをrefetchする
+  const isNewPostSuccess = useRecoilValue(
+    apiFetchDataState({ dataName: 'comments/post', state: 'isSuccess' })
+  );
 
   useEffect(() => {
+    if (!isNewPostSuccess) return;
+    refetchNewComments();
+  }, [isNewPostSuccess]);
+
+  //? コメントをrefetchするタイミング
+  const { inView, ref } = useInView();
+  useEffect(() => {
     if (inView) {
-      refetch();
+      refetchComments();
     }
   }, [inView]);
 
-  const isComments = comments !== undefined && comments.length;
+  const isComments =
+    (comments !== undefined && !!comments.length) ||
+    (newComments !== undefined && !!newComments.length);
 
-  const isNotComments = comments !== undefined && !comments.length;
+  const isNotComments =
+    comments !== undefined && !comments.length && newComments !== undefined && !newComments.length;
 
   //?エラー時
   if (isErrorFetchComments) return <ErrorFallback />;
@@ -51,10 +78,28 @@ export const Comments = (props: PropsType) => {
     <CommentsWrapper>
       {isComments && (
         <div className="sm:w-[80%] w-[92%] max-w-[750px] mt-3">
-          {comments?.map((comment) => (
-            <div key={comment.id} className="pb-3">
+          {newComments?.map((comment) => (
+            <motion.div
+              layout
+              initial={{ opacity: isStale ? 1 : 0 }}
+              animate={{ y: 0, opacity: 1, transition: { delay: isStale ? 0 : 0.4 } }}
+              transition={{ duration: 0.5, ease: [0.25, 1, 0.7, 1] }}
+              key={comment.id}
+              className="pb-3"
+            >
               <CommentBox comment={comment} />
-            </div>
+            </motion.div>
+          ))}
+          {comments?.map((comment) => (
+            <motion.div
+              layout
+              animate={{ y: 0 }}
+              transition={{ duration: 0.5, ease: [0.25, 1, 0.7, 1] }}
+              key={comment.id}
+              className="pb-3"
+            >
+              <CommentBox comment={comment} />
+            </motion.div>
           ))}
           {isNextComments && (
             <div ref={ref} className="pb-3">

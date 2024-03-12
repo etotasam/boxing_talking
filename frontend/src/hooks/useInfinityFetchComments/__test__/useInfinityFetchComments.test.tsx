@@ -1,4 +1,7 @@
-import { useInfinityFetchComments } from '../useInfinityFetchComments';
+import {
+  useInfinityFetchComments,
+  useFetchNewCommentsContainer,
+} from '../useInfinityFetchComments';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { describe, expect, test, vi, beforeAll, afterAll } from 'vitest';
 import { RecoilRoot } from 'recoil';
@@ -29,11 +32,38 @@ const comments = {
   ],
 };
 
+const newComments = {
+  newComment1: [
+    {
+      id: 3,
+      postUserName: 'name1',
+      comment: '新しいコメント1',
+      prediction: undefined,
+      createdAt: '2024-03-12 04:58:00',
+    },
+  ],
+  newComment2: [
+    {
+      id: 3,
+      postUserName: 'name2',
+      comment: '新しいコメント2',
+      prediction: undefined,
+      createdAt: '2024-03-12 05:58:00',
+    },
+  ],
+};
+
+const mockFetchNewComments = vi
+  .fn()
+  .mockReturnValueOnce(newComments.newComment1)
+  .mockReturnValueOnce(newComments.newComment2);
+
 const maxPage = Object.keys(comments).length;
 
 // interceptor
 const baseURL = import.meta.env.VITE_APP_API_URL;
 const server = setupServer(
+  //? コメント取得リクエスト
   rest.get(`${baseURL}${API_PATH.COMMENT}`, (req, res, context) => {
     const page = req.url.searchParams.get('page');
     if (page === '1') {
@@ -44,8 +74,14 @@ const server = setupServer(
     }
   }),
 
+  //? コメントのmaxPageと最新のコメントのcreated_atの取得リクエスト
   rest.get(`${baseURL}${API_PATH.COMMENT_STATE}`, (req, res, ctx) => {
     return res(ctx.status(200), ctx.json({ maxPage, resentPostTime: '2024-03-12 03:58:00' }));
+  }),
+
+  //? 新しいコメント取得リクエスト
+  rest.get(`${baseURL}${API_PATH.COMMENT_NEW}`, (req, res, ctx) => {
+    return res(ctx.status(200), ctx.json({ data: mockFetchNewComments() }));
   })
 );
 
@@ -71,7 +107,7 @@ describe('useInfinityFetchComments', () => {
     });
   });
 
-  test('refetchした時は2page目(次のページ)のコメントを取得して、取得したコメントはmergeされる', async () => {
+  test('refetchした時は2ページ目(次のページ)のコメントを取得して、取得したコメントはmergeされる', async () => {
     const matchId = 1;
     const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper });
 
@@ -93,6 +129,34 @@ describe('useInfinityFetchComments', () => {
     //? 返ってくるコメントデータは変わらない
     await waitFor(() => {
       expect(result.current.data).toEqual([...comments.page1, ...comments.page2]);
+    });
+  });
+
+  test('新しいコメントの取得', async () => {
+    const matchId = 1;
+    const resentPostTime = '';
+    const { result } = renderHook(() => useFetchNewCommentsContainer({ matchId, resentPostTime }), {
+      wrapper,
+    });
+
+    result.current.refetch();
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual(newComments.newComment1);
+    });
+  });
+
+  test('新しいコメントはmergeされて返って来る (orderBy desc)', async () => {
+    const matchId = 1;
+    const resentPostTime = '';
+    const { result } = renderHook(() => useFetchNewCommentsContainer({ matchId, resentPostTime }), {
+      wrapper,
+    });
+
+    result.current.refetch();
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual([...newComments.newComment2, ...newComments.newComment1]);
     });
   });
 });
