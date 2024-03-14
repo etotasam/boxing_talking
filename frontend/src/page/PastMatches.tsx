@@ -55,7 +55,7 @@ export const PastMatches = () => {
             {pastMatches.map((match) => (
               <li
                 key={match.id}
-                className="w-full h-full flex justify-center items-center lg:mt-8 md:mt-5 first:mt-0"
+                className="w-full h-full flex justify-center items-center px-2 pb-3 first:mt-0"
               >
                 <SimpleMatchCard matchData={match} onClick={matchSelect} />
               </li>

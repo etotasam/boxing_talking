@@ -1,5 +1,6 @@
+import { ReactNode } from 'react';
 import clsx from 'clsx';
-import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 //! type
 import { MatchDataType } from '@/assets/types';
 //! layout
@@ -9,7 +10,7 @@ import { PostComment } from './component/PostComment';
 import { Comments } from './component/Comments';
 import { LeftSection } from './component/LeftSection';
 import { PredictionVoteModal } from './component/PredictionVoteModal';
-
+import { VoteIcon } from './component/VoteIcon';
 //! image
 import ringImg from '@/assets/images/etc/ring.jpg';
 import GGG from '@/assets/images/etc/GGG.jpg';
@@ -18,22 +19,23 @@ import { RotatingLines } from 'react-loader-spinner';
 //! recoil
 import { useRecoilValue } from 'recoil';
 import { apiFetchDataState } from '@/store/apiFetchDataState';
-import { ReactNode, useEffect, useState } from 'react';
+import { boolState } from '@/store/boolState';
 
 type PropsType = {
   matchData: MatchDataType;
   device: 'PC' | 'SP';
   isShowPredictionModal: boolean;
+  showPredictionModal: () => void;
+  isHide: boolean;
 };
 export const MatchComponent = (props: PropsType) => {
-  const { matchData, device, isShowPredictionModal } = props;
+  const { matchData, device, isShowPredictionModal, isHide, showPredictionModal } = props;
+
+  const isScroll = useRecoilValue(boolState('IS_SCROLL'));
 
   return (
     <HeaderOnlyLayout>
-      <div
-      // className="bg-fixed w-[100vw] h-[100vh]"
-      // style={{ backgroundImage: `url(${GGG})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-      >
+      <div>
         <div className="flex">
           {device === 'PC' && (
             <section className="w-[30%]">
@@ -44,6 +46,11 @@ export const MatchComponent = (props: PropsType) => {
           <RightSectionWrapper device={device}>
             <Comments matchId={matchData.id} />
             <PostComment />
+            {!isHide && (
+              <div className="fixed bottom-[75px] right-[10px]">
+                <VoteIcon isScroll={isScroll} showPredictionModal={showPredictionModal} />
+              </div>
+            )}
           </RightSectionWrapper>
         </div>
       </div>

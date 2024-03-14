@@ -19,7 +19,7 @@ export const MenuModal = () => {
           initial={{ y: '-100vh', opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: '-100vh', opacity: 1, transition: { duration: 0.2 } }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
           style={{ height: `calc(100vh - ${0}px)` }}
           className="bg-neutral-900 w-full z-10 fixed top-0 flex justify-center text-white"
         >
@@ -27,7 +27,7 @@ export const MenuModal = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0 } }}
-            transition={{ duration: 0.5, delay: 0.7 }}
+            transition={{ duration: 0.3, delay: 0.5 }}
             className="w-full"
           >
             <Content />

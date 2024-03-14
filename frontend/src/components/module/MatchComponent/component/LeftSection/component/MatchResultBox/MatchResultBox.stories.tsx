@@ -3,7 +3,7 @@ import { MatchResultBox } from './MatchResultBox';
 import { MatchDataType, MatchResultType, BoxerType } from '@/assets/types';
 
 export default {
-  title: 'Match/LeftSection/MatchResultBox',
+  title: 'Match/MatchResultBox',
   component: MatchResultBox,
   parameters: {},
   tags: ['autodocs'],

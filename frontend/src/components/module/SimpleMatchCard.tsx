@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import clsx from 'clsx';
 import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
+import { motion } from 'framer-motion';
 // ! types
 import { MatchDataType } from '@/assets/types';
 import { BoxerType } from '@/assets/types';
@@ -30,14 +31,15 @@ PropsType) => {
   const isMatchResult = !!matchData.result;
 
   const { windowSize = 0 } = useWindowSize();
-  const predictionIconType: 'DEFAULT' | 'MINI' = windowSize > TAILWIND_BREAKPOINT.md ? 'DEFAULT' : 'MINI';
+  const predictionIconType: 'DEFAULT' | 'MINI' =
+    windowSize > TAILWIND_BREAKPOINT.md ? 'DEFAULT' : 'MINI';
   return (
     <>
       {matchData && (
         <div
           onClick={() => onClick(matchData.id)}
           className={clsx(
-            'relative flex justify-between w-full max-w-[1024px] cursor-pointer last-of-type:border-b-[1px] border-t-[1px] border-neutral-700  text-stone-300',
+            'relative flex justify-between w-full max-w-[1024px] cursor-pointer last-of-type:border-b-[1px] border-t-[1px] border-neutral-700  text-stone-300 bg-stone-50/10 rounded-md',
             'md:w-[80%] md:border-t-0 md:rounded-lg md:bg-stone-200/60 md:hover:bg-stone-200 md:duration-300  md:text-stone-700'
             // isMatchResult ? 'md:pt-2 md:pb-1 py-1' : 'md:py-4 py-8'
           )}
@@ -91,13 +93,20 @@ const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
 
   return (
     <div className={clsx('flex-1 py-3 relative')}>
-      {isTitleMatch ? <GradeTitleMatch matchData={matchData} /> : <GradeNonTitleMatch matchData={matchData} />}
+      {isTitleMatch ? (
+        <GradeTitleMatch matchData={matchData} />
+      ) : (
+        <GradeNonTitleMatch matchData={matchData} />
+      )}
       {/* //? 日時 */}
 
       <div className={clsx('mt-1')}>
         <time
           dateTime={dayjs(matchData.matchDate).toISOString()}
-          className={clsx('block text-center tracking-wide', isDayOnFight && 'text-yellow-500 font-bold')}
+          className={clsx(
+            'block text-center tracking-wide',
+            isDayOnFight && 'text-yellow-500 font-bold'
+          )}
         >
           {dayjs(matchData.matchDate).format('YYYY年M月D日')}
         </time>
@@ -177,9 +186,13 @@ const VoteIcon = ({ matchData }: { matchData: MatchDataType }) => {
 
   return (
     <>
-      <div className="bg-green-600 p-1 rounded-[50%] text-neutral-900 text-xs">
+      <motion.div
+        animate={{ x: [0, 3, -3, 0] }}
+        transition={{ duration: 0.3, repeat: Infinity, repeatDelay: 3 }}
+        className="bg-green-600 p-1 rounded-[50%] text-neutral-900 text-xs"
+      >
         <MdHowToVote />
-      </div>
+      </motion.div>
     </>
   );
 };
