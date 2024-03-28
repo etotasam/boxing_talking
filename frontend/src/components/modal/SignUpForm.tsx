@@ -19,21 +19,18 @@ export const SignUpForm = () => {
   const [password, setPassword] = useState<string>('');
   const [isPassedValidateName, setIsPassedValidateName] = useState<boolean>();
   const [isPassedValidateEmail, setIsPassedValidateEmail] = useState<boolean>();
-  const [isPassedValidatePassword, setIsPassedValidatePassword] =
-    useState<boolean>();
+  const [isPassedValidatePassword, setIsPassedValidatePassword] = useState<boolean>();
   //? すべての検証状態
-  const isValidated =
-    isPassedValidateName && isPassedValidateEmail && isPassedValidatePassword;
+  const isValidated = isPassedValidateName && isPassedValidateEmail && isPassedValidatePassword;
 
   useEffect(() => {
     const state = name.length >= 3 && name.length <= 30;
     setIsPassedValidateName(state);
   }, [name]);
   useEffect(() => {
-    const validationEmail =
+    const emailValidationRegex =
       /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
-    const state = validationEmail.test(email);
-    setIsPassedValidateEmail(state);
+    setIsPassedValidateEmail(emailValidationRegex.test(email));
   }, [email]);
   useEffect(() => {
     const state = isValidUppercase && isValidLength && isValidHasNumber;
@@ -41,21 +38,21 @@ export const SignUpForm = () => {
   }, [password]);
 
   //? passwordに大文字が含まれてるか
-  const validationUppercase = /[A-Z]+/;
-  const isValidUppercase = validationUppercase.test(password);
+  const uppercaseRegex = /[A-Z]+/;
+  const isValidUppercase = uppercaseRegex.test(password);
   //? passwordに文字数制限
-  const validationLength = /^.{8,24}$/;
-  const isValidLength = validationLength.test(password);
+  const lengthRegex = /^.{8,24}$/;
+  const isValidLength = lengthRegex.test(password);
   //? passwordに数字が含まれてるか
-  const validationHasNumber = /[0-9]/;
-  const isValidHasNumber = validationHasNumber.test(password);
+  const numberRegex = /[0-9]/;
+  const isValidHasNumber = numberRegex.test(password);
 
   /**
    * Form Send (User Resist)
    * @param e Event
    * @return void
    */
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
+  const signUp = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     preSignUp({ name, email, password });
   };
@@ -84,9 +81,7 @@ export const SignUpForm = () => {
 
   return (
     <>
-      {isShowPreSignUpModal && (
-        <PreSignUpModal onClick={setIsShowPreSignUpModal} />
-      )}
+      {isShowPreSignUpModal && <PreSignUpModal onClick={setIsShowPreSignUpModal} />}
       <div
         onMouseDown={(e) => {
           e.stopPropagation();
@@ -99,10 +94,8 @@ export const SignUpForm = () => {
           exit={{ opacity: 0, transition: { duration: 0.3 } }}
           className="relative sm:w-[70%] sm:max-w-[450px] w-[80%] max-w-[350px] py-10"
         >
-          <h1 className="w-full text-center text-stone-500 font-light text-xl">
-            アカウント作成
-          </h1>
-          <form onSubmit={submit} className="flex flex-col w-full pt-5">
+          <h1 className="w-full text-center text-stone-500 font-light text-xl">アカウント作成</h1>
+          <form onSubmit={signUp} className="flex flex-col w-full pt-5">
             <input
               type="text"
               placeholder="Name"
@@ -133,15 +126,11 @@ export const SignUpForm = () => {
               onChange={(e) => setPassword(e.target.value)}
               className={clsx(
                 'mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 focus:border-green-500 duration-300 bg-transparent',
-                isPassedValidatePassword
-                  ? 'border-green-500'
-                  : 'border-stone-400'
+                isPassedValidatePassword ? 'border-green-500' : 'border-stone-400'
               )}
             />
             <div className="mt-3 p-3 border-[1px] border-stone-300 text-stone-500">
-              <p className={clsx(isPassedValidateName && `text-green-700/60`)}>
-                名前は3~30文字
-              </p>
+              <p className={clsx(isPassedValidateName && `text-green-700/60`)}>名前は3~30文字</p>
               <p className="mt-2">パスワードは以下が必要です</p>
               <ul className="mt-2 space-y-1">
                 {passwordPassedConditions.map((el) => (
@@ -192,9 +181,12 @@ export const SignUpForm = () => {
 };
 
 const PreSignUpModal = ({ onClick }: { onClick: (bool: boolean) => void }) => {
+  const handleCloseModal = () => {
+    onClick(false);
+  };
   return (
     <div
-      onMouseDown={() => onClick(false)}
+      onMouseDown={handleCloseModal}
       className="z-10 fixed bg-white/20 w-[100vw] h-[100vh] flex justify-center items-center"
     >
       <div
@@ -202,16 +194,12 @@ const PreSignUpModal = ({ onClick }: { onClick: (bool: boolean) => void }) => {
         className="relative flex justify-center items-center md:w-[700px] md:h-[400px] sm:w-2/3 sm:h-2/3 w-[95%] h-2/3 shadow-lg shadow-black/30 bg-white border-[1px] border-stone-600"
       >
         <AiOutlineClose
-          onClick={() => onClick(false)}
+          onClick={handleCloseModal}
           className={'cursor-pointer absolute top-2 right-2 text-[20px]'}
         />
         <div>
-          <h2 className="text-center mb-5 text-stone-600 text-xl">
-            仮登録が完了しました。
-          </h2>
-          <p className="text-stone-600">
-            お送りしたメールにて本人確認と本登録が完了いたします。
-          </p>
+          <h2 className="text-center mb-5 text-stone-600 text-xl">仮登録が完了しました。</h2>
+          <p className="text-stone-600">お送りしたメールにて本人確認と本登録が完了いたします。</p>
           <p className="text-stone-600">(30分以上経過しますと無効となります)</p>
         </div>
       </div>

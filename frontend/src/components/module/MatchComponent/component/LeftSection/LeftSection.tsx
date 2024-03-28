@@ -1,4 +1,4 @@
-import { useRef, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import clsx from 'clsx';
 //! recoil
 import { useRecoilValue } from 'recoil';
@@ -46,13 +46,12 @@ type LeftSectionWrapperType = {
 };
 const LeftSectionWrapper = (props: LeftSectionWrapperType) => {
   const { children } = props;
-  const leftSectionRef = useRef(null);
+
   //? headerの高さを取得
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
 
   return (
     <div
-      ref={leftSectionRef}
       className={clsx('justify-center w-full h-[100vh] overflow-auto')}
       style={{
         paddingTop: `${headerHeight}px`,

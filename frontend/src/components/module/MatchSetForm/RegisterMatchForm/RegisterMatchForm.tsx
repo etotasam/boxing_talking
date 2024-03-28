@@ -63,6 +63,8 @@ const RegisterMatchForm = (props: RegisterMatchFormType) => {
         ...formData,
       };
 
+      // console.log(matchData);
+      // return;
       registerMatch(matchData);
     } catch (error: unknown) {
       const e = error as Error;

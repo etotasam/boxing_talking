@@ -1,20 +1,25 @@
 import { useEffect } from 'react';
+import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
+//! layout wrapper
+import AdminOnlyLayout from '@/layout/AdminOnlyLayout';
 // ! types
 // import { BoxerType } from "@/assets/types";
+import { MessageType } from '@/assets/types';
 // ! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 //! recoil
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { boxerDataOnFormState } from '@/store/boxerDataOnFormState';
+import { elementSizeState } from '@/store/elementSizeState';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 import { useRegisterBoxer } from '@/hooks/apiHooks/useBoxer';
 import { useLoading } from '@/hooks/useLoading';
-import { MessageType } from '@/assets/types';
+import { useWindowSize } from '@/hooks/useWindowSize';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -24,6 +29,9 @@ export const BoxerRegister = () => {
   const [boxerDataOnForm, setEditTargetBoxerData] = useRecoilState(boxerDataOnFormState);
   const { hideToastModal, showToastModalMessage } = useToastModal();
   const { registerBoxer, isSuccess: successRegisterBoxer } = useRegisterBoxer();
+
+  const { device } = useWindowSize();
+  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -77,13 +85,14 @@ export const BoxerRegister = () => {
   };
 
   return (
-    <>
+    <AdminOnlyLayout>
       <Helmet>
         <title>Boxer登録 | {siteTitle}</title>
       </Helmet>
-      <div className="min-h-[calc(100vh-100px)] flex justify-center items-center">
+
+      <div className={clsx('flex justify-center items-center py-10')}>
         <BoxerEditForm isSuccess={successRegisterBoxer} onSubmit={onSubmit} />
       </div>
-    </>
+    </AdminOnlyLayout>
   );
 };

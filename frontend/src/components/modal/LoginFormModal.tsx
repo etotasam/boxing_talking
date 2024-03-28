@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { ClearFullScreenDiv } from '@/components/atomic/ClearFullScreenDiv';
 import { motion, AnimatePresence } from 'framer-motion';
 // ! recoil
@@ -31,11 +31,6 @@ export const LoginFormModal = ({ isShow }: { isShow: boolean }) => {
 
 const LoginForm = () => {
   const { guestLogin } = useGuestLogin();
-  // ! email passwordの入力と取得
-  const email = React.useRef<string>('');
-  const [defaultEmail, setDefaultEmail] = React.useState<string>('');
-  const password = React.useRef<string>('');
-  const [defaultPassword, setDefaultPassword] = React.useState<string>('');
 
   // ! recoil
   const setFormType = useSetRecoilState(formTypeState);
@@ -52,8 +47,10 @@ const LoginForm = () => {
    */
   const toLogin = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
+    const email = emailRef.current?.value;
+    const password = passwordRef.current?.value;
     // ? email of password が未入力の場合
-    if (!email.current || !password.current) {
+    if (!email || !password) {
       setToastModal({
         message: MESSAGE.EMAIL_OR_PASSWORD_NO_INPUT,
         bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
@@ -61,12 +58,9 @@ const LoginForm = () => {
       showToastModal();
       return;
     }
-    // ? ログインに失敗した場合など、再レンダリングされた時、入力値が残り、表示される為のuseState
-    setDefaultEmail(email.current);
-    setDefaultPassword(password.current);
     // ? emailのバリデーション
     const emailPattern = /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
-    if (!emailPattern.test(email.current)) {
+    if (!emailPattern.test(email)) {
       setToastModal({
         message: MESSAGE.EMAIL_FAILED_VALIDATE,
         bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
@@ -74,7 +68,8 @@ const LoginForm = () => {
       showToastModal();
       return;
     }
-    login({ email: email.current, password: password.current });
+
+    login({ email, password });
   };
 
   const variants = {
@@ -104,6 +99,9 @@ const LoginForm = () => {
     guestLogin();
   };
 
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
   return (
     <div
       // onMouseDown={(e) => e.stopPropagation()}
@@ -119,17 +117,15 @@ const LoginForm = () => {
         <h1 className="w-full text-center text-stone-500 font-light text-xl mb-5">ログイン</h1>
         <form onSubmit={toLogin} className=" flex flex-col w-full">
           <input
+            ref={emailRef}
             type="text"
             placeholder="Email"
-            defaultValue={defaultEmail}
-            onChange={(e) => (email.current = e.target.value)}
             className={`mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 border-stone-400 focus:border-green-500 duration-300 bg-transparent`}
           />
           <input
+            ref={passwordRef}
             type="password"
             placeholder="Password"
-            defaultValue={defaultPassword}
-            onChange={(e) => (password.current = e.target.value)}
             autoComplete="off"
             className="mt-8 px-2 py-1 outline-none border-b rounded-none placeholder:text-stone-400 text-stone-600 border-stone-400 focus:border-green-500 duration-300 bg-transparent"
           />

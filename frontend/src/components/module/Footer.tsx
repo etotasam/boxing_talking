@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback } from 'react';
 import { ROUTE_PATH } from '@/assets/routePath';
 import { Link, useLocation } from 'react-router-dom';
 //! recoil
@@ -6,12 +6,12 @@ import { useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 
 export const Footer = () => {
-  const footerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!footerRef.current) return;
-    setFooterHeight(footerRef.current.clientHeight);
-  }, [footerRef.current]);
+  //? footerの高さをRecoilにセット
+  const footerRef = useCallback((node: HTMLDivElement) => {
+    if (node) {
+      setFooterHeight(node.clientHeight);
+    }
+  }, []);
 
   const setFooterHeight = useSetRecoilState(elementSizeState('FOOTER_HEIGHT'));
   const location = useLocation();
@@ -27,9 +27,7 @@ export const Footer = () => {
               利用規約
             </Link>
           )}
-          <p className="md:text-sm text-[8px] select-none">
-            ©2023 BOXING TALKING
-          </p>
+          <p className="md:text-sm text-[8px] select-none">©2023 BOXING TALKING</p>
         </div>
       </div>
     </>

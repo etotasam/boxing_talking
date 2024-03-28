@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+//! layout wrapper
+import AdminOnlyLayout from '@/layout/AdminOnlyLayout';
 // ! hooks
 import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
 import { BoxerType } from '@/assets/types';
@@ -36,13 +38,13 @@ export const MatchRegister = () => {
   }, []);
 
   return (
-    <>
+    <AdminOnlyLayout>
       <Helmet>
         <title>試合登録 | {siteTitle}</title>
       </Helmet>
       <div className="w-full flex" style={{ minHeight: `calc( 100vh - ${headerHeight}px)` }}>
         <section className="w-[70%] border-r-[1px] border-stone-200">
-          <div className="sticky top-[80px]">
+          <div className="sticky top-[10px]">
             <MatchSetUpBox boxers={matchBoxers} />
             <div className="flex mt-5">
               <div className="w-[50%] flex justify-center">
@@ -74,7 +76,7 @@ export const MatchRegister = () => {
           />
         </section>
       </div>
-    </>
+    </AdminOnlyLayout>
   );
 };
 

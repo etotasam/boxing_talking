@@ -58,10 +58,12 @@ class MatchService
     DB::beginTransaction();
     try {
       [$organizationsNameArray, $formattedMatchData] = $this->formatMatchDataForStore($requestMatchData);
+
       $createdMatch = $this->matchRepository->createMatch($formattedMatchData);
       if (!$createdMatch) {
         throw new Exception("Can not create match", 51);
       }
+
 
       $titleMatchesArray = $this->titleMatchService->formatForStoreToTitleMatchTable($createdMatch['id'], $organizationsNameArray);
       $isSuccessStoreTitleMatch = $this->titleMatchRepository->insertTitleMatch($titleMatchesArray);

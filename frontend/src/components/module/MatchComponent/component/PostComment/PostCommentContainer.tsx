@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { PostComment } from './PostComment';
 import { useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
@@ -32,31 +32,31 @@ export const PostCommentContainer = () => {
     isSuccess: isSuccessPostComment,
     isLoading: isPostingComment,
   } = usePostComment();
-
-  const commentPostRef = useRef(null);
-  //? コメント入力Elementの高さの初期値をRecoilへ
-  useEffect(() => {
-    if (!commentPostRef.current) return;
-    setRecoilPostCommentHeight((commentPostRef.current as HTMLSelectElement).clientHeight);
-  }, [commentPostRef.current]);
+  const commentPostEl = useRef<HTMLDivElement>();
+  const commentPostRef = useCallback((node: HTMLDivElement) => {
+    if (node) {
+      commentPostEl.current = node;
+      //? コメント入力Elementの高さの初期値をRecoilへ
+      setRecoilPostCommentHeight(node.clientHeight);
+    }
+  }, []);
 
   const textareaRef = useRef(null);
   const textarea = textareaRef.current as unknown as HTMLTextAreaElement;
   //?テキストエリアの高さを自動制御
+  const textareaMaxHeight = 250;
   const autoExpandTextareaAndSetComment = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setComment(e.target.value);
     if (!textarea) return;
-    if (textarea.scrollHeight > 250) {
-      textarea.style.height = 'auto';
-      textarea.style.height = '250px';
+    if (textarea.scrollHeight > textareaMaxHeight) {
+      textarea.style.height = 'auto'; // 一度`auto`にしないとうまく動かない
+      textarea.style.height = `${textareaMaxHeight}px`;
       return;
     }
-    textarea.style.height = 'auto';
+    textarea.style.height = 'auto'; // 一度`auto`にしないとうまく動かない
     textarea.style.height = `${textarea.scrollHeight}px`;
     //?コメント投稿入力Elementの高さをRecoilで管理
-    setRecoilPostCommentHeight(
-      (commentPostRef.current as unknown as HTMLSelectElement).clientHeight
-    );
+    setRecoilPostCommentHeight((commentPostEl.current as HTMLDivElement).clientHeight);
   };
 
   // ? コメント投稿成功時にコメント入力欄とその高さを初期化
@@ -68,9 +68,7 @@ export const PostCommentContainer = () => {
       (textareaRef.current as unknown as HTMLTextAreaElement).value = '';
     }
     //? postCommentの高さを初期化
-    setRecoilPostCommentHeight(
-      (commentPostRef.current as unknown as HTMLSelectElement).clientHeight
-    );
+    setRecoilPostCommentHeight((commentPostEl.current as HTMLDivElement).clientHeight);
   }, [isSuccessPostComment]);
 
   //? コメント投稿の実行

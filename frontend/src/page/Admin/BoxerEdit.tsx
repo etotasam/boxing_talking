@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { isEqual } from 'lodash';
 import { Helmet } from 'react-helmet-async';
+//! layout wrapper
+import AdminOnlyLayout from '@/layout/AdminOnlyLayout';
 //! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
@@ -179,7 +181,7 @@ export const BoxerEdit = () => {
   };
 
   return (
-    <>
+    <AdminOnlyLayout>
       <Helmet>
         <title>Boxer編集 | {siteTitle}</title>
       </Helmet>
@@ -206,7 +208,7 @@ export const BoxerEdit = () => {
           cancel={hideDeleteConformModal}
         />
       )}
-    </>
+    </AdminOnlyLayout>
   );
 };
 
@@ -222,7 +224,12 @@ const BoxerList = (props: BoxerListType) => {
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   return (
     <section
-      style={{ maxHeight: `calc( 100vh - ${headerHeight}px)` }}
+      style={{
+        position: 'sticky',
+        top: `${headerHeight}px`,
+        left: 0,
+        maxHeight: `calc( 100vh - ${headerHeight}px)`,
+      }}
       className="w-[30%] min-w-[300px] pb-5 overflow-auto"
     >
       <PaginationBoxerList pageCount={pageCount} />
@@ -249,12 +256,12 @@ const BoxerInfoAndEditBox = (props: BoxerInfoAndEditBoxType) => {
   const { setToastModal, showToastModal } = useToastModal();
   return (
     <section
-      className="w-[70%] border-r-[1px] border-stone-200"
+      className="w-[70%] border-r-[1px] border-stone-200 overflow-auto"
       style={{
-        minHeight: `calc(100vh - ${headerHeight}px)`,
+        height: `calc(100vh - ${headerHeight}px)`,
       }}
     >
-      <div className="flex sticky top-[calc(100px+30px)]">
+      <div className="flex sticky top-[30px]">
         {/* //? edit  */}
         <div className="w-[50%] flex justify-center">
           <div className="w-[95%] border-[1px]">

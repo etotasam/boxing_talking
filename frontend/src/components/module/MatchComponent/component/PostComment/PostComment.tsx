@@ -7,7 +7,7 @@ import { FaRegCommentDots } from 'react-icons/fa';
 import { usePostComment } from '@/hooks/apiHooks/useComment';
 
 type PostCommentType = {
-  commentPostRef: React.MutableRefObject<null>;
+  commentPostRef: (node: HTMLDivElement) => void;
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
   storeCommentExecute: () => void;
   textareaRef: React.MutableRefObject<null>;

@@ -89,20 +89,16 @@ const CommentBox = ({ comment }: { comment: CommentType }) => {
 const Comment = ({ commentData }: { commentData: CommentType }) => {
   const { windowSize } = useWindowSize();
   //? ひとつのコメントのmin height
-  const initialCommentElHeight = () => {
-    if (!windowSize) return 0;
-    if (windowSize > TAILWIND_BREAKPOINT.sm) return 200;
-    if (windowSize < TAILWIND_BREAKPOINT.sm) return 100;
-    return 0;
-  };
+  const defaultCommentElHeight = windowSize ? (windowSize > TAILWIND_BREAKPOINT.sm ? 200 : 100) : 0;
+
+  const el = document.getElementById(`comment_${commentData.id}`);
+  const elHeight = el ? el.clientHeight : 0;
   return (
     <div
       className="relative"
       style={
-        document.getElementById(`comment_${commentData.id}`) &&
-        (document.getElementById(`comment_${commentData.id}`)?.clientHeight as number) >
-          initialCommentElHeight()
-          ? { height: '135px', overflow: 'hidden' }
+        elHeight > defaultCommentElHeight
+          ? { height: `auto`, overflow: 'hidden' }
           : { height: 'auto' }
       }
     >
@@ -113,21 +109,19 @@ const Comment = ({ commentData }: { commentData: CommentType }) => {
           __html: commentData.comment,
         }}
       />
-      {document.getElementById(`comment_${commentData.id}`) &&
-        (document.getElementById(`comment_${commentData.id}`)?.clientHeight as number) >
-          initialCommentElHeight() && (
-          <p className="absolute bottom-0 left-0 md:h-[25px] h-[35px] bg-white w-full">
-            <span
-              onClick={stretchCommentElement}
-              className={clsx(
-                'text-stone-500 cursor-pointer border-[1px] border-transparent text-sm absolute box-border bottom-0',
-                'hover:border-b-stone-800 hover:text-stone-800'
-              )}
-            >
-              続きを読む
-            </span>
-          </p>
-        )}
+      {elHeight > defaultCommentElHeight && (
+        <p className="md:h-[25px] h-[35px] bg-white w-full">
+          <span
+            onClick={stretchCommentElement}
+            className={clsx(
+              'text-stone-500 cursor-pointer border-[1px] border-transparent text-sm absolute box-border bottom-0',
+              'hover:border-b-stone-800 hover:text-stone-800'
+            )}
+          >
+            続きを読む
+          </span>
+        </p>
+      )}
     </div>
   );
 };
