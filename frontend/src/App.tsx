@@ -5,12 +5,12 @@ import { ROUTE_PATH } from '@/assets/routePath';
 import { Home } from '@/page/Home';
 import { Match } from '@/page/Match';
 import { PastMatch } from '@/page/PastMatch';
-import { Admin } from '@/page/Admin';
+
 import { BoxerRegister } from '@/page/Admin/BoxerRegister';
 import { BoxerEdit } from '@/page/Admin/BoxerEdit';
 import { MatchRegister } from '@/page/Admin/MatchRegister';
 import { MatchEdit } from '@/page/Admin/MatchEdit';
-import { Terms } from './page/Terms/Terms';
+import { Terms } from './page/Terms';
 import { Identification } from '@/page/Identification';
 import { NotFound } from '@/page/NotFound';
 import { PastMatches } from './page/PastMatches';
@@ -32,7 +32,6 @@ function App() {
           <Route path={ROUTE_PATH.PAST_MATCH_SINGLE} element={<PastMatch />} />
 
           <Route element={<AdminOnly />}>
-            <Route path={ROUTE_PATH.ADMIN} element={<Admin />} />
             <Route path={ROUTE_PATH.BOXER_EDIT} element={<BoxerEdit />} />
             <Route path={ROUTE_PATH.BOXER_REGISTER} element={<BoxerRegister />} />
             <Route path={ROUTE_PATH.MATCH_EDIT} element={<MatchEdit />} />

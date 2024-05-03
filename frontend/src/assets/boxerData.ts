@@ -23,7 +23,7 @@ export const WEIGHT_CLASS = {
   LIGHT_HEAVY: "ライトヘビー",
   S_MIDDLE: "スーパーミドル",
   MIDDLE: "ミドル",
-  S_WELTER: "Sウェルター",
+  S_WELTER: "スーパーウェルター",
   WELTER: "ウェルター",
   S_LIGHT: "スーパーライト",
   LIGHT: "ライト",

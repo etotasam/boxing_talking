@@ -1,24 +1,16 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { PostComment } from './PostComment';
 import { useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 import { useLocation } from 'react-router-dom';
-import {
-  BG_COLOR_ON_TOAST_MODAL,
-  MESSAGE,
-} from '@/assets/statusesOnToastModal';
+import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
-import { usePostComment, useFetchComments } from '@/hooks/apiHooks/useComment';
+import { usePostComment } from '@/hooks/apiHooks/useComment';
 import { useAuth, useGuest } from '@/hooks/apiHooks/useAuth';
 import { useLoading } from '@/hooks/useLoading';
 
-type PropsType = {
-  // commentPostRef: React.MutableRefObject<null>;
-};
-export const PostCommentContainer = (props: PropsType) => {
-  // const {} = props;
-
+export const PostCommentContainer = () => {
   //? urlからクエリmatch_idを取得
   const { search } = useLocation();
   const query = new URLSearchParams(search);
@@ -30,11 +22,7 @@ export const PostCommentContainer = (props: PropsType) => {
   const { data: authUser } = useAuth();
   const isAuthOrGuest = Boolean(isGuest || authUser);
 
-  const setRecoilPostCommentHeight = useSetRecoilState(
-    elementSizeState('POST_COMMENT_HEIGHT')
-  );
-
-  const { isLoading: isFetchingComments } = useFetchComments(matchId);
+  const setRecoilPostCommentHeight = useSetRecoilState(elementSizeState('POST_COMMENT_HEIGHT'));
 
   const { setToastModal, showToastModal } = useToastModal();
   const [comment, setComment] = useState<string>();
@@ -44,35 +32,31 @@ export const PostCommentContainer = (props: PropsType) => {
     isSuccess: isSuccessPostComment,
     isLoading: isPostingComment,
   } = usePostComment();
-
-  const commentPostRef = useRef(null);
-  //? コメント入力Elementの高さの初期値をRecoilへ
-  useEffect(() => {
-    if (!commentPostRef.current) return;
-    setRecoilPostCommentHeight(
-      (commentPostRef.current as HTMLSelectElement).clientHeight
-    );
-  }, [commentPostRef.current]);
+  const commentPostEl = useRef<HTMLDivElement>();
+  const commentPostRef = useCallback((node: HTMLDivElement) => {
+    if (node) {
+      commentPostEl.current = node;
+      //? コメント入力Elementの高さの初期値をRecoilへ
+      setRecoilPostCommentHeight(node.clientHeight);
+    }
+  }, []);
 
   const textareaRef = useRef(null);
   const textarea = textareaRef.current as unknown as HTMLTextAreaElement;
   //?テキストエリアの高さを自動制御
-  const autoExpandTextareaAndSetComment = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  const textareaMaxHeight = 250;
+  const autoExpandTextareaAndSetComment = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setComment(e.target.value);
     if (!textarea) return;
-    if (textarea.scrollHeight > 250) {
-      textarea.style.height = 'auto';
-      textarea.style.height = '250px';
+    if (textarea.scrollHeight > textareaMaxHeight) {
+      textarea.style.height = 'auto'; // 一度`auto`にしないとうまく動かない
+      textarea.style.height = `${textareaMaxHeight}px`;
       return;
     }
-    textarea.style.height = 'auto';
+    textarea.style.height = 'auto'; // 一度`auto`にしないとうまく動かない
     textarea.style.height = `${textarea.scrollHeight}px`;
     //?コメント投稿入力Elementの高さをRecoilで管理
-    setRecoilPostCommentHeight(
-      (commentPostRef.current as unknown as HTMLSelectElement).clientHeight
-    );
+    setRecoilPostCommentHeight((commentPostEl.current as HTMLDivElement).clientHeight);
   };
 
   // ? コメント投稿成功時にコメント入力欄とその高さを初期化
@@ -80,14 +64,11 @@ export const PostCommentContainer = (props: PropsType) => {
     if (isSuccessPostComment) {
       setComment('');
       //? textareaの高さをリセットと中身を削除
-      (textareaRef.current as unknown as HTMLTextAreaElement).style.height =
-        'auto';
+      (textareaRef.current as unknown as HTMLTextAreaElement).style.height = 'auto';
       (textareaRef.current as unknown as HTMLTextAreaElement).value = '';
     }
     //? postCommentの高さを初期化
-    setRecoilPostCommentHeight(
-      (commentPostRef.current as unknown as HTMLSelectElement).clientHeight
-    );
+    setRecoilPostCommentHeight((commentPostEl.current as HTMLDivElement).clientHeight);
   }, [isSuccessPostComment]);
 
   //? コメント投稿の実行

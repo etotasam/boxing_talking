@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/routePath';
@@ -33,12 +33,11 @@ export const Header = () => {
 
   const setHeaderHeight = useSetRecoilState(elementSizeState('HEADER_HEIGHT'));
 
-  const headerRef = useRef(null);
-  useEffect(() => {
-    if (!headerRef.current) return;
-    const height = (headerRef.current as HTMLHeadElement).clientHeight;
-    setHeaderHeight(height);
-  }, [headerRef.current]);
+  const headerRef = useCallback((node: HTMLElement) => {
+    if (node) {
+      setHeaderHeight(node.clientHeight);
+    }
+  }, []);
 
   return (
     <>

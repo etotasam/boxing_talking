@@ -42,8 +42,9 @@ Route::get('/boxer', [BoxerController::class, 'index']);
 Route::get('/prediction', [WinLossPredictionController::class, 'index']);
 Route::get('/match/prediction', [WinLossPredictionController::class, 'fetchOnMatch']);
 //? コメント
+Route::get('/comment/old', [CommentController::class, 'old']);
 Route::get('/comment', [CommentController::class, 'index']);
-Route::get('/comment/new', [CommentController::class, 'fetch']);
+Route::get('/comment/new', [CommentController::class, 'new']);
 Route::get('/comment/state', [CommentController::class, 'state']);
 // !ゲストユーザーか通常の認証が必須
 Route::middleware('auth.user_or_guest')->group(function () {

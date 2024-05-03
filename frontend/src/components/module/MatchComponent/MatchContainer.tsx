@@ -6,6 +6,7 @@ import { ROUTE_PATH } from '@/assets/routePath';
 //! types
 import { MatchDataType, MatchPredictionsType } from '@/assets/types';
 // ! hook
+import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useModalState } from '@/hooks/useModalState';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useLoading } from '@/hooks/useLoading';
@@ -31,8 +32,10 @@ export const MatchContainer = (props: PropsType) => {
   //? 勝敗予想投票実行時の状態hook
   const { isSuccess: isSuccessVoteMatchPrediction } = useVoteMatchPrediction();
   //? userの勝敗予想投票をすべて取得など…
-  const { data: allPredictionVoteOfUsers } = useFetchUsersPrediction();
-  const { data: matchPredictions, refetch: refetchMatchPredictions } = useMatchPredictions(Number(matchId));
+  const { data: usersPredictions } = useFetchUsersPrediction();
+  const { data: matchPredictions, refetch: refetchMatchPredictions } = useMatchPredictions(
+    Number(matchId)
+  );
 
   const { resetLoadingState } = useLoading();
   const navigate = useNavigate();
@@ -69,8 +72,10 @@ export const MatchContainer = (props: PropsType) => {
   //? この試合の勝敗予想の有無とその投票
   useEffect(() => {
     //? 投票データの取得が完了しているかどうか。ログインしていない場合このデータは取得しない設定にしてる
-    if (allPredictionVoteOfUsers !== undefined) {
-      const thisMatchPredictionVote = allPredictionVoteOfUsers.find((data) => data.matchId === Number(matchId));
+    if (usersPredictions !== undefined) {
+      const thisMatchPredictionVote = usersPredictions.find(
+        (data) => data.matchId === Number(matchId)
+      );
 
       //? 投票をしていない場合は'false'をセットする(undefinedはデータ未取得,falseは未投票)
       if (thisMatchPredictionVote) {
@@ -81,7 +86,7 @@ export const MatchContainer = (props: PropsType) => {
         return;
       }
     }
-  }, [allPredictionVoteOfUsers, matchId]);
+  }, [usersPredictions, matchId]);
 
   //? コメント投稿に成功したら投票してねモーダルを消す&勝敗予想を再取得
   useEffect(() => {
@@ -90,16 +95,25 @@ export const MatchContainer = (props: PropsType) => {
     }
   }, [isSuccessVoteMatchPrediction]);
 
-  //? 試合の日が当日以降かどうか
-  // const [isThisMatchAfterToday, setIsThisMatchAfterToday] = useState<boolean>();
-  // useEffect(() => {
-  //   if (!thisMatch) return;
-  //   const todaySubtractOneSecond = dayjs().startOf('day').add(1, 'second');
-  //   const isAfterToday = dayjs(thisMatch.matchDate).isAfter(todaySubtractOneSecond);
-  //   setIsThisMatchAfterToday(isAfterToday);
-  // }, [thisMatch]);
+  //? ↓↓↓voteIconの表示判定↓↓↓
+  const [isHide, setIsHide] = useState(true);
+  const { isDayOnFight, isDayAfterFight } = useDayOfFightChecker(thisMatch?.matchDate);
+  useEffect(() => {
+    // ユーザーの投票をfetch出来てない時は隠す
+    if (usersPredictions === undefined) return setIsHide(true);
+    // 過去の試合には表示しない
+    if (isDayAfterFight === undefined || isDayAfterFight === true) return setIsHide(true);
+    // 当日は表示しない
+    if (isDayOnFight === undefined || isDayOnFight === true) return setIsHide(true);
+    // ユーザーのこの試合への投票の有無で表示を決定させる
 
-  const { state: isShowPredictionModal } = useModalState('PREDICTION_VOTE');
+    const isVote = usersPredictions.some((obj) => obj.matchId === matchId);
+    setIsHide(isVote);
+  }, [usersPredictions, isDayAfterFight, isDayOnFight]);
+  //? ↑↑↑voteIconの表示判定↑↑↑
+
+  const { state: isShowPredictionModal, showModal: showPredictionModal } =
+    useModalState('PREDICTION_VOTE');
 
   // if (!windowSize) return;
   if (!thisMatch) return;
@@ -120,7 +134,13 @@ export const MatchContainer = (props: PropsType) => {
         // isThisMatchAfterToday={isThisMatchAfterToday}
         matchPredictions={matchPredictions}
       >
-        <MatchComponent matchData={thisMatch} device={device} isShowPredictionModal={isShowPredictionModal} />
+        <MatchComponent
+          matchData={thisMatch}
+          device={device}
+          isShowPredictionModal={isShowPredictionModal}
+          showPredictionModal={showPredictionModal}
+          isHide={isHide}
+        />
       </MatchContextWrapper>
     </>
   );

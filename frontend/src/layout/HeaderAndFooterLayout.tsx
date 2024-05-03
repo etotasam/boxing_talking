@@ -50,9 +50,10 @@ export default HeaderAndFooterLayout;
 
 const Background = ({ children }: { children: React.ReactNode }) => {
   const { device } = useWindowSize();
+  const isPC = device === 'PC';
   return (
     <div
-      className={clsx('bg-fixed w-full h-[100vh]', device === 'PC' ? 'my-scroll-y' : 'overflow-auto')}
+      className={clsx('bg-fixed w-full h-[100vh]', isPC ? 'my-scroll-y' : 'overflow-auto')}
       style={{
         backgroundImage: `url(${boxingMatch})`,
         backgroundRepeat: 'no-repeat',
