@@ -18,6 +18,7 @@ import saudiArabiaFlag from '@/assets/images/flags/saudi_arabia.svg';
 import ghanaFlag from '@/assets/images/flags/ghana.svg';
 import australiaFlag from '@/assets/images/flags/australia.svg';
 import uzbekistanFlag from '@/assets/images/flags/uzbekistan.svg';
+import argentinaFlag from "@/assets/images/flags/argentina.svg"
 
 export const COUNTRY = {
   JAPAN: "Japan",
@@ -37,6 +38,7 @@ export const COUNTRY = {
   GHANA: "Ghana",
   AUSTRALIA: "Australia",
   UZBEKISTAN: "Uzbekistan",
+  ARGENTINA: "Argentina"
 } as const
 
 
@@ -58,6 +60,7 @@ export const getNationalFlag = (country: CountryType) => {
   if (country == COUNTRY.GHANA) return ghanaFlag;
   if (country == COUNTRY.AUSTRALIA) return australiaFlag;
   if (country == COUNTRY.UZBEKISTAN) return uzbekistanFlag;
+  if (country == COUNTRY.ARGENTINA) return argentinaFlag;
 };
 
 
