@@ -131,7 +131,7 @@ const GradeTitleMatch = ({ matchData }: { matchData: MatchDataType }) => {
           {isOneTitle && (
             <span className="relative ml-1">
               <GiImperialCrown className={'text-yellow-500 w-[20px] h-[20px]'} />
-              <CrownDesign title={matchData.titles[0].organization} />
+              <CrownIconContainer title={matchData.titles[0].organization} />
             </span>
           )}
         </div>
@@ -141,7 +141,7 @@ const GradeTitleMatch = ({ matchData }: { matchData: MatchDataType }) => {
           {matchData.titles.map((title) => (
             <div key={title.organization} className="relative ml-2 first-of-type:ml-0">
               <GiImperialCrown className={'text-yellow-500 w-[20px] h-[20px]'} />
-              <CrownDesign title={title.organization} />
+              <CrownIconContainer title={title.organization} />
             </div>
           ))}
         </div>
@@ -150,14 +150,17 @@ const GradeTitleMatch = ({ matchData }: { matchData: MatchDataType }) => {
   );
 };
 
-const CrownDesign = ({ title }: { title: string }) => {
+const CrownIconContainer = ({ title }: { title: string }) => {
   const index = title.indexOf('暫定');
   const titleArray: string[] | undefined =
     index !== -1 ? [title.slice(0, index), title.slice(index)] : undefined;
 
   return titleArray && titleArray.length ? (
-    <span className="text-[10px] absolute top-[70%] left-[50%] translate-x-[-50%] translate-y-[-50%] shadow-blur">
-      {titleArray[1]}
+    <span className="text-[10px] absolute top-[70%] left-[50%] translate-x-[-50%] translate-y-[-50%] shadow-blur w-full">
+      <span className="w-full absolute top-[-18px]">
+        {titleArray[1]} {/* 暫定 */}
+      </span>
+      <span className="w-full absolute top-[-8px]">{titleArray[0]}</span>
     </span>
   ) : (
     <span className="text-[10px] absolute top-[70%] left-[50%] translate-x-[-50%] translate-y-[-50%] shadow-blur">
