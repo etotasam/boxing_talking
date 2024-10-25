@@ -96,19 +96,19 @@ export const MatchContainer = (props: PropsType) => {
   }, [isSuccessVoteMatchPrediction]);
 
   //? ↓↓↓voteIconの表示判定↓↓↓
-  const [isHide, setIsHide] = useState(true);
+  const [isShowVoteIcon, setIsShowVoteIcon] = useState(false);
   const { isDayOnFight, isDayAfterFight } = useDayOfFightChecker(thisMatch?.matchDate);
   useEffect(() => {
     // ユーザーの投票をfetch出来てない時は隠す
-    if (usersPredictions === undefined) return setIsHide(true);
+    if (usersPredictions === undefined) return setIsShowVoteIcon(false);
     // 過去の試合には表示しない
-    if (isDayAfterFight === undefined || isDayAfterFight === true) return setIsHide(true);
+    if (isDayAfterFight === undefined || isDayAfterFight === true) return setIsShowVoteIcon(false);
     // 当日は表示しない
-    if (isDayOnFight === undefined || isDayOnFight === true) return setIsHide(true);
+    if (isDayOnFight === undefined || isDayOnFight === true) return setIsShowVoteIcon(false);
     // ユーザーのこの試合への投票の有無で表示を決定させる
 
     const isVote = usersPredictions.some((obj) => obj.matchId === matchId);
-    setIsHide(isVote);
+    setIsShowVoteIcon(!isVote);
   }, [usersPredictions, isDayAfterFight, isDayOnFight]);
   //? ↑↑↑voteIconの表示判定↑↑↑
 
@@ -139,7 +139,7 @@ export const MatchContainer = (props: PropsType) => {
           device={device}
           isShowPredictionModal={isShowPredictionModal}
           showPredictionModal={showPredictionModal}
-          isHide={isHide}
+          isVoteIconVisible={isShowVoteIcon}
         />
       </MatchContextWrapper>
     </>

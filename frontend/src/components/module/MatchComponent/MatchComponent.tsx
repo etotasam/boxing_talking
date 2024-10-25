@@ -26,10 +26,12 @@ type PropsType = {
   device: 'PC' | 'SP';
   isShowPredictionModal: boolean;
   showPredictionModal: () => void;
-  isHide: boolean;
+  // isHide: boolean;
+  isVoteIconVisible: boolean;
 };
 export const MatchComponent = (props: PropsType) => {
-  const { matchData, device, isShowPredictionModal, isHide, showPredictionModal } = props;
+  const { matchData, device, isShowPredictionModal, isVoteIconVisible, showPredictionModal } =
+    props;
 
   const isScroll = useRecoilValue(boolState('IS_SCROLL'));
 
@@ -46,7 +48,7 @@ export const MatchComponent = (props: PropsType) => {
           <RightSectionWrapper device={device}>
             <Comments matchId={matchData.id} />
             <PostComment />
-            {!isHide && (
+            {isVoteIconVisible && (
               <div className="fixed bottom-[75px] right-[10px]">
                 <VoteIcon isScroll={isScroll} showPredictionModal={showPredictionModal} />
               </div>
