@@ -129,7 +129,7 @@ const PredictionBar = (props: PredictionBarType) => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 1 }}
             className={clsx(
-              'text-[26px] absolute bottom-[5px] left-3',
+              'text-[26px] absolute bottom-[5px] left-3 z-10',
               usersPrediction === 'red' ? 'text-yellow-400 font-bold' : 'text-stone-300'
             )}
           >
@@ -148,7 +148,7 @@ const PredictionBar = (props: PredictionBarType) => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 1 }}
             className={clsx(
-              'text-[26px] absolute bottom-[5px] right-3',
+              'text-[26px] absolute bottom-[5px] right-3 z-10',
               usersPrediction === 'blue' ? 'text-yellow-400 font-bold' : 'text-stone-300'
             )}
           >

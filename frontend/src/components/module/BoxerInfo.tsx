@@ -8,7 +8,7 @@ import { BoxerType, MatchResultType } from '@/assets/types';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { useEffect, useState } from 'react';
 //! hooks
-import { useWindowSize } from '@/hooks/useWindowSize';
+// import { useWindowSize } from '@/hooks/useWindowSize';
 
 type BoxerInfoPropsType = React.ComponentProps<'div'> & {
   boxer: BoxerType & { color: 'red' | 'blue' };
@@ -17,7 +17,7 @@ type BoxerInfoPropsType = React.ComponentProps<'div'> & {
 
 export const BoxerInfo = (props: BoxerInfoPropsType) => {
   const { className, boxer, matchResult = null } = props;
-  const { device } = useWindowSize();
+  // const { device } = useWindowSize();
   return (
     <div className={clsx('w-full h-full flex justify-center', className)}>
       <div className="text-center w-full px-5 py-5">
@@ -58,24 +58,29 @@ const BoxerResume = (props: BoxerResumeType) => {
     ? matchResult.detail === 'ko' || matchResult.detail === 'tko'
     : false;
 
-  const [isWin, setIsWin] = useState<boolean>();
-  const [isLoss, setIsLoss] = useState<boolean>();
-  const [isDraw, setIsDraw] = useState<boolean>();
+  // const [isWin, setIsWin] = useState<boolean>();
+  // const [isLoss, setIsLoss] = useState<boolean>();
+  // const [isDraw, setIsDraw] = useState<boolean>();
+
+  const [resultState, setResultState] = useState<'win' | 'loss' | 'draw' | null>(null);
 
   //? isWin, isLoss, isDrawをセットする関数
   const setWinLoseResult = () => {
     if (result === boxer.color) {
-      setIsWin(true);
+      // setIsWin(true);
+      setResultState('win');
       return;
     }
 
     if (isResult && result !== boxer.color && result !== 'draw' && result !== 'no-contest') {
-      setIsLoss(true);
+      // setIsLoss(true);
+      setResultState('loss');
       return;
     }
 
     if (result === 'draw') {
-      setIsDraw(true);
+      // setIsDraw(true);
+      setResultState('draw');
       return;
     }
   };
@@ -89,14 +94,16 @@ const BoxerResume = (props: BoxerResumeType) => {
       <li
         className={clsx(
           "relative flex-1 bg-red-500 before:content-['WIN'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
-          isWin ? 'before:text-red-700 before:font-bold text-yellow-300' : 'before:text-gray-600'
+          resultState === 'win'
+            ? 'before:text-red-700 before:font-bold text-yellow-300'
+            : 'before:text-gray-600'
         )}
       >
         {boxer.win}
         <span
           className={clsx(
             "absolute text-sm bottom-[-20px] left-[50%] translate-x-[-50%] after:content-['KO']",
-            isWin && isKo ? 'text-red-700 font-bold' : 'text-gray-600'
+            resultState === 'win' && isKo ? 'text-red-700 font-bold' : 'text-gray-600'
           )}
         >
           {boxer.ko}
@@ -105,7 +112,9 @@ const BoxerResume = (props: BoxerResumeType) => {
       <li
         className={clsx(
           "relative flex-1 bg-gray-500 before:content-['DRAW'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
-          isDraw ? 'before:text-blue-700 before:font-bold text-yellow-300' : 'before:text-gray-600'
+          resultState === 'draw'
+            ? 'before:text-blue-700 before:font-bold text-yellow-300'
+            : 'before:text-gray-600'
         )}
       >
         {boxer.draw}
@@ -113,7 +122,9 @@ const BoxerResume = (props: BoxerResumeType) => {
       <li
         className={clsx(
           "relative flex-1 bg-stone-800 before:content-['LOSE'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
-          isLoss ? 'before:text-red-400 before:font-bold text-yellow-300' : 'before:text-gray-600'
+          resultState === 'loss'
+            ? 'before:text-red-400 before:font-bold text-yellow-300'
+            : 'before:text-gray-600'
         )}
       >
         {boxer.lose}

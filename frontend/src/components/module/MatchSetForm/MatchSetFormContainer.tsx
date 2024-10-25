@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
+import dayjs from 'dayjs';
 import { MatchSetForm } from './MatchSetForm';
-import {
-  MESSAGE,
-  BG_COLOR_ON_TOAST_MODAL,
-} from '@/assets/statusesOnToastModal';
+import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from '@/assets/statusesOnToastModal';
 import { cloneDeep } from 'lodash';
 //! type
 import { OrganizationsType } from '@/assets/types';
@@ -16,10 +14,7 @@ import { isMessageType } from '@/assets/typeEvaluations';
 //! context
 import { FormDataContext } from './FormDataContextWrapper';
 
-export const MatchSetFormContainer = (props: {
-  onSubmit: () => void;
-  title?: boolean;
-}) => {
+export const MatchSetFormContainer = (props: { onSubmit: () => void; title?: boolean }) => {
   const { onSubmit, title } = props;
 
   const { hideToastModal, showToastModalMessage } = useToastModal();
@@ -47,10 +42,7 @@ export const MatchSetFormContainer = (props: {
   const showModalIfUndefinedFieldsExist = () => {
     if (Object.values(formData).some((value) => !!value === false)) {
       throw new Error(MESSAGE.MATCH_HAS_NOT_ENTRIES);
-    } else if (
-      formData.grade === GRADE.TITLE_MATCH &&
-      !formData.titles.length
-    ) {
+    } else if (formData.grade === GRADE.TITLE_MATCH && !formData.titles.length) {
       throw new Error(MESSAGE.MATCH_HAS_NOT_ENTRIES);
     }
   };
@@ -74,17 +66,14 @@ export const MatchSetFormContainer = (props: {
     }
   };
 
-  const onChangeTitle = useCallback(
-    (title: OrganizationsType, index: number): void => {
-      setFormData((current) => {
-        const cloneCurrent = cloneDeep(current);
-        cloneCurrent.titles[index] = title;
-        const titles = cloneCurrent.titles.filter((v) => !!v);
-        return { ...current, titles };
-      });
-    },
-    []
-  );
+  const onChangeTitle = useCallback((title: OrganizationsType, index: number): void => {
+    setFormData((current) => {
+      const cloneCurrent = cloneDeep(current);
+      cloneCurrent.titles[index] = title;
+      const titles = cloneCurrent.titles.filter((v) => !!v);
+      return { ...current, titles };
+    });
+  }, []);
 
   //? 各種formデータの更新
   const onChange = <T,>(value: Record<string, T>): void => {

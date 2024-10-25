@@ -7,7 +7,7 @@ RUN apt-get update \
     zip \
     unzip \
     vim \
-    mysql-client
+    default-mysql-client
 
 # install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

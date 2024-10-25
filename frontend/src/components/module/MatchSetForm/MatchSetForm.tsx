@@ -67,7 +67,7 @@ const DateSection = (props: DateSectionType) => {
         className="w-[150px] p-1"
         id="match-date"
         type="date"
-        min={dayjs().format('YYYY-MM-DD')}
+        // min={dayjs().format('YYYY-MM-DD')}
         value={date || dayjs().format('YYYY-MM-DD')}
         onChange={(e) => onChange({ matchDate: e.target.value })}
       />
