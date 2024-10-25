@@ -20,6 +20,7 @@ import australiaFlag from '@/assets/images/flags/australia.svg';
 import uzbekistanFlag from '@/assets/images/flags/uzbekistan.svg';
 import argentinaFlag from "@/assets/images/flags/argentina.svg"
 import irelandFlag from "@/assets/images/flags/ireland.svg"
+import thailandFlag from "@/assets/images/flags/thailand.svg"
 
 export const COUNTRY = {
   JAPAN: "Japan",
@@ -40,7 +41,8 @@ export const COUNTRY = {
   AUSTRALIA: "Australia",
   UZBEKISTAN: "Uzbekistan",
   ARGENTINA: "Argentina",
-  IRELAND: "Ireland"
+  IRELAND: "Ireland",
+  THAILAND: "Thailand"
 } as const
 
 
@@ -64,6 +66,7 @@ export const getNationalFlag = (country: CountryType) => {
   if (country == COUNTRY.UZBEKISTAN) return uzbekistanFlag;
   if (country == COUNTRY.ARGENTINA) return argentinaFlag;
   if (country == COUNTRY.IRELAND) return irelandFlag;
+  if (country == COUNTRY.THAILAND) return thailandFlag;
 };
 
 
