@@ -8,7 +8,7 @@ import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal'
 import { useToastModal } from '@/hooks/useToastModal';
 import { usePostComment } from '@/hooks/apiHooks/useComment';
 import { useAuth, useGuest } from '@/hooks/apiHooks/useAuth';
-import { useLoading } from '@/hooks/useLoading';
+// import { useLoading } from '@/hooks/useLoading';
 
 export const PostCommentContainer = () => {
   //? urlからクエリmatch_idを取得

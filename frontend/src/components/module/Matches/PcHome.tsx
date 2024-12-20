@@ -20,6 +20,7 @@ export const PcHome = ({ beforeMatches, toMatchPage, afterMatches }: PropsType) 
   const [isShow, setIsShow] = useRecoilState(boolState('IS_SHOW_RESENT_MATCHES'));
   return (
     <>
+      {/* 未開催の試合の表示 */}
       {!!beforeMatches.length && (
         <ul className={clsx('md:py-10')}>
           {beforeMatches.map((match) => (
@@ -33,6 +34,7 @@ export const PcHome = ({ beforeMatches, toMatchPage, afterMatches }: PropsType) 
         </ul>
       )}
 
+      {/* 過去の試合結果の表示 */}
       {!!afterMatches.length && (
         <div className="md:pb-10">
           <div className=" flex justify-center">
@@ -40,7 +42,7 @@ export const PcHome = ({ beforeMatches, toMatchPage, afterMatches }: PropsType) 
               onClick={() => setIsShow(true)}
               className="w-full max-w-[1024px] bg-white rounded-sm py-4 text-neutral-800 text-xs text-center tracking-widest"
             >
-              最新の過去試合
+              直近の試合結果
             </div>
           </div>
 

@@ -16,7 +16,7 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
 
   const isShowMatchResultComponent = Boolean(!isDayOnFight && isDayAfterFight && matchData.result);
 
-  const isTitleMatch: boolean = matchData.grade === 'タイトルマッチ';
+  // const isTitleMatch: boolean = matchData.grade === 'タイトルマッチ';
 
   const isLongText = (text: string): boolean => {
     return text.length > 10;

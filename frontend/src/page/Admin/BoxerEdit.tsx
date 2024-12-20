@@ -105,16 +105,17 @@ export const BoxerEdit = () => {
   };
 
   //? 対象boxerデータに変更がない場合エラーモーダル表示
-  const showErrorModalWhenNoChangeInData = ({
+  const checkFighterDataUpdate = ({
     targetBoxerData,
     message,
   }: {
     targetBoxerData: BoxerType | undefined;
     message: MessageType;
   }) => {
-    if (isEqual(targetBoxerData, editTargetBoxerData)) {
+    const isDataEqual = isEqual(targetBoxerData, editTargetBoxerData);
+    if (isDataEqual) {
       showErrorToastWithMessage(message);
-      return;
+      return isDataEqual;
     }
   };
 
@@ -154,11 +155,12 @@ export const BoxerEdit = () => {
 
     if (!targetBoxerCurrentData) return;
 
-    //対象ボクサーデータに変更がない場合エラー
-    showErrorModalWhenNoChangeInData({
+    //対象ボクサーデータに変更がない場合はメッセージを表示
+    const isNotChangeFighterData = checkFighterDataUpdate({
       targetBoxerData: targetBoxerCurrentData,
       message: MESSAGE.BOXER_NOT_EDIT,
     });
+    if (isNotChangeFighterData) return;
 
     const updateBoxerData = extractChangeData(targetBoxerCurrentData);
     //ボクサーデータ編集実行

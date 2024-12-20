@@ -11,8 +11,8 @@ import { Comments } from './component/Comments';
 import { LeftSection } from './component/LeftSection';
 import { PredictionVoteModal } from './component/PredictionVoteModal';
 import { VoteIcon } from './component/VoteIcon';
+import { NewComments } from './component/NewComments';
 //! image
-import ringImg from '@/assets/images/etc/ring.jpg';
 import GGG from '@/assets/images/etc/GGG.jpg';
 //! icons
 import { RotatingLines } from 'react-loader-spinner';
@@ -46,6 +46,7 @@ export const MatchComponent = (props: PropsType) => {
           )}
 
           <RightSectionWrapper device={device}>
+            {/* <NewComments matchId={matchData.id} /> */}
             <Comments matchId={matchData.id} />
             <PostComment />
             {isVoteIconVisible && (

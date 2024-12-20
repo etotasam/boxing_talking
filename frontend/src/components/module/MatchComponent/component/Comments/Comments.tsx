@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useInView } from 'react-intersection-observer';
+// import { useInView } from 'react-intersection-observer';
 //! hooks
 import {
   useInfinityFetchComments,

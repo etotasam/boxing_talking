@@ -99,6 +99,8 @@ export const MatchContainer = (props: PropsType) => {
   const [isShowVoteIcon, setIsShowVoteIcon] = useState(false);
   const { isDayOnFight, isDayAfterFight } = useDayOfFightChecker(thisMatch?.matchDate);
   useEffect(() => {
+    // PC画面では表示させない
+    if (device === 'PC') return setIsShowVoteIcon(false);
     // ユーザーの投票をfetch出来てない時は隠す
     if (usersPredictions === undefined) return setIsShowVoteIcon(false);
     // 過去の試合には表示しない
@@ -106,10 +108,9 @@ export const MatchContainer = (props: PropsType) => {
     // 当日は表示しない
     if (isDayOnFight === undefined || isDayOnFight === true) return setIsShowVoteIcon(false);
     // ユーザーのこの試合への投票の有無で表示を決定させる
-
     const isVote = usersPredictions.some((obj) => obj.matchId === matchId);
     setIsShowVoteIcon(!isVote);
-  }, [usersPredictions, isDayAfterFight, isDayOnFight]);
+  }, [usersPredictions, isDayAfterFight, isDayOnFight, device]);
   //? ↑↑↑voteIconの表示判定↑↑↑
 
   const { state: isShowPredictionModal, showModal: showPredictionModal } =
