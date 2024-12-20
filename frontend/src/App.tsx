@@ -15,7 +15,7 @@ import { Identification } from '@/page/Identification';
 import { NotFound } from '@/page/NotFound';
 import { PastMatches } from './page/PastMatches';
 import { TestPage } from './page/TestPage';
-import { NextTestPage } from './page/NextTestPage';
+import { NewMatch } from './page/NewMatch';
 // ! middleware
 import AdminOnly from './middleware/AdminOnly';
 import Container from './middleware/Container';
@@ -28,7 +28,8 @@ function App() {
         <Route element={<Container />}>
           <Route path={ROUTE_PATH.HOME} element={<Home />} />
           <Route path={ROUTE_PATH.PAST_MATCHES} element={<PastMatches />} />
-          <Route path={ROUTE_PATH.MATCH} element={<Match />} />
+          {/* <Route path={ROUTE_PATH.MATCH} element={<Match />} /> */}
+          <Route path={ROUTE_PATH.MATCH} element={<NewMatch />} />
           <Route path={ROUTE_PATH.PAST_MATCH_SINGLE} element={<PastMatch />} />
 
           <Route element={<AdminOnly />}>
@@ -44,7 +45,6 @@ function App() {
         <Route path={ROUTE_PATH.TERMS} element={<Terms />} />
         <Route path={ROUTE_PATH.IDENTIFICATION} element={<Identification />} />
         <Route path={'/test'} element={<TestPage />} />
-        <Route path={'/next_test'} element={<NextTestPage />} />
 
         <Route path="/*" element={<NotFound />} />
       </Routes>

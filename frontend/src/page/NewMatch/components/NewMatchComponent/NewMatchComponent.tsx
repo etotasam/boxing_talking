@@ -11,9 +11,10 @@ import { Comments } from './component/Comments';
 import { LeftSection } from './component/LeftSection';
 import { PredictionVoteModal } from './component/PredictionVoteModal';
 import { VoteIcon } from './component/VoteIcon';
+import { MatchCommentsModal } from './component/MatchCommentsModal';
 // import { NewComments } from './component/NewComments';
 //! image
-import GGG from '@/assets/images/etc/GGG.jpg';
+import GGGPhoto from '@/assets/images/etc/GGG.jpg';
 //! icons
 import { RotatingLines } from 'react-loader-spinner';
 //! recoil
@@ -29,7 +30,7 @@ type PropsType = {
   // isHide: boolean;
   isVoteIconVisible: boolean;
 };
-export const MatchComponent = (props: PropsType) => {
+export const NewMatchComponent = (props: PropsType) => {
   const { matchData, device, isShowPredictionModal, isVoteIconVisible, showPredictionModal } =
     props;
 
@@ -37,26 +38,18 @@ export const MatchComponent = (props: PropsType) => {
 
   return (
     <HeaderOnlyLayout>
-      <div>
-        <div className="flex">
-          {device === 'PC' && (
-            <section className="w-[30%]">
-              <LeftSection matchData={matchData} />
-            </section>
-          )}
-
-          <RightSectionWrapper device={device}>
-            {/* <NewComments matchId={matchData.id} /> */}
-            <Comments matchId={matchData.id} />
-            <PostComment />
-            {isVoteIconVisible && (
-              <div className="fixed bottom-[75px] right-[10px]">
-                <VoteIcon isScroll={isScroll} showPredictionModal={showPredictionModal} />
-              </div>
-            )}
-          </RightSectionWrapper>
+      <MainContent device={device}>
+        <MatchCommentsModal matchId={matchData.id} />
+        {/* <Comments matchId={matchData.id} /> */}
+        <div className="absolute bottom-0 w-full">
+          <PostComment />
         </div>
-      </div>
+        {isVoteIconVisible && (
+          <div className="fixed bottom-[75px] right-[10px]">
+            <VoteIcon isScroll={isScroll} showPredictionModal={showPredictionModal} />
+          </div>
+        )}
+      </MainContent>
 
       {isShowPredictionModal && <PredictionVoteModal thisMatch={matchData} />}
     </HeaderOnlyLayout>
@@ -91,29 +84,25 @@ const CommentLoadingModal = ({ isShow }: { isShow: boolean }) => {
   );
 };
 
-const RightSectionWrapper = ({
-  children,
-  device,
-}: {
-  children: ReactNode;
-  device: 'PC' | 'SP';
-}) => {
+const MainContent = ({ children, device }: { children: ReactNode; device: 'PC' | 'SP' }) => {
   const isCommentsFetching = useRecoilValue(
     apiFetchDataState({ dataName: 'comments/fetch', state: 'isLoading' })
   );
   return (
-    <section
-      className={clsx('relative', device === 'PC' ? 'w-[70%]' : 'w-full')}
-      style={{
-        backgroundImage: `url(${GGG})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
-      <div className="w-full h-full bg-fixed backdrop-blur-[1px] bg-neutral-900/90">
-        {children}
-        <CommentLoadingModal isShow={isCommentsFetching} />
+    <section className="w-full h-[100vh] flex justify-center">
+      <div
+        className={clsx('relative w-full')}
+        style={{
+          backgroundImage: `url(${GGGPhoto})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        <div className="w-full h-full bg-fixed backdrop-blur-[1px] bg-neutral-900/90">
+          {children}
+          <CommentLoadingModal isShow={isCommentsFetching} />
+        </div>
       </div>
     </section>
   );

@@ -12,8 +12,8 @@ type CommentsWrapperType = {
 };
 export const CommentsWrapper = (props: CommentsWrapperType) => {
   const el = useRef<HTMLDivElement>(null);
-  const postCommentElHeight = useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT'));
-  const headerElHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+  const commentPostElementHeightState = useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT'));
+  const headerElementHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   const setIsScroll = useSetRecoilState(boolState('IS_SCROLL'));
 
   const { device } = useWindowSize();
@@ -43,17 +43,15 @@ export const CommentsWrapper = (props: CommentsWrapperType) => {
 
   const { children } = props;
   return (
-    <>
-      <div
-        ref={el}
-        className={clsx('relative w-full flex justify-center overflow-auto')}
-        style={{
-          // paddingTop: `${headerElHeight}px`,
-          height: `calc(80vh - (${postCommentElHeight}px) - 1px)`,
-        }}
-      >
-        {children}
-      </div>
-    </>
+    <div
+      ref={el}
+      className={clsx('relative w-full flex justify-center overflow-auto scroll-bar-gray')}
+      style={{
+        // paddingTop: `${headerElementHeightState}px`,
+        height: `calc(80vh - (${commentPostElementHeightState}px) - 1px)`,
+      }}
+    >
+      {children}
+    </div>
   );
 };
