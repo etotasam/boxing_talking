@@ -5,6 +5,8 @@ import { Comments } from '../Comments';
 //! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
+//! icons
+import { GoTriangleUp } from 'react-icons/go';
 
 type PropsType = {
   matchId: number;
@@ -22,12 +24,14 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
         animate={isShowComments ? { height: '80%' } : { height: hiddenCommentsHeight }}
         className="bg-black/40 w-full absolute bottom-0"
       >
-        <div
-          className="bg-black/40 text-white absolute top-[-20px] left-[50%] translate-x-[-50%] cursor-pointer"
+        <motion.div
+          //? translate-xが効かないので無理やり中央寄せにした( left-[calc(50%-15px)] 幅が30pxなので半分の15pxを引いている)
+          className="absolute top-0 left-[calc(50%-15px)] z-10 cursor-pointer"
+          animate={isShowComments ? { top: '-30px', rotate: 180 } : { top: '0px' }}
           onClick={toggleShowComments}
         >
-          Button
-        </div>
+          <GoTriangleUp className="w-[30px] h-[30px] text-white" />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}
