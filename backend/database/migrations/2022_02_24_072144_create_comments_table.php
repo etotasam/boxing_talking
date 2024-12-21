@@ -19,6 +19,8 @@ class CreateCommentsTable extends Migration
             $table->unsignedBigInteger('match_id');
             $table->text('comment');
             $table->timestamps();
+
+            $table->index('match_id');
         });
     }
 

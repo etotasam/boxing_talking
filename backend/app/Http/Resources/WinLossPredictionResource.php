@@ -18,7 +18,7 @@ class WinLossPredictionResource extends JsonResource
     {
 
         return [
-            'match_id' => $this->match_id,
+            'matchId' => $this->match_id,
             'prediction' => $this->prediction,
         ];
     }

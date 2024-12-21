@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Boxer;
 use App\Models\Comment;
-use App\Models\TitleMatch;
+use App\Models\Grade;
+use App\Models\WeightDivision;
 use App\Models\Organization;
+use App\Models\MatchPrediction;
 use Illuminate\Support\Facades\Log;
 
 class BoxingMatch extends Model
@@ -23,13 +25,13 @@ class BoxingMatch extends Model
         'red_boxer_id',
         'blue_boxer_id',
         'match_date',
-        'grade',
+        'grade_id',
         'country',
         'venue',
-        'weight',
+        'weight_id',
         'titles',
-        'count_red',
-        'count_blue',
+        // 'count_red',
+        // 'count_blue',
     ];
 
     protected $hidden = [
@@ -37,12 +39,16 @@ class BoxingMatch extends Model
         'updated_at',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
+
     public function comments()
     {
         return $this->hasMany(Comment::class, 'match_id');
     }
 
-    public function organization()
+    public function titleBelts()
     {
         return $this->belongsToMany(Organization::class, 'title_matches', 'match_id');
     }
@@ -60,5 +66,15 @@ class BoxingMatch extends Model
     public function result()
     {
         return $this->hasOne(MatchResult::class, "match_id");
+    }
+
+    public function getWeight()
+    {
+        return $this->belongsTo(WeightDivision::class, "weight_id");
+    }
+
+    public function getGrade()
+    {
+        return $this->belongsTo(Grade::class, "grade_id");
     }
 }

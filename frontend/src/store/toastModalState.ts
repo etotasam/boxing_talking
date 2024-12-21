@@ -2,7 +2,7 @@ import { atom } from "recoil";
 import { MessageType, BgColorType } from "@/assets/types"
 
 
-type StateType = {
+export type StateType = {
   message: MessageType,
   bgColor: BgColorType,
   isShow: boolean

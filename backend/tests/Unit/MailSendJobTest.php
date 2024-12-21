@@ -37,7 +37,7 @@ class MailSendJobTest extends TestCase
         MailSendJob::dispatch($preUser->id, $preUser->name, $preUser->email)->onQueue($queueName);
 
         Queue::assertPushed(MailSendJob::class, function ($job) use ($preUser) {
-            return $job->userID === $preUser->id && $job->name === $preUser->name && $job->email === $preUser->email;
+            return $job->userId === $preUser->id && $job->name === $preUser->name && $job->email === $preUser->email;
         });
         Queue::assertPushedOn($queueName, MailSendJob::class);
     }

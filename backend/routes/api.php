@@ -40,14 +40,24 @@ Route::get('/match/{match}/show', [MatchController::class, 'show']);
 Route::get('/boxer', [BoxerController::class, 'index']);
 //? 勝利予想
 Route::get('/prediction', [WinLossPredictionController::class, 'index']);
+Route::get('/match/prediction', [WinLossPredictionController::class, 'fetchOnMatch']);
 //? コメント
+Route::get('/comment/old', [CommentController::class, 'old']);
 Route::get('/comment', [CommentController::class, 'index']);
+Route::get('/comment/new', [CommentController::class, 'new']);
+Route::get('/comment/state', [CommentController::class, 'state']);
 // !ゲストユーザーか通常の認証が必須
 Route::middleware('auth.user_or_guest')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/guest/logout', [AuthController::class, 'guestLogout']);
     Route::post('/prediction', [WinLossPredictionController::class, 'store']);
     Route::post('/comment', [CommentController::class, 'store']);
+});
+//! ログインユーザー
+Route::middleware('auth.user')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+// !ゲストユーザー
+Route::middleware('auth.guest')->group(function () {
+    Route::post('/guest/logout', [AuthController::class, 'guestLogout']);
 });
 // !管理者
 Route::middleware('administrator')->group(function () {
@@ -59,7 +69,7 @@ Route::middleware('administrator')->group(function () {
     Route::post('/match', [MatchController::class, 'store']);
     Route::delete('/match', [MatchController::class, 'destroy']);
     Route::patch('/match', [MatchController::class, 'update']);
-    Route::post('/match/result', [MatchController::class, 'result']);
+    Route::post('/match/result', [MatchController::class, 'resultStore']);
     //?コメント削除
     Route::delete('/comment/{comment}', [CommentController::class, 'destroy']);
     //?csv作成

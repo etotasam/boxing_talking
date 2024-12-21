@@ -1,5 +1,5 @@
 import { BoxerType } from "./types";
-import { NATIONALITY } from "./NationalFlagData";
+import { COUNTRY } from "./nationalFlagData";
 
 export const STANCE = {
   SOUTHPAW: "southpaw",
@@ -9,6 +9,7 @@ export const STANCE = {
 
 
 export const ORGANIZATIONS = {
+  WBA_INTERIM: "WBA暫定",
   WBC_INTERIM: "WBC暫定",
   WBO_INTERIM: "WBO暫定",
   WBA: "WBA",
@@ -21,27 +22,27 @@ export const WEIGHT_CLASS = {
   HEAVY: "ヘビー",
   CRUISER: "クルーザー",
   LIGHT_HEAVY: "ライトヘビー",
-  S_MIDDLE: "Sミドル",
+  S_MIDDLE: "スーパーミドル",
   MIDDLE: "ミドル",
-  S_WELTER: "Sウェルター",
+  S_WELTER: "スーパーウェルター",
   WELTER: "ウェルター",
-  S_LIGHT: "Sライト",
+  S_LIGHT: "スーパーライト",
   LIGHT: "ライト",
-  S_FEATHER: "Sフェザー",
+  S_FEATHER: "スーパーフェザー",
   FEATHER: "フェザー",
-  S_BANTAM: "Sバンタム",
+  S_BANTAM: "スーパーバンタム",
   BANTAM: "バンタム",
-  S_FLY: "Sフライ",
+  S_FLY: "スーパーフライ",
   FLY: "フライ",
-  L_FLY: "Lフライ",
+  L_FLY: "ライトフライ",
   MINIMUM: "ミニマム",
 } as const;
 
 export const initialBoxerData: BoxerType = {
   id: NaN,
   name: "",
-  eng_name: "",
-  country: NATIONALITY.JAPAN,
+  engName: "",
+  country: COUNTRY.JAPAN,
   birth: "1990-01-01",
   height: 165,
   reach: 165,
@@ -56,8 +57,8 @@ export const initialBoxerData: BoxerType = {
 export const initialBoxerDataOnForm: BoxerType = {
   id: NaN,
   name: "",
-  eng_name: "",
-  country: NATIONALITY.JAPAN,
+  engName: "",
+  country: COUNTRY.JAPAN,
   birth: "1990-01-01",
   height: 165,
   reach: 165,
@@ -70,7 +71,9 @@ export const initialBoxerDataOnForm: BoxerType = {
 };
 
 export const GRADE = {
+  // UNDEFINED: undefined,
   TITLE_MATCH: "タイトルマッチ",
+  R12: "12R",
   R10: "10R",
   R8: "8R",
   R6: "6R",

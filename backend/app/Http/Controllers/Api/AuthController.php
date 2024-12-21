@@ -154,6 +154,9 @@ class AuthController extends ApiController
         try {
             $loggedInUser = $this->userService->loginUserExecute($email, $password);
             $request->session()->regenerate(); // セッションIDの再発行
+            if (Auth::guard('guest')->check()) {
+                $this->guestService->logoutGuest();
+            }
         } catch (AuthenticationException $e) {
             return $this->responseUnauthorized($e->getMessage());
         } catch (Exception $e) {
@@ -170,6 +173,9 @@ class AuthController extends ApiController
      */
     public function logout()
     {
+        if (!Auth::check()) {
+            return $this->responseBadRequest("Cna not logout no auth");
+        }
         $this->userService->logoutUserExecute();
         return $this->responseSuccessful("Success user logout");
     }
@@ -185,7 +191,7 @@ class AuthController extends ApiController
         if (!Auth::check()) {
             return false;
         }
-        $is_admin = Administrator::where("user_id", Auth::id())->exists();
-        return $is_admin;
+        $isAdmin = Administrator::where("user_id", Auth::id())->exists();
+        return $isAdmin;
     }
 }

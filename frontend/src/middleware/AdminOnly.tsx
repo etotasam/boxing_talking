@@ -1,8 +1,8 @@
-import { ROUTE_PATH } from '@/assets/RoutePath';
+import { ROUTE_PATH } from '@/assets/routePath';
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 //! component
-import { HeaderContainer } from '@/components/module/Header';
+import { Header } from '@/components/module/Header';
 //! hooks
 import { useAdmin } from '@/hooks/apiHooks/useAuth';
 //! recoil
@@ -28,15 +28,16 @@ const AdminOnly = () => {
 
   return (
     <>
-      <HeaderContainer />
-      <main
+      <Header />
+      {/* <main
+        className="bg-white"
         style={{
           minHeight: `calc(100vh - ${headerHeight}px)`,
           marginTop: `${headerHeight}px`,
         }}
-      >
-        <Outlet />
-      </main>
+      > */}
+      <Outlet />
+      {/* </main> */}
     </>
   );
 };

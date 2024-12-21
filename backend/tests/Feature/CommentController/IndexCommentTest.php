@@ -21,7 +21,7 @@ class IndexCommentTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create([
-            "name" => 'auth_user_name',
+            "name" => 'ユーザーの名前',
         ]);
 
         $this->guest = GuestUser::create([]);
@@ -56,7 +56,7 @@ class IndexCommentTest extends TestCase
     {
         $response = $this->get('/api/comment?match_id=' . $this->matches->id);
         $response->assertStatus(200);
-        $response->assertJsonFragment(['post_user_name' => 'auth_user_name'])
+        $response->assertJsonFragment(['postUserName' => 'ユーザーの名前'])
             ->assertJsonFragment(['comment' => 'コメント']);
         // $response->assertJsonFragment(['comment' => 'コメント']);
     }

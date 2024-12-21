@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
 
-class AuthenticateAdmin
+class AuthenticateAdmin extends MyJsonResponse
 {
 
     /**
@@ -20,13 +20,13 @@ class AuthenticateAdmin
     public function handle(Request $request, Closure $next)
     {
         if (Auth::check()) {
-            $is_admin = Administrator::where('user_id', Auth::id())->exists();
-            if ($is_admin) {
+            $isAdmin = Administrator::where('user_id', Auth::id())->exists();
+            if ($isAdmin) {
                 return $next($request);
             } else {
-                return response()->json(["success" => false, "message" => "Unauthorized: Cannot access with your auth"], 401);
+                return $this->responseUnauthorized("Unauthorized: Cannot access with your auth");
             }
         }
-        return response()->json(["message" => "Unauthorized"], 401);
+        return $this->responseUnauthorized("Unauthorized");
     }
 }

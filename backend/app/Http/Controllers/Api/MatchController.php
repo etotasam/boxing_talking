@@ -12,7 +12,12 @@ use App\Models\BoxingMatch;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\QueryException;
 use App\Exceptions\NonAdministratorException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use App\Http\Requests\BoxingMatchesRequest;
+use App\Repositories\Interfaces\WeightDivisionRepositoryInterface;
+use App\Repositories\Interfaces\GradeRepositoryInterface;
+use Illuminate\Support\Facades\DB;
+
+
 
 class MatchController extends ApiController
 {
@@ -20,6 +25,8 @@ class MatchController extends ApiController
     public function __construct(
         private MatchService $matchService,
         private AuthService $authService,
+        private WeightDivisionRepositoryInterface $weightRepository,
+        private GradeRepositoryInterface $gradeRepository,
     ) {
     }
 
@@ -111,7 +118,7 @@ class MatchController extends ApiController
      * @param  array update_match_data
      * @return JsonResponse
      */
-    public function update(Request $request)
+    public function update(BoxingMatchesRequest $request)
     {
         try {
             $this->matchService->updateMatch($request->match_id, $request->update_match_data);
@@ -130,7 +137,7 @@ class MatchController extends ApiController
      *
      * @return JsonResponse
      */
-    public function result(Request $request)
+    public function resultStore(Request $request)
     {
         $matchResultArray = [
             "match_id" => $request->match_id,

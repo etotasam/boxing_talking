@@ -1,5 +1,6 @@
 {
   "singleQuote": true,
   "arrowParens": "always",
-  "quoteProps": "as-needed"
+  "quoteProps": "as-needed",
+  "printWidth": 100
 }

@@ -3,16 +3,13 @@
 namespace App\Repositories;
 
 use App\Models\WeightDivision;
+use App\Repositories\Interfaces\WeightDivisionRepositoryInterface;
 
-class WeightDivisionRepository
+class WeightDivisionRepository implements WeightDivisionRepositoryInterface
 {
 
-  /**
-   * @param string $weight
-   * @return WeightDivision
-   */
-  public static function getWeightDivision($weight)
+  public static function getWeightId($weight)
   {
-    return WeightDivision::where("weight", $weight)->first();
+    return WeightDivision::where("weight", $weight)->first()->id;
   }
 }

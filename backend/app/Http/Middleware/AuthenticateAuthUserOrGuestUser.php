@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Repositories\Interfaces\GuestRepositoryInterface;
 
-class AuthenticateAuthUserOrGuestUser
+class AuthenticateAuthUserOrGuestUser extends MyJsonResponse
 {
     public function __construct(private GuestRepositoryInterface $guestRepository)
     {
@@ -26,7 +26,7 @@ class AuthenticateAuthUserOrGuestUser
         if ($isAuthUser || $isGuest) {
             return $next($request);
         } else {
-            return response()->json(["success" => false, "message" => "Must be auth for access"], 401);
+            return $this->responseUnauthorized("Must be auth for access");
         }
     }
 }

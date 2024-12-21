@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
-class AuthenticateAuthUser
+class AuthenticateAuthUser extends MyJsonResponse
 {
     /**
      * Handle an incoming request.
@@ -20,7 +20,7 @@ class AuthenticateAuthUser
         if (Auth::check()) {
             return $next($request);
         } else {
-            return response()->json(["success" => false, "message" => "Require authenticated for access", 401]);
+            return $this->responseUnauthorized("Require authenticated for access");
         }
     }
 }

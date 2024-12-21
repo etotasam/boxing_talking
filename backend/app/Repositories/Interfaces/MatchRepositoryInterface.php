@@ -15,13 +15,13 @@ interface MatchRepositoryInterface
   public function getAllMatches();
 
   /**
-   * 過去一週間以上過去の試合を取得
+   * 過去2週間以上過去の試合を取得
    * @return Collection
    */
   public function getPastMatches();
 
   /**
-   * 過去一週間からこっちの試合を取得
+   * 過去2週間からこっちの試合を取得
    * @return Collection
    */
   public function getMatches();

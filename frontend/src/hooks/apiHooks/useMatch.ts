@@ -2,12 +2,12 @@ import { useCallback } from "react"
 import { Axios } from "@/assets/axios"
 // import dayjs from "dayjs"
 import { useQuery, useMutation } from "react-query"
-import { API_PATH } from "@/assets/ApiPath"
+import { API_PATH } from "@/assets/apiPath"
 // ! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 import { QUERY_KEY } from "@/assets/queryKeys"
 // ! types
-import { MatchDataType, MatchResultType, RegisterMatchPropsType } from "@/assets/types"
+import { MatchDataType, MatchResultType, RegisterMatchPropsType, MatchUpdateFormType } from "@/assets/types"
 // ! hook
 import { useToastModal } from "../useToastModal"
 import { useLoading } from "../useLoading"
@@ -29,11 +29,11 @@ export const useFetchMatches = () => {
     const res = await Axios.get(API_PATH.MATCH).then(result => result.data)
     return res.data
   }, [])
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.FETCH_MATCHES, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true, suspense: true })
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.FETCH_MATCHES, fetcher, { keepPreviousData: true, staleTime: Infinity, enabled: true })
   return { data, isLoading, isError, isRefetching, refetch }
 }
 
-//! 過去の試合情報一覧の取得(試合後一週間以上経っている試合全部)
+//! 過去の試合情報一覧の取得(試合後2週間以上経っている試合全部)
 export const useFetchPastMatches = () => {
   const { startLoading, resetLoadingState } = useLoading()
   const fetcher = useCallback(async () => {
@@ -42,9 +42,7 @@ export const useFetchPastMatches = () => {
     return res.data
   }, [])
   const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.FETCH_PAST_MATCHES, fetcher, {
-    keepPreviousData: true, staleTime: Infinity, enabled: true, onSuccess: () => {
-      resetLoadingState()
-    }, onError: () => {
+    keepPreviousData: true, staleTime: Infinity, enabled: true, onSettled: () => {
       resetLoadingState()
     }
   })
@@ -73,8 +71,8 @@ export const useRegisterMatch = () => {
   const { resetLoadingState, startLoading } = useLoading()
 
 
-  const api = async ({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }: RegisterMatchPropsType) => {
-    await Axios.post(API_PATH.MATCH, { match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles })
+  const api = async ({ matchDate, redBoxerId, blueBoxerId, grade, country, venue, weight, titles }: RegisterMatchPropsType) => {
+    await Axios.post(API_PATH.MATCH, { matchDate, redBoxerId, blueBoxerId, grade, country, venue, weight, titles })
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
@@ -82,8 +80,8 @@ export const useRegisterMatch = () => {
     }
   })
 
-  const registerMatch = ({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }: RegisterMatchPropsType) => {
-    mutate({ match_date, red_boxer_id, blue_boxer_id, grade, country, venue, weight, titles }, {
+  const registerMatch = ({ matchDate, redBoxerId, blueBoxerId, grade, country, venue, weight, titles }: RegisterMatchPropsType) => {
+    mutate({ matchDate, redBoxerId, blueBoxerId, grade, country, venue, weight, titles }, {
       onSuccess: () => {
         refetchMatches()
         refetchAllMatches()
@@ -106,7 +104,7 @@ export const useRegisterMatch = () => {
 //! 試合の変更
 type ArgumentType = {
   matchId: number,
-  changeData: Partial<MatchDataType>
+  changeData: Partial<MatchUpdateFormType>
 }
 export const useUpdateMatch = () => {
   const { setToastModal, showToastModal } = useToastModal()
@@ -115,8 +113,8 @@ export const useUpdateMatch = () => {
   const { refetch: refetchAllMatches } = useFetchAllMatches()
   const api = useCallback(async (arg: ArgumentType) => {
     const updateData = {
-      match_id: arg.matchId,
-      update_match_data: arg.changeData
+      matchId: arg.matchId,
+      updateMatchData: arg.changeData
     }
     await Axios.patch(API_PATH.MATCH, updateData)
   }, [])
@@ -138,6 +136,8 @@ export const useUpdateMatch = () => {
         resetLoadingState()
         setToastModal({ message: MESSAGE.MATCH_UPDATE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
         showToastModal()
+      },
+      onSettled: () => {
       }
     })
   }
@@ -153,7 +153,7 @@ export const useDeleteMatch = () => {
   const { refetch: refetchAllMatches } = useFetchAllMatches()
   // const { state: matchesState, setter: setMatchesState } = useQueryState<MatchesType[]>(queryKeys.match)
   const api = useCallback(async (matchId: number) => {
-    await Axios.delete(API_PATH.MATCH, { data: { match_id: matchId } })
+    await Axios.delete(API_PATH.MATCH, { data: { matchId } })
   }, [])
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
@@ -198,8 +198,8 @@ export const useMatchResult = () => {
     }
   })
 
-  const storeMatchResult = ({ match_id, result, detail, round }: MatchResultType) => {
-    mutate({ match_id, result, detail, round }, {
+  const storeMatchResult = ({ matchId, result, detail, round }: MatchResultType) => {
+    mutate({ matchId, result, detail, round }, {
       onSuccess: () => {
         refetchMatches()
         refetchAllMatches()

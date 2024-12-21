@@ -17,7 +17,7 @@ use Exception;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SerializeDate;
 
     /**
      * The attributes that are mass assignable.
@@ -44,14 +44,13 @@ class User extends Authenticatable
     ];
 
 
-
     /**
      * The attributes that should be cast.
      *
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'created_at' => 'datetime',
     ];
 
     public function prediction()

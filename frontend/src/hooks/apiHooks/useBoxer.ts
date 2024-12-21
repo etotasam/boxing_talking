@@ -2,26 +2,25 @@ import { useCallback } from "react"
 import { useLocation } from "react-router-dom";
 import { useQuery, useMutation } from "react-query"
 import { Axios } from "@/assets/axios"
-import { API_PATH } from "@/assets/ApiPath"
+import { API_PATH } from "@/assets/apiPath"
 // ! data
 import { QUERY_KEY } from "@/assets/queryKeys"
-import { ERROR_MESSAGE_FROM_BACKEND } from "@/assets/errorMessageFromBackend";
 // //! hooks
 import { useReactQuery } from "../useReactQuery";
 import { useLoading } from "../useLoading"
 import { useToastModal } from "../useToastModal";
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal";
 // //! types
-import type { BoxerType, NationalityType } from "@/assets/types"
+import type { BoxerType, CountryType } from "@/assets/types"
 
 
-//! 選手データ取得 and 登録済み選手の数を取得
+//! boxerデータ取得 and 登録済み選手の数を取得
 const limit = 15
 export const useFetchBoxers = () => {
 
   type SearchWordType = {
     name?: string | null
-    country?: NationalityType | null
+    country?: CountryType | null
   }
   type FetcherPropsType = {
     page: number,
@@ -33,7 +32,7 @@ export const useFetchBoxers = () => {
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const paramName = (query.get("name"));
-  const paramCountry = (query.get("country")) as NationalityType | null;
+  const paramCountry = (query.get("country")) as CountryType | null;
   let paramPage = Number(query.get("page"));
 
   if (!paramPage) {
@@ -77,7 +76,7 @@ export const useFetchBoxers = () => {
   return { boxersData, boxersCount, pageCount, isLoading, isError, isPreviousData, refetch, isRefetching }
 }
 
-// //! 選手データ更新
+// //! boxerデータ更新
 export const useUpdateBoxerData = () => {
   const { startLoading, resetLoadingState } = useLoading()
   const { refetchReactQueryArrayKeys } = useReactQuery()
@@ -107,7 +106,7 @@ export const useUpdateBoxerData = () => {
   return { updateBoxer, isLoading, isSuccess }
 }
 
-// //! 選手登録
+// //! boxer登録
 export const useRegisterBoxer = () => {
   const { refetchReactQueryData } = useReactQuery()
   const { startLoading, resetLoadingState, successful } = useLoading()
@@ -161,7 +160,7 @@ export const useRegisterBoxer = () => {
   return { registerBoxer, isLoading, isError, isSuccess }
 }
 
-// //! 選手データ削除
+// //! boxerデータ削除
 export const useDeleteBoxer = () => {
   const { refetch: RefetchBoxerData } = useFetchBoxers()
   const { startLoading, resetLoadingState } = useLoading()
@@ -169,7 +168,7 @@ export const useDeleteBoxer = () => {
 
   //? api
   const api = async (boxerData: BoxerType): Promise<void> => {
-    await Axios.delete<void>(API_PATH.BOXER, { data: { boxer_id: boxerData.id, eng_name: boxerData.eng_name } }).then(v => v.data)
+    await Axios.delete<void>(API_PATH.BOXER, { data: { boxerId: boxerData.id, engName: boxerData.engName } }).then(v => v.data)
   }
 
   const { mutate, isLoading, isError, isSuccess } = useMutation(api, {

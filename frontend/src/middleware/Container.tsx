@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-import { ROUTE_PATH } from '@/assets/RoutePath';
+import { ROUTE_PATH } from '@/assets/routePath';
 // ! hooks
-import { useGuest, useAuthCheck } from '@/hooks/apiHooks/useAuth';
+import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
 import { useLoginModal } from '@/hooks/useLoginModal';
@@ -14,28 +13,24 @@ import { ToastModalContainer } from '@/components/modal/ToastModal';
 import { LoginFormModal } from '@/components/modal/LoginFormModal';
 import { FullScreenSpinnerModal } from '@/components/modal/FullScreenSpinnerModal';
 import { FirstLoadingModal } from '@/components/modal/FirstLoadingModal';
+import { MenuModal } from '@/components/modal/MenuModal';
 
 const Container = () => {
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
-  const { isLoading } = useLoading();
-  const { data: isAuth, isLoading: isFirstCheckingAuth } = useAuthCheck();
-  const { data: guestUser } = useGuest();
-  const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } =
-    useFetchBoxers();
+  const { isLoading: isAnyLoading } = useLoading();
+  const { data: isAuth, isLoading: isFirstCheckingAuth } = useAuth();
+  const { data: isGuest } = useGuest();
+  const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } = useFetchBoxers();
   const { isLoading: isMatchesFetching } = useFetchMatches();
   const navigate = useNavigate();
-  const {
-    state: isShowLoginModal,
-    showLoginModal,
-    hideLoginModal,
-  } = useLoginModal();
+  const { state: isShowLoginModal, showLoginModal, hideLoginModal } = useLoginModal();
   const { pathname } = useLocation();
 
   // ! Toast Modalの表示時間等の設定
   const waitTime = 5000;
   const waitId = React.useRef<NodeJS.Timeout>();
   //? メッセージモーダルのタイマーセット
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isShowToastModal) return;
     (async () => {
       if (waitId.current) clearTimeout(waitId.current);
@@ -53,30 +48,31 @@ const Container = () => {
 
   //? authコントロール
   useEffect(() => {
-    if (isAuth === undefined || guestUser === undefined) return;
-    if (!isAuth && !guestUser && pathname !== '/identification/') {
+    const isAuthChecking = isAuth === undefined || isGuest === undefined;
+    if (isAuthChecking) return;
+    if (!isAuth && !isGuest && pathname !== '/identification/') {
       showLoginModal();
       navigate(ROUTE_PATH.HOME);
     } else {
       hideLoginModal();
     }
-  }, [isAuth, guestUser, pathname]);
+  }, [isAuth, isGuest, pathname]);
+
+  const isShowFullScreenSpinnerCondition = isAnyLoading || isRefetchingBoxers;
+
+  const isShowFirstLoadingCondition = isFirstCheckingAuth || isBoxersFetching || isMatchesFetching;
 
   return (
     <>
+      <LoginFormModal isShow={isShowLoginModal} key={'LoginFormModal'} />
+      <ToastModalContainer isShow={isShowToastModal} key={'ToastModalContainer'} />
+      <FullScreenSpinnerModal
+        isShow={isShowFullScreenSpinnerCondition}
+        key={'FullScreenSpinnerModal'}
+      />
+      <FirstLoadingModal isShow={isShowFirstLoadingCondition} key={'FirstLoadingModal'} />
+      <MenuModal />
       <Outlet />
-      <AnimatePresence>
-        {isShowToastModal && (
-          <ToastModalContainer key={'ToastModalContainer'} />
-        )}
-        {(isLoading || isRefetchingBoxers) && (
-          <FullScreenSpinnerModal key={'FullScreenSpinnerModal'} />
-        )}
-        {(isFirstCheckingAuth || isBoxersFetching || isMatchesFetching) && (
-          <FirstLoadingModal key={'FirstLoadingModal'} />
-        )}
-      </AnimatePresence>
-      {isShowLoginModal && <LoginFormModal key={'LoginFormModal'} />}
     </>
   );
 };

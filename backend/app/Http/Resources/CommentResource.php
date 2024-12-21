@@ -23,12 +23,14 @@ class CommentResource extends JsonResource
         $user = $this->commentInstance->postUser;
         $postUserName = isset($user) ? $user->name : null;
         $formattedComment = nl2br(htmlspecialchars($this->commentInstance->comment));
+        $timestamp = strtotime($this->commentInstance->created_at);
+        $formattedCreatedAt = date('Y-m-d H:i:s', $timestamp);
 
         return [
             'id' => $this->commentInstance->id,
-            'post_user_name' => $postUserName,
+            'postUserName' => $postUserName,
             "comment" => $formattedComment,
-            "created_at" => $this->commentInstance->created_at
+            "createdAt" => $formattedCreatedAt
         ];
     }
 }

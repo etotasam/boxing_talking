@@ -1,0 +1,1 @@
+export { RegisterMatchFormWrapper as RegisterMatchForm } from "./RegisterMatchForm"

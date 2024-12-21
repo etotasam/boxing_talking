@@ -17,16 +17,21 @@ class WeightDivisionSeeder extends Seeder
         DB::table('weight_divisions')->insert([
             ['weight' => "ヘビー"],
             ['weight' => "クルーザー"],
-            ['weight' => "Lヘビー"],
-            ['weight' => "Sミドル"],
+            ['weight' => "ライトヘビー"],
+            ['weight' => "スーパーミドル"],
             ['weight' => "ミドル"],
-            ['weight' => "Sウェルター"],
+            ['weight' => "スーパーウェルター"],
             ['weight' => "ウェルター"],
-            ['weight' => "Sライト"],
+            ['weight' => "スーパーライト"],
             ['weight' => "ライト"],
-            ['weight' => "Sフェザー"],
+            ['weight' => "スーパーフェザー"],
             ['weight' => "フェザー"],
-            ['weight' => "Sバンタム"],
+            ['weight' => "スーパーバンタム"],
+            ['weight' => "バンタム"],
+            ['weight' => "スーパーフライ"],
+            ['weight' => "フライ"],
+            ['weight' => "ライトフライ"],
+            ['weight' => "ミニマム"],
         ]);
     }
 }

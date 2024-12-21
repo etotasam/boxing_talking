@@ -19,6 +19,8 @@ class CreateWinLossPredictionsTable extends Migration
             $table->unsignedBigInteger('match_id');
             $table->string("prediction", 10);
             $table->timestamps();
+
+            $table->index('match_id');
         });
     }
 

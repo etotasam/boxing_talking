@@ -1,20 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useCallback } from "react"
 import { QUERY_KEY } from "@/assets/queryKeys"
 import { Axios } from "@/assets/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal"
 import { TOKEN_ERROR_MESSAGE } from "@/assets/tokenErrorMessage"
-import { API_PATH } from "@/assets/ApiPath"
-import { CUSTOM_ERROR_CODE } from "@/assets/CustomErrorCodes"
+import { API_PATH } from "@/assets/apiPath"
+import { CUSTOM_ERROR_CODE } from "@/assets/customErrorCodes"
 //! Recoil
 import { useSetRecoilState } from "recoil"
 import { tokenErrorMessageState } from "@/store/tokenErrorMessageState"
 import { authCheckingState } from "@/store/authCheckingState"
 // !hooks
+import { useMenuModal } from "../useMenuModal"
 import { useToastModal } from "../useToastModal"
 import { useLoading } from "../useLoading"
 import { useLoginModal } from "../useLoginModal"
-import { useAllFetchMatchPredictionOfAuthUser } from "./uesWinLossPrediction"
+import { useFetchUsersPrediction } from "./uesWinLossPrediction"
 import { useReactQuery } from "../useReactQuery"
 //! types
 import type { UserType } from "@/assets/types"
@@ -28,10 +31,10 @@ export const useGuest = () => {
       const res = await Axios.get(API_PATH.GUEST).then(result => result.data);
       return Boolean(res);
     } catch (error) {
-      return null
+      return false
     }
   }, [])
-  const { data, isLoading, isError } = useQuery<boolean | null>(QUERY_KEY.GUEST, api, {
+  const { data, isLoading, isError } = useQuery<boolean>(QUERY_KEY.GUEST, api, {
     retry: false,
     staleTime: Infinity
   })
@@ -49,11 +52,12 @@ export const useGuestLogin = () => {
   const { resetLoadingState, startLoading } = useLoading()
   // ? login modal (hook)
   const { hideLoginModal } = useLoginModal()
-  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+  const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
 
   //? ReactQuery controller
   const { setReactQueryData } = useReactQuery()
-  const api = useCallback(async ({ _ }: { _?: unknown }): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const api = useCallback(async (_: unknown): Promise<void> => {
     await Axios.post<void>(API_PATH.GUEST_LOGIN).then(result => result.data)
   }, [])
 
@@ -88,15 +92,14 @@ export const useGuestLogin = () => {
 
 //! ゲストログアウト
 export const useGuestLogout = () => {
-  // const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
-  // ? react query
+  const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
   const queryClient = useQueryClient()
-  // ? toast message modal
-  const { setToastModal, showToastModal } = useToastModal()
-  // ? Loading state
+  const { showToastModalMessage } = useToastModal()
+  const { hide: hideMenuModal } = useMenuModal()
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? api
-  const api = useCallback(async ({ _ }: { _?: unknown }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const api = useCallback(async (_: unknown) => {
     await Axios.post<void>(API_PATH.GUEST_LOGOUT).then(result => result.data)
   }, [])
 
@@ -109,16 +112,17 @@ export const useGuestLogout = () => {
     mutate({}, {
       onSuccess: () => {
         // ? ユーザー情報のキャッシュをclear
+        refetchMatchPrediction()
         queryClient.setQueryData<boolean>(QUERY_KEY.GUEST, false)
         successful()
-        setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
-        showToastModal()
-        resetLoadingState()
+        showToastModalMessage({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
+        hideMenuModal()
       },
       onError: () => {
         hasError()
-        setToastModal({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showToastModalMessage({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+      },
+      onSettled: () => {
         resetLoadingState()
       }
     })
@@ -126,26 +130,7 @@ export const useGuestLogout = () => {
   return { guestLogout, isLoading, isSuccess }
 }
 
-//! auth check
-export const useAuthCheck = () => {
-
-  const api = useCallback(async () => {
-    try {
-      const res = await Axios.get(`/api/auth/user`).then(result => result.data)
-      return Boolean(res)
-    } catch (error) {
-      return null
-    }
-  }, [])
-  const { data, isLoading, isError } = useQuery<boolean | null>(QUERY_KEY.AUTH, api, {
-    retry: false,
-    staleTime: Infinity
-  })
-
-  return { data, isLoading, isError }
-}
-
-//! auth user
+//! auth check (user)
 export const useAuth = () => {
   const queryClient = useQueryClient()
 
@@ -276,14 +261,13 @@ export const useSignUpIdentification = () => {
 export const useLogin = () => {
   const { refetch: refetchAdmin } = useAdmin()
   // ? react query
-  // const queryClient = useQueryClient()
   // ? toast modal
   const { setToastModal, showToastModal } = useToastModal()
   // ? Loading state
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? login modal (hook)
   const { hideLoginModal } = useLoginModal()
-  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
+  const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
   //? ReactQuery controller
   const { setReactQueryData } = useReactQuery()
 
@@ -325,51 +309,43 @@ export const useLogin = () => {
 
 //! ログアウト
 export const useLogout = () => {
-  const { refetch: refetchMatchPrediction } = useAllFetchMatchPredictionOfAuthUser()
-  // ? react query
+  const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
   const queryClient = useQueryClient()
-  // ? toast message modal
-  const { setToastModal, showToastModal } = useToastModal()
-  // ? Loading state
+  const { showToastModalMessage } = useToastModal()
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
+  const { hide: hideMenuModal } = useMenuModal()
   // ? api
-  const api = useCallback(async ({ _ }: { _?: any }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const api = async (_: any) => {
     await Axios.post<void>(API_PATH.USER_LOGOUT).then(result => result.data)
-  }, [])
+  }
+
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
       startLoading()
     }
   })
-  const logout = useCallback(() => {
+  const logout = () => {
     mutate({}, {
       onSuccess: () => {
         // ? ユーザー情報のキャッシュをclear
         queryClient.setQueryData(QUERY_KEY.AUTH, null)
         queryClient.invalidateQueries(QUERY_KEY.ADMIN)
-        //? 勝敗予想のキャッシュをclearしてリフェッチ
-        // queryClient.removeQueries(QUERY_KEY.prediction)
-        // queryClient.setQueryData(QUERY_KEY.prediction, undefined)
         refetchMatchPrediction()
         successful()
-        setToastModal({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
-        showToastModal()
-        // //? ユーザの勝敗予想データのキャッシュを削除
-        // queryClient.setQueryData(QUERY_KEY.vote, [])
-        // //? auth を削除
-        // queryClient.setQueryData<boolean>(QUERY_KEY.AUTH, false)
-        // navigate("/")
-        resetLoadingState()
+        showToastModalMessage({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
+        hideMenuModal()
       },
       onError: () => {
         hasError()
-        setToastModal({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showToastModalMessage({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+      },
+      onSettled: () => {
         resetLoadingState()
       }
     })
-  }, [])
+  }
   return { logout, isLoading, isSuccess }
 }
 

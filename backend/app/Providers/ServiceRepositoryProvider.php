@@ -12,6 +12,9 @@ use App\Repositories\Interfaces\TitleMatchRepositoryInterface;
 use App\Repositories\Interfaces\TitleRepositoryInterface;
 use App\Repositories\Interfaces\PreUserRepositoryInterface;
 use App\Repositories\Interfaces\WinLossPredictionRepositoryInterface;
+use App\Repositories\Interfaces\WeightDivisionRepositoryInterface;
+use App\Repositories\Interfaces\GradeRepositoryInterface;
+use App\Repositories\Interfaces\OrganizationRepositoryInterface;
 use App\Repositories\GuestUserRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\BoxerRepository;
@@ -21,6 +24,9 @@ use App\Repositories\TitleMatchRepository;
 use App\Repositories\TitleRepository;
 use App\Repositories\PreUserRepository;
 use App\Repositories\WinLossPredictionRepository;
+use App\Repositories\WeightDivisionRepository;
+use App\Repositories\GradeRepository;
+use App\Repositories\OrganizationRepository;
 
 class ServiceRepositoryProvider extends ServiceProvider
 {
@@ -40,6 +46,9 @@ class ServiceRepositoryProvider extends ServiceProvider
         $this->app->singleton(UserRepositoryInterface::class, UserRepository::class);
         $this->app->singleton(PreUserRepositoryInterface::class, PreUserRepository::class);
         $this->app->singleton(WinLossPredictionRepositoryInterface::class, WinLossPredictionRepository::class);
+        $this->app->singleton(WeightDivisionRepositoryInterface::class, WeightDivisionRepository::class);
+        $this->app->singleton(GradeRepositoryInterface::class, GradeRepository::class);
+        $this->app->singleton(OrganizationRepositoryInterface::class, OrganizationRepository::class);
     }
 
     /**

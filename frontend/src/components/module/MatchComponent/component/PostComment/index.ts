@@ -1,0 +1,1 @@
+export { PostCommentContainer as PostComment } from "./PostCommentContainer"

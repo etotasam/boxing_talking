@@ -10,6 +10,8 @@ use App\Repositories\Interfaces\CommentRepositoryInterface;
 use App\Repositories\Interfaces\TitleMatchRepositoryInterface;
 use App\Repositories\Interfaces\WinLossPredictionRepositoryInterface;
 use App\Repositories\Interfaces\BoxerRepositoryInterface;
+use App\Repositories\Interfaces\GradeRepositoryInterface;
+use App\Repositories\Interfaces\WeightDivisionRepositoryInterface;
 use App\Services\TitleMatchService;
 use Illuminate\Database\QueryException;
 use App\Exceptions\NonAdministratorException;
@@ -25,6 +27,8 @@ class MatchService
     protected TitleMatchRepositoryInterface $titleMatchRepository,
     protected WinLossPredictionRepositoryInterface $predictionRepository,
     protected BoxerRepositoryInterface $boxerRepository,
+    protected GradeRepositoryInterface $gradeRepository,
+    protected WeightDivisionRepositoryInterface $weightRepository,
   ) {
   }
 
@@ -49,17 +53,17 @@ class MatchService
    *
    * @return void
    */
-  public function storeMatch(array $matchDataForStore)
+  public function storeMatch(array $requestMatchData)
   {
-    $organizationsNameArray = $this->extractOrganizationsArray($matchDataForStore);
-    unset($matchDataForStore['titles']);
-
     DB::beginTransaction();
     try {
-      $createdMatch = $this->matchRepository->createMatch($matchDataForStore);
+      [$organizationsNameArray, $formattedMatchData] = $this->formatMatchDataForStore($requestMatchData);
+
+      $createdMatch = $this->matchRepository->createMatch($formattedMatchData);
       if (!$createdMatch) {
         throw new Exception("Can not create match", 51);
       }
+
 
       $titleMatchesArray = $this->titleMatchService->formatForStoreToTitleMatchTable($createdMatch['id'], $organizationsNameArray);
       $isSuccessStoreTitleMatch = $this->titleMatchRepository->insertTitleMatch($titleMatchesArray);
@@ -76,6 +80,30 @@ class MatchService
     }
 
     DB::commit();
+  }
+
+
+  /**
+   * @param array $matchData match data before format
+   * @return array [$organizationsNameArray, $formattedMatchArray] organizationsName array & formatted match data for store
+   */
+  private function formatMatchDataForStore(array $matchData): array
+  {
+
+    $organizationsNameArray = $this->extractOrganizationsArray($matchData);
+
+
+
+    $grade = $matchData['grade'];
+    $gradeId = $this->gradeRepository->getGradeId($grade);
+    $weight = $matchData['weight'];
+    $weightId = $this->weightRepository->getWeightId($weight);
+
+    unset($matchData['weight'], $matchData['grade'], $matchData['titles']);
+
+    $formattedMatchData = array_merge($matchData, ["grade_id" => $gradeId], ["weight_id" => $weightId]);
+
+    return [$organizationsNameArray, $formattedMatchData];
   }
 
   /**
@@ -98,7 +126,6 @@ class MatchService
     } else {
       $matches = $this->matchRepository->getMatches();
     }
-
     return $matches;
   }
 
@@ -117,8 +144,11 @@ class MatchService
         $this->titleMatchService->updateTitleMatchExecute($matchId, $updateMatchData['titles']);
         unset($updateMatchData['titles']);
       }
-      if (!empty($updateMatchData)) {
-        $this->matchRepository->updateMatch($matchId, $updateMatchData);
+
+      $formattedUpdateData = $this->formatMatchDataForUpdate($updateMatchData);
+
+      if (!empty($formattedUpdateData)) {
+        $this->matchRepository->updateMatch($matchId, $formattedUpdateData);
       }
     } catch (QueryException $e) {
       DB::rollBack();
@@ -129,6 +159,27 @@ class MatchService
     }
 
     DB::commit();
+  }
+
+  /**
+   * @param array $matchData only MatchData for update
+   * @return array formatted update data
+   */
+  private function formatMatchDataForUpdate(array $matchData): array
+  {
+    if (array_key_exists('grade', $matchData)) {
+      $gradeId = $this->gradeRepository->getGradeId($matchData["grade"]);
+      unset($matchData["grade"]);
+      $matchData["grade_id"] = $gradeId;
+    }
+
+    if (array_key_exists('weight', $matchData)) {
+      $weightId = $this->weightRepository->getWeightId($matchData["weight"]);
+      unset($matchData["weight"]);
+      $matchData["weight_id"] = $weightId;
+    }
+
+    return $matchData;
   }
 
   /**
@@ -253,13 +304,16 @@ class MatchService
       //? すでにmatch_resultが存在しているかどうかをチェック
       $isMatchResult = $this->matchRepository->isMatchResult($matchId);
       if ($isMatchResult) {
-        $this->rollbackBoxersRecordCount($pastResult->toArray(), $redBoxerRecord, $blueBoxerRecord);
+        [$rollbackRedBoxerRecord, $rollbackBlueBoxerRecord] = $this->rollbackBoxersRecord($pastResult->toArray(), $redBoxerRecord, $blueBoxerRecord);
+        $redBoxerRecord = $rollbackRedBoxerRecord; //! $redBoxerRecordの上書き
+        $blueBoxerRecord = $rollbackBlueBoxerRecord; //! $blueBoxerRecordの上書き
       }
-      $this->updateBoxersRecordCount($matchResultArray, $redBoxerRecord, $blueBoxerRecord);
+
+      [$newRedBoxerRecord, $newBlueBoxerRecord] = $this->updateBoxersRecord($matchResultArray, $redBoxerRecord, $blueBoxerRecord);
 
       DB::beginTransaction();
-      $this->boxerRepository->updateBoxer($redBoxerRecord); //? red boxer のデータ更新
-      $this->boxerRepository->updateBoxer($blueBoxerRecord); //? blue boxer のデータ更新
+      $this->boxerRepository->updateBoxer($newRedBoxerRecord); //? red boxer のデータ更新
+      $this->boxerRepository->updateBoxer($newBlueBoxerRecord); //? blue boxer のデータ更新
 
       //? 新しい試合結果を登録 of 更新
       $this->matchRepository->updateOrCreateMatchResult($matchId, $matchResultArray);
@@ -278,17 +332,17 @@ class MatchService
 
   /**
    * @param array $pastResult (既存のmatchResultデータ)
-   * @param array &$redBoxerRecord (red boxer data の参照渡し)
-   * @param array &$blueBoxerRecord (blue boxer data の参照渡し)
+   * @param array $redBoxerRecord (red boxer data)
+   * @param array $blueBoxerRecord (blue boxer data)
    *
-   * @return void
+   * @return array [$rollbackRedBoxerRecord, $rollbackBlueBoxerRecord]
    */
-  private function rollbackBoxersRecordCount(array $pastResult, array &$redBoxerRecord, array &$blueBoxerRecord)
+  private function rollbackBoxersRecord(array $pastResult, array $redBoxerRecord, array $blueBoxerRecord)
   {
 
     //? past resultが"無効試合"ならそこで終了
     if ($pastResult['match_result'] == "no-contest") {
-      return;
+      return [$redBoxerRecord, $blueBoxerRecord];
     }
 
     $isKo = $pastResult["detail"] == "ko" || $pastResult["detail"] == "tko";
@@ -315,20 +369,22 @@ class MatchService
       $redBoxerRecord["draw"] && --$redBoxerRecord["draw"]; //! redのdraw数を減
       $blueBoxerRecord["draw"] && --$blueBoxerRecord["draw"]; //! blueのdraw数を減
     }
+
+    return [$redBoxerRecord, $blueBoxerRecord];
   }
 
   /**
    * @param array $postResult (matchResultデータ)
-   * @param array &$redBoxerRecord (red boxer data の参照渡し)
-   * @param array &$blueBoxerRecord (blue boxer data の参照渡し)
+   * @param array $redBoxerRecord (red boxer data)
+   * @param array $blueBoxerRecord (blue boxer data)
    *
-   * @return void
+   * @return array [$newRedBoxerRecord, $newBlueBoxerRecord]
    */
-  private function updateBoxersRecordCount(array $postResult, array &$redBoxerRecord, array &$blueBoxerRecord)
+  private function updateBoxersRecord(array $postResult, array $redBoxerRecord, array $blueBoxerRecord)
   {
     //? past resultが"無効試合"ならそこで終了
     if ($postResult['match_result'] == "no-contest") {
-      return;
+      return [$redBoxerRecord, $blueBoxerRecord];
     }
 
     $isKo = $postResult["detail"] == "ko" || $postResult["detail"] == "tko";
@@ -355,6 +411,8 @@ class MatchService
       ++$redBoxerRecord["draw"]; //! redのdraw数を+
       ++$blueBoxerRecord["draw"]; //! blueのdraw数を+
     }
+
+    return [$redBoxerRecord, $blueBoxerRecord];
   }
 
 

@@ -5,7 +5,6 @@ import { toastModalState } from "@/store/toastModalState"
 import { MessageType, BgColorType } from "@/assets/types";
 
 
-
 export const useToastModal = () => {
 
   //? ToastModalの状態(show/hide)
@@ -38,7 +37,7 @@ export const useToastModal = () => {
   }
 
   /**
-   * ! messageと背景をセットする
+   * ! messageと背景カラーをセットする
    * @param {{ Message, bgColor }} セットしたいデータ
    * @returns {void}
    */

@@ -18,11 +18,9 @@ class BoxingMatchFactory extends Factory
             'blue_boxer_id' => $this->faker->numberBetween(0, 100),
             'match_date' => $this->faker->dateTimeBetween('now', '+3months')->format('Y-m-d'),
             'country' => $this->faker->randomElement(["Japan", "USA", "UK"]),
-            'weight' => $this->faker->randomElement(["ヘビー", "ミドル", "ライト", "Sバンタム"]),
+            'weight_id' => $this->faker->numberBetween(1, 17),
             'venue' => $this->faker->randomElement(["両国", "ラスベガス", "ウェンブリー"]),
-            'grade' => $this->faker->randomElement(["タイトルマッチ", "10R", "6R"]),
-            'count_red' => $this->faker->numberBetween(0, 100),
-            'count_blue' => $this->faker->numberBetween(0, 100),
+            'grade_id' => $this->faker->numberBetween(1, 5),
         ];
     }
 }
