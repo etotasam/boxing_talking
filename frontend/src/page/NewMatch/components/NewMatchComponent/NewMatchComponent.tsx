@@ -55,7 +55,7 @@ export const NewMatchComponent = (props: PropsType) => {
 const Container = ({ children }: { children: ReactNode }) => {
   // const headerHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   return (
-    <section className="w-full h-[100vh] flex justify-center">
+    <div className="w-full h-[100vh] flex justify-center">
       <div
         className={clsx('relative w-full')}
         style={{
@@ -69,7 +69,7 @@ const Container = ({ children }: { children: ReactNode }) => {
           {children}
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
@@ -77,13 +77,13 @@ const Main = ({ matchData }: { matchData: MatchDataType }) => {
   const headerHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
 
   return (
-    <div className="h-[100vh] w-[100vw] overflow-auto">
+    <main className="h-[100vh] w-[100vw] overflow-auto">
       <div
         className="w-full flex justify-center"
         style={{ paddingTop: headerHeightState, paddingBottom: '20vh' }}
       >
         <MatchInfo matchData={matchData} />
       </div>
-    </div>
+    </main>
   );
 };

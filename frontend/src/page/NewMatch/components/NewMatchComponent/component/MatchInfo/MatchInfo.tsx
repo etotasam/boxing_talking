@@ -17,30 +17,29 @@ export const MatchInfo = ({ matchData }: MatchInfoPropsType) => {
   return (
     <>
       {matchData && (
-        <div
-          className={clsx(
-            'text-stone-700 relative flex justify-between w-full max-w-[1024px] rounded-lg bg-white/70',
-            ' box-border border-[2px]'
-          )}
-        >
-          <div className="w-[300px]">
-            <BoxerInfo
-              boxer={{ ...matchData.redBoxer, color: 'red' }}
-              matchResult={matchData.result}
-            />
-          </div>
+        <div className="flex flex-col items-center w-full">
+          {/* <MatchDate matchData={matchData} /> */}
 
-          <div className={clsx('pb-7', matchData.titles.length ? 'pt-10' : 'pt-7')}>
-            {/* <MatchInfo matchData={matchData} /> */}
-          </div>
+          <div className={clsx('text-white relative flex justify-between w-full max-w-[1024px]')}>
+            <div className="w-[45%]">
+              <BoxerInfo
+                boxer={{ ...matchData.redBoxer, color: 'red' }}
+                matchResult={matchData.result}
+              />
+            </div>
 
-          <div className="w-[300px]">
-            <BoxerInfo
-              boxer={{ ...matchData.blueBoxer, color: 'blue' }}
-              matchResult={matchData.result}
-            />
+            {/* <div className={clsx('pb-7', matchData.titles.length ? 'pt-10' : 'pt-7')}>
+
+          </div> */}
+
+            <div className="w-[45%]">
+              <BoxerInfo
+                boxer={{ ...matchData.blueBoxer, color: 'blue' }}
+                matchResult={matchData.result}
+              />
+            </div>
+            {/* <PredictionIcon matchData={matchData} /> */}
           </div>
-          {/* <PredictionIcon matchData={matchData} /> */}
         </div>
       )}
     </>
@@ -169,14 +168,14 @@ const BoxerRecord = (props: BoxerRecordType) => {
           "relative flex-1 bg-red-500 before:content-['WIN'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
           resultState === 'win'
             ? 'before:text-red-700 before:font-bold text-yellow-300'
-            : 'before:text-gray-600'
+            : 'before:text-stone-500'
         )}
       >
         {boxer.win}
         <span
           className={clsx(
             "absolute text-sm bottom-[-20px] left-[50%] translate-x-[-50%] after:content-['KO']",
-            resultState === 'win' && isKo ? 'text-red-700 font-bold' : 'text-gray-600'
+            resultState === 'win' && isKo ? 'text-red-700 font-bold' : 'text-stone-500'
           )}
         >
           {boxer.ko}
@@ -187,7 +186,7 @@ const BoxerRecord = (props: BoxerRecordType) => {
           "relative flex-1 bg-gray-500 before:content-['DRAW'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
           resultState === 'draw'
             ? 'before:text-blue-700 before:font-bold text-yellow-300'
-            : 'before:text-gray-600'
+            : 'before:text-stone-500'
         )}
       >
         {boxer.draw}
@@ -197,7 +196,7 @@ const BoxerRecord = (props: BoxerRecordType) => {
           "relative flex-1 bg-stone-800 before:content-['LOSE'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
           resultState === 'loss'
             ? 'before:text-red-400 before:font-bold text-yellow-300'
-            : 'before:text-gray-600'
+            : 'before:text-stone-500'
         )}
       >
         {boxer.lose}
@@ -214,16 +213,31 @@ const Titles = (props: Pick<BoxerType, 'titles'>) => {
         <ul className="mt-1">
           {titles.map((title) => (
             <li key={`${title.organization}_${title.weight}`} className="mt-1">
-              <p className="relative inline-block text-[15px] text-stone-600">
+              <p className="relative inline-block text-[15px] text-yellow-500/70">
                 <span className="absolute top-[2px] left-[-22px] w-[18px] h-[18px]">
                   <img src={crown} alt="" />
                 </span>
-                {`${title.organization}${title.weight}級王者`}
+                {`${title.organization}${title.weight}`}
               </p>
             </li>
           ))}
         </ul>
       )}
     </>
+  );
+};
+
+const MatchDate = ({ matchData }: { matchData: MatchDataType }) => {
+  return (
+    <div className="relative mb-8 text-white">
+      <h2 className="text-3xl after:content-['(日本時間)'] after:absolute after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] after:text-sm">
+        {dayjs(matchData.matchDate).format('YYYY年M月D日')}
+      </h2>
+      {/* {Boolean(matchData.titles.length) && (
+        <span className="absolute top-[-32px] left-[50%] translate-x-[-50%] w-[32px] h-[32px] mr-2">
+          <img src={crown} alt="crown" />
+        </span>
+      )} */}
+    </div>
   );
 };
