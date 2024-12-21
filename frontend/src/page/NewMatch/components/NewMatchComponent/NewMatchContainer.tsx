@@ -16,7 +16,7 @@ import {
   useMatchPredictions,
 } from '@/hooks/apiHooks/uesWinLossPrediction';
 //! component
-import { MatchComponent } from './MatchComponent';
+import { NewMatchComponent } from './NewMatchComponent';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -24,12 +24,11 @@ type PropsType = {
   matches: MatchDataType[] | undefined;
 };
 
-export const MatchContainer = (props: PropsType) => {
+export const NewMatchContainer = (props: PropsType) => {
   //? urlからクエリmatch_idを取得
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get('match_id'));
-
   //? 勝敗予想投票実行時の状態hook
   const { isSuccess: isSuccessVoteMatchPrediction } = useVoteMatchPrediction();
   //? userの勝敗予想投票をすべて取得など…
@@ -46,7 +45,7 @@ export const MatchContainer = (props: PropsType) => {
 
   //? 試合の存在確認を確認、なければリダイレクト
   useEffect(() => {
-    if (!props.matches || !matchId) return;
+    if (!props.matches) return;
     const match = props.matches?.find((match) => match.id === matchId);
     if (match) {
       setThisMatch(match);
@@ -136,7 +135,7 @@ export const MatchContainer = (props: PropsType) => {
         // isThisMatchAfterToday={isThisMatchAfterToday}
         matchPredictions={matchPredictions}
       >
-        <MatchComponent
+        <NewMatchComponent
           matchData={thisMatch}
           device={device}
           isShowPredictionModal={isShowPredictionModal}

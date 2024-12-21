@@ -1,0 +1,1 @@
+export { PredictionVoteModalContainer as PredictionVoteModal } from "./PredictionVoteModalContainer"

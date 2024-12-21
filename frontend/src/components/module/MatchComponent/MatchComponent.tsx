@@ -11,7 +11,7 @@ import { Comments } from './component/Comments';
 import { LeftSection } from './component/LeftSection';
 import { PredictionVoteModal } from './component/PredictionVoteModal';
 import { VoteIcon } from './component/VoteIcon';
-import { NewComments } from './component/NewComments';
+// import { NewComments } from './component/NewComments';
 //! image
 import GGG from '@/assets/images/etc/GGG.jpg';
 //! icons

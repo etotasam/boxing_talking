@@ -7,6 +7,7 @@ const modalNames = [
   "PREDICTION_VOTE",
   "MENU",
   "MENU_OPEN_BUTTON_STATE",
+  "COMMENTS_MODAL",
 ] as const
 
 export type ModalNameType = (typeof modalNames)[number]
