@@ -1,22 +1,32 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+
 //! components
 import { Comments } from '../Comments';
 //! recoil
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
+import { apiFetchDataState } from '@/store/apiFetchDataState';
 //! icons
 import { GoTriangleUp } from 'react-icons/go';
+import { modalState } from '@/store/modalState';
+import { RotatingLines } from 'react-loader-spinner';
 
 type PropsType = {
   matchId: number;
 };
 
 export const MatchCommentsModal = ({ matchId }: PropsType) => {
+  const isCommentsFirstFetchingState = useRecoilValue(
+    apiFetchDataState({ dataName: 'comments/fetch', state: 'isLoading' })
+  );
   const postCommentAreaHeight = useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT'));
   const hiddenCommentsHeight: string = (postCommentAreaHeight ?? 0) + 50 + 'px';
-  const [isShowComments, setIsShowComments] = useState(false);
-  const toggleShowComments = () => setIsShowComments((v) => !v);
+  const [isShowComments, setIsShowComments] = useRecoilState(modalState('COMMENTS_MODAL'));
+  const toggleShowComments = () => {
+    if (isCommentsFirstFetchingState) return;
+    return setIsShowComments((v) => !v);
+  };
   return (
     <div className="h-[100vh] w-full">
       <motion.div
@@ -30,24 +40,49 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
           animate={isShowComments ? { top: '-30px', rotate: 180 } : { top: '0px' }}
           onClick={toggleShowComments}
         >
-          <GoTriangleUp className="w-[30px] h-[30px] text-white" />
+          {isCommentsFirstFetchingState ? <CommentsLoadingIcon /> : <CommentsModalToggleButton />}
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={{ opacity: 0.1 }}
           animate={
             isShowComments
               ? { opacity: 1, transition: { duration: 0.5 } }
-              : { opacity: 0, transition: { duration: 0.1 } }
+              : { opacity: 0.1, transition: { duration: 0.1 } }
           }
-          // transition={{ duration: 0.5 }}
         >
           <Comments matchId={matchId} />
         </motion.div>
       </motion.div>
-      {/* <div className="absolute bottom-0 w-full">
-        <PostComment />
-      </div> */}
+    </div>
+  );
+};
+
+const CommentsModalToggleButton = () => {
+  return <GoTriangleUp className="w-[30px] h-[30px] text-white" />;
+};
+
+const CommentsLoadingIcon = () => {
+  // const text = 'コメント取得中...';
+  return (
+    <div className="w-[30px] h-[30px] text-white">
+      <motion.div
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="absolute top-0 left-0 w-full h-full flex justify-center items-center"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="flex select-none"
+        >
+          <RotatingLines strokeColor="#f5f5f5" strokeWidth="3" animationDuration="1" width="20" />
+        </motion.div>
+      </motion.div>
     </div>
   );
 };
