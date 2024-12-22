@@ -25,7 +25,7 @@ export const MatchInfo = ({ matchData }: MatchInfoPropsType) => {
         <div className="flex flex-col items-center w-full relative">
           <BoxersData matchData={matchData} />
           <Grade matchData={matchData} />
-          <div className="flex w-[80%]">
+          <div className="flex w-[80%] mt-5">
             <MatchDate matchDate={matchData.matchDate} />
             <MatchVenue country={matchData.country} venue={matchData.venue} />
           </div>
@@ -219,9 +219,9 @@ const Titles = ({ titles }: Pick<BoxerType, 'titles'>) => {
       {Boolean(titles.length) && (
         <ul className="mt-1">
           {titles.map((title) => (
-            <li key={`${title.organization}_${title.weight}`} className="mt-1">
-              <p className="font-clamp-level-0 relative inline-block text-[15px] text-yellow-500/70">
-                <span className="absolute top-[2px] left-[-22px] w-[18px] h-[18px]">
+            <li key={`${title.organization}_${title.weight}`} className="">
+              <p className="font-clamp-level-0 relative text-yellow-500 inline-block">
+                <span className="absolute top-[50%] translate-y-[-50%] left-[-25px] w-[20px] h-[20px]">
                   <img src={crown} alt="" />
                 </span>
                 {`${title.organization}${title.weight}`}
@@ -248,12 +248,8 @@ const MatchDate = ({ matchDate }: Pick<MatchDataType, 'matchDate'>) => {
 
 //? 会場
 const MatchVenue = ({ country: placeCountry, venue }: Pick<MatchDataType, 'country' | 'venue'>) => {
-  const isLongText = (text: string): boolean => {
-    return text.length > 10;
-  };
   return (
     <div className={'text-center font-clamp-level-1 text-white relative flex-1 pb-5'}>
-      {/* <SubHeadline content="会場"> */}
       <span className="overflow-hidden absolute top-[25px] left-[50%] translate-x-[-50%]">
         <FlagImage
           className="inline-block border-[1px] w-[24px] h-[18px]"
@@ -261,8 +257,6 @@ const MatchVenue = ({ country: placeCountry, venue }: Pick<MatchDataType, 'count
         />
       </span>
       <span className={clsx('')}>{venue}</span>
-      {/* <span className={clsx(isLongText(venue) && 'text-[14px]')}>{venue}</span> */}
-      {/* </SubHeadline> */}
     </div>
   );
 };
@@ -316,15 +310,5 @@ const CrownIconContainer = ({ title }: { title: string }) => {
     <span className="text-[13px] absolute top-[70%] left-[50%] translate-x-[-50%] translate-y-[-50%] shadow-blur">
       {title}
     </span>
-  );
-};
-
-const GradeNonTitleMatch = ({ matchData }: { matchData: MatchDataType }) => {
-  return (
-    <div className={clsx('text-center text-xs whitespace-nowrap')}>
-      <p>
-        {matchData.weight}級 {matchData.grade}
-      </p>
-    </div>
   );
 };

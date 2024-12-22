@@ -8,6 +8,8 @@ import { useRecoilState } from 'recoil';
 import { boolState } from '@/store/boolState';
 //! icons
 import { FaArrowAltCircleDown } from 'react-icons/fa';
+//! hooks
+import { useWindowSize } from '@/hooks/useWindowSize';
 
 type MatchesPropsType = {
   beforeMatches: MatchDataType[];
@@ -16,15 +18,19 @@ type MatchesPropsType = {
 };
 export const Matches = ({ beforeMatches, toMatchPage, afterMatches }: MatchesPropsType) => {
   const [isShow, setIsShow] = useRecoilState(boolState('IS_SHOW_RESENT_MATCHES'));
+  const { device } = useWindowSize();
 
   return (
     <>
       {!!beforeMatches.length && (
-        <ul className={clsx('md:py-10')}>
+        <ul className={clsx('md:pt-10')}>
           {beforeMatches.map((match) => (
             <li
               key={match.id}
-              className="w-full h-full flex justify-center items-center px-2 pb-3 first:mt-0"
+              className={clsx(
+                'w-full h-full flex justify-center items-center pb-3 first:mt-0',
+                device === 'SP' ? 'px-2' : 'px-0'
+              )}
             >
               <SimpleMatchCard onClick={toMatchPage} matchData={match} />
             </li>
@@ -33,52 +39,36 @@ export const Matches = ({ beforeMatches, toMatchPage, afterMatches }: MatchesPro
       )}
 
       {!!afterMatches.length && (
-        <div className="">
+        <div className="mt-5">
           <div className="flex justify-center">
             <div
-              onClick={() => setIsShow(true)}
-              className="flex items-center justify-center w-full bg-white rounded-sm py-4 text-neutral-800 text-xs text-center tracking-widest"
+              // onClick={() => setIsShow(true)}
+              className={clsx(
+                'relative w-full max-w-[1024px] md:w-[80%] text-white tracking-widest',
+                device === 'SP' ? 'px-2' : 'px-0'
+              )}
             >
-              <p className="inline-block">最新の過去試合</p>
-              <motion.div
-                animate={{ y: isShow ? 0 : [0, -3] }}
-                transition={{
-                  duration: 0.4,
-                  repeat: isShow ? 0 : Infinity,
-                  repeatType: 'reverse',
-                  type: 'spring',
-                  bounce: 0.25,
-                }}
-                className='className="ml-1"'
-              >
-                <FaArrowAltCircleDown />
-              </motion.div>
+              <p className="after:absolute after:top-[-10px] after:left-0 after:bg-white after:h-[1px] after:w-full">
+                直近の試合
+              </p>
             </div>
           </div>
 
-          <AnimatePresence>
-            {isShow && (
-              <div className="overflow-hidden md:mb-5">
-                <motion.ul
-                  layout
-                  initial={{ y: '-100%' }}
-                  animate={{ y: 0 }}
-                  exit={{ y: '-100%' }}
-                  transition={{ duration: 0.4 }}
-                  className={clsx('md:py-0')}
+          <div className="overflow-hidden md:mb-5">
+            <ul>
+              {afterMatches.map((match) => (
+                <li
+                  key={match.id}
+                  className={clsx(
+                    'w-full h-full flex justify-center items-center pb-3 first:pt-3',
+                    device === 'SP' ? 'px-2' : 'px-0'
+                  )}
                 >
-                  {afterMatches.map((match) => (
-                    <li
-                      key={match.id}
-                      className="w-full h-full flex justify-center items-center px-2 pb-3 first:pt-3"
-                    >
-                      <SimpleMatchCard onClick={toMatchPage} matchData={match} />
-                    </li>
-                  ))}
-                </motion.ul>
-              </div>
-            )}
-          </AnimatePresence>
+                  <SimpleMatchCard onClick={toMatchPage} matchData={match} />
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
     </>

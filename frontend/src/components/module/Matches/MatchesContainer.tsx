@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { Matches } from './Matches';
-import { PcHome } from './PcHome';
 import { useNavigate } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/routePath';
 // ! hooks

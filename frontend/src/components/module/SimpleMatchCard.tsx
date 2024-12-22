@@ -68,6 +68,7 @@ PropsType) => {
 };
 
 const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
+  const { device } = useWindowSize();
   //名前が10文字以上で"・"を含む場合、最後の部分を取り出してフォーマット
   let formattedName: string | undefined;
   if (boxer.name.length > 10 && boxer.name.includes('・')) {
@@ -76,14 +77,19 @@ const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
     formattedName = extractedName;
   }
   const boxerName = formattedName ?? boxer.name;
+  const isLongName = device === 'SP' && boxerName.length > 7 && boxerName.length < 11;
+  const isTooLongName = device === 'SP' && boxerName.length > 11;
+  const normalLengthName = device === 'PC' || boxerName.length < 7;
   return (
     <div className="flex justify-center items-center flex-1 py-3">
       <div className="flex flex-col justify-center items-center">
         <EngNameWithFlag boxerCountry={boxer.country} boxerEngName={boxer.engName} />
         <h2
           className={clsx(
-            'font-clamp-level-0 mt-1 font-semibold whitespace-nowrap'
-            // boxerName.length > 7 && boxerName.length > 11 ? `text-[10px]` : `text-[12px]`
+            'mt-1 font-semibold whitespace-nowrap',
+            isLongName && `text-[12px]`,
+            isTooLongName && 'text-[10px]',
+            normalLengthName && 'text-[14px]'
           )}
         >
           {boxerName}

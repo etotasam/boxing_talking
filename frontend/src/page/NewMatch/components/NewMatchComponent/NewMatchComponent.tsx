@@ -12,7 +12,6 @@ import { PostComment } from './component/PostComment';
 import { PredictionVoteModal } from './component/PredictionVoteModal';
 
 import { VoteIcon } from './component/VoteIcon';
-import { NewVoteIcon } from './component/NewVoteIcon';
 import { MatchCommentsModal } from './component/MatchCommentsModal';
 //! image/icon
 import GGGPhoto from '@/assets/images/etc/GGG.jpg';
