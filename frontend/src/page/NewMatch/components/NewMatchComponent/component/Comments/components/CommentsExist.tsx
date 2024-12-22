@@ -1,16 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
-import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 import { useInView } from 'react-intersection-observer';
-//! recoil
-import { useRecoilValue } from 'recoil';
-import { boolState } from '@/store/boolState';
 //! type
 import { CommentType } from '@/assets/types';
-//! hook
-import { useWindowSize } from '@/hooks/useWindowSize';
 //! icon
 import { AiOutlineUser } from 'react-icons/ai';
 import { RotatingLines } from 'react-loader-spinner';
@@ -35,92 +29,93 @@ export const CommentsExist = (props: CommentsExistType) => {
   }, [inView]);
 
   return (
-    <CommentsWrapper>
-      {isComments && (
-        <div className="md:w-[85%] sm:w-[85%] w-[95%] max-w-[800px]">
-          {newComments?.map((comment) => (
-            <motion.div
-              layout
-              initial={{ opacity: isStale ? 1 : 0 }}
-              animate={{ y: 0, opacity: 1, transition: { delay: isStale ? 0 : 0.4 } }}
-              transition={{ duration: 0.5, ease: [0.25, 1, 0.7, 1] }}
-              key={comment.id}
-              className="mt-3 last:pb-7"
-            >
-              <CommentBox comment={comment} />
-            </motion.div>
-          ))}
-          {comments?.map((comment) => (
-            <motion.div
-              layout
-              animate={{ y: 0 }}
-              transition={{ duration: 0.5, ease: [0.25, 1, 0.7, 1] }}
-              key={comment.id}
-              className="mt-3 last:pb-7"
-            >
-              <CommentBox comment={comment} />
-            </motion.div>
-          ))}
-          {isNextComments && (
-            <div ref={ref} className="mt-3">
-              <CommentsLoadingEl />
-            </div>
-          )}
-        </div>
-      )}
-    </CommentsWrapper>
+    <>
+      {/* {isComments && ( */}
+      <div className="md:w-[85%] sm:w-[85%] w-[95%] max-w-[800px]">
+        {newComments?.map((comment) => (
+          <motion.div
+            layout
+            initial={{ opacity: isStale ? 1 : 0 }}
+            animate={{ y: 0, opacity: 1, transition: { delay: isStale ? 0 : 0.4 } }}
+            transition={{ duration: 0.5, ease: [0.25, 1, 0.7, 1] }}
+            key={comment.id}
+            className="mt-3 last:pb-7"
+          >
+            <CommentBox comment={comment} />
+          </motion.div>
+        ))}
+        {comments?.map((comment) => (
+          <motion.div
+            layout
+            animate={{ y: 0 }}
+            transition={{ duration: 0.5, ease: [0.25, 1, 0.7, 1] }}
+            key={comment.id}
+            className="mt-3 last:pb-7"
+          >
+            <CommentBox comment={comment} />
+          </motion.div>
+        ))}
+        {isNextComments && (
+          <div ref={ref} className="mt-3">
+            <CommentsLoadingEl />
+          </div>
+        )}
+      </div>
+      {/* )} */}
+    </>
   );
 };
 
 //! コメントbox
 const CommentBox = ({ comment }: { comment: CommentType }) => {
   return (
-    <div
+    <motion.div
       className={clsx(
         'sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded-lg'
       )}
     >
       <PostTimeAndUserName commentData={comment} />
       <Comment commentData={comment} />
-    </div>
+    </motion.div>
   );
 };
 
 const Comment = ({ commentData }: { commentData: CommentType }) => {
-  const { windowSize } = useWindowSize();
+  const commentRef = useRef<HTMLParagraphElement>(null);
   //? ひとつのコメントのmin height
-  const defaultCommentElHeight = windowSize ? (windowSize > TAILWIND_BREAKPOINT.sm ? 200 : 100) : 0;
 
-  const el = document.getElementById(`comment_${commentData.id}`);
-  const elHeight = el ? el.clientHeight : 0;
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+
+  const readMore = () => {
+    setIsExpanded(true);
+  };
+
+  useEffect(() => {
+    if (commentRef.current) {
+      const { scrollHeight, clientHeight } = commentRef.current;
+      setIsOverflowing(scrollHeight > clientHeight);
+    }
+  }, [commentData.comment]);
+
   return (
-    <div
-      className="relative"
-      style={
-        elHeight > defaultCommentElHeight
-          ? { height: `auto`, overflow: 'hidden' }
-          : { height: 'auto' }
-      }
-    >
-      <p
-        id={`comment_${commentData.id}`}
-        className={clsx('text-neutral-300')}
+    <div className="relative">
+      <motion.p
+        ref={commentRef}
+        transition={{ duration: 0.2 }}
+        className={clsx(
+          'text-neutral-300 duration-300 overflow-hidden',
+          isExpanded ? 'line-clamp-none' : 'line-clamp-4'
+        )}
         dangerouslySetInnerHTML={{
           __html: commentData.comment,
         }}
       />
-      {elHeight > defaultCommentElHeight && (
-        <p className="md:h-[25px] h-[35px] bg-white w-full">
-          <span
-            onClick={stretchCommentElement}
-            className={clsx(
-              'text-stone-500 cursor-pointer border-[1px] border-transparent text-sm absolute box-border bottom-0',
-              'hover:border-b-stone-800 hover:text-stone-800'
-            )}
-          >
-            続きを読む
-          </span>
-        </p>
+      {isOverflowing && !isExpanded && (
+        <button onClick={readMore} className="text-blue-500 hover:underline mt-2">
+          続きを読む
+          {/* {isExpanded ? '閉じる' : '続きを読む'} */}
+        </button>
       )}
     </div>
   );
@@ -206,16 +201,4 @@ const CommentsLoadingEl = () => {
       <RotatingLines strokeColor="#ffffff" strokeWidth="3" animationDuration="1" width="30" />
     </div>
   );
-};
-
-//? 長いコメントの表示をコントロール
-const stretchCommentElement = (event: React.MouseEvent<HTMLParagraphElement, MouseEvent>) => {
-  const handleClickElement = event.target as HTMLSpanElement;
-  const parentElement = (handleClickElement.parentElement as HTMLParagraphElement)
-    .parentElement as HTMLDivElement;
-
-  (parentElement as HTMLDivElement).style.height = 'auto';
-  if (handleClickElement) {
-    (handleClickElement.parentElement as HTMLParagraphElement).style.display = 'none';
-  }
 };

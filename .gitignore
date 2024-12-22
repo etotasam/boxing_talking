@@ -36,6 +36,7 @@ frontend/coverage
 frontend/build
 #testpage
 TestPage
+frontend/src/page/Test.tsx
 # misc
 frontend/.DS_Store
 frontend/.env.local
