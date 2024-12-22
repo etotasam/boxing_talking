@@ -14,6 +14,7 @@ import { Terms } from './page/Terms';
 import { Identification } from '@/page/Identification';
 import { NotFound } from '@/page/NotFound';
 import { PastMatches } from './page/PastMatches';
+import { Test } from '@/page/Test';
 
 import { NewMatch } from './page/NewMatch';
 // ! middleware
@@ -45,6 +46,7 @@ function App() {
         <Route path={ROUTE_PATH.TERMS} element={<Terms />} />
         <Route path={ROUTE_PATH.IDENTIFICATION} element={<Identification />} />
 
+        <Route path="/test" element={<Test />} />
         <Route path="/*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

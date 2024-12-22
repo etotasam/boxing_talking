@@ -32,6 +32,7 @@ export const PostCommentContainer = () => {
     isSuccess: isSuccessPostComment,
     isLoading: isPostingComment,
   } = usePostComment();
+
   const commentPostEl = useRef<HTMLDivElement>();
   const commentPostRef = useCallback((node: HTMLDivElement) => {
     if (node) {

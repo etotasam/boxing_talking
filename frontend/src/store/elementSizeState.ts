@@ -5,7 +5,8 @@ const elementNameAndPosition = [
   "FOOTER_HEIGHT",
   "POST_COMMENT_HEIGHT",
   "MATCH_PAGE_BOXER_SECTION_HEIGHT",
-  "WINDOW_WIDTH"
+  "WINDOW_WIDTH",
+  'COMMENTS_MODAL_HIDDEN_HEIGHT'
 ] as const
 
 type ElementNameAndPositionType = (typeof elementNameAndPosition)[number]

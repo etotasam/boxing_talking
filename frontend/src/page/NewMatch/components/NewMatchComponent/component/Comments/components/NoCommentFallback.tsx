@@ -3,7 +3,7 @@ import { FaRegPenToSquare } from 'react-icons/fa6';
 
 export const NoCommentFallback = () => {
   return (
-    <CommentsWrapper>
+    <>
       <div className="w-full flex justify-center items-center">
         <div>
           <div className="w-full flex justify-center">
@@ -14,9 +14,9 @@ export const NoCommentFallback = () => {
             </div>
           </div>
 
-          <p className="mt-3 text-neutral-200/80">まだコメントはありません</p>
+          <p className="mt-3 text-neutral-200/80">コメントはありません</p>
         </div>
       </div>
-    </CommentsWrapper>
+    </>
   );
 };

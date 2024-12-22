@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import clsx from 'clsx';
 
 //! components
 import { Comments } from '../Comments';
@@ -21,22 +22,45 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
     apiFetchDataState({ dataName: 'comments/fetch', state: 'isLoading' })
   );
   const postCommentAreaHeight = useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT'));
-  const hiddenCommentsHeight: string = (postCommentAreaHeight ?? 0) + 50 + 'px';
+  const headerHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+  const hiddenCommentsHeight: number = (postCommentAreaHeight ?? 0) + 50;
+  const [commentsModalHeightHiddenState, setCommentsModalHightHiddenState] = useRecoilState(
+    elementSizeState('COMMENTS_MODAL_HIDDEN_HEIGHT')
+  );
+
+  useEffect(() => {
+    setCommentsModalHightHiddenState(hiddenCommentsHeight);
+  }, [hiddenCommentsHeight]);
+
   const [isShowComments, setIsShowComments] = useRecoilState(modalState('COMMENTS_MODAL'));
   const toggleShowComments = () => {
     if (isCommentsFirstFetchingState) return;
     return setIsShowComments((v) => !v);
   };
+
+  const windowHeight = window.innerHeight;
+  // const isCommentsModalHeightSmallThen80Percent =
+  //   windowHeight - (headerHeightState ?? 0) < windowHeight * 0.8;
+  //? コメントモーダルの高さはヘッダーの高さを引いた90%に設定
+  const commentsModalHeight = Math.floor((windowHeight - (headerHeightState ?? 0)) * 0.9);
+
   return (
     // <div className="h-[100vh] w-full">
     <motion.div
-      initial={{ height: hiddenCommentsHeight }}
-      animate={isShowComments ? { height: '80%' } : { height: hiddenCommentsHeight }}
+      initial={{ height: commentsModalHeightHiddenState ?? 0 }}
+      animate={
+        isShowComments
+          ? { height: commentsModalHeight }
+          : { height: commentsModalHeightHiddenState }
+      }
       className="bg-black/90 w-full absolute bottom-0"
     >
       <motion.div
         //? translate-xが効かないので無理やり中央寄せにした( left-[calc(50%-15px)] 幅が30pxなので半分の15pxを引いている)
-        className="absolute top-0 left-[calc(50%-15px)] z-10 cursor-pointer"
+        className={clsx(
+          'absolute top-0 left-[calc(50%-15px)] z-10',
+          isCommentsFirstFetchingState ? 'cursor-default' : 'cursor-pointer'
+        )}
         animate={isShowComments ? { top: '-30px', rotate: 180 } : { top: '0px' }}
         onClick={toggleShowComments}
       >
@@ -74,9 +98,9 @@ const CommentsLoadingIcon = () => {
         className="absolute top-0 left-0 w-full h-full flex justify-center items-center"
       >
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           className="flex select-none"
         >

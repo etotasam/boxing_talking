@@ -10,9 +10,10 @@ import HeaderOnlyLayout from '@/layout/HeaderOnlyLayout';
 import { MatchInfo } from './component/MatchInfo';
 import { PostComment } from './component/PostComment';
 import { PredictionVoteModal } from './component/PredictionVoteModal';
+
 import { VoteIcon } from './component/VoteIcon';
 import { MatchCommentsModal } from './component/MatchCommentsModal';
-//! image
+//! image/icon
 import GGGPhoto from '@/assets/images/etc/GGG.jpg';
 //! recoil
 import { useRecoilValue } from 'recoil';
@@ -28,9 +29,13 @@ type PropsType = {
   isVoteIconVisible: boolean;
 };
 export const NewMatchComponent = (props: PropsType) => {
-  const { matchData, isShowPredictionModal, isVoteIconVisible, showPredictionModal } = props;
+  const { matchData, isShowPredictionModal, isVoteIconVisible, showPredictionModal, device } =
+    props;
 
   const isScroll = useRecoilValue(boolState('IS_SCROLL'));
+
+  //? vote iconの位置はコメント入力欄の高さに準ずる
+  const voteIconBottomPosition = (useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT')) ?? 0) + 5;
 
   return (
     <HeaderOnlyLayout>
@@ -40,9 +45,17 @@ export const NewMatchComponent = (props: PropsType) => {
         <div className="absolute bottom-0 w-full">
           <PostComment />
         </div>
+
         {isVoteIconVisible && (
-          <div className="fixed bottom-[75px] right-[10px]">
-            <VoteIcon isScroll={isScroll} showPredictionModal={showPredictionModal} />
+          <div
+            className={clsx('fixed ', device === 'SP' ? 'right-[10px]' : 'right-[50px]')}
+            style={{ bottom: voteIconBottomPosition }}
+          >
+            <VoteIcon
+              isScroll={isScroll}
+              showPredictionModal={showPredictionModal}
+              bottomPosition={voteIconBottomPosition}
+            />
           </div>
         )}
       </Container>
@@ -55,7 +68,7 @@ export const NewMatchComponent = (props: PropsType) => {
 const Container = ({ children }: { children: ReactNode }) => {
   // const headerHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   return (
-    <section className="w-full h-[100vh] flex justify-center">
+    <div className="w-full h-[100vh] flex justify-center">
       <div
         className={clsx('relative w-full')}
         style={{
@@ -69,21 +82,25 @@ const Container = ({ children }: { children: ReactNode }) => {
           {children}
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
 const Main = ({ matchData }: { matchData: MatchDataType }) => {
   const headerHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+  //? コメントモーダルが非表示時の高さ分をpaddingにしてスクロールされる様にする
+  const commentsModalHeightHiddenState = useRecoilValue(
+    elementSizeState('COMMENTS_MODAL_HIDDEN_HEIGHT')
+  );
 
   return (
-    <div className="h-[100vh] w-[100vw] overflow-auto">
+    <main className="h-[100vh] w-[100vw] overflow-auto">
       <div
         className="w-full flex justify-center"
-        style={{ paddingTop: headerHeightState, paddingBottom: '20vh' }}
+        style={{ paddingTop: headerHeightState, paddingBottom: commentsModalHeightHiddenState }}
       >
         <MatchInfo matchData={matchData} />
       </div>
-    </div>
+    </main>
   );
 };

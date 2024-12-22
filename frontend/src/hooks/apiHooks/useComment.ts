@@ -18,7 +18,7 @@ import { apiFetchDataState } from "@/store/apiFetchDataState"
 import dayjs from "dayjs"
 
 
-const LIMIT = 30
+const LIMIT = 10
 //! コメントのmax page
 export const useFetchCommentsState = (matchId: number) => {
   const api = async () => {
