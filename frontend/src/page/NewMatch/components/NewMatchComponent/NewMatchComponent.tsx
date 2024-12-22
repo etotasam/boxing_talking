@@ -10,9 +10,11 @@ import HeaderOnlyLayout from '@/layout/HeaderOnlyLayout';
 import { MatchInfo } from './component/MatchInfo';
 import { PostComment } from './component/PostComment';
 import { PredictionVoteModal } from './component/PredictionVoteModal';
+
 import { VoteIcon } from './component/VoteIcon';
+import { NewVoteIcon } from './component/NewVoteIcon';
 import { MatchCommentsModal } from './component/MatchCommentsModal';
-//! image
+//! image/icon
 import GGGPhoto from '@/assets/images/etc/GGG.jpg';
 //! recoil
 import { useRecoilValue } from 'recoil';
@@ -28,7 +30,8 @@ type PropsType = {
   isVoteIconVisible: boolean;
 };
 export const NewMatchComponent = (props: PropsType) => {
-  const { matchData, isShowPredictionModal, isVoteIconVisible, showPredictionModal } = props;
+  const { matchData, isShowPredictionModal, isVoteIconVisible, showPredictionModal, device } =
+    props;
 
   const isScroll = useRecoilValue(boolState('IS_SCROLL'));
 
@@ -40,8 +43,14 @@ export const NewMatchComponent = (props: PropsType) => {
         <div className="absolute bottom-0 w-full">
           <PostComment />
         </div>
+
         {isVoteIconVisible && (
-          <div className="fixed bottom-[75px] right-[10px]">
+          <div
+            className={clsx(
+              'fixed bottom-[75px]',
+              device === 'SP' ? 'right-[10px]' : 'right-[50px]'
+            )}
+          >
             <VoteIcon isScroll={isScroll} showPredictionModal={showPredictionModal} />
           </div>
         )}
@@ -75,12 +84,16 @@ const Container = ({ children }: { children: ReactNode }) => {
 
 const Main = ({ matchData }: { matchData: MatchDataType }) => {
   const headerHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+  //? コメントモーダルが非表示時の高さ分をpaddingにしてスクロールされる様にする
+  const commentsModalHeightHiddenState = useRecoilValue(
+    elementSizeState('COMMENTS_MODAL_HIDDEN_HEIGHT')
+  );
 
   return (
     <main className="h-[100vh] w-[100vw] overflow-auto">
       <div
         className="w-full flex justify-center"
-        style={{ paddingTop: headerHeightState, paddingBottom: '20vh' }}
+        style={{ paddingTop: headerHeightState, paddingBottom: commentsModalHeightHiddenState }}
       >
         <MatchInfo matchData={matchData} />
       </div>

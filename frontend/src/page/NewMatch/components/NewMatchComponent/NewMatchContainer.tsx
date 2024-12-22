@@ -100,7 +100,7 @@ export const NewMatchContainer = (props: PropsType) => {
   const { isDayOnFight, isDayAfterFight } = useDayOfFightChecker(thisMatch?.matchDate);
   useEffect(() => {
     // PC画面では表示させない
-    if (device === 'PC') return setIsShowVoteIcon(false);
+    // if (device === 'PC') return setIsShowVoteIcon(false);
     // ユーザーの投票をfetch出来てない時は隠す
     if (usersPredictions === undefined) return setIsShowVoteIcon(false);
     // 過去の試合には表示しない

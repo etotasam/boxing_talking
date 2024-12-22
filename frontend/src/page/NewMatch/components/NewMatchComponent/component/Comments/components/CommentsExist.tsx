@@ -110,11 +110,11 @@ const Comment = ({ commentData }: { commentData: CommentType }) => {
         }}
       />
       {elHeight > defaultCommentElHeight && (
-        <p className="md:h-[25px] h-[35px] bg-white w-full">
+        <p className="md:h-[25px] h-[35px] w-full">
           <span
             onClick={stretchCommentElement}
             className={clsx(
-              'text-stone-500 cursor-pointer border-[1px] border-transparent text-sm absolute box-border bottom-0',
+              'text-blue-500 cursor-pointer border-[1px] border-transparent text-sm absolute box-border bottom-0',
               'hover:border-b-stone-800 hover:text-stone-800'
             )}
           >

@@ -5,8 +5,12 @@ import dayjs from 'dayjs';
 import { BoxerType, MatchResultType, MatchDataType } from '@/assets/types';
 //! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
+import { SubHeadline } from '@/components/atomic/SubHeadline';
+import { FlagImage } from '@/components/atomic/FlagImage';
+
 //! icon
 import crown from '@/assets/images/etc/champion.svg';
+import { GiImperialCrown } from 'react-icons/gi';
 
 type MatchInfoPropsType = {
   matchData: MatchDataType;
@@ -17,32 +21,34 @@ export const MatchInfo = ({ matchData }: MatchInfoPropsType) => {
   return (
     <>
       {matchData && (
-        <div className="flex flex-col items-center w-full">
-          {/* <MatchDate matchData={matchData} /> */}
-
-          <div className={clsx('text-white relative flex justify-between w-full max-w-[1024px]')}>
-            <div className="w-[45%]">
-              <BoxerInfo
-                boxer={{ ...matchData.redBoxer, color: 'red' }}
-                matchResult={matchData.result}
-              />
-            </div>
-
-            {/* <div className={clsx('pb-7', matchData.titles.length ? 'pt-10' : 'pt-7')}>
-
-          </div> */}
-
-            <div className="w-[45%]">
-              <BoxerInfo
-                boxer={{ ...matchData.blueBoxer, color: 'blue' }}
-                matchResult={matchData.result}
-              />
-            </div>
-            {/* <PredictionIcon matchData={matchData} /> */}
+        <div className="flex flex-col items-center w-full relative">
+          <BoxersData matchData={matchData} />
+          <Grade matchData={matchData} />
+          <div className="flex w-[80%]">
+            <MatchDate matchDate={matchData.matchDate} />
+            <MatchVenue country={matchData.country} venue={matchData.venue} />
           </div>
         </div>
       )}
     </>
+  );
+};
+
+const BoxersData = ({ matchData }: MatchInfoPropsType) => {
+  return (
+    <div className={clsx('text-white relative flex justify-between w-full max-w-[1024px]')}>
+      <div className="w-[45%]">
+        <BoxerInfo boxer={{ ...matchData.redBoxer, color: 'red' }} matchResult={matchData.result} />
+      </div>
+
+      <div className="w-[45%]">
+        <BoxerInfo
+          boxer={{ ...matchData.blueBoxer, color: 'blue' }}
+          matchResult={matchData.result}
+        />
+      </div>
+      {/* <PredictionIcon matchData={matchData} /> */}
+    </div>
   );
 };
 
@@ -205,8 +211,7 @@ const BoxerRecord = (props: BoxerRecordType) => {
   );
 };
 
-const Titles = (props: Pick<BoxerType, 'titles'>) => {
-  const { titles } = props;
+const Titles = ({ titles }: Pick<BoxerType, 'titles'>) => {
   return (
     <>
       {Boolean(titles.length) && (
@@ -227,17 +232,97 @@ const Titles = (props: Pick<BoxerType, 'titles'>) => {
   );
 };
 
-const MatchDate = ({ matchData }: { matchData: MatchDataType }) => {
+const MatchDate = ({ matchDate }: Pick<MatchDataType, 'matchDate'>) => {
   return (
-    <div className="relative mb-8 text-white">
-      <h2 className="text-3xl after:content-['(日本時間)'] after:absolute after:bottom-[-60%] after:left-[50%] after:translate-x-[-50%] after:text-sm">
-        {dayjs(matchData.matchDate).format('YYYY年M月D日')}
-      </h2>
-      {/* {Boolean(matchData.titles.length) && (
-        <span className="absolute top-[-32px] left-[50%] translate-x-[-50%] w-[32px] h-[32px] mr-2">
-          <img src={crown} alt="crown" />
-        </span>
-      )} */}
+    <div className="flex justify-center flex-1 pb-5">
+      <div className="relative text-white">
+        <h2 className="text-xl after:w-full after:content-['(日本時間)'] after:absolute after:bottom-[-50%] after:left-[25%] after:text-sm">
+          {dayjs(matchDate).format('YYYY年M月D日')}
+        </h2>
+      </div>
+    </div>
+  );
+};
+
+//? 会場
+const MatchVenue = ({ country: placeCountry, venue }: Pick<MatchDataType, 'country' | 'venue'>) => {
+  const isLongText = (text: string): boolean => {
+    return text.length > 10;
+  };
+  return (
+    <div className={'text-center text-2xl text-white relative flex-1 pb-5'}>
+      {/* <SubHeadline content="会場"> */}
+      <span className="overflow-hidden absolute top-[25px] left-[50%] translate-x-[-50%]">
+        <FlagImage
+          className="inline-block border-[1px] w-[24px] h-[18px]"
+          nationality={placeCountry}
+        />
+      </span>
+      <span className={clsx('text-lg')}>{venue}</span>
+      {/* <span className={clsx(isLongText(venue) && 'text-[14px]')}>{venue}</span> */}
+      {/* </SubHeadline> */}
+    </div>
+  );
+};
+
+const Grade = ({ matchData }: { matchData: MatchDataType }) => {
+  const isTitleMatch = matchData.grade === 'タイトルマッチ';
+  const isOneTitle = matchData.titles.length === 1;
+  const isUnificationMatch = matchData.titles.length > 1;
+  return (
+    <div className={clsx('text-xs flex-1 text-white')}>
+      <div className={clsx('flex justify-center whitespace-nowrap')}>
+        <div className="flex items-end">
+          <span className="text-lg">{matchData.weight}級</span>
+
+          {isOneTitle && (
+            <span className="relative ml-1">
+              <GiImperialCrown className={'text-yellow-500 w-[30px] h-[30px]'} />
+              <CrownIconContainer title={matchData.titles[0].organization} />
+            </span>
+          )}
+          {!isTitleMatch && <span className="ml-3 text-xl">{matchData.grade}</span>}
+        </div>
+      </div>
+      {isUnificationMatch && (
+        <div className="flex justify-center mt-1">
+          {matchData.titles.map((title) => (
+            <div key={title.organization} className="relative ml-2 first-of-type:ml-0">
+              <GiImperialCrown className={'text-yellow-500 w-[30px] h-[30px]'} />
+              <CrownIconContainer title={title.organization} />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const CrownIconContainer = ({ title }: { title: string }) => {
+  const index = title.indexOf('暫定');
+  const titleArray: string[] | undefined =
+    index !== -1 ? [title.slice(0, index), title.slice(index)] : undefined;
+
+  return titleArray && titleArray.length ? (
+    <span className="text-[13px] absolute top-[70%] left-[50%] translate-x-[-50%] translate-y-[-50%] shadow-blur w-full">
+      <span className="w-full absolute top-[-18px]">
+        {titleArray[1]} {/* 暫定 */}
+      </span>
+      <span className="w-full absolute top-[-8px]">{titleArray[0]}</span>
+    </span>
+  ) : (
+    <span className="text-[13px] absolute top-[70%] left-[50%] translate-x-[-50%] translate-y-[-50%] shadow-blur">
+      {title}
+    </span>
+  );
+};
+
+const GradeNonTitleMatch = ({ matchData }: { matchData: MatchDataType }) => {
+  return (
+    <div className={clsx('text-center text-xs whitespace-nowrap')}>
+      <p>
+        {matchData.weight}級 {matchData.grade}
+      </p>
     </div>
   );
 };
