@@ -35,6 +35,9 @@ export const NewMatchComponent = (props: PropsType) => {
 
   const isScroll = useRecoilValue(boolState('IS_SCROLL'));
 
+  //? vote iconの位置はコメント入力欄の高さに準ずる
+  const voteIconBottomPosition = (useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT')) ?? 0) + 5;
+
   return (
     <HeaderOnlyLayout>
       <Container>
@@ -46,12 +49,14 @@ export const NewMatchComponent = (props: PropsType) => {
 
         {isVoteIconVisible && (
           <div
-            className={clsx(
-              'fixed bottom-[75px]',
-              device === 'SP' ? 'right-[10px]' : 'right-[50px]'
-            )}
+            className={clsx('fixed ', device === 'SP' ? 'right-[10px]' : 'right-[50px]')}
+            style={{ bottom: voteIconBottomPosition }}
           >
-            <VoteIcon isScroll={isScroll} showPredictionModal={showPredictionModal} />
+            <VoteIcon
+              isScroll={isScroll}
+              showPredictionModal={showPredictionModal}
+              bottomPosition={voteIconBottomPosition}
+            />
           </div>
         )}
       </Container>

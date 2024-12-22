@@ -11,10 +11,12 @@ import { useWindowSize } from '@/hooks/useWindowSize';
 export const VoteIcon = ({
   isScroll,
   showPredictionModal,
+  bottomPosition,
 }: {
   color?: string;
   isScroll: boolean;
   showPredictionModal: () => void;
+  bottomPosition: number;
 }) => {
   const { device } = useWindowSize();
 
@@ -28,9 +30,10 @@ export const VoteIcon = ({
             : { width: '120px', x: '0px', transition: { duration: 0.3 } }
         }
         className={clsx(
-          'fixed bottom-[75px] w-[120px] h-[35px] rounded-[50px] bg-black/80',
+          'fixed w-[120px] h-[35px] rounded-[50px] bg-black/80',
           device === 'SP' ? 'right-[10px]' : 'right-[50px]'
         )}
+        style={{ bottom: bottomPosition }}
       />
       <div className="flex cursor-pointer rounded-[50px] px-1" onClick={showPredictionModal}>
         <motion.span
