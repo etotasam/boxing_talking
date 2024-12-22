@@ -29,40 +29,40 @@ export const CommentsExist = (props: CommentsExistType) => {
   }, [inView]);
 
   return (
-    <CommentsWrapper>
-      {isComments && (
-        <div className="md:w-[85%] sm:w-[85%] w-[95%] max-w-[800px]">
-          {newComments?.map((comment) => (
-            <motion.div
-              layout
-              initial={{ opacity: isStale ? 1 : 0 }}
-              animate={{ y: 0, opacity: 1, transition: { delay: isStale ? 0 : 0.4 } }}
-              transition={{ duration: 0.5, ease: [0.25, 1, 0.7, 1] }}
-              key={comment.id}
-              className="mt-3 last:pb-7"
-            >
-              <CommentBox comment={comment} />
-            </motion.div>
-          ))}
-          {comments?.map((comment) => (
-            <motion.div
-              layout
-              animate={{ y: 0 }}
-              transition={{ duration: 0.5, ease: [0.25, 1, 0.7, 1] }}
-              key={comment.id}
-              className="mt-3 last:pb-7"
-            >
-              <CommentBox comment={comment} />
-            </motion.div>
-          ))}
-          {isNextComments && (
-            <div ref={ref} className="mt-3">
-              <CommentsLoadingEl />
-            </div>
-          )}
-        </div>
-      )}
-    </CommentsWrapper>
+    <>
+      {/* {isComments && ( */}
+      <div className="md:w-[85%] sm:w-[85%] w-[95%] max-w-[800px]">
+        {newComments?.map((comment) => (
+          <motion.div
+            layout
+            initial={{ opacity: isStale ? 1 : 0 }}
+            animate={{ y: 0, opacity: 1, transition: { delay: isStale ? 0 : 0.4 } }}
+            transition={{ duration: 0.5, ease: [0.25, 1, 0.7, 1] }}
+            key={comment.id}
+            className="mt-3 last:pb-7"
+          >
+            <CommentBox comment={comment} />
+          </motion.div>
+        ))}
+        {comments?.map((comment) => (
+          <motion.div
+            layout
+            animate={{ y: 0 }}
+            transition={{ duration: 0.5, ease: [0.25, 1, 0.7, 1] }}
+            key={comment.id}
+            className="mt-3 last:pb-7"
+          >
+            <CommentBox comment={comment} />
+          </motion.div>
+        ))}
+        {isNextComments && (
+          <div ref={ref} className="mt-3">
+            <CommentsLoadingEl />
+          </div>
+        )}
+      </div>
+      {/* )} */}
+    </>
   );
 };
 

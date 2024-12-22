@@ -7,7 +7,8 @@ import { BoxerType, MatchResultType, MatchDataType } from '@/assets/types';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { SubHeadline } from '@/components/atomic/SubHeadline';
 import { FlagImage } from '@/components/atomic/FlagImage';
-
+//! hooks
+import { useWindowSize } from '@/hooks/useWindowSize';
 //! icon
 import crown from '@/assets/images/etc/champion.svg';
 import { GiImperialCrown } from 'react-icons/gi';
@@ -35,13 +36,14 @@ export const MatchInfo = ({ matchData }: MatchInfoPropsType) => {
 };
 
 const BoxersData = ({ matchData }: MatchInfoPropsType) => {
+  const { device } = useWindowSize();
   return (
     <div className={clsx('text-white relative flex justify-between w-full max-w-[1024px]')}>
-      <div className="w-[45%]">
+      <div className={`${device === 'PC' ? 'w-[45%]' : 'w-[50%]'}`}>
         <BoxerInfo boxer={{ ...matchData.redBoxer, color: 'red' }} matchResult={matchData.result} />
       </div>
 
-      <div className="w-[45%]">
+      <div className={`${device === 'PC' ? 'w-[45%]' : 'w-[50%]'}`}>
         <BoxerInfo
           boxer={{ ...matchData.blueBoxer, color: 'blue' }}
           matchResult={matchData.result}
@@ -58,10 +60,10 @@ type BoxerInfoPropsType = React.ComponentProps<'div'> & {
 };
 const BoxerInfo = (props: BoxerInfoPropsType) => {
   const { className, boxer, matchResult = null } = props;
-  // const { device } = useWindowSize();
+  const { device } = useWindowSize();
   return (
     <div className={clsx('w-full h-full flex justify-center', className)}>
-      <div className="text-center w-full px-5 py-5">
+      <div className={clsx('text-center w-full py-5', device === 'PC' ? 'px-5' : 'px-2')}>
         {/* //? 名前 */}
         <BoxerName boxer={boxer} />
         {/* //? 戦績 */}
@@ -79,7 +81,7 @@ const BoxerName = ({ boxer }: { boxer: BoxerType }) => {
   return (
     <div className="">
       <EngNameWithFlag boxerCountry={boxer.country} boxerEngName={boxer.engName} />
-      <h2 className={clsx('text-[18px] mt-1')}>{boxer.name}</h2>
+      <h2 className={clsx('font-clamp-level-1 mt-1')}>{boxer.name}</h2>
     </div>
   );
 };
@@ -88,7 +90,7 @@ const BoxerStatus = (props: { boxer: BoxerType }) => {
   const { boxer } = props;
   const currentDate = dayjs();
   return (
-    <ul className="mt-5">
+    <ul className="mt-5 font-clamp-level-1">
       <li className="flex justify-between">
         <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">年齢</p>
         <p className="flex-1">{currentDate.diff(dayjs(boxer.birth), 'year')}</p>
@@ -111,7 +113,7 @@ const BoxerStatus = (props: { boxer: BoxerType }) => {
       </li>
       <li className="flex justify-between">
         <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">スタイル</p>
-        <p className="flex-1 text-sm">
+        <p className={`flex-1`}>
           {boxer.style === 'orthodox' && 'オーソドックス'}
           {boxer.style === 'southpaw' && 'サウスポー'}
           {boxer.style === 'unknown' && '-'}
@@ -218,7 +220,7 @@ const Titles = ({ titles }: Pick<BoxerType, 'titles'>) => {
         <ul className="mt-1">
           {titles.map((title) => (
             <li key={`${title.organization}_${title.weight}`} className="mt-1">
-              <p className="relative inline-block text-[15px] text-yellow-500/70">
+              <p className="font-clamp-level-0 relative inline-block text-[15px] text-yellow-500/70">
                 <span className="absolute top-[2px] left-[-22px] w-[18px] h-[18px]">
                   <img src={crown} alt="" />
                 </span>
@@ -235,8 +237,8 @@ const Titles = ({ titles }: Pick<BoxerType, 'titles'>) => {
 const MatchDate = ({ matchDate }: Pick<MatchDataType, 'matchDate'>) => {
   return (
     <div className="flex justify-center flex-1 pb-5">
-      <div className="relative text-white">
-        <h2 className="text-xl after:w-full after:content-['(日本時間)'] after:absolute after:bottom-[-50%] after:left-[25%] after:text-sm">
+      <div className="relative text-white font-clamp-level-1">
+        <h2 className="after:content-['(日本時間)'] after:absolute after:bottom-[-70%] after:left-[50%] after:translate-x-[-50%] after:text-xs">
           {dayjs(matchDate).format('YYYY年M月D日')}
         </h2>
       </div>
@@ -250,7 +252,7 @@ const MatchVenue = ({ country: placeCountry, venue }: Pick<MatchDataType, 'count
     return text.length > 10;
   };
   return (
-    <div className={'text-center text-2xl text-white relative flex-1 pb-5'}>
+    <div className={'text-center font-clamp-level-1 text-white relative flex-1 pb-5'}>
       {/* <SubHeadline content="会場"> */}
       <span className="overflow-hidden absolute top-[25px] left-[50%] translate-x-[-50%]">
         <FlagImage
@@ -258,7 +260,7 @@ const MatchVenue = ({ country: placeCountry, venue }: Pick<MatchDataType, 'count
           nationality={placeCountry}
         />
       </span>
-      <span className={clsx('text-lg')}>{venue}</span>
+      <span className={clsx('')}>{venue}</span>
       {/* <span className={clsx(isLongText(venue) && 'text-[14px]')}>{venue}</span> */}
       {/* </SubHeadline> */}
     </div>
@@ -270,10 +272,10 @@ const Grade = ({ matchData }: { matchData: MatchDataType }) => {
   const isOneTitle = matchData.titles.length === 1;
   const isUnificationMatch = matchData.titles.length > 1;
   return (
-    <div className={clsx('text-xs flex-1 text-white')}>
+    <div className={clsx('font-clamp-level-1 flex-1 text-white')}>
       <div className={clsx('flex justify-center whitespace-nowrap')}>
         <div className="flex items-end">
-          <span className="text-lg">{matchData.weight}級</span>
+          <span className="">{matchData.weight}級</span>
 
           {isOneTitle && (
             <span className="relative ml-1">
@@ -281,7 +283,7 @@ const Grade = ({ matchData }: { matchData: MatchDataType }) => {
               <CrownIconContainer title={matchData.titles[0].organization} />
             </span>
           )}
-          {!isTitleMatch && <span className="ml-3 text-xl">{matchData.grade}</span>}
+          {!isTitleMatch && <span className="ml-3">{matchData.grade}</span>}
         </div>
       </div>
       {isUnificationMatch && (

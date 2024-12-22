@@ -1,7 +1,6 @@
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 //! icons
-import { MdHowToVote } from 'react-icons/md';
 import { GiBoxingGlove } from 'react-icons/gi';
 
 //! hook
@@ -49,7 +48,7 @@ export const VoteIcon = ({
               ? { opacity: 0, y: '10px', transition: { duration: 0.2 } }
               : { opacity: 1, y: '0px', transition: { duration: 0.5 } }
           }
-          className="z-10 text-xs text-black bg-white rounded-[50px] my-1 pt-1 px-2 mx-1 font-thin"
+          className="z-10 text-xs text-black bg-yellow-400 rounded-[50px] my-1 pt-1 px-2 mx-1"
         >
           投票
         </motion.span>
@@ -62,5 +61,20 @@ export const VoteIcon = ({
         </motion.span>
       </div>
     </AnimatePresence>
+  );
+};
+
+export const VoteIconForTop = () => {
+  return (
+    <div className="relative">
+      <span className="inline-block w-[25px] h-[25px] bg-black rounded-[50px] absolute top-[50%] translate-y-[-50%] left-[50%] translate-x-[-50%]"></span>
+      <motion.div
+        animate={{ x: [0, 8, -3, 0] }}
+        transition={{ duration: 0.3, repeat: Infinity, repeatDelay: 3 }}
+        className="flex justify-center items-center"
+      >
+        <GiBoxingGlove className="w-[15px] h-[15px] text-red-600 rotate-[-40deg]" />
+      </motion.div>
+    </div>
   );
 };

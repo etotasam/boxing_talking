@@ -47,7 +47,7 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
   return (
     // <div className="h-[100vh] w-full">
     <motion.div
-      initial={{ height: commentsModalHeightHiddenState }}
+      initial={{ height: commentsModalHeightHiddenState ?? 0 }}
       animate={
         isShowComments
           ? { height: commentsModalHeight }
@@ -98,9 +98,9 @@ const CommentsLoadingIcon = () => {
         className="absolute top-0 left-0 w-full h-full flex justify-center items-center"
       >
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           className="flex select-none"
         >

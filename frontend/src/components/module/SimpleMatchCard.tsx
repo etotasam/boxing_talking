@@ -8,6 +8,7 @@ import { MatchDataType } from '@/assets/types';
 import { BoxerType } from '@/assets/types';
 // ! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
+import { VoteIconForTop } from '@/page/NewMatch/components/NewMatchComponent/component/VoteIcon';
 // ! image
 import { GiImperialCrown } from 'react-icons/gi';
 import { MdHowToVote } from 'react-icons/md';
@@ -16,6 +17,7 @@ import { MdHowToVote } from 'react-icons/md';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useFetchUsersPrediction } from '@/hooks/apiHooks/uesWinLossPrediction';
+import { useVoteIconState } from '@/hooks/useVoteIconState';
 
 type PropsType = {
   matchData: MatchDataType;
@@ -33,14 +35,16 @@ PropsType) => {
   const { windowSize = 0 } = useWindowSize();
   const predictionIconType: 'DEFAULT' | 'MINI' =
     windowSize > TAILWIND_BREAKPOINT.md ? 'DEFAULT' : 'MINI';
+
+  const isShowVoteIcon = useVoteIconState({ matchDate: matchData.matchDate, id: matchData.id });
   return (
     <>
       {matchData && (
         <div
           onClick={() => onClick(matchData.id)}
           className={clsx(
-            'relative flex justify-between w-full max-w-[1024px] cursor-pointer last-of-type:border-b-[1px] border-t-[1px] border-neutral-700  text-stone-300 bg-stone-50/10 rounded-md',
-            'md:w-[80%] md:border-t-0 md:rounded-lg md:bg-stone-200/60 md:hover:bg-stone-200 md:duration-300  md:text-stone-700'
+            'relative flex justify-between w-full max-w-[1024px] cursor-pointer border-[1px] border-neutral-700  text-stone-300 bg-stone-50/10 rounded-md',
+            'md:w-[80%] md:hover:border-neutral-300 md:duration-300'
             // isMatchResult ? 'md:pt-2 md:pb-1 py-1' : 'md:py-4 py-8'
           )}
         >
@@ -51,9 +55,12 @@ PropsType) => {
           <BoxerBox boxer={matchData.blueBoxer} />
 
           {/* <PredictionIcon matchData={matchData} iconType={predictionIconType} /> */}
-          <div className="absolute top-1 left-1">
-            <VoteIcon matchData={matchData} />
-          </div>
+          {isShowVoteIcon && (
+            <div className="absolute top-2 left-2">
+              {/* <VoteIcon matchData={matchData} /> */}
+              <VoteIconForTop />
+            </div>
+          )}
         </div>
       )}
     </>
@@ -70,14 +77,13 @@ const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
   }
   const boxerName = formattedName ?? boxer.name;
   return (
-    <div className="md:w-[300px] flex justify-center items-center flex-1 py-3">
-      {/* //? 名前 */}
+    <div className="flex justify-center items-center flex-1 py-3">
       <div className="flex flex-col justify-center items-center">
         <EngNameWithFlag boxerCountry={boxer.country} boxerEngName={boxer.engName} />
         <h2
           className={clsx(
-            'lg:text-[20px] sm:text-[16px] mt-1 font-semibold whitespace-nowrap',
-            boxerName.length > 7 ? `text-[12px]` : `text-[14px]`
+            'font-clamp-level-0 mt-1 font-semibold whitespace-nowrap'
+            // boxerName.length > 7 && boxerName.length > 11 ? `text-[10px]` : `text-[12px]`
           )}
         >
           {boxerName}
