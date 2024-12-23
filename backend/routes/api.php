@@ -19,7 +19,7 @@ use App\Http\Controllers\Api\TestController;
 |--------------------------------------------------------------------------
 */
 
-// Route::get('/test', [TestController::class, 'test']);
+Route::get('/test', [TestController::class, 'test']);
 
 Route::get('/user', [AuthController::class, 'fetch']);
 Route::get('/guest/user', function () {

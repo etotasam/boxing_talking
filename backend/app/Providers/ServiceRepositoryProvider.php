@@ -15,6 +15,8 @@ use App\Repositories\Interfaces\WinLossPredictionRepositoryInterface;
 use App\Repositories\Interfaces\WeightDivisionRepositoryInterface;
 use App\Repositories\Interfaces\GradeRepositoryInterface;
 use App\Repositories\Interfaces\OrganizationRepositoryInterface;
+use App\Repositories\Interfaces\MatchDataSnapshotInterface;
+use App\Repositories\Interfaces\BoxerTitleSnapshotInterface;
 use App\Repositories\GuestUserRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\BoxerRepository;
@@ -27,6 +29,8 @@ use App\Repositories\WinLossPredictionRepository;
 use App\Repositories\WeightDivisionRepository;
 use App\Repositories\GradeRepository;
 use App\Repositories\OrganizationRepository;
+use App\Repositories\MatchDataSnapshotRepository;
+use App\Repositories\BoxerTitleSnapshotRepository;
 
 class ServiceRepositoryProvider extends ServiceProvider
 {
@@ -49,6 +53,8 @@ class ServiceRepositoryProvider extends ServiceProvider
         $this->app->singleton(WeightDivisionRepositoryInterface::class, WeightDivisionRepository::class);
         $this->app->singleton(GradeRepositoryInterface::class, GradeRepository::class);
         $this->app->singleton(OrganizationRepositoryInterface::class, OrganizationRepository::class);
+        $this->app->singleton(MatchDataSnapshotInterface::class, MatchDataSnapshotRepository::class);
+        $this->app->singleton(BoxerTitleSnapshotInterface::class, BoxerTitleSnapshotRepository::class);
     }
 
     /**

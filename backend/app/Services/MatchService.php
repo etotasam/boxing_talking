@@ -13,15 +13,19 @@ use App\Repositories\Interfaces\BoxerRepositoryInterface;
 use App\Repositories\Interfaces\GradeRepositoryInterface;
 use App\Repositories\Interfaces\WeightDivisionRepositoryInterface;
 use App\Services\TitleMatchService;
+use App\Services\MatchDataSnapshotService;
 use Illuminate\Database\QueryException;
 use App\Exceptions\NonAdministratorException;
 use Illuminate\Database\Events\QueryExecuted;
+
+use function Psy\debug;
 
 class MatchService
 {
 
   public function __construct(
     protected TitleMatchService $titleMatchService,
+    protected MatchDataSnapshotService $matchDataSnapshotService,
     protected MatchRepositoryInterface $matchRepository,
     protected CommentRepositoryInterface $commentRepository,
     protected TitleMatchRepositoryInterface $titleMatchRepository,
@@ -29,8 +33,7 @@ class MatchService
     protected BoxerRepositoryInterface $boxerRepository,
     protected GradeRepositoryInterface $gradeRepository,
     protected WeightDivisionRepositoryInterface $weightRepository,
-  ) {
-  }
+  ) {}
 
   /**
    * 試合データの保存
@@ -59,11 +62,23 @@ class MatchService
     try {
       [$organizationsNameArray, $formattedMatchData] = $this->formatMatchDataForStore($requestMatchData);
 
+
+
       $createdMatch = $this->matchRepository->createMatch($formattedMatchData);
       if (!$createdMatch) {
         throw new Exception("Can not create match", 51);
       }
 
+      $redBoxerId = $formattedMatchData['red_boxer_id'];
+      $blueBoxerId = $formattedMatchData['blue_boxer_id'];
+      $matchId = $createdMatch['id'];
+
+      //? 試合時の選手の戦歴、保有ベルトのスナップショット
+      $isSuccessSnapshot = $this->matchDataSnapshotService->storeBoxerDataSnapshot(["match_id" => $matchId, "red_boxer_id" => $redBoxerId, "blue_boxer_id" => $blueBoxerId]);
+
+      if (!$isSuccessSnapshot) {
+        throw new Exception("Failed store snapshot data", 500);
+      }
 
       $titleMatchesArray = $this->titleMatchService->formatForStoreToTitleMatchTable($createdMatch['id'], $organizationsNameArray);
       $isSuccessStoreTitleMatch = $this->titleMatchRepository->insertTitleMatch($titleMatchesArray);

@@ -9,7 +9,7 @@ use App\Models\Comment;
 use App\Models\Grade;
 use App\Models\WeightDivision;
 use App\Models\Organization;
-use App\Models\MatchPrediction;
+use App\Models\MatchDataSnapshot;
 use Illuminate\Support\Facades\Log;
 
 class BoxingMatch extends Model
@@ -76,5 +76,10 @@ class BoxingMatch extends Model
     public function getGrade()
     {
         return $this->belongsTo(Grade::class, "grade_id");
+    }
+
+    public function getSnapshot()
+    {
+        return $this->hasMany(MatchDataSnapshot::class, 'match_id');
     }
 }

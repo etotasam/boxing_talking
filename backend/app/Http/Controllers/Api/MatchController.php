@@ -27,8 +27,7 @@ class MatchController extends ApiController
         private AuthService $authService,
         private WeightDivisionRepositoryInterface $weightRepository,
         private GradeRepositoryInterface $gradeRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * 試合データ一覧の取得
