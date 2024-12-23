@@ -7,11 +7,10 @@ import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { MatchDataType } from '@/assets/types';
 
 
-type PropsType = Pick<MatchDataType, 'matchDate' | 'id'>
+type PropsType = Pick<Partial<MatchDataType>, 'matchDate' | 'id'>
 export const useVoteIconState = ({ matchDate, id: matchId }: PropsType) => {
   const [isShowVoteIcon, setIsShowVoteIcon] = useState(false);
-  //? 勝敗予想投票実行時の状態hook
-  // const { isSuccess: isSuccessVoteMatchPrediction } = useVoteMatchPrediction();
+
   const { isDayOnFight, isDayAfterFight } = useDayOfFightChecker(matchDate);
 
   //? userの勝敗予想投票をすべて取得など…

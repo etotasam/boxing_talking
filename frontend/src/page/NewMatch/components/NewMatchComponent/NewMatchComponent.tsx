@@ -26,11 +26,10 @@ type PropsType = {
   isShowPredictionModal: boolean;
   showPredictionModal: () => void;
   // isHide: boolean;
-  isVoteIconVisible: boolean;
+  isShowVoteIcon: boolean;
 };
 export const NewMatchComponent = (props: PropsType) => {
-  const { matchData, isShowPredictionModal, isVoteIconVisible, showPredictionModal, device } =
-    props;
+  const { matchData, isShowPredictionModal, isShowVoteIcon, showPredictionModal, device } = props;
 
   const isScroll = useRecoilValue(boolState('IS_SCROLL'));
 
@@ -46,7 +45,7 @@ export const NewMatchComponent = (props: PropsType) => {
           <PostComment />
         </div>
 
-        {isVoteIconVisible && (
+        {isShowVoteIcon && (
           <div
             className={clsx('fixed ', device === 'SP' ? 'right-[10px]' : 'right-[50px]')}
             style={{ bottom: voteIconBottomPosition }}

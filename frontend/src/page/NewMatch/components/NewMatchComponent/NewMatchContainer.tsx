@@ -6,7 +6,8 @@ import { ROUTE_PATH } from '@/assets/routePath';
 //! types
 import { MatchDataType, MatchPredictionsType } from '@/assets/types';
 // ! hook
-import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
+// import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
+import { useVoteIconState } from '@/hooks/useVoteIconState';
 import { useModalState } from '@/hooks/useModalState';
 import { useWindowSize } from '@/hooks/useWindowSize';
 import { useLoading } from '@/hooks/useLoading';
@@ -95,23 +96,11 @@ export const NewMatchContainer = (props: PropsType) => {
     }
   }, [isSuccessVoteMatchPrediction]);
 
-  //? ↓↓↓voteIconの表示判定↓↓↓
-  const [isShowVoteIcon, setIsShowVoteIcon] = useState(false);
-  const { isDayOnFight, isDayAfterFight } = useDayOfFightChecker(thisMatch?.matchDate);
-  useEffect(() => {
-    // PC画面では表示させない
-    // if (device === 'PC') return setIsShowVoteIcon(false);
-    // ユーザーの投票をfetch出来てない時は隠す
-    if (usersPredictions === undefined) return setIsShowVoteIcon(false);
-    // 過去の試合には表示しない
-    if (isDayAfterFight === undefined || isDayAfterFight === true) return setIsShowVoteIcon(false);
-    // 当日は表示しない
-    if (isDayOnFight === undefined || isDayOnFight === true) return setIsShowVoteIcon(false);
-    // ユーザーのこの試合への投票の有無で表示を決定させる
-    const isVote = usersPredictions.some((obj) => obj.matchId === matchId);
-    setIsShowVoteIcon(!isVote);
-  }, [usersPredictions, isDayAfterFight, isDayOnFight, device]);
-  //? ↑↑↑voteIconの表示判定↑↑↑
+  //? vote iconの表示/非表示の判断
+  const isShowVoteIconState = useVoteIconState({
+    matchDate: thisMatch?.matchDate,
+    id: thisMatch?.id,
+  });
 
   const { state: isShowPredictionModal, showModal: showPredictionModal } =
     useModalState('PREDICTION_VOTE');
@@ -140,7 +129,7 @@ export const NewMatchContainer = (props: PropsType) => {
           device={device}
           isShowPredictionModal={isShowPredictionModal}
           showPredictionModal={showPredictionModal}
-          isVoteIconVisible={isShowVoteIcon}
+          isShowVoteIcon={isShowVoteIconState}
         />
       </MatchContextWrapper>
     </>
