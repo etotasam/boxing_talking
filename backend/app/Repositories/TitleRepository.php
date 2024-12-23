@@ -46,7 +46,7 @@ class TitleRepository implements TitleRepositoryInterface
 
   /**
    * ボクサーの保持タイトル(titlesテーブル)を保存(一括)
-   * @param array $titlesArray [["boxer_id" => 1, "organization_id" => 1, "weight_division_id" => 1], ...]
+   * @param array $titlesArray [["boxer_id" => int, "organization_id" => int, "weight_division_id" => int], ...]
    * @return bool
    */
   public function storeTitlesHoldByTheBoxer($titlesArray)

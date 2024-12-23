@@ -73,11 +73,12 @@ class MatchService
       $blueBoxerId = $formattedMatchData['blue_boxer_id'];
       $matchId = $createdMatch['id'];
 
-      $string = $this->matchDataSnapshotService->storeBoxerDataSnapshot(["match_id" => $matchId, "red_boxer_id" => $redBoxerId, "blue_boxer_id" => $blueBoxerId]);
+      //? 試合時の選手の戦歴、保有ベルトのスナップショット
+      $isSuccessSnapshot = $this->matchDataSnapshotService->storeBoxerDataSnapshot(["match_id" => $matchId, "red_boxer_id" => $redBoxerId, "blue_boxer_id" => $blueBoxerId]);
 
-      \Log::debug($string);
-      abort(403, 'test action.');
-
+      if (!$isSuccessSnapshot) {
+        throw new Exception("Failed store snapshot data", 500);
+      }
 
       $titleMatchesArray = $this->titleMatchService->formatForStoreToTitleMatchTable($createdMatch['id'], $organizationsNameArray);
       $isSuccessStoreTitleMatch = $this->titleMatchRepository->insertTitleMatch($titleMatchesArray);
