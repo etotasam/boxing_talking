@@ -7,6 +7,8 @@ use App\Models\BoxingMatch;
 use App\Http\Resources\BoxerResource;
 use App\Http\Resources\MatchResultResource;
 use App\Http\Resources\MatchTitleBeltsResource;
+use \Illuminate\Support\Collection;
+
 
 
 class BoxingMatchResource extends JsonResource
@@ -27,14 +29,16 @@ class BoxingMatchResource extends JsonResource
     {
 
         $this->match->load(['redBoxer', 'blueBoxer', 'result', 'getWeight', 'getGrade']);
+        // \Log::debug("aaaaa : " . $this->match->titleSnapshot["red"] instanceof Collection);
+
 
         $resultResource = $this->match->result
             ? new MatchResultResource($this->match->result)
             : null;
         return  [
             "id" => $this->match->id,
-            "redBoxer" => new BoxerResource($this->match->redBoxer),
-            "blueBoxer" => new BoxerResource($this->match->blueBoxer),
+            "redBoxer" => new BoxerResource($this->match->redBoxer, $this->match->snapshot["red"], $this->match->titleSnapshot["red"]),
+            "blueBoxer" => new BoxerResource($this->match->blueBoxer, $this->match->snapshot["blue"], $this->match->titleSnapshot['blue']),
             "country" => $this->match->country,
             "venue" => $this->match->venue,
             "grade" => $this->match->getGrade->grade,

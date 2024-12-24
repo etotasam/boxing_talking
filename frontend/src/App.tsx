@@ -16,7 +16,6 @@ import { NotFound } from '@/page/NotFound';
 import { PastMatches } from './page/PastMatches';
 import { Test } from '@/page/Test';
 
-import { NewMatch } from './page/NewMatch';
 // ! middleware
 import AdminOnly from './middleware/AdminOnly';
 import Container from './middleware/Container';
@@ -30,7 +29,7 @@ function App() {
           <Route path={ROUTE_PATH.HOME} element={<Home />} />
           <Route path={ROUTE_PATH.PAST_MATCHES} element={<PastMatches />} />
           {/* <Route path={ROUTE_PATH.MATCH} element={<Match />} /> */}
-          <Route path={ROUTE_PATH.MATCH} element={<NewMatch />} />
+          <Route path={ROUTE_PATH.MATCH} element={<Match />} />
           <Route path={ROUTE_PATH.PAST_MATCH_SINGLE} element={<PastMatch />} />
 
           <Route element={<AdminOnly />}>

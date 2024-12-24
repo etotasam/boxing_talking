@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\BoxerTitleSnapshot;
+use App\Models\BoxingMatch;
 use Illuminate\Support\Collection;
 use App\Repositories\Interfaces\BoxerTitleSnapshotInterface;
 
@@ -17,5 +18,66 @@ class BoxerTitleSnapshotRepository implements BoxerTitleSnapshotInterface
   public function storeBoxerTitleSnapshot(array $titlesArray)
   {
     return BoxerTitleSnapshot::insert($titlesArray);
+  }
+
+  /**
+   * Update the state of a boxer's title snapshot.
+   * @param BoxerTitleSnapshot $snapshot
+   * @param string $state "new" | "still" | "fall"
+   * @return bool $isSuccess
+   */
+  public function updateBoxerTitleSnapshot($snapshot, $state)
+  {
+    //todo match_idとboxer_idだけじゃダメだよー organization_idとweight_division_idも全て一致させる必要があるよ
+    $isSuccess =  (bool) BoxerTitleSnapshot::where([
+      ['match_id', '=', $snapshot["match_id"]],
+      ['boxer_id', '=', $snapshot["boxer_id"]],
+      ["organization_id", '=', $snapshot['organization_id']],
+      ["weight_division_id", '=', $snapshot['weight_division_id']],
+    ])->update(['state' => $state]);
+
+    return $isSuccess;
+  }
+
+  /**
+   * Update時にstateを一度全てnullにする為
+   * @param int $matchId
+   * @return bool $isUpdateFailed 失敗した場合がtrue
+   */
+  public function resetBoxerTitleSnapshot($matchId)
+  {
+
+    $isUpdateFailed = false;
+    $hasTarget = BoxerTitleSnapshot::where('match_id', $matchId)
+      ->where('state', '!=', null)
+      ->exists();
+
+    if ($hasTarget) {
+      $isUpdateFailed = !(bool) BoxerTitleSnapshot::where('match_id', $matchId)
+        ->update(['state' => null]);
+    }
+
+    return $isUpdateFailed;
+  }
+
+  /**
+   * 試合時の選手の保持タイトルを取得
+   * @param int $matchId
+   * @return Collection
+   */
+  public function getTitleSnapshot($matchId)
+  {
+    $match = BoxingMatch::find($matchId);
+    $redBoxerId = $match->red_boxer_id;
+    $blueBoxerId = $match->blue_boxer_id;
+
+
+    $redTitleSnapshot = BoxerTitleSnapshot::where("match_id", $matchId)->where("boxer_id", $redBoxerId)->get();
+    $blueTitleSnapshot = BoxerTitleSnapshot::where("match_id", $matchId)->where("boxer_id", $blueBoxerId)->get();
+
+    return collect([
+      "red" => $redTitleSnapshot,
+      "blue" => $blueTitleSnapshot,
+    ]);
   }
 }

@@ -8,7 +8,7 @@ import { MatchDataType } from '@/assets/types';
 import { BoxerType } from '@/assets/types';
 // ! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
-import { VoteIconForTop } from '@/page/NewMatch/components/NewMatchComponent/component/VoteIcon';
+import { VoteIconForTop } from '@/components/module/MatchComponent/component/VoteIcon';
 // ! image
 import { GiImperialCrown } from 'react-icons/gi';
 import { MdHowToVote } from 'react-icons/md';

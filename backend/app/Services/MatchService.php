@@ -3,8 +3,11 @@
 namespace App\Services;
 
 use Exception;
+use \Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\BoxingMatch;
+use App\Models\BoxerTitleSnapshot;
 use App\Repositories\Interfaces\MatchRepositoryInterface;
 use App\Repositories\Interfaces\CommentRepositoryInterface;
 use App\Repositories\Interfaces\TitleMatchRepositoryInterface;
@@ -12,11 +15,15 @@ use App\Repositories\Interfaces\WinLossPredictionRepositoryInterface;
 use App\Repositories\Interfaces\BoxerRepositoryInterface;
 use App\Repositories\Interfaces\GradeRepositoryInterface;
 use App\Repositories\Interfaces\WeightDivisionRepositoryInterface;
+use App\Repositories\Interfaces\MatchBoxerSnapshotInterface;
+use App\Repositories\Interfaces\BoxerTitleSnapshotInterface;
+use App\Repositories\Interfaces\TitleRepositoryInterface;
 use App\Services\TitleMatchService;
-use App\Services\MatchDataSnapshotService;
+use App\Services\MatchBoxerSnapshotService;
 use Illuminate\Database\QueryException;
 use App\Exceptions\NonAdministratorException;
 use Illuminate\Database\Events\QueryExecuted;
+
 
 use function Psy\debug;
 
@@ -25,7 +32,7 @@ class MatchService
 
   public function __construct(
     protected TitleMatchService $titleMatchService,
-    protected MatchDataSnapshotService $matchDataSnapshotService,
+    protected MatchBoxerSnapshotService $matchBoxerSnapshotService,
     protected MatchRepositoryInterface $matchRepository,
     protected CommentRepositoryInterface $commentRepository,
     protected TitleMatchRepositoryInterface $titleMatchRepository,
@@ -33,6 +40,9 @@ class MatchService
     protected BoxerRepositoryInterface $boxerRepository,
     protected GradeRepositoryInterface $gradeRepository,
     protected WeightDivisionRepositoryInterface $weightRepository,
+    protected MatchBoxerSnapshotInterface $MatchBoxerSnapshotRepository,
+    protected BoxerTitleSnapshotInterface $BoxerTitleSnapshotRepository,
+    protected TitleRepositoryInterface $TitleRepository,
   ) {}
 
   /**
@@ -74,7 +84,7 @@ class MatchService
       $matchId = $createdMatch['id'];
 
       //? 試合時の選手の戦歴、保有ベルトのスナップショット
-      $isSuccessSnapshot = $this->matchDataSnapshotService->storeBoxerDataSnapshot(["match_id" => $matchId, "red_boxer_id" => $redBoxerId, "blue_boxer_id" => $blueBoxerId]);
+      $isSuccessSnapshot = $this->matchBoxerSnapshotService->storeMatchBoxerSnapshot(["match_id" => $matchId, "red_boxer_id" => $redBoxerId, "blue_boxer_id" => $blueBoxerId]);
 
       if (!$isSuccessSnapshot) {
         throw new Exception("Failed store snapshot data", 500);
@@ -125,7 +135,7 @@ class MatchService
    * 試合一覧の取得
    * errorCode 41 admin認証なし
    * @param string|null range
-   * @return \Illuminate\Support\Collection $matches
+   * @return Collection $matches
    */
   public function getMatchesExecute(string|null $range)
   {
@@ -141,7 +151,35 @@ class MatchService
     } else {
       $matches = $this->matchRepository->getMatches();
     }
-    return $matches;
+
+    $matchesSnapshot = $this->getMatchDataSnapshot($matches);
+    // \Log::debug("test : " . $matchesSnapshot);
+
+    return $matchesSnapshot;
+  }
+
+
+  /**
+   * ?試合のスナップショットの取得
+   * @param Collection $matches
+   */
+  public function getMatchDataSnapshot($matches)
+  {
+
+    $matchesSnapshot = $matches->map(function ($match) {
+      //? 戦績のスナップショット
+      $recordSnapshot = $this->MatchBoxerSnapshotRepository->getMatchBoxerSnapshot($match->id);
+      $match->snapshot = $recordSnapshot;
+
+      //? タイトルのスナップショット
+      $titleSnapshot = $this->BoxerTitleSnapshotRepository->getTitleSnapshot($match->id);
+      $match->titleSnapshot = $titleSnapshot;
+
+      return $match;
+    });
+
+
+    return $matchesSnapshot;
   }
 
   /**
@@ -326,7 +364,27 @@ class MatchService
 
       [$newRedBoxerRecord, $newBlueBoxerRecord] = $this->updateBoxersRecord($matchResultArray, $redBoxerRecord, $blueBoxerRecord);
 
+      $match = $this->matchRepository->getMatchById($matchId);
+      //? この試合のboxerTitleSnapshotの取得
+      $titleSnapshot = $match->boxerTitleSnapshot;
+
       DB::beginTransaction();
+      if (!$titleSnapshot->isEmpty()) {
+
+        //? 一度snapshotのstateをnullに初期化
+        $isFailedStateReset = $this->BoxerTitleSnapshotRepository->resetBoxerTitleSnapshot($matchId);
+        if ($isFailedStateReset) {
+          throw new Exception('Failed reset boxer title snapshot state to null');
+        }
+        //? 勝者がいるかチェック
+        $result = $matchResultArray["match_result"];
+        $isWinner = $result === "red" || $result === "blue";
+
+        if ($isWinner) {
+          $this->updateBoxerTitleByMatchResult($match, $titleSnapshot, $result, $redBoxer->id, $blueBoxer->id);
+        }
+      }
+      // abort(500);
       $this->boxerRepository->updateBoxer($newRedBoxerRecord); //? red boxer のデータ更新
       $this->boxerRepository->updateBoxer($newBlueBoxerRecord); //? blue boxer のデータ更新
 
@@ -344,6 +402,79 @@ class MatchService
     }
   }
 
+  /**
+   * Updates the title state of boxers based on the match result.
+   *
+   * @param BoxingMatch $match
+   * @param Collection $titleSnapshot
+   * @param string $result
+   * @param int $redBoxerId
+   * @param int $blueBoxerId
+   * @return bool $isSuccessUpdateTitleSnapshot
+   */
+  public function updateBoxerTitleByMatchResult(BoxingMatch $match, Collection $titleSnapshot, string $result, int $redBoxerId, int $blueBoxerId): void
+  {
+    foreach ($match->matchTitles as $matchTitle) {
+      foreach ($titleSnapshot as &$snapshot) {
+        $isSameOrganization = $snapshot["organization_id"] === $matchTitle["organization_id"];
+        $isSameWeight = $snapshot["weight_division_id"] === $match->weight_id;
+        //? 試合にかけられたタイトルと選手の保持していたタイトルが同じ場合
+        $isSameTitle = $isSameOrganization && $isSameWeight;
+        //? 勝者がred
+        $isWinRed = $result === "red";
+        //? 勝者がblue
+        $isWinBlue = $result === "blue";
+        //? redのsnapshot
+        $isTargetRed = $redBoxerId === $snapshot["boxer_id"];
+        //? blueのsnapshot
+        $isTargetBlue = $blueBoxerId === $snapshot["boxer_id"];
+
+        $isTarget = $redBoxerId === $snapshot["boxer_id"] ? "red" : "blue";
+
+        if ($isSameTitle) {
+          $isFailedUpdateTitleState = false;
+          if ($isWinRed) {
+            $isFailedUpdateTitleState = $this->updateBoxerTitleState($snapshot, $isTargetRed, $isTargetBlue, "still", "fall");
+          }
+          if ($isWinBlue) {
+            $isFailedUpdateTitleState =  $this->updateBoxerTitleState($snapshot, $isTargetRed, $isTargetBlue, "fall", "still");
+          }
+          if ($isFailedUpdateTitleState) {
+            throw new Exception('Failed to update boxer title snapshot state');
+          };
+        }
+      }
+    }
+  }
+
+  /**
+   * Updates the title state of a boxer based on the match result.
+   *
+   * @param BoxerTitleSnapshot $snapshot
+   * @param bool $isTargetRed
+   * @param bool $isTargetBlue
+   * @param string $redState
+   * @param string $blueState
+   * 
+   * @return bool $isFailedUpdateState 失敗したらtrue
+   */
+  public function updateBoxerTitleState(&$snapshot, $isTargetRed, $isTargetBlue, $redState, $blueState)
+  {
+
+    // \Log::debug("test : " . $snapshot instanceof BoxerTitleSnapshot ? "はい" : "違います");
+
+    $isFailedUpdateState = false;
+    if ($isTargetRed) {
+      $isFailedUpdateState = !$this->BoxerTitleSnapshotRepository->updateBoxerTitleSnapshot($snapshot, $redState);
+    };
+    if ($isTargetBlue) {
+      $isFailedUpdateState = !$this->BoxerTitleSnapshotRepository->updateBoxerTitleSnapshot($snapshot, $blueState);
+    };
+
+    return $isFailedUpdateState;
+  }
+
+  public function resetBoxerTitleStateOnUpdate(&$snapshot) {}
 
   /**
    * @param array $pastResult (既存のmatchResultデータ)

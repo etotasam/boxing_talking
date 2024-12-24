@@ -1,5 +1,5 @@
 import { Button } from '@/components/atomic/Button';
-import { InfoModal } from '../../../../modal/InfoModal';
+import { InfoModal } from '@/components/modal/InfoModal';
 import { FlagImage } from '@/components/atomic/FlagImage';
 import { RiCloseLine } from 'react-icons/ri';
 import { CountryType } from '@/assets/types';
