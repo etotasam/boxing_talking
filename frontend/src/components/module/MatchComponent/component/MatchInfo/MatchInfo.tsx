@@ -40,13 +40,18 @@ const BoxersData = ({ matchData }: MatchInfoPropsType) => {
   return (
     <div className={clsx('text-white relative flex justify-between w-full max-w-[1024px]')}>
       <div className={`${device === 'PC' ? 'w-[45%]' : 'w-[50%]'}`}>
-        <BoxerInfo boxer={{ ...matchData.redBoxer, color: 'red' }} matchResult={matchData.result} />
+        <BoxerInfo
+          boxer={{ ...matchData.redBoxer, color: 'red' }}
+          matchResult={matchData.result}
+          matchDate={matchData.matchDate}
+        />
       </div>
 
       <div className={`${device === 'PC' ? 'w-[45%]' : 'w-[50%]'}`}>
         <BoxerInfo
           boxer={{ ...matchData.blueBoxer, color: 'blue' }}
           matchResult={matchData.result}
+          matchDate={matchData.matchDate}
         />
       </div>
       {/* <PredictionIcon matchData={matchData} /> */}
@@ -57,9 +62,10 @@ const BoxersData = ({ matchData }: MatchInfoPropsType) => {
 type BoxerInfoPropsType = React.ComponentProps<'div'> & {
   boxer: BoxerType & { color: 'red' | 'blue' };
   matchResult?: MatchResultType | null;
+  matchDate: string;
 };
 const BoxerInfo = (props: BoxerInfoPropsType) => {
-  const { className, boxer, matchResult = null } = props;
+  const { className, boxer, matchResult = null, matchDate } = props;
   const { device } = useWindowSize();
   return (
     <div className={clsx('w-full h-full flex justify-center', className)}>
@@ -69,7 +75,7 @@ const BoxerInfo = (props: BoxerInfoPropsType) => {
         {/* //? 戦績 */}
         <BoxerRecord boxer={boxer} matchResult={matchResult} />
         {/* //? ステータス */}
-        <BoxerStatus boxer={boxer} />
+        <BoxerStatus boxer={boxer} matchDate={matchDate} />
         {/* //? タイトル */}
         <Titles titles={boxer.titles} />
       </div>
@@ -86,14 +92,18 @@ const BoxerName = ({ boxer }: { boxer: BoxerType }) => {
   );
 };
 
-const BoxerStatus = (props: { boxer: BoxerType }) => {
-  const { boxer } = props;
+const BoxerStatus = ({ boxer, matchDate }: { boxer: BoxerType; matchDate: string }) => {
+  // ?年齢を試合日に合わせて表示させる為のデータ
   const currentDate = dayjs();
+  const targetDate = (
+    currentDate.isBefore(dayjs(matchDate)) ? currentDate : dayjs(matchDate)
+  ) as dayjs.Dayjs;
+
   return (
     <ul className="mt-5 font-clamp-level-1">
       <li className="flex justify-between">
         <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">年齢</p>
-        <p className="flex-1">{currentDate.diff(dayjs(boxer.birth), 'year')}</p>
+        <p className="flex-1">{targetDate.diff(dayjs(boxer.birth), 'year')}</p>
       </li>
       <li className="flex justify-between">
         <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">身長</p>

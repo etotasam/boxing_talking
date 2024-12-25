@@ -8,6 +8,7 @@ import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal'
 import { useToastModal } from '@/hooks/useToastModal';
 import { usePostComment } from '@/hooks/apiHooks/useComment';
 import { useAuth, useGuest } from '@/hooks/apiHooks/useAuth';
+import { useWindowSize } from '@/hooks/useWindowSize';
 // import { useLoading } from '@/hooks/useLoading';
 
 export const PostCommentContainer = () => {
@@ -33,14 +34,19 @@ export const PostCommentContainer = () => {
     isLoading: isPostingComment,
   } = usePostComment();
 
+  const { device } = useWindowSize();
   const commentPostEl = useRef<HTMLDivElement>();
-  const commentPostRef = useCallback((node: HTMLDivElement) => {
-    if (node) {
-      commentPostEl.current = node;
-      //? コメント入力Elementの高さの初期値をRecoilへ
-      setRecoilPostCommentHeight(node.clientHeight);
-    }
-  }, []);
+  //? deviceのサイズが変わるとcommentPostElementの高さも変わる様になってるから依存関係に"device"を入れてるよ
+  const commentPostRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (node) {
+        commentPostEl.current = node;
+        //? コメント入力Elementの高さの初期値をRecoilへ
+        setRecoilPostCommentHeight(node.clientHeight);
+      }
+    },
+    [device]
+  );
 
   const textareaRef = useRef(null);
   const textarea = textareaRef.current as unknown as HTMLTextAreaElement;

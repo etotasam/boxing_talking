@@ -12,6 +12,7 @@ import { apiFetchDataState } from '@/store/apiFetchDataState';
 import { ErrorFallback } from './components/ErrorFallback';
 import { NoCommentFallback } from './components/NoCommentFallback';
 import { CommentsExist } from './components/CommentsExist';
+import { CommentsWrapper } from './components/CommentsWrapper';
 
 type PropsType = {
   matchId: number;
@@ -51,20 +52,21 @@ export const Comments = (props: PropsType) => {
   const isNotComments =
     comments !== undefined && !comments.length && newComments !== undefined && !newComments.length;
 
-  //?エラー時
-  if (isErrorFetchComments) return <ErrorFallback />;
-
-  //? コメントがない時
-  if (isNotComments) return <NoCommentFallback />;
-
   return (
-    <CommentsExist
-      comments={comments}
-      newComments={newComments}
-      isComments={isComments}
-      isNextComments={isNextComments}
-      isStale={isStale}
-      fetchNextComments={refetchComments}
-    />
+    <CommentsWrapper>
+      {isErrorFetchComments && <ErrorFallback />}
+      {isNotComments && <NoCommentFallback />}
+
+      {isComments && (
+        <CommentsExist
+          comments={comments}
+          newComments={newComments}
+          isComments={isComments}
+          isNextComments={isNextComments}
+          isStale={isStale}
+          fetchNextComments={refetchComments}
+        />
+      )}
+    </CommentsWrapper>
   );
 };

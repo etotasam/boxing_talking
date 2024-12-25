@@ -37,14 +37,14 @@ class MatchController extends ApiController
     public function index(Request $request)
     {
         try {
-            $matches =  $this->matchService->getMatchesExecute($request->query('range'));
+            $matchesWithSnapshot =  $this->matchService->getMatchesExecute($request->query('range'));
         } catch (NonAdministratorException $e) {
             return $this->responseUnauthorized($e->getMessage());
         } catch (Exception $e) {
             return $this->responseInvalidQuery("Failed get Matches :" . $e->getMessage());
         }
 
-        return BoxingMatchResource::collection($matches);
+        return BoxingMatchResource::collection($matchesWithSnapshot);
     }
 
     /**
@@ -55,7 +55,7 @@ class MatchController extends ApiController
      */
     public function show(BoxingMatch $match)
     {
-        return new BoxingMatchResource($match);
+        // return new BoxingMatchResource($match);
     }
 
 

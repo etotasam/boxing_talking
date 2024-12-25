@@ -1,24 +1,23 @@
 import { ReactNode } from 'react';
 import clsx from 'clsx';
-import { motion, AnimatePresence } from 'framer-motion';
+
 //! type
 import { MatchDataType } from '@/assets/types';
 //! layout
 import HeaderOnlyLayout from '@/layout/HeaderOnlyLayout';
+
 //! component
+import { MatchInfo } from './component/MatchInfo';
 import { PostComment } from './component/PostComment';
-import { Comments } from './component/Comments';
-import { LeftSection } from './component/LeftSection';
 import { PredictionVoteModal } from './component/PredictionVoteModal';
+
 import { VoteIcon } from './component/VoteIcon';
-// import { NewComments } from './component/NewComments';
-//! image
-import GGG from '@/assets/images/etc/GGG.jpg';
-//! icons
-import { RotatingLines } from 'react-loader-spinner';
+import { MatchCommentsModal } from './component/MatchCommentsModal';
+//! image/icon
+import GGGPhoto from '@/assets/images/etc/GGG.jpg';
 //! recoil
 import { useRecoilValue } from 'recoil';
-import { apiFetchDataState } from '@/store/apiFetchDataState';
+import { elementSizeState } from '@/store/elementSizeState';
 import { boolState } from '@/store/boolState';
 
 type PropsType = {
@@ -27,94 +26,80 @@ type PropsType = {
   isShowPredictionModal: boolean;
   showPredictionModal: () => void;
   // isHide: boolean;
-  isVoteIconVisible: boolean;
+  isShowVoteIcon: boolean;
 };
 export const MatchComponent = (props: PropsType) => {
-  const { matchData, device, isShowPredictionModal, isVoteIconVisible, showPredictionModal } =
-    props;
+  const { matchData, isShowPredictionModal, isShowVoteIcon, showPredictionModal, device } = props;
 
   const isScroll = useRecoilValue(boolState('IS_SCROLL'));
 
+  //? vote iconの位置はコメント入力欄の高さに準ずる
+  const voteIconBottomPosition = (useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT')) ?? 0) + 5;
+
   return (
     <HeaderOnlyLayout>
-      <div>
-        <div className="flex">
-          {device === 'PC' && (
-            <section className="w-[30%]">
-              <LeftSection matchData={matchData} />
-            </section>
-          )}
-
-          <RightSectionWrapper device={device}>
-            {/* <NewComments matchId={matchData.id} /> */}
-            <Comments matchId={matchData.id} />
-            <PostComment />
-            {isVoteIconVisible && (
-              <div className="fixed bottom-[75px] right-[10px]">
-                <VoteIcon isScroll={isScroll} showPredictionModal={showPredictionModal} />
-              </div>
-            )}
-          </RightSectionWrapper>
+      <Container>
+        <Main matchData={matchData} />
+        <MatchCommentsModal matchId={matchData.id} />
+        <div className="absolute bottom-0 w-full">
+          <PostComment />
         </div>
-      </div>
+
+        {isShowVoteIcon && (
+          <div
+            className={clsx('fixed ', device === 'SP' ? 'right-[10px]' : 'right-[50px]')}
+            style={{ bottom: voteIconBottomPosition }}
+          >
+            <VoteIcon
+              isScroll={isScroll}
+              showPredictionModal={showPredictionModal}
+              bottomPosition={voteIconBottomPosition}
+            />
+          </div>
+        )}
+      </Container>
 
       {isShowPredictionModal && <PredictionVoteModal thisMatch={matchData} />}
     </HeaderOnlyLayout>
   );
 };
 
-const CommentLoadingModal = ({ isShow }: { isShow: boolean }) => {
-  const text = 'コメント取得中...';
+const Container = ({ children }: { children: ReactNode }) => {
+  // const headerHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   return (
-    <AnimatePresence>
-      {isShow && (
-        <motion.div
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="absolute top-0 left-0 w-full h-full bg-black/60 flex justify-center items-center"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="flex select-none"
-          >
-            <RotatingLines strokeColor="#f5f5f5" strokeWidth="3" animationDuration="1" width="20" />
-            <span className="ml-1 text-neutral-200/60 text-sm">{text}</span>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div className="w-full h-[100vh] flex justify-center">
+      <div
+        className={clsx('relative w-full')}
+        style={{
+          backgroundImage: `url(${GGGPhoto})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        <div className={'w-full h-full bg-fixed backdrop-blur-[1px] bg-neutral-900/90'}>
+          {children}
+        </div>
+      </div>
+    </div>
   );
 };
 
-const RightSectionWrapper = ({
-  children,
-  device,
-}: {
-  children: ReactNode;
-  device: 'PC' | 'SP';
-}) => {
-  const isCommentsFetching = useRecoilValue(
-    apiFetchDataState({ dataName: 'comments/fetch', state: 'isLoading' })
+const Main = ({ matchData }: { matchData: MatchDataType }) => {
+  const headerHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+  //? コメントモーダルが非表示時の高さ分をpaddingにしてスクロールされる様にする
+  const commentsModalHeightHiddenState = useRecoilValue(
+    elementSizeState('COMMENTS_MODAL_HIDDEN_HEIGHT')
   );
+
   return (
-    <section
-      className={clsx('relative', device === 'PC' ? 'w-[70%]' : 'w-full')}
-      style={{
-        backgroundImage: `url(${GGG})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
-      <div className="w-full h-full bg-fixed backdrop-blur-[1px] bg-neutral-900/90">
-        {children}
-        <CommentLoadingModal isShow={isCommentsFetching} />
+    <main className="h-[100vh] w-[100vw] overflow-auto">
+      <div
+        className="w-full flex justify-center"
+        style={{ paddingTop: headerHeightState, paddingBottom: commentsModalHeightHiddenState }}
+      >
+        <MatchInfo matchData={matchData} />
       </div>
-    </section>
+    </main>
   );
 };
