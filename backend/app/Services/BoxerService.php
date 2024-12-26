@@ -17,8 +17,7 @@ class BoxerService
     protected BoxerRepositoryInterface $boxerRepository,
     protected TitleRepositoryInterface $titleRepository,
     protected TitleService $titleService,
-  ) {
-  }
+  ) {}
 
   /**
    * @param array $boxerData ボクサー登録に必要なデータの連想配列
@@ -75,7 +74,7 @@ class BoxerService
           $this->titleService->storeTitle($updateBoxerData['id'], $updateBoxerData["titles"]);
           unset($updateBoxerData["titles"]);
         };
-        \Log::debug($updateBoxerData);
+
         $this->boxerRepository->updateBoxer($updateBoxerData);
       });
     } catch (QueryException $e) {

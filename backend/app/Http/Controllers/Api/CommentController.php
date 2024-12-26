@@ -25,8 +25,7 @@ class CommentController extends ApiController
         protected AuthService $authService,
         protected MatchRepositoryInterface $matchRepository,
         protected CommentRepositoryInterface $commentRepository
-    ) {
-    }
+    ) {}
 
     /**
      * @param int limit
@@ -99,7 +98,9 @@ class CommentController extends ApiController
         } catch (QueryException $e) {
             \Log::error("Error on database by fetch comments" . $e->getMessage());
             return $this->responseInvalidQuery('Unexpected error');
-        } catch (\Exception) {
+        } catch (HttpException $e) {
+            return $this->responseNotFound($e->getMessage());
+        } catch (\Exception $e) {
             return $this->responseInvalidQuery('Failed get comments');
         }
     }

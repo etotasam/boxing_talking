@@ -153,7 +153,6 @@ class MatchService
     }
 
     $matchesSnapshot = $this->getMatchDataSnapshot($matches);
-    // \Log::debug("test : " . $matchesSnapshot);
 
     return $matchesSnapshot;
   }
@@ -368,7 +367,7 @@ class MatchService
         $isWinner = $result === "red" || $result === "blue";
 
         if ($isWinner) {
-          $this->updateBoxerTitleByMatchResult($match, $titleSnapshot, $result, $matchData->redBoxer->id, $matchData->blueBoxer->id);
+          $this->updateBoxerTitleSnapshotByMatchResult($match, $titleSnapshot, $result, $matchData->redBoxer->id, $matchData->blueBoxer->id);
         }
       }
 
@@ -399,7 +398,7 @@ class MatchService
    * @param int $blueBoxerId
    * @return bool $isSuccessUpdateTitleSnapshot
    */
-  private function updateBoxerTitleByMatchResult(BoxingMatch $match, Collection $titleSnapshot, string $result, int $redBoxerId, int $blueBoxerId): void
+  private function updateBoxerTitleSnapshotByMatchResult(BoxingMatch $match, Collection $titleSnapshot, string $result, int $redBoxerId, int $blueBoxerId): void
   {
     foreach ($match->matchTitles as $matchTitle) {
       foreach ($titleSnapshot as &$snapshot) {
@@ -467,7 +466,7 @@ class MatchService
    * 
    * @return bool $isFailedUpdateState 失敗したらtrue
    */
-  private function updateBoxerTitleState(&$snapshot, $isTargetRed, $isTargetBlue, $redState, $blueState)
+  public function updateBoxerTitleState(&$snapshot, $isTargetRed, $isTargetBlue, $redState, $blueState)
   {
 
     $isFailedUpdateState = false;
