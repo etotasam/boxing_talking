@@ -28,7 +28,6 @@ class BoxerTitleSnapshotRepository implements BoxerTitleSnapshotInterface
    */
   public function updateBoxerTitleSnapshot($snapshot, $state)
   {
-    //todo match_idとboxer_idだけじゃダメだよー organization_idとweight_division_idも全て一致させる必要があるよ
     $isSuccess =  (bool) BoxerTitleSnapshot::where([
       ['match_id', '=', $snapshot["match_id"]],
       ['boxer_id', '=', $snapshot["boxer_id"]],

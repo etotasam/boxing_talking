@@ -325,6 +325,7 @@ class MatchService
    *
    * @return void
    */
+  // TODO ↓↓↓試合resultを登録時、その結果に基づいてにBoxerTitleSnapshotのstateを動的に変更させている。そのテストを書く↓↓↓
   public function storeMatchResultExecute(array $matchResultArray)
   {
     try {
@@ -335,29 +336,15 @@ class MatchService
 
       //? 試合情報の取得
       $matchData = $this->matchRepository->getMatchById($matchId);
-      $redBoxer = $matchData->redBoxer;
-      $blueBoxer = $matchData->blueBoxer;
       $pastResult = $matchData->result;
 
-      $redBoxerRecord = [
-        "id" => $redBoxer["id"],
-        "win" => $redBoxer["win"],
-        "lose" => $redBoxer["lose"],
-        "draw" => $redBoxer["draw"],
-        "ko" => $redBoxer["ko"]
-      ];
-      $blueBoxerRecord = [
-        "id" => $blueBoxer["id"],
-        "win" => $blueBoxer["win"],
-        "lose" => $blueBoxer["lose"],
-        "draw" => $blueBoxer["draw"],
-        "ko" => $blueBoxer["ko"]
-      ];
+      //? 選手の戦歴を準備、作成
+      $boxerRecords = $this->prepareBoxerRecord($matchData);
 
-      //? すでにmatch_resultが存在しているかどうかをチェック
+      //? すでにmatch_resultが存在している場合はボクサーの戦歴を元に戻す
       $isMatchResult = $this->matchRepository->isMatchResult($matchId);
       if ($isMatchResult) {
-        [$rollbackRedBoxerRecord, $rollbackBlueBoxerRecord] = $this->rollbackBoxersRecord($pastResult->toArray(), $redBoxerRecord, $blueBoxerRecord);
+        [$rollbackRedBoxerRecord, $rollbackBlueBoxerRecord] = $this->rollbackBoxersRecord($pastResult->toArray(), $boxerRecords["redBoxerRecord"], $boxerRecords["blueBoxerRecord"]);
         $redBoxerRecord = $rollbackRedBoxerRecord; //! $redBoxerRecordの上書き
         $blueBoxerRecord = $rollbackBlueBoxerRecord; //! $blueBoxerRecordの上書き
       }
@@ -381,14 +368,14 @@ class MatchService
         $isWinner = $result === "red" || $result === "blue";
 
         if ($isWinner) {
-          $this->updateBoxerTitleByMatchResult($match, $titleSnapshot, $result, $redBoxer->id, $blueBoxer->id);
+          $this->updateBoxerTitleByMatchResult($match, $titleSnapshot, $result, $matchData->redBoxer->id, $matchData->blueBoxer->id);
         }
       }
-      // abort(500);
+
       $this->boxerRepository->updateBoxer($newRedBoxerRecord); //? red boxer のデータ更新
       $this->boxerRepository->updateBoxer($newBlueBoxerRecord); //? blue boxer のデータ更新
 
-      //? 新しい試合結果を登録 of 更新
+      //? 新しい試合結果を登録 or 更新
       $this->matchRepository->updateOrCreateMatchResult($matchId, $matchResultArray);
 
       DB::commit();
@@ -412,7 +399,7 @@ class MatchService
    * @param int $blueBoxerId
    * @return bool $isSuccessUpdateTitleSnapshot
    */
-  public function updateBoxerTitleByMatchResult(BoxingMatch $match, Collection $titleSnapshot, string $result, int $redBoxerId, int $blueBoxerId): void
+  private function updateBoxerTitleByMatchResult(BoxingMatch $match, Collection $titleSnapshot, string $result, int $redBoxerId, int $blueBoxerId): void
   {
     foreach ($match->matchTitles as $matchTitle) {
       foreach ($titleSnapshot as &$snapshot) {
@@ -447,6 +434,28 @@ class MatchService
     }
   }
 
+  private function prepareBoxerRecord($matchData)
+  {
+    $redBoxer = $matchData->redBoxer;
+    $blueBoxer = $matchData->blueBoxer;
+
+    return [
+      "redBoxerRecord" => [
+        "id" => $redBoxer["id"],
+        "win" => $redBoxer["win"],
+        "lose" => $redBoxer["lose"],
+        "draw" => $redBoxer["draw"],
+        "ko" => $redBoxer["ko"]
+      ],
+      "blueBoxerRecord" => [
+        "id" => $blueBoxer["id"],
+        "win" => $blueBoxer["win"],
+        "lose" => $blueBoxer["lose"],
+        "draw" => $blueBoxer["draw"],
+        "ko" => $blueBoxer["ko"]
+      ]
+    ];
+  }
   /**
    * Updates the title state of a boxer based on the match result.
    *
@@ -458,10 +467,8 @@ class MatchService
    * 
    * @return bool $isFailedUpdateState 失敗したらtrue
    */
-  public function updateBoxerTitleState(&$snapshot, $isTargetRed, $isTargetBlue, $redState, $blueState)
+  private function updateBoxerTitleState(&$snapshot, $isTargetRed, $isTargetBlue, $redState, $blueState)
   {
-
-    // \Log::debug("test : " . $snapshot instanceof BoxerTitleSnapshot ? "はい" : "違います");
 
     $isFailedUpdateState = false;
     if ($isTargetRed) {
@@ -474,7 +481,6 @@ class MatchService
     return $isFailedUpdateState;
   }
 
-  public function resetBoxerTitleStateOnUpdate(&$snapshot) {}
 
   /**
    * @param array $pastResult (既存のmatchResultデータ)
