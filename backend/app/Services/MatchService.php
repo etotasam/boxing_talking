@@ -26,7 +26,14 @@ use Illuminate\Database\Events\QueryExecuted;
 
 
 use function Psy\debug;
-
+// TODO MatchServiceを廃止を考える
+/**
+ * !単一役割の原則に忠実に・・・
+ * !試合結果を登録する役割をもつStoreMatchResultService
+ * !試合結果に伴ってBoxerTitleSnapshotを登録、更新するBoxerTittleSnapshotServiceを作成する
+ * ?serviceクラスが増える事はあまり問題にならない、それよりもモックのしやすさを考慮するべき
+ * ?このままだと見ての通りMatchServiceクラスの依存注入が多すぎてテスト時にモックを作れない
+ */
 class MatchService
 {
 
@@ -324,7 +331,7 @@ class MatchService
    *
    * @return void
    */
-  // TODO ↓↓↓試合resultを登録時、その結果に基づいてにBoxerTitleSnapshotのstateを動的に変更させている。そのテストを書く↓↓↓
+  // TODO ↓↓↓試合結果でタイトルを取得した時にboxerTitleSnapshotにそのタイトルを追加してstateにnewを付ける↓↓↓
   public function storeMatchResultExecute(array $matchResultArray)
   {
     try {
