@@ -145,8 +145,6 @@ class MatchController extends ApiController
             "round" => $request->round
         ];
 
-        \Log::debug($matchResultArray);
-
         try {
             $this->matchService->storeMatchResultExecute($matchResultArray);
             return $this->responseSuccessful("Successful store match result and update boxers record");

@@ -23,6 +23,8 @@ use App\Services\MatchBoxerSnapshotService;
 use Illuminate\Database\QueryException;
 use App\Exceptions\NonAdministratorException;
 use Illuminate\Database\Events\QueryExecuted;
+// service
+use App\Services\BoxerTitleSnapshotService;
 
 
 use function Psy\debug;
@@ -50,6 +52,7 @@ class MatchService
     protected MatchBoxerSnapshotInterface $MatchBoxerSnapshotRepository,
     protected BoxerTitleSnapshotInterface $BoxerTitleSnapshotRepository,
     protected TitleRepositoryInterface $TitleRepository,
+    protected BoxerTitleSnapshotService $boxerTitleSnapshotService,
   ) {}
 
   /**
@@ -374,7 +377,7 @@ class MatchService
         $isWinner = $result === "red" || $result === "blue";
 
         if ($isWinner) {
-          $this->updateBoxerTitleSnapshotByMatchResult($match, $titleSnapshot, $result, $matchData->redBoxer->id, $matchData->blueBoxer->id);
+          $this->boxerTitleSnapshotService->updateBoxerTitleSnapshot($match, $titleSnapshot, $result, $matchData->redBoxer->id, $matchData->blueBoxer->id);
         }
       }
 
@@ -395,50 +398,6 @@ class MatchService
     }
   }
 
-  /**
-   * Updates the title state of boxers based on the match result.
-   *
-   * @param BoxingMatch $match
-   * @param Collection $titleSnapshot
-   * @param string $result
-   * @param int $redBoxerId
-   * @param int $blueBoxerId
-   * @return bool $isSuccessUpdateTitleSnapshot
-   */
-  private function updateBoxerTitleSnapshotByMatchResult(BoxingMatch $match, Collection $titleSnapshot, string $result, int $redBoxerId, int $blueBoxerId): void
-  {
-    foreach ($match->matchTitles as $matchTitle) {
-      foreach ($titleSnapshot as &$snapshot) {
-        $isSameOrganization = $snapshot["organization_id"] === $matchTitle["organization_id"];
-        $isSameWeight = $snapshot["weight_division_id"] === $match->weight_id;
-        //? 試合にかけられたタイトルと選手の保持していたタイトルが同じ場合
-        $isSameTitle = $isSameOrganization && $isSameWeight;
-        //? 勝者がred
-        $isWinRed = $result === "red";
-        //? 勝者がblue
-        $isWinBlue = $result === "blue";
-        //? redのsnapshot
-        $isTargetRed = $redBoxerId === $snapshot["boxer_id"];
-        //? blueのsnapshot
-        $isTargetBlue = $blueBoxerId === $snapshot["boxer_id"];
-
-        $isTarget = $redBoxerId === $snapshot["boxer_id"] ? "red" : "blue";
-
-        if ($isSameTitle) {
-          $isFailedUpdateTitleState = false;
-          if ($isWinRed) {
-            $isFailedUpdateTitleState = $this->updateBoxerTitleState($snapshot, $isTargetRed, $isTargetBlue, "still", "fall");
-          }
-          if ($isWinBlue) {
-            $isFailedUpdateTitleState =  $this->updateBoxerTitleState($snapshot, $isTargetRed, $isTargetBlue, "fall", "still");
-          }
-          if ($isFailedUpdateTitleState) {
-            throw new Exception('Failed to update boxer title snapshot state');
-          };
-        }
-      }
-    }
-  }
 
   private function prepareBoxerRecord($matchData)
   {
@@ -461,30 +420,6 @@ class MatchService
         "ko" => $blueBoxer["ko"]
       ]
     ];
-  }
-  /**
-   * Updates the title state of a boxer based on the match result.
-   *
-   * @param BoxerTitleSnapshot $snapshot
-   * @param bool $isTargetRed
-   * @param bool $isTargetBlue
-   * @param string $redState
-   * @param string $blueState
-   * 
-   * @return bool $isFailedUpdateState 失敗したらtrue
-   */
-  public function updateBoxerTitleState(&$snapshot, $isTargetRed, $isTargetBlue, $redState, $blueState)
-  {
-
-    $isFailedUpdateState = false;
-    if ($isTargetRed) {
-      $isFailedUpdateState = !$this->BoxerTitleSnapshotRepository->updateBoxerTitleSnapshot($snapshot, $redState);
-    };
-    if ($isTargetBlue) {
-      $isFailedUpdateState = !$this->BoxerTitleSnapshotRepository->updateBoxerTitleSnapshot($snapshot, $blueState);
-    };
-
-    return $isFailedUpdateState;
   }
 
 

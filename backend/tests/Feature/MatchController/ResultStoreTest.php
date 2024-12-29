@@ -174,6 +174,11 @@ class ResultStoreTest extends TestCase
     /** @test */
     public function testUpdateBoxerTitleForResultDraw()
     {
+
+        //事前にデータを入れておく(stateのデフォルト値がnullなので変更しておく)
+        $this->post('/api/match/result', ["match_id" => $this->match->id, "result" => "red", "detail" => "ko", "round" => 1])
+            ->assertStatus(200);
+
         $match_id = $this->match->id;
         $result = "draw";
         $detail = null;
