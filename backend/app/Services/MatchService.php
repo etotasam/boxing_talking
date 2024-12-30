@@ -367,22 +367,16 @@ class MatchService
       DB::beginTransaction();
       if (!$titleSnapshot->isEmpty()) {
 
-        //? 一度snapshotのstateをnullに初期化
-        $isFailedStateReset = $this->BoxerTitleSnapshotRepository->resetBoxerTitleSnapshot($matchId);
-        if ($isFailedStateReset) {
-          throw new Exception('Failed reset boxer title snapshot state to null');
-        }
-        //? 勝者がいるかチェック
+        //? 試合結果の取得
         $result = $matchResultArray["match_result"];
-        $isWinner = $result === "red" || $result === "blue";
 
-        if ($isWinner) {
-          $this->boxerTitleSnapshotService->updateBoxerTitleSnapshot($match, $titleSnapshot, $result, $matchData->redBoxer->id, $matchData->blueBoxer->id);
-        }
+        //? BoxerTitleSnapshot(DB)のstateを更新
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshot($match, $titleSnapshot, $result, $matchData->redBoxer->id, $matchData->blueBoxer->id);
       }
 
-      $this->boxerRepository->updateBoxer($newRedBoxerRecord); //? red boxer のデータ更新
-      $this->boxerRepository->updateBoxer($newBlueBoxerRecord); //? blue boxer のデータ更新
+      //? 試合結果に基づいてボクサーの戦歴を更新
+      $this->boxerRepository->updateBoxer($newRedBoxerRecord);
+      $this->boxerRepository->updateBoxer($newBlueBoxerRecord);
 
       //? 新しい試合結果を登録 or 更新
       $this->matchRepository->updateOrCreateMatchResult($matchId, $matchResultArray);

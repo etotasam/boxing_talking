@@ -30,6 +30,18 @@ class BoxerTitleSnapshotService
    */
   public function updateBoxerTitleSnapshot(BoxingMatch $match, Collection $titleSnapshot, string $result, int $redBoxerId, int $blueBoxerId): void
   {
+    //? 一度snapshotのstateをnullに初期化
+    $isFailedStateReset = $this->BoxerTitleSnapshotRepository->resetBoxerTitleSnapshot($match->id);
+    if ($isFailedStateReset) {
+      throw new Exception('Failed reset boxer title snapshot state to null');
+    }
+    //? 勝者がいるかチェック
+    $isWinner = $result === "red" || $result === "blue";
+
+    //? 勝者がいなければ早期リターン
+    if (!$isWinner) return;
+
+    //? BoxerTitleSnapshotのstateの書き換え
     foreach ($match->matchTitles as $matchTitle) {
       foreach ($titleSnapshot as &$snapshot) {
         $isSameOrganization = $snapshot["organization_id"] === $matchTitle["organization_id"];
