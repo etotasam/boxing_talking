@@ -16,7 +16,7 @@ class BoxerTitleSnapshotService
     protected BoxerTitleSnapshotInterface $BoxerTitleSnapshotRepository,
   ) {}
 
-  // TODO ここにBoxerTitleSnapshotへのデータ登録のメソッドを作成しよう
+  // TODO BoxerTitleSnapshotへのデータ登録のメソッドを作成するか、update, storeをそれぞれ別のserviceにするかを検討
 
   /**
    * Updates the title state of boxers based on the match result.

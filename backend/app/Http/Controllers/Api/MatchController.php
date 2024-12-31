@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\MatchService;
 use App\Services\AuthService;
+use App\Services\MatchResultStoreService;
 use App\Http\Resources\BoxingMatchResource;
 use App\Models\BoxingMatch;
 use Illuminate\Database\Events\QueryExecuted;
@@ -24,6 +25,7 @@ class MatchController extends ApiController
 
     public function __construct(
         private MatchService $matchService,
+        private MatchResultStoreService $matchResultStoreService,
         private AuthService $authService,
         private WeightDivisionRepositoryInterface $weightRepository,
         private GradeRepositoryInterface $gradeRepository,
@@ -146,7 +148,8 @@ class MatchController extends ApiController
         ];
 
         try {
-            $this->matchService->storeMatchResultExecute($matchResultArray);
+            $this->matchResultStoreService->storeMatchResult($matchResultArray);
+            // $this->matchService->storeMatchResultExecute($matchResultArray);
             return $this->responseSuccessful("Successful store match result and update boxers record");
         } catch (Exception $e) {
             return $this->responseInvalidQuery($e->getMessage());

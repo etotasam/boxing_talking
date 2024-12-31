@@ -116,6 +116,7 @@ class ResultStoreTest extends TestCase
      */
     public function testUpdateBoxerTitleStateWhenRedBoxerWins()
     {
+        // $this->markTestSkipped();
 
         $match_id = $this->match->id;
         $result = "red";
@@ -148,6 +149,8 @@ class ResultStoreTest extends TestCase
      */
     public function testUpdateBoxerTitleStateWhenBlueBoxerWins()
     {
+        // $this->markTestSkipped();
+
         $match_id = $this->match->id;
         $result = "blue";
         $detail = "ko";
@@ -174,6 +177,8 @@ class ResultStoreTest extends TestCase
     /** @test */
     public function testUpdateBoxerTitleForResultDraw()
     {
+
+        // $this->markTestSkipped();
 
         //事前にデータを入れておく(stateのデフォルト値がnullなので変更しておく)
         $this->post('/api/match/result', ["match_id" => $this->match->id, "result" => "red", "detail" => "ko", "round" => 1])
@@ -209,6 +214,7 @@ class ResultStoreTest extends TestCase
     public function testUpdateBoxerTitleAlreadyHasState()
     {
 
+        // $this->markTestSkipped();
 
         $result_1 = ["match_id" => $this->match->id, "result" => "red", "detail" => "ko", "round" => 1];
 
