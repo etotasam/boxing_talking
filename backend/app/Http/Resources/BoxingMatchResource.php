@@ -29,7 +29,6 @@ class BoxingMatchResource extends JsonResource
     {
 
         $this->match->load(['redBoxer', 'blueBoxer', 'result', 'getWeight', 'getGrade']);
-        // \Log::debug("aaaaa : " . $this->match->titleSnapshot["red"] instanceof Collection);
 
 
         $resultResource = $this->match->result
