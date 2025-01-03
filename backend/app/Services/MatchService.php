@@ -78,12 +78,8 @@ class MatchService
         throw new Exception("Can not create match", 51);
       }
 
-      $redBoxerId = $formattedMatchData['red_boxer_id'];
-      $blueBoxerId = $formattedMatchData['blue_boxer_id'];
-      $matchId = $createdMatch['id'];
-
       //? 試合時の選手の戦歴、保有ベルトのスナップショットをstore
-      $isSuccessSnapshot = $this->matchBoxerSnapshotService->storeMatchBoxerSnapshot(["match_id" => $matchId, "red_boxer_id" => $redBoxerId, "blue_boxer_id" => $blueBoxerId]);
+      $isSuccessSnapshot = $this->matchBoxerSnapshotService->storeMatchBoxerSnapshot(["match_id" => $createdMatch['id'], "red_boxer_id" => $createdMatch['red_boxer_id'], "blue_boxer_id" => $createdMatch['blue_boxer_id']]);
 
       if (!$isSuccessSnapshot) {
         throw new Exception("Failed store snapshot data", 500);

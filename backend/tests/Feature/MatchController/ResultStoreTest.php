@@ -44,9 +44,7 @@ class ResultStoreTest extends TestCase
         ];
 
         //? ボクサー作成
-        $boxers = Boxer::factory()->count(2)->create();
-        $this->redBoxer = $boxers[0];
-        $this->blueBoxer = $boxers[1];
+        [$this->redBoxer, $this->blueBoxer] = Boxer::factory()->count(2)->create();
 
         //? 試合作成
         $this->match = BoxingMatch::factory()->create([

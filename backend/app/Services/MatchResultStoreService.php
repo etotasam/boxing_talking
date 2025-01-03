@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use Exception;
+use App\Models\BoxingMatch;
+use App\Models\BoxerTitleSnapshot;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
 use \Illuminate\Support\Collection;
@@ -42,16 +44,14 @@ class MatchResultStoreService
       $matchId = (int)$matchResultArray['match_id'];
 
       //? 試合情報の取得
-      $matchData = $this->matchRepository->getMatchById($matchId);
-      $pastResult = $matchData->result;
+      $match = $this->matchRepository->getMatchById($matchId);
 
       //? 選手の戦歴を準備、作成
-      $boxerRecords = $this->prepareBoxerRecord($matchData);
+      $boxerRecords = $this->prepareBoxerRecord($match);
 
       //? すでにmatch_resultが存在している場合はボクサーの戦歴を元に戻す
-      $isMatchResult = $this->matchRepository->isMatchResult($matchId);
-      if ($isMatchResult) {
-        [$rollbackRedBoxerRecord, $rollbackBlueBoxerRecord] = $this->rollbackBoxersRecord($pastResult->toArray(), $boxerRecords["redBoxerRecord"], $boxerRecords["blueBoxerRecord"]);
+      if ($match->result) {
+        [$rollbackRedBoxerRecord, $rollbackBlueBoxerRecord] = $this->rollbackBoxersRecord($match->result->toArray(), $boxerRecords["redBoxerRecord"], $boxerRecords["blueBoxerRecord"]);
         $redBoxerRecord = $rollbackRedBoxerRecord; //! $redBoxerRecordの上書き
         $blueBoxerRecord = $rollbackBlueBoxerRecord; //! $blueBoxerRecordの上書き
       }
@@ -69,7 +69,7 @@ class MatchResultStoreService
         $result = $matchResultArray["match_result"];
 
         //? BoxerTitleSnapshot(DB)のstateを更新
-        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshot($match, $titleSnapshot, $result, $matchData->redBoxer->id, $matchData->blueBoxer->id);
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshot($match, $titleSnapshot, $result, $match->redBoxer->id, $match->blueBoxer->id);
       }
 
       //? 試合結果に基づいてボクサーの戦歴を更新
@@ -119,7 +119,12 @@ class MatchResultStoreService
     }
   }
 
-  private function prepareBoxerRecord($matchData)
+  /**
+   * @param BoxingMatch $matchData (試合データ)
+   * 
+   * @return array (redBoxerRecord, blueBoxerRecord) - ["redBoxerRecord" => ["id" => , "win" => , "lose" => , "draw" => , "ko" => ]]
+   */
+  private function prepareBoxerRecord(BoxingMatch $matchData)
   {
     $redBoxer = $matchData->redBoxer;
     $blueBoxer = $matchData->blueBoxer;

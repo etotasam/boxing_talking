@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 use \Illuminate\Support\Collection;
 use App\Models\BoxingMatch;
 use App\Models\BoxerTitleSnapshot;
@@ -26,11 +27,12 @@ class BoxerTitleSnapshotService
    * @param string $result
    * @param int $redBoxerId
    * @param int $blueBoxerId
-   * @return bool $isSuccessUpdateTitleSnapshot
+   * @return void
    */
   public function updateBoxerTitleSnapshot(BoxingMatch $match, Collection $titleSnapshot, string $result, int $redBoxerId, int $blueBoxerId): void
   {
     //? 一度snapshotのstateをnullに初期化
+    // TODO これをテスト
     $isFailedStateReset = $this->BoxerTitleSnapshotRepository->resetBoxerTitleSnapshot($match->id);
     if ($isFailedStateReset) {
       throw new Exception('Failed reset boxer title snapshot state to null');
