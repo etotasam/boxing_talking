@@ -62,7 +62,7 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
             [
                 ["match_id" => $this->match->id, "organization_id" => $this->organization["WBA"]],
                 ["match_id" => $this->match->id, "organization_id" => $this->organization["WBC"]],
-                // ["match_id" => $this->match->id, "organization_id" => $this->organization["WBO"]],
+                ["match_id" => $this->match->id, "organization_id" => $this->organization["WBO"]],
                 // ["match_id" => $this->match->id, "organization_id" => $this->organization["IBF"]],
             ]
         );
@@ -100,6 +100,7 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
      */
     public function testThrowExceptionWhenResetFailed()
     {
+
         //? 例外が投げられることを期待
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Failed reset boxer title snapshot state to null');
@@ -116,7 +117,7 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
         $this->boxerTitleSnapshotService = new BoxerTitleSnapshotService($mockRepository);
 
         //? テスト実行
-        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshot($this->match, $this->match->boxerTitleSnapshot, 'draw', $this->redBoxer->id, $this->blueBoxer->id);
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'draw', $this->redBoxer->id, $this->blueBoxer->id);
     }
 
     /**
@@ -129,7 +130,7 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
     {
 
         //? redが勝利したパターンのアップデートを実行
-        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshot($this->match, $this->match->boxerTitleSnapshot, 'red', $this->redBoxer->id, $this->blueBoxer->id);
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'red', $this->redBoxer->id, $this->blueBoxer->id);
 
         //? 選手の保持タイトルstateが勝敗で更新されているか
         $this->assertDatabaseHas('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->redBoxer->id, 'organization_id' => $this->organization["WBA"], "weight_division_id" => $this->weight["middle"], "state" => "still"]);

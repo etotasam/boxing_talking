@@ -34,7 +34,6 @@ class MatchResultStoreService
    *
    * @return void
    */
-  // TODO ↓↓↓試合結果でタイトル(ベルト)を取得した時にboxerTitleSnapshotにそのタイトルを追加してstateにnewを付ける↓↓↓
   public function storeMatchResult(array $matchResultArray)
   {
     try {
@@ -61,15 +60,17 @@ class MatchResultStoreService
       $match = $this->matchRepository->getMatchById($matchId);
       //? この試合のBoxerTitleSnapshotの取得
       $titleSnapshot = $match->boxerTitleSnapshot;
+      $matchTitles = $match->matchTitles;
 
       DB::beginTransaction();
-      if (!$titleSnapshot->isEmpty()) {
+      //? タイトルマッチの時のみ
+      if (!$matchTitles->isEmpty()) {
 
         //? 試合結果の取得
         $result = $matchResultArray["match_result"];
 
         //? BoxerTitleSnapshot(DB)のstateを更新
-        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshot($match, $titleSnapshot, $result, $match->redBoxer->id, $match->blueBoxer->id);
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($match, $result, $match->redBoxer->id, $match->blueBoxer->id);
       }
 
       //? 試合結果に基づいてボクサーの戦歴を更新
