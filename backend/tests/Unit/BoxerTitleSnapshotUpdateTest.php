@@ -139,4 +139,36 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
         $this->assertDatabaseHas('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->redBoxer->id, 'organization_id' => $this->organization["IBF"], "weight_division_id" => $this->weight["middle"], "state" => null]);
         $this->assertDatabaseHas('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->redBoxer->id, 'organization_id' => $this->organization["WBA"], "weight_division_id" => $this->weight["welter"], "state" => null]);
     }
+
+    /**
+     * @test
+     * 新たなタイトルを取得した時に新しいスナップショットを作成し、stateはnewになるか
+     */
+    public function testNewBoxerTitle()
+    {
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'blue', $this->redBoxer->id, $this->blueBoxer->id);
+
+        //? 勝った選手(blue)のスナップショットに新たなタイトルが追加されていて、stateがnewになっているか
+        $this->assertDatabaseHas('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->blueBoxer->id, 'organization_id' => $this->organization["WBA"], "weight_division_id" => $this->weight["middle"], "state" => "new"]);
+        $this->assertDatabaseHas('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->blueBoxer->id, 'organization_id' => $this->organization["WBO"], "weight_division_id" => $this->weight["middle"], "state" => "new"]);
+        $this->assertDatabaseHas('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->blueBoxer->id, 'organization_id' => $this->organization["WBC"], "weight_division_id" => $this->weight["middle"], "state" => "still"]);
+        //? 負けた選手(red)は所持していたタイトルのstateがfallになっているか
+        $this->assertDatabaseHas('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->redBoxer->id, 'organization_id' => $this->organization["WBA"], "weight_division_id" => $this->weight["middle"], "state" => "fall"]);
+    }
+
+    /**
+     * @test
+     * 試合結果を変更する際、勝敗が変わる場合はstateがnewのレコードを削除する
+     */
+    public function testDeleteNewTitleSnapshot()
+    {
+        //? 事前データ
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'blue', $this->redBoxer->id, $this->blueBoxer->id);
+        $this->assertDatabaseHas('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->blueBoxer->id, 'organization_id' => $this->organization["WBA"], "weight_division_id" => $this->weight["middle"], "state" => "new"]);
+
+        //? 勝敗が変わる変更をした際にnewのレコードが削除されているか
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'red', $this->redBoxer->id, $this->blueBoxer->id);
+        $this->assertDatabaseMissing('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->blueBoxer->id, 'organization_id' => $this->organization["WBA"], "weight_division_id" => $this->weight["middle"], "state" => "new"]);
+        $this->assertDatabaseMissing('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->blueBoxer->id, 'organization_id' => $this->organization["WBO"], "weight_division_id" => $this->weight["middle"], "state" => "new"]);
+    }
 }

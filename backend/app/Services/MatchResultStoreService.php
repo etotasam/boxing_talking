@@ -46,11 +46,11 @@ class MatchResultStoreService
       $match = $this->matchRepository->getMatchById($matchId);
 
       //? 選手の戦歴を準備、作成
-      $boxerRecords = $this->prepareBoxerRecord($match);
+      [$redBoxerRecord, $blueBoxerRecord] = $this->prepareBoxerRecord($match);
 
       //? すでにmatch_resultが存在している場合はボクサーの戦歴を元に戻す
       if ($match->result) {
-        [$rollbackRedBoxerRecord, $rollbackBlueBoxerRecord] = $this->rollbackBoxersRecord($match->result->toArray(), $boxerRecords["redBoxerRecord"], $boxerRecords["blueBoxerRecord"]);
+        [$rollbackRedBoxerRecord, $rollbackBlueBoxerRecord] = $this->rollbackBoxersRecord($match->result->toArray(), $redBoxerRecord, $blueBoxerRecord);
         $redBoxerRecord = $rollbackRedBoxerRecord; //! $redBoxerRecordの上書き
         $blueBoxerRecord = $rollbackBlueBoxerRecord; //! $blueBoxerRecordの上書き
       }
@@ -130,22 +130,21 @@ class MatchResultStoreService
     $redBoxer = $matchData->redBoxer;
     $blueBoxer = $matchData->blueBoxer;
 
-    return [
-      "redBoxerRecord" => [
-        "id" => $redBoxer["id"],
-        "win" => $redBoxer["win"],
-        "lose" => $redBoxer["lose"],
-        "draw" => $redBoxer["draw"],
-        "ko" => $redBoxer["ko"]
-      ],
-      "blueBoxerRecord" => [
-        "id" => $blueBoxer["id"],
-        "win" => $blueBoxer["win"],
-        "lose" => $blueBoxer["lose"],
-        "draw" => $blueBoxer["draw"],
-        "ko" => $blueBoxer["ko"]
-      ]
+    $redBoxerRecord = [
+      "id" => $redBoxer->id,
+      "win" => $redBoxer->win,
+      "lose" => $redBoxer->lose,
+      "draw" => $redBoxer->draw,
+      "ko" => $redBoxer->ko
     ];
+    $blueBoxerRecord = [
+      "id" => $blueBoxer->id,
+      "win" => $blueBoxer->win,
+      "lose" => $blueBoxer->lose,
+      "draw" => $blueBoxer->draw,
+      "ko" => $blueBoxer->ko
+    ];
+    return [$redBoxerRecord, $blueBoxerRecord];
   }
 
   /**

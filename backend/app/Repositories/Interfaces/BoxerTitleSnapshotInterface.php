@@ -24,5 +24,20 @@ interface BoxerTitleSnapshotInterface
    */
   public function resetBoxerTitleSnapshot($matchId);
 
+  /**
+   * 試合時の選手の保持タイトルを取得
+   * @param int $matchId
+   * @return Collection
+   */
   public function getTitleSnapshot(int $matchId);
+
+  /**
+   * スナップショットの削除
+   * @param int $matchId
+   * @param int $boxerId
+   * @param int $organizationId
+   * @param int $weightDivisionId
+   * @return int 削除した件数
+   */
+  public function deleteBoxerTitleSnapshot(int $matchId, int $boxerId, int $organizationId, int $weightDivisionId);
 }
