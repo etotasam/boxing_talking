@@ -164,11 +164,50 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
     {
         //? 事前データ
         $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'blue', $this->redBoxer->id, $this->blueBoxer->id);
-        $this->assertDatabaseHas('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->blueBoxer->id, 'organization_id' => $this->organization["WBA"], "weight_division_id" => $this->weight["middle"], "state" => "new"]);
+        $this->assertDatabaseHas('boxer_title_snapshots', [
+            'match_id' => $this->match->id,
+            'boxer_id' => $this->blueBoxer->id,
+            'organization_id' => $this->organization["WBA"],
+            "weight_division_id" => $this->weight["middle"],
+            "state" => "new"
+        ]);
 
         //? 勝敗が変わる変更をした際にnewのレコードが削除されているか
         $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'red', $this->redBoxer->id, $this->blueBoxer->id);
-        $this->assertDatabaseMissing('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->blueBoxer->id, 'organization_id' => $this->organization["WBA"], "weight_division_id" => $this->weight["middle"], "state" => "new"]);
-        $this->assertDatabaseMissing('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->blueBoxer->id, 'organization_id' => $this->organization["WBO"], "weight_division_id" => $this->weight["middle"], "state" => "new"]);
+        $this->assertDatabaseMissing('boxer_title_snapshots', [
+            'match_id' => $this->match->id,
+            'boxer_id' => $this->blueBoxer->id,
+            'organization_id' => $this->organization["WBA"],
+            "weight_division_id" => $this->weight["middle"],
+            "state" => "new"
+        ]);
+        $this->assertDatabaseMissing('boxer_title_snapshots', [
+            'match_id' => $this->match->id,
+            'boxer_id' => $this->blueBoxer->id,
+            'organization_id' => $this->organization["WBO"],
+            "weight_division_id" => $this->weight["middle"],
+            "state" => "new"
+        ]);
+    }
+
+    /**
+     * @test
+     * 試合結果で、ボクサーが新たなタイトルを取得した時、titlesテーブルの方にもそのタイトル情報が登録されているか
+     */
+    // TODO このテストが通る様にしてねー、あと関数名はちょっと考えてねー
+    public function testTitlesTableStoreWhenTakeNewTitle()
+    {
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'blue', $this->redBoxer->id, $this->blueBoxer->id);
+
+        $this->assertDatabaseHas('titles', [
+            'boxer_id' => $this->blueBoxer->id,
+            'organization_id' => $this->organization["WBA"],
+            "weight_division_id" => $this->weight["middle"],
+        ]);
+        $this->assertDatabaseHas('boxer_title_snapshots', [
+            'boxer_id' => $this->blueBoxer->id,
+            'organization_id' => $this->organization["WBO"],
+            "weight_division_id" => $this->weight["middle"],
+        ]);
     }
 }
