@@ -34,7 +34,7 @@ class MatchResultStoreService
    *
    * @return void
    */
-  public function storeMatchResult(array $matchResultArray)
+  public function storeMatchResultExecute(array $matchResultArray)
   {
     try {
       // バリデーション。必須項目チェック
@@ -55,6 +55,7 @@ class MatchResultStoreService
         $blueBoxerRecord = $rollbackBlueBoxerRecord; //! $blueBoxerRecordの上書き
       }
 
+      //? 勝敗に応じてボクサーの戦績を変更する
       [$newRedBoxerRecord, $newBlueBoxerRecord] = $this->adjustBoxerRecordWithResult($matchResultArray, $redBoxerRecord, $blueBoxerRecord);
 
       $match = $this->matchRepository->getMatchById($matchId);
@@ -62,22 +63,33 @@ class MatchResultStoreService
       $titleSnapshot = $match->boxerTitleSnapshot;
       $matchTitles = $match->matchTitles;
 
+
       DB::beginTransaction();
       //? タイトルマッチの時のみ
       if (!$matchTitles->isEmpty()) {
 
         //? 試合結果の取得
         $result = $matchResultArray["match_result"];
+        //? この試合に勝者がいるか
+        $isWinner = $result === 'red' || $result === 'blue';
 
         //? BoxerTitleSnapshot(DB)のstateを更新
+        //TODO refactor なんでパラメータで$matchを渡してるのにそこから得られるものも別途渡してるの？$match渡してるならそれだけでええやん
         $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($match, $result, $match->redBoxer->id, $match->blueBoxer->id);
+
+        if ($isWinner) {
+          //TODO 試合がタイトルマッチの場合、結果に応じてボクサーのタイトル(titlesテーブル)を登録 or 削除する
+          $winnerBoxerId = $result === 'red' ? $match->red_boxer_id : $match->blue_boxer_id;
+          $this->adjustBoxerTitles($matchTitles, $titleSnapshot, $match->weight_id, $winnerBoxerId);
+        }
       }
 
       //? 試合結果に基づいてボクサーの戦歴を更新
       $this->boxerRepository->updateBoxer($newRedBoxerRecord);
       $this->boxerRepository->updateBoxer($newBlueBoxerRecord);
 
-      //? 新しい試合結果を登録 or 更新
+
+      //? 試合結果の登録 or 更新
       $this->matchRepository->updateOrCreateMatchResult($matchId, $matchResultArray);
 
       DB::commit();
@@ -88,6 +100,35 @@ class MatchResultStoreService
     } catch (\Exception $e) {
       DB::rollBack();
       throw new Exception($e->getMessage());
+    }
+  }
+
+  /**
+   * @param Collection $matchTitles
+   * @param Collection $boxerTitleSnapshot
+   * @param int $matchWeightId
+   * @param int $winnerBoxerId
+   * @return void
+   */
+  private function adjustBoxerTitles(Collection $matchTitles, Collection $boxerTitleSnapshot, int $matchWeightId, int $winnerBoxerId): void
+  {
+    $hasTitles = $boxerTitleSnapshot->map(function ($snapTitle) use ($winnerBoxerId, $matchWeightId) {
+      if ($snapTitle['boxer_id'] === $winnerBoxerId && $matchWeightId === $snapTitle['weight_division_id']) {
+        return $snapTitle;
+      }
+    })->filter()->values();
+
+    foreach ($matchTitles as $matchTitle) {
+      if (!$hasTitles->isEmpty()) {
+        foreach ($hasTitles as $hasTitle) {
+          $isSameOrganization = $matchTitle['organization_id'] === $hasTitle['organization_id'];
+          // $isSameWeight = $matchWeightId === $hasTitle['weight_division_id'];
+          if (!$isSameOrganization) {
+            // TODO
+            \Log::debug("タイトル : " . print_r($matchTitle->toArray(), true));
+          }
+        }
+      }
     }
   }
 
@@ -191,6 +232,7 @@ class MatchResultStoreService
   }
 
   /**
+   * 試合結果に応じて両ボクサーの戦績を変更する
    * @param array $postResult (matchResultデータ)
    * @param array $redBoxerRecord (red boxer data)
    * @param array $blueBoxerRecord (blue boxer data)

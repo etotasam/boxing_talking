@@ -18,8 +18,6 @@ class BoxerTitleSnapshotService
     protected BoxerTitleSnapshotInterface $boxerTitleSnapshotRepository,
   ) {}
 
-  // TODO BoxerTitleSnapshotへのデータ登録のメソッドを作成するか、update, storeをそれぞれ別のserviceにするかを検討
-
   /**
    * Updates the title state of boxers based on the match result.
    *
@@ -31,7 +29,6 @@ class BoxerTitleSnapshotService
    */
   public function updateBoxerTitleSnapshotState(BoxingMatch $match, string $result, int $redBoxerId, int $blueBoxerId): void
   {
-    //TODO 選手の保持タイトルの方も削除(スナップショットではなくtitlesテーブル)
     //? 試合結果修正で勝者が変わる場合はボクサーのタイトルスナップショットのstateがnewのタイトルは削除する
     if ($match->result !== $result) {
       $match->boxerTitleSnapshot->each(function ($snapshot) {
@@ -92,7 +89,6 @@ class BoxerTitleSnapshotService
       return $isWinnerBoxer && $isSameWeight && $isSameOrganization;
     });
 
-    //TODO ボクサーの保持タイトルに新たなタイトルを追加(スナップショットではなくtitlesテーブル)
     //? 取得した新たなタイトルをスナップショットに保存してstateはnewにする
     if (!$hasTitle) {
       $this->boxerTitleSnapshotRepository->storeBoxerTitleSnapshot([

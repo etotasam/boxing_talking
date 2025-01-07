@@ -194,20 +194,41 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
      * @test
      * 試合結果で、ボクサーが新たなタイトルを取得した時、titlesテーブルの方にもそのタイトル情報が登録されているか
      */
-    // TODO このテストが通る様にしてねー、あと関数名はちょっと考えてねー
     public function testTitlesTableStoreWhenTakeNewTitle()
     {
+
+        $expectTitles = [
+            [
+                'boxer_id' => $this->blueBoxer->id,
+                'organization_id' => $this->organization["WBA"],
+                "weight_division_id" => $this->weight["middle"],
+            ],
+            [
+                'boxer_id' => $this->blueBoxer->id,
+                'organization_id' => $this->organization["WBO"],
+                "weight_division_id" => $this->weight["middle"],
+            ]
+        ];
+
         $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'blue', $this->redBoxer->id, $this->blueBoxer->id);
 
-        $this->assertDatabaseHas('titles', [
-            'boxer_id' => $this->blueBoxer->id,
-            'organization_id' => $this->organization["WBA"],
-            "weight_division_id" => $this->weight["middle"],
-        ]);
-        $this->assertDatabaseHas('boxer_title_snapshots', [
-            'boxer_id' => $this->blueBoxer->id,
-            'organization_id' => $this->organization["WBO"],
-            "weight_division_id" => $this->weight["middle"],
-        ]);
+        foreach ($expectTitles as $title) {
+            $this->assertDatabaseHas('titles', [
+                'boxer_id' => $title['id'],
+                'organization_id' => $title['organization_id'],
+                "weight_division_id" => $title['weight_division_id'],
+            ]);
+        }
     }
+
+
+
+    /**
+     * @test
+     * 試合結果を後に変更した際、勝敗が変わり所持タイトルに変化がある場合titlesテーブルからそのタイトルを削除する
+     */
+    // public function testDeleteTitleWhenWinLoseResultUpdate()
+    // {
+    //     $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'blue', $this->redBoxer->id, $this->blueBoxer->id);
+    // }
 }

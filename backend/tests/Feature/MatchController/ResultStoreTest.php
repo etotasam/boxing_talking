@@ -111,6 +111,7 @@ class ResultStoreTest extends TestCase
 
     /**
      * @test
+     * 勝者がタイトルを防衛した時はstateがstillになり、敗者のタイトルのstateはfallになる
      */
     public function testUpdateBoxerTitleStateWhenRedBoxerWins()
     {
@@ -246,6 +247,37 @@ class ResultStoreTest extends TestCase
             $this->assertDatabaseHas('boxer_title_snapshots', array_merge([
                 'match_id' => $this->match->id,
                 "weight_division_id" => $this->division["heavy"],
+            ], $result));
+        }
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     * 勝敗でタイトルを獲得、奪取された場合にtitlesテーブルから対象を追加、削除する
+     */
+    public function testAdjustTitleWithResult()
+    {
+        $match_id = $this->match->id;
+        $result = "red";
+        $detail = "ko";
+        $round = 1;
+
+        //? 試合でredが勝った時に取得するタイトル
+        $expectedTitle = [
+            ['boxer_id' => $this->redBoxer->id, "organization_id" => $this->organization["WBO"], "weight_division_id" => $this->division["heavy"]],
+            ['boxer_id' => $this->redBoxer->id, "organization_id" => $this->organization["IBF"], "weight_division_id" => $this->division["heavy"]],
+        ];
+
+        //? リクエスト送信 redの勝利
+        $response = $this->post('/api/match/result', compact("match_id", "result", "detail", "round"));
+
+        //? titlesテーブルに取得したタイトルが登録されているか
+        foreach ($expectedTitle as $result) {
+            $this->assertDatabaseHas('titles', array_merge([
+                'boxer_id' => $result['boxer_id'],
+                'organization_id' => $result['organization_id'],
+                "weight_division_id" => $result['weight_division_id'],
             ], $result));
         }
         $response->assertStatus(200);
