@@ -34,6 +34,7 @@ class ResultStoreTest extends TestCase
             "heavy" => 1,
             "cruiser" => 2,
             "lightHeavy" => 3,
+            "middle" => 5,
         ];
 
         $this->organization = [
@@ -61,7 +62,7 @@ class ResultStoreTest extends TestCase
                 ["match_id" => $this->match->id, "organization_id" => 4], //IBF
             ]
         );
-        //? 試合時にボクサー保持タイトル(BoxerTitleSnapshot)
+        //? 試合時のボクサー保持タイトル(BoxerTitleSnapshot)
         $this->boxerTitleSnapshot = [
             [
                 "match_id" => $this->match->id,
@@ -274,12 +275,49 @@ class ResultStoreTest extends TestCase
 
         //? titlesテーブルに取得したタイトルが登録されているか
         foreach ($expectedTitle as $result) {
-            $this->assertDatabaseHas('titles', array_merge([
+            $this->assertDatabaseHas('titles', [
                 'boxer_id' => $result['boxer_id'],
                 'organization_id' => $result['organization_id'],
                 "weight_division_id" => $result['weight_division_id'],
-            ], $result));
+            ]);
         }
         $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     * タイトルマッチ時に勝利ボクサーがタイトルを保持していない場合でも正常にタイトルがstoreされる
+     */
+    public function testNotHasTitle()
+    {
+        //? 試合作成
+        $this->matchOnMiddle = BoxingMatch::factory()->create([
+            'red_boxer_id' => $this->redBoxer->id,
+            'blue_boxer_id' => $this->blueBoxer->id,
+            'weight_id' => $this->division['middle'],
+        ],);
+        //? 試合のタイトルを登録
+        $titleMatches = [
+            ["match_id" => $this->matchOnMiddle->id, "organization_id" => $this->organization['WBA']],
+            ["match_id" => $this->matchOnMiddle->id, "organization_id" => $this->organization['WBC']]
+        ];
+        TitleMatch::insert($titleMatches);
+
+        // $this->assertDatabaseHas('title_matches', ['match_id' => $this->matchOnMiddle->id, 'organization_id' => $this->organization['WBA']]);
+        $match_id = $this->matchOnMiddle->id;
+        $result = "red";
+        $detail = "ko";
+        $round = 1;
+        //? リクエスト送信 redの勝利
+        $response = $this->post('/api/match/result', compact("match_id", "result", "detail", "round"));
+
+        //? 試合に掛けられた全てのタイトルが勝者に付与されているか
+        foreach ($titleMatches as $titles) {
+            $this->assertDatabaseHas('titles', [
+                'boxer_id' => $this->redBoxer->id,
+                'organization_id' => $titles['organization_id'],
+                'weight_division_id' => $this->division['middle']
+            ]);
+        }
     }
 }

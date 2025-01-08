@@ -11,6 +11,7 @@ use \Illuminate\Support\Collection;
 use App\Services\BoxerTitleSnapshotService;
 use App\Repositories\Interfaces\MatchRepositoryInterface;
 use App\Repositories\Interfaces\BoxerRepositoryInterface;
+use App\Repositories\Interfaces\TitleRepositoryInterface;
 
 
 
@@ -21,6 +22,7 @@ class MatchResultStoreService
     protected BoxerTitleSnapshotService $boxerTitleSnapshotService,
     protected MatchRepositoryInterface $matchRepository,
     protected BoxerRepositoryInterface $boxerRepository,
+    protected TitleRepositoryInterface $titleRepository,
   ) {}
 
 
@@ -78,7 +80,7 @@ class MatchResultStoreService
         $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($match, $result, $match->redBoxer->id, $match->blueBoxer->id);
 
         if ($isWinner) {
-          //TODO 試合がタイトルマッチの場合、結果に応じてボクサーのタイトル(titlesテーブル)を登録 or 削除する
+          //TODO adjustBoxerTitlesは試合の登録は完了(refactorは必須かも)してるが、負けた方のタイトルを削除する仕様はまだ実装していない
           $winnerBoxerId = $result === 'red' ? $match->red_boxer_id : $match->blue_boxer_id;
           $this->adjustBoxerTitles($matchTitles, $titleSnapshot, $match->weight_id, $winnerBoxerId);
         }
@@ -103,7 +105,9 @@ class MatchResultStoreService
     }
   }
 
+
   /**
+   * タイトルマッチの試合結果によるタイトルの変動を管理
    * @param Collection $matchTitles
    * @param Collection $boxerTitleSnapshot
    * @param int $matchWeightId
@@ -112,22 +116,32 @@ class MatchResultStoreService
    */
   private function adjustBoxerTitles(Collection $matchTitles, Collection $boxerTitleSnapshot, int $matchWeightId, int $winnerBoxerId): void
   {
+    //? 試合と同じ階級で試合時に保持していたタイトルを抽出
     $hasTitles = $boxerTitleSnapshot->map(function ($snapTitle) use ($winnerBoxerId, $matchWeightId) {
       if ($snapTitle['boxer_id'] === $winnerBoxerId && $matchWeightId === $snapTitle['weight_division_id']) {
         return $snapTitle;
       }
     })->filter()->values();
 
-    foreach ($matchTitles as $matchTitle) {
-      if (!$hasTitles->isEmpty()) {
+    //? 保持タイトルがある場合
+    if (!$hasTitles->isEmpty()) {
+      foreach ($matchTitles as $matchTitle) {
         foreach ($hasTitles as $hasTitle) {
-          $isSameOrganization = $matchTitle['organization_id'] === $hasTitle['organization_id'];
-          // $isSameWeight = $matchWeightId === $hasTitle['weight_division_id'];
-          if (!$isSameOrganization) {
-            // TODO
-            \Log::debug("タイトル : " . print_r($matchTitle->toArray(), true));
+          $hasOrganizationsTitle = $matchTitle['organization_id'] === $hasTitle['organization_id'];
+          if (!$hasOrganizationsTitle) {
+            $this->titleRepository->createTitlesHoldByTheBoxer($winnerBoxerId, $matchTitle['organization_id'], $matchWeightId);
           }
         }
+      }
+      //? 保持タイトルが皆無の場合
+    } else {
+      $registerTitles = $matchTitles->map(function ($title) use ($winnerBoxerId, $matchWeightId) {
+        return ['boxer_id' => $winnerBoxerId, 'organization_id' => $title['organization_id'], 'weight_division_id' => $matchWeightId];
+      });
+
+      $isFailedStoreTitles = !$this->titleRepository->storeTitlesHoldByTheBoxer($registerTitles->toArray());
+      if ($isFailedStoreTitles) {
+        throw new Exception('Failed insert new boxer titles');
       }
     }
   }
