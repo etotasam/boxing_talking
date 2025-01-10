@@ -7,15 +7,20 @@ use App\Models\BoxerTitleSnapshot;
 
 interface BoxerTitleSnapshotInterface
 {
+  /**
+   * ! 試合登録時の選手保有タイトルを(boxer_title_snapshotテーブル)保存(一括)
+   * @param array $titlesArray [["match_id" => int, "boxer_id" => int, "organization_id" => int, "weight_division_id" => int, "state" => null | string], ...]
+   * @return bool
+   */
   public function storeBoxerTitleSnapshot(array $titlesArray);
 
   /**
    * Update the state of a boxer's title snapshot.
-   * @param BoxerTitleSnapshot $snapshot
+   * @param Collection|array $snapshot
    * @param string $state "new" | "still" | "fall"
    * @return bool $isSuccess
    */
-  public function updateBoxerTitleSnapshot(BoxerTitleSnapshot $snapshot, string $state);
+  public function updateBoxerTitleSnapshot(Collection|array $snapshot, string $state);
 
   /**
    * Update時にstateを一度全てnullにする為

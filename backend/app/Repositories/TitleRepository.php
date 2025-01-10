@@ -55,12 +55,30 @@ class TitleRepository implements TitleRepositoryInterface
   }
 
   /**
-   * ボクサーが所持するタイトル(titlesテーブル)を削除
+   * ボクサーが所持するタイトル(titlesテーブル)を全て削除
    * @param int boxerId
    * @return int
    */
   public function deleteTitlesHoldByTheBoxer($boxerId)
   {
     return Title::where('boxer_id', $boxerId)->delete();
+  }
+
+  /**
+   * ボクサー保持のタイトルを1件削除
+   * @param int $boxerId
+   * @param int $organizationId
+   * @param int $weightDivisionId
+   * @return bool isSuccessDelete
+   */
+  public function deleteTitle(int $boxerId, int $organizationId, int $weightDivisionId): bool
+  {
+    $deleteCount =  Title::where([
+      ['boxer_id', $boxerId],
+      ['organization_id', $organizationId],
+      ['weight_division_id', $weightDivisionId]
+    ])->delete();
+
+    return $deleteCount > 0;
   }
 }

@@ -30,7 +30,7 @@ class BoxerTitleSnapshotService
   public function updateBoxerTitleSnapshotState(BoxingMatch $match, string $result, int $redBoxerId, int $blueBoxerId): void
   {
     //? 試合結果修正で勝者が変わる場合はボクサーのタイトルスナップショットのstateがnewのタイトルは削除する
-    if ($match->result !== $result) {
+    if ($match->result && $match->result !== $result) {
       $match->boxerTitleSnapshot->each(function ($snapshot) {
         if ($snapshot->state === "new") {
           $this->boxerTitleSnapshotRepository->deleteBoxerTitleSnapshot($snapshot->id, $snapshot->boxer_id, $snapshot->organization_id, $snapshot->weight_division_id);
@@ -55,18 +55,84 @@ class BoxerTitleSnapshotService
     $boxerTitleSnapshot = $match->boxerTitleSnapshot;
 
     //? BoxerTitleSnapshotのstateの書き換え
-    foreach ($match->matchTitles as $matchTitle) {
+    // foreach ($match->matchTitles as $matchTitle) {
 
-      //? ボクサーがタイトルを所持している場合のみそのタイトルのstateを変更
-      if (!$boxerTitleSnapshot->isEmpty()) {
-        foreach ($boxerTitleSnapshot as &$snapshot) {
-          $this->updateBoxerTitleStateIfHeld($snapshot, $matchTitle, $match, $redBoxerId, $blueBoxerId, $result);
-        }
-      }
+    //? ボクサーがタイトルを所持している場合そのタイトルのstateのみを変更
+    // if (!$boxerTitleSnapshot->isEmpty()) {
+    //   foreach ($boxerTitleSnapshot as &$snapshot) {
+    //     $this->updateBoxerTitleStateIfHeld($snapshot, $matchTitle, $match, $redBoxerId, $blueBoxerId, $result);
+    //   }
+    // }
 
-      //? 新しいタイトル（ベルト）を取得したら新しいスナップショットを作成しstateをnewにする
-      $this->storeNewBoxerTitle($boxerTitleSnapshot, $matchTitle, $winnerBoxerId, $match->weight_id);
+    //? 新しいタイトル（ベルト）を取得したら新しいスナップショットを作成しstateをnewにする
+    // $this->storeNewBoxerTitle($boxerTitleSnapshot, $matchTitle, $winnerBoxerId, $match->weight_id);
+    // }
+
+    $this->storeOrUpdateBoxerTitleSnapshot($match, $result);
+  }
+
+  /**
+   * ? ボクサーのタイトルスナップショットを新たに保存また更新
+   * @param BoxingMatch $match
+   * @param string $result
+   * @return void
+   */
+  public function storeOrUpdateBoxerTitleSnapshot(BoxingMatch $match, string $result): void
+  {
+    //? 赤青ボクサーのid
+    $redBoxerId = $match->red_boxer_id;
+    $blueBoxerId = $match->blue_boxer_id;
+
+    //? 勝者のid
+    $winnerBoxerId = $result === "red" ? $redBoxerId : $blueBoxerId;
+    //? 敗者のid
+    $loserBoxerId = $result === "red" ? $blueBoxerId : $redBoxerId;
+
+    //? ボクサーの試合時の保持タイトルで試合に掛けられているタイトルを取得
+    $winnerBoxerTitleSnapshot = $this->extractBoxersTitleSnapshot($match, $winnerBoxerId);
+    $loserBoxerTitleSnapshot = $this->extractBoxersTitleSnapshot($match, $loserBoxerId);
+    // \Log::debug("これ" . $winnerBoxerTitleSnapshot->toArray()['match_id']);
+    //TODO 試合に掛けられているタイトルで、勝者が所持していないタイトルを抽出せよ
+
+    //? 勝者のタイトルスナップショットを更新(防衛タイトル)
+    foreach ($winnerBoxerTitleSnapshot as $winnerTile) {
+      $this->boxerTitleSnapshotRepository->updateBoxerTitleSnapshot($winnerTile, "still");
     }
+    //? 敗者のタイトルスナップショットを更新(陥落タイトル)
+    foreach ($loserBoxerTitleSnapshot as $loserTile) {
+      $this->boxerTitleSnapshotRepository->updateBoxerTitleSnapshot($loserTile, "fall");
+    }
+  }
+
+  /**
+   * ? ボクサーが保持しているタイトルでこの試合に掛けられているタイトルを抽出
+   * @param BoxingMatch $match
+   * @param int $boxerId
+   * @return Collection
+   */
+  private function extractBoxersTitleSnapshot(BoxingMatch $match, int $boxerId): Collection
+  {
+    //? この試合に掛けられているタイトルを取得
+    $matchTitles = $match->matchTitles;
+    //? この試合時にボクサーが保持しているタイトルスナップショットを取得
+    $boxerTitleSnapshot = $match->boxerTitleSnapshot;
+    //? この試合に掛けられたタイトルでボクサーが保持しているタイトルを抽出
+    $targetBoxerTitleSnapshot = $boxerTitleSnapshot->map(function ($titleSnapshot) use ($boxerId, $match, $matchTitles) {
+
+      $isTargetBoxer = $titleSnapshot->boxer_id === $boxerId;
+
+      $isSameWeight = $titleSnapshot->weight_division_id === $match->weight_id;
+
+      $isContainOrganization = $matchTitles->contains(function ($matchTitle) use ($titleSnapshot) {
+        return $matchTitle->organization_id === $titleSnapshot->organization_id;
+      });
+
+      if ($isTargetBoxer && $isSameWeight && $isContainOrganization) {
+        return $titleSnapshot;
+      }
+    })->filter()->values();
+
+    return $targetBoxerTitleSnapshot;
   }
 
 
@@ -79,19 +145,23 @@ class BoxerTitleSnapshotService
    * @param int $matchWeightId
    * @return void
    */
+  //TODO: 削除対象
   private function storeNewBoxerTitle(Collection $boxerTitleSnapshot, TitleMatch $matchTitle, int $winnerBoxerId, int $matchWeightId): void
   {
     //? 試合に掛けらたタイトル(ベルト)で新たに取得したタイトルを判定
-    $hasTitle = $boxerTitleSnapshot->contains(function ($item) use ($winnerBoxerId, $matchWeightId, $matchTitle) {
+    $isNewTitle = $boxerTitleSnapshot->contains(function ($item) use ($winnerBoxerId, $matchWeightId, $matchTitle) {
       $isWinnerBoxer = $item['boxer_id'] === $winnerBoxerId;
       $isSameWeight = $item['weight_division_id'] === $matchWeightId;
       $isSameOrganization = $item['organization_id'] === $matchTitle->organization_id;
-      return $isWinnerBoxer && $isSameWeight && $isSameOrganization;
+      \Log::debug("isSameOrganization : " . $isSameOrganization);
+      return $isWinnerBoxer && $isSameWeight && !$isSameOrganization;
     });
 
+    // \Log::debug("isNewTitle : " . $isNewTitle);
+
     //? 取得した新たなタイトルをスナップショットに保存してstateはnewにする
-    if (!$hasTitle) {
-      $this->boxerTitleSnapshotRepository->storeBoxerTitleSnapshot([
+    if ($isNewTitle) {
+      $isSuccessInsert = $this->boxerTitleSnapshotRepository->storeBoxerTitleSnapshot([
         "match_id" => $matchTitle->match_id,
         "boxer_id" => $winnerBoxerId,
         "organization_id" => $matchTitle->organization_id,
@@ -108,6 +178,7 @@ class BoxerTitleSnapshotService
    * @param int $redBoxerId
    * @param int $blueBoxerId
    * @param string $result "red" | "blue" | "draw"
+   * @return void
    */
   private function updateBoxerTitleStateIfHeld(BoxerTitleSnapshot $snapshot, TitleMatch $matchTitle, BoxingMatch $match, int $redBoxerId, int $blueBoxerId, string $result): void
   {
@@ -156,10 +227,10 @@ class BoxerTitleSnapshotService
 
     $isFailedUpdateState = false;
     if ($isTargetRed) {
-      $isFailedUpdateState = !$this->boxerTitleSnapshotRepository->updateBoxerTitleSnapshot($snapshot, $redState);
+      $isFailedUpdateState = !$this->boxerTitleSnapshotRepository->updateBoxerTitleSnapshot($snapshot->toArray(), $redState);
     };
     if ($isTargetBlue) {
-      $isFailedUpdateState = !$this->boxerTitleSnapshotRepository->updateBoxerTitleSnapshot($snapshot, $blueState);
+      $isFailedUpdateState = !$this->boxerTitleSnapshotRepository->updateBoxerTitleSnapshot($snapshot->toArray(), $blueState);
     };
 
     return $isFailedUpdateState;

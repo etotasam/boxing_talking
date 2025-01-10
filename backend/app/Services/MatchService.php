@@ -289,23 +289,26 @@ class MatchService
     DB::commit();
   }
 
-  public function isMatchDateTodayOrPast(int $matchId): bool
+  public function isMatchDateInPastOrToday(int $matchId): bool
   {
     $match = $this->matchRepository->getMatchById($matchId);
     $matchDate = strtotime($match['match_date']);
     $nowDate = strtotime('now');
 
-    return ($nowDate > $matchDate);
+    return $nowDate > $matchDate;
   }
 
-  public function matchPredictionCountUpdate(int $matchId, string $prediction): void
-  {
-    $match = $this->matchRepository->getMatchById($matchId);
-    if ($prediction == "red") {
-      $match->increment("count_red");
-    } else if ($prediction == "blue") {
-      $match->increment("count_blue");
-    }
-    $match->save();
-  }
+  // public function matchPredictionCountUpdate(int $matchId, string $prediction): void
+  // {
+  //   $match = $this->matchRepository->getMatchById($matchId);
+  //   if (!$match) {
+  //     throw new Exception("Match not found", 404);
+  //   }
+  //   if ($prediction == "red") {
+  //     $match->increment("count_red");
+  //   } else if ($prediction == "blue") {
+  //     $match->increment("count_blue");
+  //   }
+  //   $match->save();
+  // }
 }

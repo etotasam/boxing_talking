@@ -34,8 +34,10 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
         $this->actingAs(TestHelper::createAdminUser());
 
         //? シードデータ(タイトルの団体、階級)
-        $this->seed(OrganizationSeeder::class);
-        $this->seed(WeightDivisionSeeder::class);
+        $this->seed([
+            OrganizationSeeder::class,
+            WeightDivisionSeeder::class,
+        ]);
 
         $this->weight = [
             "middle" => 5,
@@ -70,8 +72,8 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
         BoxerTitleSnapshot::insert(
             [
                 ["match_id" => $this->match->id, "boxer_id" => $this->redBoxer->id, "organization_id" => $this->organization["WBA"], "weight_division_id" => $this->weight["middle"], "state" => null],
-                ["match_id" => $this->match->id, "boxer_id" => $this->redBoxer->id, "organization_id" => $this->organization["IBF"], "weight_division_id" => $this->weight["middle"], "state" => null],
                 ["match_id" => $this->match->id, "boxer_id" => $this->redBoxer->id, "organization_id" => $this->organization["WBA"], "weight_division_id" => $this->weight["welter"], "state" => null],
+                ["match_id" => $this->match->id, "boxer_id" => $this->redBoxer->id, "organization_id" => $this->organization["IBF"], "weight_division_id" => $this->weight["middle"], "state" => null],
                 ["match_id" => $this->match->id, "boxer_id" => $this->blueBoxer->id, "organization_id" => $this->organization["WBC"], "weight_division_id" => $this->weight["middle"], "state" => null],
             ]
         );
@@ -189,46 +191,47 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
             "state" => "new"
         ]);
     }
-
     /**
      * @test
-     * 試合結果で、ボクサーが新たなタイトルを取得した時、titlesテーブルの方にもそのタイトル情報が登録されているか
+     * 
      */
-    public function testTitlesTableStoreWhenTakeNewTitle()
+    public function testStoreOrUpdateBoxerTitleSnapshot()
     {
-
-        $expectTitles = [
+        $this->boxerTitleSnapshotService->storeOrUpdateBoxerTitleSnapshot($this->match, "red");
+        //? 勝者のスナップショットのstateがstillに更新されているか
+        $this->assertDatabaseHas(
+            'boxer_title_snapshots',
             [
-                'boxer_id' => $this->blueBoxer->id,
-                'organization_id' => $this->organization["WBA"],
+                "boxer_id" => $this->redBoxer->id,
+                "match_id" => $this->match->id,
+                "organization_id" => $this->organization["WBA"],
                 "weight_division_id" => $this->weight["middle"],
-            ],
-            [
-                'boxer_id' => $this->blueBoxer->id,
-                'organization_id' => $this->organization["WBO"],
-                "weight_division_id" => $this->weight["middle"],
+                "state" => "still"
             ]
-        ];
+        );
 
-        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'blue', $this->redBoxer->id, $this->blueBoxer->id);
+        //? 負けた選手のスナップショットのstateがfallに更新されているか
+        $this->assertDatabaseHas(
+            'boxer_title_snapshots',
+            [
+                "boxer_id" => $this->blueBoxer->id,
+                "match_id" => $this->match->id,
+                "organization_id" => $this->organization["WBC"],
+                "weight_division_id" => $this->weight["middle"],
+                "state" => "fall"
+            ]
+        );
 
-        foreach ($expectTitles as $title) {
-            $this->assertDatabaseHas('titles', [
-                'boxer_id' => $title['id'],
-                'organization_id' => $title['organization_id'],
-                "weight_division_id" => $title['weight_division_id'],
-            ]);
-        }
+        //? 試合に掛けられていないタイトルのスナップショットのstateがnullのままか
+        $this->assertDatabaseHas(
+            'boxer_title_snapshots',
+            [
+                "boxer_id" => $this->redBoxer->id,
+                "match_id" => $this->match->id,
+                "organization_id" => $this->organization["WBA"],
+                "weight_division_id" => $this->weight["welter"],
+                "state" => null
+            ]
+        );
     }
-
-
-
-    /**
-     * @test
-     * 試合結果を後に変更した際、勝敗が変わり所持タイトルに変化がある場合titlesテーブルからそのタイトルを削除する
-     */
-    // public function testDeleteTitleWhenWinLoseResultUpdate()
-    // {
-    //     $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'blue', $this->redBoxer->id, $this->blueBoxer->id);
-    // }
 }

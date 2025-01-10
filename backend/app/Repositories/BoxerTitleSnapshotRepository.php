@@ -15,19 +15,20 @@ class BoxerTitleSnapshotRepository implements BoxerTitleSnapshotInterface
    * @param array $titlesArray [["match_id" => int, "boxer_id" => int, "organization_id" => int, "weight_division_id" => int, "state" => null | string], ...]
    * @return bool
    */
-  public function storeBoxerTitleSnapshot(array $titlesArray)
+  public function storeBoxerTitleSnapshot(array $titlesArray): bool
   {
     return BoxerTitleSnapshot::insert($titlesArray);
   }
 
   /**
    * Update the state of a boxer's title snapshot.
-   * @param BoxerTitleSnapshot $snapshot
+   * @param Collection|array $snapshot
    * @param string $state "new" | "still" | "fall"
    * @return bool $isSuccess
    */
   public function updateBoxerTitleSnapshot($snapshot, $state)
   {
+    // \Log::debug($snapshot["match_id"]);
     $isSuccess =  (bool) BoxerTitleSnapshot::where([
       ['match_id', '=', $snapshot["match_id"]],
       ['boxer_id', '=', $snapshot["boxer_id"]],

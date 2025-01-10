@@ -50,6 +50,7 @@ class MatchResultStoreService
       //? 選手の戦歴を準備、作成
       [$redBoxerRecord, $blueBoxerRecord] = $this->prepareBoxerRecord($match);
 
+      //TODO resultのstateがfailのタイトルはadjustBoxerTitles関数によりtitlesテーブルからは削除されているはずなので、それを元に戻す処理もしないと不整合が生じる
       //? すでにmatch_resultが存在している場合はボクサーの戦歴を元に戻す
       if ($match->result) {
         [$rollbackRedBoxerRecord, $rollbackBlueBoxerRecord] = $this->rollbackBoxersRecord($match->result->toArray(), $redBoxerRecord, $blueBoxerRecord);
@@ -80,9 +81,9 @@ class MatchResultStoreService
         $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($match, $result, $match->redBoxer->id, $match->blueBoxer->id);
 
         if ($isWinner) {
-          //TODO adjustBoxerTitlesは試合の登録は完了(refactorは必須かも)してるが、負けた方のタイトルを削除する仕様はまだ実装していない
           $winnerBoxerId = $result === 'red' ? $match->red_boxer_id : $match->blue_boxer_id;
-          $this->adjustBoxerTitles($matchTitles, $titleSnapshot, $match->weight_id, $winnerBoxerId);
+          $loserBoxerId = $result === 'red' ? $match->blue_boxer_id : $match->red_boxer_id;
+          $this->adjustBoxerTitles($matchTitles, $titleSnapshot, $match->weight_id, $winnerBoxerId, $loserBoxerId);
         }
       }
 
@@ -112,28 +113,34 @@ class MatchResultStoreService
    * @param Collection $boxerTitleSnapshot
    * @param int $matchWeightId
    * @param int $winnerBoxerId
+   * @param int $loserBoxerId
    * @return void
    */
-  private function adjustBoxerTitles(Collection $matchTitles, Collection $boxerTitleSnapshot, int $matchWeightId, int $winnerBoxerId): void
+  private function adjustBoxerTitles(Collection $matchTitles, Collection $boxerTitleSnapshot, int $matchWeightId, int $winnerBoxerId, int $loserBoxerId): void
   {
-    //? 試合と同じ階級で試合時に保持していたタイトルを抽出
-    $hasTitles = $boxerTitleSnapshot->map(function ($snapTitle) use ($winnerBoxerId, $matchWeightId) {
-      if ($snapTitle['boxer_id'] === $winnerBoxerId && $matchWeightId === $snapTitle['weight_division_id']) {
-        return $snapTitle;
-      }
-    })->filter()->values();
+    //? 試合に掛けられたタイトルと同じタイトルを所持している場合抽出
+    // $hasTitles = $boxerTitleSnapshot->map(function ($snapTitle) use ($winnerBoxerId, $matchWeightId) {
+    //   if ($snapTitle['boxer_id'] === $winnerBoxerId && $matchWeightId === $snapTitle['weight_division_id']) {
+    //     return $snapTitle;
+    //   }
+    // })->filter()->values();
 
-    //? 保持タイトルがある場合
-    if (!$hasTitles->isEmpty()) {
+    //? 勝者の試合時の保持タイトルを取得
+    $winnerBoxerTitlesAtMatch = $this->extractBoxerTitlesAtMatch($boxerTitleSnapshot, $winnerBoxerId, $matchWeightId);
+    //? 敗者の試合時の保持タイトルを取得
+    $loserBoxerTitlesAtMatch = $this->extractBoxerTitlesAtMatch($boxerTitleSnapshot, $loserBoxerId, $matchWeightId);
+
+    //? 勝者が保持タイトルがある場合
+    if (!$winnerBoxerTitlesAtMatch->isEmpty()) {
       foreach ($matchTitles as $matchTitle) {
-        foreach ($hasTitles as $hasTitle) {
-          $hasOrganizationsTitle = $matchTitle['organization_id'] === $hasTitle['organization_id'];
+        foreach ($winnerBoxerTitlesAtMatch as $boxerTitle) {
+          $hasOrganizationsTitle = $matchTitle['organization_id'] === $boxerTitle['organization_id'];
           if (!$hasOrganizationsTitle) {
             $this->titleRepository->createTitlesHoldByTheBoxer($winnerBoxerId, $matchTitle['organization_id'], $matchWeightId);
           }
         }
       }
-      //? 保持タイトルが皆無の場合
+      //? 勝者が保持タイトルが皆無の場合
     } else {
       $registerTitles = $matchTitles->map(function ($title) use ($winnerBoxerId, $matchWeightId) {
         return ['boxer_id' => $winnerBoxerId, 'organization_id' => $title['organization_id'], 'weight_division_id' => $matchWeightId];
@@ -144,6 +151,40 @@ class MatchResultStoreService
         throw new Exception('Failed insert new boxer titles');
       }
     }
+
+    //? 敗者が保持タイトルがある場合
+    if (!$loserBoxerTitlesAtMatch->isEmpty()) {
+      foreach ($matchTitles as $matchTitle) {
+        foreach ($loserBoxerTitlesAtMatch as $boxerTitle) {
+          $hasOrganizationsTitle = $matchTitle['organization_id'] === $boxerTitle['organization_id'];
+          if ($hasOrganizationsTitle) {
+            $isSuccessDeleted = $this->titleRepository->deleteTitle($loserBoxerId, $matchTitle['organization_id'], $matchWeightId);
+            if (!$isSuccessDeleted) {
+              throw new Exception('Failed delete loser boxer title');
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * ? 試合時のボクサーの保持タイトルを取得
+   * @param Collection $boxerTitleSnapshot
+   * @param int $BoxerId
+   * @param int $matchWeightId
+   * @return Collection
+   */
+  private function extractBoxerTitlesAtMatch(Collection $boxerTitleSnapshot, int $BoxerId, int $matchWeightId): Collection
+  {
+    //? 試合に掛けられたタイトルと同じタイトルを所持している場合抽出
+    $boxerTitlesAtMatch = $boxerTitleSnapshot->map(function ($snapTitle) use ($BoxerId, $matchWeightId) {
+      if ($snapTitle['boxer_id'] === $BoxerId && $matchWeightId === $snapTitle['weight_division_id']) {
+        return $snapTitle;
+      }
+    })->filter()->values();
+
+    return $boxerTitlesAtMatch;
   }
 
 

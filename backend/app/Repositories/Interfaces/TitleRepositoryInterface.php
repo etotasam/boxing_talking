@@ -37,4 +37,13 @@ interface TitleRepositoryInterface
    * @return int
    */
   public function deleteTitlesHoldByTheBoxer($boxerId);
+
+  /**
+   * ボクサー保持のタイトルを1件削除
+   * @param int $boxerId
+   * @param int $organizationId
+   * @param int $weightDivisionId
+   * @return bool isSuccessDelete
+   */
+  public function deleteTitle(int $boxerId, int $organizationId, int $weightDivisionId);
 }
