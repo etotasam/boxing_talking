@@ -148,7 +148,7 @@ class MatchController extends ApiController
         ];
 
         try {
-            $this->matchResultStoreService->storeMatchResult($matchResultArray);
+            $this->matchResultStoreService->storeMatchResultExecute($matchResultArray);
             // $this->matchService->storeMatchResultExecute($matchResultArray);
             return $this->responseSuccessful("Successful store match result and update boxers record");
         } catch (Exception $e) {

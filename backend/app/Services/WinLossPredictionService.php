@@ -51,7 +51,7 @@ class WinLossPredictionService
       throw new \Exception("Match is not exists", 404);
     }
     //試合日が未来のみ投票可
-    if ($this->matchService->isMatchDateTodayOrPast($matchId)) {
+    if ($this->matchService->isMatchDateInPastOrToday($matchId)) {
       throw new \Exception('Cannot vote win-loss prediction after match date', 400);
     }
     $userId = $this->authService->getUserIdOrGuestUserId();

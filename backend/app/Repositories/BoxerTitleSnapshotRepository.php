@@ -12,22 +12,23 @@ class BoxerTitleSnapshotRepository implements BoxerTitleSnapshotInterface
 
   /**
    * 試合登録時の選手保有タイトルを(boxer_title_snapshotテーブル)保存(一括)
-   * @param array $titlesArray [["match_id" => int, "boxer_id" => int, "organization_id" => int, "weight_division_id" => int], ...]
+   * @param array $titlesArray [["match_id" => int, "boxer_id" => int, "organization_id" => int, "weight_division_id" => int, "state" => null | string], ...]
    * @return bool
    */
-  public function storeBoxerTitleSnapshot(array $titlesArray)
+  public function storeBoxerTitleSnapshot(array $titlesArray): bool
   {
     return BoxerTitleSnapshot::insert($titlesArray);
   }
 
   /**
    * Update the state of a boxer's title snapshot.
-   * @param BoxerTitleSnapshot $snapshot
+   * @param Collection|array $snapshot
    * @param string $state "new" | "still" | "fall"
    * @return bool $isSuccess
    */
   public function updateBoxerTitleSnapshot($snapshot, $state)
   {
+    // \Log::debug($snapshot["match_id"]);
     $isSuccess =  (bool) BoxerTitleSnapshot::where([
       ['match_id', '=', $snapshot["match_id"]],
       ['boxer_id', '=', $snapshot["boxer_id"]],
@@ -78,5 +79,23 @@ class BoxerTitleSnapshotRepository implements BoxerTitleSnapshotInterface
       "red" => $redTitleSnapshot,
       "blue" => $blueTitleSnapshot,
     ]);
+  }
+
+  /**
+   * スナップショットの削除
+   * @param int $matchId
+   * @param int $boxerId
+   * @param int $organizationId
+   * @param int $weightDivisionId
+   * @return int 削除した件数
+   */
+  public function deleteBoxerTitleSnapshot($matchId, $boxerId, $organizationId, $weightDivisionId)
+  {
+    return BoxerTitleSnapshot::where([
+      ['match_id', '=', $matchId],
+      ['boxer_id', '=', $boxerId],
+      ["organization_id", '=', $organizationId],
+      ["weight_division_id", '=', $weightDivisionId],
+    ])->delete();
   }
 }

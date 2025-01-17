@@ -28,8 +28,8 @@ class CommentController extends ApiController
     ) {}
 
     /**
-     * @param int limit
-     * @param int match_id
+     * @param int $limit
+     * @param int $matchId
      * 
      * @return array ["maxPage" => int, "resentPostTime" => string]
      */
@@ -39,14 +39,18 @@ class CommentController extends ApiController
         $limit = $request->limit;
         try {
             $resentComment = Comment::latest()->first();
-            $timestamp = strtotime($resentComment->created_at);
-            $formattedCreatedAt = date('Y-m-d H:i:s', $timestamp);
+            if ($resentComment) {
+                $timestamp = strtotime($resentComment->created_at);
+                $formattedCreatedAt = date('Y-m-d H:i:s', $timestamp);
+            } else {
+                $formattedCreatedAt = null;
+            }
 
             $commentsCount = Comment::where('match_id', $matchId)->count();
             $maxPage = ceil($commentsCount / $limit);
 
             return ["maxPage" => $maxPage, "resentPostTime" => $formattedCreatedAt];
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return $this->responseInvalidQuery('Failed fetch comments count');
         }
     }

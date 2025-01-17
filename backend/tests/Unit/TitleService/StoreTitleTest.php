@@ -15,7 +15,7 @@ use App\Repositories\TitleRepository;
 use Database\Seeders\OrganizationSeeder;
 use Database\Seeders\WeightDivisionSeeder;
 
-class StoreTitleMethodTest extends TestCase
+class StoreTitleTest extends TestCase
 {
 
   use RefreshDatabase;
@@ -23,19 +23,36 @@ class StoreTitleMethodTest extends TestCase
   protected $titleService;
   protected $boxer;
   protected $titles;
+  protected $organization;
+  protected $weight;
   protected function setUp(): void
   {
     parent::setUp();
     $this->seed([OrganizationSeeder::class, WeightDivisionSeeder::class]);
     $this->titleService = app()->make(TitleService::class);
 
-    $this->boxer = Boxer::factory()->create(["name" => "ボクサー1"]);
+    // $this->boxer = Boxer::factory()->create(["name" => "ボクサー1"]);
+    [$this->redBoxer, $this->blueBoxer] = Boxer::factory()->count(2)->create();
+
+    $this->organization = [
+      "WBA" => 1,
+      "WBC" => 2,
+      "IBF" => 3,
+      "WBO" => 4,
+    ];
+
+    $this->weight = [
+      'heavy' => 1,
+      'cruiser' => 2,
+      'lightHeavy' => 3,
+      'superMiddle' => 4,
+    ];
 
     //現在保持しているタイトル
     $this->titles = Title::create([
-      "boxer_id" => $this->boxer->id,
-      "organization_id" => 1, // WBA
-      "weight_division_id" => 1 // ヘビー
+      "boxer_id" => $this->redBoxer->id,
+      "organization_id" => $this->organization["WBA"],
+      "weight_division_id" => $this->weight['heavy']
     ]);
   }
 
@@ -56,17 +73,20 @@ class StoreTitleMethodTest extends TestCase
     $titlesArray = $this->titles->toArray();
     //? 実行前に保持タイトルがtitlesテーブルに存在しているか
     $this->assertDatabaseHas('titles', $titlesArray);
+
     //? テスト対象メソッドの実行
-    $this->titleService->storeTitle($this->boxer->id, $newSetTitles);
+    $this->titleService->initializeTitle($this->redBoxer->id, $newSetTitles);
+
     //? titlesをセットする前に保持しているtitlesが削除されているか
     $this->assertDatabaseMissing('titles', $titlesArray);
+
     //? 新たにセットしたタイトルがDBに登録されているか
     $this->assertDatabaseHas(
       'titles',
       [
-        "boxer_id" =>  $this->boxer->id,
-        "organization_id" => 2, // WBC
-        "weight_division_id" => 2 // クルーザー
+        "boxer_id" =>  $this->redBoxer->id,
+        "organization_id" => $this->organization["WBC"], // WBC
+        "weight_division_id" => $this->weight["cruiser"] // クルーザー
       ]
     );
   }
@@ -98,6 +118,6 @@ class StoreTitleMethodTest extends TestCase
     //? expectExceptionは例外の発生を期待するメソッドが実行される前に定義する
     $this->expectException(\Exception::class);
     // テスト対象メソッドの実行
-    $this->titleService->storeTitle($this->boxer->id, $newSetTitles);
+    $this->titleService->initializeTitle($this->redBoxer->id, $newSetTitles);
   }
 }

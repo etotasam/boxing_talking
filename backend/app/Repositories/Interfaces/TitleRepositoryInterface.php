@@ -15,6 +15,15 @@ interface TitleRepositoryInterface
   public function getTitlesHoldByTheBoxer($boxerId);
 
   /**
+   * ボクサーの保持タイトル(titlesテーブル)を既存か確認しながら保存(1件)
+   * @param int $boxerId
+   * @param int $organizationId
+   * @param int $weightDivisionId
+   * @return void
+   */
+  public function storeTitle(int $boxerId, int $organizationId, int $weightDivisionId);
+
+  /**
    * ボクサーの保持するタイトルをtitlesテーブルに保存
    * @param int $boxerId,
    * @param int $organizationId,
@@ -37,4 +46,13 @@ interface TitleRepositoryInterface
    * @return int
    */
   public function deleteTitlesHoldByTheBoxer($boxerId);
+
+  /**
+   * ボクサー保持のタイトルを1件削除
+   * @param int $boxerId
+   * @param int $weightDivisionId
+   * @param int|null $organizationId
+   * @return bool isDeleteTarget
+   */
+  public function deleteTitle(int $boxerId, int $weightDivisionId, int $organizationId = null);
 }
