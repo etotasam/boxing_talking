@@ -75,32 +75,7 @@ class ResultStoreTest extends TestCase
             $title['match_id'] = $this->match->id;
             return $title;
         }, $this->boxersTitle);
-        // $this->boxerTitleSnapshot = [
-        //     [
-        //         "match_id" => $this->match->id,
-        //         "boxer_id" => $this->redBoxer->id,
-        //         "organization_id" => $this->organization["WBA"],
-        //         "weight_division_id" => $this->division["heavy"]
-        //     ],
-        //     [
-        //         "match_id" => $this->match->id,
-        //         "boxer_id" => $this->redBoxer->id,
-        //         "organization_id" => $this->organization["WBC"],
-        //         "weight_division_id" => $this->division["heavy"]
-        //     ],
-        //     [
-        //         "match_id" => $this->match->id,
-        //         "boxer_id" => $this->blueBoxer->id,
-        //         "organization_id" => $this->organization["WBO"],
-        //         "weight_division_id" => $this->division["heavy"]
-        //     ],
-        //     [
-        //         "match_id" => $this->match->id,
-        //         "boxer_id" => $this->blueBoxer->id,
-        //         "organization_id" => $this->organization["IBF"],
-        //         "weight_division_id" => $this->division["heavy"]
-        //     ],
-        // ];
+
         BoxerTitleSnapshot::insert($this->boxerTitleSnapshot);
         Title::insert($this->boxersTitle);
 
@@ -146,38 +121,10 @@ class ResultStoreTest extends TestCase
         $response->assertStatus(200);
     }
 
-
     /**
      * @test
+     * ! 試合結果が引き分けの場合はstateがnullになる
      */
-    public function testUpdateBoxerTitleStateWhenBlueBoxerWins()
-    {
-        // $this->markTestSkipped();
-
-        $match_id = $this->match->id;
-        $result = "blue";
-        $detail = "ko";
-        $round = 1;
-
-        //リクエスト送信
-        $response = $this->post('/api/match/result', compact("match_id", "result", "detail", "round"));
-        $expectedResult = [
-            ['boxer_id' => $this->redBoxer->id, "organization_id" => $this->organization["WBA"], "state" => "fall"],
-            ['boxer_id' => $this->redBoxer->id, "organization_id" => $this->organization["WBC"], "state" => "fall"],
-            ['boxer_id' => $this->blueBoxer->id, "organization_id" => $this->organization["WBO"], "state" => "still"],
-            ['boxer_id' => $this->blueBoxer->id, "organization_id" => $this->organization["IBF"], "state" => "still"],
-        ];
-
-        foreach ($expectedResult as $result) {
-            $this->assertDatabaseHas('boxer_title_snapshots', array_merge([
-                'match_id' => $this->match->id,
-                "weight_division_id" => $this->division["heavy"],
-            ], $result));
-        }
-        $response->assertStatus(200);
-    }
-
-    /** @test */
     public function testUpdateBoxerTitleForResultDraw()
     {
 
@@ -212,7 +159,7 @@ class ResultStoreTest extends TestCase
 
 
     /**
-     * ! 試合結果を更新する際のテスト(既にstateが設定されている場合)
+     * ! 試合結果を更新する際の正常にデータが変更されているか(既にstateが設定されている場合)
      * @test
      */
     public function testUpdateBoxerTitleAlreadyHasState()

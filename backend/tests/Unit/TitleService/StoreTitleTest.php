@@ -75,7 +75,7 @@ class StoreTitleTest extends TestCase
     $this->assertDatabaseHas('titles', $titlesArray);
 
     //? テスト対象メソッドの実行
-    $this->titleService->storeTitle($this->redBoxer->id, $newSetTitles);
+    $this->titleService->initializeTitle($this->redBoxer->id, $newSetTitles);
 
     //? titlesをセットする前に保持しているtitlesが削除されているか
     $this->assertDatabaseMissing('titles', $titlesArray);
@@ -118,6 +118,6 @@ class StoreTitleTest extends TestCase
     //? expectExceptionは例外の発生を期待するメソッドが実行される前に定義する
     $this->expectException(\Exception::class);
     // テスト対象メソッドの実行
-    $this->titleService->storeTitle($this->redBoxer->id, $newSetTitles);
+    $this->titleService->initializeTitle($this->redBoxer->id, $newSetTitles);
   }
 }

@@ -55,6 +55,22 @@ class TitleRepository implements TitleRepositoryInterface
   }
 
   /**
+   * ボクサーの保持タイトル(titlesテーブル)を既存か確認しながら保存(1件)
+   * @param int $boxerId
+   * @param int $organizationId
+   * @param int $weightDivisionId
+   * @return void
+   */
+  public function storeTitle(int $boxerId, int $organizationId, int $weightDivisionId)
+  {
+    Title::firstOrCreate([
+      'boxer_id' => $boxerId,
+      'organization_id' => $organizationId,
+      'weight_division_id' => $weightDivisionId
+    ]);
+  }
+
+  /**
    * ボクサーが所持するタイトル(titlesテーブル)を全て削除
    * @param int boxerId
    * @return int
@@ -67,17 +83,20 @@ class TitleRepository implements TitleRepositoryInterface
   /**
    * ボクサー保持のタイトルを1件削除
    * @param int $boxerId
-   * @param int $organizationId
    * @param int $weightDivisionId
-   * @return bool isSuccessDelete
+   * @param int|null $organizationId
+   * @return bool isDeleteTarget
    */
-  public function deleteTitle(int $boxerId, int $organizationId, int $weightDivisionId): bool
+  public function deleteTitle(int $boxerId, int $weightDivisionId, int $organizationId = null): bool
   {
-    $deleteCount =  Title::where([
-      ['boxer_id', $boxerId],
-      ['organization_id', $organizationId],
-      ['weight_division_id', $weightDivisionId]
-    ])->delete();
+    $query = Title::where('boxer_id', $boxerId)
+      ->where('weight_division_id', $weightDivisionId);
+
+    if ($organizationId !== null) {
+      $query->where('organization_id', $organizationId);
+    }
+
+    $deleteCount = $query->delete();
 
     return $deleteCount > 0;
   }

@@ -44,5 +44,6 @@ interface BoxerTitleSnapshotInterface
    * @param int $weightDivisionId
    * @return int 削除した件数
    */
+  //TODO これテストして!! 削除できてないと思う
   public function deleteBoxerTitleSnapshot(int $matchId, int $boxerId, int $organizationId, int $weightDivisionId);
 }

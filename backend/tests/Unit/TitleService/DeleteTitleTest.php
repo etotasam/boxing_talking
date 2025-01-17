@@ -57,7 +57,7 @@ class DeleteTitleTest extends TestCase
         // ? setUpで登録したタイトルが存在しているかを確認
         $this->assertDatabaseHas('titles', $this->titles->toArray());
 
-        $isDeleted = $this->titleRepository->deleteTitle($this->titles->boxer_id, $this->titles->organization_id, $this->titles->weight_division_id);
+        $isDeleted = $this->titleRepository->deleteTitle($this->titles->boxer_id, $this->titles->weight_division_id, $this->titles->organization_id);
 
         $this->assertTrue($isDeleted);
         $this->assertDatabaseMissing('titles', $this->titles->toArray());

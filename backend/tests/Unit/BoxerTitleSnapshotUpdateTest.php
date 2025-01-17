@@ -119,7 +119,7 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
         $this->boxerTitleSnapshotService = new BoxerTitleSnapshotService($mockRepository);
 
         //? テスト実行
-        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'draw', $this->redBoxer->id, $this->blueBoxer->id);
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'draw');
     }
 
     /**
@@ -132,7 +132,7 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
     {
 
         //? redが勝利したパターンのアップデートを実行
-        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'red', $this->redBoxer->id, $this->blueBoxer->id);
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'red');
 
         //? 選手の保持タイトルstateが勝敗で更新されているか
         $this->assertDatabaseHas('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->redBoxer->id, 'organization_id' => $this->organization["WBA"], "weight_division_id" => $this->weight["middle"], "state" => "still"]);
@@ -144,11 +144,11 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
 
     /**
      * @test
-     * 新たなタイトルを取得した時に新しいスナップショットを作成し、stateはnewになるか
+     * ! 新たなタイトルを取得した時に新しいスナップショットを作成し、stateはnewになるか
      */
     public function testNewBoxerTitle()
     {
-        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'blue', $this->redBoxer->id, $this->blueBoxer->id);
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'blue');
 
         //? 勝った選手(blue)のスナップショットに新たなタイトルが追加されていて、stateがnewになっているか
         $this->assertDatabaseHas('boxer_title_snapshots', ['match_id' => $this->match->id, 'boxer_id' => $this->blueBoxer->id, 'organization_id' => $this->organization["WBA"], "weight_division_id" => $this->weight["middle"], "state" => "new"]);
@@ -160,12 +160,12 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
 
     /**
      * @test
-     * 試合結果を変更する際、勝敗が変わる場合はstateがnewのレコードを削除する
+     * ! 試合結果を変更する際、勝敗が変わる場合はstateがnewのレコードを削除する
      */
     public function testDeleteNewTitleSnapshot()
     {
-        //? 事前データ
-        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'blue', $this->redBoxer->id, $this->blueBoxer->id);
+        //? 変更前のデータを準備
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'blue');
         $this->assertDatabaseHas('boxer_title_snapshots', [
             'match_id' => $this->match->id,
             'boxer_id' => $this->blueBoxer->id,
@@ -174,8 +174,9 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
             "state" => "new"
         ]);
 
+
         //? 勝敗が変わる変更をした際にnewのレコードが削除されているか
-        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'red', $this->redBoxer->id, $this->blueBoxer->id);
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'red');
         $this->assertDatabaseMissing('boxer_title_snapshots', [
             'match_id' => $this->match->id,
             'boxer_id' => $this->blueBoxer->id,
@@ -193,11 +194,13 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
     }
     /**
      * @test
-     * 
+     * 試合結果を登録、変更した際にBoxerTitleSnapshotのstateが正しく更新されるか
      */
     public function testStoreOrUpdateBoxerTitleSnapshot()
     {
-        $this->boxerTitleSnapshotService->storeOrUpdateBoxerTitleSnapshot($this->match, "red");
+        // 試合結果を登録or更新
+        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($this->match, 'red');
+
         //? 勝者のスナップショットのstateがstillに更新されているか
         $this->assertDatabaseHas(
             'boxer_title_snapshots',
@@ -209,6 +212,25 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
                 "state" => "still"
             ]
         );
+
+        //? 勝者が新たに獲得したタイトルがスナップショットに登録され、stateがnewになっているか
+        $expectOrganizations = [
+            $this->organization["WBC"],
+            $this->organization["WBO"],
+        ];
+        foreach ($expectOrganizations as $organization) {
+            $this->assertDatabaseHas(
+                'boxer_title_snapshots',
+                [
+                    "boxer_id" => $this->redBoxer->id,
+                    "match_id" => $this->match->id,
+                    "organization_id" => $organization,
+                    "weight_division_id" => $this->weight["middle"],
+                    "state" => "new"
+                ]
+            );
+        }
+
 
         //? 負けた選手のスナップショットのstateがfallに更新されているか
         $this->assertDatabaseHas(

@@ -29,7 +29,7 @@ class BoxerService
       DB::transaction(function () use ($boxerData) {
         [$storedBoxer, $titles] = $this->postBoxerAndExtractTitles($boxerData);
         //ボクサーがタイトルを保持している場合はtitlesテーブルに保存
-        $this->titleService->storeTitle($storedBoxer['id'], $titles);
+        $this->titleService->initializeTitle($storedBoxer['id'], $titles);
       });
     } catch (QueryException $e) {
       \Log::error("database error with post boxer:" . $e->getMessage());
@@ -71,7 +71,7 @@ class BoxerService
     try {
       DB::transaction(function () use ($updateBoxerData) {
         if (array_key_exists('titles', $updateBoxerData)) {
-          $this->titleService->storeTitle($updateBoxerData['id'], $updateBoxerData["titles"]);
+          $this->titleService->initializeTitle($updateBoxerData['id'], $updateBoxerData["titles"]);
           unset($updateBoxerData["titles"]);
         };
 

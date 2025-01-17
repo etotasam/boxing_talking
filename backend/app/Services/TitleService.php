@@ -16,16 +16,15 @@ class TitleService
     private TitleRepositoryInterface $titleRepository,
     private OrganizationRepositoryInterface $organizationRepository,
     private WeightDivisionRepositoryInterface $weightRepository,
-  ) {
-  }
+  ) {}
 
 
   /**
-   * titlesテーブルへ登録
+   * titlesテーブルへ登録(初期化)
    * @param int $boxerId
    * @param array $titles [["organization" => "WBA", "weight" => "ミドル"], ...]
    */
-  public function storeTitle(int $boxerId, array $titles): void
+  public function initializeTitle(int $boxerId, array $titles): void
   {
     $this->titleRepository->deleteTitlesHoldByTheBoxer($boxerId);
 
@@ -40,6 +39,20 @@ class TitleService
       if (!$isSuccess) {
         throw FailedTitleException::create();
       }
+    }
+  }
+
+  /**
+   * titlesテーブルへ登録(追加)
+   * @param int $boxerId
+   * @param int $organizationId
+   * @param int $weightDivisionId
+   */
+  public function storeTitle(int $boxerId, int $organizationId, int $weightDivisionId): void
+  {
+    $isSuccess = $this->titleRepository->storeTitle($boxerId, $organizationId, $weightDivisionId);
+    if (!$isSuccess) {
+      throw FailedTitleException::create();
     }
   }
 }
