@@ -41,14 +41,14 @@ interface TitleRepositoryInterface
   public function storeTitlesHoldByTheBoxer($titlesArray);
 
   /**
-   * ボクサーが所持するタイトル(titlesテーブル)を削除
+   * ボクサーが所持するタイトルを全て削除(titlesテーブル)
    * @param int boxerId
    * @return int
    */
   public function deleteTitlesHoldByTheBoxer($boxerId);
 
   /**
-   * ボクサー保持のタイトルを1件削除
+   * ボクサー保持のタイトルを指定して削除(titlesテーブル)
    * @param int $boxerId
    * @param int $weightDivisionId
    * @param int|null $organizationId

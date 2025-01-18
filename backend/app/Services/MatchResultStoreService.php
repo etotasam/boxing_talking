@@ -4,8 +4,6 @@ namespace App\Services;
 
 use Exception;
 use App\Models\BoxingMatch;
-use App\Models\BoxerTitleSnapshot;
-use App\Utilities\BoxersTitleSnapshotUtility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
 use \Illuminate\Support\Collection;
@@ -40,7 +38,7 @@ class MatchResultStoreService
   public function storeMatchResultExecute(array $matchResultArray)
   {
     try {
-      // バリデーション。必須項目チェック
+      //? バリデーション。必須項目チェック
       $this->validateMatchResultArray($matchResultArray);
 
       $matchId = (int)$matchResultArray['match_id'];
@@ -48,64 +46,17 @@ class MatchResultStoreService
       //? 試合情報の取得
       $match = $this->matchRepository->getMatchById($matchId);
 
-      //? BoxerTitleSnapshotの取得
-      $boxerTitleSnapshot = $match->boxerTitleSnapshot;
-
-      //? 選手の戦歴を準備、作成(フォーマット)
-      [$redBoxerRecord, $blueBoxerRecord] = $this->prepareBoxerRecord($match);
-
-      //TODO resultのstateがfailのタイトルはadjustBoxerTitles関数によりtitlesテーブルからは削除されているはずなので、それを元に戻す処理もしないと不整合が生じる
-      //? すでにmatch_resultが存在している場合はボクサーの戦歴を元に戻す
-      $pastResult = $match->result;
-      if ($pastResult) {
-        [$rollbackRedBoxerRecord, $rollbackBlueBoxerRecord] = $this->rollbackBoxersRecord($pastResult->toArray(), $redBoxerRecord, $blueBoxerRecord, $boxerTitleSnapshot);
-        $redBoxerRecord = $rollbackRedBoxerRecord; //! $redBoxerRecordの上書き
-        $blueBoxerRecord = $rollbackBlueBoxerRecord; //! $blueBoxerRecordの上書き
-      }
-
-      //? 勝敗に応じてボクサーの戦績を変更する
-      [$newRedBoxerRecord, $newBlueBoxerRecord] = $this->adjustBoxerRecordWithResult($matchResultArray, $redBoxerRecord, $blueBoxerRecord);
-
-      $match = $this->matchRepository->getMatchById($matchId);
-      //? この試合のBoxerTitleSnapshotの取得
-      $matchTitles = $match->matchTitles;
+      //? 試合結果に応じてボクサーの戦績を更新する為のデータを準備、作成
+      [$newRedBoxerRecord, $newBlueBoxerRecord] = $this->prepareBoxerRecord($match, $matchResultArray);
 
       DB::beginTransaction();
-      //? タイトルマッチの時のみ
-      if (!$matchTitles->isEmpty()) {
-
-        //? 試合結果の取得
-        $newResult = $matchResultArray["match_result"];
-
-        $isWinner = $newResult === 'red' || $newResult === 'blue';
-
-        //? titlesテーブルを試合設定時の状態に戻す
-        // $boxerTitleSnapshot = $match->boxerTitleSnapshot;
-        // if ($boxerTitleSnapshot->isNotEmpty()) {
-        //   $this->rollbackBoxerTitles($boxerTitleSnapshot);
-        // }
-
-        //? BoxerTitleSnapshot(DB)のstateを更新
-        $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($match, $newResult);
-
-        //? 勝者がいる場合はタイトルの変動を管理(titlesテーブルの更新)
-        if ($isWinner) {
-          $winnerBoxerId = $newResult === 'red' ? $match->red_boxer_id : $match->blue_boxer_id;
-          $loserBoxerId = $newResult === 'red' ? $match->blue_boxer_id : $match->red_boxer_id;
-          $this->adjustBoxerTitles($match, $winnerBoxerId, $loserBoxerId);
-        } else {
-          //? 引き分け or 無効試合の場合はtitlesテーブルを試合設定時の状態に戻す
-          $boxerTitleSnapshot = $match->boxerTitleSnapshot;
-          if ($boxerTitleSnapshot->isNotEmpty()) {
-            $this->rollbackBoxerTitles($match);
-          }
-        }
+      //? タイトルマッチの時のみtitlesテーブルを更新
+      if (!$match->matchTitles->isEmpty()) {
+        $this->processTitles($match, $matchResultArray);
       }
 
       //? 試合結果に基づいてボクサーの戦歴を更新
-      $this->boxerRepository->updateBoxer($newRedBoxerRecord);
-      $this->boxerRepository->updateBoxer($newBlueBoxerRecord);
-
+      $this->updateBoxerRecord($newRedBoxerRecord, $newBlueBoxerRecord);
 
       //? 試合結果の登録 or 更新
       $this->matchRepository->updateOrCreateMatchResult($matchId, $matchResultArray);
@@ -121,6 +72,72 @@ class MatchResultStoreService
     }
   }
 
+  /**
+   * ボクサーの戦歴を更新する為のデータを準備、作成
+   * @param BoxingMatch $match
+   * @param array $matchResultArray
+   * @return array [$newRedBoxerRecord, $newBlueBoxerRecord]
+   */
+  private function prepareBoxerRecord(BoxingMatch $match, array $matchResultArray): array
+  {
+    //? 選手の戦歴を準備、作成(フォーマット)
+    [$redBoxerRecord, $blueBoxerRecord] = $this->formatBoxerRecord($match);
+
+    //? すでにmatch_resultが存在している場合はボクサーの戦歴を元に戻す
+    $pastResult = $match->result;
+    if ($pastResult) {
+      [$redBoxerRecord, $blueBoxerRecord] = $this->rollbackBoxersRecord($pastResult->toArray(), $redBoxerRecord, $blueBoxerRecord, $match->boxerTitleSnapshot);
+    }
+
+    //? 勝敗に応じてボクサーの戦績を変更する
+    [$newRedBoxerRecord, $newBlueBoxerRecord] = $this->adjustBoxerRecordWithResult($matchResultArray, $redBoxerRecord, $blueBoxerRecord);
+
+    return [$newRedBoxerRecord, $newBlueBoxerRecord];
+  }
+
+  /**
+   * boxerテーブルの更新(戦歴を更新)
+   * @param array $newRedBoxerRecord
+   * @param array $newBlueBoxerRecord
+   * @return void
+   */
+  private function updateBoxerRecord(array $newRedBoxerRecord, array $newBlueBoxerRecord): void
+  {
+    $this->boxerRepository->updateBoxer($newRedBoxerRecord);
+    $this->boxerRepository->updateBoxer($newBlueBoxerRecord);
+  }
+
+
+  /**
+   * titlesテーブルとboxer_title_snapshotsテーブルの更新処理
+   * @param BoxingMatch $match
+   * @param array $matchResultArray
+   * @return void
+   */
+  private function processTitles(BoxingMatch $match, array $matchResultArray): void
+  {
+
+    $newResult = $matchResultArray["match_result"];
+    $isWinner = $newResult === 'red' || $newResult === 'blue';
+
+    //? boxer_title_snapshotsテーブルのstateを更新
+    $this->boxerTitleSnapshotService->updateBoxerTitleSnapshotState($match, $newResult);
+
+    //? 勝者がいる場合はタイトルの変動を管理(titlesテーブルの更新)
+    if ($isWinner) {
+      $winnerBoxerId = $newResult === 'red' ? $match->red_boxer_id : $match->blue_boxer_id;
+      $loserBoxerId = $newResult === 'red' ? $match->blue_boxer_id : $match->red_boxer_id;
+      $this->adjustBoxerTitles($match, $winnerBoxerId, $loserBoxerId);
+    } else {
+      //? 引き分け or 無効試合の場合はtitlesテーブルを試合設定時の状態に戻す
+      $boxerTitleSnapshot = $match->boxerTitleSnapshot;
+      if ($boxerTitleSnapshot->isNotEmpty()) {
+        $this->rollbackBoxerTitles($match);
+      }
+    }
+  }
+
+
 
   /**
    * タイトルマッチの試合結果によるタイトルの変動を管理
@@ -129,37 +146,38 @@ class MatchResultStoreService
    * @param int $loserBoxerId
    * @return void
    */
-  //TODO 多分ここで間違いが生じてる。titlesテーブルの更新時に
   private function adjustBoxerTitles(BoxingMatch $match, int $winnerBoxerId, int $loserBoxerId): void
   {
 
     $matchTitles = $match->matchTitles;
     $matchWeightId = $match->weight_id;
 
-    //? 勝者のタイトルを保存
+    //? 勝者のタイトルを更新(追加)
     $matchTitles->each(function ($title) use ($winnerBoxerId, $matchWeightId) {
       $this->titleRepository->storeTitle($winnerBoxerId, $title->organization_id, $matchWeightId);
     });
 
-    //? 敗者のタイトルを削除
+    //? 敗者のタイトルを更新(削除)
     $matchTitles->each(function ($title) use ($loserBoxerId, $matchWeightId) {
       $this->titleRepository->deleteTitle($loserBoxerId, $matchWeightId, $title->organization_id);
     });
+  }
 
-    //? 勝者の試合時の保持タイトルで試合に掛けられたタイトルがあれば取得
-    // $winnerBoxerTitlesAtMatch = BoxersTitleSnapshotUtility::extractHoldTitleSnapshot($match, $winnerBoxerId);
+  /**
+   * 各ボクサーのtitlesテーブルデータを試合登録時の所持タイトルに戻す
+   * @param BoxingMatch $match
+   * @return void
+   */
+  private function rollbackBoxerTitles(BoxingMatch $match): void
+  {
+    $this->titleRepository->deleteTitlesHoldByTheBoxer($match->red_boxer_id);
+    $this->titleRepository->deleteTitlesHoldByTheBoxer($match->blue_boxer_id);
 
-    //? 敗者の試合時の保持タイトルで試合に掛けられたタイトルがあればtitlesテーブルから削除
-    // BoxersTitleSnapshotUtility::extractHoldTitleSnapshot($match, $loserBoxerId)
-    //   ->each(function ($title) use ($loserBoxerId, $matchWeightId) {
-    //     $this->titleRepository->deleteTitle($loserBoxerId, $title->organization_id, $matchWeightId);
-    //   });
-
-    //? 試合に掛けられたタイトルで、勝者が保持していないタイトルをtitlesテーブルに登録
-    // BoxersTitleSnapshotUtility::extractUnHoldTitleSnapshot($winnerBoxerTitlesAtMatch, $matchTitles)
-    //   ->each(function ($title) use ($winnerBoxerId, $matchWeightId) {
-    //     $this->titleRepository->createTitlesHoldByTheBoxer($winnerBoxerId, $title->organization_id, $matchWeightId);
-    //   });
+    $match->boxerTitleSnapshot->each(function ($title) {
+      if ($title->state !== "new") {
+        $this->titleRepository->storeTitle($title->boxer_id, $title->organization_id, $title->weight_division_id);
+      }
+    });
   }
 
 
@@ -197,7 +215,7 @@ class MatchResultStoreService
    * 
    * @return array (redBoxerRecord, blueBoxerRecord) - ["redBoxerRecord" => ["id" => , "win" => , "lose" => , "draw" => , "ko" => ]]
    */
-  private function prepareBoxerRecord(BoxingMatch $matchData)
+  private function formatBoxerRecord(BoxingMatch $matchData)
   {
     $redBoxer = $matchData->redBoxer;
     $blueBoxer = $matchData->blueBoxer;
@@ -220,6 +238,7 @@ class MatchResultStoreService
   }
 
   /**
+   * ボクサーの戦績を試合登録時の状態に戻す
    * @param array $pastResult (既存のmatchResultデータ)
    * @param array $redBoxerRecord (red boxer data)
    * @param array $blueBoxerRecord (blue boxer data)
@@ -260,28 +279,10 @@ class MatchResultStoreService
       $blueBoxerRecord["draw"] && --$blueBoxerRecord["draw"]; //! blueのdraw数を減
     }
 
-    //TODO 以下はDBデータを操作している。ここでやるとトランザクション外で行われるため、不整合が生じる可能性がある
-
-
     return [$redBoxerRecord, $blueBoxerRecord];
   }
 
-  /**
-   * 各ボクサーのtitlesテーブルデータを試合登録時の所持タイトルに戻す
-   * @param BoxingMatch $match
-   * @return void
-   */
-  private function rollbackBoxerTitles(BoxingMatch $match): void
-  {
-    $this->titleRepository->deleteTitlesHoldByTheBoxer($match->red_boxer_id);
-    $this->titleRepository->deleteTitlesHoldByTheBoxer($match->blue_boxer_id);
 
-    $match->boxerTitleSnapshot->each(function ($title) {
-      if ($title->state !== "new") {
-        $this->titleRepository->storeTitle($title->boxer_id, $title->organization_id, $title->weight_division_id);
-      }
-    });
-  }
 
   /**
    * 試合結果に応じて両ボクサーの戦績を変更する
