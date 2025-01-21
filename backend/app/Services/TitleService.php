@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\Interfaces\TitleRepositoryInterface;
 use App\Repositories\Interfaces\OrganizationRepositoryInterface;
 use App\Repositories\Interfaces\WeightDivisionRepositoryInterface;
+use App\Repositories\Interfaces\BoxerRepositoryInterface;
 use App\Exceptions\FailedTitleException;
 
 
@@ -16,6 +17,7 @@ class TitleService
     private TitleRepositoryInterface $titleRepository,
     private OrganizationRepositoryInterface $organizationRepository,
     private WeightDivisionRepositoryInterface $weightRepository,
+    private BoxerRepositoryInterface $boxerRepository,
   ) {}
 
 
@@ -26,7 +28,21 @@ class TitleService
    */
   public function initializeTitle(int $boxerId, array $titles): void
   {
+    //? 最初にボクサーが保持しているタイトルがあれば全て削除しておく
     $this->titleRepository->deleteTitlesHoldByTheBoxer($boxerId);
+
+    //? 他のボクサーが所持しているタイトルの場合はエラーをthrow
+    foreach ($titles as $title) {
+      $organizationId = $this->organizationRepository->getOrganizationId($title["organization"]);
+      $weightId = $this->weightRepository->getWeightId($title["weight"]);
+      $hasBoxer = $this->titleRepository->hasOtherBoxerTitle($organizationId, $weightId);
+      if ($hasBoxer) {
+        $boxer = $this->boxerRepository->getBoxerById($hasBoxer->boxer_id);
+        $organization = $this->organizationRepository->getOrganizationName($organizationId);
+        $division = $this->weightRepository->getWeightName($weightId);
+        throw FailedTitleException::titleAlreadyHasOtherBoxer($organization, $division, $boxer->name);
+      }
+    }
 
     if (!empty($titles)) {
       $formattedTitles = array_map(function ($title) use ($boxerId) {

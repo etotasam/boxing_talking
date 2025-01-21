@@ -8,7 +8,9 @@ use App\Services\TitleService;
 use App\Repositories\Interfaces\BoxerRepositoryInterface;
 use App\Repositories\Interfaces\TitleRepositoryInterface;
 use App\Exceptions\BoxerException;
+use App\Exceptions\FailedTitleException;
 use Illuminate\Database\QueryException;
+
 
 class BoxerService
 {
@@ -32,10 +34,10 @@ class BoxerService
         $this->titleService->initializeTitle($storedBoxer['id'], $titles);
       });
     } catch (QueryException $e) {
-      \Log::error("database error with post boxer:" . $e->getMessage());
-      throw new Exception("Unexpected error on database :" . $e->getMessage());
+      \Log::error("database error with post boxer : " . $e->getMessage());
+      throw new Exception("Unexpected error on database : " . $e->getMessage());
     } catch (Exception $e) {
-      throw new Exception("Failed create boxer :" . $e->getMessage());
+      throw new Exception("Failed create boxer : " . $e->getMessage());
     }
   }
 
@@ -64,7 +66,7 @@ class BoxerService
   /**
    * boxerデータのupdate
    * @param array $updateBoxerData アップデート対象データの配列
-   * @return null|JsonResponse
+   * @return void
    */
   public function updateBoxerExecute(array $updateBoxerData)
   {
@@ -77,6 +79,8 @@ class BoxerService
 
         $this->boxerRepository->updateBoxer($updateBoxerData);
       });
+    } catch (FailedTitleException $e) {
+      throw new FailedTitleException($e->getMessage());
     } catch (QueryException $e) {
       \Log::error("database error with update boxer :" . $e->getMessage());
       throw new Exception("Unexpected error on database :" . $e->getMessage());
@@ -89,7 +93,7 @@ class BoxerService
    * ボクサーデータのstoreと、保持タイトルがあればstore
    *
    * @param array $boxerData ボクサー登録に必要なデータの連想配列
-   * @return array|JsonResponse [Boxer $storedBoxer, array $titlesArray]
+   * @return array [Boxer $storedBoxer, array $titlesArray]
    */
   private function postBoxerAndExtractTitles(array $boxerData): array|JsonResponse
   {

@@ -9,8 +9,18 @@ use App\Repositories\Interfaces\OrganizationRepositoryInterface;
 class OrganizationRepository implements OrganizationRepositoryInterface
 {
 
-  public static function getOrganizationId($organizationName)
+  public function getOrganizationId($organizationName)
   {
     return Organization::where("name", $organizationName)->first()->id;
+  }
+
+  /**
+   * @param int $organizationId
+   * @return string
+   */
+  public function getOrganizationName($organizationId)
+  {
+    $organization = Organization::find($organizationId);
+    return $organization->name;
   }
 }

@@ -52,7 +52,7 @@ class MatchResultStoreService
       DB::beginTransaction();
       //? タイトルマッチの時のみtitlesテーブルを更新
       if (!$match->matchTitles->isEmpty()) {
-        $this->processTitles($match, $matchResultArray);
+        $this->processTitlesAndTitleSnapshot($match, $matchResultArray);
       }
 
       //? 試合結果に基づいてボクサーの戦歴を更新
@@ -114,7 +114,7 @@ class MatchResultStoreService
    * @param array $matchResultArray
    * @return void
    */
-  private function processTitles(BoxingMatch $match, array $matchResultArray): void
+  private function processTitlesAndTitleSnapshot(BoxingMatch $match, array $matchResultArray): void
   {
 
     $newResult = $matchResultArray["match_result"];

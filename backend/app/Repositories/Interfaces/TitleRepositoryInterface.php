@@ -24,14 +24,12 @@ interface TitleRepositoryInterface
   public function storeTitle(int $boxerId, int $organizationId, int $weightDivisionId);
 
   /**
-   * ボクサーの保持するタイトルをtitlesテーブルに保存
-   * @param int $boxerId,
-   * @param int $organizationId,
-   * @param int $weightDivisionId,
-   *
-   * @return Title
+   * 他のボクサーが所持しているタイトルかどうかを調べる
+   * @param int $organizationId
+   * @param int $weightDivisionId
+   * @return Boxer|null
    */
-  public function createTitlesHoldByTheBoxer($boxerId, $organizationId, $weightDivisionId);
+  public function hasOtherBoxerTitle(int $organizationId, int $weightDivisionId);
 
   /**
    * ボクサーの保持タイトル(titlesテーブル)を保存(一括)

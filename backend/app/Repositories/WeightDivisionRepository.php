@@ -8,8 +8,13 @@ use App\Repositories\Interfaces\WeightDivisionRepositoryInterface;
 class WeightDivisionRepository implements WeightDivisionRepositoryInterface
 {
 
-  public static function getWeightId($weight)
+  public function getWeightId($weight)
   {
     return WeightDivision::where("weight", $weight)->first()->id;
+  }
+
+  public function getWeightName($weightId)
+  {
+    return WeightDivision::where("id", $weightId)->first()->weight;
   }
 }
