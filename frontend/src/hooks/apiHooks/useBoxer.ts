@@ -90,6 +90,7 @@ export const useUpdateBoxerData = () => {
       startLoading()
     }
   })
+
   const updateBoxer = (updateFighterData: Pick<BoxerType, 'id'> & Partial<BoxerType>) => {
     mutate(updateFighterData, {
       onSuccess: () => {
@@ -97,8 +98,12 @@ export const useUpdateBoxerData = () => {
         refetchReactQueryArrayKeys([QUERY_KEY.FETCH_MATCHES, QUERY_KEY.BOXER])
         showToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS });
       },
-      onError: () => {
+      onError: (error: any) => {
         resetLoadingState()
+        if (error.data.errorCode === 30) {
+          showToastModalMessage({ message: error.data.message, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR });
+          return
+        }
         showToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR });
       }
     })
