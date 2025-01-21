@@ -21,27 +21,16 @@ class TitleRepository implements TitleRepositoryInterface
   }
 
   /**
-   * ボクサーの保持するタイトルをtitlesテーブルに保存
-   * @param int $boxerId,
-   * @param int $organizationId,
-   * @param int $weightDivisionId,
-   *
-   * @return bool
+   * 他のボクサーが所持しているタイトルかどうかを調べる
+   * @param int $organizationId
+   * @param int $weightDivisionId
+   * @return Boxer|null
    */
-  public function createTitlesHoldByTheBoxer($boxerId, $organizationId, $weightDivisionId)
+  public function hasOtherBoxerTitle(int $organizationId, int $weightDivisionId)
   {
-    $title = new Title;
-    $title->fill([
-      "boxer_id" => $boxerId,
-      "organization_id" => $organizationId,
-      "weight_division_id" => $weightDivisionId
-    ]);
-    $title->save();
-    // return Title::create([
-    //   "boxer_id" => $boxerId,
-    //   "organization_id" => $organizationId,
-    //   "weight_division_id" => $weightDivisionId
-    // ]);
+    return Title::where('organization_id', $organizationId)
+      ->where('weight_division_id', $weightDivisionId)
+      ->first();
   }
 
   /**

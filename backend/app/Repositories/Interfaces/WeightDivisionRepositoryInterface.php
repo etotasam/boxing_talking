@@ -11,5 +11,11 @@ interface WeightDivisionRepositoryInterface
    * @param string $weight
    * @return int
    */
-  public static function getWeightId($weight);
+  public function getWeightId($weight);
+
+  /**
+   * @param int $weightId
+   * @return string
+   */
+  public function getWeightName($weightId);
 }
