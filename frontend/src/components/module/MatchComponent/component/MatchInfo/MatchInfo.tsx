@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 //! type
-import { BoxerType, MatchResultType, MatchDataType } from '@/assets/types';
+import { BoxerType, MatchResultType, MatchDataType, TitlesStateType } from '@/assets/types';
 //! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { SubHeadline } from '@/components/atomic/SubHeadline';
@@ -11,6 +11,7 @@ import { FlagImage } from '@/components/atomic/FlagImage';
 import { useWindowSize } from '@/hooks/useWindowSize';
 //! icon
 import crown from '@/assets/images/etc/champion.svg';
+import fall_of_crown from '@/assets/images/etc/fall_champion.svg';
 import { GiImperialCrown } from 'react-icons/gi';
 
 type MatchInfoPropsType = {
@@ -230,9 +231,27 @@ const Titles = ({ titles }: Pick<BoxerType, 'titles'>) => {
         <ul className="mt-1">
           {titles.map((title) => (
             <li key={`${title.organization}_${title.weight}`} className="">
-              <p className="font-clamp-level-0 relative text-yellow-500 inline-block">
+              {/* //TODO stateで変更するUIをmodify */}
+              <p
+                className={clsx(
+                  'font-clamp-level-0 relative inline-block',
+                  (title.state === 'new' || title.state === null) && 'text-yellow-500',
+                  title.state === 'still' && 'text-blue-500',
+                  title.state === 'fall' && 'text-stone-500'
+                )}
+              >
                 <span className="absolute top-[50%] translate-y-[-50%] left-[-25px] w-[20px] h-[20px]">
-                  <img src={crown} alt="" />
+                  {title.state === 'fall' ? (
+                    <>
+                      <img src={fall_of_crown} alt="" />
+                      <span className="absolute top-[3px] left-[-3px] text-white">Fail</span>
+                    </>
+                  ) : (
+                    <>
+                      <img src={crown} alt="" />
+                      <span className="absolute top-[3px] left-[-3px] text-red-500">New</span>
+                    </>
+                  )}
                 </span>
                 {`${title.organization}${title.weight}`}
               </p>
