@@ -32,7 +32,7 @@ interface BoxerTitleSnapshotInterface
   /**
    * 試合時の選手の保持タイトルを取得
    * @param int $matchId
-   * @return Collection
+   * @return Collection  ["red" => BoxerTitleSnapshot, "blue" => BoxerTitleSnapshot]
    */
   public function getTitleSnapshot(int $matchId);
 

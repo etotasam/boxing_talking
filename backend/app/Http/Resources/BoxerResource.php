@@ -5,17 +5,18 @@ namespace App\Http\Resources;
 use \Illuminate\Support\Collection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\Boxer;
+use App\Http\Resources\TitleResource;
 use App\Models\MatchBoxerSnapshot;
 use App\Models\BoxerTitleSnapshot;
 
 class BoxerResource extends JsonResource
 {
 
-    public function __construct(private Boxer $boxer, private $snapshot, private $titleSnapshot = null)
+    public function __construct(private Boxer $boxer, private $boxerRecordSnapshot, private $titleSnapshot = null)
     {
 
         parent::__construct($boxer);
-        $this->snapshot = $snapshot;
+        $this->boxerRecordSnapshot = $boxerRecordSnapshot;
         $this->titleSnapshot = $titleSnapshot;
     }
     /**
@@ -29,29 +30,21 @@ class BoxerResource extends JsonResource
     {
 
         //? 試合データを表示する時(スナップショットがある時)はスナップショットを使用する
-        $titleCollection = $this->titleSnapshot ?? $this->titles;
-
-        $titles = $titleCollection->map(function ($title) {
-            $name = $title->organization->name;
-            $weight = $title->weightDivision->weight;
-            return ["organization" => $name, "weight" => $weight];
-        });
-
-
         return [
-            'id' => $this->boxer->id,
-            'name' => $this->boxer->name,
-            'engName' => $this->boxer->eng_name,
-            'country' => $this->boxer->country,
-            'birth' => $this->boxer->birth,
-            'height' => $this->boxer->height,
-            'reach' => $this->boxer->reach,
-            'style' => $this->snapshot->style ?? $this->boxer->style,
-            'ko' => $this->snapshot->ko ?? $this->boxer->ko,
-            'win' => $this->snapshot->win ?? $this->boxer->win,
-            'draw' => $this->snapshot->draw ?? $this->boxer->draw,
-            'lose' => $this->snapshot->lose ?? $this->boxer->lose,
-            'titles' => $titles,
+            'id' => $this->id,
+            'name' => $this->name,
+            'engName' => $this->eng_name,
+            'country' => $this->country,
+            'birth' => $this->birth,
+            'height' => $this->height,
+            'reach' => $this->reach,
+            'style' => $this->boxerRecordSnapshot->style ?? $this->style,
+            'ko' => $this->boxerRecordSnapshot->ko ?? $this->ko,
+            'win' => $this->boxerRecordSnapshot->win ?? $this->win,
+            'draw' => $this->boxerRecordSnapshot->draw ?? $this->draw,
+            'lose' => $this->boxerRecordSnapshot->lose ?? $this->lose,
+            'titles' => new TitleResource($this->boxer, $this->titleSnapshot),
+            // 'titles' => $titles,
         ];
     }
 }

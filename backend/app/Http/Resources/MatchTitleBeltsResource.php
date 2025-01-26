@@ -6,6 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 use App\Models\BoxingMatch;
 
+
 class MatchTitleBeltsResource extends JsonResource
 {
 

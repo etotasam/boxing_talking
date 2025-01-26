@@ -27,7 +27,6 @@ class BoxerTitleSnapshotService
     //? 試合結果修正で勝者が変わる場合はボクサーのタイトルスナップショットのstateがnewのタイトルは削除する
     $this->deleteBoxerTitleSnapshotIfStateNew($match, $result);
 
-    // \Log::debug("テスト : " . print_r($match->boxerTitleSnapshot->toArray(), true));
     //? 一度snapshotのstateをnullに初期化
     $isFailedStateReset = $this->boxerTitleSnapshotRepository->resetBoxerTitleSnapshot($match->id);
     if ($isFailedStateReset) {

@@ -28,7 +28,6 @@ class BoxerTitleSnapshotRepository implements BoxerTitleSnapshotInterface
    */
   public function updateBoxerTitleSnapshot($snapshot, $state)
   {
-    // \Log::debug($snapshot["match_id"]);
     $isSuccess =  (bool) BoxerTitleSnapshot::where([
       ['match_id', '=', $snapshot["match_id"]],
       ['boxer_id', '=', $snapshot["boxer_id"]],
@@ -63,7 +62,7 @@ class BoxerTitleSnapshotRepository implements BoxerTitleSnapshotInterface
   /**
    * 試合時の選手の保持タイトルを取得
    * @param int $matchId
-   * @return Collection
+   * @return Collection ["red" => BoxerTitleSnapshot, "blue" => BoxerTitleSnapshot]
    */
   public function getTitleSnapshot($matchId)
   {
