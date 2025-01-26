@@ -13,6 +13,11 @@ export type BgColorType = typeof BG_COLOR_ON_TOAST_MODAL[keyof typeof BG_COLOR_O
 // ? 国旗
 export type CountryType = typeof COUNTRY[keyof typeof COUNTRY]
 
+type TitlesStateType = {
+  organization: OrganizationsType,
+  weight: WeightClassType,
+  state?: "new" | "still" | "fall" | null
+}
 
 // ? ボクサー情報
 export type BoxerType = {
@@ -28,7 +33,8 @@ export type BoxerType = {
   ko: number;
   draw: number;
   lose: number;
-  titles: { organization: string | undefined, weight: string | undefined }[] | []
+  titles: TitlesStateType[] | []
+  // titles: { organization: string | undefined, weight: string | undefined, state?: "" }[] | []
 };
 
 export type TitleType = {

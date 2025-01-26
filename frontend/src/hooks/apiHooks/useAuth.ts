@@ -68,7 +68,7 @@ export const useGuestLogin = () => {
   })
 
   const guestLogin = () => {
-    mutate(({}), {
+    mutate({}, {
       onSuccess: () => {
         hideLoginModal()
         refetchMatchPrediction()

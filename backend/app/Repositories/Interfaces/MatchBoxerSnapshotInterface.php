@@ -19,7 +19,7 @@ interface MatchBoxerSnapshotInterface
   /**
    * 指定された試合IDのボクサースナップショットを取得
    * @param int $matchId
-   * @return Collection|false 成功時はスナップショットのコレクション、失敗時はfalse
+   * @return Collection|false 成功時はスナップショットのコレクション ["red" => ..., "blue" => ...]、失敗時はfalse
    */
   public function getMatchBoxerSnapshot(int $matchId);
 

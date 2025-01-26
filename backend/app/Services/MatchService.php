@@ -163,7 +163,7 @@ class MatchService
     $matchesSnapshot = $matches->map(function ($match) {
       //? 戦績のスナップショット
       $recordSnapshot = $this->MatchBoxerSnapshotRepository->getMatchBoxerSnapshot($match->id);
-      $match->snapshot = $recordSnapshot;
+      $match->boxerRecordSnapshot = $recordSnapshot;
 
       //? タイトルのスナップショット
       $titleSnapshot = $this->BoxerTitleSnapshotRepository->getTitleSnapshot($match->id);
