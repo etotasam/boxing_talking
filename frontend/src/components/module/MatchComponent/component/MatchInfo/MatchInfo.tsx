@@ -246,6 +246,11 @@ const Titles = ({ titles }: Pick<BoxerType, 'titles'>) => {
                       <img src={fall_of_crown} alt="" />
                       <span className="absolute top-[3px] left-[-3px] text-white">Fail</span>
                     </>
+                  ) : title.state === 'still' ? (
+                    <>
+                      <img src={crown} alt="" />
+                      <span className="absolute top-[3px] left-[-3px] text-gray-300">Still</span>
+                    </>
                   ) : (
                     <>
                       <img src={crown} alt="" />
