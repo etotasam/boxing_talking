@@ -131,6 +131,7 @@ class MatchController extends ApiController
     }
 
     /**
+     * @param bool is_update_boxer_record_checked
      * @param int match_id
      * @param string result
      * @param string | null detail
@@ -147,8 +148,10 @@ class MatchController extends ApiController
             "round" => $request->round
         ];
 
+        $isUpdateBoxerRecordChecked = $request->is_update_boxer_record_checked;
+
         try {
-            $this->matchResultStoreService->storeMatchResultExecute($matchResultArray);
+            $this->matchResultStoreService->storeMatchResultExecute($matchResultArray, $isUpdateBoxerRecordChecked);
             // $this->matchService->storeMatchResultExecute($matchResultArray);
             return $this->responseSuccessful("Successful store match result and update boxers record");
         } catch (Exception $e) {

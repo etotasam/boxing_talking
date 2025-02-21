@@ -27,15 +27,18 @@ class MatchResultStoreService
 
   /**
    * @param array $matchResultArray [
+   * "is_update_boxer_record_checked" => boolean,
    * "match_id" => number,
    * "match_result" => "red" | "blue" | "draw" | "no-contest",
    * "detail" => "ko" | "tko" | "ud" | "md" | "sd",
    * "round" => number
    * ]
+   * @param $isUpdateBoxerRecordChecked boolean
    *
    * @return void
    */
-  public function storeMatchResultExecute(array $matchResultArray)
+  //TODO isUpdateBoxerRecordCheckedの値でボクサー戦績の更新の可否を実行
+  public function storeMatchResultExecute(array $matchResultArray, bool $isUpdateBoxerRecordChecked)
   {
     try {
       //? バリデーション。必須項目チェック
