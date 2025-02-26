@@ -48,9 +48,8 @@ class MatchResultStoreService
 
       //? 試合情報の取得
       $match = $this->matchRepository->getMatchById($matchId);
+      // \Log::info("match : " . print_r($match->result->toArray(), true));
 
-      //? 試合結果に応じてボクサーの戦績を更新する為のデータを準備、作成
-      [$newRedBoxerRecord, $newBlueBoxerRecord] = $this->prepareBoxerRecord($match, $matchResultArray);
 
       DB::beginTransaction();
       //? タイトルマッチの時のみtitlesテーブルを更新
@@ -58,8 +57,12 @@ class MatchResultStoreService
         $this->processTitlesAndTitleSnapshot($match, $matchResultArray);
       }
 
-      //? 試合結果に基づいてボクサーの戦歴を更新
-      $this->updateBoxerRecord($newRedBoxerRecord, $newBlueBoxerRecord);
+      if ($isUpdateBoxerRecordChecked) {
+        //? 試合結果に応じてボクサーの戦績を更新する為のデータを準備、作成
+        [$newRedBoxerRecord, $newBlueBoxerRecord] = $this->prepareBoxerRecord($match, $matchResultArray);
+        //? 試合結果に基づいてボクサーの戦歴を更新
+        $this->updateBoxerRecord($newRedBoxerRecord, $newBlueBoxerRecord);
+      }
 
       //? 試合結果の登録 or 更新
       $this->matchRepository->updateOrCreateMatchResult($matchId, $matchResultArray);
@@ -326,6 +329,7 @@ class MatchResultStoreService
       ++$redBoxerRecord["draw"]; //! redのdraw数を+
       ++$blueBoxerRecord["draw"]; //! blueのdraw数を+
     }
+
 
     return [$redBoxerRecord, $blueBoxerRecord];
   }
