@@ -15,6 +15,7 @@ use App\Repositories\BoxerRepository;
 use App\Repositories\TitleRepository;
 use Database\Seeders\OrganizationSeeder;
 use Database\Seeders\WeightDivisionSeeder;
+use App\Exceptions\FailedTitleException;
 
 class StoreTitleTest extends TestCase
 {
@@ -104,6 +105,7 @@ class StoreTitleTest extends TestCase
      */
     $mockTitleRepository = \Mockery::mock(TitleRepository::class);
     $mockTitleRepository->makePartial();
+    //? storeTitlesHoldByTheBoxerメソッドがfalseを返すようにモック化(タイトルの保存時に必ず失敗する設定)
     $mockTitleRepository->shouldReceive('storeTitlesHoldByTheBoxer')->andReturn(false);
     $this->titleService = (new TitleService($mockTitleRepository, new OrganizationRepository, new WeightDivisionRepository, new BoxerRepository));
 
@@ -116,8 +118,8 @@ class StoreTitleTest extends TestCase
       ]
     ];
 
-    //? expectExceptionは例外の発生を期待するメソッドが実行される前に定義する
-    $this->expectException(\Exception::class);
+    //? 保存に失敗した場合に指定の例外が投げられるか
+    $this->expectException(FailedTitleException::class);
     // テスト対象メソッドの実行
     $this->titleService->initializeTitle($this->redBoxer->id, $newSetTitles);
   }

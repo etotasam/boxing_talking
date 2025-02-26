@@ -198,8 +198,8 @@ export const useMatchResult = () => {
     }
   })
 
-  const storeMatchResult = ({ matchId, result, detail, round }: MatchResultType) => {
-    mutate({ matchId, result, detail, round }, {
+  const storeMatchResult = ({ isUpdateBoxerRecordChecked, matchId, result, detail, round }: MatchResultType) => {
+    mutate({ isUpdateBoxerRecordChecked, matchId, result, detail, round }, {
       onSuccess: () => {
         refetchMatches()
         refetchAllMatches()

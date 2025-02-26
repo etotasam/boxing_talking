@@ -34,10 +34,19 @@ class BoxingMatchResource extends JsonResource
             ? new MatchResultResource($this->result)
             : null;
 
+        $redBoxerSnapshotData = [
+            'boxerRecordSnapshot' => $this->boxerRecordSnapshot["red"],
+            'titleSnapshot' => $this->titleSnapshot["red"]
+        ];
+        $blueBoxerSnapshotData = [
+            'boxerRecordSnapshot' => $this->boxerRecordSnapshot["blue"],
+            'titleSnapshot' => $this->titleSnapshot["blue"]
+        ];
+
         return  [
             "id" => $this->id,
-            "redBoxer" => new BoxerResource($this->redBoxer, $this->boxerRecordSnapshot["red"], $this->titleSnapshot["red"]),
-            "blueBoxer" => new BoxerResource($this->blueBoxer, $this->boxerRecordSnapshot["blue"], $this->titleSnapshot['blue']),
+            "redBoxer" => new BoxerResource($this->redBoxer, $redBoxerSnapshotData),
+            "blueBoxer" => new BoxerResource($this->blueBoxer, $blueBoxerSnapshotData),
             "country" => $this->country,
             "venue" => $this->venue,
             "grade" => $this->getGrade->grade,

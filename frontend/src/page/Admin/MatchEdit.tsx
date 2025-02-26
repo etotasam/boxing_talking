@@ -290,12 +290,20 @@ const MatchResultSetDialog = ({
     const round = isKo ? matchRound : undefined;
 
     const matchResultValue = {
+      isUpdateBoxerRecordChecked,
       matchId: selectedMatchData!.id,
-      result: result,
-      detail: detail,
-      round: round,
+      result,
+      detail,
+      round,
     };
+    // console.log(matchResultValue);
+    // return;
     storeMatchResult(matchResultValue);
+  };
+
+  const [isUpdateBoxerRecordChecked, setIsUpdateBoxerRecordChecked] = useState(true);
+  const handleCheck = () => {
+    setIsUpdateBoxerRecordChecked((prev) => !prev);
   };
 
   if (!selectedMatchData) return;
@@ -306,6 +314,11 @@ const MatchResultSetDialog = ({
       closeButton={true}
       closeDialog={() => setIsShowMatchResultSelectorDialog(false)}
     >
+      {/* //? 戦績更新チェックボックス */}
+      <label>
+        <input type="checkbox" checked={isUpdateBoxerRecordChecked} onChange={handleCheck} />
+        戦績を更新する
+      </label>
       <form onSubmit={submit}>
         <div className="">
           {resultObject.result.map((result) => (

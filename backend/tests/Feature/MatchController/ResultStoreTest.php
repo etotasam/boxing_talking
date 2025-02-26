@@ -82,9 +82,93 @@ class ResultStoreTest extends TestCase
         $this->titleSnapshot = BoxerTitleSnapshot::where("match_id", $this->match->id);
 
         //? 試合結果登録
-        $this->result = MatchResult::create(
+        // $this->result = MatchResult::create(
+        //     ["match_id" => $this->match->id, "match_result" => "red", "detail" => "ko", "round" => 1]
+        // );
+    }
+
+    /**
+     * @test
+     * ! 試合結果を登録時にボクサー戦績が正常に反映されている(試合結果未登録時)
+     */
+    public function testUpdateBoxerRecordWithResult()
+    {
+        // 初期状態のボクサー戦績を取得
+        $initialRedBoxerWin = $this->redBoxer->win;
+        $initialRedBoxerKo = $this->redBoxer->ko;
+        $initialBlueBoxerLose = $this->blueBoxer->lose;
+
+        // 1. ボクサー戦績を更新しないリクエストを送信
+        $is_update_boxer_record_checked = false;
+        $match_id = $this->match->id;
+        $result = "red";
+        $detail = "ko";
+        $round = 1;
+
+        $response = $this->post('/api/match/result', compact("is_update_boxer_record_checked", "match_id", "result", "detail", "round"));
+        $response->assertStatus(200);
+
+        // ボクサー戦績は更新されないことを確認
+        $this->assertDatabaseHas('boxers', [
+            'id' => $this->redBoxer->id,
+            'win' => $initialRedBoxerWin,
+            'ko' => $initialRedBoxerKo,
+        ]);
+        $this->assertDatabaseHas('boxers', [
+            'id' => $this->blueBoxer->id,
+            'lose' => $initialBlueBoxerLose,
+        ]);
+
+        // 2. 登録された試合結果を削除
+        MatchResult::where("match_id", $this->match->id)->delete();
+
+        // 3. ボクサー戦績を更新するリクエストを送信
+        $is_update_boxer_record_checked = true;
+
+        $response = $this->post('/api/match/result', compact("is_update_boxer_record_checked", "match_id", "result", "detail", "round"));
+        $response->assertStatus(200);
+
+        // ボクサー戦績が正常に更新されることを確認
+        $this->assertDatabaseHas('boxers', [
+            'id' => $this->redBoxer->id,
+            'win' => $initialRedBoxerWin + 1,
+            'ko' => $initialRedBoxerKo + 1,
+        ]);
+        $this->assertDatabaseHas('boxers', [
+            'id' => $this->blueBoxer->id,
+            'lose' => $initialBlueBoxerLose + 1,
+        ]);
+    }
+
+    /**
+     * @test
+     * ! 試合結果を登録時にボクサー戦績の更新が正常に行われている(試合結果登録済み時)
+     */
+    public function testUpdateBoxerRecordWithResultAndAlreadyHasResult()
+    {
+        // $this->markTestSkipped();
+        MatchResult::create(
             ["match_id" => $this->match->id, "match_result" => "red", "detail" => "ko", "round" => 1]
         );
+
+        $initialRedBoxerWin = $this->redBoxer->win;
+        $initialRedBoxerKo = $this->redBoxer->ko;
+        $initialBlueBoxerLose = $this->blueBoxer->lose;
+
+        $result = ["is_update_boxer_record_checked" => true, "match_id" => $this->match->id, "result" => "draw", "detail" => null, "round" => null];
+
+        $response = $this->post('/api/match/result', $result);
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('boxers', [
+            'id' => $this->redBoxer->id,
+            'win' => $initialRedBoxerWin - 1,
+            'ko' => $initialRedBoxerKo - 1,
+        ]);
+        $this->assertDatabaseHas('boxers', [
+            'id' => $this->blueBoxer->id,
+            'lose' => $initialBlueBoxerLose - 1,
+        ]);
     }
 
 
@@ -96,13 +180,14 @@ class ResultStoreTest extends TestCase
     {
         // $this->markTestSkipped();
 
+        $is_update_boxer_record_checked = true;
         $match_id = $this->match->id;
         $result = "red";
         $detail = "ko";
         $round = 1;
 
         //リクエスト送信
-        $response = $this->post('/api/match/result', compact("match_id", "result", "detail", "round"));
+        $response = $this->post('/api/match/result', compact("is_update_boxer_record_checked", "match_id", "result", "detail", "round"));
         $expectedResult = [
             // ['boxer_id' => $this->redBoxer->id, "organization_id" => $this->organization["WBO"], "state" => "new"],
             // ['boxer_id' => $this->redBoxer->id, "organization_id" => $this->organization["IBF"], "state" => "new"],
@@ -131,16 +216,17 @@ class ResultStoreTest extends TestCase
         // $this->markTestSkipped();
 
         //事前にデータを入れておく(stateのデフォルト値がnullなので変更しておく)
-        $this->post('/api/match/result', ["match_id" => $this->match->id, "result" => "red", "detail" => "ko", "round" => 1])
+        $this->post('/api/match/result', ["is_update_boxer_record_checked" => true, "match_id" => $this->match->id, "result" => "red", "detail" => "ko", "round" => 1])
             ->assertStatus(200);
 
+        $is_update_boxer_record_checked = true;
         $match_id = $this->match->id;
         $result = "draw";
         $detail = null;
         $round = null;
 
         //リクエスト送信
-        $response = $this->post('/api/match/result', compact("match_id", "result", "detail", "round"));
+        $response = $this->post('/api/match/result', compact("is_update_boxer_record_checked", "match_id", "result", "detail", "round"));
         $expectedResult = [
             ['boxer_id' => $this->redBoxer->id, "organization_id" => $this->organization["WBA"], "state" => null],
             ['boxer_id' => $this->redBoxer->id, "organization_id" => $this->organization["WBC"], "state" => null],
@@ -167,7 +253,7 @@ class ResultStoreTest extends TestCase
 
         // $this->markTestSkipped();
 
-        $result_1 = ["match_id" => $this->match->id, "result" => "red", "detail" => "ko", "round" => 1];
+        $result_1 = ["is_update_boxer_record_checked" => true, "match_id" => $this->match->id, "result" => "red", "detail" => "ko", "round" => 1];
 
         $response = $this->post('/api/match/result', $result_1);
         $response->assertStatus(200);
@@ -185,7 +271,7 @@ class ResultStoreTest extends TestCase
             ], $result));
         }
 
-        $result_2 = ["match_id" => $this->match->id, "result" => "blue", "detail" => "ko", "round" => 1];
+        $result_2 = ["is_update_boxer_record_checked" => true, "match_id" => $this->match->id, "result" => "blue", "detail" => "ko", "round" => 1];
 
         $response = $this->post('/api/match/result', $result_2);
         $response->assertStatus(200);
@@ -211,6 +297,7 @@ class ResultStoreTest extends TestCase
      */
     public function testAdjustTitleWithResult()
     {
+        $is_update_boxer_record_checked = true;
         $match_id = $this->match->id;
         $result = "red";
         $detail = "ko";
@@ -229,7 +316,7 @@ class ResultStoreTest extends TestCase
         ];
 
         //? リクエスト送信 redの勝利
-        $response = $this->post('/api/match/result', compact("match_id", "result", "detail", "round"));
+        $response = $this->post('/api/match/result', compact("is_update_boxer_record_checked", "match_id", "result", "detail", "round"));
         $response->assertStatus(200);
 
         //? titlesテーブルに取得したタイトルが登録されているか
@@ -272,12 +359,13 @@ class ResultStoreTest extends TestCase
 
         // $this->assertDatabaseHas('title_matches', ['match_id' => $this->matchOnMiddle->id, 'organization_id' => $this->organization['WBA']]);
         //? リクエストパラメータ
+        $is_update_boxer_record_checked = true;
         $match_id = $this->matchOnMiddle->id;
         $result = "red";
         $detail = "ko";
         $round = 1;
         //? リクエスト送信 redの勝利
-        $response = $this->post('/api/match/result', compact("match_id", "result", "detail", "round"));
+        $response = $this->post('/api/match/result', compact("is_update_boxer_record_checked", "match_id", "result", "detail", "round"));
 
         //? 試合に掛けられた全てのタイトルが勝者に付与されているか
         foreach ($titleMatches as $titles) {

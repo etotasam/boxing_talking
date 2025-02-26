@@ -8,7 +8,10 @@ use App\Models\Boxer;
 
 class TitleResource extends JsonResource
 {
-    //TODO 各resourceにDocを書くべき
+    /**
+     * @param Boxer $boxer
+     * @param array|null $titleSnapshot
+     */
     public function __construct(private Boxer $boxer, private $titleSnapshot = null)
     {
         parent::__construct($boxer);

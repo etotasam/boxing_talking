@@ -12,12 +12,16 @@ use App\Models\BoxerTitleSnapshot;
 class BoxerResource extends JsonResource
 {
 
-    public function __construct(private Boxer $boxer, private $boxerRecordSnapshot, private $titleSnapshot = null)
+    /**
+     * @param Boxer $boxer
+     * @param array $additionalData - ['boxerRecordSnapshot' => MatchBoxerSnapshot, 'titleSnapshot' => BoxerTitleSnapshot]
+     */
+    public function __construct(private Boxer $boxer, private $additionalData = [])
     {
 
         parent::__construct($boxer);
-        $this->boxerRecordSnapshot = $boxerRecordSnapshot;
-        $this->titleSnapshot = $titleSnapshot;
+        $this->boxerRecordSnapshot = $this->additionalData['boxerRecordSnapshot'] ?? null;
+        $this->titleSnapshot = $this->additionalData['titleSnapshot'] ?? null;
     }
     /**
      * Transform the resource into an array.
@@ -44,7 +48,6 @@ class BoxerResource extends JsonResource
             'draw' => $this->boxerRecordSnapshot->draw ?? $this->draw,
             'lose' => $this->boxerRecordSnapshot->lose ?? $this->lose,
             'titles' => new TitleResource($this->boxer, $this->titleSnapshot),
-            // 'titles' => $titles,
         ];
     }
 }

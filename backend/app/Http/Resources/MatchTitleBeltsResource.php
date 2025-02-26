@@ -10,6 +10,9 @@ use App\Models\BoxingMatch;
 class MatchTitleBeltsResource extends JsonResource
 {
 
+    /**
+     * @param BoxingMatch $match
+     */
     public function __construct(private BoxingMatch $match)
     {
         parent::__construct($match);

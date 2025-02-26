@@ -27,15 +27,18 @@ class MatchResultStoreService
 
   /**
    * @param array $matchResultArray [
+   * "is_update_boxer_record_checked" => boolean,
    * "match_id" => number,
    * "match_result" => "red" | "blue" | "draw" | "no-contest",
    * "detail" => "ko" | "tko" | "ud" | "md" | "sd",
    * "round" => number
    * ]
+   * @param $isUpdateBoxerRecordChecked boolean
    *
    * @return void
    */
-  public function storeMatchResultExecute(array $matchResultArray)
+  //TODO isUpdateBoxerRecordCheckedの値でボクサー戦績の更新の可否を実行
+  public function storeMatchResultExecute(array $matchResultArray, bool $isUpdateBoxerRecordChecked)
   {
     try {
       //? バリデーション。必須項目チェック
@@ -45,9 +48,8 @@ class MatchResultStoreService
 
       //? 試合情報の取得
       $match = $this->matchRepository->getMatchById($matchId);
+      // \Log::info("match : " . print_r($match->result->toArray(), true));
 
-      //? 試合結果に応じてボクサーの戦績を更新する為のデータを準備、作成
-      [$newRedBoxerRecord, $newBlueBoxerRecord] = $this->prepareBoxerRecord($match, $matchResultArray);
 
       DB::beginTransaction();
       //? タイトルマッチの時のみtitlesテーブルを更新
@@ -55,8 +57,12 @@ class MatchResultStoreService
         $this->processTitlesAndTitleSnapshot($match, $matchResultArray);
       }
 
-      //? 試合結果に基づいてボクサーの戦歴を更新
-      $this->updateBoxerRecord($newRedBoxerRecord, $newBlueBoxerRecord);
+      if ($isUpdateBoxerRecordChecked) {
+        //? 試合結果に応じてボクサーの戦績を更新する為のデータを準備、作成
+        [$newRedBoxerRecord, $newBlueBoxerRecord] = $this->prepareBoxerRecord($match, $matchResultArray);
+        //? 試合結果に基づいてボクサーの戦歴を更新
+        $this->updateBoxerRecord($newRedBoxerRecord, $newBlueBoxerRecord);
+      }
 
       //? 試合結果の登録 or 更新
       $this->matchRepository->updateOrCreateMatchResult($matchId, $matchResultArray);
@@ -323,6 +329,7 @@ class MatchResultStoreService
       ++$redBoxerRecord["draw"]; //! redのdraw数を+
       ++$blueBoxerRecord["draw"]; //! blueのdraw数を+
     }
+
 
     return [$redBoxerRecord, $blueBoxerRecord];
   }

@@ -60,6 +60,7 @@ export type RegisterMatchPropsType = Record<'redBoxerId' | 'blueBoxerId', number
   & MatchFormDataType
 
 export type MatchResultType = {
+  isUpdateBoxerRecordChecked: boolean,
   matchId: number,
   result: "red" | "blue" | "draw" | "no-contest",
   detail?: "ko" | "tko" | "ud" | "md" | "sd",
