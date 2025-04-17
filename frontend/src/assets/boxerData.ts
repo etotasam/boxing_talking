@@ -7,6 +7,12 @@ export const STANCE = {
   UNKNOWN: "unknown"
 } as const
 
+export const BOXER_STANCE_LABELS = {
+  [STANCE.ORTHODOX]: 'オーソドックス',
+  [STANCE.SOUTHPAW]: 'サウスポー',
+  [STANCE.UNKNOWN]: '-'
+} as const;
+
 
 export const ORGANIZATIONS = {
   WBA_INTERIM: "WBA暫定",

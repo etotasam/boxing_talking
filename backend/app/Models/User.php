@@ -15,6 +15,7 @@ use \Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, SerializeDate;
@@ -61,6 +62,11 @@ class User extends Authenticatable
     public function administrator()
     {
         return $this->hasOne(Administrator::class);
+    }
+
+    public function isAdmin()
+    {
+        return $this->administrator !== null;
     }
 
     public $incrementing = false; // 自動インクリメントを無効化

@@ -136,7 +136,9 @@ class MatchService
   {
 
     if ($range == "all") {
-      if (Auth::user()->administrator) {
+      /** @var \App\Models\User $user */
+      $user = Auth::user();
+      if ($user->isAdmin()) {
         $matches = $this->matchRepository->getAllMatches();
       } else {
         throw NonAdministratorException::create();

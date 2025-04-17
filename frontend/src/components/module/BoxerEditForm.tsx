@@ -5,7 +5,13 @@ import { STANCE, initialBoxerDataOnForm } from '@/assets/boxerData';
 import { ORGANIZATIONS, WEIGHT_CLASS } from '@/assets/boxerData';
 import { COUNTRY } from '@/assets/nationalFlagData';
 //! type
-import { BoxerType, CountryType, StanceType } from '@/assets/types';
+import {
+  BoxerType,
+  CountryType,
+  StanceType,
+  OrganizationsType,
+  WeightClassType,
+} from '@/assets/types';
 //! recoil
 import { SetterOrUpdater, useRecoilState } from 'recoil';
 import { boxerDataOnFormState } from '@/store/boxerDataOnFormState';
@@ -333,7 +339,7 @@ const Titles = () => {
                     }
                     cloneBoxerDataOnForm.titles[i] = {
                       ...cloneBoxerDataOnForm.titles[i],
-                      organization: e.target.value,
+                      organization: e.target.value as OrganizationsType,
                     };
                     return cloneBoxerDataOnForm;
                   })
@@ -360,7 +366,7 @@ const Titles = () => {
                     }
                     cloneBoxerDataOnForm.titles[i] = {
                       ...cloneBoxerDataOnForm.titles[i],
-                      weight: e.target.value,
+                      weight: e.target.value as WeightClassType,
                     };
                     return cloneBoxerDataOnForm;
                   })
