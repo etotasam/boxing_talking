@@ -37,7 +37,6 @@ class MatchResultStoreService
    *
    * @return void
    */
-  //TODO isUpdateBoxerRecordCheckedの値でボクサー戦績の更新の可否を実行
   public function storeMatchResultExecute(array $matchResultArray, bool $isUpdateBoxerRecordChecked)
   {
     try {

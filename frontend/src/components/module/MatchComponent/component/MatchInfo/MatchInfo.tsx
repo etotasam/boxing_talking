@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 //! type
-import { BoxerType, MatchResultType, MatchDataType, TitlesStateType } from '@/assets/types';
+import { BoxerType, MatchResultType, MatchDataType } from '@/assets/types';
+import { BOXER_STANCE_LABELS } from '@/assets/boxerData';
 //! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
-import { SubHeadline } from '@/components/atomic/SubHeadline';
+// import { SubHeadline } from '@/components/atomic/SubHeadline';
 import { FlagImage } from '@/components/atomic/FlagImage';
 //! hooks
 import { useWindowSize } from '@/hooks/useWindowSize';
@@ -124,11 +125,7 @@ const BoxerStatus = ({ boxer, matchDate }: { boxer: BoxerType; matchDate: string
       </li>
       <li className="flex justify-between">
         <p className="flex-1 text-sm text-stone-500 flex items-center justify-center">スタイル</p>
-        <p className={`flex-1`}>
-          {boxer.style === 'orthodox' && 'オーソドックス'}
-          {boxer.style === 'southpaw' && 'サウスポー'}
-          {boxer.style === 'unknown' && '-'}
-        </p>
+        <p className={`flex-1`}>{BOXER_STANCE_LABELS[boxer.style]}</p>
       </li>
     </ul>
   );
@@ -244,17 +241,22 @@ const Titles = ({ titles }: Pick<BoxerType, 'titles'>) => {
                   {title.state === 'fall' ? (
                     <>
                       <img src={fall_of_crown} alt="" />
-                      <span className="absolute top-[3px] left-[-3px] text-white">Fail</span>
+                      {/* <span className="absolute top-[3px] left-[-3px] text-red-600">Fail</span> */}
                     </>
                   ) : title.state === 'still' ? (
                     <>
                       <img src={crown} alt="" />
-                      <span className="absolute top-[3px] left-[-3px] text-gray-300">Still</span>
+                      {/* <span className="absolute top-[3px] left-[-3px] text-gray-300">Still</span> */}
+                    </>
+                  ) : title.state === 'new' ? (
+                    <>
+                      <img src={crown} alt="" />
+                      <span className="absolute top-[3px] left-[-3px] text-white">New</span>
                     </>
                   ) : (
                     <>
                       <img src={crown} alt="" />
-                      <span className="absolute top-[3px] left-[-3px] text-red-500">New</span>
+                      {/* <span className="absolute top-[3px] left-[-3px] text-white">New</span> */}
                     </>
                   )}
                 </span>

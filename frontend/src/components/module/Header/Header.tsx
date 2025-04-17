@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/routePath';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 //! icon
 import { IoLogOutSharp } from 'react-icons/io5';
 import { BsCalendar3 } from 'react-icons/bs';
