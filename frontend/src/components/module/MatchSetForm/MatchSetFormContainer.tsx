@@ -75,6 +75,7 @@ export const MatchSetFormContainer = (props: { onSubmit: () => void; title?: boo
     });
   }, []);
 
+  // TODO 型が柔軟すぎるらしいので、型を厳密にする(chatGPT参照)
   //? 各種formデータの更新
   const onChange = <T,>(value: Record<string, T>): void => {
     setFormData((current) => {
