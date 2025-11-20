@@ -18,7 +18,7 @@ import { useFetchBoxers, useUpdateBoxerData, useDeleteBoxer } from '@/hooks/apiH
 //! types
 import { BoxerType, MessageType } from '@/assets/types';
 //! component
-import { BoxerEditForm } from '@/components/module/BoxerEditForm';
+import { BoxerEditForm } from '@/components/module/BoxerEditForm/BoxerEditForm';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';

@@ -17,6 +17,8 @@ import { SetterOrUpdater, useRecoilState } from 'recoil';
 import { boxerDataOnFormState } from '@/store/boxerDataOnFormState';
 // ! component
 import { Button } from '@/components/atomic/Button';
+//! fields components
+import { Name, Country } from './fields';
 
 type PropsType = {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -26,9 +28,30 @@ type PropsType = {
   isGuard?: boolean;
 };
 
+export type LocalDataEntryType = <k extends keyof BoxerType>(
+  boxerDataKey: k,
+  value: BoxerType[k]
+) => void;
+
 export const BoxerEditForm = (props: PropsType) => {
-  // ? recoil
+  // ? recoil(boxerデータのmaster)
   const [boxerDataOnForm, setBoxerDataToForm] = useRecoilState(boxerDataOnFormState);
+
+  // ? boxerデータをコンポーネント内でのみ管理
+  const [localBoxerData, setLocalBoxerData] = useState<BoxerType>(boxerDataOnForm);
+  // console.log(localBoxerData);
+  useEffect(() => {
+    setLocalBoxerData(boxerDataOnForm);
+  }, [boxerDataOnForm]);
+
+  const changeLocalBoxerData = <k extends keyof BoxerType>(
+    boxerDataKey: k,
+    value: BoxerType[k]
+  ) => {
+    setLocalBoxerData((current) => {
+      return { ...current, [boxerDataKey]: value };
+    });
+  };
 
   //? 登録が完了したらformのデータを初期化
   useEffect(() => {
@@ -40,22 +63,21 @@ export const BoxerEditForm = (props: PropsType) => {
     <div className="p-10 bg-stone-200 border-stone-400 border-[1px]">
       <h1 className="text-3xl text-center">選手情報</h1>
       <form className="flex flex-col" onSubmit={props.onSubmit}>
-        <Name boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
-
-        <Country boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
-
+        <Name
+          boxerName={{ name: localBoxerData.name, engName: localBoxerData.engName }}
+          changeLocalBoxerData={changeLocalBoxerData}
+        />
+        <Country
+          boxersCountry={localBoxerData.country}
+          changeLocalBoxerData={changeLocalBoxerData}
+        />
+        // TODO ここから
         <Birth boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
-
         <Height boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
-
         <Reach boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
-
         <Stance boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
-
         <BoxerResume boxerDataOnForm={boxerDataOnForm} setBoxerDataToForm={setBoxerDataToForm} />
-
         <Titles />
-
         <div className="relative mt-5">
           <Button styleName={'wide'}>登録</Button>
         </div>
@@ -69,68 +91,73 @@ type DataEntryItemType = {
   setBoxerDataToForm: SetterOrUpdater<BoxerType>;
 };
 
-const Name = (props: DataEntryItemType) => {
-  const { boxerDataOnForm, setBoxerDataToForm } = props;
-  return (
-    <>
-      <input
-        className="mt-3 px-1 rounded border-black"
-        type="text"
-        placeholder="名前(英字表示)"
-        name="engName"
-        value={boxerDataOnForm?.engName}
-        onChange={(e) =>
-          setBoxerDataToForm((current: BoxerType) => {
-            return { ...current, engName: e.target.value };
-          })
-        }
-      />
-      <input
-        className="mt-3 px-1 rounded border-black"
-        type="text"
-        placeholder="選手名"
-        name="name"
-        value={boxerDataOnForm?.name}
-        onChange={(e) =>
-          setBoxerDataToForm((current: BoxerType) => {
-            return { ...current, name: e.target.value };
-          })
-        }
-      />
-    </>
-  );
-};
+// const Name = (props: {
+//   boxerName: { name: string; engName: string };
+//   changeLocalBoxerData: LocalDataEntryType;
+// }) => {
+//   const { boxerName, changeLocalBoxerData } = props;
+//   return (
+//     <>
+//       <input
+//         className="mt-3 px-1 rounded border-black"
+//         type="text"
+//         placeholder="名前(英字表示)"
+//         name="engName"
+//         value={boxerName.engName}
+//         onChange={
+//           (e) => changeLocalBoxerData('engName', e.target.value)
+//           // setBoxerDataToForm((current: BoxerType) => {
+//           //   return { ...current, engName: e.target.value };
+//           // })
+//         }
+//       />
+//       <input
+//         className="mt-3 px-1 rounded border-black"
+//         type="text"
+//         placeholder="選手名"
+//         name="name"
+//         value={boxerName.name}
+//         onChange={
+//           (e) => changeLocalBoxerData('name', e.target.value)
+//           // setBoxerDataToForm((current: BoxerType) => {
+//           //   return { ...current, name: e.target.value };
+//           // })
+//         }
+//       />
+//     </>
+//   );
+// };
 
-const Country = (props: DataEntryItemType) => {
-  const { boxerDataOnForm, setBoxerDataToForm } = props;
-  return (
-    <div className="flex mt-3">
-      <label className="w-[100px] text-center" htmlFor="country">
-        国籍
-      </label>
-      <select
-        className="w-[150px]"
-        name="country"
-        value={boxerDataOnForm?.country}
-        onChange={(e) => {
-          setBoxerDataToForm((current: BoxerType) => {
-            return { ...current, country: e.target.value as CountryType };
-          });
-        }}
-        id="country"
-      >
-        {/* <option value={undefined}>{countryUndefined}</option> */}
-        {Object.values(COUNTRY)
-          .sort()
-          .map((nationalName) => (
-            <option key={nationalName} value={nationalName}>
-              {nationalName}
-            </option>
-          ))}
-      </select>
-    </div>
-  );
-};
+// const Country = (props: DataEntryItemType) => {
+//   const { boxerDataOnForm, setBoxerDataToForm } = props;
+//   return (
+//     <div className="flex mt-3">
+//       <label className="w-[100px] text-center" htmlFor="country">
+//         国籍
+//       </label>
+//       <select
+//         className="w-[150px]"
+//         name="country"
+//         value={boxerDataOnForm?.country}
+//         onChange={(e) => {
+//           setBoxerDataToForm((current: BoxerType) => {
+//             return { ...current, country: e.target.value as CountryType };
+//           });
+//         }}
+//         id="country"
+//       >
+//         {/* <option value={undefined}>{countryUndefined}</option> */}
+//         {Object.values(COUNTRY)
+//           .sort()
+//           .map((nationalName) => (
+//             <option key={nationalName} value={nationalName}>
+//               {nationalName}
+//             </option>
+//           ))}
+//       </select>
+//     </div>
+//   );
+// };
 
 const Birth = (props: DataEntryItemType) => {
   const { boxerDataOnForm, setBoxerDataToForm } = props;

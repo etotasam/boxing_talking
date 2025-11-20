@@ -10,7 +10,7 @@ import { MessageType } from '@/assets/types';
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
 //! component
-import { BoxerEditForm } from '@/components/module/BoxerEditForm';
+import { BoxerEditForm } from '@/components/module/BoxerEditForm/BoxerEditForm';
 //! recoil
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { boxerDataOnFormState } from '@/store/boxerDataOnFormState';
