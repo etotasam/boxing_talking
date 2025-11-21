@@ -1,2 +1,8 @@
 export { Name } from './Name'
 export { Country } from './Country'
+export { Birth } from './Birth'
+export { Height } from './Height'
+export { Reach } from './Reach'
+export { Stance } from './Stance'
+export { BoxerResume } from './BoxerResume'
+export { Titles } from './Titles'
