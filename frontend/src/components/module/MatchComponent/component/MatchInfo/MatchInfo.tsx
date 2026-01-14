@@ -228,7 +228,6 @@ const Titles = ({ titles }: Pick<BoxerType, 'titles'>) => {
         <ul className="mt-1">
           {titles.map((title) => (
             <li key={`${title.organization}_${title.weight}`} className="">
-              {/* //TODO stateで変更するUIをmodify */}
               <p
                 className={clsx(
                   'font-clamp-level-0 relative inline-block',

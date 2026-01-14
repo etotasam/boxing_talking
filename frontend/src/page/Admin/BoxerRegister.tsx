@@ -4,16 +4,16 @@ import { Helmet } from 'react-helmet-async';
 //! layout wrapper
 import AdminOnlyLayout from '@/layout/AdminOnlyLayout';
 // ! types
-// import { BoxerType } from "@/assets/types";
+import { BoxerType } from '@/assets/types';
 import { MessageType } from '@/assets/types';
 // ! data
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
 //! component
-import { BoxerEditForm } from '@/components/module/BoxerEditForm/BoxerEditForm';
+import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 //! recoil
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { boxerDataOnFormState } from '@/store/boxerDataOnFormState';
+import { boxerCurrentState } from '@/store/boxerCurrentState';
 import { elementSizeState } from '@/store/elementSizeState';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
@@ -26,7 +26,7 @@ const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 export const BoxerRegister = () => {
   // ! use hook
   const { resetLoadingState } = useLoading();
-  const [boxerDataOnForm, setEditTargetBoxerData] = useRecoilState(boxerDataOnFormState);
+  const [boxerCurrentData, setBoxerCurrentData] = useRecoilState(boxerCurrentState);
   const { hideToastModal, showToastModalMessage } = useToastModal();
   const { registerBoxer, isSuccess: successRegisterBoxer } = useRegisterBoxer();
 
@@ -45,32 +45,38 @@ export const BoxerRegister = () => {
   useEffect(() => {
     return () => {
       hideToastModal();
-      setEditTargetBoxerData(initialBoxerDataOnForm);
+      setBoxerCurrentData(initialBoxerDataOnForm);
     };
   }, []);
 
   // ? 国の選択なしの場合
   const showModalIfNoSelectCountry = () => {
-    if (boxerDataOnForm.country === undefined) {
+    if (boxerCurrentData.country === undefined) {
       throw Error(MESSAGE.INVALID_COUNTRY);
     }
   };
   //? 名前が未入力
   const showModelIfNameUndefined = () => {
-    if (!boxerDataOnForm.name || !boxerDataOnForm.engName) {
+    if (!boxerCurrentData.name || !boxerCurrentData.engName) {
       throw Error(MESSAGE.BOXER_NAME_UNDEFINED);
     }
   };
 
   //! formデータのsubmit
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const boxerRegisterDataSubmit = ({
+    event,
+    newBoxerData,
+  }: {
+    event: React.FormEvent<HTMLFormElement>;
+    newBoxerData: BoxerType;
+  }) => {
+    event.preventDefault();
     try {
       showModalIfNoSelectCountry();
       showModelIfNameUndefined();
 
-      const { id, ...formattedBoxerDataOnForm } = boxerDataOnForm;
-      registerBoxer(formattedBoxerDataOnForm);
+      const { id, ...formattedBoxerDataForUpdate } = boxerCurrentData;
+      registerBoxer(formattedBoxerDataForUpdate);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.message) {
@@ -91,7 +97,7 @@ export const BoxerRegister = () => {
       </Helmet>
 
       <div className={clsx('flex justify-center items-center py-10')}>
-        <BoxerEditForm isSuccess={successRegisterBoxer} onSubmit={onSubmit} />
+        <BoxerEditForm isSuccess={successRegisterBoxer} submitBoxerData={boxerRegisterDataSubmit} />
       </div>
     </AdminOnlyLayout>
   );

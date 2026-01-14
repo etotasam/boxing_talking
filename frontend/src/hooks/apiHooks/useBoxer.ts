@@ -105,7 +105,7 @@ export const useUpdateBoxerData = () => {
           return
         }
         showToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR });
-      }
+      },
     })
   }
   return { updateBoxer, isLoading, isSuccess }
