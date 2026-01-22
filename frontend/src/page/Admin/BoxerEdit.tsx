@@ -16,6 +16,7 @@ import { useBoxerFieldData } from '@/hooks/useBoxerFieldData';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useFetchBoxers, useUpdateBoxerData, useDeleteBoxer } from '@/hooks/apiHooks/useBoxer';
+import { useShowErrorToast } from '@/hooks/useShowErrorToast';
 //! types
 import { BoxerType, MessageType } from '@/assets/types';
 //! component
@@ -36,12 +37,13 @@ export type LocalDataEntryType = <k extends keyof BoxerType>(
 export const BoxerEdit = () => {
   // ? use hook
   const { resetLoadingState } = useLoading();
-  const { hideToastModal, showToastModalMessage } = useToastModal();
+  const { hideToastModal } = useToastModal();
   const [boxerCurrentData, setBoxerCurrentData] = useRecoilState(boxerCurrentState);
   const { updateBoxer, isSuccess: updateBoxerSuccess } = useUpdateBoxerData();
   const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
   const { boxersData } = useFetchBoxers();
   const { setBoxerFieldData } = useBoxerFieldData();
+  const { showErrorToast } = useShowErrorToast();
   //? 選択したボクサーのidが入る(選手が選択されているかの判断に使用)
   const [selectBoxerNumber, setIsSelectBoxerNumber] = useState<number>();
 
@@ -69,37 +71,6 @@ export const BoxerEdit = () => {
     };
   }, []);
 
-  //? errorToastをMessageを受け取って表示させる
-  const showErrorToastWithMessage = (errorMessage: MessageType) => {
-    showToastModalMessage({
-      message: errorMessage,
-      bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-    });
-  };
-
-  // ? 選手が選択されていない時
-  const showErrorToastWhenNoSelectedBoxer = () => {
-    if (!selectBoxerNumber) {
-      showErrorToastWithMessage(MESSAGE.BOXER_NO_SELECTED);
-      return;
-    }
-  };
-  //? 選手名が空の時
-  const showErrorToastWhenEmptyBoxerName = () => {
-    if (!boxerCurrentData.name || !boxerCurrentData.engName) {
-      showErrorToastWithMessage(MESSAGE.BOXER_NAME_UNDEFINED);
-      return;
-    }
-  };
-
-  //? 国籍が未選択
-  const showErrorToastWhenNoSelectedCountry = () => {
-    if (!boxerCurrentData.country) {
-      showErrorToastWithMessage(MESSAGE.BOXER_COUNTRY_IS_REQUIRED);
-      return;
-    }
-  };
-
   //? update対象のboxerデータを取得
   const extractTargetBoxer = (targetBoxerId: number): BoxerType | undefined => {
     if (boxersData) {
@@ -111,13 +82,10 @@ export const BoxerEdit = () => {
   };
 
   //? 対象boxerデータに変更があるかをチェックし、変更なしの場合エラーモーダル表示
-  const checkIsBoxerDataChanged = () => {
+  const checkIsBoxerDataChanged = (): boolean => {
     const originalBoxerData = extractTargetBoxer(boxerCurrentData.id!);
     const isDataChanged = !isEqual(originalBoxerData, boxerCurrentData);
-    if (!isDataChanged) {
-      showErrorToastWithMessage(MESSAGE.BOXER_NOT_EDIT);
-    }
-    return isDataChanged;
+    return showErrorToast(!isDataChanged, MESSAGE.BOXER_NOT_EDIT) ? false : true;
   };
 
   //? boxerの変更があるデータだけを抽出
@@ -136,15 +104,20 @@ export const BoxerEdit = () => {
     e.preventDefault();
     if (!boxersData) return console.error('No have boxers data');
     //入力エラーがある時に処理終了とエラーメッセージ表示
-    showErrorToastWhenNoSelectedBoxer();
-    showErrorToastWhenEmptyBoxerName();
-    showErrorToastWhenNoSelectedCountry();
+    if (showErrorToast(!selectBoxerNumber, MESSAGE.BOXER_NO_SELECTED)) return;
+    if (
+      showErrorToast(
+        !boxerCurrentData.name || !boxerCurrentData.engName,
+        MESSAGE.BOXER_NAME_UNDEFINED
+      )
+    )
+      return;
+    if (showErrorToast(!boxerCurrentData.country, MESSAGE.BOXER_COUNTRY_IS_REQUIRED)) return;
 
     if (!boxerCurrentData) return;
 
     //対象ボクサーデータに変更があるかをチェック、変更なしの場合はメモーダルでで警告を表示
-    const isBoxerDataChanged = checkIsBoxerDataChanged();
-    if (!isBoxerDataChanged) return;
+    if (!checkIsBoxerDataChanged()) return;
 
     const formattedBoxerDataForUpdate = extractChangeData();
     //ボクサーデータ編集実行
@@ -161,7 +134,7 @@ export const BoxerEdit = () => {
   const deleteExecution = () => {
     hideDeleteConformModal();
 
-    showErrorToastWhenNoSelectedBoxer();
+    if (showErrorToast(!selectBoxerNumber, MESSAGE.BOXER_NO_SELECTED)) return;
 
     deleteBoxer(boxerCurrentData);
   };

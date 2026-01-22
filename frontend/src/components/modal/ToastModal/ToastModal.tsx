@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 //! message controller
 import { BG_COLOR_ON_TOAST_MODAL } from '@/assets/statusesOnToastModal';
@@ -16,6 +16,17 @@ export const ToastModal = (props: PropsType) => {
   const hideModal = () => {
     hideToastModal();
   };
+
+  //? ESCキーでモーダルを閉じる
+  useEffect(() => {
+    const Esc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        hideToastModal();
+      }
+    };
+    window.addEventListener('keydown', Esc);
+    return () => window.removeEventListener('keydown', Esc);
+  }, []);
 
   const [color, setColor] = React.useState<string>();
   React.useEffect(() => {
