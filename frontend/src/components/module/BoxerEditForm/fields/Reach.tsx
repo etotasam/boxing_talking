@@ -1,8 +1,8 @@
 //! types
-import { LocalDataEntryType } from '../BoxerEditForm';
+import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 
-export const Reach = (props: { boxerReach: number; changeLocalBoxerData: LocalDataEntryType }) => {
-  const { boxerReach, changeLocalBoxerData } = props;
+export const Reach = (props: { boxerReach: number; setBoxerFieldData: LocalDataEntryType }) => {
+  const { boxerReach, setBoxerFieldData } = props;
   return (
     <div className="mt-3 flex p-1">
       <label className="w-[100px] text-center" htmlFor="height">
@@ -14,7 +14,7 @@ export const Reach = (props: { boxerReach: number; changeLocalBoxerData: LocalDa
         type="number"
         min="0"
         value={boxerReach}
-        onChange={(e) => changeLocalBoxerData('reach', Number(e.target.value))}
+        onChange={(e) => setBoxerFieldData('reach', Number(e.target.value))}
       />
     </div>
   );

@@ -12,6 +12,7 @@ import { useRecoilValue, useRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 import { boxerCurrentState } from '@/store/boxerCurrentState';
 //! hooks
+import { useBoxerFieldData } from '@/hooks/useBoxerFieldData';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useFetchBoxers, useUpdateBoxerData, useDeleteBoxer } from '@/hooks/apiHooks/useBoxer';
@@ -27,6 +28,11 @@ import { Button } from '@/components/atomic/Button';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
+export type LocalDataEntryType = <k extends keyof BoxerType>(
+  boxerDataKey: k,
+  value: BoxerType[k]
+) => void;
+
 export const BoxerEdit = () => {
   // ? use hook
   const { resetLoadingState } = useLoading();
@@ -35,6 +41,7 @@ export const BoxerEdit = () => {
   const { updateBoxer, isSuccess: updateBoxerSuccess } = useUpdateBoxerData();
   const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
   const { boxersData } = useFetchBoxers();
+  const { setBoxerFieldData } = useBoxerFieldData();
   //? 選択したボクサーのidが入る(選手が選択されているかの判断に使用)
   const [selectBoxerNumber, setIsSelectBoxerNumber] = useState<number>();
 
@@ -94,50 +101,39 @@ export const BoxerEdit = () => {
   };
 
   //? update対象のboxerデータを取得
-  const extractBoxer = ({
-    targetBoxerId,
-    boxers,
-  }: {
-    targetBoxerId: number;
-    boxers: BoxerType[];
-  }): BoxerType | undefined => {
-    return boxers.find((boxer) => boxer.id === targetBoxerId);
+  const extractTargetBoxer = (targetBoxerId: number): BoxerType | undefined => {
+    if (boxersData) {
+      return boxersData.find((boxer) => boxer.id === targetBoxerId);
+    } else {
+      console.error('No have boxers data');
+      return;
+    }
   };
 
   //? 対象boxerデータに変更があるかをチェックし、変更なしの場合エラーモーダル表示
-  const checkBoxerDataChanged = ({
-    targetBoxerData,
-  }: {
-    targetBoxerData: BoxerType | undefined;
-  }) => {
-    const isDataChanged = !isEqual(targetBoxerData, boxerCurrentData);
+  const checkIsBoxerDataChanged = () => {
+    const originalBoxerData = extractTargetBoxer(boxerCurrentData.id!);
+    const isDataChanged = !isEqual(originalBoxerData, boxerCurrentData);
     if (!isDataChanged) {
       showErrorToastWithMessage(MESSAGE.BOXER_NOT_EDIT);
     }
     return isDataChanged;
   };
 
-  //TODO これはlodashを使えば良さそう 可読性もそっちの方が絶対良い(copilotを参照しろ)
-  //! まずは変数名を変更しろ。currentBoxerDataとnewBoxerDataに変更するべき。targetBoxerData, editTargetBoxerDataではどっちがどっちだかわからない
   //? boxerの変更があるデータだけを抽出
-  const extractChangeData = (newData: BoxerType): Pick<BoxerType, 'id'> & Partial<BoxerType> => {
+  const extractChangeData = (): Pick<BoxerType, 'id'> & Partial<BoxerType> => {
+    const originalBoxerData = extractTargetBoxer(boxerCurrentData.id!);
     const boxerDataForUpdate = pickBy(
-      newData,
-      (value, key) => !isEqual(value, boxerCurrentData[key as keyof BoxerType])
+      boxerCurrentData,
+      (value, key) => !isEqual(value, originalBoxerData![key as keyof BoxerType])
     );
     return { id: boxerCurrentData.id, ...boxerDataForUpdate } as Pick<BoxerType, 'id'> &
       Partial<BoxerType>;
   };
 
   //? ボクサーの編集を実行
-  const submitEditBoxerData = async ({
-    event,
-    newBoxerData,
-  }: {
-    event: React.FormEvent<HTMLFormElement>;
-    newBoxerData: BoxerType;
-  }) => {
-    event.preventDefault();
+  const submitEditBoxerData = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!boxersData) return console.error('No have boxers data');
     //入力エラーがある時に処理終了とエラーメッセージ表示
     showErrorToastWhenNoSelectedBoxer();
@@ -147,12 +143,10 @@ export const BoxerEdit = () => {
     if (!boxerCurrentData) return;
 
     //対象ボクサーデータに変更があるかをチェック、変更なしの場合はメモーダルでで警告を表示
-    const isBoxerDataChanged = checkBoxerDataChanged({
-      targetBoxerData: newBoxerData,
-    });
+    const isBoxerDataChanged = checkIsBoxerDataChanged();
     if (!isBoxerDataChanged) return;
 
-    const formattedBoxerDataForUpdate = extractChangeData(newBoxerData);
+    const formattedBoxerDataForUpdate = extractChangeData();
     //ボクサーデータ編集実行
     updateBoxer(formattedBoxerDataForUpdate);
   };
@@ -180,6 +174,7 @@ export const BoxerEdit = () => {
       <div className="w-full flex">
         <BoxerInfoAndEditBox
           boxerCurrentData={boxerCurrentData}
+          setBoxerFieldData={setBoxerFieldData}
           selectBoxerNumber={selectBoxerNumber}
           submitEditBoxerData={submitEditBoxerData}
           updateBoxerSuccess={updateBoxerSuccess}
@@ -237,21 +232,21 @@ const BoxerList = (props: BoxerListType) => {
 };
 
 type BoxerInfoAndEditBoxType = {
-  submitEditBoxerData: ({
-    event,
-    newBoxerData,
-  }: {
-    event: React.FormEvent<HTMLFormElement>;
-    newBoxerData: BoxerType;
-  }) => void;
+  submitEditBoxerData: (e: React.FormEvent<HTMLFormElement>) => void;
   boxerCurrentData: BoxerType;
+  setBoxerFieldData: LocalDataEntryType;
   selectBoxerNumber: number | undefined;
   updateBoxerSuccess: boolean;
   setIsShowDeleteConfirmModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 const BoxerInfoAndEditBox = (props: BoxerInfoAndEditBoxType) => {
-  const { submitEditBoxerData, boxerCurrentData, selectBoxerNumber, setIsShowDeleteConfirmModal } =
-    props;
+  const {
+    submitEditBoxerData,
+    boxerCurrentData,
+    selectBoxerNumber,
+    setIsShowDeleteConfirmModal,
+    setBoxerFieldData,
+  } = props;
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
 
   const { setToastModal, showToastModal } = useToastModal();
@@ -267,6 +262,8 @@ const BoxerInfoAndEditBox = (props: BoxerInfoAndEditBoxType) => {
         <div className="w-[50%] flex justify-center">
           <div className="w-[95%] border-[1px]">
             <BoxerEditForm
+              boxerCurrentData={boxerCurrentData}
+              setBoxerFieldData={setBoxerFieldData}
               submitBoxerData={submitEditBoxerData}
               isSuccess={props.updateBoxerSuccess}
             />

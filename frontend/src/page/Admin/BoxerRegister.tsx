@@ -20,6 +20,7 @@ import { useToastModal } from '@/hooks/useToastModal';
 import { useRegisterBoxer } from '@/hooks/apiHooks/useBoxer';
 import { useLoading } from '@/hooks/useLoading';
 import { useWindowSize } from '@/hooks/useWindowSize';
+import { useBoxerFieldData } from '@/hooks/useBoxerFieldData';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -32,6 +33,8 @@ export const BoxerRegister = () => {
 
   const { device } = useWindowSize();
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
+
+  const { setBoxerFieldData } = useBoxerFieldData();
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
@@ -63,14 +66,8 @@ export const BoxerRegister = () => {
   };
 
   //! formデータのsubmit
-  const boxerRegisterDataSubmit = ({
-    event,
-    newBoxerData,
-  }: {
-    event: React.FormEvent<HTMLFormElement>;
-    newBoxerData: BoxerType;
-  }) => {
-    event.preventDefault();
+  const boxerRegisterDataSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
       showModalIfNoSelectCountry();
       showModelIfNameUndefined();
@@ -97,7 +94,12 @@ export const BoxerRegister = () => {
       </Helmet>
 
       <div className={clsx('flex justify-center items-center py-10')}>
-        <BoxerEditForm isSuccess={successRegisterBoxer} submitBoxerData={boxerRegisterDataSubmit} />
+        <BoxerEditForm
+          isSuccess={successRegisterBoxer}
+          setBoxerFieldData={setBoxerFieldData}
+          submitBoxerData={boxerRegisterDataSubmit}
+          boxerCurrentData={boxerCurrentData}
+        />
       </div>
     </AdminOnlyLayout>
   );

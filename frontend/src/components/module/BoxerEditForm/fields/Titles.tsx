@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { boxerCurrentState } from '@/store/boxerCurrentState';
 //! types
-import { LocalDataEntryType } from '../BoxerEditForm';
+import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 //! data
 import { ORGANIZATIONS, WEIGHT_CLASS } from '@/assets/boxerData';
 //! types
@@ -13,9 +13,9 @@ import { cloneDeep, get } from 'lodash';
 
 export const Titles = (props: {
   titles: BoxerType['titles'];
-  changeLocalBoxerData: LocalDataEntryType;
+  setBoxerFieldData: LocalDataEntryType;
 }) => {
-  const { titles, changeLocalBoxerData } = props;
+  const { titles, setBoxerFieldData } = props;
   // console.log(titles);
   // ! use hook
   // ? タイトル入力欄(<input> <select>)の数を決める useState
@@ -41,14 +41,12 @@ export const Titles = (props: {
 
   // ? ローカルの titles を更新する関数 ※organization と weight の両方が空のものは除外する(hasTitleCount数をコントロールするため)
   const changeLocalTitles = (titles: BoxerType['titles']) => {
-    changeLocalBoxerData(
+    setBoxerFieldData(
       'titles',
       titles.filter((t) => t.organization)
     );
   };
 
-  // TODO 選択可能な団体(WBA,WBCとか…)を返す関数(自身が持つタイトルは除外する)
-  // ! 以下は違う階級の同じ団体のベルトは保持出来ない仕様になる。どういう仕様にするかを決める必要がある
   const getAvailableOrganizations = (titles: BoxerType['titles'], index: number) => {
     return (Object.keys(ORGANIZATIONS) as Array<keyof typeof ORGANIZATIONS>).filter((key) => {
       return !titles.some(

@@ -3,13 +3,13 @@ import { COUNTRY } from '@/assets/nationalFlagData';
 
 //! types
 import { CountryType } from '@/assets/types';
-import { LocalDataEntryType } from '../BoxerEditForm';
+import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 
 export const Country = (props: {
   boxersCountry: string;
-  changeLocalBoxerData: LocalDataEntryType;
+  setBoxerFieldData: LocalDataEntryType;
 }) => {
-  const { boxersCountry, changeLocalBoxerData } = props;
+  const { boxersCountry, setBoxerFieldData } = props;
   return (
     <div className="flex mt-3">
       <label className="w-[100px] text-center" htmlFor="country">
@@ -20,7 +20,7 @@ export const Country = (props: {
         name="country"
         value={boxersCountry}
         onChange={(e) => {
-          changeLocalBoxerData('country', e.target.value as CountryType);
+          setBoxerFieldData('country', e.target.value as CountryType);
           // setBoxerDataToForm((current: BoxerType) => {
           //   return { ...current, country: e.target.value as CountryType };
           // });

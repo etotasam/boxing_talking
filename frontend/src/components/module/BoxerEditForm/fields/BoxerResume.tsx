@@ -1,11 +1,11 @@
 //! types
-import { LocalDataEntryType } from '../BoxerEditForm';
+import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 
 export const BoxerResume = (props: {
   resume: { win: number; ko: number; draw: number; lose: number };
-  changeLocalBoxerData: LocalDataEntryType;
+  setBoxerFieldData: LocalDataEntryType;
 }) => {
-  const { resume, changeLocalBoxerData } = props;
+  const { resume, setBoxerFieldData } = props;
   return (
     <div className="flex w-full">
       <div className="mt-3 flex p-1">
@@ -13,7 +13,7 @@ export const BoxerResume = (props: {
         <input
           className="w-full"
           value={resume.win}
-          onChange={(e) => changeLocalBoxerData('win', Number(e.target.value))}
+          onChange={(e) => setBoxerFieldData('win', Number(e.target.value))}
           type="number"
           min="0"
           id="win"
@@ -25,7 +25,7 @@ export const BoxerResume = (props: {
         <input
           className="w-full"
           value={resume.ko}
-          onChange={(e) => changeLocalBoxerData('ko', Number(e.target.value))}
+          onChange={(e) => setBoxerFieldData('ko', Number(e.target.value))}
           type="number"
           min="0"
           id="ko"
@@ -37,7 +37,7 @@ export const BoxerResume = (props: {
         <input
           className="w-full"
           value={resume.draw}
-          onChange={(e) => changeLocalBoxerData('draw', Number(e.target.value))}
+          onChange={(e) => setBoxerFieldData('draw', Number(e.target.value))}
           type="number"
           min="0"
           id="draw"
@@ -49,7 +49,7 @@ export const BoxerResume = (props: {
         <input
           className="w-full"
           value={resume.lose}
-          onChange={(e) => changeLocalBoxerData('lose', Number(e.target.value))}
+          onChange={(e) => setBoxerFieldData('lose', Number(e.target.value))}
           type="number"
           min="0"
           id="lose"

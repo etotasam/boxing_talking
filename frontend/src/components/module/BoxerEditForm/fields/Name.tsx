@@ -1,11 +1,11 @@
 //! types
-import { LocalDataEntryType } from '../BoxerEditForm';
+import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 
 export const Name = (props: {
   boxerName: { name: string; engName: string };
-  changeLocalBoxerData: LocalDataEntryType;
+  setBoxerFieldData: LocalDataEntryType;
 }) => {
-  const { boxerName, changeLocalBoxerData } = props;
+  const { boxerName, setBoxerFieldData } = props;
   return (
     <>
       <input
@@ -15,7 +15,7 @@ export const Name = (props: {
         name="engName"
         value={boxerName.engName}
         onChange={
-          (e) => changeLocalBoxerData('engName', e.target.value)
+          (e) => setBoxerFieldData('engName', e.target.value)
           // setBoxerDataToForm((current: BoxerType) => {
           //   return { ...current, engName: e.target.value };
           // })
@@ -28,7 +28,7 @@ export const Name = (props: {
         name="name"
         value={boxerName.name}
         onChange={
-          (e) => changeLocalBoxerData('name', e.target.value)
+          (e) => setBoxerFieldData('name', e.target.value)
           // setBoxerDataToForm((current: BoxerType) => {
           //   return { ...current, name: e.target.value };
           // })

@@ -1,11 +1,11 @@
 //! types
-import { LocalDataEntryType } from '../BoxerEditForm';
+import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 import { StanceType } from '@/assets/types';
 // ! data
 import { STANCE } from '@/assets/boxerData';
 
-export const Stance = (props: { stance: StanceType; changeLocalBoxerData: LocalDataEntryType }) => {
-  const { stance, changeLocalBoxerData } = props;
+export const Stance = (props: { stance: StanceType; setBoxerFieldData: LocalDataEntryType }) => {
+  const { stance, setBoxerFieldData } = props;
   return (
     <div className="mt-3 flex p-1">
       <label className="w-[100px] text-center" htmlFor="stance">
@@ -14,7 +14,7 @@ export const Stance = (props: { stance: StanceType; changeLocalBoxerData: LocalD
       <select
         className="w-[150px]"
         value={stance}
-        onChange={(e) => changeLocalBoxerData('style', e.target.value as StanceType)}
+        onChange={(e) => setBoxerFieldData('style', e.target.value as StanceType)}
         name="boxing-style"
         id="stance"
       >
