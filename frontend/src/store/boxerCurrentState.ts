@@ -7,7 +7,7 @@ import { BoxerType } from "@/assets/types";
 
 const initialState = initialBoxerDataOnForm
 
-export const boxerDataOnFormState = atom<BoxerType>({
-  key: "boxerDataOnFormState",
+export const boxerCurrentState = atom<BoxerType>({
+  key: "boxerCurrentState",
   default: initialState
 })

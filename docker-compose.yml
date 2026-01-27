@@ -2,7 +2,7 @@
 services:
   web:
     image: nginx
-    # platform: linux/amd64
+    platform: linux/amd64
     container_name: web
     ports:
       - "8080:80"
@@ -15,7 +15,7 @@ services:
 
   php:
     build: ./docker/php/
-    # platform: linux/amd64
+    platform: linux/amd64
     container_name: php
     volumes:
       - "./backend/:/var/www/html"
@@ -27,7 +27,7 @@ services:
 
   db:
     image: mysql:8.0.21
-    # platform: linux/amd64
+    platform: linux/amd64
     container_name: db
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}

@@ -74,7 +74,6 @@ export const MatchSetFormContainer = (props: { onSubmit: () => void; title?: boo
       return { ...current, titles };
     });
   }, []);
-
   //? 各種formデータの更新
   const onChange = <T,>(value: Record<string, T>): void => {
     setFormData((current) => {

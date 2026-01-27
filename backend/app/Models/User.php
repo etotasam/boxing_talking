@@ -59,14 +59,14 @@ class User extends Authenticatable
         return $this->hasMany(WinLossPrediction::class);
     }
 
-    public function administrator()
+    private function administrator()
     {
         return $this->hasOne(Administrator::class);
     }
 
     public function isAdmin()
     {
-        return $this->administrator !== null;
+        return $this->administrator()->exists();
     }
 
     public $incrementing = false; // 自動インクリメントを無効化
