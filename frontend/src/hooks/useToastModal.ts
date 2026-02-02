@@ -3,6 +3,7 @@ import { useRecoilState } from "recoil"
 import { toastModalState } from "@/store/toastModalState"
 // !types
 import { MessageType, BgColorType } from "@/assets/types";
+import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal";
 
 
 export const useToastModal = () => {
@@ -53,6 +54,21 @@ export const useToastModal = () => {
     })
   }
 
+  const showErrorToast = (message: MessageType): void => {
+    showToastModalMessage({ message, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+  }
 
-  return { showToastModal, hideToastModal, messageOnToast, bgColor, resetToastModalToDefault, isShowToastModal, setToastModal, showToastModalMessage }
+  const showSuccessToast = (message: MessageType): void => {
+    showToastModalMessage({ message, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+  }
+
+  const showNoticeToast = (message: MessageType): void => {
+    showToastModalMessage({ message, bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE })
+  }
+
+  const showGrayBackToast = (message: MessageType): void => {
+    showToastModalMessage({ message, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
+  }
+
+  return { showErrorToast, showSuccessToast, showNoticeToast, showGrayBackToast, showToastModal, hideToastModal, messageOnToast, bgColor, resetToastModalToDefault, isShowToastModal, setToastModal, showToastModalMessage }
 }

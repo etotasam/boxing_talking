@@ -36,9 +36,13 @@ const LoginForm = () => {
   const setFormType = useSetRecoilState(formTypeState);
 
   // ! hooks
-  const { showToastModal, setToastModal } = useToastModal();
+  const { showErrorToast } = useToastModal();
   const { login } = useLogin();
 
+  const validateEmail = (email: string): boolean => {
+    const emailPattern = /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
+    return !emailPattern.test(email);
+  };
   // ! attempt login
   /**
    * ログイン実行
@@ -50,22 +54,16 @@ const LoginForm = () => {
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
     // ? email of password が未入力の場合
+
     if (!email || !password) {
-      setToastModal({
-        message: MESSAGE.EMAIL_OR_PASSWORD_NO_INPUT,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      showToastModal();
+      showErrorToast(MESSAGE.EMAIL_OR_PASSWORD_NO_INPUT);
       return;
     }
-    // ? emailのバリデーション
-    const emailPattern = /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
-    if (!emailPattern.test(email)) {
-      setToastModal({
-        message: MESSAGE.EMAIL_FAILED_VALIDATE,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      showToastModal();
+
+    // ? emailのバリデーションに失敗した場合エラーモーダル表示して処理終了
+    const isEmailValid = validateEmail(email);
+    if (isEmailValid) {
+      showErrorToast(MESSAGE.EMAIL_FAILED_VALIDATE);
       return;
     }
 

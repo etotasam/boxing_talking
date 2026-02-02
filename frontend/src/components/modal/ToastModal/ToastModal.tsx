@@ -35,7 +35,7 @@ export const ToastModal = (props: PropsType) => {
         setColor('bg-red-800 text-white');
         break;
       case BG_COLOR_ON_TOAST_MODAL.SUCCESS:
-        setColor('bg-neutral-200 text-neutral-800');
+        setColor('bg-green-600 text-white');
         break;
       case BG_COLOR_ON_TOAST_MODAL.DELETE:
         setColor('bg-stone-700 text-white');
