@@ -16,9 +16,8 @@ import { useBoxerFieldData } from '@/hooks/useBoxerFieldData';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useFetchBoxers, useUpdateBoxerData, useDeleteBoxer } from '@/hooks/apiHooks/useBoxer';
-import { useShowErrorToast } from '@/hooks/useShowErrorToast';
 //! types
-import { BoxerType, MessageType } from '@/assets/types';
+import { BoxerType } from '@/assets/types';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
@@ -37,13 +36,12 @@ export type LocalDataEntryType = <k extends keyof BoxerType>(
 export const BoxerEdit = () => {
   // ? use hook
   const { resetLoadingState } = useLoading();
-  const { hideToastModal } = useToastModal();
+  const { hideToastModal, showErrorToast, showNoticeToast } = useToastModal();
   const [boxerCurrentData, setBoxerCurrentData] = useRecoilState(boxerCurrentState);
   const { updateBoxer, isSuccess: updateBoxerSuccess } = useUpdateBoxerData();
   const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
   const { boxersData } = useFetchBoxers();
   const { setBoxerFieldData } = useBoxerFieldData();
-  const { showErrorToast } = useShowErrorToast();
   //? 選択したボクサーのidが入る(選手が選択されているかの判断に使用)
   const [selectBoxerNumber, setIsSelectBoxerNumber] = useState<number>();
 
@@ -85,7 +83,11 @@ export const BoxerEdit = () => {
   const checkIsBoxerDataChanged = (): boolean => {
     const originalBoxerData = extractTargetBoxer(boxerCurrentData.id!);
     const isDataChanged = !isEqual(originalBoxerData, boxerCurrentData);
-    return showErrorToast(!isDataChanged, MESSAGE.BOXER_NOT_EDIT) ? false : true;
+    if (!isDataChanged) {
+      showNoticeToast(MESSAGE.BOXER_NOT_EDIT);
+      return false;
+    }
+    return true;
   };
 
   //? boxerの変更があるデータだけを抽出
@@ -104,15 +106,18 @@ export const BoxerEdit = () => {
     e.preventDefault();
     if (!boxersData) return console.error('No have boxers data');
     //入力エラーがある時に処理終了とエラーメッセージ表示
-    if (showErrorToast(!selectBoxerNumber, MESSAGE.BOXER_NO_SELECTED)) return;
-    if (
-      showErrorToast(
-        !boxerCurrentData.name || !boxerCurrentData.engName,
-        MESSAGE.BOXER_NAME_UNDEFINED
-      )
-    )
+    if (!selectBoxerNumber) {
+      showErrorToast(MESSAGE.BOXER_NO_SELECTED);
       return;
-    if (showErrorToast(!boxerCurrentData.country, MESSAGE.BOXER_COUNTRY_IS_REQUIRED)) return;
+    }
+    if (!boxerCurrentData.name || !boxerCurrentData.engName) {
+      showErrorToast(MESSAGE.BOXER_NAME_UNDEFINED);
+      return;
+    }
+    if (!boxerCurrentData.country) {
+      showErrorToast(MESSAGE.BOXER_COUNTRY_IS_REQUIRED);
+      return;
+    }
 
     if (!boxerCurrentData) return;
 
@@ -134,7 +139,10 @@ export const BoxerEdit = () => {
   const deleteExecution = () => {
     hideDeleteConformModal();
 
-    if (showErrorToast(!selectBoxerNumber, MESSAGE.BOXER_NO_SELECTED)) return;
+    if (!selectBoxerNumber) {
+      showErrorToast(MESSAGE.BOXER_NO_SELECTED);
+      return;
+    }
 
     deleteBoxer(boxerCurrentData);
   };

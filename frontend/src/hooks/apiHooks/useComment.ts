@@ -11,7 +11,7 @@ import { useLoading } from "@/hooks/useLoading"
 import { useToastModal } from "@/hooks/useToastModal"
 //! types
 import { CommentType } from "@/assets/types"
-import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
+import { MESSAGE } from "@/assets/statusesOnToastModal"
 //! Recoil
 import { useRecoilState } from "recoil"
 import { apiFetchDataState } from "@/store/apiFetchDataState"
@@ -80,7 +80,7 @@ export const useFetchNewComments = ({ matchId, createdAt }: { matchId: number, c
 
 //! コメント取得(旧)
 export const useFetchCommentsOld = (matchId: number) => {
-  const { showToastModalMessage } = useToastModal()
+  const { showErrorToast } = useToastModal()
 
   const api = async () => {
     const res = await Axios.get(API_PATH.COMMENT_OLD, {
@@ -94,7 +94,7 @@ export const useFetchCommentsOld = (matchId: number) => {
   const { data, isLoading: isCommentsLoading, isFetching, refetch, isError, isSuccess } = useQuery<CommentType[]>([QUERY_KEY.COMMENT_OLD, { id: matchId }], api, {
     staleTime: 5 * 60 * 1000, onError: (error: unknown) => {
       if ((error as AxiosError).status === 419) {
-        showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showErrorToast(MESSAGE.SESSION_EXPIRED)
         return
       }
     },
@@ -112,7 +112,7 @@ export const useFetchCommentsOld = (matchId: number) => {
 
 //! コメント投稿
 export const usePostComment = () => {
-  const { showToastModalMessage } = useToastModal()
+  const { showErrorToast, showSuccessToast } = useToastModal()
   type ApiPropsType = {
     matchId: number,
     comment: string
@@ -143,18 +143,18 @@ export const usePostComment = () => {
     const sanitizedComment = sanitizeComment(comment)
     mutate({ matchId, comment: sanitizedComment }, {
       onSuccess: () => {
-        showToastModalMessage({ message: MESSAGE.COMMENT_POST_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+        showSuccessToast(MESSAGE.COMMENT_POST_SUCCESS)
         // ? match_idを指定してコメントを再取得
         queryClient.invalidateQueries([QUERY_KEY.COMMENT, { id: matchId }]);
         return
       },
       onError: (error: any) => {
         if (error.status === 419) {
-          showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showErrorToast(MESSAGE.SESSION_EXPIRED)
           return
         }
         if (error.status === 401) {
-          showToastModalMessage({ message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showErrorToast(MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH)
           return
         }
         //? 入力エラー
@@ -163,25 +163,25 @@ export const usePostComment = () => {
           if (errors.comment) {
             //? コメントが長すぎる(1000文字以内)
             if ((errors.comment as string[]).includes('The comment must not be greater')) {
-              showToastModalMessage({ message: MESSAGE.COMMENT_IS_TOO_LONG, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showErrorToast(MESSAGE.COMMENT_IS_TOO_LONG)
               return
             }
             //? 空のコメント
             if ((errors.comment as string[]).includes('comment is require')) {
-              showToastModalMessage({ message: MESSAGE.COMMENT_IS_NOT_ENTER, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showErrorToast(MESSAGE.COMMENT_IS_NOT_ENTER)
               return
             }
           }
           //? 試合が存在しない
           if (errors.matchId) {
             if ((errors.matchId as string[]).includes('match_id is require')) {
-              showToastModalMessage({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+              showErrorToast(MESSAGE.COMMENT_POST_FAILED)
               return
             }
           }
         }
         //? コメント投稿失敗
-        showToastModalMessage({ message: MESSAGE.COMMENT_POST_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showErrorToast(MESSAGE.COMMENT_POST_FAILED)
         return
       }
     })
@@ -205,7 +205,7 @@ export const usePostComment = () => {
 export const useDeleteComment = () => {
 
   type ApiPropsType = { commentID: number, matchID: number }
-  const { setToastModal, showToastModal, showToastModalMessage } = useToastModal()
+  const { showErrorToast, showGrayBackToast } = useToastModal()
   const { startLoading, resetLoadingState } = useLoading()
   const queryClient = useQueryClient()
 
@@ -231,17 +231,17 @@ export const useDeleteComment = () => {
         //? コメントの再取得。※refetch()を使うとmatchID=0での呼び出しが1回入るのでうざい
         queryClient.invalidateQueries([QUERY_KEY.COMMENT, { id: matchID }]);
         resetLoadingState()
-        setToastModal({ message: MESSAGE.COMMENT_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
-        showToastModal()
+        showGrayBackToast(MESSAGE.COMMENT_DELETED)
+        return
       },
       onError: (error: unknown) => {
         resetLoadingState()
         if ((error as AxiosError).status === 419) {
-          showToastModalMessage({ message: MESSAGE.SESSION_EXPIRED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showErrorToast(MESSAGE.SESSION_EXPIRED)
           return
         }
-        setToastModal({ message: MESSAGE.COMMENT_DELETE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showErrorToast(MESSAGE.COMMENT_DELETE_FAILED)
+        return
       }
     })
   }

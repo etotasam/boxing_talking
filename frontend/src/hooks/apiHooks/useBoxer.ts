@@ -81,7 +81,7 @@ export const useUpdateBoxerData = () => {
   const { startLoading, resetLoadingState } = useLoading()
   const { refetchReactQueryArrayKeys } = useReactQuery()
   //? params page の取得
-  const { showToastModalMessage } = useToastModal()
+  const { showErrorToast, showSuccessToast } = useToastModal()
   const api = async (updateFighterData: Pick<BoxerType, 'id'> & Partial<BoxerType>): Promise<void> => {
     await Axios.patch<void>(API_PATH.BOXER, updateFighterData);
   }
@@ -96,15 +96,15 @@ export const useUpdateBoxerData = () => {
       onSuccess: () => {
         resetLoadingState()
         refetchReactQueryArrayKeys([QUERY_KEY.FETCH_MATCHES, QUERY_KEY.BOXER])
-        showToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS });
+        showSuccessToast(MESSAGE.FIGHTER_EDIT_SUCCESS);
       },
       onError: (error: any) => {
         resetLoadingState()
         if (error.data.errorCode === 30) {
-          showToastModalMessage({ message: error.data.message, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR });
+          showErrorToast(error.data.message);
           return
         }
-        showToastModalMessage({ message: MESSAGE.FIGHTER_EDIT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR });
+        showErrorToast(MESSAGE.FIGHTER_EDIT_FAILED);
       },
     })
   }
@@ -169,7 +169,7 @@ export const useRegisterBoxer = () => {
 export const useDeleteBoxer = () => {
   const { refetch: RefetchBoxerData } = useFetchBoxers()
   const { startLoading, resetLoadingState } = useLoading()
-  const { setToastModal, showToastModal, showToastModalMessage } = useToastModal()
+  const { showErrorToast, showSuccessToast } = useToastModal()
 
   //? api
   const api = async (boxerData: BoxerType): Promise<void> => {
@@ -185,7 +185,7 @@ export const useDeleteBoxer = () => {
     mutate(boxerData, {
       onSuccess: async () => {
         resetLoadingState()
-        showToastModalMessage({ message: MESSAGE.BOXER_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+        showSuccessToast(MESSAGE.BOXER_DELETED)
         //? 選手データと選手数をリフェッチ
         RefetchBoxerData()
       },
@@ -193,19 +193,18 @@ export const useDeleteBoxer = () => {
         resetLoadingState()
         const errorCode = error.data.errorCode
         if (errorCode === 30) {
-          showToastModalMessage({ message: MESSAGE.BOXER_IS_ALREADY_SETUP_MATCH, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showErrorToast(MESSAGE.BOXER_IS_ALREADY_SETUP_MATCH)
           return
         }
         if (errorCode === 44) {
-          showToastModalMessage({ message: MESSAGE.ILLEGAL_DATA, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showErrorToast(MESSAGE.ILLEGAL_DATA)
           return
         }
         if (errorCode === 50) {
-          showToastModalMessage({ message: MESSAGE.FAILED_DELETE_BOXER, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showErrorToast(MESSAGE.FAILED_DELETE_BOXER)
           return
         }
-        setToastModal({ message: MESSAGE.FIGHTER_EDIT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showErrorToast(MESSAGE.FIGHTER_EDIT_FAILED)
         return
       }
     })

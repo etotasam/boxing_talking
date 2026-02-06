@@ -1,19 +1,16 @@
 import { useEffect, useContext } from 'react';
 import dayjs from 'dayjs';
-import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/assets/statusesOnToastModal';
 //! type
 import { MatchFormDataType, OrganizationsType } from '@/assets/types';
 //! hook
 import { useToastModal } from '@/hooks/useToastModal';
 import { useRegisterMatch } from '@/hooks/apiHooks/useMatch';
-//!context
-import { FormDataContext } from '../FormDataContextWrapper';
-//!type evolution
-import { isMessageType } from '@/assets/typeEvaluations';
 //! component
 import { MatchSetFormContainer } from '../MatchSetFormContainer';
 //! context
-import { FormDataContextWrapper } from '../FormDataContextWrapper';
+import { FormDataContextWrapper } from '../context/FormDataContextWrapper';
+import { FormDataContext } from '../context/FormDataContext';
 
 type RegisterMatchFormType = {
   boxers: Record<'redBoxerId' | 'blueBoxerId', number | undefined>;
@@ -21,7 +18,7 @@ type RegisterMatchFormType = {
 };
 const RegisterMatchForm = (props: RegisterMatchFormType) => {
   const { boxers, resetSelectedBoxers } = props;
-  const { showToastModalMessage } = useToastModal();
+  const { showNoticeToast } = useToastModal();
   const { registerMatch, isSuccess: isSuccessRegisterMatch } = useRegisterMatch();
 
   const initialFormData = {
@@ -41,42 +38,25 @@ const RegisterMatchForm = (props: RegisterMatchFormType) => {
     }
   }, [isSuccessRegisterMatch]);
 
-  // ? 選手を選択していない場合モーダルさせるexception throw
-  const showModalNotSelectedBoxers = () => {
-    if (Object.values(boxers).includes(undefined)) {
-      throw new Error(MESSAGE.MATCH_NOT_SELECTED_BOXER);
-    }
-  };
-
   type RegisterMatchType = Record<'redBoxerId' | 'blueBoxerId', number | undefined> &
     MatchFormDataType;
 
   //? 試合登録
   const register = () => {
     // ? 選手を選択していない場合モーダルでNOTICE
-    try {
-      showModalNotSelectedBoxers();
-
-      const matchData: RegisterMatchType = {
-        redBoxerId: boxers.redBoxerId!,
-        blueBoxerId: boxers.blueBoxerId!,
-        ...formData,
-      };
-
-      // console.log(matchData);
-      // return;
-      registerMatch(matchData);
-    } catch (error: unknown) {
-      const e = error as Error;
-      if (isMessageType(e.message) && e.message) {
-        showToastModalMessage({
-          message: e.message,
-          bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-        });
-      } else {
-        console.error('Has error when match update', error);
-      }
+    const isNotSelectedBoxers = Object.values(boxers).includes(undefined);
+    if (isNotSelectedBoxers) {
+      showNoticeToast(MESSAGE.MATCH_NOT_SELECTED_BOXER);
+      return;
     }
+
+    const matchData: RegisterMatchType = {
+      redBoxerId: boxers.redBoxerId!,
+      blueBoxerId: boxers.blueBoxerId!,
+      ...formData,
+    };
+
+    registerMatch(matchData);
   };
 
   return <MatchSetFormContainer onSubmit={register} />;

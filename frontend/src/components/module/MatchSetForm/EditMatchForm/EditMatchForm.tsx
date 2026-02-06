@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/assets/statusesOnToastModal';
 import { pick } from 'lodash';
 //! type
 import { MatchDataType, MatchUpdateFormType, OrganizationsType } from '@/assets/types';
@@ -8,12 +8,12 @@ import { useToastModal } from '@/hooks/useToastModal';
 import { useUpdateMatch } from '@/hooks/apiHooks/useMatch';
 //! data
 import { GRADE } from '@/assets/boxerData';
-//!type evolution
-import { isMessageType } from '@/assets/typeEvaluations';
 //! component
 import { MatchSetFormContainer } from '../MatchSetFormContainer';
 //! context
-import { FormDataContext, FormDataContextWrapper } from '../FormDataContextWrapper';
+import { FormDataContextWrapper } from '../context/FormDataContextWrapper';
+import { FormDataContext } from '../context/FormDataContext';
+
 //! functions
 import { pickModifiedData } from './functions';
 
@@ -23,7 +23,7 @@ const EditMatchForm = (props: {
 }) => {
   const { selectedMatch, isSuccessDeleteMatch } = props;
 
-  const { hideToastModal, showToastModalMessage } = useToastModal();
+  const { hideToastModal, showNoticeToast } = useToastModal();
   const { updateMatch } = useUpdateMatch();
 
   const initialFormData = {
@@ -103,13 +103,6 @@ const EditMatchForm = (props: {
     }
   }, [formData.grade]);
 
-  //? 試合が選択されていない場合モーダル表示
-  const showModalIfNotSelectMatch = () => {
-    if (!selectedMatch) {
-      throw new Error(MESSAGE.MATCH_IS_NOT_SELECTED);
-    }
-  };
-
   type FormDataKeys = keyof MatchUpdateFormType;
   //?更新するのに必要なデータだけを抽出
   const pickDataForUpdate = (): MatchUpdateFormType => {
@@ -122,40 +115,31 @@ const EditMatchForm = (props: {
     return formattedPickData;
   };
 
-  //?データ変更が無い時モーダル表示
-  const showModalIfDataNotChanged = (modifiedFormData: Partial<MatchUpdateFormType>) => {
-    if (!Object.keys(modifiedFormData).length) {
-      throw new Error(MESSAGE.MATCH_IS_NOT_MODIFIED);
-    }
+  //?データ変更が無いかを判定
+  const isNotChangedData = (modifiedFormData: Partial<MatchUpdateFormType>): boolean => {
+    return !Object.keys(modifiedFormData).length;
   };
 
   const updateMatchExecute = () => {
-    try {
-      showModalIfNotSelectMatch();
-
-      //? 現在のmatchデータと変更データを比較して、変更があるプロパティだけを抽出
-      const modifiedFormData = pickModifiedData({
-        modifiedFormData: formData,
-        originFormData: originalFormData!,
-      });
-
-      showModalIfDataNotChanged(modifiedFormData);
-
-      const matchId = selectedMatch!.id;
-
-      updateMatch({ matchId, changeData: modifiedFormData });
-    } catch (error: unknown) {
-      //?MessageTypeには空文字も含まれている
-      const e = error as Error;
-      if (isMessageType(e.message) && e.message) {
-        showToastModalMessage({
-          message: e.message,
-          bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-        });
-      } else {
-        console.error('Has error when match update', error);
-      }
+    if (!selectedMatch) {
+      showNoticeToast(MESSAGE.MATCH_IS_NOT_SELECTED);
+      return;
     }
+
+    //? 現在のmatchデータと変更データを比較して、変更があるプロパティだけを抽出
+    const modifiedFormData = pickModifiedData({
+      modifiedFormData: formData,
+      originFormData: originalFormData!,
+    });
+
+    if (isNotChangedData(modifiedFormData)) {
+      showNoticeToast(MESSAGE.MATCH_IS_NOT_MODIFIED);
+      return;
+    }
+
+    const matchId = selectedMatch.id;
+
+    updateMatch({ matchId, changeData: modifiedFormData });
   };
 
   return <MatchSetFormContainer onSubmit={updateMatchExecute} title={isTitle} />;

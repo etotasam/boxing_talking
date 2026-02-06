@@ -3,7 +3,7 @@ import { PostComment } from './PostComment';
 import { useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 import { useLocation } from 'react-router-dom';
-import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/assets/statusesOnToastModal';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 import { usePostComment } from '@/hooks/apiHooks/useComment';
@@ -25,7 +25,7 @@ export const PostCommentContainer = () => {
 
   const setRecoilPostCommentHeight = useSetRecoilState(elementSizeState('POST_COMMENT_HEIGHT'));
 
-  const { setToastModal, showToastModal } = useToastModal();
+  const { showNoticeToast } = useToastModal();
   const [comment, setComment] = useState<string>();
 
   const {
@@ -82,19 +82,11 @@ export const PostCommentContainer = () => {
   const storeCommentExecute = () => {
     if (isPostingComment) return;
     if (!isAuthOrGuest) {
-      setToastModal({
-        message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      showToastModal();
+      showNoticeToast(MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH);
       return;
     }
     if (!comment) {
-      setToastModal({
-        message: MESSAGE.COMMENT_IS_EMPTY,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      showToastModal();
+      showNoticeToast(MESSAGE.COMMENT_IS_EMPTY);
       return;
     }
     postComment({ matchId: matchId, comment: comment });

@@ -13,7 +13,7 @@ const getSelectElement = (testId: string) => {
 };
 
 // ボタンクリック
-const submitButtonClick = () => {
+const submitButtonClick = async () => {
   const button = screen.getByTestId('submitButton') as HTMLButtonElement;
   userEvent.click(button);
 };
@@ -35,24 +35,25 @@ const noSelectBoxerProps = {
 describe('EditMatchFormのテスト', () => {
   test('対象試合が未選択時はsubmit押下しても送信しない', async () => {
     render(<EditMatchFormWrapper {...noSelectBoxerProps} />);
+    await waitFor(() => expect(screen.getByTestId('submitButton')).toBeTruthy());
 
     const grade = getSelectElement('matchGrade');
     const weight = getSelectElement('matchWeight');
     const country = getSelectElement('matchPlaceCountry');
     const venue = screen.getByTestId('matchVenue') as HTMLInputElement;
 
-    userEvent.selectOptions(grade, GRADE.R12);
-    userEvent.selectOptions(weight, WEIGHT_CLASS.BANTAM);
-    userEvent.selectOptions(country, COUNTRY.CHINA);
-    await userEvent.type(venue, '場所');
+    await userEvent.selectOptions(grade, GRADE.R12);
+    await userEvent.selectOptions(weight, WEIGHT_CLASS.BANTAM);
+    await userEvent.selectOptions(country, COUNTRY.CHINA);
+    await userEvent.type(venue, '会場の場所を指定');
 
-    submitButtonClick();
+    await submitButtonClick();
 
     await waitFor(() => {
       expect(grade.value).toEqual(GRADE.R12);
       expect(weight.value).toEqual(WEIGHT_CLASS.BANTAM);
       expect(country.value).toEqual(COUNTRY.CHINA);
-      expect(venue.value).toEqual('場所');
+      expect(venue.value).toEqual('会場の場所を指定');
       expect(updateMatchMock).not.toHaveBeenCalled();
     });
   });
