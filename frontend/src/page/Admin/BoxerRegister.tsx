@@ -16,7 +16,6 @@ import { useToastModal } from '@/hooks/useToastModal';
 import { useRegisterBoxer } from '@/hooks/apiHooks/useBoxer';
 import { useLoading } from '@/hooks/useLoading';
 import { useBoxerFieldData } from '@/hooks/useBoxerFieldData';
-import { useShowErrorToast } from '@/hooks/useShowErrorToast';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -24,10 +23,8 @@ export const BoxerRegister = () => {
   // ! use hook
   const { resetLoadingState } = useLoading();
   const [boxerCurrentData, setBoxerCurrentData] = useRecoilState(boxerCurrentState);
-  const { hideToastModal } = useToastModal();
+  const { hideToastModal, showErrorToast } = useToastModal();
   const { registerBoxer, isSuccess: successRegisterBoxer } = useRegisterBoxer();
-  const { showErrorToast } = useShowErrorToast();
-
   const { setBoxerFieldData } = useBoxerFieldData();
 
   //? 初期設定(クリーンアップとか)
@@ -49,15 +46,15 @@ export const BoxerRegister = () => {
   //! formデータのsubmit
   const boxerRegisterDataSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (showErrorToast(!boxerCurrentData.country, MESSAGE.INVALID_COUNTRY)) return;
-    if (
-      showErrorToast(
-        !boxerCurrentData.name || !boxerCurrentData.engName,
-        MESSAGE.BOXER_NAME_UNDEFINED
-      )
-    )
+    if (!boxerCurrentData.country) {
+      showErrorToast(MESSAGE.INVALID_COUNTRY);
       return;
+    }
+    const isBoxerNameUndefined = !boxerCurrentData.name || !boxerCurrentData.engName;
+    if (isBoxerNameUndefined) {
+      showErrorToast(MESSAGE.BOXER_NAME_UNDEFINED);
+      return;
+    }
 
     const { id, ...formattedBoxerDataForUpdate } = boxerCurrentData;
     registerBoxer(formattedBoxerDataForUpdate);

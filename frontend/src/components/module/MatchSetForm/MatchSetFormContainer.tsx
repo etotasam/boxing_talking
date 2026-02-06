@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
-import dayjs from 'dayjs';
 import { MatchSetForm } from './MatchSetForm';
-import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/assets/statusesOnToastModal';
 import { cloneDeep } from 'lodash';
 //! type
 import { OrganizationsType } from '@/assets/types';
@@ -12,12 +11,13 @@ import { GRADE } from '@/assets/boxerData';
 //!type evolution
 import { isMessageType } from '@/assets/typeEvaluations';
 //! context
-import { FormDataContext } from './FormDataContextWrapper';
+// import { FormDataContext } from './FormDataContextWrapper';
+import { FormDataContext } from './context/FormDataContext';
 
 export const MatchSetFormContainer = (props: { onSubmit: () => void; title?: boolean }) => {
   const { onSubmit, title } = props;
 
-  const { hideToastModal, showToastModalMessage } = useToastModal();
+  const { hideToastModal, showNoticeToast } = useToastModal();
 
   const { formData, setFormData } = useContext(FormDataContext);
   const [isTitle, setIsTitle] = useState(title ?? false);
@@ -56,10 +56,7 @@ export const MatchSetFormContainer = (props: { onSubmit: () => void; title?: boo
     } catch (error: unknown) {
       const e = error as Error;
       if (isMessageType(e.message) && e.message) {
-        showToastModalMessage({
-          message: e.message,
-          bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-        });
+        showNoticeToast(e.message);
       } else {
         console.error('Has error when match update', error);
       }

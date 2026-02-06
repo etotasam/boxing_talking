@@ -47,7 +47,7 @@ export const useGuestLogin = () => {
   // ? react query
   // const queryClient = useQueryClient()
   // ? toast modal
-  const { showToastModalMessage } = useToastModal()
+  const { showErrorToast, showSuccessToast } = useToastModal()
   // ? Loading state
   const { resetLoadingState, startLoading } = useLoading()
   // ? login modal (hook)
@@ -74,15 +74,15 @@ export const useGuestLogin = () => {
         refetchMatchPrediction()
         resetLoadingState()
         setReactQueryData<boolean>(QUERY_KEY.GUEST, true)
-        showToastModalMessage({ message: MESSAGE.LOGIN_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
+        showSuccessToast(MESSAGE.LOGIN_SUCCESS)
       },
       onError: (error: any) => {
         resetLoadingState()
         if (error.data.errorCode === CUSTOM_ERROR_CODE.UNABLE_TO_GENERATE_GUEST_TODAY) {
-          showToastModalMessage({ message: MESSAGE.NOT_CREATE_GUEST_BY_LIMIT, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+          showErrorToast(MESSAGE.NOT_CREATE_GUEST_BY_LIMIT)
           return
         }
-        showToastModalMessage({ message: MESSAGE.LOGIN_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showErrorToast(MESSAGE.LOGIN_FAILED)
 
       }
     })
@@ -94,7 +94,7 @@ export const useGuestLogin = () => {
 export const useGuestLogout = () => {
   const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
   const queryClient = useQueryClient()
-  const { showToastModalMessage } = useToastModal()
+  const { showErrorToast, showSuccessToast } = useToastModal()
   const { hide: hideMenuModal } = useMenuModal()
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? api
@@ -115,12 +115,12 @@ export const useGuestLogout = () => {
         refetchMatchPrediction()
         queryClient.setQueryData<boolean>(QUERY_KEY.GUEST, false)
         successful()
-        showToastModalMessage({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
+        showSuccessToast(MESSAGE.LOGOUT_SUCCESS)
         hideMenuModal()
       },
       onError: () => {
         hasError()
-        showToastModalMessage({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showErrorToast(MESSAGE.LOGOUT_FAILED)
       },
       onSettled: () => {
         resetLoadingState()
@@ -158,7 +158,7 @@ export const usePreSignUp = () => {
   // ? react query
   // const queryClient = useQueryClient()
   // ? toast modal
-  const { setToastModal, showToastModal } = useToastModal()
+  const { showErrorToast } = useToastModal()
   // ? Loading state (hook)
   const { startLoading, resetLoadingState } = useLoading()
 
@@ -188,30 +188,25 @@ export const usePreSignUp = () => {
           const errorMessages = error.data.message as any
           if (errorMessages.email) {
             if (errorMessages.email.includes('email is already exists')) {
-              setToastModal({ message: MESSAGE.EMAIL_HAS_ALREADY_EXIST, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-              showToastModal()
+              showErrorToast(MESSAGE.EMAIL_HAS_ALREADY_EXIST)
               return
             }
           }
           if (errorMessages.name) {
             if ((errorMessages.name as string[]).includes('name is already used')) {
-              setToastModal({ message: MESSAGE.USER_NAME_ALREADY_USE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-              showToastModal()
+              showErrorToast(MESSAGE.USER_NAME_ALREADY_USE)
               return
             }
             if ((errorMessages.name as string[]).includes('The name must not be greater than 30 characters.')) {
-              setToastModal({ message: MESSAGE.NAME_CHAR_LIMIT_OVER, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-              showToastModal()
+              showErrorToast(MESSAGE.NAME_CHAR_LIMIT_OVER)
               return
             }
           }
-          setToastModal({ message: MESSAGE.SIGNUP_LACK_INPUT, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          showToastModal()
+          showErrorToast(MESSAGE.SIGNUP_LACK_INPUT)
           return
         }
 
-        setToastModal({ message: MESSAGE.USER_REGISTER_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showErrorToast(MESSAGE.USER_REGISTER_FAILED)
       }
     })
   }
@@ -262,7 +257,7 @@ export const useLogin = () => {
   const { refetch: refetchAdmin } = useAdmin()
   // ? react query
   // ? toast modal
-  const { setToastModal, showToastModal } = useToastModal()
+  const { showSuccessToast, showErrorToast } = useToastModal()
   // ? Loading state
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   // ? login modal (hook)
@@ -291,16 +286,14 @@ export const useLogin = () => {
         // ? ログインユーザーをreact query内でキャッシュする
         setReactQueryData<UserType | boolean>(QUERY_KEY.AUTH, userData)
         successful()
-        setToastModal({ message: MESSAGE.LOGIN_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        showSuccessToast(MESSAGE.LOGIN_SUCCESS)
 
       },
       // ! ログイン失敗時
       onError: () => {
         resetLoadingState()
         hasError()
-        setToastModal({ message: MESSAGE.LOGIN_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showErrorToast(MESSAGE.LOGIN_FAILED)
       }
     })
   }
@@ -311,7 +304,7 @@ export const useLogin = () => {
 export const useLogout = () => {
   const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
   const queryClient = useQueryClient()
-  const { showToastModalMessage } = useToastModal()
+  const { showErrorToast, showGrayBackToast } = useToastModal()
   const { resetLoadingState, startLoading, hasError, successful } = useLoading()
   const { hide: hideMenuModal } = useMenuModal()
   // ? api
@@ -334,12 +327,12 @@ export const useLogout = () => {
         queryClient.invalidateQueries(QUERY_KEY.ADMIN)
         refetchMatchPrediction()
         successful()
-        showToastModalMessage({ message: MESSAGE.LOGOUT_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY })
+        showGrayBackToast(MESSAGE.LOGOUT_SUCCESS)
         hideMenuModal()
       },
       onError: () => {
         hasError()
-        showToastModalMessage({ message: MESSAGE.LOGOUT_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
+        showErrorToast(MESSAGE.LOGOUT_FAILED)
       },
       onSettled: () => {
         resetLoadingState()

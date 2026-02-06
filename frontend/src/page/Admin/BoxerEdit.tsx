@@ -16,9 +16,8 @@ import { useBoxerFieldData } from '@/hooks/useBoxerFieldData';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useLoading } from '@/hooks/useLoading';
 import { useFetchBoxers, useUpdateBoxerData, useDeleteBoxer } from '@/hooks/apiHooks/useBoxer';
-// import { useShowErrorToast } from '@/hooks/useShowErrorToast';
 //! types
-import { BoxerType, MessageType } from '@/assets/types';
+import { BoxerType } from '@/assets/types';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
@@ -43,7 +42,6 @@ export const BoxerEdit = () => {
   const { deleteBoxer, isSuccess: isDeleteBoxerSuccess } = useDeleteBoxer();
   const { boxersData } = useFetchBoxers();
   const { setBoxerFieldData } = useBoxerFieldData();
-  // const { showErrorToast } = useShowErrorToast();
   //? 選択したボクサーのidが入る(選手が選択されているかの判断に使用)
   const [selectBoxerNumber, setIsSelectBoxerNumber] = useState<number>();
 

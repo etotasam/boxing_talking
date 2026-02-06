@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor } from 'test-setup';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -6,23 +7,25 @@ import { WEIGHT_CLASS, GRADE } from '@/assets/boxerData';
 //! component
 import { MatchSetFormContainer } from '../MatchSetFormContainer';
 //! context
-import { FormDataContextWrapper } from '../FormDataContextWrapper';
+import { FormDataContextWrapper } from '../context/FormDataContextWrapper';
 import { COUNTRY } from '@/assets/nationalFlagData';
 
 const onSubmitFunc = vi.fn();
 
-const rendering = (isTitle: boolean = false) => {
-  return render(
+const rendering = async (isTitle: boolean = false) => {
+  const result = render(
     <FormDataContextWrapper>
       <MatchSetFormContainer onSubmit={onSubmitFunc} title={isTitle} />
     </FormDataContextWrapper>
   );
+  await waitFor(() => expect(screen.getByTestId('submitButton')).toBeTruthy());
+  return result;
 };
 
-const submitButtonClick = () => {
+const submitButtonClick = async (user: ReturnType<typeof userEvent.setup>) => {
   const button = screen.getByTestId('submitButton') as HTMLButtonElement;
   expect(button).toBeTruthy();
-  userEvent.click(button);
+  await user.click(button);
 };
 
 const getSelectElement = (testId: string) => {
@@ -42,42 +45,49 @@ const selectedGrade = GRADE.R12;
 const selectedWeight = WEIGHT_CLASS.BANTAM;
 const selectedCountry = COUNTRY.JAPAN;
 const inputtedVenue = 'match venue';
-const setAllFormData = () => {
+const setAllFormData = async (user: ReturnType<typeof userEvent.setup>) => {
   const { grade, weight, country, venue } = getAllElement();
 
-  userEvent.selectOptions(grade, selectedGrade);
-  userEvent.selectOptions(weight, selectedWeight);
-  userEvent.selectOptions(country, selectedCountry);
+  await user.selectOptions(grade, selectedGrade);
+  await user.selectOptions(weight, selectedWeight);
+  await user.selectOptions(country, selectedCountry);
 
   return { grade, weight, country, venue };
 };
 
 // mock
-const showToastModalMessageMock = vi.fn();
+const showErrorToastMock = vi.fn();
+const showNoticeToastMock = vi.fn();
+const showSuccessToastMock = vi.fn();
 vi.mock('@/hooks/useToastModal', () => {
   return {
     useToastModal: vi.fn(() => {
       return {
         hideToastModal: vi.fn(),
-        showToastModalMessage: showToastModalMessageMock,
+        showErrorToast: showErrorToastMock,
+        showNoticeToast: showNoticeToastMock,
+        showSuccessToast: showSuccessToastMock,
       };
     }),
   };
 });
 
 describe('MatchSetFormのテスト', () => {
-  beforeEach(() => {
-    rendering();
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(async () => {
+    user = userEvent.setup();
+    await rendering();
     vi.clearAllMocks();
   });
 
   test('grade 未設定の時は送信出来ない', async () => {
-    const { grade, weight, country, venue } = setAllFormData();
-    await userEvent.type(venue, inputtedVenue);
+    const { grade, weight, country, venue } = await setAllFormData(user);
+    await user.type(venue, inputtedVenue);
 
-    userEvent.selectOptions(grade, '');
+    await user.selectOptions(grade, '');
 
-    submitButtonClick();
+    await submitButtonClick(user);
 
     await waitFor(() => {
       expect(grade.value).toEqual('');
@@ -85,18 +95,18 @@ describe('MatchSetFormのテスト', () => {
       expect(country.value).toEqual(selectedCountry);
       expect(venue.value).toEqual(inputtedVenue);
 
-      expect(showToastModalMessageMock).toBeCalled();
+      expect(showNoticeToastMock).toBeCalled();
       expect(onSubmitFunc).not.toBeCalled();
     });
   });
 
   test('weight 未設定の時は送信出来ない', async () => {
-    const { grade, weight, country, venue } = setAllFormData();
-    await userEvent.type(venue, inputtedVenue);
+    const { grade, weight, country, venue } = await setAllFormData(user);
+    await user.type(venue, inputtedVenue);
 
-    userEvent.selectOptions(weight, '');
+    await user.selectOptions(weight, '');
 
-    submitButtonClick();
+    await submitButtonClick(user);
 
     await waitFor(() => {
       expect(weight.value).toEqual('');
@@ -104,18 +114,18 @@ describe('MatchSetFormのテスト', () => {
       expect(country.value).toEqual(selectedCountry);
       expect(venue.value).toEqual(inputtedVenue);
 
-      expect(showToastModalMessageMock).toBeCalled();
+      expect(showNoticeToastMock).toBeCalled();
       expect(onSubmitFunc).not.toBeCalled();
     });
   });
 
   test('country 未設定の時は送信出来ない', async () => {
-    const { grade, weight, country, venue } = setAllFormData();
-    await userEvent.type(venue, inputtedVenue);
+    const { grade, weight, country, venue } = await setAllFormData(user);
+    await user.type(venue, inputtedVenue);
 
-    userEvent.selectOptions(country, '');
+    await user.selectOptions(country, '');
 
-    submitButtonClick();
+    await submitButtonClick(user);
 
     await waitFor(() => {
       expect(country.value).toEqual('');
@@ -123,15 +133,15 @@ describe('MatchSetFormのテスト', () => {
       expect(weight.value).toEqual(selectedWeight);
       expect(venue.value).toEqual(inputtedVenue);
 
-      expect(showToastModalMessageMock).toBeCalled();
+      expect(showNoticeToastMock).toBeCalled();
       expect(onSubmitFunc).not.toBeCalled();
     });
   });
 
   test('venue 未設定の時は送信出来ない', async () => {
-    const { grade, weight, country, venue } = setAllFormData();
+    const { grade, weight, country, venue } = await setAllFormData(user);
 
-    submitButtonClick();
+    await submitButtonClick(user);
 
     await waitFor(() => {
       expect(venue.value).toEqual('');
@@ -139,18 +149,20 @@ describe('MatchSetFormのテスト', () => {
       expect(grade.value).toEqual(selectedGrade);
       expect(weight.value).toEqual(selectedWeight);
 
-      expect(showToastModalMessageMock).toBeCalled();
+      expect(showNoticeToastMock).toBeCalled();
       expect(onSubmitFunc).not.toBeCalled();
     });
   });
 
   test('grade がタイトルマッチで団体が未選択時は送信出来ない', async () => {
-    const { grade, weight, country, venue } = setAllFormData();
+    const { grade, weight, country, venue } = await setAllFormData(user);
 
-    userEvent.selectOptions(grade, GRADE.TITLE_MATCH);
-    await userEvent.type(venue, inputtedVenue);
+    await user.selectOptions(grade, GRADE.TITLE_MATCH);
+    await user.type(venue, inputtedVenue);
 
     const title = getSelectElement('matchTitle_0') as HTMLSelectElement;
+
+    await submitButtonClick(user);
 
     await waitFor(() => {
       expect(title.value).toEqual('');
@@ -159,18 +171,16 @@ describe('MatchSetFormのテスト', () => {
       expect(grade.value).toEqual(GRADE.TITLE_MATCH);
       expect(weight.value).toEqual(selectedWeight);
 
-      submitButtonClick();
-
-      expect(showToastModalMessageMock).toBeCalled();
+      expect(showNoticeToastMock).toBeCalled();
       expect(onSubmitFunc).not.toBeCalled();
     });
   });
 
   test('データを満たしている場合はsubmit送信', async () => {
-    const { grade, weight, country, venue } = setAllFormData();
-    await userEvent.type(venue, inputtedVenue);
+    const { grade, weight, country, venue } = await setAllFormData(user);
+    await user.type(venue, inputtedVenue);
 
-    submitButtonClick();
+    await submitButtonClick(user);
 
     await waitFor(() => {
       expect(grade.value).toEqual(selectedGrade);
@@ -178,7 +188,7 @@ describe('MatchSetFormのテスト', () => {
       expect(country.value).toEqual(selectedCountry);
       expect(venue.value).toEqual(inputtedVenue);
 
-      expect(showToastModalMessageMock).not.toBeCalled();
+      expect(showSuccessToastMock).not.toBeCalled();
       expect(onSubmitFunc).toBeCalled();
     });
   });
