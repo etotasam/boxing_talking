@@ -1,12 +1,10 @@
-import { isEqual } from "lodash"
 import { useFetchNewComments, useFetchComments, useFetchCommentsState } from '@/hooks/apiHooks/useComment';
 import { useEffect } from 'react';
 import { useQueryState } from '@/hooks/apiHooks/useQueryState';
 import { CommentType } from '@/assets/types';
 //! Recoil
 import { useSetRecoilState } from "recoil"
-import { apiFetchDataState } from "@/store/apiFetchDataState"
-import dayjs from "dayjs";
+import { apiFetchState } from "@/store/apiFetchDataState"
 
 export const useInfinityFetchComments = (matchId: number) => {
 
@@ -17,11 +15,18 @@ export const useInfinityFetchComments = (matchId: number) => {
   ]);
 
   //? データがまだ取得出来てない場合loadingモーダルを表示する為のエフェクトとrecoil
-  const setIsLoading = useSetRecoilState(apiFetchDataState({ dataName: "comments/fetch", state: "isLoading" }))
+  // const setIsLoading = useSetRecoilState(apiFetchDataState({ dataName: "comments/fetch", state: "isLoading" }))
+  // useEffect(() => {
+  //   setIsLoading(!commentsData)
+  // }, [commentsData])
+  const setCommentsFetchState = useSetRecoilState(apiFetchState("comments/fetch"))
   useEffect(() => {
-    setIsLoading(!commentsData)
+    if (!commentsData) {
+      setCommentsFetchState("loading")
+    } else {
+      setCommentsFetchState("idle")
+    }
   }, [commentsData])
-
 
   //? 取得するコメントの数に基づくmaxPage数と最後の投稿のcreateAtタイムを取得
   const { data: commentState } = useFetchCommentsState(matchId);
@@ -30,8 +35,7 @@ export const useInfinityFetchComments = (matchId: number) => {
   const {
     refetch: commentsRefetch,
     data: FetchedComments,
-    isRefetching,
-    isError
+    commentFetchState
   } = useFetchComments({
     matchId,
     createdAt: commentState ? commentState.resentPostTime : '',
@@ -60,17 +64,17 @@ export const useInfinityFetchComments = (matchId: number) => {
   const refetch = () => {
     if (commentState) {
       if (commentsData.page >= commentState.maxPage) return;
-      if (isRefetching) return;
+      if (commentFetchState === "refetching") return;
       commentsRefetch();
     }
   };
 
 
-  const isNextComments = (commentState && commentsData && (commentState.maxPage > commentsData.page)) || isRefetching
+  const isNextComments = (commentState && commentsData && (commentState.maxPage > commentsData.page)) || commentFetchState === "refetching"
 
   const data = commentsData ? commentsData.comments : undefined
   // const resentPostTime = commentState ? commentState.resentPostTime : undefined
-  return { data, refetch, isError, isRefetching, isNextComments }
+  return { data, refetch, commentFetchState, isNextComments }
 }
 
 

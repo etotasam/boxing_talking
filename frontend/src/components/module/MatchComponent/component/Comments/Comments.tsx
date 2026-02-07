@@ -7,7 +7,7 @@ import {
 } from '@/hooks/useInfinityFetchComments';
 //! recoil
 import { useRecoilValue } from 'recoil';
-import { apiFetchDataState } from '@/store/apiFetchDataState';
+import { apiFetchState } from '@/store/apiFetchDataState';
 //! component
 import { ErrorFallback } from './components/ErrorFallback';
 import { NoCommentFallback } from './components/NoCommentFallback';
@@ -23,7 +23,7 @@ export const Comments = (props: PropsType) => {
     data: comments,
     refetch: refetchComments,
     isNextComments,
-    isError: isErrorFetchComments,
+    // isError: isErrorFetchComments,
   } = useInfinityFetchComments(matchId);
 
   const {
@@ -36,14 +36,17 @@ export const Comments = (props: PropsType) => {
   });
 
   //? コメント投稿が成功したら新しいコメントをrefetchする
-  const isNewPostSuccess = useRecoilValue(
-    apiFetchDataState({ dataName: 'comments/post', state: 'isSuccess' })
-  );
+  // const isNewPostSuccess = useRecoilValue(
+  //   apiFetchDataState({ dataName: 'comments/post', state: 'isSuccess' })
+  // );
+
+  const commentPostState = useRecoilValue(apiFetchState('comments/post'));
+  const commentsFetchState = useRecoilValue(apiFetchState('comments/fetch'));
 
   useEffect(() => {
-    if (!isNewPostSuccess) return;
+    if (commentPostState !== 'success') return;
     refetchNewComments();
-  }, [isNewPostSuccess]);
+  }, [commentPostState]);
 
   const isComments =
     (comments !== undefined && !!comments.length) ||
@@ -54,7 +57,8 @@ export const Comments = (props: PropsType) => {
 
   return (
     <CommentsWrapper>
-      {isErrorFetchComments && <ErrorFallback />}
+      {commentsFetchState === 'error' && <ErrorFallback />}
+      {/* {isErrorFetchComments && <ErrorFallback />} */}
       {isNotComments && <NoCommentFallback />}
 
       {isComments && (

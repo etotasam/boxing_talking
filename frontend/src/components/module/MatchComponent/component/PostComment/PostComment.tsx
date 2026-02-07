@@ -49,7 +49,7 @@ const PostCommentTextarea = ({
   autoExpandTextareaAndSetComment,
 }: PostCommentTextareaType) => {
   //? コメント投稿中…の状態取得(hookの中でRecoilを使用)
-  const { isLoading: isPostingComment } = usePostComment();
+  const { commentPostState } = usePostComment();
   return (
     <div
       className={clsx(
@@ -73,10 +73,11 @@ const PostCommentTextarea = ({
           'absolute bottom-[6px] right-[6px]',
           'w-[30px] h-[30px] ml-[5px] text-[14px] border-[1px] border-neutral-500 bg-neutral-700  hover:bg-cyan-800 focus:bg-cyan-800 rounded-md duration-300 py-1 text-stone-300 text-xl flex justify-center items-center',
           'sm:w-[35px] sm:h-[35px] sm:bottom-[8px] sm:right-[8px]',
-          isPostingComment && 'text-white/50 select-none'
+          commentPostState === 'loading' && 'text-white/50 select-none'
+          // isPostingComment && 'text-white/50 select-none'
         )}
       >
-        {isPostingComment ? (
+        {commentPostState === 'loading' ? (
           <span className="sm:w-[20px] sm:h-[20px] w-[15px] h-[15px]">
             <RotatingLines width="100%" strokeColor="white" />
           </span>

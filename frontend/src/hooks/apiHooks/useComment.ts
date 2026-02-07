@@ -14,7 +14,7 @@ import { CommentType } from "@/assets/types"
 import { MESSAGE } from "@/assets/statusesOnToastModal"
 //! Recoil
 import { useRecoilState } from "recoil"
-import { apiFetchDataState } from "@/store/apiFetchDataState"
+import { apiFetchState } from "@/store/apiFetchDataState"
 import dayjs from "dayjs"
 
 
@@ -51,7 +51,18 @@ export const useFetchComments = ({ matchId, createdAt, page }: { matchId: number
     cacheTime: 0, enabled: false, keepPreviousData: false
   })
 
-  return { data, refetch, isRefetching, isError }
+  const [commentFetchState, setCommentFetchState] = useRecoilState(apiFetchState("comments/fetch"))
+  useEffect(() => {
+    if (isRefetching) {
+      setCommentFetchState("refetching")
+    } else if (isError) {
+      setCommentFetchState("error")
+    } else {
+      setCommentFetchState("idle")
+    }
+  }, [isRefetching, isError])
+
+  return { data, refetch, commentFetchState }
 }
 
 //! 新しいコメントの取得
@@ -73,9 +84,19 @@ export const useFetchNewComments = ({ matchId, createdAt }: { matchId: number, c
     cacheTime: 0, staleTime: 500, enabled: false, keepPreviousData: false, refetchInterval: false, refetchOnMount: false, refetchOnReconnect: false
   })
 
+  const [newCommentFetchState, setNewCommentFetchState] = useRecoilState(apiFetchState("comments/fetch"))
+  useEffect(() => {
+    if (isRefetching) {
+      setNewCommentFetchState("refetching")
+    } else if (isError) {
+      setNewCommentFetchState("error")
+    } else {
+      setNewCommentFetchState("idle")
+    }
+  }, [isRefetching, isError])
 
 
-  return { data, refetch, isRefetching, isError, isStale }
+  return { data, refetch, isStale, newCommentFetchState }
 }
 
 //! コメント取得(旧)
@@ -101,13 +122,27 @@ export const useFetchCommentsOld = (matchId: number) => {
   })
 
   //?Recoilで管理
-  const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "comments/fetch", state: "isLoading" }))
+  // const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "comments/fetch", state: "isLoading" }))
+  const [commentFetchState, setCommentFetchState] = useRecoilState(apiFetchState("comments/fetch"))
+  // useEffect(() => {
+  //   setIsLoading(isCommentsLoading)
+  // }, [isCommentsLoading])
 
   useEffect(() => {
-    setIsLoading(isCommentsLoading)
-  }, [isCommentsLoading])
+    if (isCommentsLoading) {
+      setCommentFetchState("loading")
+    } else if (isFetching) {
+      setCommentFetchState("refetching")
+    } else if (isSuccess) {
+      setCommentFetchState("success")
+    } else if (isError) {
+      setCommentFetchState("error")
+    } else {
+      setCommentFetchState("idle")
+    }
+  }, [isCommentsLoading, isFetching, isSuccess, isError])
 
-  return { data, isLoading, isFetching, refetch, isError, isSuccess }
+  return { data, refetch, commentFetchState }
 }
 
 //! コメント投稿
@@ -187,18 +222,30 @@ export const usePostComment = () => {
     })
   }
 
-  const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "comments/post", state: "isLoading" }))
+  const [commentPostState, setCommentPostState] = useRecoilState(apiFetchState("comments/post"))
   useEffect(() => {
-    setIsLoading(isPostLoading)
-  }, [isPostLoading])
+    if (isPostLoading) {
+      setCommentPostState("loading")
+    } else if (isPostSuccess) {
+      setCommentPostState("success")
+    } else if (isError) {
+      setCommentPostState("error")
+    } else {
+      setCommentPostState("idle")
+    }
+  }, [isPostLoading, isPostSuccess, isError])
+  // const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "comments/post", state: "isLoading" }))
+  // useEffect(() => {
+  //   setIsLoading(isPostLoading)
+  // }, [isPostLoading])
 
-  const [isSuccess, setIsSuccess] = useRecoilState(apiFetchDataState({ dataName: "comments/post", state: "isSuccess" }))
+  // const [isSuccess, setIsSuccess] = useRecoilState(apiFetchDataState({ dataName: "comments/post", state: "isSuccess" }))
 
-  useEffect(() => {
-    setIsSuccess(isPostSuccess)
-  }, [isPostSuccess])
+  // useEffect(() => {
+  //   setIsSuccess(isPostSuccess)
+  // }, [isPostSuccess])
 
-  return { postComment, isLoading, isSuccess, isError }
+  return { postComment, commentPostState }
 }
 
 //! コメントの削除

@@ -14,7 +14,7 @@ import { useGuest, useAuth } from "./useAuth";
 import { PredictionType, MatchPredictionsType } from "@/assets/types"
 //! Recoil
 import { useRecoilState } from "recoil"
-import { apiFetchDataState } from "@/store/apiFetchDataState"
+import { apiFetchState } from "@/store/apiFetchDataState"
 
 
 //! ユーザーの勝敗予想の取得
@@ -40,15 +40,21 @@ export const useFetchUsersPrediction = () => {
     }
   })
 
-  const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/fetch", state: "isLoading" }))
-
+  // const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/fetch", state: "isLoading" }))
+  const [usePredictionFetchState, setUserPredictionFetchState] = useRecoilState(apiFetchState("userPrediction/fetch"))
 
   useEffect(() => {
-    setIsLoading(isUserPredictionLoading)
-  }, [isUserPredictionLoading])
+    if (isUserPredictionLoading) {
+      setUserPredictionFetchState("loading")
+    } else if (isRefetching) {
+      setUserPredictionFetchState("refetching")
+    } else {
+      setUserPredictionFetchState("idle")
+    }
+  }, [isUserPredictionLoading, isRefetching])
 
 
-  return { data, isLoading, isRefetching, refetch }
+  return { data, refetch, usePredictionFetchState }
 }
 
 //! 試合予想の投票
@@ -98,18 +104,31 @@ export const useVoteMatchPrediction = () => {
     })
   }
 
-  const [isSuccess, setIsSuccess] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/post", state: "isSuccess" }))
-  const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/post", state: "isLoading" }))
+  // const [isSuccess, setIsSuccess] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/post", state: "isSuccess" }))
+  // const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/post", state: "isLoading" }))
+  const [userPredictionPostState, setUserPredictionPostState] = useRecoilState(apiFetchState("userPrediction/post"))
+
+  // useEffect(() => {
+  //   setIsSuccess(isMutateSuccess)
+  // }, [isMutateSuccess])
+
+  // useEffect(() => {
+  //   setIsLoading(isMutateLoading)
+  // }, [isMutateLoading])
 
   useEffect(() => {
-    setIsSuccess(isMutateSuccess)
-  }, [isMutateSuccess])
+    if (isMutateLoading) {
+      setUserPredictionPostState("loading")
+    } else if (isMutateSuccess) {
+      setUserPredictionPostState("success")
+    } else if (isError) {
+      setUserPredictionPostState("error")
+    } else {
+      setUserPredictionPostState("idle")
+    }
+  }, [isMutateLoading, isMutateSuccess, isError])
 
-  useEffect(() => {
-    setIsLoading(isMutateLoading)
-  }, [isMutateLoading])
-
-  return { matchVotePrediction, isLoading, isSuccess, isError }
+  return { matchVotePrediction, userPredictionPostState }
 }
 
 //!試合予想の投票数の取得
@@ -120,7 +139,7 @@ export const useMatchPredictions = (matchId: number) => {
     return res.data
   }, [])
 
-  const { data, isLoading: isMatchPredictionLoading, isRefetching, refetch } = useQuery([QUERY_KEY.MATCH_PREDICTIONS, { id: matchId }], api, {
+  const { data, isLoading, isRefetching, refetch } = useQuery([QUERY_KEY.MATCH_PREDICTIONS, { id: matchId }], api, {
     staleTime: 5 * 60 * 1000,
     onError: () => {
     },
@@ -139,11 +158,18 @@ export const useMatchPredictions = (matchId: number) => {
   }, []);
 
 
-  const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "matchPrediction/fetch", state: "isLoading" }))
+  // const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "matchPrediction/fetch", state: "isLoading" }))
+  const [matchPredictionFetchState, setMatchPredictionFetchState] = useRecoilState(apiFetchState("matchPrediction/fetch"))
 
   useEffect(() => {
-    setIsLoading(isMatchPredictionLoading)
-  }, [isMatchPredictionLoading])
+    if (isLoading) {
+      setMatchPredictionFetchState("loading")
+    } else if (isRefetching) {
+      setMatchPredictionFetchState("refetching")
+    } else {
+      setMatchPredictionFetchState("idle")
+    }
+  }, [isLoading, isRefetching])
 
-  return { data, isLoading, isRefetching, refetch }
+  return { data, matchPredictionFetchState, refetch }
 }
