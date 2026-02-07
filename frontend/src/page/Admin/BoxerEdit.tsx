@@ -230,7 +230,7 @@ const BoxerInfoAndEditBox = (props: BoxerInfoAndEditBoxType) => {
   } = props;
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
 
-  const { setToastModal, showToastModal } = useToastModal();
+  const { showErrorToast } = useToastModal();
   return (
     <section
       className="w-[70%] border-r-[1px] border-stone-200 overflow-auto"
@@ -260,11 +260,7 @@ const BoxerInfoAndEditBox = (props: BoxerInfoAndEditBoxType) => {
                 styleName="delete"
                 onClick={() => {
                   if (!selectBoxerNumber) {
-                    setToastModal({
-                      message: MESSAGE.BOXER_NO_SELECTED,
-                      bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
-                    });
-                    showToastModal();
+                    showErrorToast(MESSAGE.BOXER_NO_SELECTED);
                     return;
                   }
                   setIsShowDeleteConfirmModal(true);

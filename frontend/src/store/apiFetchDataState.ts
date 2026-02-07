@@ -21,5 +21,5 @@ type DataNameType = (typeof dataName)[number]
 
 export const apiFetchDataState = atomFamily<boolean, { dataName: DataNameType, state: DataFetchStateType }>({
   key: "apiFetchDataState",
-  default: undefined
+  default: false
 })

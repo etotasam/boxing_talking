@@ -3,7 +3,7 @@ import { useQuery, useMutation, } from "react-query"
 import { Axios } from "@/assets/axios"
 import { API_PATH } from "@/assets/apiPath"
 //! data
-import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal";
+import { MESSAGE } from "@/assets/statusesOnToastModal";
 import { QUERY_KEY } from "@/assets/queryKeys";
 //! hook
 import { useLoading } from "../useLoading"
@@ -56,7 +56,7 @@ export const useVoteMatchPrediction = () => {
   // const queryClient = useQueryClient()
   const { refetch: refetchAllFetchMatchPredictionOfAuthUser } = useFetchUsersPrediction()
   // const { refetch: refetchMatches } = useFetchMatches()
-  const { setToastModal, showToastModal } = useToastModal()
+  const { showErrorToast, showSuccessToast } = useToastModal()
   const { startLoading, resetLoadingState } = useLoading()
   type ApiPropsType = {
     matchId: number,
@@ -81,23 +81,19 @@ export const useVoteMatchPrediction = () => {
       },
       onSuccess: () => {
         refetchAllFetchMatchPredictionOfAuthUser()
-        setToastModal({ message: MESSAGE.SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        showSuccessToast(MESSAGE.SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION)
       },
       onError: (error: any) => {
 
         if (error.data.message === "Cannot win-loss prediction after match date") {
-          setToastModal({ message: MESSAGE.MATCH_IS_ALREADY_DONE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          showToastModal()
+          showErrorToast(MESSAGE.MATCH_IS_ALREADY_DONE)
           return
         }
         if (error.data.message === "Cannot win-loss prediction. You have already done.") {
-          setToastModal({ message: MESSAGE.ALREADY_HAVE_DONE_VOTE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          showToastModal()
+          showErrorToast(MESSAGE.ALREADY_HAVE_DONE_VOTE)
           return
         }
-        setToastModal({ message: MESSAGE.FAILED_VOTE_WIN_LOSS_PREDICTION, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showErrorToast(MESSAGE.FAILED_VOTE_WIN_LOSS_PREDICTION)
       }
     })
   }

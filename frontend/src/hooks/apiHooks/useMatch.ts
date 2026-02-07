@@ -64,7 +64,7 @@ export const useFetchAllMatches = () => {
 
 //! 試合の登録
 export const useRegisterMatch = () => {
-  const { setToastModal, showToastModal } = useToastModal()
+  const { showErrorToast, showSuccessToast } = useToastModal()
   const { refetch: refetchMatches } = useFetchMatches()
   const { refetch: refetchAllMatches } = useFetchAllMatches()
   // const queryClient = useQueryClient()
@@ -86,14 +86,12 @@ export const useRegisterMatch = () => {
         refetchMatches()
         refetchAllMatches()
         resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_REGISTER_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        showSuccessToast(MESSAGE.MATCH_REGISTER_SUCCESS)
       },
       onError: () => {
         resetLoadingState()
         // queryClient.setQueryData(queryKeys.match, context?.snapshot)
-        setToastModal({ message: MESSAGE.MATCH_REGISTER_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showErrorToast(MESSAGE.MATCH_REGISTER_FAILED)
       }
     })
   }
@@ -107,7 +105,7 @@ type ArgumentType = {
   changeData: Partial<MatchUpdateFormType>
 }
 export const useUpdateMatch = () => {
-  const { setToastModal, showToastModal } = useToastModal()
+  const { showErrorToast, showSuccessToast } = useToastModal()
   const { resetLoadingState, startLoading } = useLoading()
   const { refetch: refetchMatches } = useFetchMatches()
   const { refetch: refetchAllMatches } = useFetchAllMatches()
@@ -129,13 +127,11 @@ export const useUpdateMatch = () => {
         refetchMatches()
         refetchAllMatches()
         resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_UPDATE_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        showSuccessToast(MESSAGE.MATCH_UPDATE_SUCCESS)
       },
       onError: () => {
         resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_UPDATE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showErrorToast(MESSAGE.MATCH_UPDATE_FAILED)
       },
       onSettled: () => {
       }
@@ -147,7 +143,7 @@ export const useUpdateMatch = () => {
 
 //! 試合の削除
 export const useDeleteMatch = () => {
-  const { setToastModal, showToastModal } = useToastModal()
+  const { showErrorToast, showSuccessToast } = useToastModal()
   const { resetLoadingState, startLoading } = useLoading()
   const { refetch: refetchMatches } = useFetchMatches()
   const { refetch: refetchAllMatches } = useFetchAllMatches()
@@ -168,13 +164,11 @@ export const useDeleteMatch = () => {
         refetchMatches()
         refetchAllMatches()
         resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        showSuccessToast(MESSAGE.MATCH_DELETED)
       },
       onError: () => {
         resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_DELETE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showErrorToast(MESSAGE.MATCH_DELETE_FAILED)
       }
     })
   }
@@ -184,7 +178,7 @@ export const useDeleteMatch = () => {
 
 //! 試合結果の登録
 export const useMatchResult = () => {
-  const { setToastModal, showToastModal } = useToastModal()
+  const { showErrorToast, showSuccessToast } = useToastModal()
   const { refetch: refetchMatches } = useFetchMatches()
   const { refetch: refetchAllMatches } = useFetchAllMatches()
   const { resetLoadingState, startLoading } = useLoading()
@@ -204,13 +198,11 @@ export const useMatchResult = () => {
         refetchMatches()
         refetchAllMatches()
         resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_RESULT_STORED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        showSuccessToast(MESSAGE.MATCH_RESULT_STORED)
       },
       onError: () => {
         resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_RESULT_STORE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showErrorToast(MESSAGE.MATCH_RESULT_STORE_FAILED)
       }
     })
   }

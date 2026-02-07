@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
-import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/assets/statusesOnToastModal';
 //! layout wrapper
 import AdminOnlyLayout from '@/layout/AdminOnlyLayout';
 //! func
@@ -37,7 +37,7 @@ export const MatchEdit = () => {
   const { data: pastMatchesData } = useFetchPastMatches();
   const { beforeMatches, afterMatches } = useSortMatches(matchesData);
   const allMatches = pastMatchesData && [...beforeMatches, ...afterMatches, ...pastMatchesData];
-  const { setToastModal, showToastModal } = useToastModal();
+  const { showNoticeToast } = useToastModal();
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
 
   const [selectedMatch, setSelectMatch] = useState<MatchDataType>();
@@ -64,11 +64,7 @@ export const MatchEdit = () => {
   //?削除ボタンを押した時の挙動(確認モーダルの表示など)
   const handleClickDeleteButton = () => {
     if (!selectedMatch) {
-      setToastModal({
-        message: MESSAGE.MATCH_IS_NOT_SELECTED,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      showToastModal();
+      showNoticeToast(MESSAGE.MATCH_IS_NOT_SELECTED);
       return;
     }
     setIsDeleteConfirm(true);

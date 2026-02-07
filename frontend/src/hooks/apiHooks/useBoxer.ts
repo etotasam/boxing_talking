@@ -115,8 +115,7 @@ export const useUpdateBoxerData = () => {
 export const useRegisterBoxer = () => {
   const { refetchReactQueryData } = useReactQuery()
   const { startLoading, resetLoadingState, successful } = useLoading()
-  const { showToastModal } = useToastModal()
-  const { setToastModal } = useToastModal()
+  const { showSuccessToast, showErrorToast } = useToastModal()
   const api = useCallback(async (newBoxerData: Omit<BoxerType, "id">): Promise<void> => {
     await Axios.post<void>(API_PATH.BOXER, newBoxerData).then(v => v.data)
     // return res
@@ -132,8 +131,7 @@ export const useRegisterBoxer = () => {
       onSuccess: () => {
         successful()
         resetLoadingState()
-        setToastModal({ message: MESSAGE.FIGHTER_REGISTER_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        showSuccessToast(MESSAGE.FIGHTER_REGISTER_SUCCESS)
         refetchReactQueryData(QUERY_KEY.BOXER)
       },
       onError: (error: any) => {
@@ -142,23 +140,19 @@ export const useRegisterBoxer = () => {
           const errors = error.data.message as any
           if (errors.name) {
             if ((errors.name as string[]).includes('name is already exists')) {
-              setToastModal({ message: MESSAGE.BOXER_IS_ALREADY_EXISTS, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-              showToastModal()
+              showErrorToast(MESSAGE.BOXER_IS_ALREADY_EXISTS)
               return
             }
           }
 
           if (errors.eng_name) {
             if ((errors.eng_name as string[]).includes('eng_name is already exists')) {
-              setToastModal({ message: MESSAGE.BOXER_IS_ALREADY_EXISTS, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-              showToastModal()
+              showErrorToast(MESSAGE.BOXER_IS_ALREADY_EXISTS)
               return
             }
           }
         }
-
-        setToastModal({ message: MESSAGE.FIGHTER_REGISTER_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showErrorToast(MESSAGE.FIGHTER_REGISTER_FAILED)
       }
     })
   }

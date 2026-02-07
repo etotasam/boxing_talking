@@ -3,19 +3,6 @@ import React, { useState } from 'react';
 import { MatchUpdateFormType } from '@/assets/types';
 //! context
 import { FormDataContext, initialFormData } from './FormDataContext';
-// const initialFormData: MatchUpdateFormType = {
-//   matchDate: dayjs().format('YYYY-MM-DD'),
-//   grade: undefined,
-//   country: undefined,
-//   venue: '',
-//   weight: undefined,
-//   titles: [] as OrganizationsType[] | [],
-// } as const;
-
-// export const FormDataContext = createContext<{
-//   formData: MatchUpdateFormType;
-//   setFormData: React.Dispatch<React.SetStateAction<MatchUpdateFormType>>;
-// }>({ formData: initialFormData, setFormData: () => {} });
 
 export const FormDataContextWrapper = ({ children }: { children: React.ReactNode }) => {
   const [formData, setFormData] = useState<MatchUpdateFormType>(initialFormData);
