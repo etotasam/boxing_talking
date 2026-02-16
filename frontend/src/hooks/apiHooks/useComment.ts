@@ -7,22 +7,22 @@ import { QUERY_KEY } from "@/assets/queryKeys"
 import { API_PATH } from "@/assets/apiPath"
 //! hook
 // import { useAuth } from "@/hooks/useAuth"
-import { useLoading } from "@/hooks/useLoading"
+import { useFullScreenLoading } from "@/hooks/useFullScreenLoading"
 import { useToastModal } from "@/hooks/useToastModal"
 //! types
-import { CommentType } from "@/assets/types"
+import { CommentType } from "@/types"
 import { MESSAGE } from "@/assets/statusesOnToastModal"
 //! Recoil
 import { useRecoilState } from "recoil"
-import { apiFetchDataState } from "@/store/apiFetchDataState"
+import { apiFetchState } from "@/store/apiFetchDataState"
 import dayjs from "dayjs"
 
 
-const LIMIT = 10
+const FETCH_COMMENTS_LIMIT_COUNT = 10
 //! コメントのmax page
 export const useFetchCommentsState = (matchId: number) => {
   const api = async () => {
-    const res = await Axios.get<{ maxPage: number, resentPostTime: string }>(API_PATH.COMMENT_STATE, { params: { matchId, limit: LIMIT } }).then(v => v.data)
+    const res = await Axios.get<{ maxPage: number, resentPostTime: string }>(API_PATH.COMMENT_STATE, { params: { matchId, limit: FETCH_COMMENTS_LIMIT_COUNT } }).then(v => v.data)
     return res
   }
 
@@ -41,7 +41,7 @@ export const useFetchComments = ({ matchId, createdAt, page }: { matchId: number
         matchId,
         createdAt,
         page,
-        limit: LIMIT
+        limit: FETCH_COMMENTS_LIMIT_COUNT
       },
     }).then(v => v.data)
     return res.data
@@ -51,7 +51,18 @@ export const useFetchComments = ({ matchId, createdAt, page }: { matchId: number
     cacheTime: 0, enabled: false, keepPreviousData: false
   })
 
-  return { data, refetch, isRefetching, isError }
+  const [commentFetchState, setCommentFetchState] = useRecoilState(apiFetchState("comments/fetch"))
+  useEffect(() => {
+    if (isRefetching) {
+      setCommentFetchState("refetching")
+    } else if (isError) {
+      setCommentFetchState("error")
+    } else {
+      setCommentFetchState("idle")
+    }
+  }, [isRefetching, isError])
+
+  return { data, refetch, commentFetchState }
 }
 
 //! 新しいコメントの取得
@@ -73,9 +84,19 @@ export const useFetchNewComments = ({ matchId, createdAt }: { matchId: number, c
     cacheTime: 0, staleTime: 500, enabled: false, keepPreviousData: false, refetchInterval: false, refetchOnMount: false, refetchOnReconnect: false
   })
 
+  const [newCommentFetchState, setNewCommentFetchState] = useRecoilState(apiFetchState("comments/fetch"))
+  useEffect(() => {
+    if (isRefetching) {
+      setNewCommentFetchState("refetching")
+    } else if (isError) {
+      setNewCommentFetchState("error")
+    } else {
+      setNewCommentFetchState("idle")
+    }
+  }, [isRefetching, isError])
 
 
-  return { data, refetch, isRefetching, isError, isStale }
+  return { data, refetch, isStale, newCommentFetchState }
 }
 
 //! コメント取得(旧)
@@ -101,13 +122,27 @@ export const useFetchCommentsOld = (matchId: number) => {
   })
 
   //?Recoilで管理
-  const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "comments/fetch", state: "isLoading" }))
+  // const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "comments/fetch", state: "isLoading" }))
+  const [commentFetchState, setCommentFetchState] = useRecoilState(apiFetchState("comments/fetch"))
+  // useEffect(() => {
+  //   setIsLoading(isCommentsLoading)
+  // }, [isCommentsLoading])
 
   useEffect(() => {
-    setIsLoading(isCommentsLoading)
-  }, [isCommentsLoading])
+    if (isCommentsLoading) {
+      setCommentFetchState("loading")
+    } else if (isFetching) {
+      setCommentFetchState("refetching")
+    } else if (isSuccess) {
+      setCommentFetchState("success")
+    } else if (isError) {
+      setCommentFetchState("error")
+    } else {
+      setCommentFetchState("idle")
+    }
+  }, [isCommentsLoading, isFetching, isSuccess, isError])
 
-  return { data, isLoading, isFetching, refetch, isError, isSuccess }
+  return { data, refetch, commentFetchState }
 }
 
 //! コメント投稿
@@ -187,18 +222,30 @@ export const usePostComment = () => {
     })
   }
 
-  const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "comments/post", state: "isLoading" }))
+  const [commentPostState, setCommentPostState] = useRecoilState(apiFetchState("comments/post"))
   useEffect(() => {
-    setIsLoading(isPostLoading)
-  }, [isPostLoading])
+    if (isPostLoading) {
+      setCommentPostState("loading")
+    } else if (isPostSuccess) {
+      setCommentPostState("success")
+    } else if (isError) {
+      setCommentPostState("error")
+    } else {
+      setCommentPostState("idle")
+    }
+  }, [isPostLoading, isPostSuccess, isError])
+  // const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "comments/post", state: "isLoading" }))
+  // useEffect(() => {
+  //   setIsLoading(isPostLoading)
+  // }, [isPostLoading])
 
-  const [isSuccess, setIsSuccess] = useRecoilState(apiFetchDataState({ dataName: "comments/post", state: "isSuccess" }))
+  // const [isSuccess, setIsSuccess] = useRecoilState(apiFetchDataState({ dataName: "comments/post", state: "isSuccess" }))
 
-  useEffect(() => {
-    setIsSuccess(isPostSuccess)
-  }, [isPostSuccess])
+  // useEffect(() => {
+  //   setIsSuccess(isPostSuccess)
+  // }, [isPostSuccess])
 
-  return { postComment, isLoading, isSuccess, isError }
+  return { postComment, commentPostState }
 }
 
 //! コメントの削除
@@ -206,7 +253,7 @@ export const useDeleteComment = () => {
 
   type ApiPropsType = { commentID: number, matchID: number }
   const { showErrorToast, showGrayBackToast } = useToastModal()
-  const { startLoading, resetLoadingState } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   const queryClient = useQueryClient()
 
   const api = useCallback(async ({ commentID }: ApiPropsType) => {
@@ -221,7 +268,7 @@ export const useDeleteComment = () => {
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
       // setIsCommentDeleting(true)
     }
   })
@@ -230,12 +277,12 @@ export const useDeleteComment = () => {
       onSuccess: () => {
         //? コメントの再取得。※refetch()を使うとmatchID=0での呼び出しが1回入るのでうざい
         queryClient.invalidateQueries([QUERY_KEY.COMMENT, { id: matchID }]);
-        resetLoadingState()
+        hideFullScreenLoading()
         showGrayBackToast(MESSAGE.COMMENT_DELETED)
         return
       },
       onError: (error: unknown) => {
-        resetLoadingState()
+        hideFullScreenLoading()
         if ((error as AxiosError).status === 419) {
           showErrorToast(MESSAGE.SESSION_EXPIRED)
           return

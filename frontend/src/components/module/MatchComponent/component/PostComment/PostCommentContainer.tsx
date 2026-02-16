@@ -9,15 +9,12 @@ import { useToastModal } from '@/hooks/useToastModal';
 import { usePostComment } from '@/hooks/apiHooks/useComment';
 import { useAuth, useGuest } from '@/hooks/apiHooks/useAuth';
 import { useWindowSize } from '@/hooks/useWindowSize';
-// import { useLoading } from '@/hooks/useLoading';
 
 export const PostCommentContainer = () => {
   //? urlからクエリmatch_idを取得
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get('match_id'));
-
-  // const { startLoading, resetLoadingState } = useLoading();
 
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
@@ -28,11 +25,7 @@ export const PostCommentContainer = () => {
   const { showNoticeToast } = useToastModal();
   const [comment, setComment] = useState<string>();
 
-  const {
-    postComment,
-    isSuccess: isSuccessPostComment,
-    isLoading: isPostingComment,
-  } = usePostComment();
+  const { postComment, commentPostState } = usePostComment();
 
   const { device } = useWindowSize();
   const commentPostEl = useRef<HTMLDivElement>();
@@ -68,7 +61,7 @@ export const PostCommentContainer = () => {
 
   // ? コメント投稿成功時にコメント入力欄とその高さを初期化
   useEffect(() => {
-    if (isSuccessPostComment) {
+    if (commentPostState === 'success') {
       setComment('');
       //? textareaの高さをリセットと中身を削除
       (textareaRef.current as unknown as HTMLTextAreaElement).style.height = 'auto';
@@ -76,11 +69,11 @@ export const PostCommentContainer = () => {
     }
     //? postCommentの高さを初期化
     setRecoilPostCommentHeight((commentPostEl.current as HTMLDivElement).clientHeight);
-  }, [isSuccessPostComment]);
+  }, [commentPostState]);
 
   //? コメント投稿の実行
   const storeCommentExecute = () => {
-    if (isPostingComment) return;
+    if (commentPostState === 'loading') return;
     if (!isAuthOrGuest) {
       showNoticeToast(MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH);
       return;

@@ -14,10 +14,9 @@ import { boxerCurrentState } from '@/store/boxerCurrentState';
 //! hooks
 import { useBoxerFieldData } from '@/hooks/useBoxerFieldData';
 import { useToastModal } from '@/hooks/useToastModal';
-import { useLoading } from '@/hooks/useLoading';
 import { useFetchBoxers, useUpdateBoxerData, useDeleteBoxer } from '@/hooks/apiHooks/useBoxer';
 //! types
-import { BoxerType } from '@/assets/types';
+import { BoxerType } from '@/types';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 import { SearchBoxer } from '@/components/module/SearchBoxer';
@@ -35,7 +34,6 @@ export type LocalDataEntryType = <k extends keyof BoxerType>(
 
 export const BoxerEdit = () => {
   // ? use hook
-  const { resetLoadingState } = useLoading();
   const { hideToastModal, showErrorToast, showNoticeToast } = useToastModal();
   const [boxerCurrentData, setBoxerCurrentData] = useRecoilState(boxerCurrentState);
   const { updateBoxer, isSuccess: updateBoxerSuccess } = useUpdateBoxerData();
@@ -46,11 +44,11 @@ export const BoxerEdit = () => {
   const [selectBoxerNumber, setIsSelectBoxerNumber] = useState<number>();
 
   //? 初期設定(クリーンアップとか)
-  useEffect(() => {
-    return () => {
-      resetLoadingState();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     resetLoadingState();
+  //   };
+  // }, []);
 
   //? boxerの削除に成功したらformデータを初期化
   useEffect(() => {
@@ -230,7 +228,7 @@ const BoxerInfoAndEditBox = (props: BoxerInfoAndEditBoxType) => {
   } = props;
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
 
-  const { setToastModal, showToastModal } = useToastModal();
+  const { showErrorToast } = useToastModal();
   return (
     <section
       className="w-[70%] border-r-[1px] border-stone-200 overflow-auto"
@@ -260,11 +258,7 @@ const BoxerInfoAndEditBox = (props: BoxerInfoAndEditBoxType) => {
                 styleName="delete"
                 onClick={() => {
                   if (!selectBoxerNumber) {
-                    setToastModal({
-                      message: MESSAGE.BOXER_NO_SELECTED,
-                      bgColor: BG_COLOR_ON_TOAST_MODAL.GRAY,
-                    });
-                    showToastModal();
+                    showErrorToast(MESSAGE.BOXER_NO_SELECTED);
                     return;
                   }
                   setIsShowDeleteConfirmModal(true);

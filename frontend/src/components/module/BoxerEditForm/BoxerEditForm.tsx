@@ -1,5 +1,5 @@
 //! type
-import { BoxerType } from '@/assets/types';
+import { BoxerType } from '@/types';
 import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 // ! component
 import { Button } from '@/components/atomic/Button';

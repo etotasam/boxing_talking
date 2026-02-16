@@ -1,5 +1,5 @@
 import { pickBy, isEqual } from 'lodash';
-import { MatchUpdateFormType } from '@/assets/types';
+import { MatchUpdateFormType } from '@/types';
 
 
 type FormDataKeys = keyof MatchUpdateFormType;

@@ -14,25 +14,23 @@ import { boxerCurrentState } from '@/store/boxerCurrentState';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 import { useRegisterBoxer } from '@/hooks/apiHooks/useBoxer';
-import { useLoading } from '@/hooks/useLoading';
 import { useBoxerFieldData } from '@/hooks/useBoxerFieldData';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const BoxerRegister = () => {
   // ! use hook
-  const { resetLoadingState } = useLoading();
   const [boxerCurrentData, setBoxerCurrentData] = useRecoilState(boxerCurrentState);
   const { hideToastModal, showErrorToast } = useToastModal();
   const { registerBoxer, isSuccess: successRegisterBoxer } = useRegisterBoxer();
   const { setBoxerFieldData } = useBoxerFieldData();
 
   //? 初期設定(クリーンアップとか)
-  useEffect(() => {
-    return () => {
-      resetLoadingState();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     resetLoadingState();
+  //   };
+  // }, []);
 
   // ? アンマウント時にはトーストモーダルを隠す
   //? form内データをデフォルトに戻す

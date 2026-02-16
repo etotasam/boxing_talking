@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 // ! types
-import { MatchDataType } from '@/assets/types';
+import { MatchDataType } from '@/types';
 // ! components
 import { BoxerInfo } from './BoxerInfo';
 import { PredictionIcon } from '@/components/atomic/PredictionIcon';

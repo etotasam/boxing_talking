@@ -1,6 +1,6 @@
 import { useSetRecoilState } from 'recoil';
 import { boxerCurrentState } from '@/store/boxerCurrentState';
-import { BoxerType } from '@/assets/types';
+import { BoxerType } from '@/types';
 
 export const useBoxerFieldData = () => {
   const setBoxerCurrentData = useSetRecoilState(boxerCurrentState);

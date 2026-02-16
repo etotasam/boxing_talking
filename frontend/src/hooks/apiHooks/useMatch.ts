@@ -7,10 +7,10 @@ import { API_PATH } from "@/assets/apiPath"
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
 import { QUERY_KEY } from "@/assets/queryKeys"
 // ! types
-import { MatchDataType, MatchResultType, RegisterMatchPropsType, MatchUpdateFormType } from "@/assets/types"
+import { MatchDataType, MatchResultType, RegisterMatchPropsType, MatchUpdateFormType } from "@/types"
 // ! hook
 import { useToastModal } from "../useToastModal"
-import { useLoading } from "../useLoading"
+import { useFullScreenLoading } from "../useFullScreenLoading"
 
 
 //! 試合情報の取得(1試合)
@@ -35,15 +35,15 @@ export const useFetchMatches = () => {
 
 //! 過去の試合情報一覧の取得(試合後2週間以上経っている試合全部)
 export const useFetchPastMatches = () => {
-  const { startLoading, resetLoadingState } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   const fetcher = useCallback(async () => {
-    startLoading()
+    showFullScreenLoading()
     const res = await Axios.get(API_PATH.MATCH, { params: { range: "past" } }).then(result => result.data)
     return res.data
   }, [])
   const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType[]>(QUERY_KEY.FETCH_PAST_MATCHES, fetcher, {
     keepPreviousData: true, staleTime: Infinity, enabled: true, onSettled: () => {
-      resetLoadingState()
+      hideFullScreenLoading()
     }
   })
 
@@ -64,11 +64,11 @@ export const useFetchAllMatches = () => {
 
 //! 試合の登録
 export const useRegisterMatch = () => {
-  const { setToastModal, showToastModal } = useToastModal()
+  const { showErrorToast, showSuccessToast } = useToastModal()
   const { refetch: refetchMatches } = useFetchMatches()
   const { refetch: refetchAllMatches } = useFetchAllMatches()
   // const queryClient = useQueryClient()
-  const { resetLoadingState, startLoading } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
 
 
   const api = async ({ matchDate, redBoxerId, blueBoxerId, grade, country, venue, weight, titles }: RegisterMatchPropsType) => {
@@ -76,7 +76,7 @@ export const useRegisterMatch = () => {
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
     }
   })
 
@@ -85,15 +85,13 @@ export const useRegisterMatch = () => {
       onSuccess: () => {
         refetchMatches()
         refetchAllMatches()
-        resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_REGISTER_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        hideFullScreenLoading()
+        showSuccessToast(MESSAGE.MATCH_REGISTER_SUCCESS)
       },
       onError: () => {
-        resetLoadingState()
+        hideFullScreenLoading()
         // queryClient.setQueryData(queryKeys.match, context?.snapshot)
-        setToastModal({ message: MESSAGE.MATCH_REGISTER_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showErrorToast(MESSAGE.MATCH_REGISTER_FAILED)
       }
     })
   }
@@ -107,8 +105,8 @@ type ArgumentType = {
   changeData: Partial<MatchUpdateFormType>
 }
 export const useUpdateMatch = () => {
-  const { setToastModal, showToastModal } = useToastModal()
-  const { resetLoadingState, startLoading } = useLoading()
+  const { showErrorToast, showSuccessToast } = useToastModal()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   const { refetch: refetchMatches } = useFetchMatches()
   const { refetch: refetchAllMatches } = useFetchAllMatches()
   const api = useCallback(async (arg: ArgumentType) => {
@@ -120,7 +118,7 @@ export const useUpdateMatch = () => {
   }, [])
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
     }
   })
   const updateMatch = (updateMatchData: ArgumentType) => {
@@ -128,14 +126,12 @@ export const useUpdateMatch = () => {
       onSuccess: () => {
         refetchMatches()
         refetchAllMatches()
-        resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_UPDATE_SUCCESS, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        hideFullScreenLoading()
+        showSuccessToast(MESSAGE.MATCH_UPDATE_SUCCESS)
       },
       onError: () => {
-        resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_UPDATE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        hideFullScreenLoading()
+        showErrorToast(MESSAGE.MATCH_UPDATE_FAILED)
       },
       onSettled: () => {
       }
@@ -147,8 +143,8 @@ export const useUpdateMatch = () => {
 
 //! 試合の削除
 export const useDeleteMatch = () => {
-  const { setToastModal, showToastModal } = useToastModal()
-  const { resetLoadingState, startLoading } = useLoading()
+  const { showErrorToast, showSuccessToast } = useToastModal()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   const { refetch: refetchMatches } = useFetchMatches()
   const { refetch: refetchAllMatches } = useFetchAllMatches()
   // const { state: matchesState, setter: setMatchesState } = useQueryState<MatchesType[]>(queryKeys.match)
@@ -158,7 +154,7 @@ export const useDeleteMatch = () => {
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
     }
   })
 
@@ -167,14 +163,12 @@ export const useDeleteMatch = () => {
       onSuccess: () => {
         refetchMatches()
         refetchAllMatches()
-        resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_DELETED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        hideFullScreenLoading()
+        showSuccessToast(MESSAGE.MATCH_DELETED)
       },
       onError: () => {
-        resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_DELETE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        hideFullScreenLoading()
+        showErrorToast(MESSAGE.MATCH_DELETE_FAILED)
       }
     })
   }
@@ -184,17 +178,17 @@ export const useDeleteMatch = () => {
 
 //! 試合結果の登録
 export const useMatchResult = () => {
-  const { setToastModal, showToastModal } = useToastModal()
+  const { showErrorToast, showSuccessToast } = useToastModal()
   const { refetch: refetchMatches } = useFetchMatches()
   const { refetch: refetchAllMatches } = useFetchAllMatches()
-  const { resetLoadingState, startLoading } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
 
   const api = async (resultData: MatchResultType) => {
     await Axios.post(`${API_PATH.MATCH_RESULT}`, resultData)
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
     }
   })
 
@@ -203,14 +197,12 @@ export const useMatchResult = () => {
       onSuccess: () => {
         refetchMatches()
         refetchAllMatches()
-        resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_RESULT_STORED, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        hideFullScreenLoading()
+        showSuccessToast(MESSAGE.MATCH_RESULT_STORED)
       },
       onError: () => {
-        resetLoadingState()
-        setToastModal({ message: MESSAGE.MATCH_RESULT_STORE_FAILED, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        hideFullScreenLoading()
+        showErrorToast(MESSAGE.MATCH_RESULT_STORE_FAILED)
       }
     })
   }

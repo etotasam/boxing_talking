@@ -3,7 +3,7 @@ import { MatchSetForm } from './MatchSetForm';
 import { MESSAGE } from '@/assets/statusesOnToastModal';
 import { cloneDeep } from 'lodash';
 //! type
-import { OrganizationsType } from '@/assets/types';
+import { OrganizationsType } from '@/types';
 //! hook
 import { useToastModal } from '@/hooks/useToastModal';
 //! data

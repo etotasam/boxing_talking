@@ -1,6 +1,6 @@
 //! types
 import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
-import { StanceType } from '@/assets/types';
+import { StanceType } from '@/types';
 // ! data
 import { STANCE } from '@/assets/boxerData';
 

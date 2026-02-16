@@ -2,7 +2,7 @@ import { useEffect, useContext } from 'react';
 import dayjs from 'dayjs';
 import { MESSAGE } from '@/assets/statusesOnToastModal';
 //! type
-import { MatchFormDataType, OrganizationsType } from '@/assets/types';
+import { MatchFormDataType, OrganizationsType } from '@/types';
 //! hook
 import { useToastModal } from '@/hooks/useToastModal';
 import { useRegisterMatch } from '@/hooks/apiHooks/useMatch';

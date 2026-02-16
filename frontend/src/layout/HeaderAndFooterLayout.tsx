@@ -4,7 +4,6 @@ import clsx from 'clsx';
 import { Footer } from '@/components/module/Footer';
 import { Header } from '@/components/module/Header';
 // ! hooks
-import { useLoading } from '@/hooks/useLoading';
 import { useWindowSize } from '@/hooks/useWindowSize';
 //! recoil
 import { useRecoilValue } from 'recoil';
@@ -16,16 +15,15 @@ import boxingMatch from '@/assets/images/etc/boxing_match.jpg';
 
 const HeaderAndFooterLayout = ({ children }: { children: React.ReactNode }) => {
   // ! use hook
-  const { resetLoadingState } = useLoading();
 
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   const footerHeight = useRecoilValue(elementSizeState('FOOTER_HEIGHT'));
 
   //? 初期設定(クリーンアップとか)
   useEffect(() => {
-    return () => {
-      resetLoadingState();
-    };
+    // return () => {
+    //   resetLoadingState();
+    // };
   }, []);
 
   return (

@@ -2,7 +2,7 @@ import { atom } from "recoil";
 // ! data
 import { initialBoxerDataOnForm } from "@/assets/boxerData";
 // ! types
-import { BoxerType } from "@/assets/types";
+import { BoxerType } from "@/types";
 
 
 const initialState = initialBoxerDataOnForm

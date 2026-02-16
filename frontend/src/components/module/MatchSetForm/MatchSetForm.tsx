@@ -7,7 +7,7 @@ import {
   WeightClassType,
   OrganizationsType,
   MatchUpdateFormType,
-} from '@/assets/types';
+} from '@/types';
 //! data
 import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
 import { COUNTRY } from '@/assets/nationalFlagData';

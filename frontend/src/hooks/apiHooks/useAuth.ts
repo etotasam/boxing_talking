@@ -15,12 +15,12 @@ import { authCheckingState } from "@/store/authCheckingState"
 // !hooks
 import { useMenuModal } from "../useMenuModal"
 import { useToastModal } from "../useToastModal"
-import { useLoading } from "../useLoading"
+import { useFullScreenLoading } from "../useFullScreenLoading"
 import { useLoginModal } from "../useLoginModal"
 import { useFetchUsersPrediction } from "./uesWinLossPrediction"
 import { useReactQuery } from "../useReactQuery"
 //! types
-import type { UserType } from "@/assets/types"
+import type { UserType } from "@/types"
 
 
 //! ゲストauthチェック
@@ -49,7 +49,7 @@ export const useGuestLogin = () => {
   // ? toast modal
   const { showErrorToast, showSuccessToast } = useToastModal()
   // ? Loading state
-  const { resetLoadingState, startLoading } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   // ? login modal (hook)
   const { hideLoginModal } = useLoginModal()
   const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
@@ -63,7 +63,7 @@ export const useGuestLogin = () => {
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
     }
   })
 
@@ -72,12 +72,12 @@ export const useGuestLogin = () => {
       onSuccess: () => {
         hideLoginModal()
         refetchMatchPrediction()
-        resetLoadingState()
+        hideFullScreenLoading()
         setReactQueryData<boolean>(QUERY_KEY.GUEST, true)
         showSuccessToast(MESSAGE.LOGIN_SUCCESS)
       },
       onError: (error: any) => {
-        resetLoadingState()
+        hideFullScreenLoading()
         if (error.data.errorCode === CUSTOM_ERROR_CODE.UNABLE_TO_GENERATE_GUEST_TODAY) {
           showErrorToast(MESSAGE.NOT_CREATE_GUEST_BY_LIMIT)
           return
@@ -96,7 +96,7 @@ export const useGuestLogout = () => {
   const queryClient = useQueryClient()
   const { showErrorToast, showSuccessToast } = useToastModal()
   const { hide: hideMenuModal } = useMenuModal()
-  const { resetLoadingState, startLoading, hasError, successful } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   // ? api
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const api = useCallback(async (_: unknown) => {
@@ -105,7 +105,7 @@ export const useGuestLogout = () => {
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
     }
   })
   const guestLogout = useCallback(() => {
@@ -114,16 +114,16 @@ export const useGuestLogout = () => {
         // ? ユーザー情報のキャッシュをclear
         refetchMatchPrediction()
         queryClient.setQueryData<boolean>(QUERY_KEY.GUEST, false)
-        successful()
+        // successful()
         showSuccessToast(MESSAGE.LOGOUT_SUCCESS)
         hideMenuModal()
       },
       onError: () => {
-        hasError()
+        // hasError()
         showErrorToast(MESSAGE.LOGOUT_FAILED)
       },
       onSettled: () => {
-        resetLoadingState()
+        hideFullScreenLoading()
       }
     })
   }, [])
@@ -160,7 +160,7 @@ export const usePreSignUp = () => {
   // ? toast modal
   const { showErrorToast } = useToastModal()
   // ? Loading state (hook)
-  const { startLoading, resetLoadingState } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
 
   type ApiPropsType = {
     name: string,
@@ -173,17 +173,17 @@ export const usePreSignUp = () => {
   }, [])
   const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
     }
   })
   const preSignUp = ({ name, email, password }: ApiPropsType) => {
     mutate({ name, email, password }, {
       onSuccess: () => {
-        resetLoadingState()
+        hideFullScreenLoading()
       },
 
       onError: (error: any) => {
-        resetLoadingState()
+        hideFullScreenLoading()
         if (error.status === 422) {
           const errorMessages = error.data.message as any
           if (errorMessages.email) {
@@ -259,7 +259,7 @@ export const useLogin = () => {
   // ? toast modal
   const { showSuccessToast, showErrorToast } = useToastModal()
   // ? Loading state
-  const { resetLoadingState, startLoading, hasError, successful } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   // ? login modal (hook)
   const { hideLoginModal } = useLoginModal()
   const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
@@ -272,7 +272,7 @@ export const useLogin = () => {
   }, [])
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
     }
   })
   const login = (props: { email: string, password: string }) => {
@@ -281,18 +281,16 @@ export const useLogin = () => {
       onSuccess: (userData) => {
         refetchMatchPrediction()
         hideLoginModal()
-        resetLoadingState()
+        hideFullScreenLoading()
         refetchAdmin()
         // ? ログインユーザーをreact query内でキャッシュする
         setReactQueryData<UserType | boolean>(QUERY_KEY.AUTH, userData)
-        successful()
         showSuccessToast(MESSAGE.LOGIN_SUCCESS)
 
       },
       // ! ログイン失敗時
       onError: () => {
-        resetLoadingState()
-        hasError()
+        hideFullScreenLoading()
         showErrorToast(MESSAGE.LOGIN_FAILED)
       }
     })
@@ -305,7 +303,7 @@ export const useLogout = () => {
   const { refetch: refetchMatchPrediction } = useFetchUsersPrediction()
   const queryClient = useQueryClient()
   const { showErrorToast, showGrayBackToast } = useToastModal()
-  const { resetLoadingState, startLoading, hasError, successful } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   const { hide: hideMenuModal } = useMenuModal()
   // ? api
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -316,7 +314,7 @@ export const useLogout = () => {
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
     }
   })
   const logout = () => {
@@ -326,16 +324,14 @@ export const useLogout = () => {
         queryClient.setQueryData(QUERY_KEY.AUTH, null)
         queryClient.invalidateQueries(QUERY_KEY.ADMIN)
         refetchMatchPrediction()
-        successful()
         showGrayBackToast(MESSAGE.LOGOUT_SUCCESS)
         hideMenuModal()
       },
       onError: () => {
-        hasError()
         showErrorToast(MESSAGE.LOGOUT_FAILED)
       },
       onSettled: () => {
-        resetLoadingState()
+        hideFullScreenLoading()
       }
     })
   }

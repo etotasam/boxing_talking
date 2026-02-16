@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 //! type
-import { BoxerType, MatchResultType, MatchDataType } from '@/assets/types';
+import { BoxerType, MatchResultType, MatchDataType } from '@/types';
 import { BOXER_STANCE_LABELS } from '@/assets/boxerData';
 //! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';

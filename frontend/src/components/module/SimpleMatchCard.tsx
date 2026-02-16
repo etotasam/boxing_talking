@@ -4,8 +4,8 @@ import clsx from 'clsx';
 import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 import { motion } from 'framer-motion';
 // ! types
-import { MatchDataType } from '@/assets/types';
-import { BoxerType } from '@/assets/types';
+import { MatchDataType } from '@/types';
+import { BoxerType } from '@/types';
 // ! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { VoteIconForTop } from '@/components/module/MatchComponent/component/VoteIcon';

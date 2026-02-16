@@ -1,16 +1,22 @@
-import React, { useEffect, useState, createContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/assets/routePath';
 
 //! types
-import { MatchDataType, MatchPredictionsType } from '@/assets/types';
+import { MatchDataType, MatchPredictionsType } from '@/types';
+import { DeviceStateType } from '@/store/deviceState';
+//! contexts
+import {
+  UsersPredictionContext,
+  MatchPredictionsContext,
+  UsersPredictionType,
+} from '@/contexts/MatchContext';
 // ! hook
 // import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
 import { useModalState } from '@/hooks/useModalState';
 import { useWindowSize } from '@/hooks/useWindowSize';
-import { useLoading } from '@/hooks/useLoading';
 import {
   useVoteMatchPrediction,
   useFetchUsersPrediction,
@@ -31,14 +37,13 @@ export const MatchContainer = (props: PropsType) => {
   const query = new URLSearchParams(search);
   const matchId = Number(query.get('match_id'));
   //? 勝敗予想投票実行時の状態hook
-  const { isSuccess: isSuccessVoteMatchPrediction } = useVoteMatchPrediction();
+  const { userPredictionPostState } = useVoteMatchPrediction();
   //? userの勝敗予想投票をすべて取得など…
   const { data: usersPredictions } = useFetchUsersPrediction();
   const { data: matchPredictions, refetch: refetchMatchPredictions } = useMatchPredictions(
     Number(matchId)
   );
 
-  const { resetLoadingState } = useLoading();
   const navigate = useNavigate();
   const { device } = useWindowSize();
 
@@ -57,18 +62,17 @@ export const MatchContainer = (props: PropsType) => {
 
   //? userこの試合の勝敗予想の有無(falseは未投票、undefinedはデータ未取得状態)
   const [thisMatchPredictionByUser, setThisMatchPredictionByUser] = useState<UsersPredictionType>();
-
   //? 読み込み時にscrollをtop位置へ移動
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   //? 初期設定(クリーンアップとか)
-  useEffect(() => {
-    return () => {
-      resetLoadingState();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     resetLoadingState();
+  //   };
+  // }, []);
 
   //? この試合の勝敗予想の有無とその投票
   useEffect(() => {
@@ -91,10 +95,10 @@ export const MatchContainer = (props: PropsType) => {
 
   //? コメント投稿に成功したら投票してねモーダルを消す&勝敗予想を再取得
   useEffect(() => {
-    if (isSuccessVoteMatchPrediction) {
+    if (userPredictionPostState === 'success') {
       refetchMatchPredictions();
     }
-  }, [isSuccessVoteMatchPrediction]);
+  }, [userPredictionPostState]);
 
   //? vote iconの表示/非表示の判断
   const isShowVoteIconState = useVoteIconState({
@@ -136,17 +140,12 @@ export const MatchContainer = (props: PropsType) => {
   );
 };
 
-//? context
-export type UsersPredictionType = 'red' | 'blue' | false | undefined;
-export const UsersPredictionContext = createContext<UsersPredictionType>(undefined);
-
+//? context wrapper
 type MatchContextWrapperType = {
   children: React.ReactNode;
   thisMatchPredictionByUser: UsersPredictionType;
   matchPredictions: MatchPredictionsType | undefined;
 };
-
-export const MatchPredictionsContext = createContext<MatchPredictionsType | undefined>(undefined);
 
 export const MatchContextWrapper = (props: MatchContextWrapperType) => {
   return (
