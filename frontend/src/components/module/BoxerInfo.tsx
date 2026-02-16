@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 // ! image
 import crown from '@/assets/images/etc/champion.svg';
 // ! types
-import { BoxerType, MatchResultType } from '@/assets/types';
+import { BoxerType, MatchResultType } from '@/types';
 // ! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { useEffect, useState } from 'react';

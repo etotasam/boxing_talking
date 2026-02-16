@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { MESSAGE } from '@/assets/statusesOnToastModal';
 import { pick } from 'lodash';
 //! type
-import { MatchDataType, MatchUpdateFormType, OrganizationsType } from '@/assets/types';
+import { MatchDataType, MatchUpdateFormType, OrganizationsType } from '@/types';
 //! hook
 import { useToastModal } from '@/hooks/useToastModal';
 import { useUpdateMatch } from '@/hooks/apiHooks/useMatch';

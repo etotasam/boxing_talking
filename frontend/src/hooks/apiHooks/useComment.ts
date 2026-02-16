@@ -7,10 +7,10 @@ import { QUERY_KEY } from "@/assets/queryKeys"
 import { API_PATH } from "@/assets/apiPath"
 //! hook
 // import { useAuth } from "@/hooks/useAuth"
-import { useLoading } from "@/hooks/useLoading"
+import { useFullScreenLoading } from "@/hooks/useFullScreenLoading"
 import { useToastModal } from "@/hooks/useToastModal"
 //! types
-import { CommentType } from "@/assets/types"
+import { CommentType } from "@/types"
 import { MESSAGE } from "@/assets/statusesOnToastModal"
 //! Recoil
 import { useRecoilState } from "recoil"
@@ -18,11 +18,11 @@ import { apiFetchState } from "@/store/apiFetchDataState"
 import dayjs from "dayjs"
 
 
-const LIMIT = 10
+const FETCH_COMMENTS_LIMIT_COUNT = 10
 //! コメントのmax page
 export const useFetchCommentsState = (matchId: number) => {
   const api = async () => {
-    const res = await Axios.get<{ maxPage: number, resentPostTime: string }>(API_PATH.COMMENT_STATE, { params: { matchId, limit: LIMIT } }).then(v => v.data)
+    const res = await Axios.get<{ maxPage: number, resentPostTime: string }>(API_PATH.COMMENT_STATE, { params: { matchId, limit: FETCH_COMMENTS_LIMIT_COUNT } }).then(v => v.data)
     return res
   }
 
@@ -41,7 +41,7 @@ export const useFetchComments = ({ matchId, createdAt, page }: { matchId: number
         matchId,
         createdAt,
         page,
-        limit: LIMIT
+        limit: FETCH_COMMENTS_LIMIT_COUNT
       },
     }).then(v => v.data)
     return res.data
@@ -253,7 +253,7 @@ export const useDeleteComment = () => {
 
   type ApiPropsType = { commentID: number, matchID: number }
   const { showErrorToast, showGrayBackToast } = useToastModal()
-  const { startLoading, resetLoadingState } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   const queryClient = useQueryClient()
 
   const api = useCallback(async ({ commentID }: ApiPropsType) => {
@@ -268,7 +268,7 @@ export const useDeleteComment = () => {
 
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
       // setIsCommentDeleting(true)
     }
   })
@@ -277,12 +277,12 @@ export const useDeleteComment = () => {
       onSuccess: () => {
         //? コメントの再取得。※refetch()を使うとmatchID=0での呼び出しが1回入るのでうざい
         queryClient.invalidateQueries([QUERY_KEY.COMMENT, { id: matchID }]);
-        resetLoadingState()
+        hideFullScreenLoading()
         showGrayBackToast(MESSAGE.COMMENT_DELETED)
         return
       },
       onError: (error: unknown) => {
-        resetLoadingState()
+        hideFullScreenLoading()
         if ((error as AxiosError).status === 419) {
           showErrorToast(MESSAGE.SESSION_EXPIRED)
           return

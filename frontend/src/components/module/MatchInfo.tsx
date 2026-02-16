@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 // ! types
-import { MatchDataType } from '@/assets/types';
+import { MatchDataType } from '@/types';
 // ! image
 import crown from '@/assets/images/etc/champion.svg';
 //! component

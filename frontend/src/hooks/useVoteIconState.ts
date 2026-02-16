@@ -4,7 +4,7 @@ import {
 } from '@/hooks/apiHooks/uesWinLossPrediction';
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 //! type
-import { MatchDataType } from '@/assets/types';
+import { MatchDataType } from '@/types';
 
 
 type PropsType = Pick<Partial<MatchDataType>, 'matchDate' | 'id'>

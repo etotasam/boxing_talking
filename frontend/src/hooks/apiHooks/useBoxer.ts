@@ -7,11 +7,11 @@ import { API_PATH } from "@/assets/apiPath"
 import { QUERY_KEY } from "@/assets/queryKeys"
 // //! hooks
 import { useReactQuery } from "../useReactQuery";
-import { useLoading } from "../useLoading"
+import { useFullScreenLoading } from "../useFullScreenLoading";
 import { useToastModal } from "../useToastModal";
-import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal";
+import { MESSAGE } from "@/assets/statusesOnToastModal";
 // //! types
-import type { BoxerType, CountryType } from "@/assets/types"
+import type { BoxerType, CountryType } from "@/types"
 
 
 //! boxerデータ取得 and 登録済み選手の数を取得
@@ -78,7 +78,7 @@ export const useFetchBoxers = () => {
 
 // //! boxerデータ更新
 export const useUpdateBoxerData = () => {
-  const { startLoading, resetLoadingState } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   const { refetchReactQueryArrayKeys } = useReactQuery()
   //? params page の取得
   const { showErrorToast, showSuccessToast } = useToastModal()
@@ -87,26 +87,25 @@ export const useUpdateBoxerData = () => {
   }
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: async () => {
-      startLoading()
-    }
+      showFullScreenLoading()
+    },
+    onSuccess: () => {
+      hideFullScreenLoading()
+      refetchReactQueryArrayKeys([QUERY_KEY.FETCH_MATCHES, QUERY_KEY.BOXER])
+      showSuccessToast(MESSAGE.FIGHTER_EDIT_SUCCESS)
+    },
+    onError: (error: any) => {
+      hideFullScreenLoading()
+      if (error.data.errorCode === 30) {
+        showErrorToast(error.data.message)
+        return
+      }
+      showErrorToast(MESSAGE.FIGHTER_EDIT_FAILED)
+    },
   })
 
   const updateBoxer = (updateFighterData: Pick<BoxerType, 'id'> & Partial<BoxerType>) => {
-    mutate(updateFighterData, {
-      onSuccess: () => {
-        resetLoadingState()
-        refetchReactQueryArrayKeys([QUERY_KEY.FETCH_MATCHES, QUERY_KEY.BOXER])
-        showSuccessToast(MESSAGE.FIGHTER_EDIT_SUCCESS);
-      },
-      onError: (error: any) => {
-        resetLoadingState()
-        if (error.data.errorCode === 30) {
-          showErrorToast(error.data.message);
-          return
-        }
-        showErrorToast(MESSAGE.FIGHTER_EDIT_FAILED);
-      },
-    })
+    mutate(updateFighterData,)
   }
   return { updateBoxer, isLoading, isSuccess }
 }
@@ -114,7 +113,7 @@ export const useUpdateBoxerData = () => {
 // //! boxer登録
 export const useRegisterBoxer = () => {
   const { refetchReactQueryData } = useReactQuery()
-  const { startLoading, resetLoadingState, successful } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   const { showSuccessToast, showErrorToast } = useToastModal()
   const api = useCallback(async (newBoxerData: Omit<BoxerType, "id">): Promise<void> => {
     await Axios.post<void>(API_PATH.BOXER, newBoxerData).then(v => v.data)
@@ -122,20 +121,19 @@ export const useRegisterBoxer = () => {
   }, []);
   const { mutate, isLoading, isError, isSuccess } = useMutation(api, {
     onMutate: async () => {
-      startLoading()
+      showFullScreenLoading()
     }
   })
   const registerBoxer = (newBoxerData: Omit<BoxerType, "id">) => {
     // const convertedBoxerDataBoxerData = convertToBoxerData(newBoxerData)
     mutate(newBoxerData, {
       onSuccess: () => {
-        successful()
-        resetLoadingState()
+        hideFullScreenLoading()
         showSuccessToast(MESSAGE.FIGHTER_REGISTER_SUCCESS)
         refetchReactQueryData(QUERY_KEY.BOXER)
       },
       onError: (error: any) => {
-        resetLoadingState()
+        hideFullScreenLoading()
         if (error.status === 422) {
           const errors = error.data.message as any
           if (errors.name) {
@@ -162,7 +160,7 @@ export const useRegisterBoxer = () => {
 // //! boxerデータ削除
 export const useDeleteBoxer = () => {
   const { refetch: RefetchBoxerData } = useFetchBoxers()
-  const { startLoading, resetLoadingState } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   const { showErrorToast, showSuccessToast } = useToastModal()
 
   //? api
@@ -172,19 +170,19 @@ export const useDeleteBoxer = () => {
 
   const { mutate, isLoading, isError, isSuccess } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
     }
   })
   const deleteBoxer = (boxerData: BoxerType) => {
     mutate(boxerData, {
       onSuccess: async () => {
-        resetLoadingState()
+        hideFullScreenLoading()
         showSuccessToast(MESSAGE.BOXER_DELETED)
         //? 選手データと選手数をリフェッチ
         RefetchBoxerData()
       },
       onError: (error: any) => {
-        resetLoadingState()
+        hideFullScreenLoading()
         const errorCode = error.data.errorCode
         if (errorCode === 30) {
           showErrorToast(MESSAGE.BOXER_IS_ALREADY_SETUP_MATCH)

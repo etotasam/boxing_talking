@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 //! type
-import { MatchUpdateFormType } from '@/assets/types';
+import { MatchUpdateFormType } from '@/types';
 //! context
 import { FormDataContext, initialFormData } from './FormDataContext';
 

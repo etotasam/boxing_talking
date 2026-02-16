@@ -6,12 +6,12 @@ import { API_PATH } from "@/assets/apiPath"
 import { MESSAGE } from "@/assets/statusesOnToastModal";
 import { QUERY_KEY } from "@/assets/queryKeys";
 //! hook
-import { useLoading } from "../useLoading"
+import { useFullScreenLoading } from "../useFullScreenLoading"
 import { useToastModal } from "../useToastModal";
 
 import { useGuest, useAuth } from "./useAuth";
 //! types
-import { PredictionType, MatchPredictionsType } from "@/assets/types"
+import { PredictionType, MatchPredictionsType } from "@/types"
 //! Recoil
 import { useRecoilState } from "recoil"
 import { apiFetchState } from "@/store/apiFetchDataState"
@@ -63,7 +63,7 @@ export const useVoteMatchPrediction = () => {
   const { refetch: refetchAllFetchMatchPredictionOfAuthUser } = useFetchUsersPrediction()
   // const { refetch: refetchMatches } = useFetchMatches()
   const { showErrorToast, showSuccessToast } = useToastModal()
-  const { startLoading, resetLoadingState } = useLoading()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   type ApiPropsType = {
     matchId: number,
     prediction: "red" | "blue"
@@ -77,13 +77,13 @@ export const useVoteMatchPrediction = () => {
   }, [])
   const { mutate, isLoading: isMutateLoading, isSuccess: isMutateSuccess, isError } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
     }
   })
   const matchVotePrediction = ({ matchId, prediction }: ApiPropsType) => {
     mutate({ matchId, prediction }, {
       onSettled: () => {
-        resetLoadingState()
+        hideFullScreenLoading()
       },
       onSuccess: () => {
         refetchAllFetchMatchPredictionOfAuthUser()
@@ -128,7 +128,7 @@ export const useVoteMatchPrediction = () => {
     }
   }, [isMutateLoading, isMutateSuccess, isError])
 
-  return { matchVotePrediction, userPredictionPostState }
+  return { matchVotePrediction, userPredictionPostState, isSuccess: isMutateSuccess, isError }
 }
 
 //!試合予想の投票数の取得

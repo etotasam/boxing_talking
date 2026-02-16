@@ -1,6 +1,6 @@
 import { ClearFullScreenDiv } from '@/components/atomic/ClearFullScreenDiv';
 import { MatchInfo } from '@/components/module/MatchInfo';
-import { MatchDataType } from '@/assets/types';
+import { MatchDataType } from '@/types';
 import { useModalState } from '@/hooks/useModalState';
 import { useWindowSize } from '@/hooks/useWindowSize';
 

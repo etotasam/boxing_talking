@@ -9,22 +9,20 @@ import HeaderAndFooterLayout from '@/layout/HeaderAndFooterLayout';
 import { SimpleMatchCard } from '@/components/module/SimpleMatchCard';
 //! hooks
 import { useFetchPastMatches } from '@/hooks/apiHooks/useMatch';
-import { useLoading } from '@/hooks/useLoading';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const PastMatches = () => {
-  const { resetLoadingState } = useLoading();
   const { data: pastMatches } = useFetchPastMatches();
 
   const navigate = useNavigate();
 
   //? 初期設定(クリーンアップとか)
-  useEffect(() => {
-    return () => {
-      resetLoadingState();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     resetLoadingState();
+  //   };
+  // }, []);
 
   const matchSelect = (matchId: number) => {
     navigate(`${ROUTE_PATH.PAST_MATCH_SINGLE}?match_id=${matchId}`);

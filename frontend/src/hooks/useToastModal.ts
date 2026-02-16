@@ -2,7 +2,7 @@
 import { useRecoilState } from "recoil"
 import { toastModalState } from "@/store/toastModalState"
 // !types
-import { MessageType, BgColorType } from "@/assets/types";
+import { MessageType, BgColorType } from "@/types";
 import { BG_COLOR_ON_TOAST_MODAL } from "@/assets/statusesOnToastModal";
 
 

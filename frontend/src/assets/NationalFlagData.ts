@@ -1,5 +1,5 @@
 // ! types
-import { CountryType } from '@/assets/types';
+import { CountryType } from '@/types';
 // ! Flags
 import japanFlag from '@/assets/images/flags/japan.svg';
 import usaFlag from '@/assets/images/flags/usa.svg';

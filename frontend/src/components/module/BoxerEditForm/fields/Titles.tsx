@@ -7,7 +7,7 @@ import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 //! data
 import { ORGANIZATIONS, WEIGHT_CLASS } from '@/assets/boxerData';
 //! types
-import type { BoxerType, OrganizationsType, WeightClassType } from '@/assets/types';
+import type { BoxerType, OrganizationsType, WeightClassType } from '@/types';
 // ! lodash
 import { cloneDeep, get } from 'lodash';
 

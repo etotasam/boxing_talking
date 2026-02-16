@@ -6,8 +6,8 @@ import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
 import { useLoginModal } from '@/hooks/useLoginModal';
-import { useLoading } from '@/hooks/useLoading';
 import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
+import { useFullScreenLoading } from '@/hooks/useFullScreenLoading';
 // ! modal
 import { ToastModalContainer } from '@/components/modal/ToastModal';
 import { LoginFormModal } from '@/components/modal/LoginFormModal';
@@ -17,11 +17,11 @@ import { MenuModal } from '@/components/modal/MenuModal';
 
 const Container = () => {
   const { isShowToastModal, hideToastModal, messageOnToast } = useToastModal();
-  const { isLoading: isAnyLoading } = useLoading();
   const { data: isAuth, isLoading: isFirstCheckingAuth } = useAuth();
   const { data: isGuest } = useGuest();
   const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } = useFetchBoxers();
   const { isLoading: isMatchesFetching } = useFetchMatches();
+  const { isLoading: isFullScreenLoading } = useFullScreenLoading();
   const navigate = useNavigate();
   const { state: isShowLoginModal, showLoginModal, hideLoginModal } = useLoginModal();
   const { pathname } = useLocation();
@@ -48,8 +48,9 @@ const Container = () => {
 
   //? authコントロール
   useEffect(() => {
-    const isAuthChecking = isAuth === undefined || isGuest === undefined;
-    if (isAuthChecking) return;
+    const isAuthUndefined = isAuth === undefined || isGuest === undefined;
+    if (isAuthUndefined) return;
+    // const isShowLoginModalCondition = [!isAuth, !isGuest,pathname !== '/identification/'].every((condition) => condition);
     if (!isAuth && !isGuest && pathname !== '/identification/') {
       showLoginModal();
       navigate(ROUTE_PATH.HOME);
@@ -58,9 +59,15 @@ const Container = () => {
     }
   }, [isAuth, isGuest, pathname]);
 
-  const isShowFullScreenSpinnerCondition = isAnyLoading || isRefetchingBoxers;
+  const isShowFullScreenSpinnerCondition = isFullScreenLoading || isRefetchingBoxers;
 
-  const isShowFirstLoadingCondition = isFirstCheckingAuth || isBoxersFetching || isMatchesFetching;
+  // const isShowFirstLoadingCondition = isFirstCheckingAuth || isBoxersFetching || isMatchesFetching;
+
+  const isShowFirstLoadingCondition = [
+    isFirstCheckingAuth,
+    isBoxersFetching,
+    isMatchesFetching,
+  ].some((condition) => condition);
 
   return (
     <>

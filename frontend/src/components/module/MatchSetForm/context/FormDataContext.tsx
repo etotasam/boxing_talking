@@ -1,5 +1,5 @@
 import React, { createContext } from 'react';
-import { MatchUpdateFormType, OrganizationsType } from '@/assets/types';
+import { MatchUpdateFormType, OrganizationsType } from '@/types';
 import dayjs from 'dayjs';
 
 export const initialFormData: MatchUpdateFormType = {

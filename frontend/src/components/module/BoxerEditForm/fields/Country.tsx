@@ -2,7 +2,7 @@
 import { COUNTRY } from '@/assets/nationalFlagData';
 
 //! types
-import { CountryType } from '@/assets/types';
+import { CountryType } from '@/types';
 import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 
 export const Country = (props: {

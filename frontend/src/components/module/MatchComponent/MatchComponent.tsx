@@ -2,7 +2,8 @@ import { ReactNode } from 'react';
 import clsx from 'clsx';
 
 //! type
-import { MatchDataType } from '@/assets/types';
+import { MatchDataType } from '@/types';
+import { DeviceStateType } from '@/store/deviceState';
 //! layout
 import HeaderOnlyLayout from '@/layout/HeaderOnlyLayout';
 
@@ -22,7 +23,7 @@ import { boolState } from '@/store/boolState';
 
 type PropsType = {
   matchData: MatchDataType;
-  device: 'PC' | 'SP';
+  device: DeviceStateType;
   isShowPredictionModal: boolean;
   showPredictionModal: () => void;
   // isHide: boolean;

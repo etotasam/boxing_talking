@@ -1,9 +1,9 @@
 import { useMemo } from "react"
 import { flatten } from 'lodash';
 //!types
-import { MatchDataType } from "@/assets/types"
+import { MatchDataType } from "@/types"
 //! func
-import { isMatchDatePast } from "@/assets/functions";
+import { isMatchDatePast } from "@/utils/match";
 
 //? 試合データの並び替え（試合日が今日以降のと過去のを分ける）
 export const useSortMatches = (matchesData: MatchDataType[] | undefined) => {

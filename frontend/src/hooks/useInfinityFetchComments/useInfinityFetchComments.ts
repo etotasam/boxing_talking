@@ -1,32 +1,24 @@
 import { useFetchNewComments, useFetchComments, useFetchCommentsState } from '@/hooks/apiHooks/useComment';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useQueryState } from '@/hooks/apiHooks/useQueryState';
-import { CommentType } from '@/assets/types';
+import { CommentType } from '@/types';
 //! Recoil
 import { useSetRecoilState } from "recoil"
 import { apiFetchState } from "@/store/apiFetchDataState"
 
 export const useInfinityFetchComments = (matchId: number) => {
 
+
   //? どこまで取得したかのpage数と取得したコメントはmergeしてキャッシュしておく
-  const [commentsData, setCommentsData] = useQueryState<{ page: number; comments: CommentType[] }>([
-    'cache/comments',
-    { matchId },
-  ]);
+  const cacheKey = useMemo(() => ['cache/comments', { matchId }], [matchId]);
+  const [commentsData, setCommentsData] = useQueryState<{ page: number; comments: CommentType[] }>(cacheKey);
 
   //? データがまだ取得出来てない場合loadingモーダルを表示する為のエフェクトとrecoil
-  // const setIsLoading = useSetRecoilState(apiFetchDataState({ dataName: "comments/fetch", state: "isLoading" }))
-  // useEffect(() => {
-  //   setIsLoading(!commentsData)
-  // }, [commentsData])
   const setCommentsFetchState = useSetRecoilState(apiFetchState("comments/fetch"))
+
   useEffect(() => {
-    if (!commentsData) {
-      setCommentsFetchState("loading")
-    } else {
-      setCommentsFetchState("idle")
-    }
-  }, [commentsData])
+    setCommentsFetchState(!commentsData ? "loading" : "idle")
+  }, [commentsData, setCommentsFetchState])
 
   //? 取得するコメントの数に基づくmaxPage数と最後の投稿のcreateAtタイムを取得
   const { data: commentState } = useFetchCommentsState(matchId);
@@ -49,9 +41,9 @@ export const useInfinityFetchComments = (matchId: number) => {
     setCommentsData((current) => {
       if (!current) return { page: 1, comments: FetchedComments };
       if (current.page >= commentState.maxPage) return current;
-      return { page: ++current.page, comments: [...current.comments, ...FetchedComments] };
+      return { page: current.page + 1, comments: [...current.comments, ...FetchedComments] };
     });
-  }, [FetchedComments]);
+  }, [FetchedComments, commentState, setCommentsData]);
 
   //? 初期fetchの実行 useQueryのenabledはfalseにしているのでページ読み込み完了後に実行させてる
   useEffect(() => {
@@ -61,7 +53,7 @@ export const useInfinityFetchComments = (matchId: number) => {
   }, [commentState]);
 
 
-  const refetch = () => {
+  const refetchComments = () => {
     if (commentState) {
       if (commentsData.page >= commentState.maxPage) return;
       if (commentFetchState === "refetching") return;
@@ -74,7 +66,7 @@ export const useInfinityFetchComments = (matchId: number) => {
 
   const data = commentsData ? commentsData.comments : undefined
   // const resentPostTime = commentState ? commentState.resentPostTime : undefined
-  return { data, refetch, commentFetchState, isNextComments }
+  return { data, refetchComments, commentFetchState, isNextComments }
 }
 
 

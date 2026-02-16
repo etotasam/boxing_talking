@@ -21,14 +21,14 @@ export const Comments = (props: PropsType) => {
   const { matchId } = props;
   const {
     data: comments,
-    refetch: refetchComments,
+    refetchComments,
     isNextComments,
     // isError: isErrorFetchComments,
   } = useInfinityFetchComments(matchId);
 
   const {
     data: newComments,
-    refetch: refetchNewComments,
+    refetch,
     isStale,
   } = useFetchNewCommentsContainer({
     matchId,
@@ -45,7 +45,7 @@ export const Comments = (props: PropsType) => {
 
   useEffect(() => {
     if (commentPostState !== 'success') return;
-    refetchNewComments();
+    refetch();
   }, [commentPostState]);
 
   const isComments =

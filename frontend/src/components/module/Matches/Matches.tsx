@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { MatchDataType } from '@/assets/types';
+import { MatchDataType } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 // ! components
 import { SimpleMatchCard } from '@/components/module/SimpleMatchCard';
@@ -17,7 +17,7 @@ type MatchesPropsType = {
   toMatchPage: (matchId: number) => void;
 };
 export const Matches = ({ beforeMatches, toMatchPage, afterMatches }: MatchesPropsType) => {
-  const [isShow, setIsShow] = useRecoilState(boolState('IS_SHOW_RESENT_MATCHES'));
+  const [isShow, setIsShow] = useRecoilState(boolState('IS_SHOW_RECENT_MATCHES'));
   const { device } = useWindowSize();
 
   return (

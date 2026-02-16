@@ -10,7 +10,7 @@ import { GiBoxingGlove } from 'react-icons/gi';
 import { AiOutlineUser } from 'react-icons/ai';
 import { RiTimeLine } from 'react-icons/ri';
 // ! types
-import { UserType } from '@/assets/types';
+import { UserType } from '@/types';
 //! hooks
 import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
 import { useWindowSize } from '@/hooks/useWindowSize';

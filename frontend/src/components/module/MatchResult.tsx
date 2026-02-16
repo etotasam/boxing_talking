@@ -1,9 +1,9 @@
 import { useRef } from 'react';
-import { MatchDataType } from '@/assets/types';
+import { MatchDataType } from '@/types';
 import clsx from 'clsx';
 import { useWindowSize } from '@/hooks/useWindowSize';
 //! type
-import { MatchResultType } from '@/assets/types';
+import { MatchResultType } from '@/types';
 
 export const MatchResult = ({ matchData }: { matchData: MatchDataType }) => {
   const { result } = matchData;

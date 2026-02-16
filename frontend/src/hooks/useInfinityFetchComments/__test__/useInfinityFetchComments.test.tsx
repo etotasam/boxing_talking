@@ -112,7 +112,7 @@ describe('useInfinityFetchComments', () => {
     const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper });
 
     //? 意図的にrefetchする
-    act(() => result.current.refetch());
+    act(() => result.current.refetchComments());
     //? refetch時には次のページのコメントを取得(page2)してmergeされたコメントが帰ってくる
     await waitFor(() => {
       expect(result.current.data).toEqual([...comments.page1, ...comments.page2]);
@@ -125,7 +125,7 @@ describe('useInfinityFetchComments', () => {
     const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper });
 
     //? 意図的に再refetchする
-    act(() => result.current.refetch());
+    act(() => result.current.refetchComments());
     //? 返ってくるコメントデータは変わらない
     await waitFor(() => {
       expect(result.current.data).toEqual([...comments.page1, ...comments.page2]);

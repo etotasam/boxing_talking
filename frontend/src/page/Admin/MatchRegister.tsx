@@ -4,8 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import AdminOnlyLayout from '@/layout/AdminOnlyLayout';
 // ! hooks
 import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
-import { BoxerType } from '@/assets/types';
-import { useLoading } from '@/hooks/useLoading';
+import { BoxerType } from '@/types';
 //! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
@@ -28,14 +27,13 @@ export const MatchRegister = () => {
     blue_boxer: undefined,
   };
   const [matchBoxers, setMatchBoxers] = useState<MatchBoxersType>(initialMatchBoxers);
-  const { resetLoadingState } = useLoading();
 
   //? 初期設定(クリーンアップとか)
-  useEffect(() => {
-    return () => {
-      resetLoadingState();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     resetLoadingState();
+  //   };
+  // }, []);
 
   return (
     <AdminOnlyLayout>

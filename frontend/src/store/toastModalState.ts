@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { MessageType, BgColorType } from "@/assets/types"
+import { MessageType, BgColorType } from "@/types"
 
 
 export type StateType = {
