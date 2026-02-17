@@ -78,9 +78,7 @@ const Container = ({ children }: { children: ReactNode }) => {
           backgroundRepeat: 'no-repeat',
         }}
       >
-        <div className={'w-full h-full bg-fixed backdrop-blur-[1px] bg-neutral-900/90'}>
-          {children}
-        </div>
+        <div className={'w-full h-full bg-fixed backdrop-blur-[1px] bg-base-bg/90'}>{children}</div>
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ export const MenuModal = () => {
           exit={{ y: '-100vh', opacity: 1, transition: { duration: 0.2 } }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
           style={{ height: `calc(100vh - ${0}px)` }}
-          className="bg-neutral-900 w-full z-10 fixed top-0 flex justify-center text-white"
+          className="bg-base-bg/90 w-full z-10 fixed top-0 flex justify-center text-white"
         >
           <motion.div
             initial={{ opacity: 0 }}

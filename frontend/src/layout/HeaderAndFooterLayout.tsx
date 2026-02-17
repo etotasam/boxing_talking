@@ -61,7 +61,7 @@ const Background = ({ children }: { children: React.ReactNode }) => {
     >
       <div
         className={clsx(
-          'bg-fixed w-full h-[100vh] bg-neutral-900/90 backdrop-blur-[1px] overflow-auto'
+          'bg-fixed w-full h-[100vh] bg-base-bg/90 backdrop-blur-[1px] overflow-auto'
         )}
       >
         {children}
