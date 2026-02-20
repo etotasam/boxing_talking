@@ -38,32 +38,27 @@ export const MatchComponent = (props: PropsType) => {
   const voteIconBottomPosition = (useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT')) ?? 0) + 5;
 
   return (
-    // <HeaderOnlyLayout>
     <>
-      <Container>
-        <Main matchData={matchData} />
-        <MatchCommentsModal matchId={matchData.id} />
-        <div className="absolute bottom-0 w-full">
-          <PostComment />
+      <Main matchData={matchData} />
+      {/* <MatchCommentsModal matchId={matchData.id} /> */}
+      <div className="absolute bottom-0 w-full">
+        <PostComment />
+      </div>
+
+      {isShowVoteIcon && (
+        <div
+          className={clsx('fixed ', device === 'SP' ? 'right-[10px]' : 'right-[50px]')}
+          style={{ bottom: voteIconBottomPosition }}
+        >
+          <VoteIcon
+            isScroll={isScroll}
+            showPredictionModal={showPredictionModal}
+            bottomPosition={voteIconBottomPosition}
+          />
         </div>
-
-        {isShowVoteIcon && (
-          <div
-            className={clsx('fixed ', device === 'SP' ? 'right-[10px]' : 'right-[50px]')}
-            style={{ bottom: voteIconBottomPosition }}
-          >
-            <VoteIcon
-              isScroll={isScroll}
-              showPredictionModal={showPredictionModal}
-              bottomPosition={voteIconBottomPosition}
-            />
-          </div>
-        )}
-      </Container>
-
+      )}
       {isShowPredictionModal && <PredictionVoteModal thisMatch={matchData} />}
     </>
-    // </HeaderOnlyLayout>
   );
 };
 
@@ -94,10 +89,10 @@ const Main = ({ matchData }: { matchData: MatchDataType }) => {
   );
 
   return (
-    <main className="h-[100vh] w-[100vw] overflow-auto">
+    <main className="w-[100vw] overflow-auto">
       <div
         className="w-full flex justify-center"
-        style={{ paddingTop: headerHeightState, paddingBottom: commentsModalHeightHiddenState }}
+        style={{ paddingBottom: commentsModalHeightHiddenState }}
       >
         <MatchInfo matchData={matchData} />
       </div>

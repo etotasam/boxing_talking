@@ -4,11 +4,15 @@ import { RotatingLines } from 'react-loader-spinner';
 
 export const FullScreenSpinnerModal = ({ isShow }: { isShow: boolean }) => {
   React.useEffect(() => {
-    document.body.style.overflowY = 'hidden';
+    if (isShow) {
+      document.body.style.overflowY = 'hidden';
+    } else {
+      document.body.style.overflowY = 'scroll';
+    }
     return () => {
       document.body.style.overflowY = 'scroll';
     };
-  }, []);
+  }, [isShow]);
   return (
     // <AnimatePresence>
     <>

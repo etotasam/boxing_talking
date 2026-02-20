@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'framer-motion';
-import { ToastModal } from '.';
+import { ToastModal } from './ToastModal';
 // ! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 

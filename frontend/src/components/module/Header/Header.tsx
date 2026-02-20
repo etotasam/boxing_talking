@@ -41,15 +41,18 @@ export const Header = () => {
     <>
       <header
         ref={headerRef}
-        style={device === 'SP' ? { width: `100%` } : { width: `calc(100% - 10px)` }}
-        className={clsx('z-10 h-[80px] fixed top-0 left-0 flex backdrop-blur-sm text-stone-200')}
+        className={clsx(
+          'z-10 h-[80px] w-full fixed top-0 left-0 backdrop-blur-md hover:h-[90px] text-white hover:bg-red-600 duration-500'
+        )}
       >
-        <SiteTitle />
+        <div className="w-full fixed top-0 left-0 flex">
+          <SiteTitle />
 
-        {device === 'PC' && <LinksComponent pathname={pathname} />}
-        {device === 'SP' && <Hamburger />}
+          {device === 'PC' && <LinksComponent pathname={pathname} />}
+          {device === 'SP' && <Hamburger />}
 
-        <AuthInfo />
+          <AuthInfo />
+        </div>
       </header>
     </>
   );
@@ -57,7 +60,11 @@ export const Header = () => {
 
 const SiteTitle = () => {
   const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
-  return <h1 className={clsx('shadow-blur sm:text-[48px] text-[32px] font-thin')}>{siteTitle}</h1>;
+  return (
+    <h1 className={clsx('pointer-events-none sm:text-[48px] text-[32px] font-bold')}>
+      {siteTitle}
+    </h1>
+  );
 };
 
 const AuthInfo = () => {

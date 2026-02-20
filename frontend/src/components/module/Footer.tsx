@@ -19,7 +19,7 @@ export const Footer = () => {
     <>
       <div
         ref={footerRef}
-        className="relative w-full h-[50px] border-t-[1px] border-stone-200 text-stone-400"
+        className="mt-auto relative w-full h-[50px] border-t-[1px] border-stone-200 text-stone-400"
       >
         <div className="flex absolute bottom-2 right-10">
           {location.pathname !== '/terms' && (
