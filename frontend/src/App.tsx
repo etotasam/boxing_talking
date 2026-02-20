@@ -28,7 +28,6 @@ function App() {
         <Route element={<Container />}>
           <Route path={ROUTE_PATH.HOME} element={<Home />} />
           <Route path={ROUTE_PATH.PAST_MATCHES} element={<PastMatches />} />
-          {/* <Route path={ROUTE_PATH.MATCH} element={<Match />} /> */}
           <Route path={ROUTE_PATH.MATCH} element={<Match />} />
           <Route path={ROUTE_PATH.PAST_MATCH_SINGLE} element={<PastMatch />} />
 

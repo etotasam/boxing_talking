@@ -136,17 +136,15 @@ const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
   return (
     <>
       <ul className="absolute bottom-2 sm:static flex sm:items-end sm:mb-4">
-        {pathname !== ROUTE_PATH.HOME && (
-          <li className="md:ml-5 ml-2">
-            <ToBoxMatchLinkButton />
-          </li>
-        )}
+        <li className="md:ml-5 ml-2">
+          {/* <ToBoxMatchLinkButton /> */}
+          <Link to={ROUTE_PATH.HOME}>Schedule</Link>
+        </li>
 
-        {pathname !== ROUTE_PATH.PAST_MATCHES && (
-          <li className="md:ml-5 ml-2">
-            <ToPastMatchesPageLinkButton />
-          </li>
-        )}
+        <li className="md:ml-5 ml-2">
+          {/* <ToPastMatchesPageLinkButton /> */}
+          <Link to={ROUTE_PATH.PAST_MATCHES}>Match Result</Link>
+        </li>
 
         {device === 'SP' &&
           (pathname === ROUTE_PATH.MATCH || pathname === ROUTE_PATH.PAST_MATCH_SINGLE) && (
