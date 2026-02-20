@@ -12,19 +12,13 @@ import { elementSizeState } from '@/store/elementSizeState';
 import topImg_1 from '@/assets/images/etc/boxerImg.jpg';
 import manOnTheRing from '@/assets/images/etc/man_on_the_ring.jpg';
 import boxingMatch from '@/assets/images/etc/boxing_match.jpg';
+import { Outlet } from 'react-router-dom';
 
-const HeaderAndFooterLayout = ({ children }: { children: React.ReactNode }) => {
+const HeaderAndFooterLayout = () => {
   // ! use hook
 
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   const footerHeight = useRecoilValue(elementSizeState('FOOTER_HEIGHT'));
-
-  //? 初期設定(クリーンアップとか)
-  useEffect(() => {
-    // return () => {
-    //   resetLoadingState();
-    // };
-  }, []);
 
   return (
     <>
@@ -36,7 +30,7 @@ const HeaderAndFooterLayout = ({ children }: { children: React.ReactNode }) => {
             marginTop: `${headerHeight}px`,
           }}
         >
-          {children}
+          <Outlet />
         </div>
         <Footer />
       </Background>

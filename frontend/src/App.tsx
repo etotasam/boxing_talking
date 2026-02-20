@@ -20,16 +20,22 @@ import { Test } from '@/page/Test';
 import AdminOnly from './middleware/AdminOnly';
 import Container from './middleware/Container';
 import './App.css';
+import HeaderAndFooterLayout from './layout/HeaderAndFooterLayout';
+import HeaderOnlyLayout from './layout/HeaderOnlyLayout';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<Container />}>
-          <Route path={ROUTE_PATH.HOME} element={<Home />} />
-          <Route path={ROUTE_PATH.PAST_MATCHES} element={<PastMatches />} />
-          <Route path={ROUTE_PATH.MATCH} element={<Match />} />
-          <Route path={ROUTE_PATH.PAST_MATCH_SINGLE} element={<PastMatch />} />
+          <Route element={<HeaderAndFooterLayout />}>
+            <Route path={ROUTE_PATH.HOME} element={<Home />} />
+            <Route path={ROUTE_PATH.PAST_MATCHES} element={<PastMatches />} />
+          </Route>
+          <Route element={<HeaderOnlyLayout />}>
+            <Route path={ROUTE_PATH.MATCH} element={<Match />} />
+            <Route path={ROUTE_PATH.PAST_MATCH_SINGLE} element={<PastMatch />} />
+          </Route>
 
           <Route element={<AdminOnly />}>
             <Route path={ROUTE_PATH.BOXER_EDIT} element={<BoxerEdit />} />

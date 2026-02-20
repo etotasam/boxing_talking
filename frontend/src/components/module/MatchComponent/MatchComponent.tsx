@@ -38,7 +38,8 @@ export const MatchComponent = (props: PropsType) => {
   const voteIconBottomPosition = (useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT')) ?? 0) + 5;
 
   return (
-    <HeaderOnlyLayout>
+    // <HeaderOnlyLayout>
+    <>
       <Container>
         <Main matchData={matchData} />
         <MatchCommentsModal matchId={matchData.id} />
@@ -61,7 +62,8 @@ export const MatchComponent = (props: PropsType) => {
       </Container>
 
       {isShowPredictionModal && <PredictionVoteModal thisMatch={matchData} />}
-    </HeaderOnlyLayout>
+    </>
+    // </HeaderOnlyLayout>
   );
 };
 

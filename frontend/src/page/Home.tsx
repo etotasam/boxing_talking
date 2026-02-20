@@ -10,9 +10,9 @@ export const Home = () => {
 
   return (
     <>
-      <HeaderAndFooterLayout>
-        <Matches />
-      </HeaderAndFooterLayout>
+      {/* <HeaderAndFooterLayout> */}
+      <Matches />
+      {/* </HeaderAndFooterLayout> */}
     </>
   );
 };

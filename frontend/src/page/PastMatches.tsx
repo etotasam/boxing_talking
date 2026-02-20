@@ -31,14 +31,16 @@ export const PastMatches = () => {
   //? 過去の試合が見つからない時
   if (pastMatches && Boolean(!pastMatches.length))
     return (
-      <HeaderAndFooterLayout>
+      // <HeaderAndFooterLayout>
+      <>
         <Helmet>
           <title>過去の試合 | {siteTitle}</title>
         </Helmet>
         <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
           <div>過去の試合が見つかりませんでした</div>
         </div>
-      </HeaderAndFooterLayout>
+      </>
+      // </HeaderAndFooterLayout>
     );
 
   //? 正常にデータ取得が完了した時
@@ -47,20 +49,20 @@ export const PastMatches = () => {
       <Helmet>
         <title>過去の試合 | {siteTitle}</title>
       </Helmet>
-      <HeaderAndFooterLayout>
-        {pastMatches && (
-          <ul className="md:py-10">
-            {pastMatches.map((match) => (
-              <li
-                key={match.id}
-                className="w-full h-full flex justify-center items-center pb-3 first:mt-0"
-              >
-                <SimpleMatchCard matchData={match} onClick={matchSelect} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </HeaderAndFooterLayout>
+      {/* <HeaderAndFooterLayout> */}
+      {pastMatches && (
+        <ul className="md:py-10">
+          {pastMatches.map((match) => (
+            <li
+              key={match.id}
+              className="w-full h-full flex justify-center items-center pb-3 first:mt-0"
+            >
+              <SimpleMatchCard matchData={match} onClick={matchSelect} />
+            </li>
+          ))}
+        </ul>
+      )}
+      {/* </HeaderAndFooterLayout> */}
     </>
   );
 };

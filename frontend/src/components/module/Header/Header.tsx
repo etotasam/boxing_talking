@@ -1,14 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/routePath';
 import { motion } from 'framer-motion';
 //! icon
 import { IoLogOutSharp } from 'react-icons/io5';
-import { BsCalendar3 } from 'react-icons/bs';
 import { GiBoxingGlove } from 'react-icons/gi';
 import { AiOutlineUser } from 'react-icons/ai';
-import { RiTimeLine } from 'react-icons/ri';
 // ! types
 import { UserType } from '@/types';
 //! hooks
@@ -126,6 +124,18 @@ const GuestIcon = () => {
   );
 };
 
+const LINK_STYLES = {
+  common: 'text-[14px] duration-300 px-4 py-1 rounded-[50px]',
+  currentPage: 'text-black bg-yellow-400 pointer-events-none',
+  normalPage: 'text-white hover:bg-gray-500/50 hover:scale-[110%]',
+} as const;
+
+const getLinkClassName = (targetPath: string, currentPath: string) =>
+  clsx(
+    LINK_STYLES.common,
+    currentPath === targetPath ? LINK_STYLES.currentPage : LINK_STYLES.normalPage
+  );
+
 type LinksComponentsPropsType = {
   pathname: string;
 };
@@ -137,13 +147,18 @@ const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
     <>
       <ul className="absolute bottom-2 sm:static flex sm:items-end sm:mb-4">
         <li className="md:ml-5 ml-2">
-          {/* <ToBoxMatchLinkButton /> */}
-          <Link to={ROUTE_PATH.HOME}>Schedule</Link>
+          <Link className={getLinkClassName(ROUTE_PATH.HOME, pathname)} to={ROUTE_PATH.HOME}>
+            Schedule
+          </Link>
         </li>
 
         <li className="md:ml-5 ml-2">
-          {/* <ToPastMatchesPageLinkButton /> */}
-          <Link to={ROUTE_PATH.PAST_MATCHES}>Match Result</Link>
+          <Link
+            className={getLinkClassName(ROUTE_PATH.PAST_MATCHES, pathname)}
+            to={ROUTE_PATH.PAST_MATCHES}
+          >
+            Match Result
+          </Link>
         </li>
 
         {device === 'SP' &&
@@ -159,57 +174,6 @@ const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
           </li>
         )}
       </ul>
-    </>
-  );
-};
-
-const ToBoxMatchLinkButton = () => {
-  const [isShowDescription, setIsShowDescription] = useState(false);
-  const { device } = useWindowSize();
-
-  return (
-    <>
-      <div className="relative">
-        {isShowDescription && (
-          <div className="absolute top-[-22px] left-0 w-[60px] text-center py-[1px] select-none bg-white/90 text-stone-700 rounded-md text-xs">
-            <p>試合一覧</p>
-          </div>
-        )}
-        <Link to={ROUTE_PATH.HOME}>
-          <LinkButton
-            onMouseEnter={device === 'PC' ? () => setIsShowDescription(true) : () => {}}
-            onMouseLeave={device === 'PC' ? () => setIsShowDescription(false) : () => {}}
-          >
-            <BsCalendar3 />
-          </LinkButton>
-        </Link>
-      </div>
-    </>
-  );
-};
-
-const ToPastMatchesPageLinkButton = () => {
-  const [isShowDescription, setIsShowDescription] = useState(false);
-  const { device } = useWindowSize();
-
-  return (
-    <>
-      <div className="relative">
-        {isShowDescription && (
-          <div className="absolute top-[-22px] left-0 w-[100px] text-center py-[1px] select-none bg-white/90 text-stone-700 rounded-md text-xs">
-            <p>過去の試合一覧</p>
-          </div>
-        )}
-        <Link to={ROUTE_PATH.PAST_MATCHES}>
-          <LinkButton
-            className="text-[20px] hover:text-[22px]"
-            onMouseEnter={device === 'PC' ? () => setIsShowDescription(true) : () => {}}
-            onMouseLeave={device === 'PC' ? () => setIsShowDescription(false) : () => {}}
-          >
-            <RiTimeLine />
-          </LinkButton>
-        </Link>
-      </div>
     </>
   );
 };
