@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/assets/routePath';
@@ -47,18 +47,27 @@ export const MatchContainer = (props: PropsType) => {
   const navigate = useNavigate();
   const { device } = useWindowSize();
 
-  const [thisMatch, setThisMatch] = useState<MatchDataType>();
-
-  //? 試合の存在確認を確認、なければリダイレクト
+  // const [thisMatch, setThisMatch] = useState<MatchDataType>();
+  const thisMatch = useMemo(
+    () => props.matches?.find((match) => match.id === matchId),
+    [props.matches, matchId]
+  );
   useEffect(() => {
-    if (!props.matches) return;
-    const match = props.matches?.find((match) => match.id === matchId);
-    if (match) {
-      setThisMatch(match);
-    } else {
+    if (props.matches && !thisMatch) {
       navigate(ROUTE_PATH.HOME);
     }
-  }, [matchId, props.matches]);
+  }, [props.matches, thisMatch]);
+
+  //? 試合の存在確認を確認、なければリダイレクト
+  // useEffect(() => {
+  //   if (!props.matches) return;
+  //   const match = props.matches?.find((match) => match.id === matchId);
+  //   if (match) {
+  //     setThisMatch(match);
+  //   } else {
+  //     navigate(ROUTE_PATH.HOME);
+  //   }
+  // }, [matchId, props.matches]);
 
   //? userこの試合の勝敗予想の有無(falseは未投票、undefinedはデータ未取得状態)
   const [thisMatchPredictionByUser, setThisMatchPredictionByUser] = useState<UsersPredictionType>();
@@ -66,13 +75,6 @@ export const MatchContainer = (props: PropsType) => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  //? 初期設定(クリーンアップとか)
-  // useEffect(() => {
-  //   return () => {
-  //     resetLoadingState();
-  //   };
-  // }, []);
 
   //? この試合の勝敗予想の有無とその投票
   useEffect(() => {
