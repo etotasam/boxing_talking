@@ -22,7 +22,7 @@ export const Home = () => {
 
   return (
     <div className="flex flex-col" style={{ minHeight: `calc(100vh - ${headerHeight}px)` }}>
-      <div className="flex-1">
+      <div className="relative flex-1">
         <Matches
           beforeMatches={beforeMatches}
           afterMatches={afterMatches}

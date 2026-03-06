@@ -27,27 +27,14 @@ export const PastMatches = () => {
     [navigate]
   );
 
-  if (!pastMatches)
-    return (
-      <CommonLayout>
-        <div>読み込み中...</div>
-      </CommonLayout>
-    );
+  //? データ取得中
+  if (!pastMatches) return <Loading />;
 
   //? 過去の試合が見つからない時
-  if (pastMatches && Boolean(!pastMatches.length))
-    return (
-      <CommonLayout>
-        <NoMatches />
-      </CommonLayout>
-    );
+  if (pastMatches.length === 0) return <NoMatches />;
 
   //? 正常にデータ取得が完了した時
-  return (
-    <CommonLayout>
-      <ShowMatches pastMatches={pastMatches} matchSelect={matchSelect} />
-    </CommonLayout>
-  );
+  return <ShowMatches pastMatches={pastMatches} matchSelect={matchSelect} />;
 };
 
 const CommonLayout = ({ children }: { children: React.ReactNode }) => {
@@ -74,25 +61,39 @@ const ShowMatches = ({
   matchSelect: (matchId: number) => void;
 }) => {
   return (
-    <div className="flex-1">
-      <ul className="md:py-10">
-        {pastMatches.map((match) => (
-          <li
-            key={match.id}
-            className="w-full h-full flex justify-center items-center pb-3 first:mt-0"
-          >
-            <SimpleMatchCard matchData={match} onClick={matchSelect} />
-          </li>
-        ))}
-      </ul>
-    </div>
+    <CommonLayout>
+      <div className="flex-1">
+        <ul className="md:py-10">
+          {pastMatches.map((match) => (
+            <li
+              key={match.id}
+              className="w-full h-full flex justify-center items-center pb-3 first:mt-0"
+            >
+              <SimpleMatchCard matchData={match} onClick={matchSelect} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </CommonLayout>
   );
 };
 
 const NoMatches = () => {
   return (
-    <div className="flex-1 flex items-center justify-center">
-      <div>過去の試合が見つかりませんでした</div>
-    </div>
+    <CommonLayout>
+      <div className="flex-1 flex items-center justify-center">
+        <div>過去の試合が見つかりませんでした</div>
+      </div>
+    </CommonLayout>
+  );
+};
+
+const Loading = () => {
+  return (
+    <CommonLayout>
+      <div className="flex-1 flex items-center justify-center">
+        <div>読み込み中...</div>
+      </div>
+    </CommonLayout>
   );
 };

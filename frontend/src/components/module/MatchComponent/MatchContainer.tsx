@@ -47,27 +47,16 @@ export const MatchContainer = (props: PropsType) => {
   const navigate = useNavigate();
   const { device } = useWindowSize();
 
-  // const [thisMatch, setThisMatch] = useState<MatchDataType>();
   const thisMatch = useMemo(
     () => props.matches?.find((match) => match.id === matchId),
     [props.matches, matchId]
   );
+  //? 試合の存在確認を確認、なければリダイレクト
   useEffect(() => {
     if (props.matches && !thisMatch) {
       navigate(ROUTE_PATH.HOME);
     }
   }, [props.matches, thisMatch]);
-
-  //? 試合の存在確認を確認、なければリダイレクト
-  // useEffect(() => {
-  //   if (!props.matches) return;
-  //   const match = props.matches?.find((match) => match.id === matchId);
-  //   if (match) {
-  //     setThisMatch(match);
-  //   } else {
-  //     navigate(ROUTE_PATH.HOME);
-  //   }
-  // }, [matchId, props.matches]);
 
   //? userこの試合の勝敗予想の有無(falseは未投票、undefinedはデータ未取得状態)
   const [thisMatchPredictionByUser, setThisMatchPredictionByUser] = useState<UsersPredictionType>();

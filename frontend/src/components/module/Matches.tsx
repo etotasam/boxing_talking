@@ -1,13 +1,7 @@
 import clsx from 'clsx';
 import { MatchDataType } from '@/types';
-import { motion, AnimatePresence } from 'framer-motion';
 // ! components
 import { SimpleMatchCard } from '@/components/module/SimpleMatchCard';
-//!recoil
-import { useRecoilState } from 'recoil';
-import { boolState } from '@/store/boolState';
-//! icons
-import { FaArrowAltCircleDown } from 'react-icons/fa';
 //! hooks
 import { useWindowSize } from '@/hooks/useWindowSize';
 
@@ -17,25 +11,12 @@ type MatchesPropsType = {
   toMatchPage: (matchId: number) => void;
 };
 export const Matches = ({ beforeMatches, toMatchPage, afterMatches }: MatchesPropsType) => {
-  const [isShow, setIsShow] = useRecoilState(boolState('IS_SHOW_RECENT_MATCHES'));
   const { device } = useWindowSize();
 
   return (
     <>
       {!!beforeMatches.length && (
-        <ul className={clsx('md:pt-10')}>
-          {beforeMatches.map((match) => (
-            <li
-              key={match.id}
-              className={clsx(
-                'w-full h-full flex justify-center items-center pb-3 first:mt-0',
-                device === 'SP' ? 'px-2' : 'px-0'
-              )}
-            >
-              <SimpleMatchCard onClick={toMatchPage} matchData={match} />
-            </li>
-          ))}
-        </ul>
+        <MatchesListComponent matches={beforeMatches} toMatchPage={toMatchPage} />
       )}
 
       {!!afterMatches.length && (
@@ -54,23 +35,30 @@ export const Matches = ({ beforeMatches, toMatchPage, afterMatches }: MatchesPro
             </div>
           </div>
 
-          <div className="overflow-hidden md:mb-5">
-            <ul>
-              {afterMatches.map((match) => (
-                <li
-                  key={match.id}
-                  className={clsx(
-                    'w-full h-full flex justify-center items-center pb-3 first:pt-3',
-                    device === 'SP' ? 'px-2' : 'px-0'
-                  )}
-                >
-                  <SimpleMatchCard onClick={toMatchPage} matchData={match} />
-                </li>
-              ))}
-            </ul>
-          </div>
+          <MatchesListComponent matches={afterMatches} toMatchPage={toMatchPage} />
         </div>
       )}
     </>
+  );
+};
+
+const MatchesListComponent = ({
+  matches,
+  toMatchPage,
+}: {
+  matches: MatchDataType[];
+  toMatchPage: (matchId: number) => void;
+}) => {
+  return (
+    <ul className={clsx('md:pt-10')}>
+      {matches.map((match) => (
+        <li
+          key={match.id}
+          className={clsx('w-full h-full flex justify-center items-center pb-3 first:mt-0', 'px-2')}
+        >
+          <SimpleMatchCard onClick={toMatchPage} matchData={match} />
+        </li>
+      ))}
+    </ul>
   );
 };

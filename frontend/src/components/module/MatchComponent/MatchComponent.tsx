@@ -41,7 +41,7 @@ export const MatchComponent = (props: PropsType) => {
     <>
       <Main matchData={matchData} />
       {/* <MatchCommentsModal matchId={matchData.id} /> */}
-      <div className="absolute bottom-0 w-full">
+      <div className="fixed bottom-0 w-full">
         <PostComment />
       </div>
 
@@ -57,7 +57,7 @@ export const MatchComponent = (props: PropsType) => {
           />
         </div>
       )}
-      {isShowPredictionModal && <PredictionVoteModal thisMatch={matchData} />}
+      {/* {isShowPredictionModal && <PredictionVoteModal thisMatch={matchData} />} */}
     </>
   );
 };
@@ -96,6 +96,7 @@ const Main = ({ matchData }: { matchData: MatchDataType }) => {
       >
         <MatchInfo matchData={matchData} />
       </div>
+      <MatchCommentsModal matchId={matchData.id} />
     </main>
   );
 };
