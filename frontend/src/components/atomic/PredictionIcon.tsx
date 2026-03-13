@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { MdHowToVote } from 'react-icons/md';
 import { motion } from 'framer-motion';
 //!type
@@ -19,18 +19,16 @@ export const PredictionIcon = ({ matchData, iconType = 'DEFAULT' }: PropsType) =
 
   const { isDayOnFight, isDayAfterFight } = useDayOfFightChecker(matchData.matchDate);
 
-  const [isHide, setIsHide] = useState(true);
-  useEffect(() => {
-    if (!Array.isArray(allPrediction)) return setIsHide(true);
-    if (isDayAfterFight === undefined || isDayAfterFight === true) return setIsHide(true);
-    if (isDayOnFight === undefined || isDayOnFight === true) return setIsHide(true);
+  const isHide = useMemo(() => {
+    if (isDayAfterFight === undefined || isDayAfterFight === true) return true;
+    if (isDayOnFight === undefined || isDayOnFight === true) return true;
+    if (!Array.isArray(allPrediction)) return true;
 
     const isVoteToThisMatch = allPrediction.some((obj) => obj.matchId === matchData.id);
-    setIsHide(isVoteToThisMatch);
-  }, [allPrediction, isDayAfterFight, isDayOnFight]);
+    return isVoteToThisMatch;
+  }, [allPrediction, isDayAfterFight, isDayOnFight, matchData.id]);
 
   if (isHide) return;
-
   if (iconType === 'DEFAULT') return <PredictionIconDefault />;
   if (iconType === 'MINI') return <PredictionIconMini />;
 };

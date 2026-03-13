@@ -9,6 +9,8 @@ import { formTypeState, FORM_TYPE } from '@/store/formTypeState';
 import { usePreSignUp } from '@/hooks/apiHooks/useAuth';
 //! component
 import { CustomButton } from '@/components/atomic/Button';
+//! utils
+import { validateName, validateEmail, validatePassword } from '@/utils/validation/signUpValidation';
 
 export const SignUpForm = () => {
   const { preSignUp, isSuccess: isSuccessPreRegister } = usePreSignUp();
@@ -17,35 +19,12 @@ export const SignUpForm = () => {
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [isPassedValidateName, setIsPassedValidateName] = useState<boolean>();
-  const [isPassedValidateEmail, setIsPassedValidateEmail] = useState<boolean>();
-  const [isPassedValidatePassword, setIsPassedValidatePassword] = useState<boolean>();
+  //? バリデーション（stateではなく、レンダリング毎に再計算される通常変数）
+  const isPassedValidateName = validateName(name);
+  const isPassedValidateEmail = validateEmail(email);
+  const { hasUppercase: isValidUppercase, isValidLength, hasNumber: isValidHasNumber, isValid: isPassedValidatePassword } = validatePassword(password);
   //? すべての検証状態
   const isValidated = isPassedValidateName && isPassedValidateEmail && isPassedValidatePassword;
-
-  useEffect(() => {
-    const state = name.length >= 3 && name.length <= 30;
-    setIsPassedValidateName(state);
-  }, [name]);
-  useEffect(() => {
-    const emailValidationRegex =
-      /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
-    setIsPassedValidateEmail(emailValidationRegex.test(email));
-  }, [email]);
-  useEffect(() => {
-    const state = isValidUppercase && isValidLength && isValidHasNumber;
-    setIsPassedValidatePassword(state);
-  }, [password]);
-
-  //? passwordに大文字が含まれてるか
-  const uppercaseRegex = /[A-Z]+/;
-  const isValidUppercase = uppercaseRegex.test(password);
-  //? passwordに文字数制限
-  const lengthRegex = /^.{8,24}$/;
-  const isValidLength = lengthRegex.test(password);
-  //? passwordに数字が含まれてるか
-  const numberRegex = /[0-9]/;
-  const isValidHasNumber = numberRegex.test(password);
 
   /**
    * Form Send (User Resist)
