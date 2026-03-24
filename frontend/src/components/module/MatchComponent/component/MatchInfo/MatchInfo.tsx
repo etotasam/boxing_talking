@@ -209,7 +209,7 @@ const BoxerRecord = (props: BoxerRecordType) => {
       </li>
       <li
         className={clsx(
-          "relative flex-1 bg-stone-800 before:content-['LOSE'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
+          "relative flex-1 bg-stone-800 before:content-['LOSS'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
           resultState === 'loss'
             ? 'before:text-red-400 before:font-bold text-yellow-300'
             : 'before:text-stone-500'

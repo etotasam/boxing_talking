@@ -6,7 +6,6 @@ import crown from '@/assets/images/etc/champion.svg';
 import { BoxerType, MatchResultType } from '@/types';
 // ! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
-import { useEffect, useState } from 'react';
 //! hooks
 // import { useWindowSize } from '@/hooks/useWindowSize';
 
@@ -51,44 +50,20 @@ const BoxerResume = (props: BoxerResumeType) => {
   const { boxer, matchResult } = props;
 
   //試合結果が登録されているかどうか
-  const result = matchResult?.result ?? false;
+  const result = matchResult?.result;
   const isResult = Boolean(result);
 
   const isKo = matchResult?.detail
     ? matchResult.detail === 'ko' || matchResult.detail === 'tko'
     : false;
 
-  // const [isWin, setIsWin] = useState<boolean>();
-  // const [isLoss, setIsLoss] = useState<boolean>();
-  // const [isDraw, setIsDraw] = useState<boolean>();
-
-  const [resultState, setResultState] = useState<'win' | 'loss' | 'draw' | null>(null);
-
-  //? isWin, isLoss, isDrawをセットする関数
-  const setWinLoseResult = () => {
-    if (result === boxer.color) {
-      // setIsWin(true);
-      setResultState('win');
-      return;
-    }
-
-    if (isResult && result !== boxer.color && result !== 'draw' && result !== 'no-contest') {
-      // setIsLoss(true);
-      setResultState('loss');
-      return;
-    }
-
-    if (result === 'draw') {
-      // setIsDraw(true);
-      setResultState('draw');
-      return;
-    }
-  };
-
-  useEffect(() => {
-    if (!isResult) return;
-    setWinLoseResult();
-  }, [isResult]);
+  const resultState = ((): 'win' | 'loss' | 'draw' | null => {
+    if (!isResult) return null;
+    if (result === boxer.color) return 'win';
+    if (result === 'draw') return 'draw';
+    if (result !== 'no-contest') return 'loss';
+    return null;
+  })();
   return (
     <ul className="flex justify-between w-full mt-5 text-white">
       <li
@@ -121,7 +96,7 @@ const BoxerResume = (props: BoxerResumeType) => {
       </li>
       <li
         className={clsx(
-          "relative flex-1 bg-stone-800 before:content-['LOSE'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
+          "relative flex-1 bg-stone-800 before:content-['LOSS'] before:absolute before:top-[-20px] before:left-[50%] before:translate-x-[-50%] before:text-sm",
           resultState === 'loss'
             ? 'before:text-red-400 before:font-bold text-yellow-300'
             : 'before:text-gray-600'

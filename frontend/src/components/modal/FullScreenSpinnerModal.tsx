@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { RotatingLines } from 'react-loader-spinner';
 
 export const FullScreenSpinnerModal = ({ isShow }: { isShow: boolean }) => {
@@ -14,7 +13,6 @@ export const FullScreenSpinnerModal = ({ isShow }: { isShow: boolean }) => {
     };
   }, [isShow]);
   return (
-    // <AnimatePresence>
     <>
       {isShow && (
         <div
@@ -24,6 +22,5 @@ export const FullScreenSpinnerModal = ({ isShow }: { isShow: boolean }) => {
         </div>
       )}
     </>
-    // </AnimatePresence>
   );
 };
