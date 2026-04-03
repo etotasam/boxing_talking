@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 //! icons
 import { GiBoxingGlove } from 'react-icons/gi';
 
-//! hook
-import { useModalState } from '@/hooks/useModalState';
 import { useRecoilValue } from 'recoil';
 import { deviceState } from '@/store/deviceState';
 

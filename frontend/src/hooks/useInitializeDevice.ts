@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
-import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
+import { DEVICE_BREAKPOINT } from '@/assets/deviceBreakpoint';
 import { deviceState } from '@/store/deviceState';
 
 export const useInitializeDevice = () => {
@@ -9,7 +9,7 @@ export const useInitializeDevice = () => {
   useEffect(() => {
     const updateDevice = () => {
       const width = window.innerWidth;
-      const nextDevice = width > TAILWIND_BREAKPOINT.pc ? 'PC' : 'SP';
+      const nextDevice = width > DEVICE_BREAKPOINT.pc ? 'PC' : 'SP';
       setDevice(nextDevice);
     };
 

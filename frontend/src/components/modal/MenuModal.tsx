@@ -7,8 +7,6 @@ import { useMenuModal } from '@/hooks/useMenuModal';
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 import { deviceState } from '@/store/deviceState';
-//! icon
-import { IoLogOutSharp } from 'react-icons/io5';
 import { useEffect } from 'react';
 
 export const MenuModal = () => {
@@ -67,14 +65,5 @@ const Content = () => {
         ))}
       </ul>
     </div>
-  );
-};
-
-const LogoutIcon = () => {
-  return (
-    <button className="fixed top-[40px] right-0 flex items-center text-xs px-[3px] py-[2px] bg-neutral-800 text-neutral-500">
-      <IoLogOutSharp className={'text-xl mr-1'} />
-      ログアウト
-    </button>
   );
 };

@@ -75,12 +75,12 @@ const server = setupServer(
   }),
 
   //? コメントのmaxPageと最新のコメントのcreated_atの取得リクエスト
-  rest.get(`${baseURL}${API_PATH.COMMENT_STATE}`, (req, res, ctx) => {
+  rest.get(`${baseURL}${API_PATH.COMMENT_STATE}`, (_req, res, ctx) => {
     return res(ctx.status(200), ctx.json({ maxPage, resentPostTime: '2024-03-12 03:58:00' }));
   }),
 
   //? 新しいコメント取得リクエスト
-  rest.get(`${baseURL}${API_PATH.COMMENT_NEW}`, (req, res, ctx) => {
+  rest.get(`${baseURL}${API_PATH.COMMENT_NEW}`, (_req, res, ctx) => {
     return res(ctx.status(200), ctx.json({ data: mockFetchNewComments() }));
   })
 );

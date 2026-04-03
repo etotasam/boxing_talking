@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { isEqual, pickBy } from 'lodash';
 import { Helmet } from 'react-helmet-async';
-//! layout wrapper
-import AdminOnlyLayout from '@/layout/AdminOnlyLayout';
 //! data
-import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/assets/statusesOnToastModal';
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
 
 //! recoil
@@ -146,7 +144,7 @@ export const BoxerEdit = () => {
   };
 
   return (
-    <AdminOnlyLayout>
+    <>
       <Helmet>
         <title>Boxer編集 | {siteTitle}</title>
       </Helmet>
@@ -175,7 +173,7 @@ export const BoxerEdit = () => {
           cancel={hideDeleteConformModal}
         />
       )}
-    </AdminOnlyLayout>
+    </>
   );
 };
 

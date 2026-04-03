@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
-//! layout wrapper
-import AdminOnlyLayout from '@/layout/AdminOnlyLayout';
 // ! data
 import { MESSAGE } from '@/assets/statusesOnToastModal';
 import { initialBoxerDataOnForm } from '@/assets/boxerData';
@@ -59,7 +57,7 @@ export const BoxerRegister = () => {
   };
 
   return (
-    <AdminOnlyLayout>
+    <>
       <Helmet>
         <title>Boxer登録 | {siteTitle}</title>
       </Helmet>
@@ -72,6 +70,6 @@ export const BoxerRegister = () => {
           boxerCurrentData={boxerCurrentData}
         />
       </div>
-    </AdminOnlyLayout>
+    </>
   );
 };

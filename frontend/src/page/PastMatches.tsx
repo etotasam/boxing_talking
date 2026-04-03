@@ -3,12 +3,8 @@ import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/assets/routePath';
 // ! components
 import { SimpleMatchCard } from '@/components/module/SimpleMatchCard';
-import { Footer } from '@/components/module/Footer';
 //! hooks
 import { useFetchPastMatches } from '@/hooks/apiHooks/useMatch';
-//! recoil
-import { useRecoilValue } from 'recoil';
-import { elementSizeState } from '@/store/elementSizeState';
 // ! types
 import { MatchDataType } from '@/types';
 import { useCallback } from 'react';
@@ -37,18 +33,13 @@ export const PastMatches = () => {
   return <ShowMatches pastMatches={pastMatches} matchSelect={matchSelect} />;
 };
 
-const CommonLayout = ({ children }: { children: React.ReactNode }) => {
-  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
-
+const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <Helmet>
         <title>過去の試合 | {siteTitle}</title>
       </Helmet>
-      <div className="flex flex-col" style={{ minHeight: `calc(100vh - ${headerHeight}px)` }}>
-        {children}
-        <Footer />
-      </div>
+      <div className="flex flex-col">{children}</div>
     </>
   );
 };
@@ -61,7 +52,7 @@ const ShowMatches = ({
   matchSelect: (matchId: number) => void;
 }) => {
   return (
-    <CommonLayout>
+    <Layout>
       <div className="flex-1">
         <ul className="pc:py-10">
           {pastMatches.map((match) => (
@@ -74,26 +65,26 @@ const ShowMatches = ({
           ))}
         </ul>
       </div>
-    </CommonLayout>
+    </Layout>
   );
 };
 
 const NoMatches = () => {
   return (
-    <CommonLayout>
+    <Layout>
       <div className="flex-1 flex items-center justify-center">
         <div>過去の試合が見つかりませんでした</div>
       </div>
-    </CommonLayout>
+    </Layout>
   );
 };
 
 const Loading = () => {
   return (
-    <CommonLayout>
+    <Layout>
       <div className="flex-1 flex items-center justify-center">
         <div>読み込み中...</div>
       </div>
-    </CommonLayout>
+    </Layout>
   );
 };

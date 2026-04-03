@@ -1,21 +1,15 @@
-import { ReactNode } from 'react';
 import clsx from 'clsx';
 
 //! type
 import { MatchDataType } from '@/types';
 import { DeviceStateType } from '@/store/deviceState';
-//! layout
-import HeaderOnlyLayout from '@/layout/HeaderOnlyLayout';
 
 //! component
 import { MatchInfo } from './component/MatchInfo';
 import { PostComment } from './component/PostComment';
-import { PredictionVoteModal } from './component/PredictionVoteModal';
 
 import { VoteIcon } from './component/VoteIcon';
 import { MatchCommentsModal } from './component/MatchCommentsModal';
-//! image/icon
-import GGGPhoto from '@/assets/images/etc/GGG.jpg';
 //! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
@@ -30,7 +24,7 @@ type PropsType = {
   isShowVoteIcon: boolean;
 };
 export const MatchComponent = (props: PropsType) => {
-  const { matchData, isShowPredictionModal, isShowVoteIcon, showPredictionModal, device } = props;
+  const { matchData, isShowVoteIcon, showPredictionModal, device } = props;
 
   const isScroll = useRecoilValue(boolState('IS_SCROLL'));
 
@@ -62,27 +56,7 @@ export const MatchComponent = (props: PropsType) => {
   );
 };
 
-const Container = ({ children }: { children: ReactNode }) => {
-  // const headerHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
-  return (
-    <div className="w-full h-[100vh] flex justify-center">
-      <div
-        className={clsx('relative w-full')}
-        style={{
-          backgroundImage: `url(${GGGPhoto})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
-      >
-        <div className={'w-full h-full bg-fixed backdrop-blur-[1px] bg-base-bg/90'}>{children}</div>
-      </div>
-    </div>
-  );
-};
-
 const Main = ({ matchData }: { matchData: MatchDataType }) => {
-  const headerHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   //? コメントモーダルが非表示時の高さ分をpaddingにしてスクロールされる様にする
   const commentsModalHeightHiddenState = useRecoilValue(
     elementSizeState('COMMENTS_MODAL_HIDDEN_HEIGHT')

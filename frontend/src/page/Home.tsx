@@ -2,16 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/routePath';
 // ! components
 import { Matches } from '@/components/module/Matches';
-import { Footer } from '@/components/module/Footer';
-//! recoil
-import { useRecoilValue } from 'recoil';
-import { elementSizeState } from '@/store/elementSizeState';
 // ! hooks
 import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
 import { useSortMatches } from '@/hooks/useSortMatches';
 
 export const Home = () => {
-  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   const { data: matchesData } = useFetchMatches();
   const { beforeMatches, afterMatches } = useSortMatches(matchesData);
   const navigate = useNavigate();
@@ -21,7 +16,7 @@ export const Home = () => {
   };
 
   return (
-    <div className="flex flex-col" style={{ minHeight: `calc(100vh - ${headerHeight}px)` }}>
+    <div className="flex flex-col">
       <div className="relative flex-1">
         <Matches
           beforeMatches={beforeMatches}
@@ -29,7 +24,6 @@ export const Home = () => {
           toMatchPage={matchSelect}
         />
       </div>
-      <Footer />
     </div>
   );
 };

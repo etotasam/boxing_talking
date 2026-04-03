@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { MatchDataType } from '@/types';
 import dayjs from 'dayjs';
 
 

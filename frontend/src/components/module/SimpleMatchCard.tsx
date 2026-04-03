@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
 // ! types
 import { MatchDataType } from '@/types';
 import { BoxerType } from '@/types';
@@ -10,11 +8,9 @@ import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { VoteIconForTop } from '@/components/module/MatchComponent/component/VoteIcon';
 // ! image
 import { GiImperialCrown } from 'react-icons/gi';
-import { MdHowToVote } from 'react-icons/md';
 
 //! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
-import { useFetchUsersPrediction } from '@/hooks/apiHooks/uesWinLossPrediction';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
 import { useRecoilValue } from 'recoil';
 import { deviceState } from '@/store/deviceState';
@@ -30,8 +26,6 @@ export const SimpleMatchCard = ({
   onClick,
 }: // isPredictionVote,
 PropsType) => {
-  const isMatchResult = !!matchData.result;
-
   const isShowVoteIcon = useVoteIconState({ matchDate: matchData.matchDate, id: matchData.id });
   return (
     <>
@@ -184,38 +178,5 @@ const GradeNonTitleMatch = ({ matchData }: { matchData: MatchDataType }) => {
         {matchData.weight}級 {matchData.grade}
       </p>
     </div>
-  );
-};
-
-const VoteIcon = ({ matchData }: { matchData: MatchDataType }) => {
-  const { isDayOnFight, isDayAfterFight } = useDayOfFightChecker(matchData.matchDate);
-  const { data: usersPredictions } = useFetchUsersPrediction();
-
-  const [isHide, setIsHide] = useState(true);
-  useEffect(() => {
-    //? ユーザーの投票をfetch出来てない時は隠す
-    if (usersPredictions === undefined) return setIsHide(true);
-    //? 過去の試合には表示しない
-    if (isDayAfterFight === undefined || isDayAfterFight === true) return setIsHide(true);
-    //? 当日は表示しない
-    if (isDayOnFight === undefined || isDayOnFight === true) return setIsHide(true);
-    //? ユーザーのこの試合への投票の有無で表示を決定させる
-
-    const isVote = usersPredictions.some((obj) => obj.matchId === matchData.id);
-    setIsHide(isVote);
-  }, [usersPredictions, isDayAfterFight, isDayOnFight]);
-
-  if (isHide) return;
-
-  return (
-    <>
-      <motion.div
-        animate={{ x: [0, 3, -3, 0] }}
-        transition={{ duration: 0.3, repeat: Infinity, repeatDelay: 3 }}
-        className="bg-green-600 p-1 rounded-[50%] text-neutral-900 text-xs"
-      >
-        <MdHowToVote />
-      </motion.div>
-    </>
   );
 };

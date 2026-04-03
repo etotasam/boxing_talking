@@ -17,19 +17,19 @@ export const Footer = () => {
   const location = useLocation();
   return (
     <>
-      <div
+      <footer
         ref={footerRef}
-        className="mt-auto relative w-full h-[50px] border-t-[1px] border-stone-200 text-stone-400"
+        className="mt-auto relative w-full h-[30px] border-stone-200 text-stone-400"
       >
         <div className="flex absolute bottom-2 right-10">
           {location.pathname !== '/terms' && (
-            <Link to={ROUTE_PATH.TERMS} className="text-stone-500 text-sm mr-5">
+            <Link to={ROUTE_PATH.TERMS} className="text-stone-500 pc:text-sm text-xs mr-5">
               利用規約
             </Link>
           )}
-          <p className="pc:text-sm text-[8px] select-none">©2023 BOXING TALKING</p>
+          <p className="pc:text-sm text-xs select-none">©2023 BOXING TALKING</p>
         </div>
-      </div>
+      </footer>
     </>
   );
 };
