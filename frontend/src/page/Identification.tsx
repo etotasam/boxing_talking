@@ -43,7 +43,7 @@ export const Identification = () => {
         }}
         className="flex justify-center items-center"
       >
-        <div className="flex justify-center items-center max-w-[600px] w-[70%] min-w-[200px] lg:h-[300px] sm:h-[250px] h-[150px] bg-white border-[1px] border-stone-600 shadow-lg">
+        <div className="flex justify-center items-center max-w-[600px] w-[70%] min-w-[200px] pc:h-[300px] sm:h-[250px] h-[150px] bg-white border-[1px] border-stone-600 shadow-lg">
           {authCheckState.isLoading && <Authenticating />}
           {authCheckState.isSuccess && <SuccessRegister />}
           {authCheckState.isError && <FiledAuth />}

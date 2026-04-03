@@ -5,7 +5,7 @@ import { ROUTE_PATH } from '@/assets/routePath';
 
 //! types
 import { MatchDataType, MatchPredictionsType } from '@/types';
-import { DeviceStateType } from '@/store/deviceState';
+import { deviceState } from '@/store/deviceState';
 //! contexts
 import {
   UsersPredictionContext,
@@ -16,12 +16,12 @@ import {
 // import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
 import { useModalState } from '@/hooks/useModalState';
-import { useWindowSize } from '@/hooks/useWindowSize';
 import {
   useVoteMatchPrediction,
   useFetchUsersPrediction,
   useMatchPredictions,
 } from '@/hooks/apiHooks/uesWinLossPrediction';
+import { useRecoilValue } from 'recoil';
 //! component
 import { MatchComponent } from './MatchComponent';
 
@@ -45,7 +45,7 @@ export const MatchContainer = (props: PropsType) => {
   );
 
   const navigate = useNavigate();
-  const { device } = useWindowSize();
+  const device = useRecoilValue(deviceState);
 
   const thisMatch = useMemo(
     () => props.matches?.find((match) => match.id === matchId),

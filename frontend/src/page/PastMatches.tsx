@@ -63,7 +63,7 @@ const ShowMatches = ({
   return (
     <CommonLayout>
       <div className="flex-1">
-        <ul className="md:py-10">
+        <ul className="pc:py-10">
           {pastMatches.map((match) => (
             <li
               key={match.id}

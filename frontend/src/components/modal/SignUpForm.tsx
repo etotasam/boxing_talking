@@ -22,7 +22,12 @@ export const SignUpForm = () => {
   //? バリデーション（stateではなく、レンダリング毎に再計算される通常変数）
   const isPassedValidateName = validateName(name);
   const isPassedValidateEmail = validateEmail(email);
-  const { hasUppercase: isValidUppercase, isValidLength, hasNumber: isValidHasNumber, isValid: isPassedValidatePassword } = validatePassword(password);
+  const {
+    hasUppercase: isValidUppercase,
+    isValidLength,
+    hasNumber: isValidHasNumber,
+    isValid: isPassedValidatePassword,
+  } = validatePassword(password);
   //? すべての検証状態
   const isValidated = isPassedValidateName && isPassedValidateEmail && isPassedValidatePassword;
 
@@ -65,7 +70,7 @@ export const SignUpForm = () => {
         onMouseDown={(e) => {
           e.stopPropagation();
         }}
-        className="md:w-[550px] md:h-[600px] sm:w-2/3 sm:h-2/3 w-[95%] max-w-[500px] h-auto bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
+        className="pc:w-[550px] pc:h-[600px] sm:w-2/3 sm:h-2/3 w-[95%] max-w-[500px] h-auto bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
       >
         <motion.div
           initial={{ opacity: 0 }}
@@ -170,7 +175,7 @@ const PreSignUpModal = ({ onClick }: { onClick: (bool: boolean) => void }) => {
     >
       <div
         onMouseDown={(e) => e.stopPropagation()}
-        className="relative flex justify-center items-center md:w-[700px] md:h-[400px] sm:w-2/3 sm:h-2/3 w-[95%] h-2/3 shadow-lg shadow-black/30 bg-white border-[1px] border-stone-600"
+        className="relative flex justify-center items-center pc:w-[700px] pc:h-[400px] sm:w-2/3 sm:h-2/3 w-[95%] h-2/3 shadow-lg shadow-black/30 bg-white border-[1px] border-stone-600"
       >
         <AiOutlineClose
           onClick={handleCloseModal}

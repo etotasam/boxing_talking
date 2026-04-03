@@ -13,6 +13,9 @@ export default {
         'base-bg': colors.neutral[900],
       }
     },
+    screens: {
+      'pc': '768px',
+    }
   },
   plugins: [
     containerQueries,

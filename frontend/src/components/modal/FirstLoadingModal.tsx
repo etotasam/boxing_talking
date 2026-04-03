@@ -16,7 +16,7 @@ export const FirstLoadingModal = ({ isShow }: { isShow: boolean }) => {
             exit={{ opacity: 0, translateY: -30, transition: { duration: 0.3 } }}
             className=" text-stone-100"
           >
-            <h1 className="lg:text-[50px] sm:text-[36px] text-[24px] font-bold text-center select-none">
+            <h1 className="pc:text-[50px] sm:text-[36px] text-[24px] font-bold text-center select-none">
               {siteTitle}
             </h1>
             <div className="flex justify-center items-center mt-8">

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import clsx from 'clsx';
-import { TAILWIND_BREAKPOINT } from '@/assets/tailwindcssBreakpoint';
 import { motion } from 'framer-motion';
 // ! types
 import { MatchDataType } from '@/types';
@@ -14,10 +13,11 @@ import { GiImperialCrown } from 'react-icons/gi';
 import { MdHowToVote } from 'react-icons/md';
 
 //! hook
-import { useWindowSize } from '@/hooks/useWindowSize';
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useFetchUsersPrediction } from '@/hooks/apiHooks/uesWinLossPrediction';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
+import { useRecoilValue } from 'recoil';
+import { deviceState } from '@/store/deviceState';
 
 type PropsType = {
   matchData: MatchDataType;
@@ -32,10 +32,6 @@ export const SimpleMatchCard = ({
 PropsType) => {
   const isMatchResult = !!matchData.result;
 
-  const { windowSize = 0 } = useWindowSize();
-  const predictionIconType: 'DEFAULT' | 'MINI' =
-    windowSize > TAILWIND_BREAKPOINT.md ? 'DEFAULT' : 'MINI';
-
   const isShowVoteIcon = useVoteIconState({ matchDate: matchData.matchDate, id: matchData.id });
   return (
     <>
@@ -44,8 +40,8 @@ PropsType) => {
           onClick={() => onClick(matchData.id)}
           className={clsx(
             'relative flex justify-between w-full max-w-[1024px] cursor-pointer border-[1px] border-neutral-700  text-stone-300 bg-stone-50/10 rounded-md',
-            'md:w-[80%] md:hover:bg-red-600/80 hover:white md:hover:border-neutral-300 md:duration-300'
-            // isMatchResult ? 'md:pt-2 md:pb-1 py-1' : 'md:py-4 py-8'
+            'pc:w-[80%] pc:hover:bg-red-600/80 hover:white pc:hover:border-neutral-300 pc:duration-300'
+            // isMatchResult ? 'pc:pt-2 pc:pb-1 py-1' : 'pc:py-4 py-8'
           )}
         >
           <BoxerBox boxer={matchData.redBoxer} />
@@ -68,7 +64,7 @@ PropsType) => {
 };
 
 const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
-  const { device } = useWindowSize();
+  const device = useRecoilValue(deviceState);
   //名前が10文字以上で"・"を含む場合、最後の部分を取り出してフォーマット
   let formattedName: string | undefined;
   if (boxer.name.length > 10 && boxer.name.includes('・')) {

@@ -31,7 +31,7 @@ export const CommentsExist = (props: CommentsExistType) => {
   return (
     <>
       {/* {isComments && ( */}
-      <div className="md:w-[85%] sm:w-[85%] w-[95%] max-w-[800px]">
+      <div className="pc:w-[85%] sm:w-[85%] w-[95%] max-w-[800px]">
         {newComments?.map((comment) => (
           <motion.div
             layout

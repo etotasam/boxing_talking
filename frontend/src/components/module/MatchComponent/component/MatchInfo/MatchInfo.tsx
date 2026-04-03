@@ -8,8 +8,8 @@ import { BOXER_STANCE_LABELS } from '@/assets/boxerData';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 // import { SubHeadline } from '@/components/atomic/SubHeadline';
 import { FlagImage } from '@/components/atomic/FlagImage';
-//! hooks
-import { useWindowSize } from '@/hooks/useWindowSize';
+import { useRecoilValue } from 'recoil';
+import { deviceState } from '@/store/deviceState';
 //! icon
 import crown from '@/assets/images/etc/champion.svg';
 import fall_of_crown from '@/assets/images/etc/fall_champion.svg';
@@ -38,7 +38,7 @@ export const MatchInfo = ({ matchData }: MatchInfoPropsType) => {
 };
 
 const BoxersData = ({ matchData }: MatchInfoPropsType) => {
-  const { device } = useWindowSize();
+  const device = useRecoilValue(deviceState);
   return (
     <div className={clsx('text-white relative flex justify-between w-full max-w-[1024px]')}>
       <div className={`${device === 'PC' ? 'w-[45%]' : 'w-[50%]'}`}>
@@ -68,7 +68,7 @@ type BoxerInfoPropsType = React.ComponentProps<'div'> & {
 };
 const BoxerInfo = (props: BoxerInfoPropsType) => {
   const { className, boxer, matchResult = null, matchDate } = props;
-  const { device } = useWindowSize();
+  const device = useRecoilValue(deviceState);
   return (
     <div className={clsx('w-full h-full flex justify-center', className)}>
       <div className={clsx('text-center w-full py-5', device === 'PC' ? 'px-5' : 'px-2')}>

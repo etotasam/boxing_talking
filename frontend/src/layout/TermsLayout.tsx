@@ -1,10 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import { ROUTE_PATH } from '@/assets/routePath';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-// ! hooks
-import { useWindowSize } from '@/hooks/useWindowSize';
 //! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
@@ -43,7 +41,6 @@ const TermsLayout = ({ children }: { children: React.ReactNode }) => {
 export default TermsLayout;
 
 const Background = ({ children }: { children: React.ReactNode }) => {
-  const { device } = useWindowSize();
   return (
     <div className={clsx('bg-fixed w-full h-[100vh] bg-neutral-100 text-stone-800 overflow-auto')}>
       {children}
@@ -81,7 +78,7 @@ const Footer = () => {
     <>
       <div className="relative w-full h-[50px] border-t-[1px] border-stone-500 text-stone-500">
         <div className="flex absolute bottom-2 right-10">
-          <p className="md:text-sm text-[8px] select-none">©2023 BOXING TALKING</p>
+          <p className="pc:text-sm text-[8px] select-none">©2023 BOXING TALKING</p>
         </div>
       </div>
     </>

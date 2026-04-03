@@ -28,7 +28,7 @@ export const AdministratorPageLinks = () => {
   return (
     <ul className="flex ">
       {linksArray.map((link) => (
-        <li key={`${link.name}_${link.path}`} className="md:ml-5 ml-2">
+        <li key={`${link.name}_${link.path}`} className="pc:ml-5 ml-2">
           <Link to={link.path}>
             <LinkButton pathname={pathname} link={link}>
               {link.name === 'ボクサー登録' && <RiUserAddLine />}

@@ -6,12 +6,15 @@ import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
 import { useAuth } from '@/hooks/apiHooks/useAuth';
 import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
+import { useInitializeDevice } from '@/hooks/useInitializeDevice';
 // ! modal
 import { FirstLoadingModal } from '@/components/modal/FirstLoadingModal';
 import { FullScreenSpinnerModal } from '@/components/modal/FullScreenSpinnerModal';
 import { ToastModal } from '@/components/modal/ToastModal';
 
 const RootLayout = () => {
+  useInitializeDevice();
+
   const { isLoading: isFullScreenLoading } = useFullScreenLoading();
   const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } = useFetchBoxers();
   const isShowFullScreenSpinnerCondition = isFullScreenLoading || isRefetchingBoxers;

@@ -59,11 +59,16 @@ export const Hamburger = () => {
     hideMenuModal();
   }, [pathname]);
 
+  // TODO: このuseEffectは不要かもしれない。copilotのresumeで最新を確認すればわかるはず
   useEffect(() => {
     (async () => {
       if (isShowMenuModal) return await toAfterHamburger();
       await toBeforeHamburger();
     })();
+
+    return () => {
+      setsHamburgerOpen(false);
+    };
   }, [isShowMenuModal]);
 
   const onClick = () => {
@@ -92,7 +97,10 @@ export const Hamburger = () => {
   );
 
   return (
-    <div onClick={onClick} className="z-30 absolute bottom-2 left-[50%] translate-x-[-50%]">
+    <div
+      onClick={onClick}
+      className="z-30 fixed bottom-0 left-[50%] translate-x-[-50%] cursor-pointer"
+    >
       {HamburgerIcon}
     </div>
   );

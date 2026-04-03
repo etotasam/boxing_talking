@@ -2,8 +2,8 @@ import clsx from 'clsx';
 import { MatchDataType } from '@/types';
 // ! components
 import { SimpleMatchCard } from '@/components/module/SimpleMatchCard';
-//! hooks
-import { useWindowSize } from '@/hooks/useWindowSize';
+import { useRecoilValue } from 'recoil';
+import { deviceState } from '@/store/deviceState';
 
 type MatchesPropsType = {
   beforeMatches: MatchDataType[];
@@ -11,7 +11,7 @@ type MatchesPropsType = {
   toMatchPage: (matchId: number) => void;
 };
 export const Matches = ({ beforeMatches, toMatchPage, afterMatches }: MatchesPropsType) => {
-  const { device } = useWindowSize();
+  const device = useRecoilValue(deviceState);
 
   return (
     <>
@@ -25,7 +25,7 @@ export const Matches = ({ beforeMatches, toMatchPage, afterMatches }: MatchesPro
             <div
               // onClick={() => setIsShow(true)}
               className={clsx(
-                'relative w-full max-w-[1024px] md:w-[80%] text-white tracking-widest',
+                'relative w-full max-w-[1024px] pc:w-[80%] text-white tracking-widest',
                 device === 'SP' ? 'px-2' : 'px-0'
               )}
             >
@@ -50,7 +50,7 @@ const MatchesListComponent = ({
   toMatchPage: (matchId: number) => void;
 }) => {
   return (
-    <ul className={clsx('md:pt-10')}>
+    <ul className={clsx('pc:pt-10 pt-6')}>
       {matches.map((match) => (
         <li
           key={match.id}

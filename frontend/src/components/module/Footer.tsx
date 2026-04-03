@@ -27,7 +27,7 @@ export const Footer = () => {
               利用規約
             </Link>
           )}
-          <p className="md:text-sm text-[8px] select-none">©2023 BOXING TALKING</p>
+          <p className="pc:text-sm text-[8px] select-none">©2023 BOXING TALKING</p>
         </div>
       </div>
     </>

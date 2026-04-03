@@ -6,22 +6,31 @@ import { useMenuModal } from '@/hooks/useMenuModal';
 //! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
+import { deviceState } from '@/store/deviceState';
 //! icon
 import { IoLogOutSharp } from 'react-icons/io5';
+import { useEffect } from 'react';
 
 export const MenuModal = () => {
-  const { state: isShow } = useMenuModal();
+  const { state: isShow, hide: hideMenuModal } = useMenuModal();
+  const device = useRecoilValue(deviceState);
+
+  useEffect(() => {
+    if (device === 'PC') {
+      hideMenuModal();
+    }
+  }, [device]);
 
   return (
     <AnimatePresence>
       {isShow && (
         <motion.div
-          initial={{ y: '-100vh', opacity: 0 }}
+          initial={{ y: '-100vh', opacity: 1 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: '-100vh', opacity: 1, transition: { duration: 0.2 } }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
           style={{ height: `calc(100vh - ${0}px)` }}
-          className="bg-base-bg/90 w-full z-10 fixed top-0 flex justify-center text-white"
+          className="bg-red-600 w-full z-10 fixed top-0 flex justify-center text-white"
         >
           <motion.div
             initial={{ opacity: 0 }}

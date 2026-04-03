@@ -5,7 +5,8 @@ import { GiBoxingGlove } from 'react-icons/gi';
 
 //! hook
 import { useModalState } from '@/hooks/useModalState';
-import { useWindowSize } from '@/hooks/useWindowSize';
+import { useRecoilValue } from 'recoil';
+import { deviceState } from '@/store/deviceState';
 
 const ICON_TEXT = '勝敗予想' as const;
 
@@ -19,7 +20,7 @@ export const VoteIcon = ({
   showPredictionModal: () => void;
   bottomPosition: number;
 }) => {
-  const { device } = useWindowSize();
+  const device = useRecoilValue(deviceState);
 
   return (
     <AnimatePresence>

@@ -64,7 +64,7 @@ export const ToastModal = (props: PropsType) => {
       exit="hidden"
       variants={variants}
       onClick={hideModal}
-      className={`cursor-pointer z-[999] fixed top-[10px] left-[50%] py-2 px-5 min-w-[80%] md:min-w-[30%] text-center rounded-lg whitespace-pre-wrap select-none  ${color}`}
+      className={`cursor-pointer z-[999] fixed top-[10px] left-[50%] py-2 px-5 min-w-[80%] pc:min-w-[30%] text-center rounded-lg whitespace-pre-wrap select-none  ${color}`}
     >
       {messageOnToast}
     </motion.div>

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Outlet, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/routePath';
 // ! images
 import boxingMatch from '@/assets/images/etc/boxing_match.jpg';
@@ -7,11 +7,7 @@ import ManOnTheRing from '@/assets/images/etc/man_on_the_ring.jpg';
 import GGGPhoto from '@/assets/images/etc/GGG.jpg';
 import Grove from '@/assets/images/etc/black_grove.jpg';
 
-// ! hooks
-import { useWindowSize } from '@/hooks/useWindowSize';
-
 export const Background = () => {
-  const { device } = useWindowSize();
   const { pathname } = useLocation();
   // const isPC = device === 'PC';
   const getBackgroundImage = () => {

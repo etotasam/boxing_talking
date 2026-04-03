@@ -2,11 +2,12 @@ import { ClearFullScreenDiv } from '@/components/atomic/ClearFullScreenDiv';
 import { MatchInfo } from '@/components/module/MatchInfo';
 import { MatchDataType } from '@/types';
 import { useModalState } from '@/hooks/useModalState';
-import { useWindowSize } from '@/hooks/useWindowSize';
+import { useRecoilValue } from 'recoil';
+import { deviceState } from '@/store/deviceState';
 
 export const MatchInfoModal = ({ matchData }: { matchData: MatchDataType | undefined }) => {
   const { hideModal } = useModalState('MATCH_INFO');
-  const { device } = useWindowSize();
+  const device = useRecoilValue(deviceState);
   if (matchData === undefined) return;
 
   if (device === 'PC') {
