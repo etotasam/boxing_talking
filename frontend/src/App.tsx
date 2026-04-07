@@ -42,7 +42,6 @@ function App() {
               <Route path={ROUTE_PATH.MATCH} element={<Match />} />
               {/* //? </ContentLayout> */}
             </Route>
-            {/* <Route element={<HeaderOnlyLayout />}></Route> */}
 
             <Route element={<AdminOnly />}>
               <Route element={<AdminLayout />}>

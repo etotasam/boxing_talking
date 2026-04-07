@@ -3,7 +3,7 @@ import { useSetRecoilState } from 'recoil';
 import { DEVICE_BREAKPOINT } from '@/assets/deviceBreakpoint';
 import { deviceState } from '@/store/deviceState';
 
-export const useInitializeDevice = () => {
+export const useInitializeDevice = (): void => {
   const setDevice = useSetRecoilState(deviceState);
 
   useEffect(() => {

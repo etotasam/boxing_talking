@@ -7,34 +7,34 @@ import { DeviceStateType } from '@/store/deviceState';
 //! component
 import { MatchInfo } from './component/MatchInfo';
 import { PostComment } from './component/PostComment';
-
+import { PredictionVoteModal } from './component/PredictionVoteModal';
 import { VoteIcon } from './component/VoteIcon';
 import { MatchCommentsModal } from './component/MatchCommentsModal';
-//! recoil
-import { useRecoilValue } from 'recoil';
-import { elementSizeState } from '@/store/elementSizeState';
-import { boolState } from '@/store/boolState';
 
-type PropsType = {
+export type MatchViewProps = {
   matchData: MatchDataType;
   device: DeviceStateType;
   isShowPredictionModal: boolean;
   showPredictionModal: () => void;
-  // isHide: boolean;
   isShowVoteIcon: boolean;
+  isScroll: boolean;
+  voteIconBottomPosition: number;
+  commentsModalHeightHiddenState: number;
 };
-export const MatchComponent = (props: PropsType) => {
-  const { matchData, isShowVoteIcon, showPredictionModal, device } = props;
 
-  const isScroll = useRecoilValue(boolState('IS_SCROLL'));
-
-  //? vote iconの位置はコメント入力欄の高さに準ずる
-  const voteIconBottomPosition = (useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT')) ?? 0) + 5;
-
+export const MatchView = ({
+  matchData,
+  device,
+  isShowPredictionModal,
+  showPredictionModal,
+  isShowVoteIcon,
+  isScroll,
+  voteIconBottomPosition,
+  commentsModalHeightHiddenState,
+}: MatchViewProps) => {
   return (
     <>
-      <Main matchData={matchData} />
-      {/* <MatchCommentsModal matchId={matchData.id} /> */}
+      <Main matchData={matchData} commentsModalHeightHiddenState={commentsModalHeightHiddenState} />
       <div className="fixed bottom-0 w-full">
         <PostComment />
       </div>
@@ -51,17 +51,17 @@ export const MatchComponent = (props: PropsType) => {
           />
         </div>
       )}
-      {/* {isShowPredictionModal && <PredictionVoteModal thisMatch={matchData} />} */}
+      {isShowPredictionModal && <PredictionVoteModal thisMatch={matchData} />}
     </>
   );
 };
 
-const Main = ({ matchData }: { matchData: MatchDataType }) => {
-  //? コメントモーダルが非表示時の高さ分をpaddingにしてスクロールされる様にする
-  const commentsModalHeightHiddenState = useRecoilValue(
-    elementSizeState('COMMENTS_MODAL_HIDDEN_HEIGHT')
-  );
+type MainProps = {
+  matchData: MatchDataType;
+  commentsModalHeightHiddenState: number;
+};
 
+const Main = ({ matchData, commentsModalHeightHiddenState }: MainProps) => {
   return (
     <main className="w-[100vw] overflow-auto">
       <div

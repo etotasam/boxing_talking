@@ -22,8 +22,10 @@ import {
   useMatchPredictions,
 } from '@/hooks/apiHooks/uesWinLossPrediction';
 import { useRecoilValue } from 'recoil';
+import { elementSizeState } from '@/store/elementSizeState';
+import { boolState } from '@/store/boolState';
 //! component
-import { MatchComponent } from './MatchComponent';
+import { MatchView } from './MatchView';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -46,6 +48,10 @@ export const MatchContainer = (props: PropsType) => {
 
   const navigate = useNavigate();
   const device = useRecoilValue(deviceState);
+  const isScroll = useRecoilValue(boolState('IS_SCROLL'));
+  const postCommentHeight = useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT')) ?? 0;
+  const commentsModalHeightHiddenState =
+    useRecoilValue(elementSizeState('COMMENTS_MODAL_HIDDEN_HEIGHT')) ?? 0;
 
   const thisMatch = useMemo(
     () => props.matches?.find((match) => match.id === matchId),
@@ -99,6 +105,8 @@ export const MatchContainer = (props: PropsType) => {
 
   const { state: isShowPredictionModal, showModal: showPredictionModal } =
     useModalState('PREDICTION_VOTE');
+  // +5pxは、投稿完了のモーダルがvote iconと被るのを防ぐための余白
+  const voteIconBottomPosition = postCommentHeight + 5;
 
   // if (!windowSize) return;
   if (!thisMatch) return;
@@ -119,12 +127,15 @@ export const MatchContainer = (props: PropsType) => {
         // isThisMatchAfterToday={isThisMatchAfterToday}
         matchPredictions={matchPredictions}
       >
-        <MatchComponent
+        <MatchView
           matchData={thisMatch}
           device={device}
           isShowPredictionModal={isShowPredictionModal}
           showPredictionModal={showPredictionModal}
           isShowVoteIcon={isShowVoteIconState}
+          isScroll={isScroll}
+          voteIconBottomPosition={voteIconBottomPosition}
+          commentsModalHeightHiddenState={commentsModalHeightHiddenState}
         />
       </MatchContextWrapper>
     </>
