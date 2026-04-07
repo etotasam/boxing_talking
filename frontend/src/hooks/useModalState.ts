@@ -1,17 +1,17 @@
-// !Recoil
-import { useRecoilState } from "recoil"
-import { modalState, ModalNameType } from "@/store/modalState"
+import { useCallback } from 'react';
+import { useRecoilState } from 'recoil';
+import { modalState, ModalNameType } from '@/store/modalState';
 
 export const useModalState = (modalName: ModalNameType) => {
-  const [state, setter] = useRecoilState(modalState(modalName))
+  const [state, setter] = useRecoilState(modalState(modalName));
 
-  const hideModal = () => {
-    setter(false)
-  }
+  const hideModal = useCallback(() => {
+    setter(false);
+  }, [setter]);
 
-  const showModal = () => {
-    setter(true)
-  }
+  const showModal = useCallback(() => {
+    setter(true);
+  }, [setter]);
 
-  return { state, hideModal, showModal }
-}
+  return { state, hideModal, showModal };
+};
