@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 //! type
-import { BoxerType, MatchResultType, MatchDataType } from '@/types';
+import { BoxerType, MatchResultType, MatchDataType, MatchPredictionsType } from '@/types';
 import { BOXER_STANCE_LABELS } from '@/assets/boxerData';
 //! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
@@ -17,16 +17,24 @@ import { GiImperialCrown } from 'react-icons/gi';
 
 type MatchInfoPropsType = {
   matchData: MatchDataType;
+  userPrediction?: 'red' | 'blue' | false;
+  matchPredictions?: MatchPredictionsType;
   // onClick: (matchId: number) => void;
   className?: string;
 };
-export const MatchInfo = ({ matchData }: MatchInfoPropsType) => {
+export const MatchInfo = ({ matchData, userPrediction, matchPredictions }: MatchInfoPropsType) => {
   return (
     <>
       {matchData && (
         <div className="flex flex-col items-center w-full relative">
           <BoxersData matchData={matchData} />
           <Grade matchData={matchData} />
+          <PredictionSummary
+            userPrediction={userPrediction}
+            matchPredictions={matchPredictions}
+            redBoxerName={matchData.redBoxer.name}
+            blueBoxerName={matchData.blueBoxer.name}
+          />
           <div className="flex w-[80%] mt-5">
             <MatchDate matchDate={matchData.matchDate} />
             <MatchVenue country={matchData.country} venue={matchData.venue} />
@@ -34,6 +42,89 @@ export const MatchInfo = ({ matchData }: MatchInfoPropsType) => {
         </div>
       )}
     </>
+  );
+};
+
+type PredictionSummaryProps = {
+  userPrediction?: 'red' | 'blue' | false;
+  matchPredictions?: MatchPredictionsType;
+  redBoxerName: string;
+  blueBoxerName: string;
+};
+
+const PredictionSummary = ({
+  userPrediction,
+  matchPredictions,
+  redBoxerName,
+  blueBoxerName,
+}: PredictionSummaryProps) => {
+  const userPredictionLabel =
+    userPrediction === undefined
+      ? '取得中'
+      : userPrediction === false
+      ? '未投票'
+      : userPrediction === 'red'
+      ? `${redBoxerName} 勝利`
+      : `${blueBoxerName} 勝利`;
+
+  return (
+    <section
+      className="mt-4 w-[88%] max-w-[820px] rounded-xl border border-stone-700 bg-stone-900/90 p-4 text-white"
+      aria-label="prediction-summary"
+    >
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs tracking-widest text-stone-400">PREDICTION</p>
+          <h3 className="mt-1 text-base font-bold">勝敗予想サマリー</h3>
+        </div>
+        <div className="rounded-full bg-stone-800 px-3 py-1 text-sm">
+          あなたの予想: <span className="font-bold">{userPredictionLabel}</span>
+        </div>
+      </div>
+
+      {matchPredictions ? (
+        <div className="mt-4">
+          <div className="mb-2 flex items-center justify-between text-xs text-stone-400">
+            <span>全体投票</span>
+            <span>合計 {matchPredictions.totalVotes}票</span>
+          </div>
+          <div className="h-3 overflow-hidden rounded-full bg-stone-800">
+            <div className="flex h-full">
+              <div
+                className="h-full bg-red-500"
+                style={{
+                  width:
+                    matchPredictions.totalVotes === 0
+                      ? '50%'
+                      : `${(matchPredictions.red / matchPredictions.totalVotes) * 100}%`,
+                }}
+              />
+              <div
+                className="h-full bg-blue-500"
+                style={{
+                  width:
+                    matchPredictions.totalVotes === 0
+                      ? '50%'
+                      : `${(matchPredictions.blue / matchPredictions.totalVotes) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+            <div className="rounded-lg bg-red-500/10 px-3 py-2 text-red-200">
+              <p className="text-xs text-red-300">{redBoxerName}</p>
+              <p className="mt-1 font-bold">{matchPredictions.red}票</p>
+            </div>
+            <div className="rounded-lg bg-blue-500/10 px-3 py-2 text-blue-200">
+              <p className="text-xs text-blue-300">{blueBoxerName}</p>
+              <p className="mt-1 font-bold">{matchPredictions.blue}票</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <p className="mt-4 text-sm text-stone-400">全体投票は取得中です。</p>
+      )}
+    </section>
   );
 };
 

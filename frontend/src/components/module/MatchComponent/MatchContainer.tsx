@@ -1,17 +1,11 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/assets/routePath';
 
 //! types
-import { MatchDataType, MatchPredictionsType } from '@/types';
+import { MatchDataType } from '@/types';
 import { deviceState } from '@/store/deviceState';
-//! contexts
-import {
-  UsersPredictionContext,
-  MatchPredictionsContext,
-  UsersPredictionType,
-} from '@/contexts/MatchContext';
 // ! hook
 // import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
@@ -25,7 +19,7 @@ import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 import { boolState } from '@/store/boolState';
 //! component
-import { MatchView } from './MatchView';
+import { MatchView, UsersPredictionType } from './MatchView';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
@@ -42,7 +36,7 @@ export const MatchContainer = (props: PropsType) => {
   const { userPredictionPostState } = useVoteMatchPrediction();
   //? userの勝敗予想投票をすべて取得など…
   const { data: usersPredictions } = useFetchUsersPrediction();
-  const { data: matchPredictions, refetch: refetchMatchPredictions } = useMatchPredictions(
+  const { refetch: refetchMatchPredictions, data: matchPredictions } = useMatchPredictions(
     Number(matchId)
   );
 
@@ -64,31 +58,18 @@ export const MatchContainer = (props: PropsType) => {
     }
   }, [props.matches, thisMatch]);
 
-  //? userこの試合の勝敗予想の有無(falseは未投票、undefinedはデータ未取得状態)
-  const [thisMatchPredictionByUser, setThisMatchPredictionByUser] = useState<UsersPredictionType>();
+  const userPrediction = useMemo<UsersPredictionType>(() => {
+    if (usersPredictions === undefined) return undefined;
+
+    const matchPrediction = usersPredictions.find((data) => data.matchId === matchId);
+
+    return matchPrediction ? matchPrediction.prediction : false;
+  }, [usersPredictions, matchId]);
+
   //? 読み込み時にscrollをtop位置へ移動
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  //? この試合の勝敗予想の有無とその投票
-  useEffect(() => {
-    //? 投票データの取得が完了しているかどうか。ログインしていない場合このデータは取得しない設定にしてる
-    if (usersPredictions !== undefined) {
-      const thisMatchPredictionVote = usersPredictions.find(
-        (data) => data.matchId === Number(matchId)
-      );
-
-      //? 投票をしていない場合は'false'をセットする(undefinedはデータ未取得,falseは未投票)
-      if (thisMatchPredictionVote) {
-        setThisMatchPredictionByUser(thisMatchPredictionVote.prediction);
-        return;
-      } else {
-        setThisMatchPredictionByUser(false);
-        return;
-      }
-    }
-  }, [usersPredictions, matchId]);
 
   //? コメント投稿に成功したら投票してねモーダルを消す&勝敗予想を再取得
   useEffect(() => {
@@ -121,40 +102,18 @@ export const MatchContainer = (props: PropsType) => {
           <title> The Match | {siteTitle}</title>
         )}
       </Helmet>
-
-      <MatchContextWrapper
-        thisMatchPredictionByUser={thisMatchPredictionByUser}
-        // isThisMatchAfterToday={isThisMatchAfterToday}
+      <MatchView
+        matchData={thisMatch}
+        userPrediction={userPrediction}
         matchPredictions={matchPredictions}
-      >
-        <MatchView
-          matchData={thisMatch}
-          device={device}
-          isShowPredictionModal={isShowPredictionModal}
-          showPredictionModal={showPredictionModal}
-          isShowVoteIcon={isShowVoteIconState}
-          isScroll={isScroll}
-          voteIconBottomPosition={voteIconBottomPosition}
-          commentsModalHeightHiddenState={commentsModalHeightHiddenState}
-        />
-      </MatchContextWrapper>
+        device={device}
+        isShowPredictionModal={isShowPredictionModal}
+        showPredictionModal={showPredictionModal}
+        isShowVoteIcon={isShowVoteIconState}
+        isScroll={isScroll}
+        voteIconBottomPosition={voteIconBottomPosition}
+        commentsModalHeightHiddenState={commentsModalHeightHiddenState}
+      />
     </>
-  );
-};
-
-//? context wrapper
-type MatchContextWrapperType = {
-  children: React.ReactNode;
-  thisMatchPredictionByUser: UsersPredictionType;
-  matchPredictions: MatchPredictionsType | undefined;
-};
-
-export const MatchContextWrapper = (props: MatchContextWrapperType) => {
-  return (
-    <MatchPredictionsContext.Provider value={props.matchPredictions}>
-      <UsersPredictionContext.Provider value={props.thisMatchPredictionByUser}>
-        {props.children}
-      </UsersPredictionContext.Provider>
-    </MatchPredictionsContext.Provider>
   );
 };

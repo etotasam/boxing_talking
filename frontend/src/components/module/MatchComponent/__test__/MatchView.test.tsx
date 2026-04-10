@@ -68,6 +68,8 @@ const defaultProps: MatchViewProps = {
     matchDate: '2026-01-01',
     result: null,
   },
+  userPrediction: undefined,
+  matchPredictions: undefined,
   device: 'SP',
   isShowPredictionModal: false,
   showPredictionModal,
@@ -103,11 +105,10 @@ describe('MatchView', () => {
     expect(screen.getByTestId('prediction-vote-modal')).toBeInTheDocument();
   });
 
-  test('commentsModalHeightHiddenState を main レイアウトに反映する', () => {
-    const { container } = renderComponent({ commentsModalHeightHiddenState: 180 });
+  test('commentsModalHeightHiddenState を MainContent のレイアウトに反映する', () => {
+    renderComponent({ commentsModalHeightHiddenState: 180 });
 
-    const main = container.querySelector('main');
-    expect(main).toBeInTheDocument();
-    expect(main?.firstElementChild).toHaveStyle({ paddingBottom: '180px' });
+    const mainContent = screen.getByTestId('match-main-content');
+    expect(mainContent).toHaveStyle({ paddingBottom: '180px' });
   });
 });

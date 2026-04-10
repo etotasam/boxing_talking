@@ -1,8 +1,8 @@
 import clsx from 'clsx';
-
 //! type
 import { MatchDataType } from '@/types';
 import { DeviceStateType } from '@/store/deviceState';
+import { MatchPredictionsType } from '@/types';
 
 //! component
 import { MatchInfo } from './component/MatchInfo';
@@ -11,8 +11,12 @@ import { PredictionVoteModal } from './component/PredictionVoteModal';
 import { VoteIcon } from './component/VoteIcon';
 import { MatchCommentsModal } from './component/MatchCommentsModal';
 
+export type UsersPredictionType = 'red' | 'blue' | false | undefined;
+
 export type MatchViewProps = {
   matchData: MatchDataType;
+  userPrediction: UsersPredictionType;
+  matchPredictions: MatchPredictionsType | undefined;
   device: DeviceStateType;
   isShowPredictionModal: boolean;
   showPredictionModal: () => void;
@@ -24,6 +28,8 @@ export type MatchViewProps = {
 
 export const MatchView = ({
   matchData,
+  userPrediction,
+  matchPredictions,
   device,
   isShowPredictionModal,
   showPredictionModal,
@@ -34,7 +40,12 @@ export const MatchView = ({
 }: MatchViewProps) => {
   return (
     <>
-      <Main matchData={matchData} commentsModalHeightHiddenState={commentsModalHeightHiddenState} />
+      <MainContent
+        matchData={matchData}
+        userPrediction={userPrediction}
+        matchPredictions={matchPredictions}
+        commentsModalHeightHiddenState={commentsModalHeightHiddenState}
+      />
       <div className="fixed bottom-0 w-full">
         <PostComment />
       </div>
@@ -58,19 +69,31 @@ export const MatchView = ({
 
 type MainProps = {
   matchData: MatchDataType;
+  userPrediction: UsersPredictionType;
+  matchPredictions: MatchPredictionsType | undefined;
   commentsModalHeightHiddenState: number;
 };
 
-const Main = ({ matchData, commentsModalHeightHiddenState }: MainProps) => {
+const MainContent = ({
+  matchData,
+  userPrediction,
+  matchPredictions,
+  commentsModalHeightHiddenState,
+}: MainProps) => {
   return (
-    <main className="w-[100vw] overflow-auto">
+    <div className="w-[100vw] overflow-auto">
       <div
+        data-testid="match-main-content"
         className="w-full flex justify-center"
         style={{ paddingBottom: commentsModalHeightHiddenState }}
       >
-        <MatchInfo matchData={matchData} />
+        <MatchInfo
+          matchData={matchData}
+          userPrediction={userPrediction}
+          matchPredictions={matchPredictions}
+        />
       </div>
       <MatchCommentsModal matchId={matchData.id} />
-    </main>
+    </div>
   );
 };
