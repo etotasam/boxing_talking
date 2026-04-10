@@ -89,6 +89,7 @@ const User = () => {
       <button
         type="button"
         onClick={handleLogout}
+        aria-label="ログアウト"
         className={clsx(
           'group/user relative flex items-center rounded-md text-[10px] transition-opacity',
           'hover:opacity-80 cursor-pointer'
@@ -138,8 +139,8 @@ const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
   const { isAdmin } = useAdmin();
 
   return (
-    <>
-      <ul className="absolute bottom-2 pc:static flex pc:items-end pc:mb-4">
+    <nav className="absolute bottom-2 pc:static flex pc:items-end pc:mb-4">
+      <ul className="flex pc:items-end">
         <li className="pc:ml-5 ml-2">
           <Link className={getLinkClassName(ROUTE_PATH.HOME, pathname)} to={ROUTE_PATH.HOME}>
             Schedule
@@ -154,12 +155,8 @@ const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
             Match Result
           </Link>
         </li>
-        {isAdmin && (
-          <li>
-            <AdministratorPageLinks />
-          </li>
-        )}
       </ul>
-    </>
+      {isAdmin && <AdministratorPageLinks />}
+    </nav>
   );
 };
