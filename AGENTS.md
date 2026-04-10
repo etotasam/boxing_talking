@@ -43,9 +43,7 @@
 
 - 変更内容が一目で分かるメッセージにしてください。
 - コミットメッセージは Conventional Commits の形式で書いてください。
-- 形式: `<type>(<scope>): <description>`
-- `scope` は変更対象を簡潔に示してください。不要な場合は省略しても構いません。
-- `<description>`は日本語を使用する事
+- 詳細は `./.agents/skills/git-commit/SKILL.md` を参照してください。
 
 使用する `type`:
 
