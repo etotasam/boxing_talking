@@ -1,27 +1,19 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
 import { ROUTE_PATH } from '@/assets/routePath';
-import { motion } from 'framer-motion';
 //! icon
-import { IoLogOutSharp } from 'react-icons/io5';
-import { GiBoxingGlove } from 'react-icons/gi';
 import { AiOutlineUser } from 'react-icons/ai';
-// ! types
-import { UserType } from '@/types';
 //! hooks
 import { useGuest, useAuth } from '@/hooks/apiHooks/useAuth';
-import { useMatchInfoModal } from '@/hooks/useMatchInfoModal';
 import { useAdmin } from '@/hooks/apiHooks/useAuth';
 import { useLogout, useGuestLogout } from '@/hooks/apiHooks/useAuth';
-import { useMenuModal } from '@/hooks/useMenuModal';
 //!recoil
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 import { deviceState } from '@/store/deviceState';
 //! component
 import { Link } from 'react-router-dom';
-import { LogoutButton } from '@/components/atomic/LogoutButton';
 import { AdministratorPageLinks } from '../AdministratorPageLinks';
 import { Hamburger } from './component/Hamburger';
 
@@ -77,67 +69,53 @@ const SiteTitle = () => {
   );
 };
 
-const AuthInfo = () => {
+const AuthInfo = () => <User />;
+
+const User = () => {
   const device = useRecoilValue(deviceState);
-  const { state: isShowMenu } = useMenuModal();
-  return (
-    <>
-      <UserName />
-      <LogoutBox isShow={device === 'PC'} />
-      <LogoutIcon isShow={isShowMenu} />
-    </>
-  );
-};
-
-const LogoutBox = ({ isShow }: { isShow: boolean }) => {
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
-
-  const isShowCondition = isShow && (isGuest || authUser);
-  return (
-    <>
-      {isShowCondition && (
-        <div className="absolute sm:bottom-5 bottom-3 pc:right-10 right-2 flex justify-center">
-          <LogoutButton />
-        </div>
-      )}
-    </>
-  );
-};
-
-const UserName = () => {
-  const { data: isGuest } = useGuest();
-  const { data: authUser } = useAuth();
+  const { logout } = useLogout();
+  const { guestLogout } = useGuestLogout();
 
   if (!isGuest && !authUser) return;
 
+  const userName = authUser ? authUser.name : 'ゲスト';
+  const iconBgColor = authUser ? 'bg-cyan-700' : 'bg-stone-400';
+  const handleLogout = authUser ? logout : guestLogout;
+
   return (
     <div className="absolute sm:top-1 top-2 pc:right-5 right-2 flex">
-      {authUser ? <UserIcon userData={authUser} /> : isGuest && <GuestIcon />}
+      <button
+        type="button"
+        onClick={handleLogout}
+        className={clsx(
+          'group/user relative flex items-center rounded-md text-[10px] transition-opacity',
+          'hover:opacity-80 cursor-pointer'
+        )}
+      >
+        <AiOutlineUser
+          className={clsx(
+            'mr-1 mt-[2px] block h-[16px] w-[16px] rounded-[50%] text-white',
+            iconBgColor
+          )}
+        />
+        <span>{userName}</span>
+        {device === 'PC' && (
+          <span
+            className={clsx(
+              'pointer-events-none absolute left-0 top-full mt-1',
+              'whitespace-nowrap rounded-md bg-neutral-900 px-3 py-[6px] text-[10px] font-medium text-white shadow-lg',
+              'after:absolute after:left-3 after:bottom-full after:h-0 after:w-0',
+              'after:border-x-[6px] after:border-b-[6px] after:border-x-transparent after:border-b-neutral-900',
+              'opacity-0 transition-opacity duration-200 group-hover/user:opacity-100'
+            )}
+          >
+            ログアウト
+          </span>
+        )}
+      </button>
     </div>
-  );
-};
-
-const UserIcon = ({ userData }: { userData: UserType | undefined | null }) => {
-  if (!userData) return;
-  return (
-    <>
-      <p className={clsx('text-[10px] flex items-center')}>
-        <AiOutlineUser className="mr-1 block bg-cyan-700 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-        {userData.name}
-      </p>
-    </>
-  );
-};
-
-const GuestIcon = () => {
-  return (
-    <>
-      <p className="text-[10px] flex items-center">
-        <AiOutlineUser className="mr-1 block bg-stone-400 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
-        ゲスト
-      </p>
-    </>
   );
 };
 
@@ -157,7 +135,6 @@ type LinksComponentsPropsType = {
   pathname: string;
 };
 const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
-  const device = useRecoilValue(deviceState);
   const { isAdmin } = useAdmin();
 
   return (
@@ -177,14 +154,6 @@ const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
             Match Result
           </Link>
         </li>
-
-        {device === 'SP' &&
-          (pathname === ROUTE_PATH.MATCH || pathname === ROUTE_PATH.PAST_MATCH_SINGLE) && (
-            <li className="pc:ml-5 ml-2">
-              <ViewMatchInfoButton />
-            </li>
-          )}
-
         {isAdmin && (
           <li>
             <AdministratorPageLinks />
@@ -192,82 +161,5 @@ const LinksComponent = ({ pathname }: LinksComponentsPropsType) => {
         )}
       </ul>
     </>
-  );
-};
-
-const ViewMatchInfoButton = () => {
-  const { viewMatchInfoModal, hideMatchInfoModal } = useMatchInfoModal();
-
-  //コンポーネントが非表示になるタイミングでmodalも非表示にする
-  useEffect(() => {
-    return () => {
-      hideMatchInfoModal();
-    };
-  }, []);
-
-  return (
-    <>
-      <LinkButton
-        onClick={() => viewMatchInfoModal()}
-        className={'rotate-[-40deg] pc:hover:rotate-[240deg]'}
-      >
-        <GiBoxingGlove />
-      </LinkButton>
-    </>
-  );
-};
-
-type LinkButtonPropsType = React.ComponentProps<'button'>;
-const LinkButton = ({
-  children,
-  onMouseEnter,
-  onMouseLeave,
-  className,
-  onClick,
-}: LinkButtonPropsType) => {
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      className={clsx(
-        'sm:w-[40px] sm:h-[40px] w-[30px] h-[30px] bg-stone-600 hover:bg-black rounded-[50%] flex justify-center items-center text-white text-[16px] hover:text-[18px] duration-300',
-        className
-      )}
-    >
-      {children}
-    </button>
-  );
-};
-
-const LogoutIcon = ({ isShow }: { isShow: boolean }) => {
-  const { logout } = useLogout();
-  const { guestLogout } = useGuestLogout();
-  const { data: authUser } = useAuth();
-  const { data: isGuest } = useGuest();
-
-  const userLogout = () => {
-    if (authUser) {
-      logout();
-      return;
-    }
-    if (isGuest) {
-      guestLogout();
-      return;
-    }
-  };
-
-  if (!isShow) return;
-  return (
-    <motion.button
-      onClick={userLogout}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="fixed top-[50px] right-2 flex items-center text-[8px] px-[3px] py-[2px] bg-neutral-800 text-neutral-400"
-    >
-      <IoLogOutSharp className={'text-xl mr-1'} />
-      ログアウト
-    </motion.button>
   );
 };

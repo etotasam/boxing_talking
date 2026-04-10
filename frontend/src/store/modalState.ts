@@ -2,7 +2,6 @@ import { atomFamily } from "recoil";
 
 const modalNames = [
   "LOGIN",
-  "MATCH_INFO",
   "BOXER_INFO",
   "PREDICTION_VOTE",
   "MENU",
