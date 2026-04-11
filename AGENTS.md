@@ -45,22 +45,6 @@
 - コミットメッセージは Conventional Commits の形式で書いてください。
 - 詳細は `./.agents/skills/git-commit/SKILL.md` を参照してください。
 
-使用する `type`:
-
-- `feat`: 新機能
-- `fix`: バグ修正
-- `refactor`: リファクタリング
-- `docs`: ドキュメント
-- `test`: テスト
-- `chore`: 雑務・設定変更
-
-例:
-
-- `feat(frontend): ログインフォームを追加`
-- `fix(backend): ユーザー認証の不具合を修正`
-- `docs(readme): 環境構築手順を更新`
-- `test(frontend): ログイン画面のテストを追加`
-
 ## Restrictions
 
 - 生成物である `frontend/dist/` は手動で編集しないでください。
