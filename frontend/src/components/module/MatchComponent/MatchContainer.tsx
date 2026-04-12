@@ -36,9 +36,11 @@ export const MatchContainer = (props: PropsType) => {
   const { userPredictionPostState } = useVoteMatchPrediction();
   //? userの勝敗予想投票をすべて取得など…
   const { data: usersPredictions } = useFetchUsersPrediction();
-  const { refetch: refetchMatchPredictions, data: matchPredictions } = useMatchPredictions(
-    Number(matchId)
-  );
+  const {
+    refetch: refetchMatchPredictions,
+    data: matchPredictions,
+    matchPredictionFetchState,
+  } = useMatchPredictions(Number(matchId));
 
   const navigate = useNavigate();
   const device = useRecoilValue(deviceState);
@@ -106,6 +108,7 @@ export const MatchContainer = (props: PropsType) => {
         matchData={thisMatch}
         userPrediction={userPrediction}
         matchPredictions={matchPredictions}
+        isMatchPredictionsLoading={matchPredictionFetchState === 'loading'}
         device={device}
         isShowPredictionModal={isShowPredictionModal}
         showPredictionModal={showPredictionModal}

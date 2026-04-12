@@ -14,31 +14,39 @@ import { deviceState } from '@/store/deviceState';
 import crown from '@/assets/images/etc/champion.svg';
 import fall_of_crown from '@/assets/images/etc/fall_champion.svg';
 import { GiImperialCrown } from 'react-icons/gi';
+import { RotatingLines } from 'react-loader-spinner';
 
 type MatchInfoPropsType = {
   matchData: MatchDataType;
   userPrediction?: 'red' | 'blue' | false;
   matchPredictions?: MatchPredictionsType;
+  isMatchPredictionsLoading?: boolean;
   // onClick: (matchId: number) => void;
   className?: string;
 };
-export const MatchInfo = ({ matchData, userPrediction, matchPredictions }: MatchInfoPropsType) => {
+export const MatchInfo = ({
+  matchData,
+  userPrediction,
+  matchPredictions,
+  isMatchPredictionsLoading = false,
+}: MatchInfoPropsType) => {
   return (
     <>
       {matchData && (
         <div className="flex flex-col items-center w-full relative">
           <BoxersData matchData={matchData} />
           <Grade matchData={matchData} />
-          <PredictionSummary
-            userPrediction={userPrediction}
-            matchPredictions={matchPredictions}
-            redBoxerName={matchData.redBoxer.name}
-            blueBoxerName={matchData.blueBoxer.name}
-          />
           <div className="flex w-[80%] mt-5">
             <MatchDate matchDate={matchData.matchDate} />
             <MatchVenue country={matchData.country} venue={matchData.venue} />
           </div>
+          <PredictionSummary
+            userPrediction={userPrediction}
+            matchPredictions={matchPredictions}
+            isLoading={isMatchPredictionsLoading}
+            redBoxerName={matchData.redBoxer.name}
+            blueBoxerName={matchData.blueBoxer.name}
+          />
         </div>
       )}
     </>
@@ -48,6 +56,7 @@ export const MatchInfo = ({ matchData, userPrediction, matchPredictions }: Match
 type PredictionSummaryProps = {
   userPrediction?: 'red' | 'blue' | false;
   matchPredictions?: MatchPredictionsType;
+  isLoading: boolean;
   redBoxerName: string;
   blueBoxerName: string;
 };
@@ -55,6 +64,7 @@ type PredictionSummaryProps = {
 const PredictionSummary = ({
   userPrediction,
   matchPredictions,
+  isLoading,
   redBoxerName,
   blueBoxerName,
 }: PredictionSummaryProps) => {
@@ -82,7 +92,12 @@ const PredictionSummary = ({
         </div>
       </div>
 
-      {matchPredictions ? (
+      {isLoading ? (
+        <div className="mt-4 flex items-center justify-center gap-3 rounded-lg bg-stone-800/70 px-3 py-4 text-sm text-stone-200">
+          <RotatingLines strokeColor="#f5f5f5" strokeWidth="3" animationDuration="1" width="24" />
+          <span>勝敗予想を読み込み中...</span>
+        </div>
+      ) : matchPredictions ? (
         <div className="mt-4">
           <div className="mb-2 flex items-center justify-between text-xs text-stone-400">
             <span>全体投票</span>

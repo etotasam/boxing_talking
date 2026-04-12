@@ -59,7 +59,19 @@ describe('MatchInfo', () => {
     expect(screen.getByText('5票')).toBeInTheDocument();
   });
 
-  test('matchPredictions がない時は取得中表示を出す', () => {
+  test('初回取得中はローディング表示を出す', () => {
+    render(
+      <MatchInfo
+        matchData={matchData}
+        matchPredictions={undefined}
+        isMatchPredictionsLoading={true}
+      />
+    );
+
+    expect(screen.getByText('勝敗予想を読み込み中...')).toBeInTheDocument();
+  });
+
+  test('初回取得中ではなく matchPredictions がない時は取得中表示を出す', () => {
     render(<MatchInfo matchData={matchData} matchPredictions={undefined} />);
 
     expect(screen.getByText('全体投票は取得中です。')).toBeInTheDocument();

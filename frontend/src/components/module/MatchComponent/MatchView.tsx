@@ -17,6 +17,7 @@ export type MatchViewProps = {
   matchData: MatchDataType;
   userPrediction: UsersPredictionType;
   matchPredictions: MatchPredictionsType | undefined;
+  isMatchPredictionsLoading: boolean;
   device: DeviceStateType;
   isShowPredictionModal: boolean;
   showPredictionModal: () => void;
@@ -30,6 +31,7 @@ export const MatchView = ({
   matchData,
   userPrediction,
   matchPredictions,
+  isMatchPredictionsLoading,
   device,
   isShowPredictionModal,
   showPredictionModal,
@@ -44,6 +46,7 @@ export const MatchView = ({
         matchData={matchData}
         userPrediction={userPrediction}
         matchPredictions={matchPredictions}
+        isMatchPredictionsLoading={isMatchPredictionsLoading}
         commentsModalHeightHiddenState={commentsModalHeightHiddenState}
       />
       <div className="fixed bottom-0 w-full">
@@ -71,6 +74,7 @@ type MainProps = {
   matchData: MatchDataType;
   userPrediction: UsersPredictionType;
   matchPredictions: MatchPredictionsType | undefined;
+  isMatchPredictionsLoading: boolean;
   commentsModalHeightHiddenState: number;
 };
 
@@ -78,6 +82,7 @@ const MainContent = ({
   matchData,
   userPrediction,
   matchPredictions,
+  isMatchPredictionsLoading,
   commentsModalHeightHiddenState,
 }: MainProps) => {
   return (
@@ -91,6 +96,7 @@ const MainContent = ({
           matchData={matchData}
           userPrediction={userPrediction}
           matchPredictions={matchPredictions}
+          isMatchPredictionsLoading={isMatchPredictionsLoading}
         />
       </div>
       <MatchCommentsModal matchId={matchData.id} />
