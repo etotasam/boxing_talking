@@ -1,7 +1,6 @@
 import { atomFamily } from "recoil";
 
 const boolTypeName = [
-  "IS_SHOW_RECENT_MATCHES",
   "IS_SCROLL"
 ] as const
 

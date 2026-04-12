@@ -1,4 +1,5 @@
 
+.github
 .env*
 .husky
 # backend
@@ -53,3 +54,4 @@ docker/db/
 wiki.md
 HOOKS_NAMING_CONVENTION.md
 HOOKS_REFACTORING_TODO.md
+config.toml

@@ -1,18 +1,12 @@
 import { ROUTE_PATH } from '@/assets/routePath';
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-//! component
-import { Header } from '@/components/module/Header';
 //! hooks
 import { useAdmin } from '@/hooks/apiHooks/useAuth';
-//! recoil
-import { useRecoilValue } from 'recoil';
-import { elementSizeState } from '@/store/elementSizeState';
 
 const AdminOnly = () => {
   const navigate = useNavigate();
   const { isAdmin, isLoading } = useAdmin();
-  const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
 
   useEffect(() => {
     if (isLoading) return;
@@ -26,20 +20,7 @@ const AdminOnly = () => {
       </div>
     );
 
-  return (
-    <>
-      <Header />
-      {/* <main
-        className="bg-white"
-        style={{
-          minHeight: `calc(100vh - ${headerHeight}px)`,
-          marginTop: `${headerHeight}px`,
-        }}
-      > */}
-      <Outlet />
-      {/* </main> */}
-    </>
-  );
+  return <Outlet />;
 };
 
 export default AdminOnly;

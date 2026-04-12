@@ -8,8 +8,6 @@ import { CommentType } from '@/types';
 //! icon
 import { AiOutlineUser } from 'react-icons/ai';
 import { RotatingLines } from 'react-loader-spinner';
-// wrapper
-import { CommentsWrapper } from './CommentsWrapper';
 
 type CommentsExistType = {
   newComments: CommentType[] | undefined;
@@ -20,7 +18,7 @@ type CommentsExistType = {
   fetchNextComments: () => void;
 };
 export const CommentsExist = (props: CommentsExistType) => {
-  const { isComments, newComments, comments, isStale, isNextComments, fetchNextComments } = props;
+  const { newComments, comments, isStale, isNextComments, fetchNextComments } = props;
   const { inView, ref } = useInView();
 
   useEffect(() => {
@@ -31,7 +29,7 @@ export const CommentsExist = (props: CommentsExistType) => {
   return (
     <>
       {/* {isComments && ( */}
-      <div className="md:w-[85%] sm:w-[85%] w-[95%] max-w-[800px]">
+      <div className="pc:w-[85%] sm:w-[85%] w-[95%] max-w-[800px]">
         {newComments?.map((comment) => (
           <motion.div
             layout

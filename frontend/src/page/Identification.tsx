@@ -35,21 +35,22 @@ export const Identification = () => {
   if (!token) return;
 
   return (
-    <HeaderOnlyLayout>
+    <>
+      <HeaderOnlyLayout />
       <div
         style={{
           minHeight: `calc(100vh - (${headerHeight}px + ${footerHeight}px) - 1px)`,
         }}
         className="flex justify-center items-center"
       >
-        <div className="flex justify-center items-center max-w-[600px] w-[70%] min-w-[200px] lg:h-[300px] sm:h-[250px] h-[150px] bg-white border-[1px] border-stone-600 shadow-lg">
+        <div className="flex justify-center items-center max-w-[600px] w-[70%] min-w-[200px] pc:h-[300px] sm:h-[250px] h-[150px] bg-white border-[1px] border-stone-600 shadow-lg">
           {authCheckState.isLoading && <Authenticating />}
           {authCheckState.isSuccess && <SuccessRegister />}
           {authCheckState.isError && <FiledAuth />}
         </div>
       </div>
       <Footer />
-    </HeaderOnlyLayout>
+    </>
   );
 };
 
@@ -57,12 +58,7 @@ const Authenticating = () => {
   return (
     <>
       <p className="text-lg tracking-[0.2em]">認証中</p>
-      <RotatingLines
-        strokeColor="#000"
-        strokeWidth="3"
-        animationDuration="1"
-        width="20"
-      />
+      <RotatingLines strokeColor="#000" strokeWidth="3" animationDuration="1" width="20" />
     </>
   );
 };
@@ -94,11 +90,7 @@ const FiledAuth = () => {
   return (
     <>
       <div className="text-center">
-        {tokenErrorMessage ? (
-          <p>{tokenErrorMessage}</p>
-        ) : (
-          <p>無効なリクエストです</p>
-        )}
+        {tokenErrorMessage ? <p>{tokenErrorMessage}</p> : <p>無効なリクエストです</p>}
         <Link
           className="inline-block mt-5 py-1 px-4 bg-stone-700 hover:bg-stone-500 text-white rounded-md"
           to={ROUTE_PATH.HOME}

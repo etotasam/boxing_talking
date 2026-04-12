@@ -10,7 +10,7 @@ export const Terms = () => {
         <title>利用規約 | {siteTitle}</title>
       </Helmet>
       <div className="text-stone-800 w-full flex justify-center items-center">
-        <div className="max-w-[1000px] md:w-[80%] w-[90%] my-10">
+        <div className="max-w-[1000px] pc:w-[80%] w-[90%] my-10">
           <h1 className="text-center text-[26px]">利用規約</h1>
           <div className="mt-10">
             <h2 className="font-bold text-[18px] mb-3">第1条 定義</h2>
@@ -20,15 +20,11 @@ export const Terms = () => {
             </p>
             <ul>
               <li className="mt-1">
-                1.
-                「本サービス」とは当ウェブサイト上で提供するサービスを意味します。
+                1. 「本サービス」とは当ウェブサイト上で提供するサービスを意味します。
               </li>
+              <li className="mt-1">2. 「ユーザー」とは、本サービスを利用する者を意味します。</li>
               <li className="mt-1">
-                2. 「ユーザー」とは、本サービスを利用する者を意味します。
-              </li>
-              <li className="mt-1">
-                3.
-                「アカウント」とは、本サービスを利用するために必要な識別情報を意味します。
+                3. 「アカウント」とは、本サービスを利用するために必要な識別情報を意味します。
               </li>
             </ul>
           </div>
@@ -47,19 +43,12 @@ export const Terms = () => {
             </p>
             <ul>
               <li className="mt-1">1. 本規約に違反した場合</li>
+              <li className="mt-1">2. 本サービスのシステムに支障を与える行為をした場合</li>
+              <li className="mt-1">3. 本サービスの運営を妨害する行為をした場合</li>
               <li className="mt-1">
-                2. 本サービスのシステムに支障を与える行為をした場合
+                4. 本サービスの利用を通じて、他のユーザーまたは第三者に損害を与える行為をした場合
               </li>
-              <li className="mt-1">
-                3. 本サービスの運営を妨害する行為をした場合
-              </li>
-              <li className="mt-1">
-                4.
-                本サービスの利用を通じて、他のユーザーまたは第三者に損害を与える行為をした場合
-              </li>
-              <li className="mt-1">
-                5. その他、本サービスの利用を適当でないと判断した場合
-              </li>
+              <li className="mt-1">5. その他、本サービスの利用を適当でないと判断した場合</li>
             </ul>
           </div>
           <div className="mt-10">
@@ -71,20 +60,16 @@ export const Terms = () => {
             <ul>
               <li className="mt-1">1. 本サービスの利用規約に違反する行為</li>
               <li className="mt-1">
-                2.
-                本サービスのシステムまたはサーバーへの不正アクセスまたは侵入を試みる行為
+                2. 本サービスのシステムまたはサーバーへの不正アクセスまたは侵入を試みる行為
               </li>
               <li className="mt-1">
-                3.
-                本サービスのソフトウェアまたはコンテンツを改変または複製する行為
+                3. 本サービスのソフトウェアまたはコンテンツを改変または複製する行為
               </li>
               <li className="mt-1">
-                4.
-                本サービスの利用を通じて、他のユーザーまたは第三者に不利益または損害を与える行為
+                4. 本サービスの利用を通じて、他のユーザーまたは第三者に不利益または損害を与える行為
               </li>
               <li className="mt-1">
-                5.
-                本サービスの利用を通じて、公序良俗に反する行為または法令に違反する行為
+                5. 本サービスの利用を通じて、公序良俗に反する行為または法令に違反する行為
               </li>
               <li className="mt-1">6. その他、不適切と判断する行為</li>
             </ul>
@@ -99,9 +84,7 @@ export const Terms = () => {
             </p>
           </div>
           <div className="mt-10">
-            <h2 className="font-bold text-[18px] mb-3">
-              第6条 個人情報の取り扱い
-            </h2>
+            <h2 className="font-bold text-[18px] mb-3">第6条 個人情報の取り扱い</h2>
 
             <p className="mb-2">
               ユーザーの個人情報を、本サービスの提供および運営のために必要な範囲内で利用します。当社は、ユーザーの個人情報を第三者に提供または開示することはありません。
@@ -117,9 +100,7 @@ export const Terms = () => {
             </p>
           </div>
           <div className="mt-10">
-            <h2 className="font-bold text-[18px] mb-3">
-              第8条 準拠法・管轄裁判所
-            </h2>
+            <h2 className="font-bold text-[18px] mb-3">第8条 準拠法・管轄裁判所</h2>
           </div>
           <p className="mb-2">
             本規約の解釈および適用は、日本法に準拠するものとします。本規約に関する紛争については、東京地方裁判所を第一審の専属的合意管轄裁判所とします。

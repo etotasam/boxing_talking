@@ -4,7 +4,7 @@ import { Axios } from "@/assets/axios"
 import { useQuery, useMutation } from "react-query"
 import { API_PATH } from "@/assets/apiPath"
 // ! data
-import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal"
+import { MESSAGE } from "@/assets/statusesOnToastModal"
 import { QUERY_KEY } from "@/assets/queryKeys"
 // ! types
 import { MatchDataType, MatchResultType, RegisterMatchPropsType, MatchUpdateFormType } from "@/types"

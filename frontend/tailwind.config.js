@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 import containerQueries from '@tailwindcss/container-queries'
+import colors from 'tailwindcss/colors'
 
 export default {
   content: [
@@ -8,8 +9,13 @@ export default {
   ],
   theme: {
     extend: {
-
+      colors: {
+        'base-bg': colors.neutral[900],
+      }
     },
+    screens: {
+      'pc': '768px',
+    }
   },
   plugins: [
     containerQueries,

@@ -1,14 +1,14 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { PostComment } from './PostComment';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
+import { deviceState } from '@/store/deviceState';
 import { useLocation } from 'react-router-dom';
 import { MESSAGE } from '@/assets/statusesOnToastModal';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 import { usePostComment } from '@/hooks/apiHooks/useComment';
 import { useAuth, useGuest } from '@/hooks/apiHooks/useAuth';
-import { useWindowSize } from '@/hooks/useWindowSize';
 
 export const PostCommentContainer = () => {
   //? urlからクエリmatch_idを取得
@@ -27,7 +27,7 @@ export const PostCommentContainer = () => {
 
   const { postComment, commentPostState } = usePostComment();
 
-  const { device } = useWindowSize();
+  const device = useRecoilValue(deviceState);
   const commentPostEl = useRef<HTMLDivElement>();
   //? deviceのサイズが変わるとcommentPostElementの高さも変わる様になってるから依存関係に"device"を入れてるよ
   const commentPostRef = useCallback(

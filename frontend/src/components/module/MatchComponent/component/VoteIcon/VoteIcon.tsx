@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 //! icons
 import { GiBoxingGlove } from 'react-icons/gi';
 
-//! hook
-import { useModalState } from '@/hooks/useModalState';
-import { useWindowSize } from '@/hooks/useWindowSize';
+import { useRecoilValue } from 'recoil';
+import { deviceState } from '@/store/deviceState';
+
+const ICON_TEXT = '勝敗予想' as const;
 
 export const VoteIcon = ({
   isScroll,
@@ -17,7 +18,7 @@ export const VoteIcon = ({
   showPredictionModal: () => void;
   bottomPosition: number;
 }) => {
-  const { device } = useWindowSize();
+  const device = useRecoilValue(deviceState);
 
   return (
     <AnimatePresence>
@@ -50,7 +51,7 @@ export const VoteIcon = ({
           }
           className="z-10 text-xs text-black bg-yellow-400 rounded-[50px] my-1 pt-1 px-2 mx-1"
         >
-          投票
+          {ICON_TEXT}
         </motion.span>
         <motion.span
           animate={isScroll ? { x: '-25px' } : { x: 0 }}

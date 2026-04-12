@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 //! message controller
 import { BG_COLOR_ON_TOAST_MODAL } from '@/assets/statusesOnToastModal';
@@ -28,28 +28,16 @@ export const ToastModal = (props: PropsType) => {
     return () => window.removeEventListener('keydown', Esc);
   }, []);
 
-  const [color, setColor] = React.useState<string>();
-  React.useEffect(() => {
-    switch (bgColor) {
-      case BG_COLOR_ON_TOAST_MODAL.ERROR:
-        setColor('bg-red-800 text-white');
-        break;
-      case BG_COLOR_ON_TOAST_MODAL.SUCCESS:
-        setColor('bg-green-600 text-white');
-        break;
-      case BG_COLOR_ON_TOAST_MODAL.DELETE:
-        setColor('bg-stone-700 text-white');
-        break;
-      case BG_COLOR_ON_TOAST_MODAL.NOTICE:
-        setColor('bg-blue-900 text-white');
-        break;
-      case BG_COLOR_ON_TOAST_MODAL.GRAY:
-        setColor('bg-stone-700 text-white');
-        break;
-      default:
-        setColor('bg-neutral-800 text-white');
-    }
-  }, [bgColor]);
+  //? bgColorに対応するCSSクラスのマッピング
+  const bgColorClassMap: Record<BgColorType, string> = {
+    [BG_COLOR_ON_TOAST_MODAL.ERROR]: 'bg-red-800 text-white',
+    [BG_COLOR_ON_TOAST_MODAL.SUCCESS]: 'bg-green-600 text-white',
+    [BG_COLOR_ON_TOAST_MODAL.DELETE]: 'bg-stone-700 text-white',
+    [BG_COLOR_ON_TOAST_MODAL.NOTICE]: 'bg-blue-900 text-white',
+    [BG_COLOR_ON_TOAST_MODAL.GRAY]: 'bg-stone-700 text-white',
+    [BG_COLOR_ON_TOAST_MODAL.NULL]: 'bg-neutral-800 text-white',
+  };
+  const color = bgColorClassMap[bgColor];
 
   const variants = {
     hidden: {
@@ -76,7 +64,7 @@ export const ToastModal = (props: PropsType) => {
       exit="hidden"
       variants={variants}
       onClick={hideModal}
-      className={`cursor-pointer z-[999] fixed top-[10px] left-[50%] py-2 px-5 min-w-[80%] md:min-w-[30%] text-center rounded-lg whitespace-pre-wrap select-none  ${color}`}
+      className={`cursor-pointer z-[999] fixed top-[10px] left-[50%] py-2 px-5 min-w-[80%] pc:min-w-[30%] text-center rounded-lg whitespace-pre-wrap select-none  ${color}`}
     >
       {messageOnToast}
     </motion.div>

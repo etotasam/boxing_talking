@@ -38,9 +38,9 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
         {/* //?会場 */}
         <div className={'mt-7 text-center text-[8px]'}>
           <SubHeadline content="会場">
-            <span className="lg:w-[32px] lg:h-[24px] w-[24px] h-[18px] overflow-hidden absolute top-[1px] lg:left-[-35px] left-[-30px]">
+            <span className="pc:w-[32px] pc:h-[24px] w-[24px] h-[18px] overflow-hidden absolute top-[1px] pc:left-[-35px] left-[-30px]">
               <FlagImage
-                className="inline-block border-[1px] lg:w-[24px] lg:h-[18px] w-[24px] h-[18px]"
+                className="inline-block border-[1px] pc:w-[24px] pc:h-[18px] w-[24px] h-[18px]"
                 nationality={matchData.country}
               />
             </span>

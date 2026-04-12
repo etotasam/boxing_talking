@@ -59,7 +59,7 @@ const PostCommentTextarea = ({
     >
       <textarea
         ref={textareaRef}
-        className="w-full resize-none outline-0 placeholder:text-stone-600 leading-[34px] bg-neutral-800"
+        className="w-full resize-none outline-none placeholder:text-stone-600 leading-[34px] bg-neutral-800"
         placeholder="コメント投稿..."
         wrap={'hard'}
         name=""

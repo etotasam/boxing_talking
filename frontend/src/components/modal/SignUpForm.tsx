@@ -9,6 +9,8 @@ import { formTypeState, FORM_TYPE } from '@/store/formTypeState';
 import { usePreSignUp } from '@/hooks/apiHooks/useAuth';
 //! component
 import { CustomButton } from '@/components/atomic/Button';
+//! utils
+import { validateName, validateEmail, validatePassword } from '@/utils/validation/signUpValidation';
 
 export const SignUpForm = () => {
   const { preSignUp, isSuccess: isSuccessPreRegister } = usePreSignUp();
@@ -17,35 +19,17 @@ export const SignUpForm = () => {
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [isPassedValidateName, setIsPassedValidateName] = useState<boolean>();
-  const [isPassedValidateEmail, setIsPassedValidateEmail] = useState<boolean>();
-  const [isPassedValidatePassword, setIsPassedValidatePassword] = useState<boolean>();
+  //? バリデーション（stateではなく、レンダリング毎に再計算される通常変数）
+  const isPassedValidateName = validateName(name);
+  const isPassedValidateEmail = validateEmail(email);
+  const {
+    hasUppercase: isValidUppercase,
+    isValidLength,
+    hasNumber: isValidHasNumber,
+    isValid: isPassedValidatePassword,
+  } = validatePassword(password);
   //? すべての検証状態
   const isValidated = isPassedValidateName && isPassedValidateEmail && isPassedValidatePassword;
-
-  useEffect(() => {
-    const state = name.length >= 3 && name.length <= 30;
-    setIsPassedValidateName(state);
-  }, [name]);
-  useEffect(() => {
-    const emailValidationRegex =
-      /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
-    setIsPassedValidateEmail(emailValidationRegex.test(email));
-  }, [email]);
-  useEffect(() => {
-    const state = isValidUppercase && isValidLength && isValidHasNumber;
-    setIsPassedValidatePassword(state);
-  }, [password]);
-
-  //? passwordに大文字が含まれてるか
-  const uppercaseRegex = /[A-Z]+/;
-  const isValidUppercase = uppercaseRegex.test(password);
-  //? passwordに文字数制限
-  const lengthRegex = /^.{8,24}$/;
-  const isValidLength = lengthRegex.test(password);
-  //? passwordに数字が含まれてるか
-  const numberRegex = /[0-9]/;
-  const isValidHasNumber = numberRegex.test(password);
 
   /**
    * Form Send (User Resist)
@@ -86,7 +70,7 @@ export const SignUpForm = () => {
         onMouseDown={(e) => {
           e.stopPropagation();
         }}
-        className="md:w-[550px] md:h-[600px] sm:w-2/3 sm:h-2/3 w-[95%] max-w-[500px] h-auto bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
+        className="pc:w-[550px] pc:h-[600px] sm:w-2/3 sm:h-2/3 w-[95%] max-w-[500px] h-auto bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
       >
         <motion.div
           initial={{ opacity: 0 }}
@@ -191,7 +175,7 @@ const PreSignUpModal = ({ onClick }: { onClick: (bool: boolean) => void }) => {
     >
       <div
         onMouseDown={(e) => e.stopPropagation()}
-        className="relative flex justify-center items-center md:w-[700px] md:h-[400px] sm:w-2/3 sm:h-2/3 w-[95%] h-2/3 shadow-lg shadow-black/30 bg-white border-[1px] border-stone-600"
+        className="relative flex justify-center items-center pc:w-[700px] pc:h-[400px] sm:w-2/3 sm:h-2/3 w-[95%] h-2/3 shadow-lg shadow-black/30 bg-white border-[1px] border-stone-600"
       >
         <AiOutlineClose
           onClick={handleCloseModal}

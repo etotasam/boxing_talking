@@ -28,6 +28,9 @@ export const PredictionVoteModalContainer = (props: PropsType) => {
     if (isSuccess || isError) {
       hideModal();
     }
+    return () => {
+      hideModal();
+    };
   }, [isSuccess, isError]);
 
   //? 試合情報がない場合は何も表示させない

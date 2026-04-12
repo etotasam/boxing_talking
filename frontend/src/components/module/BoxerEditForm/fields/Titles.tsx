@@ -1,43 +1,23 @@
-import { useEffect, useState } from 'react';
-// ! recoil
-import { useRecoilState } from 'recoil';
-import { boxerCurrentState } from '@/store/boxerCurrentState';
 //! types
 import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 //! data
 import { ORGANIZATIONS, WEIGHT_CLASS } from '@/assets/boxerData';
 //! types
 import type { BoxerType, OrganizationsType, WeightClassType } from '@/types';
-// ! lodash
-import { cloneDeep, get } from 'lodash';
 
 export const Titles = (props: {
   titles: BoxerType['titles'];
   setBoxerFieldData: LocalDataEntryType;
 }) => {
   const { titles, setBoxerFieldData } = props;
-  // console.log(titles);
-  // ! use hook
-  // ? タイトル入力欄(<input> <select>)の数を決める useState
-  const [hasTitleCount, setHasTitleCount] = useState(1);
-  // console.log(hasTitleCount);
-
-  // const [boxerDataOnForm, setBoxerDataOnForm] = useRecoilState(boxerDataOnFormState);
-
-  // ? 団体と階級を選択した場合入力欄を追加
-  useEffect(() => {
-    if (titles.length >= 4) {
-      setHasTitleCount(4);
-      return;
-    }
-    if (!titles.length) {
-      setHasTitleCount(1);
-      return;
-    }
-    const lastIndex = titles.length - 1;
-    if (!titles[lastIndex]?.weight || !titles[lastIndex]?.organization) return;
-    setHasTitleCount(titles.length + 1);
-  }, [titles]);
+  // ? タイトル入力欄の表示数を titles から算出
+  const hasTitleCount = (() => {
+    if (titles.length >= 4) return 4;
+    if (!titles.length) return 1;
+    const last = titles[titles.length - 1];
+    if (!last?.weight || !last?.organization) return titles.length;
+    return titles.length + 1;
+  })();
 
   // ? ローカルの titles を更新する関数 ※organization と weight の両方が空のものは除外する(hasTitleCount数をコントロールするため)
   const changeLocalTitles = (titles: BoxerType['titles']) => {

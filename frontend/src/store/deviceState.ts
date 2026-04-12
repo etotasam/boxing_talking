@@ -1,7 +1,7 @@
-import { atom } from "recoil";
+import { atom } from 'recoil';
 
-export type DeviceStateType = "PC" | "SP" | undefined
+export type DeviceStateType = 'PC' | 'SP';
 export const deviceState = atom<DeviceStateType>({
-  key: "deviceState",
-  default: undefined
-})
+  key: 'deviceState',
+  default: 'SP',
+});

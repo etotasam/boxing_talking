@@ -107,7 +107,7 @@ const LoginForm = () => {
   const passwordRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="md:w-[550px] md:h-[600px] sm:w-2/3 w-[95%] max-w-[500px] h-auto bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center">
+    <div className="pc:w-[550px] pc:h-[600px] sm:w-2/3 w-[95%] max-w-[500px] h-auto bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center">
       <motion.div
         initial="initial"
         animate="show"

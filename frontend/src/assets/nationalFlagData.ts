@@ -70,7 +70,7 @@ export const getNationalFlag = (country: CountryType) => {
 };
 
 
-export const formatPosition = (country: CountryType) => {
+export const formatPosition = (_country: CountryType) => {
   // if (country == COUNTRY.USA) return '25% 20%';
   // if (country == COUNTRY.UK) return '25% 30%';
   // if (country == COUNTRY.UZBEKISTAN) return '25% 20%';

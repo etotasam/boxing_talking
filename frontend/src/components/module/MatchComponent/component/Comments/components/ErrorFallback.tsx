@@ -1,4 +1,3 @@
-import { CommentsWrapper } from './CommentsWrapper';
 import { MdErrorOutline } from 'react-icons/md';
 
 export const ErrorFallback = () => {

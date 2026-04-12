@@ -5,7 +5,7 @@ import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 //! component
 import { Header } from '@/components/module/Header';
-const HeaderOnlyLayout = ({ children }: { children: React.ReactNode }) => {
+const HeaderOnlyLayout = () => {
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   return (
     <div className="text-stone-700">
@@ -15,8 +15,8 @@ const HeaderOnlyLayout = ({ children }: { children: React.ReactNode }) => {
           minHeight: `calc(100vh - (${headerHeight}px)`,
         }}
       >
-        {/* <Outlet /> */}
-        {children}
+        <Outlet />
+        {/* {children} */}
       </main>
     </div>
   );

@@ -16,10 +16,12 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": "./",
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "test-setup": [
+        "./test-setup.tsx"
       ]
     },
     "strict": true,

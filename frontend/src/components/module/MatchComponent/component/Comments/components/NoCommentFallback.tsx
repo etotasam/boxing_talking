@@ -1,4 +1,3 @@
-import { CommentsWrapper } from './CommentsWrapper';
 import { FaRegPenToSquare } from 'react-icons/fa6';
 
 export const NoCommentFallback = () => {

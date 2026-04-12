@@ -3,8 +3,6 @@ import dayjs from 'dayjs';
 import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
 import { MESSAGE } from '@/assets/statusesOnToastModal';
-//! layout wrapper
-import AdminOnlyLayout from '@/layout/AdminOnlyLayout';
 //! func
 import { isMatchDatePast } from '@/utils/match';
 //! components
@@ -76,7 +74,7 @@ export const MatchEdit = () => {
   };
 
   return (
-    <AdminOnlyLayout>
+    <>
       <Helmet>
         <title>試合編集 | {siteTitle}</title>
       </Helmet>
@@ -152,7 +150,7 @@ export const MatchEdit = () => {
       {isDeleteConfirm && (
         <DeleteConfirm execution={deleteExecution} cancel={() => setIsDeleteConfirm(false)} />
       )}
-    </AdminOnlyLayout>
+    </>
   );
 };
 
