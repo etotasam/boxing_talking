@@ -1,14 +1,14 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { PostComment } from './PostComment';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
+import { deviceState } from '@/store/deviceState';
 import { useLocation } from 'react-router-dom';
-import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/assets/statusesOnToastModal';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 import { usePostComment } from '@/hooks/apiHooks/useComment';
 import { useAuth, useGuest } from '@/hooks/apiHooks/useAuth';
-// import { useLoading } from '@/hooks/useLoading';
 
 export const PostCommentContainer = () => {
   //? urlからクエリmatch_idを取得
@@ -16,30 +16,30 @@ export const PostCommentContainer = () => {
   const query = new URLSearchParams(search);
   const matchId = Number(query.get('match_id'));
 
-  // const { startLoading, resetLoadingState } = useLoading();
-
   const { data: isGuest } = useGuest();
   const { data: authUser } = useAuth();
   const isAuthOrGuest = Boolean(isGuest || authUser);
 
   const setRecoilPostCommentHeight = useSetRecoilState(elementSizeState('POST_COMMENT_HEIGHT'));
 
-  const { setToastModal, showToastModal } = useToastModal();
+  const { showNoticeToast } = useToastModal();
   const [comment, setComment] = useState<string>();
 
-  const {
-    postComment,
-    isSuccess: isSuccessPostComment,
-    isLoading: isPostingComment,
-  } = usePostComment();
+  const { postComment, commentPostState } = usePostComment();
+
+  const device = useRecoilValue(deviceState);
   const commentPostEl = useRef<HTMLDivElement>();
-  const commentPostRef = useCallback((node: HTMLDivElement) => {
-    if (node) {
-      commentPostEl.current = node;
-      //? コメント入力Elementの高さの初期値をRecoilへ
-      setRecoilPostCommentHeight(node.clientHeight);
-    }
-  }, []);
+  //? deviceのサイズが変わるとcommentPostElementの高さも変わる様になってるから依存関係に"device"を入れてるよ
+  const commentPostRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (node) {
+        commentPostEl.current = node;
+        //? コメント入力Elementの高さの初期値をRecoilへ
+        setRecoilPostCommentHeight(node.clientHeight);
+      }
+    },
+    [device]
+  );
 
   const textareaRef = useRef(null);
   const textarea = textareaRef.current as unknown as HTMLTextAreaElement;
@@ -61,7 +61,7 @@ export const PostCommentContainer = () => {
 
   // ? コメント投稿成功時にコメント入力欄とその高さを初期化
   useEffect(() => {
-    if (isSuccessPostComment) {
+    if (commentPostState === 'success') {
       setComment('');
       //? textareaの高さをリセットと中身を削除
       (textareaRef.current as unknown as HTMLTextAreaElement).style.height = 'auto';
@@ -69,25 +69,17 @@ export const PostCommentContainer = () => {
     }
     //? postCommentの高さを初期化
     setRecoilPostCommentHeight((commentPostEl.current as HTMLDivElement).clientHeight);
-  }, [isSuccessPostComment]);
+  }, [commentPostState]);
 
   //? コメント投稿の実行
   const storeCommentExecute = () => {
-    if (isPostingComment) return;
+    if (commentPostState === 'loading') return;
     if (!isAuthOrGuest) {
-      setToastModal({
-        message: MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      showToastModal();
+      showNoticeToast(MESSAGE.FAILED_POST_COMMENT_WITHOUT_AUTH);
       return;
     }
     if (!comment) {
-      setToastModal({
-        message: MESSAGE.COMMENT_IS_EMPTY,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      showToastModal();
+      showNoticeToast(MESSAGE.COMMENT_IS_EMPTY);
       return;
     }
     postComment({ matchId: matchId, comment: comment });

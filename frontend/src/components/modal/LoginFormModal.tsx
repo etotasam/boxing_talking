@@ -11,7 +11,7 @@ import { Button } from '@/components/atomic/Button';
 import { useLogin, useGuestLogin } from '@/hooks/apiHooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 // !etc
-import { MESSAGE, BG_COLOR_ON_TOAST_MODAL } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/assets/statusesOnToastModal';
 
 export const LoginFormModal = ({ isShow }: { isShow: boolean }) => {
   // ! recoil
@@ -20,10 +20,16 @@ export const LoginFormModal = ({ isShow }: { isShow: boolean }) => {
   return (
     <AnimatePresence>
       {isShow && (
-        <ClearFullScreenDiv className="z-40 bg-white/20 flex justify-center items-center">
-          {formType === FORM_TYPE.LOGIN_FORM && <LoginForm />}
-          {formType === FORM_TYPE.SIGN_ON_FORM && <SignUpForm />}
-        </ClearFullScreenDiv>
+        <motion.div
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1, transition: { duration: 0 } }}
+          exit={{ opacity: 0, transition: { duration: 0.3 } }}
+        >
+          <ClearFullScreenDiv className="z-40 bg-white/20 flex justify-center items-center">
+            {formType === FORM_TYPE.LOGIN_FORM && <LoginForm />}
+            {formType === FORM_TYPE.SIGN_ON_FORM && <SignUpForm />}
+          </ClearFullScreenDiv>
+        </motion.div>
       )}
     </AnimatePresence>
   );
@@ -36,9 +42,13 @@ const LoginForm = () => {
   const setFormType = useSetRecoilState(formTypeState);
 
   // ! hooks
-  const { showToastModal, setToastModal } = useToastModal();
+  const { showErrorToast } = useToastModal();
   const { login } = useLogin();
 
+  const validateEmail = (email: string): boolean => {
+    const emailPattern = /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
+    return !emailPattern.test(email);
+  };
   // ! attempt login
   /**
    * ログイン実行
@@ -50,22 +60,16 @@ const LoginForm = () => {
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
     // ? email of password が未入力の場合
+
     if (!email || !password) {
-      setToastModal({
-        message: MESSAGE.EMAIL_OR_PASSWORD_NO_INPUT,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      showToastModal();
+      showErrorToast(MESSAGE.EMAIL_OR_PASSWORD_NO_INPUT);
       return;
     }
-    // ? emailのバリデーション
-    const emailPattern = /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
-    if (!emailPattern.test(email)) {
-      setToastModal({
-        message: MESSAGE.EMAIL_FAILED_VALIDATE,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      showToastModal();
+
+    // ? emailのバリデーションに失敗した場合エラーモーダル表示して処理終了
+    const isEmailValid = validateEmail(email);
+    if (isEmailValid) {
+      showErrorToast(MESSAGE.EMAIL_FAILED_VALIDATE);
       return;
     }
 
@@ -103,10 +107,7 @@ const LoginForm = () => {
   const passwordRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div
-      // onMouseDown={(e) => e.stopPropagation()}
-      className="md:w-[550px] md:h-[600px] sm:w-2/3 w-[95%] max-w-[500px] h-auto bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center"
-    >
+    <div className="pc:w-[550px] pc:h-[600px] sm:w-2/3 w-[95%] max-w-[500px] h-auto bg-white rounded fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center items-center">
       <motion.div
         initial="initial"
         animate="show"

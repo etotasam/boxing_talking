@@ -14,38 +14,54 @@ import { Terms } from './page/Terms';
 import { Identification } from '@/page/Identification';
 import { NotFound } from '@/page/NotFound';
 import { PastMatches } from './page/PastMatches';
-import { TestPage } from './page/TestPage';
-import { NextTestPage } from './page/NextTestPage';
+import { Test } from '@/page/Test';
+
 // ! middleware
 import AdminOnly from './middleware/AdminOnly';
-import Container from './middleware/Container';
 import './App.css';
+// ! layout
+import AppShell from './layout/AppShell';
+import AdminLayout from './layout/AdminLayout';
+import ContentLayout from './layout/ContentLayout';
+import HeaderFooterLayout from './layout/HeaderFooterLayout';
+import HeaderShell from './layout/HeaderShell';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<Container />}>
-          <Route path={ROUTE_PATH.HOME} element={<Home />} />
-          <Route path={ROUTE_PATH.PAST_MATCHES} element={<PastMatches />} />
-          <Route path={ROUTE_PATH.MATCH} element={<Match />} />
-          <Route path={ROUTE_PATH.PAST_MATCH_SINGLE} element={<PastMatch />} />
+        <Route element={<AppShell />}>
+          <Route element={<HeaderShell />}>
+            <Route element={<HeaderFooterLayout />}>
+              <Route path={ROUTE_PATH.HOME} element={<Home />} />
+              <Route path={ROUTE_PATH.PAST_MATCHES} element={<PastMatches />} />
+              {/* //? </HeaderFooterLayout> */}
+            </Route>
+            <Route element={<ContentLayout />}>
+              <Route path={ROUTE_PATH.PAST_MATCH_SINGLE} element={<PastMatch />} />
+              <Route path={ROUTE_PATH.MATCH} element={<Match />} />
+              {/* //? </ContentLayout> */}
+            </Route>
 
-          <Route element={<AdminOnly />}>
-            <Route path={ROUTE_PATH.BOXER_EDIT} element={<BoxerEdit />} />
-            <Route path={ROUTE_PATH.BOXER_REGISTER} element={<BoxerRegister />} />
-            <Route path={ROUTE_PATH.MATCH_EDIT} element={<MatchEdit />} />
-            <Route path={ROUTE_PATH.MATCH_REGISTER} element={<MatchRegister />} />
-            {/* //? </AdminOnly> */}
+            <Route element={<AdminOnly />}>
+              <Route element={<AdminLayout />}>
+                <Route path={ROUTE_PATH.BOXER_EDIT} element={<BoxerEdit />} />
+                <Route path={ROUTE_PATH.BOXER_REGISTER} element={<BoxerRegister />} />
+                <Route path={ROUTE_PATH.MATCH_EDIT} element={<MatchEdit />} />
+                <Route path={ROUTE_PATH.MATCH_REGISTER} element={<MatchRegister />} />
+                {/* //? </AdminLayout> */}
+              </Route>
+              {/* //? </AdminOnly> */}
+            </Route>
+            {/* //? HeaderShell */}
           </Route>
-          {/* //? </container> */}
+          {/*  //? AppShell */}
         </Route>
 
         <Route path={ROUTE_PATH.TERMS} element={<Terms />} />
         <Route path={ROUTE_PATH.IDENTIFICATION} element={<Identification />} />
-        <Route path={'/test'} element={<TestPage />} />
-        <Route path={'/next_test'} element={<NextTestPage />} />
 
+        <Route path="/test" element={<Test />} />
         <Route path="/*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

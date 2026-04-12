@@ -3,18 +3,18 @@ import { useQuery, useMutation, } from "react-query"
 import { Axios } from "@/assets/axios"
 import { API_PATH } from "@/assets/apiPath"
 //! data
-import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from "@/assets/statusesOnToastModal";
+import { MESSAGE } from "@/assets/statusesOnToastModal";
 import { QUERY_KEY } from "@/assets/queryKeys";
 //! hook
-import { useLoading } from "../useLoading"
+import { useFullScreenLoading } from "../useFullScreenLoading"
 import { useToastModal } from "../useToastModal";
 
 import { useGuest, useAuth } from "./useAuth";
 //! types
-import { PredictionType, MatchPredictionsType } from "@/assets/types"
+import { PredictionType, MatchPredictionsType } from "@/types"
 //! Recoil
 import { useRecoilState } from "recoil"
-import { apiFetchDataState } from "@/store/apiFetchDataState"
+import { apiFetchState } from "@/store/apiFetchDataState"
 
 
 //! ユーザーの勝敗予想の取得
@@ -40,15 +40,21 @@ export const useFetchUsersPrediction = () => {
     }
   })
 
-  const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/fetch", state: "isLoading" }))
-
+  // const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/fetch", state: "isLoading" }))
+  const [usePredictionFetchState, setUserPredictionFetchState] = useRecoilState(apiFetchState("userPrediction/fetch"))
 
   useEffect(() => {
-    setIsLoading(isUserPredictionLoading)
-  }, [isUserPredictionLoading])
+    if (isUserPredictionLoading) {
+      setUserPredictionFetchState("loading")
+    } else if (isRefetching) {
+      setUserPredictionFetchState("refetching")
+    } else {
+      setUserPredictionFetchState("idle")
+    }
+  }, [isUserPredictionLoading, isRefetching])
 
 
-  return { data, isLoading, isRefetching, refetch }
+  return { data, refetch, usePredictionFetchState }
 }
 
 //! 試合予想の投票
@@ -56,8 +62,8 @@ export const useVoteMatchPrediction = () => {
   // const queryClient = useQueryClient()
   const { refetch: refetchAllFetchMatchPredictionOfAuthUser } = useFetchUsersPrediction()
   // const { refetch: refetchMatches } = useFetchMatches()
-  const { setToastModal, showToastModal } = useToastModal()
-  const { startLoading, resetLoadingState } = useLoading()
+  const { showErrorToast, showSuccessToast } = useToastModal()
+  const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   type ApiPropsType = {
     matchId: number,
     prediction: "red" | "blue"
@@ -71,49 +77,58 @@ export const useVoteMatchPrediction = () => {
   }, [])
   const { mutate, isLoading: isMutateLoading, isSuccess: isMutateSuccess, isError } = useMutation(api, {
     onMutate: () => {
-      startLoading()
+      showFullScreenLoading()
     }
   })
   const matchVotePrediction = ({ matchId, prediction }: ApiPropsType) => {
     mutate({ matchId, prediction }, {
       onSettled: () => {
-        resetLoadingState()
+        hideFullScreenLoading()
       },
       onSuccess: () => {
         refetchAllFetchMatchPredictionOfAuthUser()
-        setToastModal({ message: MESSAGE.SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION, bgColor: BG_COLOR_ON_TOAST_MODAL.SUCCESS })
-        showToastModal()
+        showSuccessToast(MESSAGE.SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION)
       },
       onError: (error: any) => {
 
         if (error.data.message === "Cannot win-loss prediction after match date") {
-          setToastModal({ message: MESSAGE.MATCH_IS_ALREADY_DONE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          showToastModal()
+          showErrorToast(MESSAGE.MATCH_IS_ALREADY_DONE)
           return
         }
         if (error.data.message === "Cannot win-loss prediction. You have already done.") {
-          setToastModal({ message: MESSAGE.ALREADY_HAVE_DONE_VOTE, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-          showToastModal()
+          showErrorToast(MESSAGE.ALREADY_HAVE_DONE_VOTE)
           return
         }
-        setToastModal({ message: MESSAGE.FAILED_VOTE_WIN_LOSS_PREDICTION, bgColor: BG_COLOR_ON_TOAST_MODAL.ERROR })
-        showToastModal()
+        showErrorToast(MESSAGE.FAILED_VOTE_WIN_LOSS_PREDICTION)
       }
     })
   }
 
-  const [isSuccess, setIsSuccess] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/post", state: "isSuccess" }))
-  const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/post", state: "isLoading" }))
+  // const [isSuccess, setIsSuccess] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/post", state: "isSuccess" }))
+  // const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/post", state: "isLoading" }))
+  const [userPredictionPostState, setUserPredictionPostState] = useRecoilState(apiFetchState("userPrediction/post"))
+
+  // useEffect(() => {
+  //   setIsSuccess(isMutateSuccess)
+  // }, [isMutateSuccess])
+
+  // useEffect(() => {
+  //   setIsLoading(isMutateLoading)
+  // }, [isMutateLoading])
 
   useEffect(() => {
-    setIsSuccess(isMutateSuccess)
-  }, [isMutateSuccess])
+    if (isMutateLoading) {
+      setUserPredictionPostState("loading")
+    } else if (isMutateSuccess) {
+      setUserPredictionPostState("success")
+    } else if (isError) {
+      setUserPredictionPostState("error")
+    } else {
+      setUserPredictionPostState("idle")
+    }
+  }, [isMutateLoading, isMutateSuccess, isError])
 
-  useEffect(() => {
-    setIsLoading(isMutateLoading)
-  }, [isMutateLoading])
-
-  return { matchVotePrediction, isLoading, isSuccess, isError }
+  return { matchVotePrediction, userPredictionPostState, isSuccess: isMutateSuccess, isError }
 }
 
 //!試合予想の投票数の取得
@@ -124,7 +139,7 @@ export const useMatchPredictions = (matchId: number) => {
     return res.data
   }, [])
 
-  const { data, isLoading: isMatchPredictionLoading, isRefetching, refetch } = useQuery([QUERY_KEY.MATCH_PREDICTIONS, { id: matchId }], api, {
+  const { data, isLoading, isRefetching, refetch } = useQuery([QUERY_KEY.MATCH_PREDICTIONS, { id: matchId }], api, {
     staleTime: 5 * 60 * 1000,
     onError: () => {
     },
@@ -143,11 +158,18 @@ export const useMatchPredictions = (matchId: number) => {
   }, []);
 
 
-  const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "matchPrediction/fetch", state: "isLoading" }))
+  // const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "matchPrediction/fetch", state: "isLoading" }))
+  const [matchPredictionFetchState, setMatchPredictionFetchState] = useRecoilState(apiFetchState("matchPrediction/fetch"))
 
   useEffect(() => {
-    setIsLoading(isMatchPredictionLoading)
-  }, [isMatchPredictionLoading])
+    if (isLoading) {
+      setMatchPredictionFetchState("loading")
+    } else if (isRefetching) {
+      setMatchPredictionFetchState("refetching")
+    } else {
+      setMatchPredictionFetchState("idle")
+    }
+  }, [isLoading, isRefetching])
 
-  return { data, isLoading, isRefetching, refetch }
+  return { data, matchPredictionFetchState, refetch }
 }

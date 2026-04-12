@@ -21,32 +21,21 @@ class TitleRepository implements TitleRepositoryInterface
   }
 
   /**
-   * ボクサーの保持するタイトルをtitlesテーブルに保存
-   * @param int $boxerId,
-   * @param int $organizationId,
-   * @param int $weightDivisionId,
-   *
-   * @return bool
+   * 他のボクサーが所持しているタイトルかどうかを調べる
+   * @param int $organizationId
+   * @param int $weightDivisionId
+   * @return Boxer|null
    */
-  public function createTitlesHoldByTheBoxer($boxerId, $organizationId, $weightDivisionId)
+  public function hasOtherBoxerTitle(int $organizationId, int $weightDivisionId)
   {
-    $title = new Title;
-    $title->fill([
-      "boxer_id" => $boxerId,
-      "organization_id" => $organizationId,
-      "weight_division_id" => $weightDivisionId
-    ]);
-    $title->save();
-    // return Title::create([
-    //   "boxer_id" => $boxerId,
-    //   "organization_id" => $organizationId,
-    //   "weight_division_id" => $weightDivisionId
-    // ]);
+    return Title::where('organization_id', $organizationId)
+      ->where('weight_division_id', $weightDivisionId)
+      ->first();
   }
 
   /**
    * ボクサーの保持タイトル(titlesテーブル)を保存(一括)
-   * @param array $titlesArray [["boxer_id" => 1, "organization_id" => 1, "weight_division_id" => 1], ...]
+   * @param array $titlesArray [["boxer_id" => int, "organization_id" => int, "weight_division_id" => int], ...]
    * @return bool
    */
   public function storeTitlesHoldByTheBoxer($titlesArray)
@@ -55,12 +44,49 @@ class TitleRepository implements TitleRepositoryInterface
   }
 
   /**
-   * ボクサーが所持するタイトル(titlesテーブル)を削除
+   * ボクサーの保持タイトル(titlesテーブル)を既存か確認しながら保存(1件)
+   * @param int $boxerId
+   * @param int $organizationId
+   * @param int $weightDivisionId
+   * @return void
+   */
+  public function storeTitle(int $boxerId, int $organizationId, int $weightDivisionId)
+  {
+    Title::firstOrCreate([
+      'boxer_id' => $boxerId,
+      'organization_id' => $organizationId,
+      'weight_division_id' => $weightDivisionId
+    ]);
+  }
+
+  /**
+   * ボクサーが所持するタイトル(titlesテーブル)を全て削除
    * @param int boxerId
    * @return int
    */
   public function deleteTitlesHoldByTheBoxer($boxerId)
   {
     return Title::where('boxer_id', $boxerId)->delete();
+  }
+
+  /**
+   * ボクサー保持のタイトルを1件削除
+   * @param int $boxerId
+   * @param int $weightDivisionId
+   * @param int|null $organizationId
+   * @return bool isDeleteTarget
+   */
+  public function deleteTitle(int $boxerId, int $weightDivisionId, int $organizationId = null): bool
+  {
+    $query = Title::where('boxer_id', $boxerId)
+      ->where('weight_division_id', $weightDivisionId);
+
+    if ($organizationId !== null) {
+      $query->where('organization_id', $organizationId);
+    }
+
+    $deleteCount = $query->delete();
+
+    return $deleteCount > 0;
   }
 }

@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { BoxerType } from "@/assets/types";
+import { BoxerType } from "@/types";
 
 type boxerInfoDataState = BoxerType & { color: "red" | "blue" }
 export const boxerInfoDataState = atom<boxerInfoDataState>({

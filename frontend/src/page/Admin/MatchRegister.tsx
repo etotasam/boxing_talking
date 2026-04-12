@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-//! layout wrapper
-import AdminOnlyLayout from '@/layout/AdminOnlyLayout';
 // ! hooks
 import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
-import { BoxerType } from '@/assets/types';
-import { useLoading } from '@/hooks/useLoading';
+import { BoxerType } from '@/types';
 //! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
@@ -28,21 +25,20 @@ export const MatchRegister = () => {
     blue_boxer: undefined,
   };
   const [matchBoxers, setMatchBoxers] = useState<MatchBoxersType>(initialMatchBoxers);
-  const { resetLoadingState } = useLoading();
 
   //? 初期設定(クリーンアップとか)
-  useEffect(() => {
-    return () => {
-      resetLoadingState();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     resetLoadingState();
+  //   };
+  // }, []);
 
   return (
-    <AdminOnlyLayout>
+    <>
       <Helmet>
         <title>試合登録 | {siteTitle}</title>
       </Helmet>
-      <div className="w-full flex" style={{ minHeight: `calc( 100vh - ${headerHeight}px)` }}>
+      <div className="w-full flex">
         <section className="w-[70%] border-r-[1px] border-stone-200">
           <div className="sticky top-[10px]">
             <MatchSetUpBox boxers={matchBoxers} />
@@ -65,7 +61,12 @@ export const MatchRegister = () => {
           </div>
         </section>
         <section
-          style={{ maxHeight: `calc( 100vh - ${headerHeight}px)` }}
+          style={{
+            position: 'sticky',
+            top: `${headerHeight}px`,
+            left: 0,
+            maxHeight: `calc( 100vh - ${headerHeight}px)`,
+          }}
           className="relative w-[30%] min-w-[300px] pb-5 overflow-auto"
         >
           <PaginationBoxerList pageCount={pageCount} />
@@ -76,7 +77,7 @@ export const MatchRegister = () => {
           />
         </section>
       </div>
-    </AdminOnlyLayout>
+    </>
   );
 };
 

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 //!type
-import { MatchDataType } from '@/assets/types';
+import { MatchDataType } from '@/types';
 //! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 

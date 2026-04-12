@@ -1,4 +1,5 @@
 
+.github
 .env*
 .husky
 # backend
@@ -36,6 +37,7 @@ frontend/coverage
 frontend/build
 #testpage
 TestPage
+frontend/src/page/Test.tsx
 # misc
 frontend/.DS_Store
 frontend/.env.local
@@ -50,3 +52,6 @@ yarn-error.log*
 docker/db/
 
 wiki.md
+HOOKS_NAMING_CONVENTION.md
+HOOKS_REFACTORING_TODO.md
+config.toml

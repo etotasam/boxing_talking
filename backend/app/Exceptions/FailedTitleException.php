@@ -16,4 +16,9 @@ class FailedTitleException extends Exception
     {
         return new static("Failed store title");
     }
+
+    public static function titleAlreadyHasOtherBoxer(string $organization, string $division, string $boxerName): self
+    {
+        return new static($organization . $division . "級タイトルは" . $boxerName . "が保持しています");
+    }
 }

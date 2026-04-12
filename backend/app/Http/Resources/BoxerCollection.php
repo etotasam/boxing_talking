@@ -2,15 +2,16 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Support\Collection;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class BoxerCollection extends ResourceCollection
 {
     protected $boxerCount;
 
-    public function __construct($resource, $boxerCount)
+    public function __construct(Collection $boxerCollection, int $boxerCount)
     {
-        parent::__construct($resource);
+        parent::__construct($boxerCollection);
         $this->boxerCount = $boxerCount;
     }
     /**
@@ -21,9 +22,8 @@ class BoxerCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-
         return [
-            'boxers' => $this->collection,
+            'boxers' => BoxerResource::collection($this->collection),
             'count' => $this->boxerCount
         ];
     }

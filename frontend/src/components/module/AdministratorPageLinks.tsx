@@ -7,8 +7,6 @@ import { FaUserEdit } from 'react-icons/fa';
 import { RiEditBoxFill } from 'react-icons/ri';
 import { RiUserAddLine } from 'react-icons/ri';
 import { BsCalendarPlus } from 'react-icons/bs';
-//! hook
-import { useAdmin } from '@/hooks/apiHooks/useAuth';
 
 const linksArray = [
   // { pathName: 'Home', path: ROUTE_PATH.HOME },
@@ -20,15 +18,11 @@ const linksArray = [
 
 export const AdministratorPageLinks = () => {
   const { pathname } = useLocation();
-  const { isAdmin } = useAdmin();
-
-  // 管理者ユーザーのときのみ表示
-  if (!isAdmin) return;
 
   return (
     <ul className="flex ">
       {linksArray.map((link) => (
-        <li key={`${link.name}_${link.path}`} className="md:ml-5 ml-2">
+        <li key={`${link.name}_${link.path}`} className="pc:ml-5 ml-2">
           <Link to={link.path}>
             <LinkButton pathname={pathname} link={link}>
               {link.name === 'ボクサー登録' && <RiUserAddLine />}

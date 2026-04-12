@@ -9,7 +9,9 @@ use App\Models\Comment;
 use App\Models\Grade;
 use App\Models\WeightDivision;
 use App\Models\Organization;
-use App\Models\MatchPrediction;
+use App\Models\BoxerTitleSnapshot;
+use App\Models\TitleMatch;
+use App\Models\MatchBoxerSnapshot;
 use Illuminate\Support\Facades\Log;
 
 class BoxingMatch extends Model
@@ -77,4 +79,19 @@ class BoxingMatch extends Model
     {
         return $this->belongsTo(Grade::class, "grade_id");
     }
+
+    public function boxerTitleSnapshot()
+    {
+        return $this->hasMany(BoxerTitleSnapshot::class, "match_id");
+    }
+
+    public function matchTitles()
+    {
+        return $this->hasMany(TitleMatch::class, "match_id");
+    }
+
+    // public function getSnapshot()
+    // {
+    //     return $this->hasMany(MatchDataSnapshot::class, 'match_id');
+    // }
 }

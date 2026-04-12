@@ -10,8 +10,9 @@ use App\Repositories\Interfaces\BoxerRepositoryInterface;
 use App\Repositories\Interfaces\MatchRepositoryInterface;
 use App\Services\BoxerService;
 use App\Http\Resources\BoxerCollection;
-use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Database\QueryException;
+use App\Exceptions\FailedTitleException;
+use App\Exceptions\CustomErrorCodes;
+
 
 class BoxerController extends ApiController
 {
@@ -20,8 +21,7 @@ class BoxerController extends ApiController
         protected BoxerService $boxerService,
         protected BoxerRepositoryInterface $boxerRepository,
         protected MatchRepositoryInterface $matchRepository
-    ) {
-    }
+    ) {}
 
     /**
      * boxer一覧取得
@@ -100,6 +100,8 @@ class BoxerController extends ApiController
         try {
             $this->boxerService->updateBoxerExecute($updateBoxerData);
             return $this->responseSuccessful("Successful boxer update");
+        } catch (FailedTitleException $e) {
+            return $this->responseInvalidQuery($e->getMessage(), CustomErrorCodes::TITLE_ALREADY_HAS_OTHER_BOXER);
         } catch (Exception $e) {
             return $this->responseInvalidQuery($e->getMessage());
         }

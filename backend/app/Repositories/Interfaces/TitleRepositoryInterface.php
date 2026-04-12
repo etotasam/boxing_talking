@@ -15,26 +15,42 @@ interface TitleRepositoryInterface
   public function getTitlesHoldByTheBoxer($boxerId);
 
   /**
-   * ボクサーの保持するタイトルをtitlesテーブルに保存
-   * @param int $boxerId,
-   * @param int $organizationId,
-   * @param int $weightDivisionId,
-   *
-   * @return Title
+   * ボクサーの保持タイトル(titlesテーブル)を既存か確認しながら保存(1件)
+   * @param int $boxerId
+   * @param int $organizationId
+   * @param int $weightDivisionId
+   * @return void
    */
-  public function createTitlesHoldByTheBoxer($boxerId, $organizationId, $weightDivisionId);
+  public function storeTitle(int $boxerId, int $organizationId, int $weightDivisionId);
+
+  /**
+   * 他のボクサーが所持しているタイトルかどうかを調べる
+   * @param int $organizationId
+   * @param int $weightDivisionId
+   * @return Boxer|null
+   */
+  public function hasOtherBoxerTitle(int $organizationId, int $weightDivisionId);
 
   /**
    * ボクサーの保持タイトル(titlesテーブル)を保存(一括)
-   * @param array $titlesArray [["boxer_id" => 1, "organization_id" => 1, "weight_division_id" => 1], ...]
+   * @param array $titlesArray [["boxer_id" => int, "organization_id" => int, "weight_division_id" => int], ...]
    * @return bool
    */
   public function storeTitlesHoldByTheBoxer($titlesArray);
 
   /**
-   * ボクサーが所持するタイトル(titlesテーブル)を削除
+   * ボクサーが所持するタイトルを全て削除(titlesテーブル)
    * @param int boxerId
    * @return int
    */
   public function deleteTitlesHoldByTheBoxer($boxerId);
+
+  /**
+   * ボクサー保持のタイトルを指定して削除(titlesテーブル)
+   * @param int $boxerId
+   * @param int $weightDivisionId
+   * @param int|null $organizationId
+   * @return bool isDeleteTarget
+   */
+  public function deleteTitle(int $boxerId, int $weightDivisionId, int $organizationId = null);
 }

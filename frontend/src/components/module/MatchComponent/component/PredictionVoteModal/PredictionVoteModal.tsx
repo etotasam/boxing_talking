@@ -1,8 +1,8 @@
 import { Button } from '@/components/atomic/Button';
-import { InfoModal } from '../../../../modal/InfoModal';
+import { InfoModal } from '@/components/modal/InfoModal';
 import { FlagImage } from '@/components/atomic/FlagImage';
 import { RiCloseLine } from 'react-icons/ri';
-import { CountryType } from '@/assets/types';
+import { CountryType } from '@/types';
 import clsx from 'clsx';
 // ! image
 import crown from '@/assets/images/etc/champion.svg';

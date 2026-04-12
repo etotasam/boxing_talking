@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 import { useQuery, QueryKey, useQueryClient } from "react-query"
 
 export const useQueryState = <T>(key: QueryKey, initialState?: T): [T, React.Dispatch<React.SetStateAction<T>>] => {
@@ -11,7 +11,7 @@ export const useQueryState = <T>(key: QueryKey, initialState?: T): [T, React.Dis
 
   const queryClient = useQueryClient()
 
-  const setter = (arg: ((arg: T) => void) | T): void => {
+  const setter = useCallback((arg: ((arg: T) => void) | T): void => {
     let newValue;
     if (typeof arg === "function") {
       const nowValue = queryClient.getQueryData<T>(key)
@@ -20,7 +20,7 @@ export const useQueryState = <T>(key: QueryKey, initialState?: T): [T, React.Dis
       newValue = arg as any
     }
     queryClient.setQueryData<T>(key, newValue)
-  }
+  }, [key, queryClient])
 
   return [state, setter]
 }

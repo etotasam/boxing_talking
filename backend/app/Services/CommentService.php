@@ -3,33 +3,26 @@
 namespace App\Services;
 
 use Exception;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Repositories\Interfaces\CommentRepositoryInterface;
 use App\Models\Comment;
+use App\Models\BoxingMatch;
 
 class CommentService
 {
 
   public function __construct(
     protected CommentRepositoryInterface $commentRepository
-  ) {
-  }
+  ) {}
 
-  /**
-   * 指定の範囲のコメントを取得
-   * 指定の試合のコメント $matchId
-   * 何ページ目を取得するのか $page
-   * 取得する件数 $limit
-   * 指定の時間より前の時間のコメント $createdAt
-   * @param int $matchId
-   * @param int $page
-   * @param int $limit
-   * @param string $createAt
-   *
-   * @return Comment[]
-   */
-  public function fetchComments(int $matchId, int $page, int $limit, string $createdAt)
+
+  public function fetchComments($matchId, $page, $limit, $createdAt)
   {
 
+    $match = BoxingMatch::find($matchId);
+    if (!$match) {
+      return throw new HttpException(404, 'Match not found');
+    }
     $timestamp = strtotime($createdAt);
     $formattedCreatedAt = date('Y-m-d H:i:s', $timestamp);
     $offset = ($page - 1) * $limit;
@@ -60,8 +53,6 @@ class CommentService
       $q->where('match_id', $matchId);
       $q->where('created_at', ">", $formattedCreatedAt);
     })->orderBy('created_at', 'desc')->get();
-
-
 
     return $comments;
   }

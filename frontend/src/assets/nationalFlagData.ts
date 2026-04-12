@@ -1,5 +1,5 @@
 // ! types
-import { CountryType } from '@/assets/types';
+import { CountryType } from '@/types';
 // ! Flags
 import japanFlag from '@/assets/images/flags/japan.svg';
 import usaFlag from '@/assets/images/flags/usa.svg';
@@ -70,7 +70,7 @@ export const getNationalFlag = (country: CountryType) => {
 };
 
 
-export const formatPosition = (country: CountryType) => {
+export const formatPosition = (_country: CountryType) => {
   // if (country == COUNTRY.USA) return '25% 20%';
   // if (country == COUNTRY.UK) return '25% 30%';
   // if (country == COUNTRY.UZBEKISTAN) return '25% 20%';

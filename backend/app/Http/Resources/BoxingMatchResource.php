@@ -9,6 +9,7 @@ use App\Http\Resources\MatchResultResource;
 use App\Http\Resources\MatchTitleBeltsResource;
 
 
+
 class BoxingMatchResource extends JsonResource
 {
 
@@ -28,19 +29,30 @@ class BoxingMatchResource extends JsonResource
 
         $this->match->load(['redBoxer', 'blueBoxer', 'result', 'getWeight', 'getGrade']);
 
-        $resultResource = $this->match->result
-            ? new MatchResultResource($this->match->result)
+
+        $resultResource = $this->result
+            ? new MatchResultResource($this->result)
             : null;
+
+        $redBoxerSnapshotData = [
+            'boxerRecordSnapshot' => $this->boxerRecordSnapshot["red"],
+            'titleSnapshot' => $this->titleSnapshot["red"]
+        ];
+        $blueBoxerSnapshotData = [
+            'boxerRecordSnapshot' => $this->boxerRecordSnapshot["blue"],
+            'titleSnapshot' => $this->titleSnapshot["blue"]
+        ];
+
         return  [
-            "id" => $this->match->id,
-            "redBoxer" => new BoxerResource($this->match->redBoxer),
-            "blueBoxer" => new BoxerResource($this->match->blueBoxer),
-            "country" => $this->match->country,
-            "venue" => $this->match->venue,
-            "grade" => $this->match->getGrade->grade,
+            "id" => $this->id,
+            "redBoxer" => new BoxerResource($this->redBoxer, $redBoxerSnapshotData),
+            "blueBoxer" => new BoxerResource($this->blueBoxer, $blueBoxerSnapshotData),
+            "country" => $this->country,
+            "venue" => $this->venue,
+            "grade" => $this->getGrade->grade,
             "titles" => new MatchTitleBeltsResource($this->match),
-            "weight" => $this->match->getWeight->weight,
-            "matchDate" => $this->match->match_date,
+            "weight" => $this->getWeight->weight,
+            "matchDate" => $this->match_date,
             "result" => $resultResource
         ];
     }

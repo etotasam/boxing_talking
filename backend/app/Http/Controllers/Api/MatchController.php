@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\MatchService;
 use App\Services\AuthService;
+use App\Services\MatchResultStoreService;
 use App\Http\Resources\BoxingMatchResource;
 use App\Models\BoxingMatch;
 use Illuminate\Database\Events\QueryExecuted;
@@ -24,11 +25,11 @@ class MatchController extends ApiController
 
     public function __construct(
         private MatchService $matchService,
+        private MatchResultStoreService $matchResultStoreService,
         private AuthService $authService,
         private WeightDivisionRepositoryInterface $weightRepository,
         private GradeRepositoryInterface $gradeRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * 試合データ一覧の取得
@@ -38,14 +39,14 @@ class MatchController extends ApiController
     public function index(Request $request)
     {
         try {
-            $matches =  $this->matchService->getMatchesExecute($request->query('range'));
+            $matchesWithSnapshot =  $this->matchService->getMatchesExecute($request->query('range'));
         } catch (NonAdministratorException $e) {
             return $this->responseUnauthorized($e->getMessage());
         } catch (Exception $e) {
             return $this->responseInvalidQuery("Failed get Matches :" . $e->getMessage());
         }
 
-        return BoxingMatchResource::collection($matches);
+        return BoxingMatchResource::collection($matchesWithSnapshot);
     }
 
     /**
@@ -56,7 +57,7 @@ class MatchController extends ApiController
      */
     public function show(BoxingMatch $match)
     {
-        return new BoxingMatchResource($match);
+        // return new BoxingMatchResource($match);
     }
 
 
@@ -130,6 +131,7 @@ class MatchController extends ApiController
     }
 
     /**
+     * @param bool is_update_boxer_record_checked
      * @param int match_id
      * @param string result
      * @param string | null detail
@@ -146,8 +148,11 @@ class MatchController extends ApiController
             "round" => $request->round
         ];
 
+        $isUpdateBoxerRecordChecked = $request->is_update_boxer_record_checked;
+
         try {
-            $this->matchService->storeMatchResultExecute($matchResultArray);
+            $this->matchResultStoreService->storeMatchResultExecute($matchResultArray, $isUpdateBoxerRecordChecked);
+            // $this->matchService->storeMatchResultExecute($matchResultArray);
             return $this->responseSuccessful("Successful store match result and update boxers record");
         } catch (Exception $e) {
             return $this->responseInvalidQuery($e->getMessage());

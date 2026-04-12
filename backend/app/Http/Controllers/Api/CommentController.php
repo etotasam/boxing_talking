@@ -25,12 +25,11 @@ class CommentController extends ApiController
         protected AuthService $authService,
         protected MatchRepositoryInterface $matchRepository,
         protected CommentRepositoryInterface $commentRepository
-    ) {
-    }
+    ) {}
 
     /**
-     * @param int limit
-     * @param int match_id
+     * @param int $limit
+     * @param int $matchId
      * 
      * @return array ["maxPage" => int, "resentPostTime" => string]
      */
@@ -40,14 +39,18 @@ class CommentController extends ApiController
         $limit = $request->limit;
         try {
             $resentComment = Comment::latest()->first();
-            $timestamp = strtotime($resentComment->created_at);
-            $formattedCreatedAt = date('Y-m-d H:i:s', $timestamp);
+            if ($resentComment) {
+                $timestamp = strtotime($resentComment->created_at);
+                $formattedCreatedAt = date('Y-m-d H:i:s', $timestamp);
+            } else {
+                $formattedCreatedAt = null;
+            }
 
             $commentsCount = Comment::where('match_id', $matchId)->count();
             $maxPage = ceil($commentsCount / $limit);
 
             return ["maxPage" => $maxPage, "resentPostTime" => $formattedCreatedAt];
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return $this->responseInvalidQuery('Failed fetch comments count');
         }
     }
@@ -99,7 +102,9 @@ class CommentController extends ApiController
         } catch (QueryException $e) {
             \Log::error("Error on database by fetch comments" . $e->getMessage());
             return $this->responseInvalidQuery('Unexpected error');
-        } catch (\Exception) {
+        } catch (HttpException $e) {
+            return $this->responseNotFound($e->getMessage());
+        } catch (\Exception $e) {
             return $this->responseInvalidQuery('Failed get comments');
         }
     }

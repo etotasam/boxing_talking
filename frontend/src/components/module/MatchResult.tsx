@@ -1,16 +1,17 @@
 import { useRef } from 'react';
-import { MatchDataType } from '@/assets/types';
+import { MatchDataType } from '@/types';
 import clsx from 'clsx';
-import { useWindowSize } from '@/hooks/useWindowSize';
+import { useRecoilValue } from 'recoil';
+import { deviceState } from '@/store/deviceState';
 //! type
-import { MatchResultType } from '@/assets/types';
+import { MatchResultType } from '@/types';
 
 export const MatchResult = ({ matchData }: { matchData: MatchDataType }) => {
   const { result } = matchData;
   const matchResult = useRef<string | null>(null);
   const winner = useRef<string | null>(null);
 
-  const { device } = useWindowSize();
+  const device = useRecoilValue(deviceState);
 
   const isWinner: boolean = result?.result === 'red' || result?.result === 'blue';
   const isKo: boolean = isWinner && (result?.detail === 'ko' || result?.detail === 'tko');
@@ -88,7 +89,7 @@ const SPType = (props: ResultDataType) => {
       {winnerName && (
         <span
           className={clsx(
-            'lg:text-[20px] sm:text-[16px] mt-1',
+            'pc:text-[20px] sm:text-[16px] mt-1',
             winnerName.length > 7 ? `text-[12px]` : `text-[16px]`
           )}
         >

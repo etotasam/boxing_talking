@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
-import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
-//! layout wrapper
-import AdminOnlyLayout from '@/layout/AdminOnlyLayout';
+import { MESSAGE } from '@/assets/statusesOnToastModal';
 //! func
-import { isMatchDatePast } from '@/assets/functions';
+import { isMatchDatePast } from '@/utils/match';
 //! components
 import { MatchInfo } from '@/components/module/MatchInfo';
 import { EditMatchForm } from '@/components/module/MatchSetForm/EditMatchForm';
@@ -18,12 +16,11 @@ import { elementSizeState } from '@/store/elementSizeState';
 // ! hooks
 import { useFetchPastMatches, useFetchMatches, useDeleteMatch } from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';
-import { useLoading } from '@/hooks/useLoading';
 import { useSortMatches } from '@/hooks/useSortMatches';
 import { useMatchResult } from '@/hooks/apiHooks/useMatch';
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 //! types
-import { MatchDataType } from '@/assets/types';
+import { MatchDataType } from '@/types';
 // ! image
 import { Button, CustomButton } from '@/components/atomic/Button';
 
@@ -32,12 +29,11 @@ const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 export const MatchEdit = () => {
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   // ? use hook
-  const { resetLoadingState } = useLoading();
   const { data: matchesData } = useFetchMatches();
   const { data: pastMatchesData } = useFetchPastMatches();
   const { beforeMatches, afterMatches } = useSortMatches(matchesData);
   const allMatches = pastMatchesData && [...beforeMatches, ...afterMatches, ...pastMatchesData];
-  const { setToastModal, showToastModal } = useToastModal();
+  const { showNoticeToast } = useToastModal();
   const { deleteMatch, isSuccess: isSuccessDeleteMatch } = useDeleteMatch();
 
   const [selectedMatch, setSelectMatch] = useState<MatchDataType>();
@@ -49,11 +45,11 @@ export const MatchEdit = () => {
   const isShowMatchResultRegisterButton = !isDayOnFight && isDayAfterFight;
 
   //? 初期設定(クリーンアップとか)
-  useEffect(() => {
-    return () => {
-      resetLoadingState();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     resetLoadingState();
+  //   };
+  // }, []);
 
   //? 試合の削除に成功したら...
   useEffect(() => {
@@ -64,11 +60,7 @@ export const MatchEdit = () => {
   //?削除ボタンを押した時の挙動(確認モーダルの表示など)
   const handleClickDeleteButton = () => {
     if (!selectedMatch) {
-      setToastModal({
-        message: MESSAGE.MATCH_IS_NOT_SELECTED,
-        bgColor: BG_COLOR_ON_TOAST_MODAL.NOTICE,
-      });
-      showToastModal();
+      showNoticeToast(MESSAGE.MATCH_IS_NOT_SELECTED);
       return;
     }
     setIsDeleteConfirm(true);
@@ -82,7 +74,7 @@ export const MatchEdit = () => {
   };
 
   return (
-    <AdminOnlyLayout>
+    <>
       <Helmet>
         <title>試合編集 | {siteTitle}</title>
       </Helmet>
@@ -158,7 +150,7 @@ export const MatchEdit = () => {
       {isDeleteConfirm && (
         <DeleteConfirm execution={deleteExecution} cancel={() => setIsDeleteConfirm(false)} />
       )}
-    </AdminOnlyLayout>
+    </>
   );
 };
 
@@ -290,12 +282,20 @@ const MatchResultSetDialog = ({
     const round = isKo ? matchRound : undefined;
 
     const matchResultValue = {
+      isUpdateBoxerRecordChecked,
       matchId: selectedMatchData!.id,
-      result: result,
-      detail: detail,
-      round: round,
+      result,
+      detail,
+      round,
     };
+    // console.log(matchResultValue);
+    // return;
     storeMatchResult(matchResultValue);
+  };
+
+  const [isUpdateBoxerRecordChecked, setIsUpdateBoxerRecordChecked] = useState(true);
+  const handleCheck = () => {
+    setIsUpdateBoxerRecordChecked((prev) => !prev);
   };
 
   if (!selectedMatchData) return;
@@ -306,6 +306,11 @@ const MatchResultSetDialog = ({
       closeButton={true}
       closeDialog={() => setIsShowMatchResultSelectorDialog(false)}
     >
+      {/* //? 戦績更新チェックボックス */}
+      <label>
+        <input type="checkbox" checked={isUpdateBoxerRecordChecked} onChange={handleCheck} />
+        戦績を更新する
+      </label>
       <form onSubmit={submit}>
         <div className="">
           {resultObject.result.map((result) => (

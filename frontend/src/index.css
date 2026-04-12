@@ -5,7 +5,6 @@
 body {
   font-family: 'Zen Kaku Gothic New', sans-serif;
   font-weight: 450;
-  overflow: hidden;
   background-color: #1b1b1b;
 }
 
@@ -13,23 +12,9 @@ body::-webkit-scrollbar {
   width: 0px;
 }
 
-.my-scroll-y {
-  overflow: auto;
-}
-
-.my-scroll-y::-webkit-scrollbar {
-  width: 10px;
-  background-color: #000000d3;
-  border-radius: 50px;
-}
-
-.my-scroll-y::-webkit-scrollbar-thumb {
-  background-color: #545454;
-  border-radius: 50px;
-}
-
-.my-scroll-y::-webkit-scrollbar-thumb:hover {
-  background-color: #cfcfcf;
+.scroll-bar-gray {
+  scrollbar-width: thin;
+  scrollbar-color: #6a6a6a #000000;
 }
 
 .text-shadow {
@@ -37,4 +22,13 @@ body::-webkit-scrollbar {
 }
 .shadow-blur {
   text-shadow: 0px 0px 5px rgba(0, 0, 0, 10);
+}
+
+.font-clamp-level-1 {
+  font-size: clamp(0.8rem, 3vw, 1.2rem);
+  white-space: nowrap;
+}
+.font-clamp-level-0 {
+  font-size: clamp(0.6rem, 2.5vw, 0.875rem);
+  white-space: nowrap;
 }

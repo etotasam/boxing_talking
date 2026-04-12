@@ -1,7 +1,7 @@
 // import React from "react";
 import { FlagImage } from '@/components/atomic/FlagImage';
 
-import { CountryType } from '@/assets/types';
+import { CountryType } from '@/types';
 import clsx from 'clsx';
 
 export const EngNameWithFlag = ({

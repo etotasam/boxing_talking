@@ -1,11 +1,17 @@
-import { BoxerType } from "./types";
-import { COUNTRY } from "./nationalFlagData";
+import { BoxerType } from '@/types';
+import { COUNTRY } from './nationalFlagData';
 
 export const STANCE = {
   SOUTHPAW: "southpaw",
   ORTHODOX: "orthodox",
   UNKNOWN: "unknown"
 } as const
+
+export const BOXER_STANCE_LABELS = {
+  [STANCE.ORTHODOX]: 'オーソドックス',
+  [STANCE.SOUTHPAW]: 'サウスポー',
+  [STANCE.UNKNOWN]: '-'
+} as const;
 
 
 export const ORGANIZATIONS = {

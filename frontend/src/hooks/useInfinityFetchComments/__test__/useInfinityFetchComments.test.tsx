@@ -75,12 +75,12 @@ const server = setupServer(
   }),
 
   //? コメントのmaxPageと最新のコメントのcreated_atの取得リクエスト
-  rest.get(`${baseURL}${API_PATH.COMMENT_STATE}`, (req, res, ctx) => {
+  rest.get(`${baseURL}${API_PATH.COMMENT_STATE}`, (_req, res, ctx) => {
     return res(ctx.status(200), ctx.json({ maxPage, resentPostTime: '2024-03-12 03:58:00' }));
   }),
 
   //? 新しいコメント取得リクエスト
-  rest.get(`${baseURL}${API_PATH.COMMENT_NEW}`, (req, res, ctx) => {
+  rest.get(`${baseURL}${API_PATH.COMMENT_NEW}`, (_req, res, ctx) => {
     return res(ctx.status(200), ctx.json({ data: mockFetchNewComments() }));
   })
 );
@@ -112,7 +112,7 @@ describe('useInfinityFetchComments', () => {
     const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper });
 
     //? 意図的にrefetchする
-    act(() => result.current.refetch());
+    act(() => result.current.refetchComments());
     //? refetch時には次のページのコメントを取得(page2)してmergeされたコメントが帰ってくる
     await waitFor(() => {
       expect(result.current.data).toEqual([...comments.page1, ...comments.page2]);
@@ -125,7 +125,7 @@ describe('useInfinityFetchComments', () => {
     const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper });
 
     //? 意図的に再refetchする
-    act(() => result.current.refetch());
+    act(() => result.current.refetchComments());
     //? 返ってくるコメントデータは変わらない
     await waitFor(() => {
       expect(result.current.data).toEqual([...comments.page1, ...comments.page2]);

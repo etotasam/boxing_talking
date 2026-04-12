@@ -1,29 +1,29 @@
-//! layout
-import HeaderAndFooterLayout from '@/layout/HeaderAndFooterLayout';
+import { useNavigate } from 'react-router-dom';
+import { ROUTE_PATH } from '@/assets/routePath';
 // ! components
-import { Matches } from '@/components/module/Matches/Matches';
-//! icon
-import { VisualModeChangeButton } from '@/components/atomic/VisualModeChangeButton';
+import { Matches } from '@/components/module/Matches';
 // ! hooks
-import { useWindowSize } from '@/hooks/useWindowSize';
-import { useVisualModeController } from '@/hooks/useVisualModeController';
+import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
+import { useSortMatches } from '@/hooks/useSortMatches';
 
 export const Home = () => {
-  const { device } = useWindowSize();
+  const { data: matchesData } = useFetchMatches();
+  const { beforeMatches, afterMatches } = useSortMatches(matchesData);
+  const navigate = useNavigate();
 
-  const { visualModeToggleSwitch } = useVisualModeController();
+  const matchSelect = (matchId: number) => {
+    navigate(`${ROUTE_PATH.MATCH}?match_id=${matchId}`);
+  };
 
   return (
-    <>
-      {device == 'PC' && (
-        <div className="z-10 fixed top-[100px] lg:right-10 md:right-5 right-2">
-          <VisualModeChangeButton onClick={() => visualModeToggleSwitch()} />
-        </div>
-      )}
-
-      <HeaderAndFooterLayout>
-        <Matches />
-      </HeaderAndFooterLayout>
-    </>
+    <div className="flex flex-col">
+      <div className="relative flex-1">
+        <Matches
+          beforeMatches={beforeMatches}
+          afterMatches={afterMatches}
+          toMatchPage={matchSelect}
+        />
+      </div>
+    </div>
   );
 };
