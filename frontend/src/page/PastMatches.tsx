@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/assets/routePath';
 // ! components
-import { SimpleMatchCard } from '@/components/module/SimpleMatchCard';
+import { MatchCard } from '@/components/module/MatchCard';
 //! hooks
 import { useFetchPastMatches } from '@/hooks/apiHooks/useMatch';
 // ! types
@@ -60,7 +60,7 @@ const ShowMatches = ({
               key={match.id}
               className="w-full h-full flex justify-center items-center pb-3 first:mt-0"
             >
-              <SimpleMatchCard matchData={match} onClick={matchSelect} />
+              <MatchCard matchData={match} onClick={matchSelect} />
             </li>
           ))}
         </ul>

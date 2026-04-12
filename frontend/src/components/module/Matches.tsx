@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { MatchDataType } from '@/types';
 // ! components
-import { SimpleMatchCard } from '@/components/module/SimpleMatchCard';
+import { MatchCard } from '@/components/module/MatchCard';
 import { useRecoilValue } from 'recoil';
 import { deviceState } from '@/store/deviceState';
 
@@ -56,7 +56,7 @@ const MatchesListComponent = ({
           key={match.id}
           className={clsx('w-full h-full flex justify-center items-center pb-3 first:mt-0', 'px-2')}
         >
-          <SimpleMatchCard onClick={toMatchPage} matchData={match} />
+          <MatchCard onClick={toMatchPage} matchData={match} />
         </li>
       ))}
     </ul>
