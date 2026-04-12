@@ -70,6 +70,7 @@ const defaultProps: MatchViewProps = {
   },
   userPrediction: undefined,
   matchPredictions: undefined,
+  isMatchPredictionsLoading: false,
   device: 'SP',
   isShowPredictionModal: false,
   showPredictionModal,
