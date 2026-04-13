@@ -11,6 +11,8 @@ type MatchInfoPropsType = {
   userPrediction?: 'red' | 'blue' | false;
   matchPredictions?: MatchPredictionsType;
   isMatchPredictionsLoading?: boolean;
+  isShowVoteButton?: boolean;
+  showPredictionModal?: () => void;
   className?: string;
 };
 
@@ -19,6 +21,8 @@ export const MatchInfo = ({
   userPrediction,
   matchPredictions,
   isMatchPredictionsLoading = false,
+  isShowVoteButton = false,
+  showPredictionModal,
 }: MatchInfoPropsType) => {
   return (
     <>
@@ -36,6 +40,8 @@ export const MatchInfo = ({
             isLoading={isMatchPredictionsLoading}
             redBoxerName={matchData.redBoxer.name}
             blueBoxerName={matchData.blueBoxer.name}
+            isShowVoteButton={isShowVoteButton}
+            showPredictionModal={showPredictionModal}
           />
         </div>
       )}

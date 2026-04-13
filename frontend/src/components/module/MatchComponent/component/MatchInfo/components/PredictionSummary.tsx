@@ -8,6 +8,8 @@ type PredictionSummaryProps = {
   isLoading: boolean;
   redBoxerName: string;
   blueBoxerName: string;
+  isShowVoteButton?: boolean;
+  showPredictionModal?: () => void;
 };
 
 export const PredictionSummary = ({
@@ -16,6 +18,8 @@ export const PredictionSummary = ({
   isLoading,
   redBoxerName,
   blueBoxerName,
+  isShowVoteButton = false,
+  showPredictionModal,
 }: PredictionSummaryProps) => {
   const userPredictionLabel =
     userPrediction === undefined
@@ -25,6 +29,9 @@ export const PredictionSummary = ({
       : userPrediction === 'red'
       ? `${redBoxerName} 勝利`
       : `${blueBoxerName} 勝利`;
+  const canOpenPredictionModal = isShowVoteButton && showPredictionModal;
+  const shouldShowUserPrediction = userPrediction !== false || Boolean(canOpenPredictionModal);
+  const shouldShowVoteButton = userPrediction === false && Boolean(canOpenPredictionModal);
 
   return (
     <section
@@ -36,9 +43,22 @@ export const PredictionSummary = ({
           <p className="text-xs tracking-widest text-stone-400">PREDICTION</p>
           <h3 className="mt-1 text-base font-bold">勝敗予想サマリー</h3>
         </div>
-        <div className="rounded-full bg-stone-800 px-3 py-1 text-sm">
-          あなたの予想: <span className="font-bold">{userPredictionLabel}</span>
-        </div>
+        {shouldShowUserPrediction && (
+          <div className="flex items-center gap-2 rounded-full bg-stone-800 px-3 py-1 text-sm">
+            <span>あなたの予想:</span>
+            {shouldShowVoteButton ? (
+              <button
+                type="button"
+                className="rounded-md bg-yellow-400 px-3 py-1 text-xs font-bold text-stone-900 duration-300 hover:bg-yellow-300"
+                onClick={showPredictionModal}
+              >
+                投票する
+              </button>
+            ) : (
+              <span className="font-bold">{userPredictionLabel}</span>
+            )}
+          </div>
+        )}
       </div>
 
       {isLoading ? (

@@ -1,13 +1,26 @@
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from 'test-setup';
-import { describe, expect, test, vi } from 'vitest';
+import { fireEvent, render, screen } from 'test-setup';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { MatchView, MatchViewProps } from '../MatchView';
 import { initialBoxerData, GRADE, WEIGHT_CLASS } from '@/constants/boxerData';
 import { COUNTRY } from '@/constants/country';
 
 vi.mock('../component/MatchInfo', () => ({
-  MatchInfo: ({ matchData }: { matchData: { id: number } }) => (
-    <div data-testid="match-info">{matchData.id}</div>
+  MatchInfo: ({
+    matchData,
+    isShowVoteButton,
+    showPredictionModal,
+  }: {
+    matchData: { id: number };
+    isShowVoteButton: boolean;
+    showPredictionModal: () => void;
+  }) => (
+    <div data-testid="match-info" data-is-show-vote-button={String(isShowVoteButton)}>
+      <span>{matchData.id}</span>
+      <button type="button" data-testid="match-info-vote-button" onClick={showPredictionModal}>
+        投票する
+      </button>
+    </div>
   ),
 }));
 
@@ -18,22 +31,6 @@ vi.mock('../component/PostComment', () => ({
 vi.mock('../component/PredictionVoteModal', () => ({
   PredictionVoteModal: ({ thisMatch }: { thisMatch: { id: number } }) => (
     <div data-testid="prediction-vote-modal">{thisMatch.id}</div>
-  ),
-}));
-
-vi.mock('../component/VoteIcon', () => ({
-  VoteIcon: ({
-    isScroll,
-    bottomPosition,
-  }: {
-    isScroll: boolean;
-    bottomPosition: number;
-  }) => (
-    <div
-      data-testid="vote-icon"
-      data-is-scroll={String(isScroll)}
-      data-bottom-position={String(bottomPosition)}
-    />
   ),
 }));
 
@@ -71,12 +68,9 @@ const defaultProps: MatchViewProps = {
   userPrediction: undefined,
   matchPredictions: undefined,
   isMatchPredictionsLoading: false,
-  device: 'SP',
   isShowPredictionModal: false,
   showPredictionModal,
   isShowVoteIcon: true,
-  isScroll: true,
-  voteIconBottomPosition: 45,
   commentsModalHeightHiddenState: 120,
 };
 
@@ -85,19 +79,23 @@ const renderComponent = (props?: Partial<MatchViewProps>) => {
 };
 
 describe('MatchView', () => {
-  test('isShowVoteIcon=true の時は VoteIcon を表示する', () => {
-    renderComponent();
-
-    const voteIcon = screen.getByTestId('vote-icon');
-    expect(voteIcon).toBeInTheDocument();
-    expect(voteIcon).toHaveAttribute('data-is-scroll', 'true');
-    expect(voteIcon).toHaveAttribute('data-bottom-position', '45');
+  beforeEach(() => {
+    showPredictionModal.mockClear();
   });
 
-  test('isShowVoteIcon=false の時は VoteIcon を表示しない', () => {
+  test('isShowVoteIcon=true の時は MatchInfo に投票ボタン表示フラグを渡す', () => {
+    renderComponent();
+
+    expect(screen.getByTestId('match-info')).toHaveAttribute('data-is-show-vote-button', 'true');
+
+    fireEvent.click(screen.getByTestId('match-info-vote-button'));
+    expect(showPredictionModal).toHaveBeenCalledTimes(1);
+  });
+
+  test('isShowVoteIcon=false の時は MatchInfo に投票ボタン非表示フラグを渡す', () => {
     renderComponent({ isShowVoteIcon: false });
 
-    expect(screen.queryByTestId('vote-icon')).not.toBeInTheDocument();
+    expect(screen.getByTestId('match-info')).toHaveAttribute('data-is-show-vote-button', 'false');
   });
 
   test('isShowPredictionModal=true の時は PredictionVoteModal を表示する', () => {

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from 'test-setup';
-import { describe, expect, test } from 'vitest';
+import { fireEvent, render, screen } from 'test-setup';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { MatchInfo } from './MatchInfo';
 import { initialBoxerData, GRADE, WEIGHT_CLASS } from '@/constants/boxerData';
 import { COUNTRY } from '@/constants/country';
@@ -28,7 +28,13 @@ const matchData = {
   result: null,
 };
 
+const showPredictionModal = vi.fn();
+
 describe('MatchInfo', () => {
+  beforeEach(() => {
+    showPredictionModal.mockClear();
+  });
+
   test('userPrediction がある時は自分の予想を表示する', () => {
     render(<MatchInfo matchData={matchData} userPrediction="red" />);
 
@@ -36,10 +42,30 @@ describe('MatchInfo', () => {
     expect(screen.getByText('Red Boxer 勝利')).toBeInTheDocument();
   });
 
-  test('未投票時は未投票表示を出す', () => {
-    render(<MatchInfo matchData={matchData} userPrediction={false} />);
+  test('未投票で投票可能な時は投票ボタンを表示する', () => {
+    render(
+      <MatchInfo
+        matchData={matchData}
+        userPrediction={false}
+        isShowVoteButton={true}
+        showPredictionModal={showPredictionModal}
+      />
+    );
 
-    expect(screen.getByText('未投票')).toBeInTheDocument();
+    expect(screen.getByText('あなたの予想:')).toBeInTheDocument();
+
+    const voteButton = screen.getByRole('button', { name: '投票する' });
+    expect(voteButton).toBeInTheDocument();
+
+    fireEvent.click(voteButton);
+    expect(showPredictionModal).toHaveBeenCalledTimes(1);
+  });
+
+  test('未投票で投票不可の時はあなたの予想を表示しない', () => {
+    render(<MatchInfo matchData={matchData} userPrediction={false} isShowVoteButton={false} />);
+
+    expect(screen.queryByText('あなたの予想:')).not.toBeInTheDocument();
+    expect(screen.queryByText('未投票')).not.toBeInTheDocument();
   });
 
   test('matchPredictions がある時は集計結果を表示する', () => {

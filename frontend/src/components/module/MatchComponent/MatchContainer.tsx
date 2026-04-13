@@ -5,7 +5,6 @@ import { ROUTE_PATH } from '@/constants/routePath';
 
 //! types
 import { MatchDataType } from '@/types';
-import { deviceState } from '@/store/deviceState';
 // ! hook
 // import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
@@ -17,7 +16,6 @@ import {
 } from '@/hooks/apiHooks/uesWinLossPrediction';
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
-import { boolState } from '@/store/boolState';
 //! component
 import { MatchView, UsersPredictionType } from './MatchView';
 
@@ -43,9 +41,6 @@ export const MatchContainer = (props: PropsType) => {
   } = useMatchPredictions(Number(matchId));
 
   const navigate = useNavigate();
-  const device = useRecoilValue(deviceState);
-  const isScroll = useRecoilValue(boolState('IS_SCROLL'));
-  const postCommentHeight = useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT')) ?? 0;
   const commentsModalHeightHiddenState =
     useRecoilValue(elementSizeState('COMMENTS_MODAL_HIDDEN_HEIGHT')) ?? 0;
 
@@ -88,8 +83,6 @@ export const MatchContainer = (props: PropsType) => {
 
   const { state: isShowPredictionModal, showModal: showPredictionModal } =
     useModalState('PREDICTION_VOTE');
-  // +5pxは、投稿完了のモーダルがvote iconと被るのを防ぐための余白
-  const voteIconBottomPosition = postCommentHeight + 5;
 
   // if (!windowSize) return;
   if (!thisMatch) return;
@@ -109,12 +102,9 @@ export const MatchContainer = (props: PropsType) => {
         userPrediction={userPrediction}
         matchPredictions={matchPredictions}
         isMatchPredictionsLoading={matchPredictionFetchState === 'loading'}
-        device={device}
         isShowPredictionModal={isShowPredictionModal}
         showPredictionModal={showPredictionModal}
         isShowVoteIcon={isShowVoteIconState}
-        isScroll={isScroll}
-        voteIconBottomPosition={voteIconBottomPosition}
         commentsModalHeightHiddenState={commentsModalHeightHiddenState}
       />
     </>
