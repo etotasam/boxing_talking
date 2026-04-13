@@ -9,7 +9,7 @@ import React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
-import { API_PATH } from '@/assets/apiPath';
+import { API_PATH } from '@/constants/apiPath';
 
 const comments = {
   page1: [

@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { MESSAGE } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { pick } from 'lodash';
 //! type
 import { MatchDataType, MatchUpdateFormType, OrganizationsType } from '@/types';
@@ -7,7 +7,7 @@ import { MatchDataType, MatchUpdateFormType, OrganizationsType } from '@/types';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useUpdateMatch } from '@/hooks/apiHooks/useMatch';
 //! data
-import { GRADE } from '@/assets/boxerData';
+import { GRADE } from '@/constants/boxerData';
 //! component
 import { MatchSetFormContainer } from '../MatchSetFormContainer';
 //! context

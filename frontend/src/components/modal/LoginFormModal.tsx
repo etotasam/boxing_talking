@@ -11,7 +11,7 @@ import { Button } from '@/components/atomic/Button';
 import { useLogin, useGuestLogin } from '@/hooks/apiHooks/useAuth';
 import { useToastModal } from '@/hooks/useToastModal';
 // !etc
-import { MESSAGE } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/constants/statusesOnToastModal';
 
 export const LoginFormModal = ({ isShow }: { isShow: boolean }) => {
   // ! recoil

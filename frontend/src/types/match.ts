@@ -1,4 +1,4 @@
-import { GRADE } from "@/assets/boxerData";
+import { GRADE } from "@/constants/boxerData";
 import { BoxerType, OrganizationsType, WeightClassType } from "./boxer";
 import { CountryType } from "./common";
 

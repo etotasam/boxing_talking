@@ -2,8 +2,8 @@ import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor } from 'test-setup';
 import { expect, test, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { WEIGHT_CLASS, GRADE } from '@/assets/boxerData';
-import { COUNTRY } from '@/assets/nationalFlagData';
+import { WEIGHT_CLASS, GRADE } from '@/constants/boxerData';
+import { COUNTRY } from '@/constants/country';
 
 import { EditMatchFormWrapper } from '../EditMatchForm';
 

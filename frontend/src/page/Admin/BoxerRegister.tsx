@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
 // ! data
-import { MESSAGE } from '@/assets/statusesOnToastModal';
-import { initialBoxerDataOnForm } from '@/assets/boxerData';
+import { MESSAGE } from '@/constants/statusesOnToastModal';
+import { initialBoxerDataOnForm } from '@/constants/boxerData';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 //! recoil

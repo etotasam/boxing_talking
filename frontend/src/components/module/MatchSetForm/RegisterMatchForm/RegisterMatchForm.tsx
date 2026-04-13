@@ -1,6 +1,6 @@
 import { useEffect, useContext } from 'react';
 import dayjs from 'dayjs';
-import { MESSAGE } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/constants/statusesOnToastModal';
 //! type
 import { MatchFormDataType, OrganizationsType } from '@/types';
 //! hook

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/routePath';
+import { ROUTE_PATH } from '@/constants/routePath';
 // ! components
 import { Matches } from '@/components/module/Matches';
 // ! hooks

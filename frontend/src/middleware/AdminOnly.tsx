@@ -1,4 +1,4 @@
-import { ROUTE_PATH } from '@/assets/routePath';
+import { ROUTE_PATH } from '@/constants/routePath';
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 //! hooks

@@ -1,11 +1,11 @@
 import { useCallback } from "react"
-import { Axios } from "@/assets/axios"
+import { Axios } from "@/api/axios"
 // import dayjs from "dayjs"
 import { useQuery, useMutation } from "react-query"
-import { API_PATH } from "@/assets/apiPath"
+import { API_PATH } from "@/constants/apiPath"
 // ! data
-import { MESSAGE } from "@/assets/statusesOnToastModal"
-import { QUERY_KEY } from "@/assets/queryKeys"
+import { MESSAGE } from "@/constants/statusesOnToastModal"
+import { QUERY_KEY } from "@/constants/queryKeys"
 // ! types
 import { MatchDataType, MatchResultType, RegisterMatchPropsType, MatchUpdateFormType } from "@/types"
 // ! hook

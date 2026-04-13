@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { TOKEN_ERROR_MESSAGE } from "@/assets/tokenErrorMessage";
+import { TOKEN_ERROR_MESSAGE } from "@/constants/tokenErrorMessage";
 
 
 type atomType = typeof TOKEN_ERROR_MESSAGE[keyof typeof TOKEN_ERROR_MESSAGE]

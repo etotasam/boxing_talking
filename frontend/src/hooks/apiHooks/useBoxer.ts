@@ -1,15 +1,15 @@
 import { useCallback } from "react"
 import { useLocation } from "react-router-dom";
 import { useQuery, useMutation } from "react-query"
-import { Axios } from "@/assets/axios"
-import { API_PATH } from "@/assets/apiPath"
+import { Axios } from "@/api/axios"
+import { API_PATH } from "@/constants/apiPath"
 // ! data
-import { QUERY_KEY } from "@/assets/queryKeys"
+import { QUERY_KEY } from "@/constants/queryKeys"
 // //! hooks
 import { useReactQuery } from "../useReactQuery";
 import { useFullScreenLoading } from "../useFullScreenLoading";
 import { useToastModal } from "../useToastModal";
-import { MESSAGE } from "@/assets/statusesOnToastModal";
+import { MESSAGE } from "@/constants/statusesOnToastModal";
 // //! types
 import type { BoxerType, CountryType } from "@/types"
 

@@ -1,5 +1,5 @@
 //! data
-import { COUNTRY } from '@/assets/nationalFlagData';
+import { COUNTRY } from '@/constants/country';
 
 //! types
 import { CountryType } from '@/types';

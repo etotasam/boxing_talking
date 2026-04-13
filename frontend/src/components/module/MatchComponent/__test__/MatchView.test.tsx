@@ -2,8 +2,8 @@ import '@testing-library/jest-dom/vitest';
 import { render, screen } from 'test-setup';
 import { describe, expect, test, vi } from 'vitest';
 import { MatchView, MatchViewProps } from '../MatchView';
-import { initialBoxerData, GRADE, WEIGHT_CLASS } from '@/assets/boxerData';
-import { COUNTRY } from '@/assets/nationalFlagData';
+import { initialBoxerData, GRADE, WEIGHT_CLASS } from '@/constants/boxerData';
+import { COUNTRY } from '@/constants/country';
 
 vi.mock('../component/MatchInfo', () => ({
   MatchInfo: ({ matchData }: { matchData: { id: number } }) => (

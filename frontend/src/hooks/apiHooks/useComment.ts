@@ -1,17 +1,17 @@
 import { useCallback, useEffect } from "react"
 import { AxiosError } from "axios"
 // import { useLocation } from "react-router-dom"
-import { Axios } from "@/assets/axios"
+import { Axios } from "@/api/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
-import { QUERY_KEY } from "@/assets/queryKeys"
-import { API_PATH } from "@/assets/apiPath"
+import { QUERY_KEY } from "@/constants/queryKeys"
+import { API_PATH } from "@/constants/apiPath"
 //! hook
 // import { useAuth } from "@/hooks/useAuth"
 import { useFullScreenLoading } from "@/hooks/useFullScreenLoading"
 import { useToastModal } from "@/hooks/useToastModal"
 //! types
 import { CommentType } from "@/types"
-import { MESSAGE } from "@/assets/statusesOnToastModal"
+import { MESSAGE } from "@/constants/statusesOnToastModal"
 //! Recoil
 import { useRecoilState } from "recoil"
 import { apiFetchState } from "@/store/apiFetchDataState"

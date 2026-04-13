@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { ROUTE_PATH } from '@/assets/routePath';
+import { ROUTE_PATH } from '@/constants/routePath';
 import { Link } from 'react-router-dom';
 
 //! recoil

@@ -1,10 +1,10 @@
 import { useCallback, useEffect } from "react"
 import { useQuery, useMutation, } from "react-query"
-import { Axios } from "@/assets/axios"
-import { API_PATH } from "@/assets/apiPath"
+import { Axios } from "@/api/axios"
+import { API_PATH } from "@/constants/apiPath"
 //! data
-import { MESSAGE } from "@/assets/statusesOnToastModal";
-import { QUERY_KEY } from "@/assets/queryKeys";
+import { MESSAGE } from "@/constants/statusesOnToastModal";
+import { QUERY_KEY } from "@/constants/queryKeys";
 //! hook
 import { useFullScreenLoading } from "../useFullScreenLoading"
 import { useToastModal } from "../useToastModal";

@@ -1,5 +1,5 @@
 import React from 'react';
-import { COUNTRY } from '@/assets/nationalFlagData';
+import { COUNTRY } from '@/constants/country';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/atomic/Button';
 

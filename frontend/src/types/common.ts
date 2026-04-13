@@ -1,4 +1,4 @@
-import { COUNTRY } from "@/assets/nationalFlagData";
+import { COUNTRY } from "@/constants/country";
 
 export type UserType = {
   name: string | undefined;

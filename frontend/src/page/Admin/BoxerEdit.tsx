@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { isEqual, pickBy } from 'lodash';
 import { Helmet } from 'react-helmet-async';
 //! data
-import { MESSAGE } from '@/assets/statusesOnToastModal';
-import { initialBoxerDataOnForm } from '@/assets/boxerData';
+import { MESSAGE } from '@/constants/statusesOnToastModal';
+import { initialBoxerDataOnForm } from '@/constants/boxerData';
 
 //! recoil
 import { useRecoilValue, useRecoilState } from 'recoil';

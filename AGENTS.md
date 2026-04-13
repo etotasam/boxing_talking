@@ -24,14 +24,29 @@
 - `cd frontend && npm run cy`: Cypress を起動します。
 - `cd backend && npm test`: `./vendor/bin/phpunit` で PHPUnit を実行します。
 
-## Coding Rules
+## Frontend Rules
 
-- フロントエンドでは TypeScript を使い、`frontend/.prettierrc` に従ってください。
-- シングルクォートと `printWidth: 100` を維持してください。
-- React コンポーネントやページは `PascalCase`、hooks は `use` で始まる `camelCase` を使ってください。
-- 共有定数は `frontend/src/assets` にまとめてください。
-- `console.error` 以外の `console` は使用しないでください。
-- バックエンドの Controller・Service・Model・Repository は `PascalCase`、1 ファイル 1 クラスで管理してください。
+- フロントエンドは TypeScript を使用すること
+- コードフォーマットは `frontend/.prettierrc` に必ず従うこと
+  - シングルクォート
+  - `printWidth: 100`
+
+- React コンポーネント・ページ
+  - ファイル名・コンポーネント名ともに `PascalCase` を使用する
+  - 例) `UserInfo.tsx`, `LoginPage.tsx`
+
+- カスタムフック
+  - `use` で始まる `camelCase` を使用する
+  - 例) `useUserData.ts`, `useComments.ts`
+
+- `any` 型の使用は禁止（やむを得ない場合は理由をコメントで明示すること）
+- `console.error` 以外の `console` は使用しないこと（デバッグ用途も含む）
+- 共有定数は `frontend/src/constants` に配置すること
+
+## Backend Rules
+
+- Controller・Service・Model・Repository は `PascalCase`
+- 1 ファイル 1 クラスで管理する
 
 ## Testing
 

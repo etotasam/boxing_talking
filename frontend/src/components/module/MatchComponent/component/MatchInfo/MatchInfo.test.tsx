@@ -2,8 +2,8 @@ import '@testing-library/jest-dom/vitest';
 import { render, screen } from 'test-setup';
 import { describe, expect, test } from 'vitest';
 import { MatchInfo } from './MatchInfo';
-import { initialBoxerData, GRADE, WEIGHT_CLASS } from '@/assets/boxerData';
-import { COUNTRY } from '@/assets/nationalFlagData';
+import { initialBoxerData, GRADE, WEIGHT_CLASS } from '@/constants/boxerData';
+import { COUNTRY } from '@/constants/country';
 
 const matchData = {
   id: 1,

@@ -1,5 +1,5 @@
 import { BoxerType } from '@/types';
-import { COUNTRY } from './nationalFlagData';
+import { COUNTRY } from '@/constants/country';
 
 export const STANCE = {
   SOUTHPAW: "southpaw",

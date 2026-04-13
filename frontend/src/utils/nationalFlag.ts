@@ -1,5 +1,6 @@
 // ! types
 import { CountryType } from '@/types';
+import { COUNTRY } from '@/constants/country';
 // ! Flags
 import japanFlag from '@/assets/images/flags/japan.svg';
 import usaFlag from '@/assets/images/flags/usa.svg';
@@ -21,30 +22,6 @@ import uzbekistanFlag from '@/assets/images/flags/uzbekistan.svg';
 import argentinaFlag from "@/assets/images/flags/argentina.svg"
 import irelandFlag from "@/assets/images/flags/ireland.svg"
 import thailandFlag from "@/assets/images/flags/thailand.svg"
-
-export const COUNTRY = {
-  JAPAN: "Japan",
-  MEXICO: "Mexico",
-  USA: "USA",
-  KAZAKHSTAN: "Kazakhstan",
-  UK: "UK",
-  RUSSIA: "Russia",
-  PHILIPPINES: "Philippines",
-  UKRAINE: "Ukraine",
-  CANADA: "Canada",
-  VENEZUELA: "Venezuela",
-  SOUTH_AFRICA: "SouthAfrica",
-  CHINA: "China",
-  PUERTO_RICO: "PuertoRico",
-  SAUDI_ARABIA: "SaudiArabia",
-  GHANA: "Ghana",
-  AUSTRALIA: "Australia",
-  UZBEKISTAN: "Uzbekistan",
-  ARGENTINA: "Argentina",
-  IRELAND: "Ireland",
-  THAILAND: "Thailand"
-} as const
-
 
 export const getNationalFlag = (country: CountryType) => {
   if (country == COUNTRY.JAPAN) return japanFlag;
@@ -70,7 +47,7 @@ export const getNationalFlag = (country: CountryType) => {
 };
 
 
-export const formatPosition = (_country: CountryType) => {
+export const formatPosition = () => {
   // if (country == COUNTRY.USA) return '25% 20%';
   // if (country == COUNTRY.UK) return '25% 30%';
   // if (country == COUNTRY.UZBEKISTAN) return '25% 20%';

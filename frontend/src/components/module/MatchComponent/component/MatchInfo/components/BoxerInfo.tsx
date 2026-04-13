@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { useRecoilValue } from 'recoil';
 //! type
 import { BoxerType, MatchResultType } from '@/types';
-import { BOXER_STANCE_LABELS } from '@/assets/boxerData';
+import { BOXER_STANCE_LABELS } from '@/constants/boxerData';
 //! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 //! recoil

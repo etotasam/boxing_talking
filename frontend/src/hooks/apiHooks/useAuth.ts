@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useCallback } from "react"
-import { QUERY_KEY } from "@/assets/queryKeys"
-import { Axios } from "@/assets/axios"
+import { QUERY_KEY } from "@/constants/queryKeys"
+import { Axios } from "@/api/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
-import { MESSAGE } from "@/assets/statusesOnToastModal"
-import { TOKEN_ERROR_MESSAGE } from "@/assets/tokenErrorMessage"
-import { API_PATH } from "@/assets/apiPath"
-import { CUSTOM_ERROR_CODE } from "@/assets/customErrorCodes"
+import { MESSAGE } from "@/constants/statusesOnToastModal"
+import { TOKEN_ERROR_MESSAGE } from "@/constants/tokenErrorMessage"
+import { API_PATH } from "@/constants/apiPath"
+import { CUSTOM_ERROR_CODE } from "@/constants/customErrorCodes"
 //! Recoil
 import { useSetRecoilState } from "recoil"
 import { tokenErrorMessageState } from "@/store/tokenErrorMessageState"

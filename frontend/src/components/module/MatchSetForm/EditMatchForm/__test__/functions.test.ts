@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom/vitest';
 import { expect, test } from 'vitest';
 import { pickModifiedData } from "../functions"
-import { WEIGHT_CLASS, GRADE } from '@/assets/boxerData';
-import { COUNTRY } from '@/assets/nationalFlagData';
+import { WEIGHT_CLASS, GRADE } from '@/constants/boxerData';
+import { COUNTRY } from '@/constants/country';
 
 const originData = {
   matchDate: '2024-2-28',

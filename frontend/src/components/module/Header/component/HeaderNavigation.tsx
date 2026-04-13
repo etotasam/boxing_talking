@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/routePath';
+import { ROUTE_PATH } from '@/constants/routePath';
 import { useAdmin } from '@/hooks/apiHooks/useAuth';
 import { AdministratorPageLinks } from '../../AdministratorPageLinks';
 
