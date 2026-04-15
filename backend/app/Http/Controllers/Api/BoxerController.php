@@ -64,8 +64,9 @@ class BoxerController extends ApiController
 
     /**
      * ボクサーの削除
-     * errorCode 30 削除対象のboxerは試合が組まれている状態
-     * errorCode 44 削除対象のboxerが存在しない
+     * errorCode CustomErrorCodes::BOXER_ALREADY_HAS_MATCH 削除対象のboxerは試合が組まれている状態
+     * errorCode CustomErrorCodes::BOXER_NOT_FOUND 削除対象のboxerが存在しない
+     * errorCode CustomErrorCodes::BOXER_DELETE_FAILED boxerの削除に失敗
      * @param int boxer_id
      * @return JsonResponse
      */
@@ -73,16 +74,16 @@ class BoxerController extends ApiController
     {
         $boxerId = $request->boxer_id;
         if ($this->matchRepository->hasMatchBoxer($boxerId)) {
-            return $this->responseBadRequest("Boxer has already setup match", 30);
+            return $this->responseBadRequest("Boxer has already setup match", CustomErrorCodes::BOXER_ALREADY_HAS_MATCH);
         }
 
         try {
             $this->boxerService->deleteBoxerExecute($boxerId);
             return $this->responseSuccessful("Success delete boxer");
         } catch (BoxerException $e) {
-            return $this->responseNotFound($e->getMessage(), 44);
+            return $this->responseNotFound($e->getMessage(), CustomErrorCodes::BOXER_NOT_FOUND);
         } catch (Exception $e) {
-            return $this->responseInvalidQuery($e->getMessage());
+            return $this->responseInvalidQuery($e->getMessage(), CustomErrorCodes::BOXER_DELETE_FAILED);
         }
     }
 
