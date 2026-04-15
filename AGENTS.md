@@ -22,7 +22,7 @@
 - `cd frontend && npm test`: Vitest を実行します。
 - `cd frontend && npm run test:coverage`: カバレッジ付きで Vitest を実行します。
 - `cd frontend && npm run cy`: Cypress を起動します。
-- `cd backend && npm test`: `./vendor/bin/phpunit` で PHPUnit を実行します。
+- `docker compose exec php php artisan test`: バックエンドの PHPUnit / Laravel テストを Docker 経由で実行します。
 
 ## Frontend Rules
 
@@ -47,6 +47,10 @@
 
 - Controller・Service・Model・Repository は `PascalCase`
 - 1 ファイル 1 クラスで管理する
+- バックエンドの PHP / artisan / PHPUnit コマンドは Docker 経由で実行すること
+  - テスト: `docker compose exec php php artisan test`
+  - マイグレーション: `docker compose exec php php artisan migrate`
+  - ローカルの `php` や `./vendor/bin/phpunit` を直接実行しない
 
 ## Testing
 
