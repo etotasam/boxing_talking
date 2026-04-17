@@ -51,6 +51,7 @@
   - テスト: `docker compose exec php php artisan test`
   - マイグレーション: `docker compose exec php php artisan migrate`
   - ローカルの `php` や `./vendor/bin/phpunit` を直接実行しない
+- 関数には何をしている関数なのかを日本語でコメントを入れる
 
 ## Testing
 
