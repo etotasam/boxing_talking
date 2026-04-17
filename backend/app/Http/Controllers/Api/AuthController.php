@@ -116,10 +116,10 @@ class AuthController extends ApiController
             return $this->responseSuccessful("Successful signup");
             //? tokenが期限切れ
         } catch (ExpiredException $e) {
-            return $this->responseUnauthorized("Expired token", 1050);
+            return $this->responseUnauthorized("Expired token", CustomErrorCodes::EXPIRED_TOKEN);
             //? tokenが不正
         } catch (UnexpectedValueException $e) {
-            return $this->responseBadRequest("Invalid token", 1051);
+            return $this->responseBadRequest("Invalid token", CustomErrorCodes::INVALID_TOKEN);
         } catch (Exception $e) {
             return $this->responseInvalidQuery($e->getMessage());
         }
