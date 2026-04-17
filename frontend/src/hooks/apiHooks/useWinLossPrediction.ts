@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from "react"
 import { useQuery, useMutation, } from "react-query"
+import type { AxiosResponse } from "axios"
 import { Axios } from "@/api/axios"
 import { API_PATH } from "@/constants/apiPath"
 //! data
@@ -16,6 +17,9 @@ import { PredictionType, MatchPredictionsType } from "@/types"
 import { useRecoilState } from "recoil"
 import { apiFetchState } from "@/store/apiFetchDataState"
 
+type PredictionErrorResponse = {
+  message: string
+}
 
 //! ユーザーの勝敗予想の取得
 export const useFetchUsersPrediction = () => {
@@ -25,7 +29,6 @@ export const useFetchUsersPrediction = () => {
 
   const api = useCallback(async () => {
     const res = await Axios.get<{ data: PredictionType[] | null }>(API_PATH.PREDICTION).then(v => v.data)
-    // console.log(res.data);
     const formattedData = res.data === null ? undefined : res.data
     return formattedData
   }, [])
@@ -33,14 +36,12 @@ export const useFetchUsersPrediction = () => {
     staleTime: Infinity,
     enabled: isAuthOrGuest,
     onError: () => {
-      // queryClient.setQueryData(queryKeys.vote, [])
     },
     onSuccess: () => {
 
     }
   })
 
-  // const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/fetch", state: "isLoading" }))
   const [usePredictionFetchState, setUserPredictionFetchState] = useRecoilState(apiFetchState("userPrediction/fetch"))
 
   useEffect(() => {
@@ -59,9 +60,7 @@ export const useFetchUsersPrediction = () => {
 
 //! 試合予想の投票
 export const useVoteMatchPrediction = () => {
-  // const queryClient = useQueryClient()
   const { refetch: refetchAllFetchMatchPredictionOfAuthUser } = useFetchUsersPrediction()
-  // const { refetch: refetchMatches } = useFetchMatches()
   const { showErrorToast, showSuccessToast } = useToastModal()
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   type ApiPropsType = {
@@ -75,7 +74,11 @@ export const useVoteMatchPrediction = () => {
       prediction
     })
   }, [])
-  const { mutate, isLoading: isMutateLoading, isSuccess: isMutateSuccess, isError } = useMutation(api, {
+  const { mutate, isLoading: isMutateLoading, isSuccess: isMutateSuccess, isError } = useMutation<
+    void,
+    AxiosResponse<PredictionErrorResponse>,
+    ApiPropsType
+  >(api, {
     onMutate: () => {
       showFullScreenLoading()
     }
@@ -89,7 +92,7 @@ export const useVoteMatchPrediction = () => {
         refetchAllFetchMatchPredictionOfAuthUser()
         showSuccessToast(MESSAGE.SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION)
       },
-      onError: (error: any) => {
+      onError: (error: AxiosResponse<PredictionErrorResponse>) => {
 
         if (error.data.message === "Cannot win-loss prediction after match date") {
           showErrorToast(MESSAGE.MATCH_IS_ALREADY_DONE)
@@ -104,17 +107,7 @@ export const useVoteMatchPrediction = () => {
     })
   }
 
-  // const [isSuccess, setIsSuccess] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/post", state: "isSuccess" }))
-  // const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "userPrediction/post", state: "isLoading" }))
   const [userPredictionPostState, setUserPredictionPostState] = useRecoilState(apiFetchState("userPrediction/post"))
-
-  // useEffect(() => {
-  //   setIsSuccess(isMutateSuccess)
-  // }, [isMutateSuccess])
-
-  // useEffect(() => {
-  //   setIsLoading(isMutateLoading)
-  // }, [isMutateLoading])
 
   useEffect(() => {
     if (isMutateLoading) {
@@ -158,7 +151,6 @@ export const useMatchPredictions = (matchId: number) => {
   }, []);
 
 
-  // const [isLoading, setIsLoading] = useRecoilState(apiFetchDataState({ dataName: "matchPrediction/fetch", state: "isLoading" }))
   const [matchPredictionFetchState, setMatchPredictionFetchState] = useRecoilState(apiFetchState("matchPrediction/fetch"))
 
   useEffect(() => {

@@ -13,7 +13,7 @@ import {
   useVoteMatchPrediction,
   useFetchUsersPrediction,
   useMatchPredictions,
-} from '@/hooks/apiHooks/uesWinLossPrediction';
+} from '@/hooks/apiHooks/useWinLossPrediction';
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 //! component

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   useFetchUsersPrediction
-} from '@/hooks/apiHooks/uesWinLossPrediction';
+} from '@/hooks/apiHooks/useWinLossPrediction';
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 //! type
 import { MatchDataType } from '@/types';

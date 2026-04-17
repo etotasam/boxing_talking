@@ -18,7 +18,7 @@ import { useMenuModal } from "../useMenuModal"
 import { useToastModal } from "../useToastModal"
 import { useFullScreenLoading } from "../useFullScreenLoading"
 import { useLoginModal } from "../useLoginModal"
-import { useFetchUsersPrediction } from "./uesWinLossPrediction"
+import { useFetchUsersPrediction } from "./useWinLossPrediction"
 import { useReactQuery } from "../useReactQuery"
 //! types
 import type { UserType } from "@/types"
