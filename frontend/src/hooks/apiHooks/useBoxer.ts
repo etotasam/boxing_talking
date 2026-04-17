@@ -18,21 +18,12 @@ import type { BoxerType, CountryType } from '@/types';
 
 type UpdateBoxerDataType = Pick<BoxerType, 'id'> & Partial<BoxerType>;
 type RegisterBoxerDataType = Omit<BoxerType, 'id'>;
-type BoxerValidationMessagesType = Partial<Record<'name' | 'eng_name', string[]>>;
 type BoxerApiDefaultErrorDataType = {
   errorCode?: number | false;
   message?: string;
 };
-type BoxerApiValidationErrorDataType = {
-  errorCode?: number | false;
-  message?: BoxerValidationMessagesType;
-};
-type BoxerApiErrorDataType = BoxerApiDefaultErrorDataType | BoxerApiValidationErrorDataType;
+type BoxerApiErrorDataType = BoxerApiDefaultErrorDataType;
 type BoxerApiErrorResponseType = AxiosResponse<BoxerApiErrorDataType>;
-
-const isBoxerValidationMessages = (
-  message: BoxerApiErrorDataType['message']
-): message is BoxerValidationMessagesType => typeof message === 'object' && message !== null;
 
 //! boxerデータ取得 and 登録済み選手の数を取得
 const limit = 15;
@@ -192,12 +183,9 @@ export const useRegisterBoxer = () => {
       onError: (error) => {
         hideFullScreenLoading();
         if (error.status === HTTP_STATUS_CODE.UNPROCESSABLE_ENTITY) {
-          const errors = error.data.message;
-          if (isBoxerValidationMessages(errors)) {
-            if (errors.name?.length || errors.eng_name?.length) {
-              showErrorToast(MESSAGE.BOXER_IS_ALREADY_EXISTS);
-              return;
-            }
+          if (error.data.errorCode === CUSTOM_ERROR_CODE.BOXER_ALREADY_EXISTS) {
+            showErrorToast(MESSAGE.BOXER_IS_ALREADY_EXISTS);
+            return;
           }
         }
         showErrorToast(MESSAGE.FIGHTER_REGISTER_FAILED);

@@ -4,6 +4,7 @@ namespace Tests\Feature\BoxerController;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Exceptions\CustomErrorCodes;
 use App\Models\Boxer;
 use App\Repositories\Interfaces\TitleRepositoryInterface;
 use App\Repositories\TitleRepository;
@@ -79,5 +80,62 @@ class StoreBoxerTest extends TestCase
     unset($this->boxerData['titles']);
     //ボクサーデータはrollbackされ、DBには保存されていない
     $this->assertDatabaseMissing('boxers', $this->boxerData);
+  }
+
+  /**
+   * ボクサー登録時に同じnameの選手が存在する
+   */
+  public function testStoreBoxerReturnsAlreadyExistsErrorCodeWhenNameIsDuplicated()
+  {
+    $this->actingAs(TestHelper::createAdminUser());
+    Boxer::factory()->create(["name" => $this->boxerData['name']]);
+
+    $this->boxerData['titles'] = [];
+    $response = $this->post('api/boxer', $this->boxerData);
+
+    $response
+      ->assertStatus(422)
+      ->assertJson([
+        'success' => false,
+        'errorCode' => CustomErrorCodes::BOXER_ALREADY_EXISTS,
+      ]);
+  }
+
+  /**
+   * ボクサー登録時に同じeng_nameの選手が存在する
+   */
+  public function testStoreBoxerReturnsAlreadyExistsErrorCodeWhenEngNameIsDuplicated()
+  {
+    $this->actingAs(TestHelper::createAdminUser());
+    Boxer::factory()->create(["eng_name" => $this->boxerData['eng_name']]);
+
+    $this->boxerData['titles'] = [];
+    $response = $this->post('api/boxer', $this->boxerData);
+
+    $response
+      ->assertStatus(422)
+      ->assertJson([
+        'success' => false,
+        'errorCode' => CustomErrorCodes::BOXER_ALREADY_EXISTS,
+      ]);
+  }
+
+  /**
+   * ボクサー登録時にnameが未入力
+   */
+  public function testStoreBoxerReturnsNoErrorCodeWhenNameIsRequired()
+  {
+    $this->actingAs(TestHelper::createAdminUser());
+    unset($this->boxerData['name']);
+
+    $this->boxerData['titles'] = [];
+    $response = $this->post('api/boxer', $this->boxerData);
+
+    $response
+      ->assertStatus(422)
+      ->assertJson([
+        'success' => false,
+        'errorCode' => false,
+      ]);
   }
 }

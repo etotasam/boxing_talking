@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Exceptions\CustomErrorCodes;
 use App\Http\Requests\ApiRequest;
+use Illuminate\Contracts\Validation\Validator;
 
 /**
  * @property string name
@@ -42,5 +44,16 @@ class BoxerRequest extends ApiRequest
             'eng_name.required' => 'eng_name is required',
             'eng_name.unique' => 'eng_name is already exists',
         ];
+    }
+
+    protected function validationErrorCode(Validator $validator): int|false
+    {
+        $failedRules = $validator->failed();
+
+        if (isset($failedRules['name']['Unique']) || isset($failedRules['eng_name']['Unique'])) {
+            return CustomErrorCodes::BOXER_ALREADY_EXISTS;
+        }
+
+        return false;
     }
 }
