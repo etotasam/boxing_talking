@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "backend:test": "docker compose exec php php artisan test",
+    "backend:generate-error-codes": "docker compose -f docker-compose.yml -f docker-compose.codegen.yml run --rm php php artisan custom-error-codes:generate",
+    "backend:test-error-codes": "docker compose -f docker-compose.yml -f docker-compose.codegen.yml run --rm php php artisan test"
+  },
   "devDependencies": {
     "husky": "^8.0.3"
   }
