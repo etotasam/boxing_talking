@@ -29,7 +29,7 @@ class GenerateCustomErrorCodes extends Command
      */
     public function handle()
     {
-        $outputPath = base_path('../frontend/src/constants/customErrorCodes.ts');
+        $outputPath = base_path(config('custom_error_codes.frontend_output_path'));
         file_put_contents($outputPath, $this->buildTypescriptContent());
 
         $this->info("Generated {$outputPath}");
