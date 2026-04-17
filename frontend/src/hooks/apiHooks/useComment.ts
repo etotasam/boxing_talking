@@ -5,6 +5,7 @@ import { Axios } from "@/api/axios"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import { QUERY_KEY } from "@/constants/queryKeys"
 import { API_PATH } from "@/constants/apiPath"
+import { HTTP_STATUS_CODE } from "@/constants/httpStatusCodes"
 //! hook
 // import { useAuth } from "@/hooks/useAuth"
 import { useFullScreenLoading } from "@/hooks/useFullScreenLoading"
@@ -193,7 +194,7 @@ export const usePostComment = () => {
           return
         }
         //? 入力エラー
-        if (error.status === 422) {
+        if (error.status === HTTP_STATUS_CODE.UNPROCESSABLE_ENTITY) {
           const errors = error.message.errors as any
           if (errors.comment) {
             //? コメントが長すぎる(1000文字以内)

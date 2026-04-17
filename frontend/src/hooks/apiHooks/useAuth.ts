@@ -8,6 +8,7 @@ import { MESSAGE } from "@/constants/statusesOnToastModal"
 import { TOKEN_ERROR_MESSAGE } from "@/constants/tokenErrorMessage"
 import { API_PATH } from "@/constants/apiPath"
 import { CUSTOM_ERROR_CODE } from "@/constants/customErrorCodes"
+import { HTTP_STATUS_CODE } from "@/constants/httpStatusCodes"
 //! Recoil
 import { useSetRecoilState } from "recoil"
 import { tokenErrorMessageState } from "@/store/tokenErrorMessageState"
@@ -184,7 +185,7 @@ export const usePreSignUp = () => {
 
       onError: (error: any) => {
         hideFullScreenLoading()
-        if (error.status === 422) {
+        if (error.status === HTTP_STATUS_CODE.UNPROCESSABLE_ENTITY) {
           const errorMessages = error.data.message as any
           if (errorMessages.email) {
             if (errorMessages.email.includes('email is already exists')) {
