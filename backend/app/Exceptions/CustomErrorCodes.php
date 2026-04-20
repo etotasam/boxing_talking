@@ -10,6 +10,7 @@ class CustomErrorCodes
   public const UNABLE_TO_GENERATE_GUEST_TODAY = 40;
   public const BOXER_NOT_FOUND = 44;
   public const BOXER_DELETE_FAILED = 50;
+  public const MATCH_VENUE_TOO_LONG = 52;
 
   public const EXPIRED_TOKEN = 1050;
   public const INVALID_TOKEN = 1051;

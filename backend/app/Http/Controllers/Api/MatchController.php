@@ -81,7 +81,7 @@ class MatchController extends ApiController
      *
      * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(BoxingMatchesRequest $request)
     {
         try {
             $this->matchService->storeMatch($request->toArray());
@@ -119,6 +119,7 @@ class MatchController extends ApiController
      * @param  array update_match_data
      * @return JsonResponse
      */
+    // TODO: argをupdate_match_dataとして受けるのを変更しよう(BoxingMatchesRequestのrulesから'update_match_data.venue'を削除したい)
     public function update(BoxingMatchesRequest $request)
     {
         try {

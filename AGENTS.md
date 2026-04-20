@@ -23,6 +23,7 @@
 - `cd frontend && npm run test:coverage`: カバレッジ付きで Vitest を実行します。
 - `cd frontend && npm run cy`: Cypress を起動します。
 - `docker compose exec php php artisan test`: バックエンドの PHPUnit / Laravel テストを Docker 経由で実行します。
+- `npm run backend:generate-error-codes`: バックエンドの `CustomErrorCodes` からフロントエンドのエラーコード定数を生成します。
 
 ## Frontend Rules
 
@@ -51,6 +52,7 @@
   - テスト: `docker compose exec php php artisan test`
   - マイグレーション: `docker compose exec php php artisan migrate`
   - ローカルの `php` や `./vendor/bin/phpunit` を直接実行しない
+- エラーコードを追加・変更する時は `backend/app/Exceptions/CustomErrorCodes.php` を編集し、`npm run backend:generate-error-codes` でフロントエンド側の `frontend/src/constants/customErrorCodes.ts` を生成すること
 - 関数には何をしている関数なのかを日本語でコメントを入れる
 
 ## Testing

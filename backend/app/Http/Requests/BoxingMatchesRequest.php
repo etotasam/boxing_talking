@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Exceptions\CustomErrorCodes;
+use Illuminate\Contracts\Validation\Validator;
 
-class BoxingMatchesRequest extends FormRequest
+class BoxingMatchesRequest extends ApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,6 +25,7 @@ class BoxingMatchesRequest extends FormRequest
     public function rules()
     {
         return [
+            'venue' => ['string', 'max:20'],
             'update_match_data.venue' => ['string', 'max:20']
 
         ];
@@ -33,7 +35,22 @@ class BoxingMatchesRequest extends FormRequest
     public function messages()
     {
         return [
-            'max:20' => 'venue is max 20 chars',
+            'venue.max' => 'venue is max 20 chars',
+            'update_match_data.venue.max' => 'venue is max 20 chars',
         ];
+    }
+
+    /**
+     * バリデーションエラーに対応する独自エラーコードを返す
+     */
+    protected function validationErrorCode(Validator $validator): int|false
+    {
+        $failedRules = $validator->failed();
+
+        if (isset($failedRules['venue']['Max']) || isset($failedRules['update_match_data.venue']['Max'])) {
+            return CustomErrorCodes::MATCH_VENUE_TOO_LONG;
+        }
+
+        return false;
     }
 }

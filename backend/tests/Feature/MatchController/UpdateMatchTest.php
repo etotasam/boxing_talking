@@ -5,6 +5,7 @@ namespace Tests\Feature\MatchController;
 use Mockery\MockInterface;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Exceptions\CustomErrorCodes;
 use App\Helpers\TestHelper;
 use App\Models\Boxer;
 use App\Models\BoxingMatch;
@@ -102,5 +103,29 @@ class UpdateMatchTest extends TestCase
     $response = $this->patch('/api/match', $updateData);
     $response->assertStatus(200);
     $this->assertDatabaseHas('boxing_matches', ['country' => 'USA']);
+  }
+
+  /**
+   * @test
+   * 試合会場が文字数制限を超えた時は専用のエラーコードを返す
+   */
+  public function testUpdateMatchReturnsVenueTooLongErrorCode()
+  {
+    $this->actingAs(TestHelper::createAdminUser());
+
+    $updateData = [
+      'match_id' => $this->match->id,
+      'update_match_data' => ['venue' => '123456789012345678901']
+    ];
+
+    $response = $this->patch('/api/match', $updateData);
+
+    $response
+      ->assertStatus(422)
+      ->assertJson([
+        'success' => false,
+        'errorCode' => CustomErrorCodes::MATCH_VENUE_TOO_LONG,
+      ]);
+    $this->assertDatabaseMissing('boxing_matches', ['venue' => $updateData['update_match_data']['venue']]);
   }
 }
