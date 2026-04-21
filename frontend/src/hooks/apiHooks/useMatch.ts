@@ -100,21 +100,20 @@ export const useRegisterMatch = () => {
 }
 
 //! 試合の変更
-type ArgumentType = {
-  matchId: number,
-  changeData: Partial<MatchUpdateFormType>
-}
+type ArgumentType = Partial<MatchUpdateFormType> & { matchId: number }
+
+// type ArgumentType = {
+//   matchId: number,
+//   changeData: Partial<MatchUpdateFormType>
+// }
 export const useUpdateMatch = () => {
   const { showErrorToast, showSuccessToast } = useToastModal()
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading()
   const { refetch: refetchMatches } = useFetchMatches()
   const { refetch: refetchAllMatches } = useFetchAllMatches()
   const api = useCallback(async (arg: ArgumentType) => {
-    const updateData = {
-      matchId: arg.matchId,
-      updateMatchData: arg.changeData
-    }
-    await Axios.patch(API_PATH.MATCH, updateData)
+
+    await Axios.patch(API_PATH.MATCH, arg)
   }, [])
   const { mutate, isLoading, isSuccess } = useMutation(api, {
     onMutate: () => {

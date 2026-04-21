@@ -57,7 +57,8 @@ class UpdateMatchTest extends TestCase
 
     $updateData = [
       'match_id' => $this->match->id,
-      'update_match_data' => ['country' => 'USA', 'titles' => ['WBA']]
+      'country' => 'USA',
+      'titles' => ['WBA']
     ];
 
     $response = $this->patch('/api/match', $updateData);
@@ -75,7 +76,7 @@ class UpdateMatchTest extends TestCase
 
     $updateData = [
       'match_id' => $this->match->id,
-      'update_match_data' => ['titles' => ['WBA', 'WBO']]
+      'titles' => ['WBA', 'WBO']
     ];
     //adminユーザーとして実行
     $this->actingAs(TestHelper::createAdminUser());
@@ -95,7 +96,8 @@ class UpdateMatchTest extends TestCase
 
     $updateData = [
       'match_id' => $this->match->id,
-      'update_match_data' => ['country' => 'USA', 'titles' => ['WBA']]
+      'country' => 'USA',
+      'titles' => ['WBA']
     ];
     //adminユーザーとして実行
     $this->actingAs(TestHelper::createAdminUser());
@@ -115,7 +117,7 @@ class UpdateMatchTest extends TestCase
 
     $updateData = [
       'match_id' => $this->match->id,
-      'update_match_data' => ['venue' => '123456789012345678901']
+      'venue' => '123456789012345678901'
     ];
 
     $response = $this->patch('/api/match', $updateData);
@@ -126,6 +128,6 @@ class UpdateMatchTest extends TestCase
         'success' => false,
         'errorCode' => CustomErrorCodes::MATCH_VENUE_TOO_LONG,
       ]);
-    $this->assertDatabaseMissing('boxing_matches', ['venue' => $updateData['update_match_data']['venue']]);
+    $this->assertDatabaseMissing('boxing_matches', ['venue' => $updateData['venue']]);
   }
 }

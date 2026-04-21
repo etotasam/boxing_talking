@@ -139,7 +139,7 @@ const EditMatchForm = (props: {
 
     const matchId = selectedMatch.id;
 
-    updateMatch({ matchId, changeData: modifiedFormData });
+    updateMatch({ matchId, ...modifiedFormData });
   };
 
   return <MatchSetFormContainer onSubmit={updateMatchExecute} title={isTitle} />;

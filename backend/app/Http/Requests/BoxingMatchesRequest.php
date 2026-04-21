@@ -25,9 +25,16 @@ class BoxingMatchesRequest extends ApiRequest
     public function rules()
     {
         return [
+            'match_id' => ['integer'],
+            'match_date' => ['date'],
+            'red_boxer_id' => ['integer'],
+            'blue_boxer_id' => ['integer'],
+            'grade' => ['string'],
+            'country' => ['string'],
             'venue' => ['string', 'max:20'],
-            'update_match_data.venue' => ['string', 'max:20']
-
+            'weight' => ['string'],
+            'titles' => ['array'],
+            'titles.*' => ['string'],
         ];
     }
 
@@ -36,8 +43,18 @@ class BoxingMatchesRequest extends ApiRequest
     {
         return [
             'venue.max' => 'venue is max 20 chars',
-            'update_match_data.venue.max' => 'venue is max 20 chars',
         ];
+    }
+
+    /**
+     * 更新対象の試合データを返す
+     */
+    public function validatedUpdateData(): array
+    {
+        $data = $this->validated();
+        unset($data['match_id']);
+
+        return $data;
     }
 
     /**
@@ -47,7 +64,7 @@ class BoxingMatchesRequest extends ApiRequest
     {
         $failedRules = $validator->failed();
 
-        if (isset($failedRules['venue']['Max']) || isset($failedRules['update_match_data.venue']['Max'])) {
+        if (isset($failedRules['venue']['Max'])) {
             return CustomErrorCodes::MATCH_VENUE_TOO_LONG;
         }
 

@@ -115,15 +115,23 @@ class MatchController extends ApiController
     /**
      * 試合データの更新
      *
-     * @param  int match_id
-     * @param  array update_match_data
+     * @param BoxingMatchesRequest $request
+     *  [
+     *    'match_id' => 1,
+     *    'country' => 'USA',
+     *    'venue' => 'ラスベガス',
+     *    'grade' => 'タイトルマッチ',
+     *    'weight' => 'クルーザー',
+     *    'titles' => ['WBA', 'WBC'],
+     *  ]
      * @return JsonResponse
      */
-    // TODO: argをupdate_match_dataとして受けるのを変更しよう(BoxingMatchesRequestのrulesから'update_match_data.venue'を削除したい)
     public function update(BoxingMatchesRequest $request)
     {
+        $matchId = $request->match_id;
+        $updateMatchData = $request->validatedUpdateData();
         try {
-            $this->matchService->updateMatch($request->match_id, $request->update_match_data);
+            $this->matchService->updateMatch($matchId, $updateMatchData);
         } catch (Exception $e) {
             return $this->responseInvalidQuery($e->getMessage());
         }
