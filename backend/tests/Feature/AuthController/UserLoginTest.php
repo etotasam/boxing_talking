@@ -37,6 +37,26 @@ class UserLoginTest extends TestCase
         $response = $this->post('/api/login', ['email' => '', 'password' => $this->rightPassword]);
         $response->assertStatus(422);
     }
+
+    /**
+     * @test
+     * email形式が不正な場合
+     */
+    public function invalidEmailFormat()
+    {
+        $response = $this->post('/api/login', ['email' => 'invalid-email-format', 'password' => $this->rightPassword]);
+        $response->assertStatus(422);
+    }
+
+    /**
+     * @test
+     * passwordが空の場合
+     */
+    public function emptyPasswordInput()
+    {
+        $response = $this->post('/api/login', ['email' => $this->rightEmail, 'password' => '']);
+        $response->assertStatus(422);
+    }
     /**
      * @test
      *  リクエストのemailがDBに存在しない場合401

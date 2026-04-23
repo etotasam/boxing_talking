@@ -3,7 +3,7 @@ import {
   useFetchNewCommentsContainer,
 } from '../useInfinityFetchComments';
 import { renderHook, waitFor, act } from '@testing-library/react';
-import { describe, expect, test, vi, beforeAll, afterAll } from 'vitest';
+import { describe, expect, test, vi, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import { RecoilRoot } from 'recoil';
 import React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -53,10 +53,7 @@ const newComments = {
   ],
 };
 
-const mockFetchNewComments = vi
-  .fn()
-  .mockReturnValueOnce(newComments.newComment1)
-  .mockReturnValueOnce(newComments.newComment2);
+const mockFetchNewComments = vi.fn();
 
 const maxPage = Object.keys(comments).length;
 
@@ -85,21 +82,33 @@ const server = setupServer(
   })
 );
 
-const queryClient = new QueryClient();
+const createWrapper = () => {
+  const queryClient = new QueryClient();
 
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <RecoilRoot>
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  </RecoilRoot>
-);
+  return ({ children }: { children: React.ReactNode }) => (
+    <RecoilRoot>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </RecoilRoot>
+  );
+};
 
 describe('useInfinityFetchComments', () => {
   beforeAll(() => server.listen());
   afterAll(() => server.close());
+  beforeEach(() => {
+    mockFetchNewComments
+      .mockReset()
+      .mockReturnValueOnce(newComments.newComment1)
+      .mockReturnValueOnce(newComments.newComment2);
+  });
+  afterEach(() => {
+    server.resetHandlers();
+    vi.clearAllMocks();
+  });
 
   test('初期ページ読み込み時にコメントの1ページ目を取得する', async () => {
     const matchId = 1;
-    const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper });
+    const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper: createWrapper() });
     expect(result.current.data).not.toBeTruthy();
     await waitFor(() => {
       expect(result.current.data).toEqual(comments.page1);
@@ -109,7 +118,11 @@ describe('useInfinityFetchComments', () => {
 
   test('refetchした時は2ページ目(次のページ)のコメントを取得して、取得したコメントはmergeされる', async () => {
     const matchId = 1;
-    const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper });
+    const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual(comments.page1);
+    });
 
     //? 意図的にrefetchする
     act(() => result.current.refetchComments());
@@ -122,11 +135,21 @@ describe('useInfinityFetchComments', () => {
 
   test('maxPageまでのコメントを取得した場合refetchは実行されない', async () => {
     const matchId = 1;
-    const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper });
+    const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper: createWrapper() });
 
-    //? 意図的に再refetchする
+    await waitFor(() => {
+      expect(result.current.data).toEqual(comments.page1);
+    });
+
     act(() => result.current.refetchComments());
-    //? 返ってくるコメントデータは変わらない
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual([...comments.page1, ...comments.page2]);
+    });
+
+    //? maxPage到達後に再refetchしてもコメントは増えない
+    act(() => result.current.refetchComments());
+
     await waitFor(() => {
       expect(result.current.data).toEqual([...comments.page1, ...comments.page2]);
     });
@@ -136,7 +159,7 @@ describe('useInfinityFetchComments', () => {
     const matchId = 1;
     const resentPostTime = '';
     const { result } = renderHook(() => useFetchNewCommentsContainer({ matchId, resentPostTime }), {
-      wrapper,
+      wrapper: createWrapper(),
     });
 
     result.current.refetch();
@@ -150,13 +173,55 @@ describe('useInfinityFetchComments', () => {
     const matchId = 1;
     const resentPostTime = '';
     const { result } = renderHook(() => useFetchNewCommentsContainer({ matchId, resentPostTime }), {
-      wrapper,
+      wrapper: createWrapper(),
+    });
+
+    result.current.refetch();
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual(newComments.newComment1);
     });
 
     result.current.refetch();
 
     await waitFor(() => {
       expect(result.current.data).toEqual([...newComments.newComment2, ...newComments.newComment1]);
+    });
+  });
+
+  test('新しいコメントが0件の時は空配列を返す', async () => {
+    server.use(
+      rest.get(`${baseURL}${API_PATH.COMMENT_NEW}`, (_req, res, ctx) => {
+        return res(ctx.status(200), ctx.json({ data: [] }));
+      })
+    );
+
+    const matchId = 1;
+    const resentPostTime = '';
+    const { result } = renderHook(() => useFetchNewCommentsContainer({ matchId, resentPostTime }), {
+      wrapper: createWrapper(),
+    });
+
+    result.current.refetch();
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual([]);
+    });
+  });
+
+  test('コメント取得に失敗した時はコメント一覧を返さない', async () => {
+    server.use(
+      rest.get(`${baseURL}${API_PATH.COMMENT}`, (_req, res, ctx) => {
+        return res(ctx.status(500));
+      })
+    );
+
+    const matchId = 1;
+    const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(result.current.data).toBeUndefined();
+      expect(result.current.isNextComments).toBe(false);
     });
   });
 });

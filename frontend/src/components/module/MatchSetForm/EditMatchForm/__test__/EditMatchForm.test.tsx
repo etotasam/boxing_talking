@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor } from 'test-setup';
-import { expect, test, vi } from 'vitest';
+import { expect, test, vi, describe } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { WEIGHT_CLASS, GRADE } from '@/constants/boxerData';
 import { COUNTRY } from '@/constants/country';
