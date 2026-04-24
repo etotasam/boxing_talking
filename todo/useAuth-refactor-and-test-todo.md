@@ -26,13 +26,13 @@
 - [x] `useGuestLogin`
 - [x] `useSignUpIdentification`
 - [ ] 中優先度 hook のテストを作成する
-- [ ] `useLogin`
-- [ ] `useLogout`
-- [ ] `useGuestLogout`
-- [ ] 低優先度 hook の契約テストを作成する
-- [ ] `useGuest`
-- [ ] `useAuth`
-- [ ] `useAdmin`
+- [x] `useLogin`
+- [x] `useLogout`
+- [x] `useGuestLogout`
+- [x] 低優先度 hook の契約テストを作成する
+- [x] `useGuest`
+- [x] `useAuth`
+- [x] `useAdmin`
 - [ ] `useAuth.ts` 内 hook の主要分岐と副作用がテストで固定されていることを確認する
 - [ ] `useAuth.ts` を `1hook 1file` へ分割する
 - [ ] `auth/index.ts` などの再 export 用ファイルを用意して公開 interface を維持する
