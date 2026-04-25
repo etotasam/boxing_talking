@@ -10,7 +10,7 @@ import { QUERY_KEY } from "@/constants/queryKeys";
 import { useFullScreenLoading } from "../useFullScreenLoading"
 import { useToastModal } from "../useToastModal";
 
-import { useGuest, useAuth } from "./useAuth";
+import { useGuest, useAuth } from "./auth";
 //! types
 import { PredictionType, MatchPredictionsType } from "@/types"
 //! Recoil

@@ -6,7 +6,7 @@ import { Axios } from '@/api/axios';
 import { CUSTOM_ERROR_CODE } from '@/constants/customErrorCodes';
 import { QUERY_KEY } from '@/constants/queryKeys';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
-import { useGuestLogin } from '@/hooks/apiHooks/useAuth';
+import { useGuestLogin } from '@/hooks/apiHooks/auth';
 
 const noop = () => undefined;
 

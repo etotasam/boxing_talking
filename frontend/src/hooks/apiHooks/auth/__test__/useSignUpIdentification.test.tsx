@@ -6,7 +6,7 @@ import { RecoilRoot, useRecoilValue } from 'recoil';
 import { Axios } from '@/api/axios';
 import { CUSTOM_ERROR_CODE } from '@/constants/customErrorCodes';
 import { TOKEN_ERROR_MESSAGE } from '@/constants/tokenErrorMessage';
-import { useSignUpIdentification } from '@/hooks/apiHooks/useAuth';
+import { useSignUpIdentification } from '@/hooks/apiHooks/auth';
 import { authCheckingState } from '@/store/authCheckingState';
 import { tokenErrorMessageState } from '@/store/tokenErrorMessageState';
 

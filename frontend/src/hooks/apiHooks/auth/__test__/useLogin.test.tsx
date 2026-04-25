@@ -6,7 +6,7 @@ import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
-import { useLogin } from '@/hooks/apiHooks/useAuth';
+import { useLogin } from '@/hooks/apiHooks/auth';
 import type { UserType } from '@/types';
 
 const noop = () => undefined;

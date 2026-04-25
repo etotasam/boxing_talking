@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
 import { Axios } from '@/api/axios';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { HTTP_STATUS_CODE } from '@/constants/httpStatusCodes';
-import { usePreSignUp } from '@/hooks/apiHooks/useAuth';
+import { usePreSignUp } from '@/hooks/apiHooks/auth';
 
 const noop = () => undefined;
 

@@ -8,7 +8,7 @@ import { MESSAGE } from '@/constants/statusesOnToastModal';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 import { usePostComment } from '@/hooks/apiHooks/useComment';
-import { useAuth, useGuest } from '@/hooks/apiHooks/useAuth';
+import { useAuth, useGuest } from '@/hooks/apiHooks/auth';
 
 export const PostCommentContainer = () => {
   //? urlからクエリmatch_idを取得

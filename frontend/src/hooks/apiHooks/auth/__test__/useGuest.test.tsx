@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
-import { useGuest } from '@/hooks/apiHooks/useAuth';
+import { useGuest } from '@/hooks/apiHooks/auth';
 
 const noop = () => undefined;
 

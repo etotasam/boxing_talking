@@ -7,7 +7,7 @@ import { HeaderNavigation } from '../component/HeaderNavigation';
 
 const mockUseAdmin = vi.fn();
 
-vi.mock('@/hooks/apiHooks/useAuth', () => ({
+vi.mock('@/hooks/apiHooks/auth', () => ({
   useAdmin: () => mockUseAdmin(),
 }));
 

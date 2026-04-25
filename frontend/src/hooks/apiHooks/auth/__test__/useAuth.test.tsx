@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
-import { useAuth } from '@/hooks/apiHooks/useAuth';
+import { useAuth } from '@/hooks/apiHooks/auth';
 import type { UserType } from '@/types';
 
 const noop = () => undefined;

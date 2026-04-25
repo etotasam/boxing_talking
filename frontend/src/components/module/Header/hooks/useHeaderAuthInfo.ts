@@ -1,4 +1,4 @@
-import { useAuth, useGuest, useGuestLogout, useLogout } from '@/hooks/apiHooks/useAuth';
+import { useAuth, useGuest, useGuestLogout, useLogout } from '@/hooks/apiHooks/auth';
 
 export const useHeaderAuthInfo = () => {
   const { data: isGuest } = useGuest();
