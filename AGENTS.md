@@ -66,8 +66,8 @@
 - 認証・フォーム送信・API 通信を変更した場合は、必ず関連テストを追加または更新すること。
 - 一覧取得・ページングを変更した場合は、必要に応じて `0件` `通常表示` `最終ページ` `取得失敗` を確認すること。
 - 変更後は必ず関連テストを実行し、必要に応じて lint / build / coverage も確認すること。
-- フロントエンドの詳細手順は `frontend/.agents/skills/frontend-test/SKILL.md` を参照してください。
-- バックエンドの詳細手順は `backend/.agents/skills/php-test/SKILL.md` を参照してください。
+- フロントエンドのテスト作成・更新時は必ず `frontend/.agents/skills/frontend-test/SKILL.md` を読むこと。
+- バックエンドのテスト作成・更新時は必ず `backend/.agents/skills/php-test/SKILL.md` を読むこと。
 
 ## Commit Rules
 
