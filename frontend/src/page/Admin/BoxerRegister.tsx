@@ -11,7 +11,7 @@ import { useRecoilState } from 'recoil';
 import { boxerCurrentState } from '@/store/boxerCurrentState';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
-import { useRegisterBoxer } from '@/hooks/apiHooks/useBoxer';
+import { useRegisterBoxer } from '@/hooks/apiHooks/boxer';
 import { useBoxerFieldData } from '@/hooks/useBoxerFieldData';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;

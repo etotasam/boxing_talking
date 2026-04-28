@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ROUTE_PATH } from '@/constants/routePath';
 // ! hooks
 import { useFullScreenLoading } from '@/hooks/useFullScreenLoading';
-import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
+import { useFetchBoxers } from '@/hooks/apiHooks/boxer';
 import { useAuth, useGuest } from '@/hooks/apiHooks/auth';
 import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
 import { useToastModal } from '@/hooks/useToastModal';

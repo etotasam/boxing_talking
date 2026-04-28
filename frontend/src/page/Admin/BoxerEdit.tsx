@@ -12,7 +12,7 @@ import { boxerCurrentState } from '@/store/boxerCurrentState';
 //! hooks
 import { useBoxerFieldData } from '@/hooks/useBoxerFieldData';
 import { useToastModal } from '@/hooks/useToastModal';
-import { useFetchBoxers, useUpdateBoxerData, useDeleteBoxer } from '@/hooks/apiHooks/useBoxer';
+import { useFetchBoxers, useUpdateBoxerData, useDeleteBoxer } from '@/hooks/apiHooks/boxer';
 //! types
 import { BoxerType } from '@/types';
 //! component

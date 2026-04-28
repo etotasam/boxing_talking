@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 // ! hooks
-import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
+import { useFetchBoxers } from '@/hooks/apiHooks/boxer';
 import { BoxerType } from '@/types';
 //! recoil
 import { useRecoilValue } from 'recoil';
