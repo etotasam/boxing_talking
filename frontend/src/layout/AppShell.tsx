@@ -5,7 +5,7 @@ import { ROUTE_PATH } from '@/constants/routePath';
 import { useFullScreenLoading } from '@/hooks/useFullScreenLoading';
 import { useFetchBoxers } from '@/hooks/apiHooks/boxer';
 import { useAuth, useGuest } from '@/hooks/apiHooks/auth';
-import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
+import { useFetchMatches } from '@/hooks/apiHooks/match';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useInitializeDevice } from '@/hooks/useInitializeDevice';
 import { useLoginModal } from '@/hooks/useLoginModal';

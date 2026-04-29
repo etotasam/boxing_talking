@@ -5,7 +5,7 @@ import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { MatchFormDataType, OrganizationsType } from '@/types';
 //! hook
 import { useToastModal } from '@/hooks/useToastModal';
-import { useRegisterMatch } from '@/hooks/apiHooks/useMatch';
+import { useRegisterMatch } from '@/hooks/apiHooks/match';
 //! component
 import { MatchSetFormContainer } from '../MatchSetFormContainer';
 //! context

@@ -20,7 +20,7 @@ const submitButtonClick = async () => {
 
 // mock
 const updateMatchMock = vi.fn();
-vi.mock('@/hooks/apiHooks/useMatch', () => {
+vi.mock('@/hooks/apiHooks/match', () => {
   return {
     useUpdateMatch: vi.fn(() => {
       return { updateMatch: updateMatchMock };

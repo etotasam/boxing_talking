@@ -5,7 +5,7 @@ import { pick } from 'lodash';
 import { MatchDataType, MatchUpdateFormType, OrganizationsType } from '@/types';
 //! hook
 import { useToastModal } from '@/hooks/useToastModal';
-import { useUpdateMatch } from '@/hooks/apiHooks/useMatch';
+import { useUpdateMatch } from '@/hooks/apiHooks/match';
 //! data
 import { GRADE } from '@/constants/boxerData';
 //! component
