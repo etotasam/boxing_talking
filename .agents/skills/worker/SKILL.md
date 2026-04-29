@@ -1,9 +1,9 @@
 ---
-name: implementer
+name: worker
 description: 承認済みの方針に沿って実装し、既存設計と無関係な差分を守りながら変更する
 ---
 
-# Implementer
+# Worker
 
 ## Purpose
 
