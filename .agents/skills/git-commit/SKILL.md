@@ -5,11 +5,11 @@ description: git に今回の変更だけを安全に保存する
 
 # Git Commit
 
-## 目的
+## Purpose
 
 - 今回の変更だけを確認・テストして `git commit` する。
 
-## 手順
+## Workflow
 
 1. `git status --short` で変更ファイルを確認する。
 2. 変更が複数の目的に分かれている場合は、今回 commit する対象をユーザーに確認する。
@@ -20,7 +20,7 @@ description: git に今回の変更だけを安全に保存する
 7. ユーザー承認後に `git commit -m "<message>"` を実行する。
 8. commit 後に `git status --short` を確認し、未コミット差分が残っていれば説明する。
 
-## 安全ルール
+## Safety Rules
 
 - unrelated な差分を勝手に stage / commit しない。
 - 既に stage されている変更がある場合も、今回の対象か確認する。
@@ -28,7 +28,7 @@ description: git に今回の変更だけを安全に保存する
 - `.env`、秘密情報、`node_modules/`、`frontend/dist/` は含めない。
 - `git reset --hard` や `git checkout --` などの破壊的操作は行わない。
 
-## テスト選択
+## Test Selection
 
 - frontend 差分: 関連する Vitest、`npm run lint`、必要に応じて `npm run build` / `npx tsc --noEmit`。
 - backend 差分: 関連する PHPUnit、必要に応じて `cd backend && npm test`。
@@ -40,7 +40,7 @@ description: git に今回の変更だけを安全に保存する
 - `scope` は変更対象を簡潔に示す。不要な場合は省略してよい。
 - `description` は日本語を使用する。
 
-使用する `type`:
+### Allowed `type` Values
 
 - `feat`: 新機能
 - `fix`: バグ修正
@@ -49,7 +49,7 @@ description: git に今回の変更だけを安全に保存する
 - `test`: テスト
 - `chore`: 雑務・設定変更
 
-例:
+### Examples
 
 - `feat(frontend): ログインフォームを追加`
 - `fix(backend): ユーザー認証の不具合を修正`

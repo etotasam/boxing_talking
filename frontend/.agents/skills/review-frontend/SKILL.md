@@ -3,11 +3,13 @@ name: review-frontend
 description: React フロントエンドのコードレビュー専用。コンポーネント分割、状態管理、UI責務、データ取得、可読性を確認する。Laravel バックエンド設計レビューには使わない。
 ---
 
-目的:
+# Review Frontend
+
+## Purpose
 
 - React 実装の保守性と可読性を確認する
 
-確認項目:
+## Checklist
 
 1. コンポーネントの責務が明確か
 2. props の受け渡しが複雑すぎないか
@@ -17,7 +19,7 @@ description: React フロントエンドのコードレビュー専用。コン�
 6. 命名が具体的か
 7. 再利用性とテストしやすさがあるか
 
-レビュー出力:
+## Output
 
 - 問題点
 - 理由

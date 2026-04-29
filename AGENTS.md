@@ -1,32 +1,57 @@
-# Repository Guidelines
+# リポジトリガイドライン
 
-## AI Instructions
+## AI 向け指示
 
-- 変更前に必ず提案すること。
-- 変更する際は必ず承認を得ること。
-- 変更後は必ずテストを行うこと。
-- 重要な変更では複数案を比較し、採用理由を明示したうえで最適案を選ぶこと。
+- 変更前に必ず提案すること
+- 変更する際は必ず承認を得ること
+- 関連テストを実行し、実行できない場合は理由を報告すること
+- 重要な変更では複数案を比較し、採用理由を明示したうえで最適案を選ぶこと
 
-## Project Structure
+## エージェント選択ルール
 
-- フロントエンドは `frontend/`、バックエンドは `backend/` にあります。
-- フロントエンド実装は `frontend/src`、Cypress は `frontend/cypress/e2e`、ユニットテストは各機能近くの `__test__` に配置します。
-- バックエンドのアプリ本体は `backend/app`、ルートは `backend/routes`、マイグレーションと Seeder は `backend/database`、PHP テストは `backend/tests` にあります。
-- Docker 関連のファイルは `docker/` にあり、起動定義はルートの `docker-compose.yml` です。
+- 小規模タスク（単一ファイル・単純修正）は単一エージェントで実行する
+- 以下の場合は multi-agent の使用を検討する:
+  - 設計が必要な場合
+  - 複数ファイルにまたがる変更
+  - テスト作成が含まれる場合
+  - リファクタリング
 
-## Commands
+## エージェント役割対応
 
-- `docker compose up --build`: Nginx、PHP、MySQL、フロント開発サーバーをまとめて起動します。
-- `cd frontend && npm run dev`: Vite 開発サーバーを起動します。
-- `cd frontend && npm run build`: TypeScript の型検査と本番ビルドを実行します。
-- `cd frontend && npm run lint`: `ts` / `tsx` を ESLint で検査します。
-- `cd frontend && npm test`: Vitest を実行します。
-- `cd frontend && npm run test:coverage`: カバレッジ付きで Vitest を実行します。
-- `cd frontend && npm run cy`: Cypress を起動します。
-- `docker compose exec php php artisan test`: バックエンドの PHPUnit / Laravel テストを Docker 経由で実行します。
-- `npm run backend:generate-error-codes`: バックエンドの `CustomErrorCodes` からフロントエンドのエラーコード定数を生成します。
+- Planner: 設計、影響範囲、複数案比較、実装方針、テスト方針を整理する。詳細は `.agents/skills/planner/SKILL.md` を参照すること
+- Implementer: 承認済み方針に沿って実装し、無関係な差分を触らない。詳細は `.agents/skills/implementer/SKILL.md` を参照すること
+- Tester: テスト追加・更新と関連テスト実行を担当する。詳細は `.agents/skills/tester/SKILL.md` を参照すること
+- Reviewer: 差分、仕様適合性、テスト不足、リグレッションリスクを確認する。詳細は `.agents/skills/reviewer/SKILL.md` を参照すること
 
-## Frontend Rules
+## ワークフロー
+
+- 役割を分ける場合は、以下の流れを基本とする:
+  1. 設計が必要な場合は必ず Planner が設計すること
+  2. 実装は承認後に Implementer が実装すること
+  3. テスト追加・更新が必要な場合は Tester が作成すること
+  4. 実装後は Reviewer が差分・仕様・テスト観点で確認すること
+  5. 最後に関連テストを実行し、結果を報告すること
+
+## プロジェクト構成
+
+- フロントエンドは `frontend/`、バックエンドは `backend/` にあります
+- フロントエンド実装は `frontend/src`、Cypress は `frontend/cypress/e2e`、ユニットテストは各機能近くの `__test__` に配置します
+- バックエンドのアプリ本体は `backend/app`、ルートは `backend/routes`、マイグレーションと Seeder は `backend/database`、PHP テストは `backend/tests` にあります
+- Docker 関連のファイルは `docker/` にあり、起動定義はルートの `docker-compose.yml` です
+
+## コマンド
+
+- `docker compose up --build`: Nginx、PHP、MySQL、フロント開発サーバーをまとめて起動します
+- `cd frontend && npm run dev`: Vite 開発サーバーを起動します
+- `cd frontend && npm run build`: TypeScript の型検査と本番ビルドを実行します
+- `cd frontend && npm run lint`: `ts` / `tsx` を ESLint で検査します
+- `cd frontend && npm test`: Vitest を実行します
+- `cd frontend && npm run test:coverage`: カバレッジ付きで Vitest を実行します
+- `cd frontend && npm run cy`: Cypress を起動します
+- `docker compose exec php php artisan test`: バックエンドの PHPUnit / Laravel テストを Docker 経由で実行します
+- `npm run backend:generate-error-codes`: バックエンドの `CustomErrorCodes` からフロントエンドのエラーコード定数を生成します
+
+## フロントエンドルール
 
 - フロントエンドは TypeScript を使用すること
 - コードフォーマットは `frontend/.prettierrc` に必ず従うこと
@@ -45,7 +70,7 @@
 - `console.error` 以外の `console` は使用しないこと（デバッグ用途も含む）
 - 共有定数は `frontend/src/constants` に配置すること
 
-## Backend Rules
+## バックエンドルール
 
 - Controller・Service・Model・Repository は `PascalCase`
 - 1 ファイル 1 クラスで管理する
@@ -54,30 +79,25 @@
   - マイグレーション: `docker compose exec php php artisan migrate`
   - ローカルの `php` や `./vendor/bin/phpunit` を直接実行しない
 - エラーコードを追加・変更する時は `backend/app/Exceptions/CustomErrorCodes.php` を編集し、`npm run backend:generate-error-codes` でフロントエンド側の `frontend/src/constants/customErrorCodes.ts` を生成すること
-- 関数には何をしている関数なのかを日本語でコメントを入れる
+- 公開メソッド・複雑な処理・意図が読み取りにくい関数には日本語コメントを入れること
 
-## Testing
+## テスト
 
-- テストは、実装詳細ではなく公開される振る舞い・仕様・ユーザーから見える結果を検証すること。
-- テスト追加・更新の要否は変更リスクに応じて判断し、「何を保証するテストか」を明確にすること。
-- カバレッジ率だけを目的にせず、変更箇所・重要ロジック・障害時の挙動を優先して確認すること。
-- テストはリファクタリングで壊れにくく、仕様変更時にだけ見直しが必要になる形を目指すこと。
-- 変更内容に応じて `正常系` `異常系` `境界系` を意識すること。
-- 認証・フォーム送信・API 通信を変更した場合は、必ず関連テストを追加または更新すること。
-- 一覧取得・ページングを変更した場合は、必要に応じて `0件` `通常表示` `最終ページ` `取得失敗` を確認すること。
-- 変更後は必ず関連テストを実行し、必要に応じて lint / build / coverage も確認すること。
-- フロントエンドのテスト作成・更新時は必ず `frontend/.agents/skills/frontend-test/SKILL.md` を読むこと。
-- バックエンドのテスト作成・更新時は必ず `backend/.agents/skills/php-test/SKILL.md` を読むこと。
+- テストは、実装詳細ではなく公開される振る舞い・仕様・ユーザーから見える結果を検証すること
+- テスト追加・更新の要否は変更リスクに応じて判断し、「何を保証するテストか」を明確にすること
+- 認証・フォーム送信・API 通信・一覧取得・ページングを変更した場合は、関連テストの追加・更新を検討すること
+- 変更後は関連テストを実行し、実行できない場合は理由を報告すること
+- テスト作成・更新時は `.agents/skills/tester/SKILL.md` を参照すること
 
-## Commit Rules
+## コミットルール
 
-- 変更内容が一目で分かるメッセージにしてください。
-- コミットメッセージは Conventional Commits の形式で書いてください。
-- 詳細は `./.agents/skills/git-commit/SKILL.md` を参照してください。
+- 変更内容が一目で分かるメッセージにすること
+- コミットメッセージは Conventional Commits の形式で書くこと
+- 詳細は `./.agents/skills/git-commit/SKILL.md` を参照すること
 
-## Restrictions
+## 制限事項
 
-- 生成物である `frontend/dist/` は手動で編集しないでください。
-- 依存パッケージの `node_modules/` は手動で編集しないでください。
-- 環境変数や秘密情報はコミットしないでください。
-- 新しい設定値を追加した場合は、対応する README も更新してください。
+- 生成物である `frontend/dist/` は手動で編集しない
+- 依存パッケージの `node_modules/` は手動で編集しない
+- 環境変数や秘密情報はコミットしない
+- 新しい設定値を追加した場合は、対応する README も更新すること
