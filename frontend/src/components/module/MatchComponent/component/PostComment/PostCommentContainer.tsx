@@ -7,7 +7,7 @@ import { useLocation } from 'react-router-dom';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
-import { usePostComment } from '@/hooks/apiHooks/useComment';
+import { usePostComment } from '@/hooks/apiHooks/comment';
 import { useAuth, useGuest } from '@/hooks/apiHooks/auth';
 
 export const PostCommentContainer = () => {
