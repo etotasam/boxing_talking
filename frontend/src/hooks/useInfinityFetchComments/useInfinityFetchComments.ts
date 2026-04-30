@@ -1,4 +1,8 @@
-import { useFetchNewComments, useFetchComments, useFetchCommentsState } from '@/hooks/apiHooks/useComment';
+import {
+  useFetchNewComments,
+  useFetchComments,
+  useFetchCommentsState,
+} from '@/hooks/apiHooks/comment';
 import { useEffect, useMemo } from 'react';
 import { useQueryState } from '@/hooks/apiHooks/useQueryState';
 import { CommentType } from '@/types';
@@ -13,15 +17,11 @@ export const useInfinityFetchComments = (matchId: number) => {
   const cacheKey = useMemo(() => ['cache/comments', { matchId }], [matchId]);
   const [commentsData, setCommentsData] = useQueryState<{ page: number; comments: CommentType[] }>(cacheKey);
 
-  //? データがまだ取得出来てない場合loadingモーダルを表示する為のエフェクトとrecoil
+  //? データがまだ取得出来てない場合loadingモーダルを表示する為のrecoil
   const setCommentsFetchState = useSetRecoilState(apiFetchState("comments/fetch"))
 
-  useEffect(() => {
-    setCommentsFetchState(!commentsData ? "loading" : "idle")
-  }, [commentsData, setCommentsFetchState])
-
   //? 取得するコメントの数に基づくmaxPage数と最後の投稿のcreateAtタイムを取得
-  const { data: commentState } = useFetchCommentsState(matchId);
+  const { data: commentState, isError: isCommentStateError } = useFetchCommentsState(matchId);
 
   //? コメントの取得
   const {
@@ -33,6 +33,14 @@ export const useInfinityFetchComments = (matchId: number) => {
     createdAt: commentState ? commentState.resentPostTime : '',
     page: commentsData ? commentsData.page + 1 : 1,
   });
+
+  useEffect(() => {
+    if (isCommentStateError) {
+      setCommentsFetchState("error")
+      return
+    }
+    setCommentsFetchState(!commentsData ? "loading" : "idle")
+  }, [commentsData, isCommentStateError, setCommentsFetchState])
 
   //? 取得したデータをcommentsDataにmergeしてキャッシュする
   useEffect(() => {

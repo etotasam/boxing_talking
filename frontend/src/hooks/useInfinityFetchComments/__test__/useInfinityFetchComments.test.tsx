@@ -6,7 +6,7 @@ import { renderHook, waitFor, act } from '@testing-library/react';
 import { describe, expect, test, vi, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import { RecoilRoot } from 'recoil';
 import React from 'react';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import { API_PATH } from '@/constants/apiPath';
@@ -55,6 +55,14 @@ const newComments = {
 
 const mockFetchNewComments = vi.fn();
 
+const noop = () => undefined;
+
+setLogger({
+  log: noop,
+  warn: noop,
+  error: noop,
+});
+
 const maxPage = Object.keys(comments).length;
 
 // interceptor
@@ -83,7 +91,13 @@ const server = setupServer(
 );
 
 const createWrapper = () => {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
 
   return ({ children }: { children: React.ReactNode }) => (
     <RecoilRoot>
@@ -222,6 +236,24 @@ describe('useInfinityFetchComments', () => {
     await waitFor(() => {
       expect(result.current.data).toBeUndefined();
       expect(result.current.isNextComments).toBe(false);
+      expect(result.current.commentFetchState).toBe('error');
+    });
+  });
+
+  test('コメント状態取得に失敗した時はコメント取得状態が error になる', async () => {
+    server.use(
+      rest.get(`${baseURL}${API_PATH.COMMENT_STATE}`, (_req, res, ctx) => {
+        return res(ctx.status(500));
+      })
+    );
+
+    const matchId = 1;
+    const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(result.current.data).toBeUndefined();
+      expect(result.current.isNextComments).toBe(false);
+      expect(result.current.commentFetchState).toBe('error');
     });
   });
 });

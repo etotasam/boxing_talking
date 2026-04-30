@@ -1,0 +1,1 @@
+export const FETCH_COMMENTS_LIMIT_COUNT = 10;
