@@ -1,9 +1,9 @@
 ---
-name: php-test
+name: backend-test
 description: Laravel バックエンドのテスト作成・確認時に参照する手順
 ---
 
-# PHP Test
+# Backend Test
 
 ## Purpose
 

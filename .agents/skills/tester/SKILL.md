@@ -15,8 +15,8 @@ description: 変更内容に応じたテスト追加・更新・実行を担当�
 
 1. 変更内容が保証すべき振る舞いを整理する。
 2. `正常系` `異常系` `境界系` から必要な観点を選ぶ。
-3. フロントエンドのテスト作成・更新時は `frontend/.agents/skills/frontend-test/SKILL.md` を読む。
-4. バックエンドのテスト作成・更新時は `backend/.agents/skills/php-test/SKILL.md` を読む。
+3. フロントエンドのテスト作成・更新時は `.agents/skills/frontend-test/SKILL.md` を読む。
+4. バックエンドのテスト作成・更新時は `.agents/skills/backend-test/SKILL.md` を読む。
 5. 関連テストを実行し、必要に応じて lint / build / coverage も確認する。
 6. テスト結果、保証した内容、残リスクを報告する。
 
