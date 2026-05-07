@@ -1,4 +1,4 @@
-import { API_PATH } from "../../src/assets/apiPath"
+import { API_PATH } from "../../src/constants/apiPath"
 import { expect } from "chai"
 
 

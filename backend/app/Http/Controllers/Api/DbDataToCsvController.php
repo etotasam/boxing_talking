@@ -11,7 +11,8 @@ class DbDataToCsvController extends Controller
 {
     /**
      * DBデータをcsvに保存する
-     * @return string
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
     public function output()
     {

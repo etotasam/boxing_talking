@@ -4,10 +4,11 @@ import clsx from 'clsx';
 
 //! components
 import { Comments } from '../Comments';
+//! hooks
+import { useFetchComments } from '@/hooks/apiHooks/comment';
 //! recoil
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
-import { apiFetchState } from '@/store/apiFetchDataState';
 //! icons
 import { GoTriangleUp } from 'react-icons/go';
 import { modalState } from '@/store/modalState';
@@ -18,10 +19,12 @@ type PropsType = {
 };
 
 export const MatchCommentsModal = ({ matchId }: PropsType) => {
-  // const isCommentsFirstFetchingState = useRecoilValue(
-  //   apiFetchDataState({ dataName: 'comments/fetch', state: 'isLoading' })
-  // );
-  const commentsFetchState = useRecoilValue(apiFetchState('comments/fetch'));
+  const {
+    data: comments,
+    refetchComments,
+    isNextComments,
+    commentFetchState,
+  } = useFetchComments(matchId);
   const postCommentAreaHeight = useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT'));
   const headerHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   const hiddenCommentsHeight: number = (postCommentAreaHeight ?? 0) + 50;
@@ -35,8 +38,7 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
 
   const [isShowComments, setIsShowComments] = useRecoilState(modalState('COMMENTS_MODAL'));
   const toggleShowComments = () => {
-    if (commentsFetchState === 'loading') return;
-    // if (isCommentsFirstFetchingState) return;
+    if (commentFetchState === 'loading') return;
     return setIsShowComments((v) => !v);
   };
 
@@ -61,13 +63,12 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
         //? translate-xが効かないので無理やり中央寄せにした( left-[calc(50%-15px)] 幅が30pxなので半分の15pxを引いている)
         className={clsx(
           'absolute top-0 left-[calc(50%-15px)] z-10',
-          commentsFetchState === 'loading' ? 'cursor-default' : 'cursor-pointer'
-          // isCommentsFirstFetchingState ? 'cursor-default' : 'cursor-pointer'
+          commentFetchState === 'loading' ? 'cursor-default' : 'cursor-pointer'
         )}
         animate={isShowComments ? { top: '-30px', rotate: 180 } : { top: '0px' }}
         onClick={toggleShowComments}
       >
-        {commentsFetchState === 'loading' ? <CommentsLoadingIcon /> : <CommentsModalToggleButton />}
+        {commentFetchState === 'loading' ? <CommentsLoadingIcon /> : <CommentsModalToggleButton />}
       </motion.div>
 
       <motion.div
@@ -78,7 +79,13 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
             : { opacity: 0, transition: { duration: 0.1 } }
         }
       >
-        <Comments matchId={matchId} />
+        <Comments
+          matchId={matchId}
+          comments={comments}
+          refetchComments={refetchComments}
+          isNextComments={isNextComments}
+          commentFetchState={commentFetchState}
+        />
       </motion.div>
     </motion.div>
     // </div>

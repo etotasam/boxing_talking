@@ -10,7 +10,7 @@ const mockUseAuth = vi.fn();
 const mockLogout = vi.fn();
 const mockGuestLogout = vi.fn();
 
-vi.mock('@/hooks/apiHooks/useAuth', () => ({
+vi.mock('@/hooks/apiHooks/auth', () => ({
   useGuest: () => mockUseGuest(),
   useAuth: () => mockUseAuth(),
   useLogout: () => ({ logout: mockLogout }),

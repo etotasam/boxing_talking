@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { ROUTE_PATH } from '@/assets/routePath';
+import { ROUTE_PATH } from '@/constants/routePath';
 import { Link, useLocation } from 'react-router-dom';
 //! recoil
 import { useSetRecoilState } from 'recoil';

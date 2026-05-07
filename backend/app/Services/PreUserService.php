@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\MailSendJob;

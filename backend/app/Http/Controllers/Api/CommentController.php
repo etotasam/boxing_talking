@@ -14,8 +14,6 @@ use App\Repositories\Interfaces\MatchRepositoryInterface;
 use App\Repositories\Interfaces\CommentRepositoryInterface;
 use Illuminate\Database\QueryException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use App\Models\Comment;
-use DateTime;
 
 class CommentController extends ApiController
 {
@@ -28,41 +26,15 @@ class CommentController extends ApiController
     ) {}
 
     /**
-     * @param int $limit
-     * @param int $matchId
-     * 
-     * @return array ["maxPage" => int, "resentPostTime" => string]
-     */
-    public function state(Request $request)
-    {
-        $matchId = $request->match_id;
-        $limit = $request->limit;
-        try {
-            $resentComment = Comment::latest()->first();
-            if ($resentComment) {
-                $timestamp = strtotime($resentComment->created_at);
-                $formattedCreatedAt = date('Y-m-d H:i:s', $timestamp);
-            } else {
-                $formattedCreatedAt = null;
-            }
-
-            $commentsCount = Comment::where('match_id', $matchId)->count();
-            $maxPage = ceil($commentsCount / $limit);
-
-            return ["maxPage" => $maxPage, "resentPostTime" => $formattedCreatedAt];
-        } catch (\Exception) {
-            return $this->responseInvalidQuery('Failed fetch comments count');
-        }
-    }
-
-    /**
      * 新しいコメントの取得
      * created_at以降に投稿されたコメントの取得
      *
-     * @param int match_id
-     * @param string created_at
+     * リクエストクエリ:
+     * - match_id: 取得したいコメントの試合ID
+     * - created_at: 取得したいコメントの作成日時の基準
      *
-     * @return CommentResource[]|JsonResponse
+     * @param Request $request
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|JsonResponse
      */
     public function new(Request $request)
     {
@@ -82,23 +54,29 @@ class CommentController extends ApiController
     /**
      * 指定の範囲の試合コメントを取得
      *
-     * @param int match_id
-     * @param int page
-     * @param int limit
-     * @param string create_at
+     * リクエストクエリ:
+     * - match_id: 取得したいコメントの試合ID
+     * - cursor: 取得したいコメントのカーソル
      *
-     * @return CommentResource[]|JsonResponse
+     * @param Request $request
+     *
+     * @return array|JsonResponse
      */
     public function index(Request $request)
     {
         $matchId = $request->match_id;
-        $page = $request->page;
-        $limit = $request->limit;
-        $createdAt = $request->created_at;
+        $cursor = $request->cursor;
 
         try {
-            $comments = $this->commentService->fetchComments($matchId, $page, $limit, $createdAt);
-            return CommentResource::collection($comments);
+            $comments = $this->commentService->fetchComments($matchId, $cursor);
+            $nextCursor = $comments->nextCursor();
+            return [
+                'data' => CommentResource::collection($comments->items()),
+                'meta' => [
+                    'nextCursor' => optional($nextCursor)->encode(),
+                    'hasMore' => $nextCursor !== null,
+                ],
+            ];
         } catch (QueryException $e) {
             \Log::error("Error on database by fetch comments" . $e->getMessage());
             return $this->responseInvalidQuery('Unexpected error');
@@ -110,31 +88,16 @@ class CommentController extends ApiController
     }
 
     /**
-     * 試合へのコメント一覧の取得
-     *
-     * @param int match_id
-     * @return CommentResource[]|JsonResponse
-     */
-    public function old(Request $request)
-    {
-        $matchId = $request->query('match_id');
-        try {
-            $commentsOnMatch = $this->commentRepository->getCommentsOnMatchByMatchId($matchId);
-        } catch (QueryException $e) {
-            \Log::error("Database error with get comments" . $e->getMessage());
-            return $this->responseInvalidQuery('Unexpected error');
-        } catch (Exception $e) {
-            return $this->responseInvalidQuery('Failed get comments');
-        }
-
-        return CommentResource::collection($commentsOnMatch);
-    }
-
-    /**
      * 試合へのコメント投稿
-     * errorCode 41 認証なし
-     * @param int match_id
-     * @param string comment
+     *
+     * エラーコード:
+     * - 41: 認証なし
+     *
+     * リクエストボディ:
+     * - match_id: コメントを投稿したい試合ID
+     * - comment: 投稿するコメント
+     *
+     * @param CommentRequest $request
      * @return JsonResponse
      */
     public function store(CommentRequest $request)
@@ -161,7 +124,10 @@ class CommentController extends ApiController
     /**
      * コメント削除
      *
-     * @param int comment_id
+     * ルートパラメータ:
+     * - comment: 削除したいコメント
+     *
+     * @param \App\Models\Comment $comment
      * @return bool
      */
     public function destroy(\App\Models\Comment $comment)

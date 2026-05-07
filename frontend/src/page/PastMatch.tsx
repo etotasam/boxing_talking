@@ -1,5 +1,5 @@
 import { MatchComponent } from '@/components/module/MatchComponent';
-import { useFetchPastMatches } from '@/hooks/apiHooks/useMatch';
+import { useFetchPastMatches } from '@/hooks/apiHooks/match';
 
 export const PastMatch = () => {
   //? 過去の試合だけ取得してpropsで渡す

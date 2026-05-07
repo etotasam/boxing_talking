@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { RecoilRoot } from 'recoil';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { ROUTE_PATH } from '@/assets/routePath';
+import { ROUTE_PATH } from '@/constants/routePath';
 import { deviceState, DeviceStateType } from '@/store/deviceState';
 import { Header } from '../Header';
 

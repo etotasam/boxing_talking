@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
-import { MESSAGE } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/constants/statusesOnToastModal';
 //! func
 import { isMatchDatePast } from '@/utils/match';
 //! components
@@ -14,10 +14,14 @@ import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 // ! hooks
-import { useFetchPastMatches, useFetchMatches, useDeleteMatch } from '@/hooks/apiHooks/useMatch';
+import {
+  useDeleteMatch,
+  useFetchMatches,
+  useFetchPastMatches,
+  useMatchResult,
+} from '@/hooks/apiHooks/match';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useSortMatches } from '@/hooks/useSortMatches';
-import { useMatchResult } from '@/hooks/apiHooks/useMatch';
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 //! types
 import { MatchDataType } from '@/types';

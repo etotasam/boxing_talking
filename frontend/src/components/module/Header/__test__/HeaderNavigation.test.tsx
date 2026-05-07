@@ -2,12 +2,12 @@ import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { ROUTE_PATH } from '@/assets/routePath';
+import { ROUTE_PATH } from '@/constants/routePath';
 import { HeaderNavigation } from '../component/HeaderNavigation';
 
 const mockUseAdmin = vi.fn();
 
-vi.mock('@/hooks/apiHooks/useAuth', () => ({
+vi.mock('@/hooks/apiHooks/auth', () => ({
   useAdmin: () => mockUseAdmin(),
 }));
 

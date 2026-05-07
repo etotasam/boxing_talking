@@ -107,6 +107,89 @@ class StoreCommentTest extends TestCase
         $response->assertStatus(200);
         $this->assertDatabaseHas('comments', ['user_id' => $this->user->id, 'match_id' => $this->matches->id, 'comment' => 'コメント投稿']);
     }
+
+    /**
+     * @test
+     * ログインユーザーが1000文字ちょうどのコメントを投稿できる
+     */
+    public function testPostByLoginUserWithMaxLengthComment(): void
+    {
+        $comment = str_repeat('a', 1000);
+
+        $response = $this->actingAs($this->user)
+            ->post(
+                '/api/comment',
+                [
+                    'user_id' => $this->user->id,
+                    'match_id' => $this->matches->id,
+                    'comment' => $comment
+                ]
+            );
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('comments', ['user_id' => $this->user->id, 'match_id' => $this->matches->id, 'comment' => $comment]);
+    }
+
+    /**
+     * @test
+     * ログインユーザーが空コメントを投稿した場合はバリデーションエラー
+     */
+    public function testPostByLoginUserWithEmptyComment(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->post(
+                '/api/comment',
+                [
+                    'user_id' => $this->user->id,
+                    'match_id' => $this->matches->id,
+                    'comment' => ''
+                ]
+            );
+
+        $response->assertStatus(422);
+        $this->assertDatabaseMissing('comments', ['user_id' => $this->user->id, 'match_id' => $this->matches->id, 'comment' => '']);
+    }
+
+    /**
+     * @test
+     * ログインユーザーが1001文字のコメントを投稿した場合はバリデーションエラー
+     */
+    public function testPostByLoginUserWithTooLongComment(): void
+    {
+        $comment = str_repeat('a', 1001);
+
+        $response = $this->actingAs($this->user)
+            ->post(
+                '/api/comment',
+                [
+                    'user_id' => $this->user->id,
+                    'match_id' => $this->matches->id,
+                    'comment' => $comment
+                ]
+            );
+
+        $response->assertStatus(422);
+        $this->assertDatabaseMissing('comments', ['user_id' => $this->user->id, 'match_id' => $this->matches->id, 'comment' => $comment]);
+    }
+
+    /**
+     * @test
+     * ログインユーザーがmatch_idなしで投稿した場合はバリデーションエラー
+     */
+    public function testPostByLoginUserWithoutMatchId(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->post(
+                '/api/comment',
+                [
+                    'user_id' => $this->user->id,
+                    'comment' => 'コメント投稿'
+                ]
+            );
+
+        $response->assertStatus(422);
+        $this->assertDatabaseMissing('comments', ['user_id' => $this->user->id, 'comment' => 'コメント投稿']);
+    }
     /**
      * @test
      * ゲストによるコメント投稿

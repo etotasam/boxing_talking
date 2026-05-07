@@ -6,7 +6,7 @@ import { clsx } from 'clsx';
 import { useSetRecoilState } from 'recoil';
 import { formTypeState, FORM_TYPE } from '@/store/formTypeState';
 //! hooks
-import { usePreSignUp } from '@/hooks/apiHooks/useAuth';
+import { usePreSignUp } from '@/hooks/apiHooks/auth';
 //! component
 import { CustomButton } from '@/components/atomic/Button';
 //! utils

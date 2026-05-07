@@ -7,30 +7,35 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Repositories\Interfaces\CommentRepositoryInterface;
 use App\Models\Comment;
 use App\Models\BoxingMatch;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 
 class CommentService
 {
+  private const FETCH_COMMENTS_LIMIT_COUNT = 10;
 
   public function __construct(
     protected CommentRepositoryInterface $commentRepository
   ) {}
 
-
-  public function fetchComments($matchId, $page, $limit, $createdAt)
+  /**
+   * コメントの取得
+   * @param int $matchId
+   * @param string|null $cursor
+   *
+   * @return CursorPaginator
+   */
+  public function fetchComments(int $matchId, ?string $cursor = null): CursorPaginator
   {
 
     $match = BoxingMatch::find($matchId);
     if (!$match) {
       return throw new HttpException(404, 'Match not found');
     }
-    $timestamp = strtotime($createdAt);
-    $formattedCreatedAt = date('Y-m-d H:i:s', $timestamp);
-    $offset = ($page - 1) * $limit;
 
-    $comments = Comment::where(function ($q) use ($matchId, $formattedCreatedAt) {
-      $q->where('match_id', $matchId);
-      $q->where('created_at', "<=", $formattedCreatedAt);
-    })->orderBy('created_at', 'desc')->offset($offset)->limit($limit)->get();
+    $comments = Comment::where('match_id', $matchId)
+      ->orderBy('created_at', 'desc')
+      ->orderBy('id', 'desc')
+      ->cursorPaginate(self::FETCH_COMMENTS_LIMIT_COUNT, ['*'], 'cursor', $cursor);
 
     return $comments;
   }

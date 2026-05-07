@@ -1,9 +1,9 @@
 import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor } from 'test-setup';
-import { expect, test, vi } from 'vitest';
+import { expect, test, vi, describe } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { WEIGHT_CLASS, GRADE } from '@/assets/boxerData';
-import { COUNTRY } from '@/assets/nationalFlagData';
+import { WEIGHT_CLASS, GRADE } from '@/constants/boxerData';
+import { COUNTRY } from '@/constants/country';
 
 import { EditMatchFormWrapper } from '../EditMatchForm';
 
@@ -20,7 +20,7 @@ const submitButtonClick = async () => {
 
 // mock
 const updateMatchMock = vi.fn();
-vi.mock('@/hooks/apiHooks/useMatch', () => {
+vi.mock('@/hooks/apiHooks/match', () => {
   return {
     useUpdateMatch: vi.fn(() => {
       return { updateMatch: updateMatchMock };

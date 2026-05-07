@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { RotatingLines } from 'react-loader-spinner';
 import { FaRegCommentDots } from 'react-icons/fa';
 //! hooks
-import { usePostComment } from '@/hooks/apiHooks/useComment';
+import { usePostComment } from '@/hooks/apiHooks/comment';
 
 type PostCommentType = {
   commentPostRef: (node: HTMLDivElement) => void;

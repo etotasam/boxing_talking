@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useRecoilState } from 'recoil';
 import { toastModalState } from '@/store/toastModalState';
 import { MessageType, BgColorType } from '@/types';
-import { BG_COLOR_ON_TOAST_MODAL } from '@/assets/statusesOnToastModal';
+import { BG_COLOR_ON_TOAST_MODAL } from '@/constants/statusesOnToastModal';
 
 export const useToastModal = () => {
   //? ToastModalの状態(show/hide)

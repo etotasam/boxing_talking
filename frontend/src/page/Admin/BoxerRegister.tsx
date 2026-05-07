@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
 // ! data
-import { MESSAGE } from '@/assets/statusesOnToastModal';
-import { initialBoxerDataOnForm } from '@/assets/boxerData';
+import { MESSAGE } from '@/constants/statusesOnToastModal';
+import { initialBoxerDataOnForm } from '@/constants/boxerData';
 //! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
 //! recoil
@@ -11,7 +11,7 @@ import { useRecoilState } from 'recoil';
 import { boxerCurrentState } from '@/store/boxerCurrentState';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
-import { useRegisterBoxer } from '@/hooks/apiHooks/useBoxer';
+import { useRegisterBoxer } from '@/hooks/apiHooks/boxer';
 import { useBoxerFieldData } from '@/hooks/useBoxerFieldData';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;

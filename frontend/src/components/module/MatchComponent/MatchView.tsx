@@ -1,14 +1,11 @@
-import clsx from 'clsx';
 //! type
 import { MatchDataType } from '@/types';
-import { DeviceStateType } from '@/store/deviceState';
 import { MatchPredictionsType } from '@/types';
 
 //! component
 import { MatchInfo } from './component/MatchInfo';
 import { PostComment } from './component/PostComment';
 import { PredictionVoteModal } from './component/PredictionVoteModal';
-import { VoteIcon } from './component/VoteIcon';
 import { MatchCommentsModal } from './component/MatchCommentsModal';
 
 export type UsersPredictionType = 'red' | 'blue' | false | undefined;
@@ -18,12 +15,9 @@ export type MatchViewProps = {
   userPrediction: UsersPredictionType;
   matchPredictions: MatchPredictionsType | undefined;
   isMatchPredictionsLoading: boolean;
-  device: DeviceStateType;
   isShowPredictionModal: boolean;
   showPredictionModal: () => void;
   isShowVoteIcon: boolean;
-  isScroll: boolean;
-  voteIconBottomPosition: number;
   commentsModalHeightHiddenState: number;
 };
 
@@ -32,12 +26,9 @@ export const MatchView = ({
   userPrediction,
   matchPredictions,
   isMatchPredictionsLoading,
-  device,
   isShowPredictionModal,
   showPredictionModal,
   isShowVoteIcon,
-  isScroll,
-  voteIconBottomPosition,
   commentsModalHeightHiddenState,
 }: MatchViewProps) => {
   return (
@@ -47,24 +38,14 @@ export const MatchView = ({
         userPrediction={userPrediction}
         matchPredictions={matchPredictions}
         isMatchPredictionsLoading={isMatchPredictionsLoading}
+        showPredictionModal={showPredictionModal}
+        isShowVoteIcon={isShowVoteIcon}
         commentsModalHeightHiddenState={commentsModalHeightHiddenState}
       />
       <div className="fixed bottom-0 w-full">
         <PostComment />
       </div>
 
-      {isShowVoteIcon && (
-        <div
-          className={clsx('fixed ', device === 'SP' ? 'right-[10px]' : 'right-[50px]')}
-          style={{ bottom: voteIconBottomPosition }}
-        >
-          <VoteIcon
-            isScroll={isScroll}
-            showPredictionModal={showPredictionModal}
-            bottomPosition={voteIconBottomPosition}
-          />
-        </div>
-      )}
       {isShowPredictionModal && <PredictionVoteModal thisMatch={matchData} />}
     </>
   );
@@ -75,6 +56,8 @@ type MainProps = {
   userPrediction: UsersPredictionType;
   matchPredictions: MatchPredictionsType | undefined;
   isMatchPredictionsLoading: boolean;
+  showPredictionModal: () => void;
+  isShowVoteIcon: boolean;
   commentsModalHeightHiddenState: number;
 };
 
@@ -83,6 +66,8 @@ const MainContent = ({
   userPrediction,
   matchPredictions,
   isMatchPredictionsLoading,
+  showPredictionModal,
+  isShowVoteIcon,
   commentsModalHeightHiddenState,
 }: MainProps) => {
   return (
@@ -97,6 +82,8 @@ const MainContent = ({
           userPrediction={userPrediction}
           matchPredictions={matchPredictions}
           isMatchPredictionsLoading={isMatchPredictionsLoading}
+          isShowVoteButton={isShowVoteIcon}
+          showPredictionModal={showPredictionModal}
         />
       </div>
       <MatchCommentsModal matchId={matchData.id} />

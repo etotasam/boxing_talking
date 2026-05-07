@@ -1,0 +1,19 @@
+name = "tester"
+description = "テスト設計・作成"
+
+model = "gpt-5.3-codex"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+.agents/skills/tester/SKILL.md を必ず読むこと。
+
+重要なテストのみ作成：
+
+- 正常系
+- 異常系
+- 境界値
+
+無意味なテストは禁止。
+DB更新や副作用は必ず検証する。
+"""

@@ -1,0 +1,4 @@
+services:
+  php:
+    volumes:
+      - "./frontend/:/var/www/frontend"

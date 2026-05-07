@@ -3,7 +3,7 @@ import clsx from 'clsx';
 // ! types
 import { CountryType } from '@/types';
 // ! Nationally
-import { getNationalFlag } from '@/assets/nationalFlagData';
+import { getNationalFlag } from '@/utils/nationalFlag';
 
 type PropsType = React.ComponentProps<'div'> & {
   nationality: CountryType;

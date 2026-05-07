@@ -1,5 +1,5 @@
 import { MatchComponent } from '@/components/module/MatchComponent';
-import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
+import { useFetchMatches } from '@/hooks/apiHooks/match';
 
 export const Match = () => {
   //? 過去の試合は取得せず、予定された試合だけを取得

@@ -9,8 +9,8 @@ import {
   MatchUpdateFormType,
 } from '@/types';
 //! data
-import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/assets/boxerData';
-import { COUNTRY } from '@/assets/nationalFlagData';
+import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/constants/boxerData';
+import { COUNTRY } from '@/constants/country';
 //! component
 import { Button } from '@/components/atomic/Button';
 type PropsType = {

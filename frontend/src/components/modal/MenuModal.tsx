@@ -1,4 +1,4 @@
-import { ROUTE_PATH } from '@/assets/routePath';
+import { ROUTE_PATH } from '@/constants/routePath';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 //! hook

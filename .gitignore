@@ -35,6 +35,7 @@ frontend/.env
 frontend/coverage
 # production
 frontend/build
+frontend/dist/
 #testpage
 TestPage
 frontend/src/page/Test.tsx

@@ -1,0 +1,7 @@
+import { MESSAGE } from "@/constants/statusesOnToastModal";
+import { MessageType } from "@/types"
+
+export const isMessageType = (message: unknown): message is MessageType => {
+  const modalMessage = Object.values(MESSAGE);
+  return modalMessage.includes(message as MessageType);
+};

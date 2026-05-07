@@ -1,4 +1,4 @@
-import { STANCE, ORGANIZATIONS, WEIGHT_CLASS } from "@/assets/boxerData";
+import { STANCE, ORGANIZATIONS, WEIGHT_CLASS } from "@/constants/boxerData";
 import { CountryType } from "./common";
 
 export type StanceType = typeof STANCE[keyof typeof STANCE];
