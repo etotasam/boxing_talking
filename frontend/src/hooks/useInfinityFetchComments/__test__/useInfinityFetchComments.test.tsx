@@ -63,25 +63,26 @@ setLogger({
   error: noop,
 });
 
-const maxPage = Object.keys(comments).length;
+const page2Cursor = 'cursor-page-2';
 
 // interceptor
 const baseURL = import.meta.env.VITE_APP_API_URL;
 const server = setupServer(
   //? コメント取得リクエスト
   rest.get(`${baseURL}${API_PATH.COMMENT}`, (req, res, context) => {
-    const page = req.url.searchParams.get('page');
-    if (page === '1') {
-      return res(context.status(200), context.json({ data: comments.page1 }));
+    const cursor = req.url.searchParams.get('cursor');
+    if (!cursor) {
+      return res(
+        context.status(200),
+        context.json({ data: comments.page1, meta: { nextCursor: page2Cursor, hasMore: true } })
+      );
     }
-    if (page === '2') {
-      return res(context.status(200), context.json({ data: comments.page2 }));
+    if (cursor === page2Cursor) {
+      return res(
+        context.status(200),
+        context.json({ data: comments.page2, meta: { nextCursor: null, hasMore: false } })
+      );
     }
-  }),
-
-  //? コメントのmaxPageと最新のコメントのcreated_atの取得リクエスト
-  rest.get(`${baseURL}${API_PATH.COMMENT_STATE}`, (_req, res, ctx) => {
-    return res(ctx.status(200), ctx.json({ maxPage, resentPostTime: '2024-03-12 03:58:00' }));
   }),
 
   //? 新しいコメント取得リクエスト
@@ -147,7 +148,7 @@ describe('useInfinityFetchComments', () => {
     });
   });
 
-  test('maxPageまでのコメントを取得した場合refetchは実行されない', async () => {
+  test('最後のcursorまでコメントを取得した場合refetchは実行されない', async () => {
     const matchId = 1;
     const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper: createWrapper() });
 
@@ -161,7 +162,7 @@ describe('useInfinityFetchComments', () => {
       expect(result.current.data).toEqual([...comments.page1, ...comments.page2]);
     });
 
-    //? maxPage到達後に再refetchしてもコメントは増えない
+    //? 最後のcursor到達後に再refetchしてもコメントは増えない
     act(() => result.current.refetchComments());
 
     await waitFor(() => {
@@ -240,20 +241,4 @@ describe('useInfinityFetchComments', () => {
     });
   });
 
-  test('コメント状態取得に失敗した時はコメント取得状態が error になる', async () => {
-    server.use(
-      rest.get(`${baseURL}${API_PATH.COMMENT_STATE}`, (_req, res, ctx) => {
-        return res(ctx.status(500));
-      })
-    );
-
-    const matchId = 1;
-    const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper: createWrapper() });
-
-    await waitFor(() => {
-      expect(result.current.data).toBeUndefined();
-      expect(result.current.isNextComments).toBe(false);
-      expect(result.current.commentFetchState).toBe('error');
-    });
-  });
 });

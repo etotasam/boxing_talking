@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
 // import { useInView } from 'react-intersection-observer';
 //! hooks
-import {
-  useInfinityFetchComments,
-  useFetchNewCommentsContainer,
-} from '@/hooks/useInfinityFetchComments';
+import { useFetchNewCommentsContainer } from '@/hooks/useInfinityFetchComments';
 //! recoil
 import { useRecoilValue } from 'recoil';
-import { apiFetchState } from '@/store/apiFetchDataState';
+import { apiFetchState, type ApiFetchStateType } from '@/store/apiFetchDataState';
+//! types
+import type { CommentType } from '@/types';
 //! component
 import { ErrorFallback } from './components/ErrorFallback';
 import { NoCommentFallback } from './components/NoCommentFallback';
@@ -16,15 +15,13 @@ import { CommentsWrapper } from './components/CommentsWrapper';
 
 type PropsType = {
   matchId: number;
+  comments: CommentType[] | undefined;
+  refetchComments: () => void;
+  isNextComments: boolean;
+  commentFetchState: ApiFetchStateType;
 };
 export const Comments = (props: PropsType) => {
-  const { matchId } = props;
-  const {
-    data: comments,
-    refetchComments,
-    isNextComments,
-    // isError: isErrorFetchComments,
-  } = useInfinityFetchComments(matchId);
+  const { matchId, comments, refetchComments, isNextComments, commentFetchState } = props;
 
   const {
     data: newComments,
@@ -41,7 +38,6 @@ export const Comments = (props: PropsType) => {
   // );
 
   const commentPostState = useRecoilValue(apiFetchState('comments/post'));
-  const commentsFetchState = useRecoilValue(apiFetchState('comments/fetch'));
 
   useEffect(() => {
     if (commentPostState !== 'success') return;
@@ -57,8 +53,7 @@ export const Comments = (props: PropsType) => {
 
   return (
     <CommentsWrapper>
-      {commentsFetchState === 'error' && <ErrorFallback />}
-      {/* {isErrorFetchComments && <ErrorFallback />} */}
+      {commentFetchState === 'error' && <ErrorFallback />}
       {isNotComments && <NoCommentFallback />}
 
       {isComments && (

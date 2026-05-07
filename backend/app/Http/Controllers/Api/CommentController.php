@@ -83,22 +83,25 @@ class CommentController extends ApiController
      * 指定の範囲の試合コメントを取得
      *
      * @param int match_id
-     * @param int page
-     * @param int limit
-     * @param string create_at
+     * @param string|null cursor
      *
      * @return CommentResource[]|JsonResponse
      */
     public function index(Request $request)
     {
         $matchId = $request->match_id;
-        $page = $request->page;
-        $limit = $request->limit;
-        $createdAt = $request->created_at;
+        $cursor = $request->cursor;
 
         try {
-            $comments = $this->commentService->fetchComments($matchId, $page, $limit, $createdAt);
-            return CommentResource::collection($comments);
+            $comments = $this->commentService->fetchComments($matchId, $cursor);
+            $nextCursor = $comments->nextCursor();
+            return [
+                'data' => CommentResource::collection($comments->items()),
+                'meta' => [
+                    'nextCursor' => optional($nextCursor)->encode(),
+                    'hasMore' => $nextCursor !== null,
+                ],
+            ];
         } catch (QueryException $e) {
             \Log::error("Error on database by fetch comments" . $e->getMessage());
             return $this->responseInvalidQuery('Unexpected error');

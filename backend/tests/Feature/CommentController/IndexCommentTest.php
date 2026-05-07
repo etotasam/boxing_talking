@@ -37,21 +37,14 @@ class IndexCommentTest extends TestCase
 
 
         $this->currentDateTime = Carbon::now()->format('Y-m-d H:i:s');
-        $this->beforeOneHourDateTime = Carbon::now()->subHour()->format('Y-m-d H:i:s');
-        $commentsArray = [
-            [
-                'user_id' => $this->user->id,
+        $commentsArray = collect(range(1, 12))->map(function ($number) {
+            return [
+                'user_id' => $number % 2 === 0 ? $this->user2->id : $this->user->id,
                 'match_id' => $this->match->id,
-                'comment' => "test_comment",
-                'created_at' => $this->currentDateTime
-            ],
-            [
-                'user_id' => $this->user2->id,
-                'match_id' => $this->match->id,
-                'comment' => "test_comment2",
-                'created_at' => $this->beforeOneHourDateTime
-            ],
-        ];
+                'comment' => "test_comment{$number}",
+                'created_at' => Carbon::now()->subMinutes($number)->format('Y-m-d H:i:s')
+            ];
+        })->all();
         $this->commentsCount = count($commentsArray);
         $this->comments = Comment::insert($commentsArray);
     }
@@ -61,7 +54,7 @@ class IndexCommentTest extends TestCase
      */
     public function testCommentsFetchRequestWithNotExistsBoxingMatchId(): void
     {
-        $response = $this->get('/api/comment?match_id=' . 100 . '&created_at=' . $this->currentDateTime . '&page=' . 1 . '&limit=' . 10); // 存在しない試合を指定
+        $response = $this->get('/api/comment?match_id=' . 100); // 存在しない試合を指定
 
         $response->assertStatus(404);
 
@@ -76,11 +69,43 @@ class IndexCommentTest extends TestCase
     public function testSuccessCommentsFetch(): void
     {
         $response = $this->get(
-            '/api/comment?match_id=' . $this->match->id . '&created_at=' . $this->currentDateTime . '&page=' . 1 . '&limit=' . 10
+            '/api/comment?match_id=' . $this->match->id
         );
         $response->assertStatus(200);
-        $response->assertJsonFragment(['postUserName' => 'testUserName2'])
-            ->assertJsonFragment(['comment' => 'test_comment2']);
-        $response->assertJsonCount($this->commentsCount, 'data');
+        $response->assertJsonFragment(['postUserName' => 'testUserName'])
+            ->assertJsonFragment(['comment' => 'test_comment1'])
+            ->assertJsonPath('meta.hasMore', true);
+        $response->assertJsonCount(10, 'data');
+    }
+
+    /**
+     * @test
+     * cursor指定時は次のコメントを取得する
+     */
+    public function testSuccessCommentsFetchWithCursor(): void
+    {
+        $firstResponse = $this->get('/api/comment?match_id=' . $this->match->id);
+        $cursor = $firstResponse->json('meta.nextCursor');
+
+        $response = $this->get('/api/comment?match_id=' . $this->match->id . '&cursor=' . $cursor);
+
+        $response->assertStatus(200);
+        $response->assertJsonCount(2, 'data');
+        $response->assertJsonFragment(['comment' => 'test_comment11'])
+            ->assertJsonFragment(['comment' => 'test_comment12'])
+            ->assertJsonPath('meta.hasMore', false)
+            ->assertJsonPath('meta.nextCursor', null);
+    }
+
+    /**
+     * @test
+     * limitを指定されてもバックエンド固定件数を超えて取得しない
+     */
+    public function testCommentsFetchIgnoresLimitParameter(): void
+    {
+        $response = $this->get('/api/comment?match_id=' . $this->match->id . '&limit=100');
+
+        $response->assertStatus(200);
+        $response->assertJsonCount(10, 'data');
     }
 }

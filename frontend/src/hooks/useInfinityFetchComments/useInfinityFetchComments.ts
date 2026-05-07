@@ -1,106 +1,93 @@
-import {
-  useFetchNewComments,
-  useFetchComments,
-  useFetchCommentsState,
-} from '@/hooks/apiHooks/comment';
+import { useFetchNewComments } from '@/hooks/apiHooks/comment';
 import { useEffect, useMemo } from 'react';
-import { useQueryState } from '@/hooks/apiHooks/useQueryState';
+import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { CommentType } from '@/types';
-//! Recoil
-import { useSetRecoilState } from "recoil"
-import { apiFetchState } from "@/store/apiFetchDataState"
+import { Axios } from '@/api/axios';
+import { API_PATH } from '@/constants/apiPath';
+import { QUERY_KEY } from '@/constants/queryKeys';
+import type { FetchCommentsInfinityResponse } from '@/hooks/apiHooks/comment/types';
+import type { ApiFetchStateType } from '@/store/apiFetchDataState';
 
 export const useInfinityFetchComments = (matchId: number) => {
+  const commentsQuery = useInfiniteQuery<FetchCommentsInfinityResponse>(
+    [QUERY_KEY.COMMENT, { matchId }],
+    async ({ pageParam }) => {
+      const res = await Axios.get(API_PATH.COMMENT, {
+        params: {
+          matchId,
+          cursor: pageParam,
+        },
+      }).then((v) => v.data as FetchCommentsInfinityResponse);
 
-
-  //? どこまで取得したかのpage数と取得したコメントはmergeしてキャッシュしておく
-  const cacheKey = useMemo(() => ['cache/comments', { matchId }], [matchId]);
-  const [commentsData, setCommentsData] = useQueryState<{ page: number; comments: CommentType[] }>(cacheKey);
-
-  //? データがまだ取得出来てない場合loadingモーダルを表示する為のrecoil
-  const setCommentsFetchState = useSetRecoilState(apiFetchState("comments/fetch"))
-
-  //? 取得するコメントの数に基づくmaxPage数と最後の投稿のcreateAtタイムを取得
-  const { data: commentState, isError: isCommentStateError } = useFetchCommentsState(matchId);
-
-  //? コメントの取得
-  const {
-    refetch: commentsRefetch,
-    data: FetchedComments,
-    commentFetchState
-  } = useFetchComments({
-    matchId,
-    createdAt: commentState ? commentState.resentPostTime : '',
-    page: commentsData ? commentsData.page + 1 : 1,
-  });
-
-  useEffect(() => {
-    if (isCommentStateError) {
-      setCommentsFetchState("error")
-      return
+      return res;
+    },
+    {
+      keepPreviousData: false,
+      getNextPageParam: (lastPage) => {
+        return lastPage.meta.hasMore ? lastPage.meta.nextCursor ?? undefined : undefined;
+      },
     }
-    setCommentsFetchState(!commentsData ? "loading" : "idle")
-  }, [commentsData, isCommentStateError, setCommentsFetchState])
+  );
 
-  //? 取得したデータをcommentsDataにmergeしてキャッシュする
-  useEffect(() => {
-    if (!FetchedComments) return;
-    if (!commentState) return;
-    setCommentsData((current) => {
-      if (!current) return { page: 1, comments: FetchedComments };
-      if (current.page >= commentState.maxPage) return current;
-      return { page: current.page + 1, comments: [...current.comments, ...FetchedComments] };
-    });
-  }, [FetchedComments, commentState, setCommentsData]);
-
-  //? 初期fetchの実行 useQueryのenabledはfalseにしているのでページ読み込み完了後に実行させてる
-  useEffect(() => {
-    if (!commentState) return;
-    if (commentsData && commentsData.comments) return;
-    commentsRefetch();
-  }, [commentState]);
-
+  const commentFetchState: ApiFetchStateType =
+    commentsQuery.isError
+      ? 'error'
+      : commentsQuery.isLoading
+        ? 'loading'
+        : commentsQuery.isFetchingNextPage
+          ? 'refetching'
+          : 'idle';
 
   const refetchComments = () => {
-    if (commentState) {
-      if (commentsData.page >= commentState.maxPage) return;
-      if (commentFetchState === "refetching") return;
-      commentsRefetch();
-    }
+    if (!commentsQuery.hasNextPage) return;
+    if (commentsQuery.isFetchingNextPage) return;
+
+    commentsQuery.fetchNextPage();
   };
 
+  const isNextComments = !!commentsQuery.hasNextPage || commentsQuery.isFetchingNextPage;
 
-  const isNextComments = (commentState && commentsData && (commentState.maxPage > commentsData.page)) || commentFetchState === "refetching"
+  const data = commentsQuery.data?.pages.flatMap((page) => page.data);
+  return { data, refetchComments, commentFetchState, isNextComments };
+};
 
-  const data = commentsData ? commentsData.comments : undefined
-  // const resentPostTime = commentState ? commentState.resentPostTime : undefined
-  return { data, refetchComments, commentFetchState, isNextComments }
-}
-
-
-
-export const useFetchNewCommentsContainer = ({ matchId, resentPostTime }: { matchId: number, resentPostTime: string | null }) => {
-
+export const useFetchNewCommentsContainer = ({
+  matchId,
+  resentPostTime,
+}: {
+  matchId: number;
+  resentPostTime: string | null;
+}) => {
   //? ここに新しいコメントをキャッシュしておく
-  const [newCommentsData, setNewCommentsData] = useQueryState<CommentType[] | undefined>([
-    'cache/comments/new',
-    { matchId },
-  ]);
+  const queryClient = useQueryClient();
+  const newCommentsCacheKey = useMemo(() => ['cache/comments/new', { matchId }], [matchId]);
+  const { data: newCommentsData } = useQuery<CommentType[] | undefined>(newCommentsCacheKey, {
+    enabled: false,
+    staleTime: Infinity,
+    keepPreviousData: true,
+  });
 
-  const newestPostTime = (newCommentsData && !!newCommentsData.length) ? newCommentsData[0].createdAt : resentPostTime
-  const { data: newComments, refetch, isStale } = useFetchNewComments({ matchId, createdAt: newestPostTime })
+  const newestPostTime =
+    newCommentsData && !!newCommentsData.length ? newCommentsData[0].createdAt : resentPostTime;
+  const {
+    data: newComments,
+    refetch,
+    isStale,
+  } = useFetchNewComments({
+    matchId,
+    createdAt: newestPostTime,
+  });
   useEffect(() => {
-    if (!newComments) return
-    if (!newComments.length) return
-    setNewCommentsData(current => {
-      if (!current) return newComments
-      return [...newComments, ...current]
-    })
-  }, [newComments])
+    if (!newComments) return;
+    if (!newComments.length) return;
+    queryClient.setQueryData<CommentType[] | undefined>(newCommentsCacheKey, (current) => {
+      if (!current) return newComments;
+      return [...newComments, ...current];
+    });
+  }, [newComments, newCommentsCacheKey, queryClient]);
 
   // console.log("new", newComments);
   // console.log("cache", newCommentsData);
-  const data = newCommentsData ?? []
-  return { data, refetch, isStale }
-
-}
+  const data = newCommentsData ?? [];
+  return { data, refetch, isStale };
+};
