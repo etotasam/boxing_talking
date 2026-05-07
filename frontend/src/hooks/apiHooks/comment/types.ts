@@ -1,13 +1,11 @@
-export type FetchCommentsStateResponse = {
-  maxPage: number;
-  resentPostTime: string;
-};
+import type { CommentType } from '@/types';
 
-export type FetchCommentsParams = {
-  matchId: number;
-  createdAt: string;
-  page: number;
-  limit?: number;
+export type FetchCommentsInfinityResponse = {
+  data: CommentType[];
+  meta: {
+    nextCursor: string | null;
+    hasMore: boolean;
+  };
 };
 
 export type FetchNewCommentsParams = {
