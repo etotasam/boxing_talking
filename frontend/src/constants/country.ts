@@ -1,0 +1,22 @@
+export const COUNTRY = {
+  JAPAN: "Japan",
+  MEXICO: "Mexico",
+  USA: "USA",
+  KAZAKHSTAN: "Kazakhstan",
+  UK: "UK",
+  RUSSIA: "Russia",
+  PHILIPPINES: "Philippines",
+  UKRAINE: "Ukraine",
+  CANADA: "Canada",
+  VENEZUELA: "Venezuela",
+  SOUTH_AFRICA: "SouthAfrica",
+  CHINA: "China",
+  PUERTO_RICO: "PuertoRico",
+  SAUDI_ARABIA: "SaudiArabia",
+  GHANA: "Ghana",
+  AUSTRALIA: "Australia",
+  UZBEKISTAN: "Uzbekistan",
+  ARGENTINA: "Argentina",
+  IRELAND: "Ireland",
+  THAILAND: "Thailand"
+} as const

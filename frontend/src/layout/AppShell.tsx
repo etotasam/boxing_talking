@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/routePath';
+import { ROUTE_PATH } from '@/constants/routePath';
 // ! hooks
 import { useFullScreenLoading } from '@/hooks/useFullScreenLoading';
-import { useFetchBoxers } from '@/hooks/apiHooks/useBoxer';
-import { useAuth, useGuest } from '@/hooks/apiHooks/useAuth';
-import { useFetchMatches } from '@/hooks/apiHooks/useMatch';
+import { useFetchBoxers } from '@/hooks/apiHooks/boxer';
+import { useAuth, useGuest } from '@/hooks/apiHooks/auth';
+import { useFetchMatches } from '@/hooks/apiHooks/match';
 import { useToastModal } from '@/hooks/useToastModal';
 import { useInitializeDevice } from '@/hooks/useInitializeDevice';
 import { useLoginModal } from '@/hooks/useLoginModal';

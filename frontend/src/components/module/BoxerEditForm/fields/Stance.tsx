@@ -2,7 +2,7 @@
 import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 import { StanceType } from '@/types';
 // ! data
-import { STANCE } from '@/assets/boxerData';
+import { STANCE } from '@/constants/boxerData';
 
 export const Stance = (props: { stance: StanceType; setBoxerFieldData: LocalDataEntryType }) => {
   const { stance, setBoxerFieldData } = props;

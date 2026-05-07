@@ -26,7 +26,7 @@ const dataName = [
 
 // type DataFetchStateType = (typeof dataFetchState)[number]
 type DataNameType = (typeof dataName)[number]
-type stateType = (typeof state)[number]
+export type ApiFetchStateType = (typeof state)[number]
 
 
 // export const apiFetchDataState = atomFamily<boolean, { dataName: DataNameType, state: DataFetchStateType }>({
@@ -34,7 +34,7 @@ type stateType = (typeof state)[number]
 //   default: false
 // })
 
-export const apiFetchState = atomFamily<stateType, DataNameType>(
+export const apiFetchState = atomFamily<ApiFetchStateType, DataNameType>(
   {
     key: "apiFetchState",
     default: "idle"

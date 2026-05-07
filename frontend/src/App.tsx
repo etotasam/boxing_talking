@@ -1,6 +1,6 @@
 // import { useState } from "react";
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/routePath';
+import { ROUTE_PATH } from '@/constants/routePath';
 // ! page
 import { Home } from '@/page/Home';
 import { Match } from '@/page/Match';

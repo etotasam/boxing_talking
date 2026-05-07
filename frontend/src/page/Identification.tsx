@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/routePath';
+import { ROUTE_PATH } from '@/constants/routePath';
 //! layout
 import HeaderOnlyLayout from '@/layout/HeaderOnlyLayout';
 //! hook
-import { useSignUpIdentification } from '@/hooks/apiHooks/useAuth';
+import { useSignUpIdentification } from '@/hooks/apiHooks/auth';
 //! component
 import { Footer } from '@/components/module/Footer';
 import { RotatingLines } from 'react-loader-spinner';

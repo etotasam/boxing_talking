@@ -5,6 +5,7 @@ namespace Tests\Feature\MatchController;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use App\Exceptions\CustomErrorCodes;
 use App\Models\Organization;
 use App\Models\Boxer;
 use App\Helpers\TestHelper;
@@ -118,6 +119,25 @@ class StoreMatchTest extends TestCase
     $formattedMatchData = $this->formatMatchDataForStore($this->storeMatchData);
     //?boxing_matchesにもsoreされていない
     $this->assertDatabaseMissing('boxing_matches', $formattedMatchData);
+  }
+
+  /**
+   * 試合登録時に試合会場が文字数制限を超えた時は専用のエラーコードを返す
+   */
+  public function testStoreMatchReturnsVenueTooLongErrorCode()
+  {
+    $this->actingAs(TestHelper::createAdminUser());
+    $this->storeMatchData['venue'] = '123456789012345678901';
+
+    $response = $this->post('/api/match', $this->storeMatchData);
+
+    $response
+      ->assertStatus(422)
+      ->assertJson([
+        'success' => false,
+        'errorCode' => CustomErrorCodes::MATCH_VENUE_TOO_LONG,
+      ]);
+    $this->assertDatabaseMissing('boxing_matches', ['venue' => $this->storeMatchData['venue']]);
   }
 
 

@@ -1,13 +1,13 @@
 import { useState, useEffect, useContext } from 'react';
-import { MESSAGE } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { pick } from 'lodash';
 //! type
 import { MatchDataType, MatchUpdateFormType, OrganizationsType } from '@/types';
 //! hook
 import { useToastModal } from '@/hooks/useToastModal';
-import { useUpdateMatch } from '@/hooks/apiHooks/useMatch';
+import { useUpdateMatch } from '@/hooks/apiHooks/match';
 //! data
-import { GRADE } from '@/assets/boxerData';
+import { GRADE } from '@/constants/boxerData';
 //! component
 import { MatchSetFormContainer } from '../MatchSetFormContainer';
 //! context
@@ -139,7 +139,7 @@ const EditMatchForm = (props: {
 
     const matchId = selectedMatch.id;
 
-    updateMatch({ matchId, changeData: modifiedFormData });
+    updateMatch({ matchId, ...modifiedFormData });
   };
 
   return <MatchSetFormContainer onSubmit={updateMatchExecute} title={isTitle} />;

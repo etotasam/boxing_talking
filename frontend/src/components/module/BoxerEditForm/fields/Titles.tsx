@@ -1,7 +1,7 @@
 //! types
 import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 //! data
-import { ORGANIZATIONS, WEIGHT_CLASS } from '@/assets/boxerData';
+import { ORGANIZATIONS, WEIGHT_CLASS } from '@/constants/boxerData';
 //! types
 import type { BoxerType, OrganizationsType, WeightClassType } from '@/types';
 

@@ -2,13 +2,13 @@ import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor } from 'test-setup';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { WEIGHT_CLASS, GRADE } from '@/assets/boxerData';
+import { WEIGHT_CLASS, GRADE } from '@/constants/boxerData';
 
 //! component
 import { MatchSetFormContainer } from '../MatchSetFormContainer';
 //! context
 import { FormDataContextWrapper } from '../context/FormDataContextWrapper';
-import { COUNTRY } from '@/assets/nationalFlagData';
+import { COUNTRY } from '@/constants/country';
 
 const onSubmitFunc = vi.fn();
 

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/routePath';
-import { useAdmin } from '@/hooks/apiHooks/useAuth';
+import { ROUTE_PATH } from '@/constants/routePath';
+import { useAdmin } from '@/hooks/apiHooks/auth';
 import { AdministratorPageLinks } from '../../AdministratorPageLinks';
 
 const LINK_STYLES = {

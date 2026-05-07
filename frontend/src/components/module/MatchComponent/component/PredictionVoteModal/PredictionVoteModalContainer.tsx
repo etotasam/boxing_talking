@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { PredictionVoteModal } from './PredictionVoteModal';
 import { MatchDataType } from '@/types';
-import { useVoteMatchPrediction } from '@/hooks/apiHooks/uesWinLossPrediction';
+import { useVoteMatchPrediction } from '@/hooks/apiHooks/useWinLossPrediction';
 import { useModalState } from '@/hooks/useModalState';
 
 type PropsType = {

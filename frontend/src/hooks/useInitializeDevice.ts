@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
-import { DEVICE_BREAKPOINT } from '@/assets/deviceBreakpoint';
+import { DEVICE_BREAKPOINT } from '@/constants/deviceBreakpoint';
 import { deviceState } from '@/store/deviceState';
 
 export const useInitializeDevice = (): void => {

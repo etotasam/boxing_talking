@@ -4,11 +4,11 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 import { deviceState } from '@/store/deviceState';
 import { useLocation } from 'react-router-dom';
-import { MESSAGE } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/constants/statusesOnToastModal';
 //! hooks
 import { useToastModal } from '@/hooks/useToastModal';
-import { usePostComment } from '@/hooks/apiHooks/useComment';
-import { useAuth, useGuest } from '@/hooks/apiHooks/useAuth';
+import { usePostComment } from '@/hooks/apiHooks/comment';
+import { useAuth, useGuest } from '@/hooks/apiHooks/auth';
 
 export const PostCommentContainer = () => {
   //? urlからクエリmatch_idを取得

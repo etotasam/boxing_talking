@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
-import { ROUTE_PATH } from '@/assets/routePath';
+import { ROUTE_PATH } from '@/constants/routePath';
 // ! images
 import boxingMatch from '@/assets/images/etc/boxing_match.jpg';
 import ManOnTheRing from '@/assets/images/etc/man_on_the_ring.jpg';

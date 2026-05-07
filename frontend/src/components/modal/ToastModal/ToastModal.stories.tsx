@@ -1,6 +1,6 @@
 import { ToastModal, PropsType } from './ToastModal';
 import { StoryObj, Meta } from '@storybook/react';
-import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/assets/statusesOnToastModal';
+import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/constants/statusesOnToastModal';
 // ! Recoil
 import { RecoilRoot } from 'recoil';
 

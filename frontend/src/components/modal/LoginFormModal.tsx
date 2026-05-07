@@ -8,10 +8,10 @@ import { formTypeState, FORM_TYPE } from '@/store/formTypeState';
 import { SignUpForm } from './SignUpForm';
 import { Button } from '@/components/atomic/Button';
 // ! hooks
-import { useLogin, useGuestLogin } from '@/hooks/apiHooks/useAuth';
+import { useLogin, useGuestLogin } from '@/hooks/apiHooks/auth';
 import { useToastModal } from '@/hooks/useToastModal';
 // !etc
-import { MESSAGE } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/constants/statusesOnToastModal';
 
 export const LoginFormModal = ({ isShow }: { isShow: boolean }) => {
   // ! recoil

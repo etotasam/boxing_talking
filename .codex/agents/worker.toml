@@ -1,0 +1,19 @@
+name = "worker"
+description = "実装担当"
+
+model = "gpt-5.3-codex"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+.agents/skills/worker/SKILL.md を必ず読むこと。
+
+plannerの設計に従って実装する。
+
+- 余計なリファクタは禁止
+- 最小変更を守る
+- 可読性を優先
+- TypeScriptはany禁止
+
+変更点は明確にする。
+"""

@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Exceptions\CustomErrorCodes;
+use Illuminate\Contracts\Validation\Validator;
 
-class BoxingMatchesRequest extends FormRequest
+class BoxingMatchesRequest extends ApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,8 +25,16 @@ class BoxingMatchesRequest extends FormRequest
     public function rules()
     {
         return [
-            'update_match_data.venue' => ['string', 'max:20']
-
+            'match_id' => ['integer'],
+            'match_date' => ['date'],
+            'red_boxer_id' => ['integer'],
+            'blue_boxer_id' => ['integer'],
+            'grade' => ['string'],
+            'country' => ['string'],
+            'venue' => ['string', 'max:20'],
+            'weight' => ['string'],
+            'titles' => ['array'],
+            'titles.*' => ['string'],
         ];
     }
 
@@ -33,7 +42,32 @@ class BoxingMatchesRequest extends FormRequest
     public function messages()
     {
         return [
-            'max:20' => 'venue is max 20 chars',
+            'venue.max' => 'venue is max 20 chars',
         ];
+    }
+
+    /**
+     * 更新対象の試合データを返す
+     */
+    public function validatedUpdateData(): array
+    {
+        $data = $this->validated();
+        unset($data['match_id']);
+
+        return $data;
+    }
+
+    /**
+     * バリデーションエラーに対応する独自エラーコードを返す
+     */
+    protected function validationErrorCode(Validator $validator): int|false
+    {
+        $failedRules = $validator->failed();
+
+        if (isset($failedRules['venue']['Max'])) {
+            return CustomErrorCodes::MATCH_VENUE_TOO_LONG;
+        }
+
+        return false;
     }
 }

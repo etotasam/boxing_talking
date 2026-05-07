@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { MatchSetForm } from './MatchSetForm';
-import { MESSAGE } from '@/assets/statusesOnToastModal';
+import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { cloneDeep } from 'lodash';
 //! type
 import { OrganizationsType } from '@/types';
 //! hook
 import { useToastModal } from '@/hooks/useToastModal';
 //! data
-import { GRADE } from '@/assets/boxerData';
+import { GRADE } from '@/constants/boxerData';
 //!type evolution
-import { isMessageType } from '@/assets/typeEvaluations';
+import { isMessageType } from '@/utils/typeEvaluations';
 //! context
 // import { FormDataContext } from './FormDataContextWrapper';
 import { FormDataContext } from './context/FormDataContext';
