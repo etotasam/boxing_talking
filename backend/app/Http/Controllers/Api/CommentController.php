@@ -14,8 +14,6 @@ use App\Repositories\Interfaces\MatchRepositoryInterface;
 use App\Repositories\Interfaces\CommentRepositoryInterface;
 use Illuminate\Database\QueryException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use App\Models\Comment;
-use DateTime;
 
 class CommentController extends ApiController
 {
@@ -26,34 +24,6 @@ class CommentController extends ApiController
         protected MatchRepositoryInterface $matchRepository,
         protected CommentRepositoryInterface $commentRepository
     ) {}
-
-    /**
-     * @param int $limit
-     * @param int $matchId
-     * 
-     * @return array ["maxPage" => int, "resentPostTime" => string]
-     */
-    public function state(Request $request)
-    {
-        $matchId = $request->match_id;
-        $limit = $request->limit;
-        try {
-            $resentComment = Comment::latest()->first();
-            if ($resentComment) {
-                $timestamp = strtotime($resentComment->created_at);
-                $formattedCreatedAt = date('Y-m-d H:i:s', $timestamp);
-            } else {
-                $formattedCreatedAt = null;
-            }
-
-            $commentsCount = Comment::where('match_id', $matchId)->count();
-            $maxPage = ceil($commentsCount / $limit);
-
-            return ["maxPage" => $maxPage, "resentPostTime" => $formattedCreatedAt];
-        } catch (\Exception) {
-            return $this->responseInvalidQuery('Failed fetch comments count');
-        }
-    }
 
     /**
      * 新しいコメントの取得
@@ -115,27 +85,6 @@ class CommentController extends ApiController
         } catch (\Exception $e) {
             return $this->responseInvalidQuery('Failed get comments');
         }
-    }
-
-    /**
-     * 試合へのコメント一覧の取得
-     *
-     * @param int match_id
-     * @return CommentResource[]|JsonResponse
-     */
-    public function old(Request $request)
-    {
-        $matchId = $request->query('match_id');
-        try {
-            $commentsOnMatch = $this->commentRepository->getCommentsOnMatchByMatchId($matchId);
-        } catch (QueryException $e) {
-            \Log::error("Database error with get comments" . $e->getMessage());
-            return $this->responseInvalidQuery('Unexpected error');
-        } catch (Exception $e) {
-            return $this->responseInvalidQuery('Failed get comments');
-        }
-
-        return CommentResource::collection($commentsOnMatch);
     }
 
     /**

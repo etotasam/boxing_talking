@@ -2,24 +2,11 @@
 
 namespace App\Repositories;
 
-use Illuminate\Support\Collection;
 use App\Models\Comment;
-use App\Models\BoxingMatch;
 use App\Repositories\Interfaces\CommentRepositoryInterface;
 
 class CommentRepository implements CommentRepositoryInterface
 {
-
-  /**
-   * 試合に紐づいたコメント一覧を取得
-   * @param int $matchId
-   * @return Collection
-   */
-  public function getCommentsOnMatchByMatchId(int $matchId)
-  {
-    return BoxingMatch::findOrFail($matchId)->comments()->orderBy('created_at', 'desc')->get();
-  }
-
   public function postComment(string $userId, int $matchId, string $comment)
   {
     $commentInstance = new Comment;

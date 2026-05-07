@@ -17,7 +17,6 @@ export const API_PATH = {
   //?comment
   COMMENT: '/api/comment',
   COMMENT_NEW: '/api/comment/new',
-  COMMENT_STATE: '/api/comment/state',
   //?match
   MATCH: '/api/match',
   // MATCH_INFINITY: '/api/match/infinity',

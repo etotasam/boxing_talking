@@ -2,16 +2,8 @@
 
 namespace App\Repositories\Interfaces;
 
-use Illuminate\Support\Collection;
-use App\Models\Comment;
-
 interface CommentRepositoryInterface
 {
-  /**
-   * @param int $matchId
-   */
-  public function getCommentsOnMatchByMatchId(int $matchId);
-
   /**
    * @param string $userId
    * @param int $matchId
