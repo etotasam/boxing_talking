@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react"
+import { useCallback } from "react"
 import { useQuery, useMutation, } from "react-query"
 import type { AxiosResponse } from "axios"
 import { Axios } from "@/api/axios"
@@ -13,10 +13,6 @@ import { useToastModal } from "../useToastModal";
 import { useGuest, useAuth } from "./auth";
 //! types
 import { PredictionType, MatchPredictionsType } from "@/types"
-//! Recoil
-import { useRecoilState } from "recoil"
-import { apiFetchState } from "@/store/apiFetchDataState"
-
 type PredictionErrorResponse = {
   message: string
 }
@@ -42,18 +38,7 @@ export const useFetchUsersPrediction = () => {
     }
   })
 
-  const [usePredictionFetchState, setUserPredictionFetchState] = useRecoilState(apiFetchState("userPrediction/fetch"))
-
-  useEffect(() => {
-    if (isUserPredictionLoading) {
-      setUserPredictionFetchState("loading")
-    } else if (isRefetching) {
-      setUserPredictionFetchState("refetching")
-    } else {
-      setUserPredictionFetchState("idle")
-    }
-  }, [isUserPredictionLoading, isRefetching])
-
+  const usePredictionFetchState = isUserPredictionLoading ? "loading" : isRefetching ? "refetching" : "idle"
 
   return { data, refetch, usePredictionFetchState }
 }
@@ -107,19 +92,13 @@ export const useVoteMatchPrediction = () => {
     })
   }
 
-  const [userPredictionPostState, setUserPredictionPostState] = useRecoilState(apiFetchState("userPrediction/post"))
-
-  useEffect(() => {
-    if (isMutateLoading) {
-      setUserPredictionPostState("loading")
-    } else if (isMutateSuccess) {
-      setUserPredictionPostState("success")
-    } else if (isError) {
-      setUserPredictionPostState("error")
-    } else {
-      setUserPredictionPostState("idle")
-    }
-  }, [isMutateLoading, isMutateSuccess, isError])
+  const userPredictionPostState = isMutateLoading
+    ? "loading"
+    : isMutateSuccess
+      ? "success"
+      : isError
+        ? "error"
+        : "idle"
 
   return { matchVotePrediction, userPredictionPostState, isSuccess: isMutateSuccess, isError }
 }
@@ -130,38 +109,18 @@ export const useMatchPredictions = (matchId: number) => {
   const api = useCallback(async () => {
     const res = await Axios.get<{ data: MatchPredictionsType }>(API_PATH.MATCH_PREDICTION, { params: { match_id: matchId } }).then(v => v.data)
     return res.data
-  }, [])
+  }, [matchId])
 
   const { data, isLoading, isRefetching, refetch } = useQuery([QUERY_KEY.MATCH_PREDICTIONS, { id: matchId }], api, {
     staleTime: 5 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
     onError: () => {
     },
     onSettled: () => {
 
     }
   })
-
-  //? 5分毎にrefetch
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      refetch();
-    }, 5 * 60 * 1000);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-
-  const [matchPredictionFetchState, setMatchPredictionFetchState] = useRecoilState(apiFetchState("matchPrediction/fetch"))
-
-  useEffect(() => {
-    if (isLoading) {
-      setMatchPredictionFetchState("loading")
-    } else if (isRefetching) {
-      setMatchPredictionFetchState("refetching")
-    } else {
-      setMatchPredictionFetchState("idle")
-    }
-  }, [isLoading, isRefetching])
+  const matchPredictionFetchState = isLoading ? "loading" : isRefetching ? "refetching" : "idle"
 
   return { data, matchPredictionFetchState, refetch }
 }
