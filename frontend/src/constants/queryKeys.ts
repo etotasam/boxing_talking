@@ -9,10 +9,9 @@ export const QUERY_KEY = {
   FETCH_PAST_MATCHES: 'matches/past',
   FETCH_ALL_MATCHES: 'matches/all',
   DELETE_MATCH: 'match/delete',
-  COMMENT_OLD: 'comment/old',
   COMMENT: 'comment',
   COMMENT_NEW: 'comment/new',
   COMMENT_STATE: 'comment/state',
   PREDICTION: 'prediction',
   MATCH_PREDICTIONS: 'match/predictions',
-} as const
+} as const;

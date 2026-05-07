@@ -15,7 +15,6 @@ export const API_PATH = {
   PREDICTION: '/api/prediction',
   MATCH_PREDICTION: '/api/match/prediction',
   //?comment
-  COMMENT_OLD: '/api/comment/old',
   COMMENT: '/api/comment',
   COMMENT_NEW: '/api/comment/new',
   COMMENT_STATE: '/api/comment/state',

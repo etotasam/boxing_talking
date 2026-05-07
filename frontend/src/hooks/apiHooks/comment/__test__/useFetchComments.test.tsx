@@ -1,7 +1,3 @@
-import {
-  useInfinityFetchComments,
-  useFetchNewCommentsContainer,
-} from '../useInfinityFetchComments';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { describe, expect, test, vi, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import { RecoilRoot } from 'recoil';
@@ -10,6 +6,7 @@ import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import { API_PATH } from '@/constants/apiPath';
+import { useFetchComments, useFetchNewComments } from '@/hooks/apiHooks/comment';
 
 const comments = {
   page1: [
@@ -107,7 +104,7 @@ const createWrapper = () => {
   );
 };
 
-describe('useInfinityFetchComments', () => {
+describe('useFetchComments', () => {
   beforeAll(() => server.listen());
   afterAll(() => server.close());
   beforeEach(() => {
@@ -123,7 +120,7 @@ describe('useInfinityFetchComments', () => {
 
   test('初期ページ読み込み時にコメントの1ページ目を取得する', async () => {
     const matchId = 1;
-    const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useFetchComments(matchId), { wrapper: createWrapper() });
     expect(result.current.data).not.toBeTruthy();
     await waitFor(() => {
       expect(result.current.data).toEqual(comments.page1);
@@ -133,7 +130,7 @@ describe('useInfinityFetchComments', () => {
 
   test('refetchした時は2ページ目(次のページ)のコメントを取得して、取得したコメントはmergeされる', async () => {
     const matchId = 1;
-    const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useFetchComments(matchId), { wrapper: createWrapper() });
 
     await waitFor(() => {
       expect(result.current.data).toEqual(comments.page1);
@@ -150,7 +147,7 @@ describe('useInfinityFetchComments', () => {
 
   test('最後のcursorまでコメントを取得した場合refetchは実行されない', async () => {
     const matchId = 1;
-    const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useFetchComments(matchId), { wrapper: createWrapper() });
 
     await waitFor(() => {
       expect(result.current.data).toEqual(comments.page1);
@@ -173,7 +170,7 @@ describe('useInfinityFetchComments', () => {
   test('新しいコメントの取得', async () => {
     const matchId = 1;
     const resentPostTime = '';
-    const { result } = renderHook(() => useFetchNewCommentsContainer({ matchId, resentPostTime }), {
+    const { result } = renderHook(() => useFetchNewComments({ matchId, resentPostTime }), {
       wrapper: createWrapper(),
     });
 
@@ -187,7 +184,7 @@ describe('useInfinityFetchComments', () => {
   test('新しいコメントはmergeされて返って来る (orderBy desc)', async () => {
     const matchId = 1;
     const resentPostTime = '';
-    const { result } = renderHook(() => useFetchNewCommentsContainer({ matchId, resentPostTime }), {
+    const { result } = renderHook(() => useFetchNewComments({ matchId, resentPostTime }), {
       wrapper: createWrapper(),
     });
 
@@ -213,7 +210,7 @@ describe('useInfinityFetchComments', () => {
 
     const matchId = 1;
     const resentPostTime = '';
-    const { result } = renderHook(() => useFetchNewCommentsContainer({ matchId, resentPostTime }), {
+    const { result } = renderHook(() => useFetchNewComments({ matchId, resentPostTime }), {
       wrapper: createWrapper(),
     });
 
@@ -232,7 +229,7 @@ describe('useInfinityFetchComments', () => {
     );
 
     const matchId = 1;
-    const { result } = renderHook(() => useInfinityFetchComments(matchId), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useFetchComments(matchId), { wrapper: createWrapper() });
 
     await waitFor(() => {
       expect(result.current.data).toBeUndefined();
@@ -240,5 +237,4 @@ describe('useInfinityFetchComments', () => {
       expect(result.current.commentFetchState).toBe('error');
     });
   });
-
 });

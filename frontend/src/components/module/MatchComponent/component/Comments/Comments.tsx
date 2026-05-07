@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 // import { useInView } from 'react-intersection-observer';
 //! hooks
-import { useFetchNewCommentsContainer } from '@/hooks/useInfinityFetchComments';
+import { useFetchNewComments } from '@/hooks/apiHooks/comment';
 //! recoil
 import { useRecoilValue } from 'recoil';
 import { apiFetchState, type ApiFetchStateType } from '@/store/apiFetchDataState';
@@ -27,7 +27,7 @@ export const Comments = (props: PropsType) => {
     data: newComments,
     refetch,
     isStale,
-  } = useFetchNewCommentsContainer({
+  } = useFetchNewComments({
     matchId,
     resentPostTime: comments && !!comments.length ? comments[0].createdAt : null,
   });

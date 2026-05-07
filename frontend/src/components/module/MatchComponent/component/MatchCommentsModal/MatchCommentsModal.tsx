@@ -5,7 +5,7 @@ import clsx from 'clsx';
 //! components
 import { Comments } from '../Comments';
 //! hooks
-import { useInfinityFetchComments } from '@/hooks/useInfinityFetchComments';
+import { useFetchComments } from '@/hooks/apiHooks/comment';
 //! recoil
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
@@ -24,7 +24,7 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
     refetchComments,
     isNextComments,
     commentFetchState,
-  } = useInfinityFetchComments(matchId);
+  } = useFetchComments(matchId);
   const postCommentAreaHeight = useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT'));
   const headerHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   const hiddenCommentsHeight: number = (postCommentAreaHeight ?? 0) + 50;

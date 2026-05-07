@@ -1,4 +1,4 @@
 export { useDeleteComment } from './useDeleteComment';
-export { useFetchCommentsOld } from './useFetchCommentsOld';
+export { useFetchComments } from './useFetchComments';
 export { useFetchNewComments } from './useFetchNewComments';
 export { usePostComment } from './usePostComment';
