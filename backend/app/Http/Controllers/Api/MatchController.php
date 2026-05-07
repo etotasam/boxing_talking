@@ -33,8 +33,12 @@ class MatchController extends ApiController
 
     /**
      * 試合データ一覧の取得
-     * @param string range = null
-     * @return BoxingMatchResource::collection|JsonResponse
+     *
+     * リクエストクエリ:
+     * - range: 取得範囲
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|JsonResponse
      */
     public function index(Request $request)
     {
@@ -52,8 +56,11 @@ class MatchController extends ApiController
     /**
      * idで指定の試合データの取得
      *
+     * ルートパラメータ:
+     * - match: 取得したい試合
+     *
      * @param BoxingMatch $match
-    //  * @return BoxingMatchResource
+     * @return void
      */
     public function show(BoxingMatch $match)
     {
@@ -63,22 +70,22 @@ class MatchController extends ApiController
 
     /**
      * 試合データの登録
-     * errorCode 51 matchesテーブルへの登録が失敗
-     * errorCode 50 titleMatchesテーブルへの登録が失敗
-     * @param array [
-     *  'match_date' => '2023-10-18',
-     *  'red_boxer_id' => 45,
-     *  'blue_boxer_id' => 43,
-     *  'grade' => 'タイトルマッチ',
-     *  'country' => 'Mexico',
-     *  'venue' => '会場',
-     *  'weight' => 'クルーザー',
-     *  'titles' => [
-     *      0 => 'WBC暫定',
-     *      1 => 'WBO暫定',
-     *   ],
-     *  ]
      *
+     * リクエストボディ:
+     * - match_date: 試合日
+     * - red_boxer_id: 赤コーナーのボクサーID
+     * - blue_boxer_id: 青コーナーのボクサーID
+     * - grade: 試合グレード
+     * - country: 開催国
+     * - venue: 会場
+     * - weight: 階級
+     * - titles: タイトル一覧
+     *
+     * エラーコード:
+     * - 51: matchesテーブルへの登録が失敗
+     * - 50: titleMatchesテーブルへの登録が失敗
+     *
+     * @param BoxingMatchesRequest $request
      * @return JsonResponse
      */
     public function store(BoxingMatchesRequest $request)
@@ -93,9 +100,14 @@ class MatchController extends ApiController
 
     /**
      * 試合データの削除
-     * @errorCode 44 targetの試合データがない
-     * @param int match_id
      *
+     * リクエストボディ:
+     * - match_id: 削除したい試合ID
+     *
+     * エラーコード:
+     * - 44: targetの試合データがない
+     *
+     * @param Request $request
      * @return JsonResponse
      */
     public function destroy(Request $request)
@@ -115,15 +127,15 @@ class MatchController extends ApiController
     /**
      * 試合データの更新
      *
+     * リクエストボディ:
+     * - match_id: 更新したい試合ID
+     * - country: 開催国
+     * - venue: 会場
+     * - grade: 試合グレード
+     * - weight: 階級
+     * - titles: タイトル一覧
+     *
      * @param BoxingMatchesRequest $request
-     *  [
-     *    'match_id' => 1,
-     *    'country' => 'USA',
-     *    'venue' => 'ラスベガス',
-     *    'grade' => 'タイトルマッチ',
-     *    'weight' => 'クルーザー',
-     *    'titles' => ['WBA', 'WBC'],
-     *  ]
      * @return JsonResponse
      */
     public function update(BoxingMatchesRequest $request)
@@ -140,12 +152,16 @@ class MatchController extends ApiController
     }
 
     /**
-     * @param bool is_update_boxer_record_checked
-     * @param int match_id
-     * @param string result
-     * @param string | null detail
-     * @param int | null round
+     * 試合結果を登録する
      *
+     * リクエストボディ:
+     * - is_update_boxer_record_checked: ボクサー戦績を更新するか
+     * - match_id: 結果を登録したい試合ID
+     * - result: 試合結果
+     * - detail: 試合結果の詳細
+     * - round: 決着ラウンド
+     *
+     * @param Request $request
      * @return JsonResponse
      */
     public function resultStore(Request $request)

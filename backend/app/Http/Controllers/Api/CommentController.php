@@ -59,10 +59,12 @@ class CommentController extends ApiController
      * 新しいコメントの取得
      * created_at以降に投稿されたコメントの取得
      *
-     * @param int match_id
-     * @param string created_at
+     * リクエストクエリ:
+     * - match_id: 取得したいコメントの試合ID
+     * - created_at: 取得したいコメントの作成日時の基準
      *
-     * @return CommentResource[]|JsonResponse
+     * @param Request $request
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|JsonResponse
      */
     public function new(Request $request)
     {
@@ -82,10 +84,13 @@ class CommentController extends ApiController
     /**
      * 指定の範囲の試合コメントを取得
      *
-     * @param int match_id
-     * @param string|null cursor
+     * リクエストクエリ:
+     * - match_id: 取得したいコメントの試合ID
+     * - cursor: 取得したいコメントのカーソル
      *
-     * @return CommentResource[]|JsonResponse
+     * @param Request $request
+     *
+     * @return array|JsonResponse
      */
     public function index(Request $request)
     {
@@ -135,9 +140,15 @@ class CommentController extends ApiController
 
     /**
      * 試合へのコメント投稿
-     * errorCode 41 認証なし
-     * @param int match_id
-     * @param string comment
+     *
+     * エラーコード:
+     * - 41: 認証なし
+     *
+     * リクエストボディ:
+     * - match_id: コメントを投稿したい試合ID
+     * - comment: 投稿するコメント
+     *
+     * @param CommentRequest $request
      * @return JsonResponse
      */
     public function store(CommentRequest $request)
@@ -164,7 +175,10 @@ class CommentController extends ApiController
     /**
      * コメント削除
      *
-     * @param int comment_id
+     * ルートパラメータ:
+     * - comment: 削除したいコメント
+     *
+     * @param \App\Models\Comment $comment
      * @return bool
      */
     public function destroy(\App\Models\Comment $comment)

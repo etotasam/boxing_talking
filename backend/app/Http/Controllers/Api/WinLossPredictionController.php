@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Support\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\WinLossPredictionService;
@@ -25,7 +24,7 @@ class WinLossPredictionController extends ApiController
     /**
      * ユーザーの勝敗予想を取得
      *
-     * @return Collection|JsonResource
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|JsonResponse
      */
     public function index()
     {
@@ -45,7 +44,11 @@ class WinLossPredictionController extends ApiController
 
     /**
      * 試合の投票数の取得
-     * @param int match_id
+     *
+     * リクエストクエリ:
+     * - match_id: 投票数を取得したい試合ID
+     *
+     * @param Request $request
      * @return MatchPredictionsResource|JsonResponse
      */
     public function fetchOnMatch(Request $request)
@@ -61,9 +64,11 @@ class WinLossPredictionController extends ApiController
     /**
      * 試合の勝敗予想の投票
      *
-     * @param string match_id
-     * @param string prediction "red"|"blue"
+     * リクエストボディ:
+     * - match_id: 投票したい試合ID
+     * - prediction: 投票内容（"red"|"blue"）
      *
+     * @param Request $request
      * @return JsonResponse
      */
     public function store(Request $request): JsonResponse

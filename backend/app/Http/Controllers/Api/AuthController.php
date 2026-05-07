@@ -39,8 +39,9 @@ class AuthController extends ApiController
     }
 
     /**
-     * guest_login
+     * ゲストユーザーでログインする
      *
+     * @param Request $request
      * @return JsonResponse
      */
     public function guestLogin(Request $request)
@@ -60,7 +61,7 @@ class AuthController extends ApiController
 
 
     /**
-     * guest_logout
+     * ゲストユーザーをログアウトする
      *
      * @return JsonResponse
      */
@@ -77,9 +78,13 @@ class AuthController extends ApiController
 
     /**
      * 仮ユーザー作成と本登録用のメールをqueueにセット
-     * @param string $name
-     * @param string $email
-     * @param string $password
+     *
+     * リクエストボディ:
+     * - name: ユーザー名
+     * - email: メールアドレス
+     * - password: パスワード
+     *
+     * @param PreCreateAuthRequest $request
      * @return JsonResponse
      */
     public function preCreate(PreCreateAuthRequest $request)
@@ -94,12 +99,16 @@ class AuthController extends ApiController
     }
 
     /**
-     * create
-     * @errorCode - 1050 tokenが期限切れ フロントで使うコード
-     * @errorCode - 1051 tokenが不正 フロントで使うコード
-     * @param string $name
-     * @param string $email
-     * @param string $password
+     * 本登録用トークンからユーザーを作成する
+     *
+     * リクエストボディ:
+     * - token: 本登録用トークン
+     *
+     * エラーコード:
+     * - 1050: tokenが期限切れ
+     * - 1051: tokenが不正
+     *
+     * @param Request $request
      * @return JsonResponse
      */
     public function create(Request $request)
@@ -126,8 +135,9 @@ class AuthController extends ApiController
     }
 
     /**
-     * user
+     * ログイン中のユーザーを取得する
      *
+     * @param Request $request
      * @return UserResource|null
      */
     public function fetch(Request $request)
@@ -141,10 +151,13 @@ class AuthController extends ApiController
 
 
     /**
-     * login
+     * ユーザーでログインする
      *
-     * @param string $email
-     * @param string $password
+     * リクエストボディ:
+     * - email: メールアドレス
+     * - password: パスワード
+     *
+     * @param LoginRequest $request
      * @return UserResource|JsonResponse
      */
     public function login(LoginRequest $request)
@@ -167,7 +180,7 @@ class AuthController extends ApiController
     }
 
     /**
-     * logout
+     * ログイン中のユーザーをログアウトする
      *
      * @return JsonResponse
      */
@@ -182,7 +195,7 @@ class AuthController extends ApiController
 
 
     /**
-     * admin check
+     * ログイン中のユーザーが管理者か確認する
      *
      * @return bool|JsonResponse
      */

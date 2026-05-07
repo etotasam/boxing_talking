@@ -26,11 +26,13 @@ class BoxerController extends ApiController
     /**
      * boxer一覧取得
      *
-     * @param int require limit
-     * @param int require page
-     * @param string name
-     * @param string country
+     * リクエストクエリ:
+     * - limit: 取得件数
+     * - page: ページ番号
+     * - name: ボクサー名
+     * - country: 国
      *
+     * @param Request $request
      * @return BoxerCollection|JsonResponse
      */
     public function index(Request $request): BoxerCollection|JsonResponse
@@ -50,7 +52,12 @@ class BoxerController extends ApiController
 
     /**
      * boxer登録
-     * @param array boxerData ボクサー登録用のデータ
+     *
+     * リクエストボディ:
+     * - boxerData: ボクサー登録用のデータ
+     *
+     * @param BoxerRequest $request
+     * @return JsonResponse
      */
     public function store(BoxerRequest $request): JsonResponse
     {
@@ -64,10 +71,16 @@ class BoxerController extends ApiController
 
     /**
      * ボクサーの削除
-     * errorCode CustomErrorCodes::BOXER_ALREADY_HAS_MATCH 削除対象のboxerは試合が組まれている状態
-     * errorCode CustomErrorCodes::BOXER_NOT_FOUND 削除対象のboxerが存在しない
-     * errorCode CustomErrorCodes::BOXER_DELETE_FAILED boxerの削除に失敗
-     * @param int boxer_id
+     *
+     * リクエストボディ:
+     * - boxer_id: 削除したいボクサーID
+     *
+     * エラーコード:
+     * - CustomErrorCodes::BOXER_ALREADY_HAS_MATCH: 削除対象のboxerは試合が組まれている状態
+     * - CustomErrorCodes::BOXER_NOT_FOUND: 削除対象のboxerが存在しない
+     * - CustomErrorCodes::BOXER_DELETE_FAILED: boxerの削除に失敗
+     *
+     * @param Request $request
      * @return JsonResponse
      */
     public function destroy(Request $request): JsonResponse
@@ -89,7 +102,11 @@ class BoxerController extends ApiController
 
     /**
      * ボクサーデータの更新
-     * @param array boxerData idと更新対象データのみ
+     *
+     * リクエストボディ:
+     * - boxerData: idと更新対象データのみ
+     *
+     * @param Request $request
      * @return JsonResponse
      */
     public function update(Request $request): JsonResponse
