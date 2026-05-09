@@ -5,7 +5,7 @@ import { API_PATH } from '@/constants/apiPath';
 import { CUSTOM_ERROR_CODE } from '@/constants/customErrorCodes';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { QUERY_KEY } from '@/constants/queryKeys';
-import { useFetchUsersPrediction } from '../useWinLossPrediction';
+import { useFetchUsersPrediction } from '../prediction';
 import { useFullScreenLoading } from '../../useFullScreenLoading';
 import { useLoginModal } from '../../useLoginModal';
 import { useReactQuery } from '../../useReactQuery';

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { MatchDataType } from '@/types';
 //! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
-import { useFetchUsersPrediction } from '@/hooks/apiHooks/useWinLossPrediction';
+import { useFetchUsersPrediction } from '@/hooks/apiHooks/prediction';
 
 type IconType = 'DEFAULT' | 'MINI';
 

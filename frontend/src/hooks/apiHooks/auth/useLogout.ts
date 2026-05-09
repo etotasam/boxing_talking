@@ -3,7 +3,7 @@ import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { QUERY_KEY } from '@/constants/queryKeys';
-import { useFetchUsersPrediction } from '../useWinLossPrediction';
+import { useFetchUsersPrediction } from '../prediction';
 import { useFullScreenLoading } from '../../useFullScreenLoading';
 import { useMenuModal } from '../../useMenuModal';
 import { useToastModal } from '../../useToastModal';
