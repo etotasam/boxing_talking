@@ -30,10 +30,8 @@ export const MESSAGE = {
   USER_NAME_ALREADY_USE: "すでに使われている名前です \n 別の名前を検討してください",
   NAME_CHAR_LIMIT_OVER: "名前の文字数がオーバーしています \n 30文字までです",
 
-  // ! login form
   EMAIL_OR_PASSWORD_NO_INPUT: "Email・Passwordの入力が必要です",
   EMAIL_FAILED_VALIDATE: "Emailが正しくありません",
-  // ! ログイン系
   LOGOUT_SUCCESS: "ログアウトしました",
   LOGOUT_FAILED: "ログアウト中にエラーが発生しました \n 再度ログアウトの実行を行ってください",
   LOGIN_SUCCESS: "ログインしました",
@@ -103,5 +101,4 @@ export const MESSAGE = {
 } as const
 
 
-// export type MessageType = typeof MESSAGE[keyof typeof MESSAGE]
 // export type BgColorType = typeof BG_COLOR_ON_TOAST_MODAL[keyof typeof BG_COLOR_ON_TOAST_MODAL]

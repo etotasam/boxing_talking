@@ -1,10 +1,7 @@
 import clsx from 'clsx';
 import { useRecoilValue } from 'recoil';
-//! type
 import { MatchDataType } from '@/types';
-//! recoil
 import { deviceState } from '@/store/deviceState';
-//! components
 import { BoxerInfo } from './BoxerInfo';
 
 type BoxersDataProps = {

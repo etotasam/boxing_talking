@@ -1,9 +1,7 @@
 import { ROUTE_PATH } from '@/constants/routePath';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-//! hook
 import { useMenuModal } from '@/hooks/useMenuModal';
-//! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 import { deviceState } from '@/store/deviceState';

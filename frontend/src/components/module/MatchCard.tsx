@@ -1,15 +1,11 @@
 import dayjs from 'dayjs';
 import clsx from 'clsx';
-// ! types
 import { MatchDataType } from '@/types';
 import { BoxerType } from '@/types';
-// ! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { VoteIconForTop } from '@/components/module/MatchComponent/component/VoteIcon';
-// ! image
 import { GiImperialCrown } from 'react-icons/gi';
 
-//! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
 import { useRecoilValue } from 'recoil';

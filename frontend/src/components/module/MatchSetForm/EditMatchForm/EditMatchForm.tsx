@@ -1,20 +1,14 @@
 import { useState, useEffect, useContext } from 'react';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { pick } from 'lodash';
-//! type
 import { MatchDataType, MatchUpdateFormType, OrganizationsType } from '@/types';
-//! hook
 import { useToastModal } from '@/hooks/useToastModal';
 import { useUpdateMatch } from '@/hooks/apiHooks/match';
-//! data
 import { GRADE } from '@/constants/boxerData';
-//! component
 import { MatchSetFormContainer } from '../MatchSetFormContainer';
-//! context
 import { FormDataContextWrapper } from '../context/FormDataContextWrapper';
 import { FormDataContext } from '../context/FormDataContext';
 
-//! functions
 import { pickModifiedData } from './functions';
 
 const EditMatchForm = (props: {

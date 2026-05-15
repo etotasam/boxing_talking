@@ -1,15 +1,11 @@
 import { useEffect } from 'react';
 import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
-// ! data
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { initialBoxerDataOnForm } from '@/constants/boxerData';
-//! component
 import { BoxerEditForm } from '@/components/module/BoxerEditForm';
-//! recoil
 import { useRecoilState } from 'recoil';
 import { boxerCurrentState } from '@/store/boxerCurrentState';
-//! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 import { useRegisterBoxer } from '@/hooks/apiHooks/boxer';
 import { useBoxerFieldData } from '@/hooks/useBoxerFieldData';
@@ -17,18 +13,13 @@ import { useBoxerFieldData } from '@/hooks/useBoxerFieldData';
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const BoxerRegister = () => {
-  // ! use hook
   const [boxerCurrentData, setBoxerCurrentData] = useRecoilState(boxerCurrentState);
   const { hideToastModal, showErrorToast } = useToastModal();
   const { registerBoxer, isSuccess: successRegisterBoxer } = useRegisterBoxer();
   const { setBoxerFieldData } = useBoxerFieldData();
 
   //? 初期設定(クリーンアップとか)
-  // useEffect(() => {
-  //   return () => {
   //     resetLoadingState();
-  //   };
-  // }, []);
 
   // ? アンマウント時にはトーストモーダルを隠す
   //? form内データをデフォルトに戻す
@@ -39,7 +30,6 @@ export const BoxerRegister = () => {
     };
   }, []);
 
-  //! formデータのsubmit
   const boxerRegisterDataSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!boxerCurrentData.country) {

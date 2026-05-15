@@ -5,7 +5,6 @@ import { elementSizeState } from '@/store/elementSizeState';
 import { deviceState } from '@/store/deviceState';
 import { useLocation } from 'react-router-dom';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
-//! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 import { usePostComment } from '@/hooks/apiHooks/comment';
 import { useAuth, useGuest } from '@/hooks/apiHooks/auth';

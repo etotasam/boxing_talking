@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { MatchDataType } from '@/types';
-// ! components
 import { MatchCard } from '@/components/module/MatchCard';
 import { useRecoilValue } from 'recoil';
 import { deviceState } from '@/store/deviceState';

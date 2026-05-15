@@ -1,10 +1,8 @@
 import { useRef, useEffect } from 'react';
 import clsx from 'clsx';
-//! recoil
 import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 import { boolState } from '@/store/boolState';
-//!hook
 import { modalState } from '@/store/modalState';
 
 type CommentsWrapperType = {

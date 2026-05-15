@@ -1,14 +1,10 @@
 import clsx from 'clsx';
 import dayjs from 'dayjs';
-// ! types
 import { MatchDataType } from '@/types';
-// ! image
 import crown from '@/assets/images/etc/champion.svg';
-//! component
 import { FlagImage } from '@/components/atomic/FlagImage';
 import { SubHeadline } from '@/components/atomic/SubHeadline';
 import { MatchResult } from './MatchResult';
-//! hooks
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 
 export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
@@ -16,7 +12,6 @@ export const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
 
   const isShowMatchResultComponent = Boolean(!isDayOnFight && isDayAfterFight && matchData.result);
 
-  // const isTitleMatch: boolean = matchData.grade === 'タイトルマッチ';
 
   const isLongText = (text: string): boolean => {
     return text.length > 10;

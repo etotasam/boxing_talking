@@ -1,5 +1,4 @@
 import { RotatingLines } from 'react-loader-spinner';
-//! type
 import { MatchPredictionsType } from '@/types';
 
 type PredictionSummaryProps = {

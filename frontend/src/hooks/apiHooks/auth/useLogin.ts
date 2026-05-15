@@ -17,7 +17,6 @@ type LoginInput = {
   password: string;
 };
 
-//! ログイン
 export const useLogin = () => {
   const { refetch: refetchAdmin } = useAdmin();
   const { showSuccessToast, showErrorToast } = useToastModal();

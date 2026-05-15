@@ -1,7 +1,5 @@
-// ! types
 import { CountryType } from '@/types';
 import { COUNTRY } from '@/constants/country';
-// ! Flags
 import japanFlag from '@/assets/images/flags/japan.svg';
 import usaFlag from '@/assets/images/flags/usa.svg';
 import philippinesFlag from '@/assets/images/flags/philippines.svg';
@@ -48,14 +46,5 @@ export const getNationalFlag = (country: CountryType) => {
 
 
 export const formatPosition = () => {
-  // if (country == COUNTRY.USA) return '25% 20%';
-  // if (country == COUNTRY.UK) return '25% 30%';
-  // if (country == COUNTRY.UZBEKISTAN) return '25% 20%';
-  // if (country == COUNTRY.SOUTH_AFRICA) return '25% 30%';
-  // if (country == COUNTRY.MEXICO) return '25% 40%';
-  // if (country == COUNTRY.CHINA) return '25% 25%';
-  // if (country == COUNTRY.VENEZUELA) return '25% 35%';
-  // if (country == COUNTRY.GHANA) return '25% 35%';
-  // if (country == COUNTRY.AUSTRALIA) return '25% 35%';
   return 'center';
 };

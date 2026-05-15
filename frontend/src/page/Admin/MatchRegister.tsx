@@ -1,23 +1,18 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-// ! hooks
 import { useFetchBoxers } from '@/hooks/apiHooks/boxer';
 import { BoxerType } from '@/types';
-//! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
-//! component
 import { SearchBoxer } from '@/components/module/SearchBoxer';
 import { PaginationBoxerList } from '@/components/module/PaginationBoxerList';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
-// import { RegisterMatchForm } from '@/components/module/MatchSetForm';
 import { RegisterMatchForm } from '@/components/module/MatchSetForm/RegisterMatchForm';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const MatchRegister = () => {
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
-  //! use hook
   const { boxersData, pageCount } = useFetchBoxers();
 
   const initialMatchBoxers = {
@@ -27,11 +22,7 @@ export const MatchRegister = () => {
   const [matchBoxers, setMatchBoxers] = useState<MatchBoxersType>(initialMatchBoxers);
 
   //? 初期設定(クリーンアップとか)
-  // useEffect(() => {
-  //   return () => {
   //     resetLoadingState();
-  //   };
-  // }, []);
 
   return (
     <>
@@ -81,7 +72,6 @@ export const MatchRegister = () => {
   );
 };
 
-// ! 対戦相手
 const MatchSetUpBox = ({ boxers }: { boxers: MatchBoxersType }) => {
   return (
     <div className="flex items-center h-[150px] bg-gray-50">
@@ -98,7 +88,6 @@ const MatchSetUpBox = ({ boxers }: { boxers: MatchBoxersType }) => {
   );
 };
 
-// ! 選手
 const BoxerBox = ({ boxerData }: { boxerData: BoxerType }) => {
   return (
     <>
@@ -112,7 +101,6 @@ const BoxerBox = ({ boxerData }: { boxerData: BoxerType }) => {
   );
 };
 
-// ! 選手リスト
 type BoxerListType = {
   boxersData: BoxerType[] | undefined;
   matchBoxers: MatchBoxersType;

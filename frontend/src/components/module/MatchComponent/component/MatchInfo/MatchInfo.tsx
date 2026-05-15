@@ -1,6 +1,4 @@
-//! type
 import { MatchDataType, MatchPredictionsType } from '@/types';
-//! components
 import { BoxersData } from './components/BoxersData';
 import { Grade } from './components/Grade';
 import { MatchDate, MatchVenue } from './components/MatchMeta';

@@ -13,7 +13,6 @@ type PredictionErrorResponse = {
   message: string;
 };
 
-//! 試合予想の投票
 export const useVoteMatchPrediction = () => {
   const queryClient = useQueryClient();
   const { refetch: refetchAllFetchMatchPredictionOfAuthUser } = useFetchUsersPrediction();

@@ -1,7 +1,5 @@
-// import { useState } from "react";
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ROUTE_PATH } from '@/constants/routePath';
-// ! page
 import { Home } from '@/page/Home';
 import { Match } from '@/page/Match';
 import { PastMatch } from '@/page/PastMatch';
@@ -16,10 +14,8 @@ import { NotFound } from '@/page/NotFound';
 import { PastMatches } from './page/PastMatches';
 import { Test } from '@/page/Test';
 
-// ! middleware
 import AdminOnly from './middleware/AdminOnly';
 import './App.css';
-// ! layout
 import AppShell from './layout/AppShell';
 import AdminLayout from './layout/AdminLayout';
 import ContentLayout from './layout/ContentLayout';

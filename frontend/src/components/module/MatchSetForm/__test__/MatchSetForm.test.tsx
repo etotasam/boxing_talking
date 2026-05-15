@@ -4,9 +4,7 @@ import { describe, expect, test, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { WEIGHT_CLASS, GRADE } from '@/constants/boxerData';
 
-//! component
 import { MatchSetFormContainer } from '../MatchSetFormContainer';
-//! context
 import { FormDataContextWrapper } from '../context/FormDataContextWrapper';
 import { COUNTRY } from '@/constants/country';
 

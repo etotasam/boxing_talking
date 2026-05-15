@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { GiImperialCrown } from 'react-icons/gi';
-//! type
 import { MatchDataType } from '@/types';
 
 export const Grade = ({ matchData }: { matchData: MatchDataType }) => {

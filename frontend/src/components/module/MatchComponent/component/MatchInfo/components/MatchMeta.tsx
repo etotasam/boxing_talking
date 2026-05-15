@@ -1,8 +1,6 @@
 import clsx from 'clsx';
 import dayjs from 'dayjs';
-//! type
 import { MatchDataType } from '@/types';
-//! components
 import { FlagImage } from '@/components/atomic/FlagImage';
 
 export const MatchDate = ({ matchDate }: Pick<MatchDataType, 'matchDate'>) => {

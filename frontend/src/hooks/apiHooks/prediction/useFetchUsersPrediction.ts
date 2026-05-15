@@ -7,7 +7,6 @@ import { useAuth } from '../auth/useAuth';
 import { useGuest } from '../auth/useGuest';
 import type { PredictionType } from '@/types';
 
-//! ユーザーの勝敗予想の取得
 export const useFetchUsersPrediction = () => {
   const { data: authUser } = useAuth();
   const { data: isGuest } = useGuest();

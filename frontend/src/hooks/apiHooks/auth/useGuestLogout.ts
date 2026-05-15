@@ -9,7 +9,6 @@ import { useFullScreenLoading } from '../../useFullScreenLoading';
 import { useMenuModal } from '../../useMenuModal';
 import { useToastModal } from '../../useToastModal';
 
-//! ゲストログアウト
 export const useGuestLogout = () => {
   const { refetch: refetchMatchPrediction } = useFetchUsersPrediction();
   const queryClient = useQueryClient();

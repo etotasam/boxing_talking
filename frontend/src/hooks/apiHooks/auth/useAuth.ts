@@ -5,7 +5,6 @@ import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
 import type { UserType } from '@/types';
 
-//! auth check (user)
 export const useAuth = () => {
   const queryClient = useQueryClient();
 

@@ -18,7 +18,6 @@ export const useRegisterBoxer = () => {
   const { showSuccessToast, showErrorToast } = useToastModal();
   const api = useCallback(async (newBoxerData: RegisterBoxerDataType): Promise<void> => {
     await Axios.post<void>(API_PATH.BOXER, newBoxerData).then((v) => v.data);
-    // return res
   }, []);
   const { mutate, isLoading, isError, isSuccess } = useMutation<
     void,
@@ -30,7 +29,6 @@ export const useRegisterBoxer = () => {
     },
   });
   const registerBoxer = (newBoxerData: RegisterBoxerDataType) => {
-    // const convertedBoxerDataBoxerData = convertToBoxerData(newBoxerData)
     mutate(newBoxerData, {
       onSuccess: () => {
         hideFullScreenLoading();

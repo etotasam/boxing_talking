@@ -3,10 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/constants/routePath';
 
-//! types
 import { MatchDataType } from '@/types';
-// ! hook
-// import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
 import { useModalState } from '@/hooks/useModalState';
 import {
@@ -16,7 +13,6 @@ import {
 } from '@/hooks/apiHooks/prediction';
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
-//! component
 import { MatchView, UsersPredictionType } from './MatchView';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
@@ -84,7 +80,6 @@ export const MatchContainer = (props: PropsType) => {
   const { state: isShowPredictionModal, showModal: showPredictionModal } =
     useModalState('PREDICTION_VOTE');
 
-  // if (!windowSize) return;
   if (!thisMatch) return;
   return (
     <>

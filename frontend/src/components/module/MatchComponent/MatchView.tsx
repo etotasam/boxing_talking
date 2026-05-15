@@ -1,8 +1,6 @@
-//! type
 import { MatchDataType } from '@/types';
 import { MatchPredictionsType } from '@/types';
 
-//! component
 import { MatchInfo } from './component/MatchInfo';
 import { PostComment } from './component/PostComment';
 import { PredictionVoteModal } from './component/PredictionVoteModal';

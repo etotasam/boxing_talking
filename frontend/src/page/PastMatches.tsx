@@ -1,11 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/constants/routePath';
-// ! components
 import { MatchCard } from '@/components/module/MatchCard';
-//! hooks
 import { useFetchPastMatches } from '@/hooks/apiHooks/match';
-// ! types
 import { MatchDataType } from '@/types';
 import { useCallback } from 'react';
 

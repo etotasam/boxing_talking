@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
-//! icons
 import { GiBoxingGlove } from 'react-icons/gi';
 
 import { useRecoilValue } from 'recoil';

@@ -17,7 +17,6 @@ type GuestLoginError = {
   };
 };
 
-//! ゲストログイン
 export const useGuestLogin = () => {
   const { showErrorToast, showSuccessToast } = useToastModal();
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();

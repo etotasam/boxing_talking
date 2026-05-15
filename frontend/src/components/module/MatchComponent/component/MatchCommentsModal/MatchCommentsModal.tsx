@@ -2,14 +2,10 @@ import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
 
-//! components
 import { Comments } from '../Comments';
-//! hooks
 import { useFetchComments } from '@/hooks/apiHooks/comment';
-//! recoil
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
-//! icons
 import { GoTriangleUp } from 'react-icons/go';
 import { modalState } from '@/store/modalState';
 import { RotatingLines } from 'react-loader-spinner';
@@ -43,13 +39,11 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
   };
 
   const windowHeight = window.innerHeight;
-  // const isCommentsModalHeightSmallThen80Percent =
   //   windowHeight - (headerHeightState ?? 0) < windowHeight * 0.8;
   //? コメントモーダルの高さはヘッダーの高さを引いた90%に設定
   const commentsModalHeight = Math.floor((windowHeight - (headerHeightState ?? 0)) * 0.9);
 
   return (
-    // <div className="h-[100vh] w-full">
     <motion.div
       initial={{ height: commentsModalHeightHiddenState ?? 0 }}
       animate={
@@ -88,7 +82,6 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
         />
       </motion.div>
     </motion.div>
-    // </div>
   );
 };
 
@@ -97,7 +90,6 @@ const CommentsModalToggleButton = () => {
 };
 
 const CommentsLoadingIcon = () => {
-  // const text = 'コメント取得中...';
   return (
     <div className="w-[30px] h-[30px] text-white">
       <motion.div

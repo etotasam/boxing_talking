@@ -1,7 +1,5 @@
 import { atom } from "recoil";
-// ! data
 import { initialBoxerDataOnForm } from "@/constants/boxerData";
-// ! types
 import { BoxerType } from "@/types";
 
 

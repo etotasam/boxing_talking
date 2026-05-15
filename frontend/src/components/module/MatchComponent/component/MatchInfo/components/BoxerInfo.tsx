@@ -2,14 +2,10 @@ import { ComponentProps } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { useRecoilValue } from 'recoil';
-//! type
 import { BoxerType, MatchResultType } from '@/types';
 import { BOXER_STANCE_LABELS } from '@/constants/boxerData';
-//! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
-//! recoil
 import { deviceState } from '@/store/deviceState';
-//! image
 import crown from '@/assets/images/etc/champion.svg';
 import fallOfCrown from '@/assets/images/etc/fall_champion.svg';
 

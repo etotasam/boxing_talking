@@ -1,7 +1,5 @@
 import { motion } from 'framer-motion';
-//!type
 import { MatchDataType } from '@/types';
-//! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 
 type IconType = 'DEFAULT' | 'MINI';

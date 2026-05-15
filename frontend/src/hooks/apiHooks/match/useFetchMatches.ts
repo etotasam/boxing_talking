@@ -5,7 +5,6 @@ import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
 import type { MatchDataType } from '@/types';
 
-//! 試合情報一覧の取得
 export const useFetchMatches = () => {
   const fetcher = useCallback(async () => {
     const res = await Axios.get(API_PATH.MATCH).then((result) => result.data);

@@ -1,7 +1,6 @@
 import { ROUTE_PATH } from '@/constants/routePath';
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-//! hooks
 import { useAdmin } from '@/hooks/apiHooks/auth';
 
 const AdminOnly = () => {

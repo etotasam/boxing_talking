@@ -5,7 +5,6 @@ import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
 import type { MatchPredictionsType } from '@/types';
 
-//!試合予想の投票数の取得
 export const useMatchPredictions = (matchId: number) => {
   const api = useCallback(async () => {
     const res = await Axios.get<{ data: MatchPredictionsType }>(API_PATH.MATCH_PREDICTION, {

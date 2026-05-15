@@ -6,7 +6,6 @@ import { QUERY_KEY } from '@/constants/queryKeys';
 import { useFullScreenLoading } from '@/hooks/useFullScreenLoading';
 import type { MatchDataType } from '@/types';
 
-//! 過去の試合情報一覧の取得(試合後2週間以上経っている試合全部)
 export const useFetchPastMatches = () => {
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();
   const fetcher = useCallback(async () => {

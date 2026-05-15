@@ -2,9 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, useAnimationControls } from 'framer-motion';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
-//! hook
 import { useMenuModal } from '@/hooks/useMenuModal';
-//!recoil
 import { useRecoilState } from 'recoil';
 import { modalState } from '@/store/modalState';
 
