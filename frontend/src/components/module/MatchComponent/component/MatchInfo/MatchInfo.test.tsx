@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom/vitest';
+import { within } from '@testing-library/react';
 import { fireEvent, render, screen } from 'test-setup';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { MatchInfo } from './MatchInfo';
@@ -38,8 +39,18 @@ describe('MatchInfo', () => {
   test('userPrediction がある時は自分の予想を表示する', () => {
     render(<MatchInfo matchData={matchData} userPrediction="red" />);
 
-    expect(screen.getByText('あなたの予想:')).toBeInTheDocument();
-    expect(screen.getByText('Red Boxer 勝利')).toBeInTheDocument();
+    const predictionSummary = screen.getByRole('region', { name: 'prediction-summary' });
+    expect(within(predictionSummary).getByText('Red Boxer')).toBeInTheDocument();
+  });
+
+  test('試合日時と試合会場を表示する', () => {
+    render(<MatchInfo matchData={matchData} />);
+
+    expect(screen.getByText('試合日時')).toBeInTheDocument();
+    expect(screen.getByText('2026年1月1日（木）')).toBeInTheDocument();
+    expect(screen.getByText('日本時間')).toBeInTheDocument();
+    expect(screen.getByText('試合会場')).toBeInTheDocument();
+    expect(screen.getByText('Tokyo Dome')).toBeInTheDocument();
   });
 
   test('未投票で投票可能な時は投票ボタンを表示する', () => {
@@ -52,9 +63,7 @@ describe('MatchInfo', () => {
       />
     );
 
-    expect(screen.getByText('あなたの予想:')).toBeInTheDocument();
-
-    const voteButton = screen.getByRole('button', { name: '投票する' });
+    const voteButton = screen.getByRole('button', { name: '投票' });
     expect(voteButton).toBeInTheDocument();
 
     fireEvent.click(voteButton);
@@ -64,8 +73,7 @@ describe('MatchInfo', () => {
   test('未投票で投票不可の時はあなたの予想を表示しない', () => {
     render(<MatchInfo matchData={matchData} userPrediction={false} isShowVoteButton={false} />);
 
-    expect(screen.queryByText('あなたの予想:')).not.toBeInTheDocument();
-    expect(screen.queryByText('未投票')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '投票' })).not.toBeInTheDocument();
   });
 
   test('matchPredictions がある時は集計結果を表示する', () => {
@@ -80,9 +88,16 @@ describe('MatchInfo', () => {
       />
     );
 
-    expect(screen.getByText('合計 12票')).toBeInTheDocument();
+    expect(screen.getByLabelText('合計 12票')).toBeInTheDocument();
     expect(screen.getByText('7票')).toBeInTheDocument();
     expect(screen.getByText('5票')).toBeInTheDocument();
+    expect(screen.getByText('58%')).toBeInTheDocument();
+    expect(screen.getByText('42%')).toBeInTheDocument();
+
+    const predictionSummary = screen.getByRole('region', { name: 'prediction-summary' });
+    expect(within(predictionSummary).queryByText('Red Boxer')).not.toBeInTheDocument();
+    expect(within(predictionSummary).queryByText('Blue Boxer')).not.toBeInTheDocument();
+    expect(within(predictionSummary).queryByText(/vs/i)).not.toBeInTheDocument();
   });
 
   test('初回取得中はローディング表示を出す', () => {
@@ -100,6 +115,6 @@ describe('MatchInfo', () => {
   test('初回取得中ではなく matchPredictions がない時は取得中表示を出す', () => {
     render(<MatchInfo matchData={matchData} matchPredictions={undefined} />);
 
-    expect(screen.getByText('全体投票は取得中です。')).toBeInTheDocument();
+    expect(screen.getByText('取得中')).toBeInTheDocument();
   });
 });

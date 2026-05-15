@@ -26,12 +26,12 @@ export const MatchInfo = ({
     <>
       {matchData && (
         <div className="flex flex-col items-center w-full relative">
-          <BoxersData matchData={matchData} />
           <Grade matchData={matchData} />
-          <div className="flex w-[80%] mt-5">
+          <div className="mt-5 grid w-[95%] max-w-[1024px] grid-cols-1 gap-3 pc:grid-cols-2">
             <MatchDate matchDate={matchData.matchDate} />
             <MatchVenue country={matchData.country} venue={matchData.venue} />
           </div>
+          <BoxersData matchData={matchData} />
           <PredictionSummary
             userPrediction={userPrediction}
             matchPredictions={matchPredictions}
