@@ -15,7 +15,7 @@ export const useLogout = () => {
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();
   const { hide: hideMenuModal } = useMenuModal();
 
-  const api = async (_: unknown) => {
+  const api = async () => {
     await Axios.post<void>(API_PATH.USER_LOGOUT).then((result) => result.data);
   };
 
@@ -27,7 +27,7 @@ export const useLogout = () => {
 
   const logout = () => {
     mutate(
-      {},
+      undefined,
       {
         onSuccess: () => {
           queryClient.setQueryData(QUERY_KEY.AUTH, null);

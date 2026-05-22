@@ -16,7 +16,7 @@ export const useGuestLogout = () => {
   const { hide: hideMenuModal } = useMenuModal();
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();
 
-  const api = useCallback(async (_: unknown) => {
+  const api = useCallback(async () => {
     await Axios.post<void>(API_PATH.GUEST_LOGOUT).then((result) => result.data);
   }, []);
 
@@ -28,7 +28,7 @@ export const useGuestLogout = () => {
 
   const guestLogout = useCallback(() => {
     mutate(
-      {},
+      undefined,
       {
         onSuccess: () => {
           refetchMatchPrediction();

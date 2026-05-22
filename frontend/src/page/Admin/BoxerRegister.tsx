@@ -42,8 +42,8 @@ export const BoxerRegister = () => {
       return;
     }
 
-    const { id, ...formattedBoxerDataForUpdate } = boxerCurrentData;
-    registerBoxer(formattedBoxerDataForUpdate);
+    const { id: _id, ...formattedBoxerDataForRegister } = boxerCurrentData;
+    registerBoxer(formattedBoxerDataForRegister);
   };
 
   return (

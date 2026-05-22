@@ -24,7 +24,7 @@ export const useGuestLogin = () => {
   const { refetch: refetchMatchPrediction } = useFetchUsersPrediction();
   const { setReactQueryData } = useReactQuery();
 
-  const api = useCallback(async (_: unknown): Promise<void> => {
+  const api = useCallback(async (): Promise<void> => {
     await Axios.post<void>(API_PATH.GUEST_LOGIN).then((result) => result.data);
   }, []);
 
@@ -36,7 +36,7 @@ export const useGuestLogin = () => {
 
   const guestLogin = () => {
     mutate(
-      {},
+      undefined,
       {
         onSuccess: () => {
           hideLoginModal();
