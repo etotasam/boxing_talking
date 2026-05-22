@@ -10,6 +10,7 @@ type BoxersDataProps = {
 
 export const BoxersData = ({ matchData }: BoxersDataProps) => {
   const device = useRecoilValue(deviceState);
+
   return (
     <div className={clsx('text-white relative flex justify-between w-full max-w-[1024px]')}>
       <div className={`${device === 'PC' ? 'w-[45%]' : 'w-[50%]'}`}>
