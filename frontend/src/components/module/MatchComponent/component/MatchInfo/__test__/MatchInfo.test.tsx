@@ -2,7 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import { within } from '@testing-library/react';
 import { fireEvent, render, screen } from 'test-setup';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { MatchInfo } from './MatchInfo';
+import { MatchInfo } from '../MatchInfo';
 import { initialBoxerData, GRADE, WEIGHT_CLASS } from '@/constants/boxerData';
 import { COUNTRY } from '@/constants/country';
 
@@ -74,6 +74,22 @@ describe('MatchInfo', () => {
     render(<MatchInfo matchData={matchData} userPrediction={false} isShowVoteButton={false} />);
 
     expect(screen.queryByRole('button', { name: '投票' })).not.toBeInTheDocument();
+  });
+
+  test('userPrediction が未取得の時は投票状態を表示しない', () => {
+    render(
+      <MatchInfo
+        matchData={matchData}
+        userPrediction={undefined}
+        isShowVoteButton={true}
+        showPredictionModal={showPredictionModal}
+      />
+    );
+
+    const predictionSummary = screen.getByRole('region', { name: 'prediction-summary' });
+    expect(within(predictionSummary).queryByText('Red Boxer')).not.toBeInTheDocument();
+    expect(within(predictionSummary).queryByText('Blue Boxer')).not.toBeInTheDocument();
+    expect(within(predictionSummary).queryByRole('button', { name: '投票' })).not.toBeInTheDocument();
   });
 
   test('matchPredictions がある時は集計結果を表示する', () => {
