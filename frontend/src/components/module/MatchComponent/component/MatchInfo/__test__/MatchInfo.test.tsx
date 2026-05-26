@@ -13,12 +13,21 @@ const matchData = {
     id: 10,
     name: 'Red Boxer',
     engName: 'Red Boxer',
+    win: 10,
+    ko: 5,
+    draw: 2,
+    lose: 1,
   },
   blueBoxer: {
     ...initialBoxerData,
     id: 20,
     name: 'Blue Boxer',
     engName: 'Blue Boxer',
+    country: COUNTRY.USA,
+    win: 8,
+    ko: 3,
+    draw: 1,
+    lose: 2,
   },
   country: COUNTRY.JAPAN,
   venue: 'Tokyo Dome',
@@ -51,6 +60,41 @@ describe('MatchInfo', () => {
     expect(screen.getByText('日本時間')).toBeInTheDocument();
     expect(screen.getByText('試合会場')).toBeInTheDocument();
     expect(screen.getByText('Tokyo Dome')).toBeInTheDocument();
+  });
+
+  test('ボクサーの名前、戦績、国籍を表示する', () => {
+    render(<MatchInfo matchData={matchData} />);
+
+    const fightersSummary = screen.getByRole('region', { name: 'fighters-summary' });
+
+    expect(within(fightersSummary).getByText('Red Boxer')).toBeInTheDocument();
+    expect(within(fightersSummary).getByText('10勝（5KO） 1敗 2分')).toBeInTheDocument();
+    expect(within(fightersSummary).getByText('日本')).toBeInTheDocument();
+    expect(within(fightersSummary).getByText('Blue Boxer')).toBeInTheDocument();
+    expect(within(fightersSummary).getByText('8勝（3KO） 2敗 1分')).toBeInTheDocument();
+    expect(within(fightersSummary).getByText('アメリカ')).toBeInTheDocument();
+    expect(within(fightersSummary).getByText('VS')).toBeInTheDocument();
+  });
+
+  test('試合結果がある時は戦績表示に反映する', () => {
+    render(
+      <MatchInfo
+        matchData={{
+          ...matchData,
+          result: {
+            isUpdateBoxerRecordChecked: true,
+            matchId: matchData.id,
+            result: 'red',
+            detail: 'ko',
+          },
+        }}
+      />
+    );
+
+    const fightersSummary = screen.getByRole('region', { name: 'fighters-summary' });
+
+    expect(within(fightersSummary).getByText('11勝（6KO） 1敗 2分')).toBeInTheDocument();
+    expect(within(fightersSummary).getByText('8勝（3KO） 3敗 1分')).toBeInTheDocument();
   });
 
   test('未投票で投票可能な時は投票ボタンを表示する', () => {

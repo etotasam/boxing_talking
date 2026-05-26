@@ -1,6 +1,20 @@
-import type { BoxerType } from '@/types';
+import type { BoxerType, MatchResultType } from '@/types';
 
 export type BoxerResultState = 'win' | 'loss' | 'draw' | null;
+export type BoxerSide = 'red' | 'blue';
+
+export const getBoxerResultState = ({
+  result,
+  boxerSide,
+}: {
+  result: MatchResultType['result'] | false;
+  boxerSide: BoxerSide;
+}): BoxerResultState => {
+  if (result === boxerSide) return 'win';
+  if (result === 'draw') return 'draw';
+  if (result && result !== 'no-contest') return 'loss';
+  return null;
+};
 
 export const getDisplayedBoxerRecord = ({
   boxer,

@@ -46,8 +46,9 @@ const SiteTitle = ({ siteTitle }: SiteTitleProps) => {
   return (
     <h1
       className={clsx(
-        'pointer-events-none text-[24px] font-bold fixed left-[50%] translate-x-[-50%]',
-        'pc:text-[38px] pc:static pc:left-0 pc:translate-x-0'
+        'pointer-events-none fixed left-[50%] max-w-[calc(100vw-48px)] translate-x-[-50%]',
+        'whitespace-nowrap text-[clamp(18px,6vw,24px)] font-bold',
+        'pc:static pc:left-0 pc:max-w-none pc:translate-x-0 pc:text-[38px]'
       )}
     >
       {siteTitle}

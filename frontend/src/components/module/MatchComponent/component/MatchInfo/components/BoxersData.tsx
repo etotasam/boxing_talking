@@ -1,33 +1,37 @@
 import clsx from 'clsx';
-import { useRecoilValue } from 'recoil';
 import { MatchDataType } from '@/types';
-import { deviceState } from '@/store/deviceState';
-import { BoxerInfo } from './BoxerInfo';
+import { FighterSummary } from './FighterSummary';
 
 type BoxersDataProps = {
   matchData: MatchDataType;
 };
 
 export const BoxersData = ({ matchData }: BoxersDataProps) => {
-  const device = useRecoilValue(deviceState);
-
   return (
-    <div className={clsx('text-white relative flex justify-between w-full max-w-[1024px]')}>
-      <div className={`${device === 'PC' ? 'w-[45%]' : 'w-[50%]'}`}>
-        <BoxerInfo
-          boxer={{ ...matchData.redBoxer, color: 'red' }}
-          matchResult={matchData.result}
-          matchDate={matchData.matchDate}
+    <section
+      className={clsx('relative mt-4 w-[95%] max-w-[1024px] text-white')}
+      aria-label="fighters-summary"
+    >
+      <div className={clsx('relative overflow-hidden')}>
+        <div className="grid min-h-[130px] grid-cols-2 pc:min-h-[170px]">
+          <FighterSummary side="red" boxer={matchData.redBoxer} matchResult={matchData.result} />
+          <FighterSummary side="blue" boxer={matchData.blueBoxer} matchResult={matchData.result} />
+        </div>
+        <div
+          className="absolute bottom-5 left-1/2 top-5 w-px -translate-x-1/2 bg-stone-500/70"
+          aria-hidden="true"
         />
+        <div
+          className={clsx(
+            'pointer-events-none absolute left-1/2 top-1/2 flex h-8 w-8',
+            '-translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full',
+            'border border-stone-500/80 bg-stone-950/95 text-sm font-black text-stone-50',
+            'pc:h-12 pc:w-12 pc:text-xl'
+          )}
+        >
+          VS
+        </div>
       </div>
-
-      <div className={`${device === 'PC' ? 'w-[45%]' : 'w-[50%]'}`}>
-        <BoxerInfo
-          boxer={{ ...matchData.blueBoxer, color: 'blue' }}
-          matchResult={matchData.result}
-          matchDate={matchData.matchDate}
-        />
-      </div>
-    </div>
+    </section>
   );
 };
