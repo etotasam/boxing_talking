@@ -5,7 +5,7 @@ import type { BoxerType, MatchResultType } from '@/types';
 import type { BoxerSide } from './helper/boxerRecord';
 import { getBoxerResultState, getDisplayedBoxerRecord } from './helper/boxerRecord';
 
-type FighterSummaryProps = {
+type BoxerSummaryProps = {
   boxer: BoxerType;
   side: BoxerSide;
   matchResult?: MatchResultType | null;
@@ -15,7 +15,7 @@ const formatRecord = ({ win, ko, lose, draw }: ReturnType<typeof getDisplayedBox
   return `${win}勝（${ko}KO） ${lose}敗 ${draw}分`;
 };
 
-export const FighterSummary = ({ boxer, side, matchResult = null }: FighterSummaryProps) => {
+export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryProps) => {
   const result = matchResult?.result ?? false;
   const isKo = matchResult?.detail
     ? matchResult.detail === 'ko' || matchResult.detail === 'tko'

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { MatchDataType } from '@/types';
-import { FighterSummary } from './FighterSummary';
+import { BoxerSummary } from './BoxerSummary';
 
 type BoxersDataProps = {
   matchData: MatchDataType;
@@ -10,12 +10,12 @@ export const BoxersData = ({ matchData }: BoxersDataProps) => {
   return (
     <section
       className={clsx('relative mt-4 w-[95%] max-w-[1024px] text-white')}
-      aria-label="fighters-summary"
+      aria-label="boxers-summary"
     >
       <div className={clsx('relative overflow-hidden')}>
         <div className="grid min-h-[130px] grid-cols-2 pc:min-h-[170px]">
-          <FighterSummary side="red" boxer={matchData.redBoxer} matchResult={matchData.result} />
-          <FighterSummary side="blue" boxer={matchData.blueBoxer} matchResult={matchData.result} />
+          <BoxerSummary side="red" boxer={matchData.redBoxer} matchResult={matchData.result} />
+          <BoxerSummary side="blue" boxer={matchData.blueBoxer} matchResult={matchData.result} />
         </div>
         <div
           className="absolute bottom-5 left-1/2 top-5 w-px -translate-x-1/2 bg-stone-500/70"

@@ -65,15 +65,15 @@ describe('MatchInfo', () => {
   test('ボクサーの名前、戦績、国籍を表示する', () => {
     render(<MatchInfo matchData={matchData} />);
 
-    const fightersSummary = screen.getByRole('region', { name: 'fighters-summary' });
+    const boxersSummary = screen.getByRole('region', { name: 'boxers-summary' });
 
-    expect(within(fightersSummary).getByText('Red Boxer')).toBeInTheDocument();
-    expect(within(fightersSummary).getByText('10勝（5KO） 1敗 2分')).toBeInTheDocument();
-    expect(within(fightersSummary).getByText('日本')).toBeInTheDocument();
-    expect(within(fightersSummary).getByText('Blue Boxer')).toBeInTheDocument();
-    expect(within(fightersSummary).getByText('8勝（3KO） 2敗 1分')).toBeInTheDocument();
-    expect(within(fightersSummary).getByText('アメリカ')).toBeInTheDocument();
-    expect(within(fightersSummary).getByText('VS')).toBeInTheDocument();
+    expect(within(boxersSummary).getByText('Red Boxer')).toBeInTheDocument();
+    expect(within(boxersSummary).getByText('10勝（5KO） 1敗 2分')).toBeInTheDocument();
+    expect(within(boxersSummary).getByText('日本')).toBeInTheDocument();
+    expect(within(boxersSummary).getByText('Blue Boxer')).toBeInTheDocument();
+    expect(within(boxersSummary).getByText('8勝（3KO） 2敗 1分')).toBeInTheDocument();
+    expect(within(boxersSummary).getByText('アメリカ')).toBeInTheDocument();
+    expect(within(boxersSummary).getByText('VS')).toBeInTheDocument();
   });
 
   test('試合結果がある時は戦績表示に反映する', () => {
@@ -91,10 +91,10 @@ describe('MatchInfo', () => {
       />
     );
 
-    const fightersSummary = screen.getByRole('region', { name: 'fighters-summary' });
+    const boxersSummary = screen.getByRole('region', { name: 'boxers-summary' });
 
-    expect(within(fightersSummary).getByText('11勝（6KO） 1敗 2分')).toBeInTheDocument();
-    expect(within(fightersSummary).getByText('8勝（3KO） 3敗 1分')).toBeInTheDocument();
+    expect(within(boxersSummary).getByText('11勝（6KO） 1敗 2分')).toBeInTheDocument();
+    expect(within(boxersSummary).getByText('8勝（3KO） 3敗 1分')).toBeInTheDocument();
   });
 
   test('未投票で投票可能な時は投票ボタンを表示する', () => {
