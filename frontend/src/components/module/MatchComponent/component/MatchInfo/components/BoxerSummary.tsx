@@ -1,8 +1,9 @@
+import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import { COUNTRY_LABELS } from '@/constants/countryLabels';
 import { FlagImage } from '@/components/atomic/FlagImage';
 import type { BoxerType, MatchResultType } from '@/types';
-import type { BoxerSide } from './helper/boxerRecord';
+import type { BoxerResultState, BoxerSide } from './helper/boxerRecord';
 import { getBoxerResultState, getDisplayedBoxerRecord } from './helper/boxerRecord';
 
 type BoxerSummaryProps = {
@@ -13,6 +14,44 @@ type BoxerSummaryProps = {
 
 const formatRecord = ({ win, ko, lose, draw }: ReturnType<typeof getDisplayedBoxerRecord>) => {
   return `${win}勝（${ko}KO） ${lose}敗 ${draw}分`;
+};
+
+const getRecordHighlightClass = ({
+  field,
+  resultState,
+  isKo,
+}: {
+  field: 'win' | 'ko' | 'lose' | 'draw';
+  resultState: BoxerResultState;
+  isKo: boolean;
+}) => {
+  if ((field === 'win' || (field === 'ko' && isKo)) && resultState === 'win') {
+    return 'text-yellow-300';
+  }
+  if (field === 'lose' && resultState === 'loss') {
+    return 'text-red-500';
+  }
+  if (field === 'draw' && resultState === 'draw') {
+    return 'text-blue-300';
+  }
+
+  return null;
+};
+
+const RecordPart = ({
+  children,
+  field,
+  resultState,
+  isKo,
+}: {
+  children: ReactNode;
+  field: 'win' | 'ko' | 'lose' | 'draw';
+  resultState: BoxerResultState;
+  isKo: boolean;
+}) => {
+  const highlightClass = getRecordHighlightClass({ field, resultState, isKo });
+
+  return <span className={clsx(highlightClass, highlightClass && 'font-black')}>{children}</span>;
 };
 
 export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryProps) => {
@@ -41,16 +80,41 @@ export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryPr
       >
         {boxer.name}
       </h2>
-      <p
+      <div
         className={clsx(
-          'mt-1 max-w-full whitespace-nowrap text-[clamp(10px,3vw,18px)] font-bold leading-tight',
-          'pc:mt-2 pc:break-words pc:text-base',
+          'mt-1 grid grid-cols-3 gap-x-2 text-left text-[clamp(10px,3vw,18px)] font-bold leading-tight',
+          'pc:mt-2 pc:gap-x-3 pc:text-base',
           isRedSide ? 'text-red-300' : 'text-blue-300'
         )}
         title={recordLabel}
       >
-        {recordLabel}
-      </p>
+        <span className="flex min-w-0 flex-col">
+          <span className="whitespace-nowrap">
+            <RecordPart field="win" resultState={resultState} isKo={isKo}>
+              {displayedRecord.win}
+            </RecordPart>
+            <span>勝</span>
+          </span>
+          <span className="mt-0.5 whitespace-nowrap text-[0.72em] leading-none">
+            <RecordPart field="ko" resultState={resultState} isKo={isKo}>
+              {displayedRecord.ko}
+            </RecordPart>
+            <span>KO</span>
+          </span>
+        </span>
+        <span className="whitespace-nowrap">
+          <RecordPart field="lose" resultState={resultState} isKo={isKo}>
+            {displayedRecord.lose}
+          </RecordPart>
+          <span>敗</span>
+        </span>
+        <span className="whitespace-nowrap">
+          <RecordPart field="draw" resultState={resultState} isKo={isKo}>
+            {displayedRecord.draw}
+          </RecordPart>
+          <span>分</span>
+        </span>
+      </div>
       <span
         className={clsx(
           'mt-3 inline-flex max-w-full items-center gap-1.5 rounded border border-stone-600',
