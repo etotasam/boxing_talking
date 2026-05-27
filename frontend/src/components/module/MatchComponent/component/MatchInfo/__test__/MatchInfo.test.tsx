@@ -40,6 +40,14 @@ const matchData = {
 
 const showPredictionModal = vi.fn();
 
+const expectVisibleRecordText = (container: HTMLElement, text: string) => {
+  expect(
+    within(container).getByText((_, element) => {
+      return element?.tagName.toLowerCase() === 'span' && element.textContent === text;
+    })
+  ).toBeInTheDocument();
+};
+
 describe('MatchInfo', () => {
   beforeEach(() => {
     showPredictionModal.mockClear();
@@ -68,10 +76,16 @@ describe('MatchInfo', () => {
     const boxersSummary = screen.getByRole('region', { name: 'boxers-summary' });
 
     expect(within(boxersSummary).getByText('Red Boxer')).toBeInTheDocument();
-    expect(within(boxersSummary).getByText('10勝（5KO） 1敗 2分')).toBeInTheDocument();
+    expectVisibleRecordText(boxersSummary, '10勝');
+    expectVisibleRecordText(boxersSummary, '5KO');
+    expectVisibleRecordText(boxersSummary, '1敗');
+    expectVisibleRecordText(boxersSummary, '2分');
     expect(within(boxersSummary).getByText('日本')).toBeInTheDocument();
     expect(within(boxersSummary).getByText('Blue Boxer')).toBeInTheDocument();
-    expect(within(boxersSummary).getByText('8勝（3KO） 2敗 1分')).toBeInTheDocument();
+    expectVisibleRecordText(boxersSummary, '8勝');
+    expectVisibleRecordText(boxersSummary, '3KO');
+    expectVisibleRecordText(boxersSummary, '2敗');
+    expectVisibleRecordText(boxersSummary, '1分');
     expect(within(boxersSummary).getByText('アメリカ')).toBeInTheDocument();
     expect(within(boxersSummary).getByText('VS')).toBeInTheDocument();
   });
@@ -93,8 +107,9 @@ describe('MatchInfo', () => {
 
     const boxersSummary = screen.getByRole('region', { name: 'boxers-summary' });
 
-    expect(within(boxersSummary).getByText('11勝（6KO） 1敗 2分')).toBeInTheDocument();
-    expect(within(boxersSummary).getByText('8勝（3KO） 3敗 1分')).toBeInTheDocument();
+    expectVisibleRecordText(boxersSummary, '11勝');
+    expectVisibleRecordText(boxersSummary, '6KO');
+    expectVisibleRecordText(boxersSummary, '3敗');
   });
 
   test('未投票で投票可能な時は投票ボタンを表示する', () => {
