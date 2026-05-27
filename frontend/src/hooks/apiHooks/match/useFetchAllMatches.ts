@@ -5,7 +5,6 @@ import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
 import type { MatchDataType } from '@/types';
 
-//! すべての試合情報の取得(過去含めすべて)
 export const useFetchAllMatches = () => {
   const fetcher = useCallback(async () => {
     const res = await Axios.get<{ data: MatchDataType[] }>(API_PATH.MATCH, {

@@ -38,7 +38,6 @@ export const SearchBoxer = () => {
         <select
           className="w-[150px] ml-5"
           name="country"
-          // value={boxerDataOnForm?.country}
           onChange={(e) => {
             country.current = e.target.value;
           }}

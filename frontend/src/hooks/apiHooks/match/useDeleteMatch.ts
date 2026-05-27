@@ -8,7 +8,6 @@ import { useToastModal } from '@/hooks/useToastModal';
 import { useFetchAllMatches } from './useFetchAllMatches';
 import { useFetchMatches } from './useFetchMatches';
 
-//! 試合の削除
 export const useDeleteMatch = () => {
   const { showErrorToast, showSuccessToast } = useToastModal();
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();

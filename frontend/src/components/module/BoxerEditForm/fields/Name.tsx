@@ -1,4 +1,3 @@
-//! types
 import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 
 export const Name = (props: {
@@ -16,9 +15,6 @@ export const Name = (props: {
         value={boxerName.engName}
         onChange={
           (e) => setBoxerFieldData('engName', e.target.value)
-          // setBoxerDataToForm((current: BoxerType) => {
-          //   return { ...current, engName: e.target.value };
-          // })
         }
       />
       <input
@@ -29,9 +25,6 @@ export const Name = (props: {
         value={boxerName.name}
         onChange={
           (e) => setBoxerFieldData('name', e.target.value)
-          // setBoxerDataToForm((current: BoxerType) => {
-          //   return { ...current, name: e.target.value };
-          // })
         }
       />
     </>

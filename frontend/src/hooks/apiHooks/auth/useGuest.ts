@@ -4,7 +4,6 @@ import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
 
-//! ゲストauthチェック
 export const useGuest = () => {
   const api = useCallback(async () => {
     try {

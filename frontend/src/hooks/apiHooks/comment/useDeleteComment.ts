@@ -9,7 +9,6 @@ import { useFullScreenLoading } from '@/hooks/useFullScreenLoading';
 import { useToastModal } from '@/hooks/useToastModal';
 import type { DeleteCommentParams } from './types';
 
-//! コメントの削除
 export const useDeleteComment = () => {
   const { showErrorToast, showGrayBackToast } = useToastModal();
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();

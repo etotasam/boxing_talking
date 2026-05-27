@@ -4,7 +4,6 @@ import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
 
-//! 管理者判定
 export const useAdmin = () => {
   const api = useCallback(async () => {
     const res = await Axios.get(API_PATH.ADMIN).then((result) => result.data);

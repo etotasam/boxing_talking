@@ -1,8 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-// ! types
 import { CountryType } from '@/types';
-// ! Nationally
 import { getNationalFlag } from '@/utils/nationalFlag';
 
 type PropsType = React.ComponentProps<'div'> & {

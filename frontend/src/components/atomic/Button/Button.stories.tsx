@@ -1,6 +1,5 @@
 import { Button } from './Button';
 import { StoryObj, Meta } from '@storybook/react';
-// import { action } from '@storybook/addon-actions';
 
 export default {
   title: 'Button',

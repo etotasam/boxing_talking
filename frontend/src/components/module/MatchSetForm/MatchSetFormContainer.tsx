@@ -2,16 +2,10 @@ import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { MatchSetForm } from './MatchSetForm';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { cloneDeep } from 'lodash';
-//! type
 import { OrganizationsType } from '@/types';
-//! hook
 import { useToastModal } from '@/hooks/useToastModal';
-//! data
 import { GRADE } from '@/constants/boxerData';
-//!type evolution
 import { isMessageType } from '@/utils/typeEvaluations';
-//! context
-// import { FormDataContext } from './FormDataContextWrapper';
 import { FormDataContext } from './context/FormDataContext';
 
 export const MatchSetFormContainer = (props: { onSubmit: () => void; title?: boolean }) => {

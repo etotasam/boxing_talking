@@ -1,4 +1,3 @@
-// import React from "react";
 import { FlagImage } from '@/components/atomic/FlagImage';
 
 import { CountryType } from '@/types';

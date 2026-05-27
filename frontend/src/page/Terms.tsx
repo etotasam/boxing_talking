@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet-async';
-//! layout
 import TermsLayout from '@/layout/TermsLayout';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;

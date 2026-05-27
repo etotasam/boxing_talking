@@ -1,8 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ROUTE_PATH } from '@/constants/routePath';
-// ! components
 import { Matches } from '@/components/module/Matches';
-// ! hooks
 import { useFetchMatches } from '@/hooks/apiHooks/match';
 import { useSortMatches } from '@/hooks/useSortMatches';
 

@@ -1,9 +1,7 @@
-//! type
 import { MatchDataType, MatchPredictionsType } from '@/types';
-//! components
 import { BoxersData } from './components/BoxersData';
 import { Grade } from './components/Grade';
-import { MatchDate, MatchVenue } from './components/MatchMeta';
+import { MatchMeta } from './components/MatchMeta';
 import { PredictionSummary } from './components/PredictionSummary';
 
 type MatchInfoPropsType = {
@@ -28,12 +26,13 @@ export const MatchInfo = ({
     <>
       {matchData && (
         <div className="flex flex-col items-center w-full relative">
-          <BoxersData matchData={matchData} />
           <Grade matchData={matchData} />
-          <div className="flex w-[80%] mt-5">
-            <MatchDate matchDate={matchData.matchDate} />
-            <MatchVenue country={matchData.country} venue={matchData.venue} />
-          </div>
+          <MatchMeta
+            matchDate={matchData.matchDate}
+            country={matchData.country}
+            venue={matchData.venue}
+          />
+          <BoxersData matchData={matchData} />
           <PredictionSummary
             userPrediction={userPrediction}
             matchPredictions={matchPredictions}

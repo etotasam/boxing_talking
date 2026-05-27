@@ -4,7 +4,7 @@ import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { QUERY_KEY } from '@/constants/queryKeys';
-import { useFetchUsersPrediction } from '../useWinLossPrediction';
+import { useFetchUsersPrediction } from '../prediction';
 import { useAdmin } from './useAdmin';
 import { useFullScreenLoading } from '../../useFullScreenLoading';
 import { useLoginModal } from '../../useLoginModal';
@@ -17,7 +17,6 @@ type LoginInput = {
   password: string;
 };
 
-//! ログイン
 export const useLogin = () => {
   const { refetch: refetchAdmin } = useAdmin();
   const { showSuccessToast, showErrorToast } = useToastModal();

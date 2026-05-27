@@ -3,12 +3,11 @@ import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { QUERY_KEY } from '@/constants/queryKeys';
-import { useFetchUsersPrediction } from '../useWinLossPrediction';
+import { useFetchUsersPrediction } from '../prediction';
 import { useFullScreenLoading } from '../../useFullScreenLoading';
 import { useMenuModal } from '../../useMenuModal';
 import { useToastModal } from '../../useToastModal';
 
-//! ログアウト
 export const useLogout = () => {
   const { refetch: refetchMatchPrediction } = useFetchUsersPrediction();
   const queryClient = useQueryClient();
@@ -16,7 +15,7 @@ export const useLogout = () => {
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();
   const { hide: hideMenuModal } = useMenuModal();
 
-  const api = async (_: unknown) => {
+  const api = async () => {
     await Axios.post<void>(API_PATH.USER_LOGOUT).then((result) => result.data);
   };
 
@@ -28,7 +27,7 @@ export const useLogout = () => {
 
   const logout = () => {
     mutate(
-      {},
+      undefined,
       {
         onSuccess: () => {
           queryClient.setQueryData(QUERY_KEY.AUTH, null);

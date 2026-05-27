@@ -1,11 +1,9 @@
 import { useMemo } from 'react';
 import { MdHowToVote } from 'react-icons/md';
 import { motion } from 'framer-motion';
-//!type
 import { MatchDataType } from '@/types';
-//! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
-import { useFetchUsersPrediction } from '@/hooks/apiHooks/useWinLossPrediction';
+import { useFetchUsersPrediction } from '@/hooks/apiHooks/prediction';
 
 type IconType = 'DEFAULT' | 'MINI';
 

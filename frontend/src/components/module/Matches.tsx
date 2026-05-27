@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { MatchDataType } from '@/types';
-// ! components
 import { MatchCard } from '@/components/module/MatchCard';
 import { useRecoilValue } from 'recoil';
 import { deviceState } from '@/store/deviceState';
@@ -20,7 +19,7 @@ export const Matches = ({ beforeMatches, toMatchPage, afterMatches }: MatchesPro
       )}
 
       {!!afterMatches.length && (
-        <div className="mt-5">
+        <div>
           <div className="flex justify-center">
             <div
               // onClick={() => setIsShow(true)}
@@ -50,7 +49,7 @@ const MatchesListComponent = ({
   toMatchPage: (matchId: number) => void;
 }) => {
   return (
-    <ul className={clsx('pc:pt-10 pt-6')}>
+    <ul className={clsx('pc:py-10 pt-6')}>
       {matches.map((match) => (
         <li
           key={match.id}

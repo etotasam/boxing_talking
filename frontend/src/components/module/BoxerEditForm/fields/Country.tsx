@@ -1,7 +1,5 @@
-//! data
 import { COUNTRY } from '@/constants/country';
 
-//! types
 import { CountryType } from '@/types';
 import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 
@@ -21,9 +19,6 @@ export const Country = (props: {
         value={boxersCountry}
         onChange={(e) => {
           setBoxerFieldData('country', e.target.value as CountryType);
-          // setBoxerDataToForm((current: BoxerType) => {
-          //   return { ...current, country: e.target.value as CountryType };
-          // });
         }}
         id="country"
       >

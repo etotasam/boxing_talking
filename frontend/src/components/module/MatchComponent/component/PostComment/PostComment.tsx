@@ -1,9 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
-//!icon
 import { RotatingLines } from 'react-loader-spinner';
 import { FaRegCommentDots } from 'react-icons/fa';
-//! hooks
 import { usePostComment } from '@/hooks/apiHooks/comment';
 
 type PostCommentType = {
@@ -35,7 +33,6 @@ export const PostComment = (props: PostCommentType) => {
   );
 };
 
-// ! コメント投稿テキストエリア
 type PostCommentTextareaType = {
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
   storeCommentExecute: () => void;

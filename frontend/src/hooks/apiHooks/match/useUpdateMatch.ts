@@ -11,7 +11,6 @@ import { useFetchMatches } from './useFetchMatches';
 
 type ArgumentType = Partial<MatchUpdateFormType> & { matchId: number };
 
-//! 試合の変更
 export const useUpdateMatch = () => {
   const { showErrorToast, showSuccessToast } = useToastModal();
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();

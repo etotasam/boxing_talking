@@ -68,7 +68,7 @@ vi.mock('@/hooks/useMenuModal', () => {
   };
 });
 
-vi.mock('@/hooks/apiHooks/useWinLossPrediction', () => {
+vi.mock('@/hooks/apiHooks/prediction', () => {
   return {
     useFetchUsersPrediction: vi.fn(() => {
       return {

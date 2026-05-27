@@ -2,14 +2,12 @@ import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
 import { ROUTE_PATH } from '@/constants/routePath';
 import { Link } from 'react-router-dom';
-// ! icons
 import { FaUserEdit } from 'react-icons/fa';
 import { RiEditBoxFill } from 'react-icons/ri';
 import { RiUserAddLine } from 'react-icons/ri';
 import { BsCalendarPlus } from 'react-icons/bs';
 
 const linksArray = [
-  // { pathName: 'Home', path: ROUTE_PATH.HOME },
   { name: 'ボクサー登録', path: ROUTE_PATH.BOXER_REGISTER },
   { name: 'ボクサー編集', path: ROUTE_PATH.BOXER_EDIT },
   { name: '試合登録', path: ROUTE_PATH.MATCH_REGISTER },

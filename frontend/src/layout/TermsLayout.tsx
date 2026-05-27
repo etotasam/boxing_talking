@@ -3,22 +3,16 @@ import clsx from 'clsx';
 import { ROUTE_PATH } from '@/constants/routePath';
 import { Link } from 'react-router-dom';
 
-//! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 
 const TermsLayout = ({ children }: { children: React.ReactNode }) => {
-  // ! use hook
 
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   const footerHeight = useRecoilValue(elementSizeState('FOOTER_HEIGHT'));
 
   //? 初期設定(クリーンアップとか)
-  // useEffect(() => {
-  //   return () => {
   //     resetLoadingState();
-  //   };
-  // }, []);
 
   return (
     <>

@@ -3,9 +3,7 @@ import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { useInView } from 'react-intersection-observer';
-//! type
 import { CommentType } from '@/types';
-//! icon
 import { AiOutlineUser } from 'react-icons/ai';
 import { RotatingLines } from 'react-loader-spinner';
 
@@ -64,7 +62,6 @@ export const CommentsExist = (props: CommentsExistType) => {
   );
 };
 
-//! コメントbox
 const CommentBox = ({ comment }: { comment: CommentType }) => {
   return (
     <motion.div

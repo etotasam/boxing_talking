@@ -3,7 +3,6 @@ import { MatchDataType } from '@/types';
 import clsx from 'clsx';
 import { useRecoilValue } from 'recoil';
 import { deviceState } from '@/store/deviceState';
-//! type
 import { MatchResultType } from '@/types';
 
 export const MatchResult = ({ matchData }: { matchData: MatchDataType }) => {

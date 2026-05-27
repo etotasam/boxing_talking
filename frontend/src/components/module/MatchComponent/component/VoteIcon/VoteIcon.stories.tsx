@@ -1,6 +1,5 @@
 import { VoteIcon } from './VoteIcon';
 import { StoryObj, Meta } from '@storybook/react';
-// import { action } from '@storybook/addon-actions';
 
 const COLOR = [
   '',

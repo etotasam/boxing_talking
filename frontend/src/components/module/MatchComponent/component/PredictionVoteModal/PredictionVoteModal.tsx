@@ -4,7 +4,6 @@ import { FlagImage } from '@/components/atomic/FlagImage';
 import { RiCloseLine } from 'react-icons/ri';
 import { CountryType } from '@/types';
 import clsx from 'clsx';
-// ! image
 import crown from '@/assets/images/etc/champion.svg';
 
 type BoxersDataType = {

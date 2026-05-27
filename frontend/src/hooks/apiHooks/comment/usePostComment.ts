@@ -10,7 +10,6 @@ import { useToastModal } from '@/hooks/useToastModal';
 import { apiFetchState } from '@/store/apiFetchDataState';
 import type { PostCommentApiError, PostCommentParams } from './types';
 
-//! コメント投稿
 export const usePostComment = () => {
   const { showErrorToast, showSuccessToast } = useToastModal();
 

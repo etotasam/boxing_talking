@@ -72,7 +72,7 @@ vi.mock('@/hooks/useLoginModal', () => {
   };
 });
 
-vi.mock('@/hooks/apiHooks/useWinLossPrediction', () => {
+vi.mock('@/hooks/apiHooks/prediction', () => {
   return {
     useFetchUsersPrediction: vi.fn(() => {
       return {

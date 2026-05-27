@@ -1,4 +1,3 @@
-//! types
 import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 
 export const BoxerResume = (props: {

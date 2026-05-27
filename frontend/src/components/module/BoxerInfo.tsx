@@ -1,10 +1,7 @@
 import clsx from 'clsx';
 import dayjs from 'dayjs';
-// ! image
 import crown from '@/assets/images/etc/champion.svg';
-// ! types
 import { BoxerType, MatchResultType } from '@/types';
-// ! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 
 type BoxerInfoPropsType = React.ComponentProps<'div'> & {

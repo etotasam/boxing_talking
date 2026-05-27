@@ -9,7 +9,6 @@ import { apiFetchState } from '@/store/apiFetchDataState';
 import type { CommentType } from '@/types';
 import type { FetchNewCommentsParams } from './types';
 
-//! 新しいコメントの取得
 const useFetchNewCommentsQuery = ({ matchId, createdAt }: FetchNewCommentsParams) => {
   const sanitizeTime = createdAt ?? dayjs().subtract(1, 'minute').format('YYYY-MM-DD H:mm:ss');
 
