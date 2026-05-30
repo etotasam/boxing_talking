@@ -21,7 +21,7 @@ export const PostComment = (props: PostCommentType) => {
   } = props;
   return (
     <div ref={commentPostRef} className="w-full flex justify-center pb-5">
-      <div className="md:w-[85%] sm:w-[85%] w-[95%] max-w-[800px]">
+      <div className="md:w-[85%] sm:w-[85%] w-[95%] max-w-[1024px]">
         <PostCommentTextarea
           setComment={setComment}
           storeCommentExecute={storeCommentExecute}
