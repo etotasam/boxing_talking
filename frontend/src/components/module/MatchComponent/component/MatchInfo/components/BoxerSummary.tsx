@@ -26,13 +26,13 @@ const getRecordHighlightClass = ({
   isKo: boolean;
 }) => {
   if ((field === 'win' || (field === 'ko' && isKo)) && resultState === 'win') {
-    return 'text-yellow-300';
+    return 'bg-yellow-300/15 text-yellow-200 ring-yellow-200/25 shadow-[0_0_14px_rgba(253,224,71,0.28)]';
   }
   if (field === 'lose' && resultState === 'loss') {
-    return 'text-red-500';
+    return 'bg-stone-300/12 text-stone-400 ring-stone-300/25 shadow-[0_0_14px_rgba(214,211,209,0.18)]';
   }
   if (field === 'draw' && resultState === 'draw') {
-    return 'text-blue-300';
+    return 'bg-stone-100/12 text-stone-100 ring-stone-100/25 shadow-[0_0_14px_rgba(214,211,209,0.18)]';
   }
 
   return null;
@@ -51,7 +51,17 @@ const RecordPart = ({
 }) => {
   const highlightClass = getRecordHighlightClass({ field, resultState, isKo });
 
-  return <span className={clsx(highlightClass, highlightClass && 'font-black')}>{children}</span>;
+  return (
+    <span
+      className={clsx(
+        'inline-flex rounded px-0.5 py-0.5',
+        highlightClass,
+        highlightClass && 'ring-1'
+      )}
+    >
+      {children}
+    </span>
+  );
 };
 
 export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryProps) => {
@@ -82,8 +92,8 @@ export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryPr
       </h2>
       <div
         className={clsx(
-          'mt-1 grid grid-cols-3 gap-x-2 text-left text-[clamp(10px,3vw,18px)] font-bold leading-tight',
-          'pc:mt-2 pc:gap-x-3 pc:text-base',
+          'mt-1 grid grid-cols-3 gap-x-1 text-left text-[clamp(12px,3vw,18px)] font-bold leading-tight',
+          'pc:mt-2 pc:gap-x-2 pc:text-xl',
           isRedSide ? 'text-red-300' : 'text-blue-300'
         )}
         title={recordLabel}
@@ -91,28 +101,24 @@ export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryPr
         <span className="flex min-w-0 flex-col">
           <span className="whitespace-nowrap">
             <RecordPart field="win" resultState={resultState} isKo={isKo}>
-              {displayedRecord.win}
+              {displayedRecord.win}勝
             </RecordPart>
-            <span>勝</span>
           </span>
           <span className="mt-0.5 whitespace-nowrap text-[0.72em] leading-none">
             <RecordPart field="ko" resultState={resultState} isKo={isKo}>
-              {displayedRecord.ko}
+              {displayedRecord.ko}KO
             </RecordPart>
-            <span>KO</span>
           </span>
         </span>
         <span className="whitespace-nowrap">
           <RecordPart field="lose" resultState={resultState} isKo={isKo}>
-            {displayedRecord.lose}
+            {displayedRecord.lose}敗
           </RecordPart>
-          <span>敗</span>
         </span>
         <span className="whitespace-nowrap">
           <RecordPart field="draw" resultState={resultState} isKo={isKo}>
-            {displayedRecord.draw}
+            {displayedRecord.draw}分
           </RecordPart>
-          <span>分</span>
         </span>
       </div>
       <span
