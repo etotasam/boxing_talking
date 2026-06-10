@@ -29,8 +29,8 @@ PropsType) => {
         <div
           onClick={() => onClick(matchData.id)}
           className={clsx(
-            'relative flex justify-between w-full max-w-[1024px] cursor-pointer border-[1px] border-neutral-700  text-stone-300 bg-stone-50/10 rounded-md',
-            'pc:w-[80%] pc:hover:bg-red-600/80 hover:white pc:hover:border-neutral-300 pc:duration-300'
+            'relative flex justify-between w-full cursor-pointer border-[1px] border-neutral-700  text-stone-300 bg-stone-50/10 rounded-md',
+            'pc:hover:bg-red-600/80 hover:white pc:hover:border-neutral-300 pc:duration-300'
             // isMatchResult ? 'pc:pt-2 pc:pb-1 py-1' : 'pc:py-4 py-8'
           )}
         >

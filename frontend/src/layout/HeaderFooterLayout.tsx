@@ -15,6 +15,7 @@ const HeaderFooterLayout = () => {
           minHeight: `calc(100vh - ${footerHeight}px)`,
           paddingTop: `${headerHeight}px`,
         }}
+        className="max-w-[1200px] w-[96%] pc:w-[92%] mx-auto"
       >
         <Outlet />
       </main>

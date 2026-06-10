@@ -24,7 +24,7 @@ export const Matches = ({ beforeMatches, toMatchPage, afterMatches }: MatchesPro
             <div
               // onClick={() => setIsShow(true)}
               className={clsx(
-                'relative w-full max-w-[1200px] pc:w-[92%] text-white tracking-widest',
+                'relative w-full text-white tracking-widest',
                 device === 'SP' ? 'px-2' : 'px-0'
               )}
             >
@@ -53,7 +53,7 @@ const MatchesListComponent = ({
       {matches.map((match) => (
         <li
           key={match.id}
-          className={clsx('w-full h-full flex justify-center items-center pb-3 first:mt-0', 'px-2')}
+          className={clsx('w-full h-full flex justify-center items-center pb-3 first:mt-0')}
         >
           <MatchCard onClick={toMatchPage} matchData={match} />
         </li>

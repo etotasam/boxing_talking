@@ -55,7 +55,7 @@ const ShowMatches = ({
           {pastMatches.map((match) => (
             <li
               key={match.id}
-              className="w-full h-full flex justify-center items-center pb-3 first:mt-0 px-2"
+              className="w-full h-full flex justify-center items-center pb-3 first:mt-0"
             >
               <MatchCard matchData={match} onClick={matchSelect} />
             </li>

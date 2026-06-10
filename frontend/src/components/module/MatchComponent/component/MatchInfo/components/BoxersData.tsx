@@ -9,10 +9,7 @@ type BoxersDataProps = {
 
 export const BoxersData = ({ matchData }: BoxersDataProps) => {
   return (
-    <section
-      className={clsx('relative mt-4 w-[95%] max-w-[1024px] text-white')}
-      aria-label="boxers-summary"
-    >
+    <section className={clsx('relative mt-4 w-full text-white')} aria-label="boxers-summary">
       <div className={clsx('relative overflow-hidden')}>
         {matchData.result && <MatchResultSummary result={matchData.result} />}
         <div className="relative">

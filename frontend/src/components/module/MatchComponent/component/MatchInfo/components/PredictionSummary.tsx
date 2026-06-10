@@ -49,7 +49,7 @@ export const PredictionSummary = ({
 
   return (
     <section
-      className="mt-4 w-[95%] max-w-[1024px] rounded-lg border border-stone-700 bg-stone-950/95 p-3 text-white shadow-lg shadow-black/20 sm:p-4"
+      className="mt-4 w-full rounded-lg border border-stone-700 bg-stone-950/95 p-3 text-white shadow-lg shadow-black/20 sm:p-4"
       aria-label="prediction-summary"
     >
       {isLoading ? (

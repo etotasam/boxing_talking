@@ -21,7 +21,7 @@ export const MatchMeta = ({
   return (
     <section
       className={clsx(
-        'mt-5 flex w-[95%] max-w-[1024px] flex-col rounded-lg border border-stone-600/80',
+        'mt-5 flex w-full flex-col rounded-lg border border-stone-600/80',
         'bg-stone-950/80 text-white shadow-lg shadow-black/20 pc:flex-row pc:items-center'
       )}
       aria-label="match-meta"
@@ -33,7 +33,10 @@ export const MatchMeta = ({
       >
         <MatchDateContent matchDate={matchDate} />
       </MatchMetaColumn>
-      <div className="mx-4 h-px bg-stone-500/70 pc:mx-0 pc:h-12 pc:w-px pc:shrink-0" aria-hidden="true" />
+      <div
+        className="mx-4 h-px bg-stone-500/70 pc:mx-0 pc:h-12 pc:w-px pc:shrink-0"
+        aria-hidden="true"
+      />
       <MatchMetaColumn
         icon={<MdLocationPin aria-hidden="true" />}
         label="試合会場"
