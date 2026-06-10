@@ -40,7 +40,7 @@ export const MatchView = ({
         isShowVoteIcon={isShowVoteIcon}
         commentsModalHeightHiddenState={commentsModalHeightHiddenState}
       />
-      <div className="fixed bottom-0 w-full">
+      <div className="fixed bottom-0 inset-x-0">
         <PostComment />
       </div>
 
@@ -69,10 +69,10 @@ const MainContent = ({
   commentsModalHeightHiddenState,
 }: MainProps) => {
   return (
-    <div className="w-[100vw] overflow-auto">
+    <div className="w-full overflow-auto">
       <div
         data-testid="match-main-content"
-        className="w-full flex justify-center"
+        className="flex justify-center"
         style={{ paddingBottom: commentsModalHeightHiddenState }}
       >
         <MatchInfo

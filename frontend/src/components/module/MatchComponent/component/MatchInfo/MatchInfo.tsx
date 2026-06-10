@@ -25,7 +25,7 @@ export const MatchInfo = ({
   return (
     <>
       {matchData && (
-        <div className="flex flex-col items-center w-full relative">
+        <div className="flex flex-col items-center relative w-full">
           <Grade matchData={matchData} />
           <MatchMeta
             matchDate={matchData.matchDate}

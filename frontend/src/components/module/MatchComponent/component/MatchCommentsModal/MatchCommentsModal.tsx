@@ -51,7 +51,7 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
           ? { height: commentsModalHeight }
           : { height: commentsModalHeightHiddenState }
       }
-      className="bg-black/90 w-full fixed bottom-0"
+      className="bg-black/90 w-full fixed bottom-0 left-0"
     >
       <motion.div
         //? translate-xが効かないので無理やり中央寄せにした( left-[calc(50%-15px)] 幅が30pxなので半分の15pxを引いている)

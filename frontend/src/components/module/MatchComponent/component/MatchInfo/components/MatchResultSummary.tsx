@@ -26,9 +26,10 @@ const getResultLabel = (result: MatchResultType) => {
   if (result.result === 'no-contest') return 'NO CONTEST';
 
   if (result.detail === 'ud' || result.detail === 'md' || result.detail === 'sd') {
-    return result.result === 'red'
+    const decisionLabel = result.result === 'red'
       ? RED_WIN_DECISION_LABELS[result.detail]
       : BLUE_WIN_DECISION_LABELS[result.detail];
+    return `判定 ${decisionLabel}`;
   }
 
   const detailLabel = result.detail ? RESULT_DETAIL_LABELS[result.detail] : '';

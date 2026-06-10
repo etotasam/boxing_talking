@@ -7,10 +7,10 @@ export const Grade = ({ matchData }: { matchData: MatchDataType }) => {
   const titleOrganizations = matchData.titles.map(({ organization }) => organization).join(' / ');
 
   return (
-    <section className="flex w-[95%] justify-center pt-4 text-white" aria-label="match-grade">
+    <section className="flex w-full justify-center pt-4 text-white" aria-label="match-grade">
       <div
         className={clsx(
-          'flex w-full max-w-[1024px] items-center justify-center rounded-lg border px-4 py-3 shadow-lg shadow-black/20',
+          'flex w-full items-center justify-center rounded-lg border px-4 py-3 shadow-lg shadow-black/20',
           isTitleMatch
             ? 'border-yellow-500/40 bg-yellow-500/10'
             : 'border-stone-700 bg-stone-950/95'

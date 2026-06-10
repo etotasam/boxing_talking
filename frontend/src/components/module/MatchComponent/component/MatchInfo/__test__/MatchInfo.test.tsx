@@ -41,11 +41,11 @@ const matchData = {
 const showPredictionModal = vi.fn();
 
 const expectVisibleRecordText = (container: HTMLElement, text: string) => {
-  expect(
-    within(container).getByText((_, element) => {
-      return element?.tagName.toLowerCase() === 'span' && element.textContent === text;
-    })
-  ).toBeInTheDocument();
+  const matchedElements = within(container).getAllByText((_, element) => {
+    return element?.tagName.toLowerCase() === 'span' && element.textContent === text;
+  });
+
+  expect(matchedElements.length).toBeGreaterThan(0);
 };
 
 describe('MatchInfo', () => {
@@ -112,6 +112,27 @@ describe('MatchInfo', () => {
     expectVisibleRecordText(boxersSummary, '3敗');
   });
 
+  test('試合結果がある時は結果サマリーを表示する', () => {
+    render(
+      <MatchInfo
+        matchData={{
+          ...matchData,
+          result: {
+            isUpdateBoxerRecordChecked: true,
+            matchId: matchData.id,
+            result: 'blue',
+            detail: 'sd',
+          },
+        }}
+      />
+    );
+
+    const resultSummary = screen.getByLabelText('match-result-summary');
+    expect(within(resultSummary).getByText('LOSE')).toBeInTheDocument();
+    expect(within(resultSummary).getByText('判定 1-2')).toBeInTheDocument();
+    expect(within(resultSummary).getByText('WIN')).toBeInTheDocument();
+  });
+
   test('未投票で投票可能な時は投票ボタンを表示する', () => {
     render(
       <MatchInfo
@@ -148,7 +169,9 @@ describe('MatchInfo', () => {
     const predictionSummary = screen.getByRole('region', { name: 'prediction-summary' });
     expect(within(predictionSummary).queryByText('Red Boxer')).not.toBeInTheDocument();
     expect(within(predictionSummary).queryByText('Blue Boxer')).not.toBeInTheDocument();
-    expect(within(predictionSummary).queryByRole('button', { name: '投票' })).not.toBeInTheDocument();
+    expect(
+      within(predictionSummary).queryByRole('button', { name: '投票' })
+    ).not.toBeInTheDocument();
   });
 
   test('matchPredictions がある時は集計結果を表示する', () => {
