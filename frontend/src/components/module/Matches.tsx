@@ -24,7 +24,7 @@ export const Matches = ({ beforeMatches, toMatchPage, afterMatches }: MatchesPro
             <div
               // onClick={() => setIsShow(true)}
               className={clsx(
-                'relative w-full max-w-[1024px] pc:w-[80%] text-white tracking-widest',
+                'relative w-full max-w-[1200px] pc:w-[92%] text-white tracking-widest',
                 device === 'SP' ? 'px-2' : 'px-0'
               )}
             >
