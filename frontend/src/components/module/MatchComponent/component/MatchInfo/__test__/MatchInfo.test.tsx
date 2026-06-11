@@ -145,7 +145,7 @@ describe('MatchInfo', () => {
       />
     );
 
-    const voteButton = screen.getByRole('button', { name: '投票' });
+    const voteButton = screen.getByRole('button', { name: '投票する' });
     expect(voteButton).toBeInTheDocument();
 
     fireEvent.click(voteButton);
@@ -155,7 +155,7 @@ describe('MatchInfo', () => {
   test('未投票で投票不可の時はあなたの予想を表示しない', () => {
     render(<MatchInfo matchData={matchData} userPrediction={false} isShowVoteButton={false} />);
 
-    expect(screen.queryByRole('button', { name: '投票' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '投票する' })).not.toBeInTheDocument();
   });
 
   test('userPrediction が未取得の時は投票状態を表示しない', () => {
@@ -172,7 +172,7 @@ describe('MatchInfo', () => {
     expect(within(predictionSummary).queryByText('赤ボクサー')).not.toBeInTheDocument();
     expect(within(predictionSummary).queryByText('青ボクサー')).not.toBeInTheDocument();
     expect(
-      within(predictionSummary).queryByRole('button', { name: '投票' })
+      within(predictionSummary).queryByRole('button', { name: '投票する' })
     ).not.toBeInTheDocument();
   });
 
