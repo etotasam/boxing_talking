@@ -11,7 +11,7 @@ const matchData = {
   redBoxer: {
     ...initialBoxerData,
     id: 10,
-    name: 'Red Boxer',
+    name: '赤ボクサー',
     engName: 'Red Boxer',
     win: 10,
     ko: 5,
@@ -21,7 +21,7 @@ const matchData = {
   blueBoxer: {
     ...initialBoxerData,
     id: 20,
-    name: 'Blue Boxer',
+    name: '青ボクサー',
     engName: 'Blue Boxer',
     country: COUNTRY.USA,
     win: 8,
@@ -57,7 +57,7 @@ describe('MatchInfo', () => {
     render(<MatchInfo matchData={matchData} userPrediction="red" />);
 
     const predictionSummary = screen.getByRole('region', { name: 'prediction-summary' });
-    expect(within(predictionSummary).getByText('Red Boxer')).toBeInTheDocument();
+    expect(within(predictionSummary).getByText('赤ボクサー')).toBeInTheDocument();
   });
 
   test('試合日時と試合会場を表示する', () => {
@@ -75,12 +75,14 @@ describe('MatchInfo', () => {
 
     const boxersSummary = screen.getByRole('region', { name: 'boxers-summary' });
 
+    expect(within(boxersSummary).getByText('赤ボクサー')).toBeInTheDocument();
     expect(within(boxersSummary).getByText('Red Boxer')).toBeInTheDocument();
     expectVisibleRecordText(boxersSummary, '10勝');
     expectVisibleRecordText(boxersSummary, '5KO');
     expectVisibleRecordText(boxersSummary, '1敗');
     expectVisibleRecordText(boxersSummary, '2分');
     expect(within(boxersSummary).getByText('日本')).toBeInTheDocument();
+    expect(within(boxersSummary).getByText('青ボクサー')).toBeInTheDocument();
     expect(within(boxersSummary).getByText('Blue Boxer')).toBeInTheDocument();
     expectVisibleRecordText(boxersSummary, '8勝');
     expectVisibleRecordText(boxersSummary, '3KO');
@@ -143,7 +145,7 @@ describe('MatchInfo', () => {
       />
     );
 
-    const voteButton = screen.getByRole('button', { name: '投票' });
+    const voteButton = screen.getByRole('button', { name: '投票する' });
     expect(voteButton).toBeInTheDocument();
 
     fireEvent.click(voteButton);
@@ -153,7 +155,7 @@ describe('MatchInfo', () => {
   test('未投票で投票不可の時はあなたの予想を表示しない', () => {
     render(<MatchInfo matchData={matchData} userPrediction={false} isShowVoteButton={false} />);
 
-    expect(screen.queryByRole('button', { name: '投票' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '投票する' })).not.toBeInTheDocument();
   });
 
   test('userPrediction が未取得の時は投票状態を表示しない', () => {
@@ -167,10 +169,10 @@ describe('MatchInfo', () => {
     );
 
     const predictionSummary = screen.getByRole('region', { name: 'prediction-summary' });
-    expect(within(predictionSummary).queryByText('Red Boxer')).not.toBeInTheDocument();
-    expect(within(predictionSummary).queryByText('Blue Boxer')).not.toBeInTheDocument();
+    expect(within(predictionSummary).queryByText('赤ボクサー')).not.toBeInTheDocument();
+    expect(within(predictionSummary).queryByText('青ボクサー')).not.toBeInTheDocument();
     expect(
-      within(predictionSummary).queryByRole('button', { name: '投票' })
+      within(predictionSummary).queryByRole('button', { name: '投票する' })
     ).not.toBeInTheDocument();
   });
 
@@ -193,8 +195,8 @@ describe('MatchInfo', () => {
     expect(screen.getByText('42%')).toBeInTheDocument();
 
     const predictionSummary = screen.getByRole('region', { name: 'prediction-summary' });
-    expect(within(predictionSummary).queryByText('Red Boxer')).not.toBeInTheDocument();
-    expect(within(predictionSummary).queryByText('Blue Boxer')).not.toBeInTheDocument();
+    expect(within(predictionSummary).queryByText('赤ボクサー')).not.toBeInTheDocument();
+    expect(within(predictionSummary).queryByText('青ボクサー')).not.toBeInTheDocument();
     expect(within(predictionSummary).queryByText(/vs/i)).not.toBeInTheDocument();
   });
 
