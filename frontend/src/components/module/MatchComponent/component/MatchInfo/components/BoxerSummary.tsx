@@ -26,13 +26,13 @@ const getRecordHighlightClass = ({
   isKo: boolean;
 }) => {
   if ((field === 'win' || (field === 'ko' && isKo)) && resultState === 'win') {
-    return 'bg-yellow-300/15 text-yellow-200 ring-yellow-200/25 shadow-[0_0_14px_rgba(253,224,71,0.28)]';
+    return 'bg-yellow-300/10 text-yellow-200 shadow-[0_0_18px_rgba(253,224,71,0.28)]';
   }
   if (field === 'lose' && resultState === 'loss') {
-    return 'bg-stone-300/12 text-stone-400 ring-stone-300/25 shadow-[0_0_14px_rgba(214,211,209,0.18)]';
+    return 'bg-stone-300/5 text-stone-400 shadow-[0_0_18px_rgba(214,211,209,0.18)]';
   }
   if (field === 'draw' && resultState === 'draw') {
-    return 'bg-stone-100/12 text-stone-100 ring-stone-100/25 shadow-[0_0_14px_rgba(214,211,209,0.18)]';
+    return 'bg-white/5 text-stone-100 shadow-[0_0_18px_rgba(214,211,209,0.18)]';
   }
 
   return null;
@@ -52,13 +52,7 @@ const RecordPart = ({
   const highlightClass = getRecordHighlightClass({ field, resultState, isKo });
 
   return (
-    <span
-      className={clsx(
-        'inline-flex rounded px-0.5 py-0.5',
-        highlightClass,
-        highlightClass && 'ring-1'
-      )}
-    >
+    <span className={clsx('inline-flex rounded py-0.5', highlightClass, highlightClass && '')}>
       {children}
     </span>
   );
@@ -73,7 +67,7 @@ export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryPr
   const displayedRecord = getDisplayedBoxerRecord({ boxer, resultState, isKo });
   const recordLabel = formatRecord(displayedRecord);
   const isRedSide = side === 'red';
-  const isLongName = boxer.name.length >= 10;
+  const isLongName = boxer.name.length >= 9;
 
   return (
     <article
@@ -102,30 +96,30 @@ export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryPr
       </h2>
       <div
         className={clsx(
-          'mt-1 grid grid-cols-3 gap-x-1 text-left text-[clamp(12px,3vw,18px)] font-bold leading-tight',
-          'pc:mt-2 pc:gap-x-2 pc:text-xl',
+          'mt-1 grid grid-cols-3 gap-x-1 text-left text-[clamp(16px,3vw,22px)] font-bold leading-tight',
+          'pc:mt-2 pc:gap-x-2',
           isRedSide ? 'text-red-300' : 'text-blue-300'
         )}
         title={recordLabel}
       >
         <span className="flex min-w-0 flex-col">
-          <span className="whitespace-nowrap">
+          <span className="whitespace-nowrap flex justify-center">
             <RecordPart field="win" resultState={resultState} isKo={isKo}>
               {displayedRecord.win}勝
             </RecordPart>
           </span>
-          <span className="mt-0.5 whitespace-nowrap text-[0.72em] leading-none">
+          <span className="mt-0.5 whitespace-nowrap text-[0.72em] leading-none flex justify-center">
             <RecordPart field="ko" resultState={resultState} isKo={isKo}>
               {displayedRecord.ko}KO
             </RecordPart>
           </span>
         </span>
-        <span className="whitespace-nowrap">
+        <span className="whitespace-nowrap flex justify-center">
           <RecordPart field="lose" resultState={resultState} isKo={isKo}>
             {displayedRecord.lose}敗
           </RecordPart>
         </span>
-        <span className="whitespace-nowrap">
+        <span className="whitespace-nowrap flex justify-center">
           <RecordPart field="draw" resultState={resultState} isKo={isKo}>
             {displayedRecord.draw}分
           </RecordPart>
