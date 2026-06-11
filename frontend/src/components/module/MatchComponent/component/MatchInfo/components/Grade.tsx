@@ -4,44 +4,51 @@ import { MatchDataType } from '@/types';
 
 export const Grade = ({ matchData }: { matchData: MatchDataType }) => {
   const isTitleMatch = matchData.grade === 'タイトルマッチ';
-  const titleOrganizations = matchData.titles.map(({ organization }) => organization).join(' / ');
+  const titleOrganizations = matchData.titles.map(({ organization }) => organization);
+  const shouldShowTitleBadges = isTitleMatch && titleOrganizations.length > 0;
 
   return (
     <section className="flex w-full justify-center pt-4 text-white" aria-label="match-grade">
-      <div
-        className={clsx(
-          'flex w-full items-center justify-center rounded-lg border px-4 py-3 shadow-lg shadow-black/20',
-          isTitleMatch
-            ? 'border-yellow-500/40 bg-yellow-500/10'
-            : 'border-stone-700 bg-stone-950/95'
-        )}
-      >
-        <div className="flex min-w-0 items-center">
-          <div className="min-w-0 text-center">
-            <p
-              className={clsx(
-                'text-xs font-bold tracking-wide',
-                isTitleMatch ? 'text-yellow-100' : 'text-stone-400'
-              )}
-            >
-              {matchData.weight}級
-            </p>
-            {isTitleMatch && titleOrganizations && (
-              <p className="mt-1 break-words text-sm font-bold leading-tight text-yellow-200 sm:text-base">
-                {titleOrganizations}
-              </p>
-            )}
-            <p
-              className={clsx(
-                'mt-1 flex items-center justify-center gap-1 break-words text-lg font-black leading-tight sm:text-xl',
-                isTitleMatch ? 'text-yellow-300' : 'text-stone-100'
-              )}
-            >
-              {isTitleMatch && <GiImperialCrown className="h-5 w-5 shrink-0" aria-hidden="true" />}
-              {matchData.grade}
-            </p>
+      <div className="min-w-0 text-center">
+        <p
+          className={clsx(
+            'inline-flex items-center justify-center gap-1 break-words text-[clamp(16px,3vw,24px)] font-black leading-tight',
+            isTitleMatch ? 'text-yellow-200' : 'text-white'
+          )}
+        >
+          {isTitleMatch && (
+            <GiImperialCrown className="h-[0.9em] w-[0.9em] shrink-0" aria-hidden="true" />
+          )}
+          {matchData.weight}級
+          {isTitleMatch && (
+            <GiImperialCrown className="h-[0.9em] w-[0.9em] shrink-0" aria-hidden="true" />
+          )}
+        </p>
+        {shouldShowTitleBadges ? (
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+            {titleOrganizations.map((organization, index) => (
+              <span
+                key={`${organization}-${index}`}
+                className="relative isolate overflow-hidden rounded-md border-2 border-yellow-400/70 bg-zinc-950/70 px-3 py-1 text-[clamp(13px,2.2vw,18px)] font-black leading-none text-yellow-200 shadow-[0_0_18px_rgba(250,204,21,0.26),inset_0_0_14px_rgba(250,204,21,0.12)] backdrop-blur-sm"
+              >
+                <span
+                  className="absolute inset-x-2 top-[-10px] h-5 rounded-full bg-yellow-300/25 blur-md"
+                  aria-hidden="true"
+                />
+                <span className="relative tracking-wide">{organization}</span>
+              </span>
+            ))}
           </div>
-        </div>
+        ) : (
+          <p
+            className={clsx(
+              'mt-1 break-words text-[clamp(16px,3vw,24px)] font-black leading-tight',
+              isTitleMatch ? 'text-yellow-300' : 'text-white'
+            )}
+          >
+            {matchData.grade}
+          </p>
+        )}
       </div>
     </section>
   );

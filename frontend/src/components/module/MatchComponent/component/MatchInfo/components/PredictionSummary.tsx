@@ -183,11 +183,11 @@ const UserPredictionStatus = (props: UserPredictionStatusProps) => {
       {props.type === 'votable' ? (
         <button
           type="button"
-          className="inline-flex items-center gap-1 rounded-full bg-yellow-400 px-4 py-1.5 text-xs font-black text-stone-950 duration-300 hover:bg-yellow-300"
+          className="inline-flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-400 px-4 py-2 text-sm text-stone-950 shadow-md shadow-black/30 duration-300 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:ring-offset-2 focus:ring-offset-stone-950"
           onClick={props.onVoteClick}
         >
-          <MdHowToVote aria-hidden="true" />
-          投票
+          <MdHowToVote className="text-xl" aria-hidden="true" />
+          投票する
         </button>
       ) : (
         <span className="inline-flex max-w-full items-center gap-1 rounded-full border border-stone-600 bg-stone-900 px-3 py-1 text-xs font-bold text-stone-100">

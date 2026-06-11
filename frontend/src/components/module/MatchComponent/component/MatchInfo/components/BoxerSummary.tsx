@@ -73,6 +73,7 @@ export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryPr
   const displayedRecord = getDisplayedBoxerRecord({ boxer, resultState, isKo });
   const recordLabel = formatRecord(displayedRecord);
   const isRedSide = side === 'red';
+  const isLongName = boxer.name.length >= 10;
 
   return (
     <article
@@ -83,8 +84,17 @@ export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryPr
           : 'items-end border-r-4 border-blue-500 pl-7 pr-3 text-right pc:pl-16 pc:pr-7'
       )}
     >
+      <span
+        className="max-w-full whitespace-normal break-words text-[clamp(10px,2vw,14px)] font-semibold leading-tight text-stone-400"
+        title={boxer.engName}
+      >
+        {boxer.engName}
+      </span>
       <h2
-        className="max-w-full whitespace-nowrap text-[clamp(12px,4vw,30px)] font-black leading-tight pc:break-words pc:text-3xl"
+        className={clsx(
+          'max-w-full whitespace-nowrap font-black leading-tight pc:break-words',
+          isLongName ? 'text-[clamp(10px,3vw,26px)]' : 'text-[clamp(16px,3vw,26px)]'
+        )}
         title={boxer.name}
         aria-label={boxer.name}
       >
