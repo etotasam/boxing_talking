@@ -53,11 +53,13 @@ describe('MatchInfo', () => {
     showPredictionModal.mockClear();
   });
 
-  test('userPrediction がある時は自分の予想を表示する', () => {
+  test('userPrediction がある時は投票済みの無効な投票ボタンを表示する', () => {
     render(<MatchInfo matchData={matchData} userPrediction="red" />);
 
     const predictionSummary = screen.getByRole('region', { name: 'prediction-summary' });
-    expect(within(predictionSummary).getByText('赤ボクサー')).toBeInTheDocument();
+    const voteButton = within(predictionSummary).getByRole('button', { name: '投票する' });
+    expect(voteButton).toBeDisabled();
+    expect(within(predictionSummary).queryByText('赤ボクサー')).not.toBeInTheDocument();
   });
 
   test('試合日時と試合会場を表示する', () => {

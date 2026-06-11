@@ -1,6 +1,7 @@
 import { RotatingLines } from 'react-loader-spinner';
-import { MdCheckCircle, MdHowToVote } from 'react-icons/md';
+import { MdHowToVote } from 'react-icons/md';
 import { HiUserGroup } from 'react-icons/hi';
+import { PiSealCheckFill } from 'react-icons/pi';
 import { MatchPredictionsType } from '@/types';
 
 type PredictionSummaryProps = {
@@ -19,7 +20,6 @@ type UserPredictionStatusProps =
     }
   | {
       type: 'voted';
-      boxerName: string;
     }
   | {
       type: 'votable';
@@ -34,16 +34,12 @@ export const PredictionSummary = ({
   userPrediction,
   matchPredictions,
   isLoading,
-  redBoxerName,
-  blueBoxerName,
   isShowVoteButton = false,
   showPredictionModal,
 }: PredictionSummaryProps) => {
   const canOpenPredictionModal = isShowVoteButton && showPredictionModal;
   const userPredictionStatus = getUserPredictionStatus({
     userPrediction,
-    redBoxerName,
-    blueBoxerName,
     showPredictionModal: canOpenPredictionModal ? showPredictionModal : undefined,
   });
 
@@ -66,26 +62,14 @@ export const PredictionSummary = ({
 
 const getUserPredictionStatus = ({
   userPrediction,
-  redBoxerName,
-  blueBoxerName,
   showPredictionModal,
 }: {
   userPrediction?: 'red' | 'blue' | false;
-  redBoxerName: string;
-  blueBoxerName: string;
   showPredictionModal?: () => void;
 }): UserPredictionStatusProps => {
-  if (userPrediction === 'red') {
+  if (userPrediction === 'red' || userPrediction === 'blue') {
     return {
       type: 'voted',
-      boxerName: redBoxerName,
-    };
-  }
-
-  if (userPrediction === 'blue') {
-    return {
-      type: 'voted',
-      boxerName: blueBoxerName,
     };
   }
 
@@ -186,15 +170,30 @@ const UserPredictionStatus = (props: UserPredictionStatusProps) => {
           className="inline-flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-400 px-4 py-2 text-sm text-stone-950 shadow-md shadow-black/30 duration-300 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:ring-offset-2 focus:ring-offset-stone-950"
           onClick={props.onVoteClick}
         >
-          <MdHowToVote className="text-xl" aria-hidden="true" />
+          <span className="relative inline-flex shrink-0">
+            <MdHowToVote className="text-xl" aria-hidden="true" />
+          </span>
           投票する
         </button>
       ) : (
-        <span className="inline-flex max-w-full items-center gap-1 rounded-full border border-stone-600 bg-stone-900 px-3 py-1 text-xs font-bold text-stone-100">
-          <MdCheckCircle className="text-green-400" aria-hidden="true" />
-          <span className="truncate">{props.boxerName}</span>
-        </span>
+        <button
+          type="button"
+          className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-stone-500 bg-stone-600 px-4 py-2 text-sm text-stone-500 shadow-md shadow-black/20"
+          disabled
+        >
+          <span className="relative inline-flex shrink-0">
+            <MdHowToVote className="text-xl" aria-hidden="true" />
+            <VotedBadge />
+          </span>
+          投票する
+        </button>
       )}
     </div>
+  );
+};
+
+const VotedBadge = () => {
+  return (
+    <PiSealCheckFill className="absolute -left-8 -top-4 h-8 w-8 rotate-[-12deg] place-items-center text-yellow-300" />
   );
 };
