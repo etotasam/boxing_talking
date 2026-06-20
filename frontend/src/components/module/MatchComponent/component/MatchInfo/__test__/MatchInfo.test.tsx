@@ -53,13 +53,40 @@ describe('MatchInfo', () => {
     showPredictionModal.mockClear();
   });
 
-  test('userPrediction がある時は投票済みの無効な投票ボタンを表示する', () => {
-    render(<MatchInfo matchData={matchData} userPrediction="red" />);
+  test('赤ボクサーに投票済みの時は投票先と投票済み状態を表示する', () => {
+    render(
+      <MatchInfo
+        matchData={matchData}
+        userPrediction="red"
+        matchPredictions={{ totalVotes: 1, red: 1, blue: 0 }}
+      />
+    );
 
     const predictionSummary = screen.getByRole('region', { name: 'prediction-summary' });
-    const voteButton = within(predictionSummary).getByRole('button', { name: '投票する' });
+    const voteButton = within(predictionSummary).getByRole('button', { name: '投票済み' });
+    const redPrediction = within(predictionSummary).getByLabelText('赤コーナーの投票結果');
+    const bluePrediction = within(predictionSummary).getByLabelText('青コーナーの投票結果');
     expect(voteButton).toBeDisabled();
+    expect(within(redPrediction).getByText('あなたの投票')).toBeInTheDocument();
+    expect(within(bluePrediction).queryByText('あなたの投票')).not.toBeInTheDocument();
     expect(within(predictionSummary).queryByText('赤ボクサー')).not.toBeInTheDocument();
+  });
+
+  test('青ボクサーに投票済みの時も投票先を表示する', () => {
+    render(
+      <MatchInfo
+        matchData={matchData}
+        userPrediction="blue"
+        matchPredictions={{ totalVotes: 1, red: 0, blue: 1 }}
+      />
+    );
+
+    const predictionSummary = screen.getByRole('region', { name: 'prediction-summary' });
+    const redPrediction = within(predictionSummary).getByLabelText('赤コーナーの投票結果');
+    const bluePrediction = within(predictionSummary).getByLabelText('青コーナーの投票結果');
+    expect(within(bluePrediction).getByText('あなたの投票')).toBeInTheDocument();
+    expect(within(redPrediction).queryByText('あなたの投票')).not.toBeInTheDocument();
+    expect(within(predictionSummary).getByRole('button', { name: '投票済み' })).toBeDisabled();
   });
 
   test('試合日時と試合会場を表示する', () => {

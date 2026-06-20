@@ -28,6 +28,7 @@ type UserPredictionStatusProps =
 
 type PredictionStatsProps = {
   matchPredictions: MatchPredictionsType;
+  userPrediction?: 'red' | 'blue' | false;
 };
 
 export const PredictionSummary = ({
@@ -51,7 +52,7 @@ export const PredictionSummary = ({
       {isLoading ? (
         <PredictionSummaryLoading />
       ) : matchPredictions ? (
-        <PredictionStats matchPredictions={matchPredictions} />
+        <PredictionStats matchPredictions={matchPredictions} userPrediction={userPrediction} />
       ) : (
         <PredictionSummaryEmpty />
       )}
@@ -102,7 +103,7 @@ const PredictionSummaryEmpty = () => {
   );
 };
 
-const PredictionStats = ({ matchPredictions }: PredictionStatsProps) => {
+const PredictionStats = ({ matchPredictions, userPrediction }: PredictionStatsProps) => {
   const totalVotes = matchPredictions.totalVotes;
   const redVotes = matchPredictions.red;
   const blueVotes = matchPredictions.blue;
@@ -121,18 +122,38 @@ const PredictionStats = ({ matchPredictions }: PredictionStatsProps) => {
         {totalVotes}
       </div>
 
-      <div className="grid grid-cols-2 items-center gap-3">
-        <div className="min-w-0 rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2">
-          <div className="flex items-end gap-2">
-            <span className="text-2xl font-black leading-none text-red-300">{redPercent}%</span>
-            <span className="pb-0.5 text-xs font-bold text-red-200/80">{redVotes}票</span>
+      <div className="grid grid-cols-1 items-center gap-3 pc:grid-cols-2">
+        <div
+          className={`min-w-0 rounded-md border px-3 py-2 ${
+            userPrediction === 'red'
+              ? 'border-red-400/80 bg-red-500/20 shadow-sm shadow-red-500/20'
+              : 'border-red-500/20 bg-red-500/10'
+          }`}
+          aria-label="赤コーナーの投票結果"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-end gap-2">
+              <span className="text-2xl font-black leading-none text-red-300">{redPercent}%</span>
+              <span className="pb-0.5 text-xs font-bold text-red-200/80">{redVotes}票</span>
+            </div>
+            {userPrediction === 'red' && <UserPredictionBadge />}
           </div>
         </div>
 
-        <div className="min-w-0 rounded-md border border-blue-500/20 bg-blue-500/10 px-3 py-2 text-right">
-          <div className="flex items-end justify-end gap-2">
-            <span className="pb-0.5 text-xs font-bold text-blue-200/80">{blueVotes}票</span>
-            <span className="text-2xl font-black leading-none text-blue-300">{bluePercent}%</span>
+        <div
+          className={`min-w-0 rounded-md border px-3 py-2 text-right ${
+            userPrediction === 'blue'
+              ? 'border-blue-400/80 bg-blue-500/20 shadow-sm shadow-blue-500/20'
+              : 'border-blue-500/20 bg-blue-500/10'
+          }`}
+          aria-label="青コーナーの投票結果"
+        >
+          <div className="flex items-center justify-between gap-3">
+            {userPrediction === 'blue' && <UserPredictionBadge />}
+            <div className="ml-auto flex items-end justify-end gap-2">
+              <span className="pb-0.5 text-xs font-bold text-blue-200/80">{blueVotes}票</span>
+              <span className="text-2xl font-black leading-none text-blue-300">{bluePercent}%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -185,10 +206,19 @@ const UserPredictionStatus = (props: UserPredictionStatusProps) => {
             <MdHowToVote className="text-xl" aria-hidden="true" />
             <VotedBadge />
           </span>
-          投票する
+          投票済み
         </button>
       )}
     </div>
+  );
+};
+
+const UserPredictionBadge = () => {
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-yellow-300">
+      <PiSealCheckFill className="h-5 w-5" aria-hidden="true" />
+      あなたの投票
+    </span>
   );
 };
 
