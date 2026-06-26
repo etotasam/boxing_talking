@@ -1,6 +1,8 @@
 import { RotatingLines } from 'react-loader-spinner';
-import { MdCheckCircle, MdHowToVote } from 'react-icons/md';
+import { MdHowToVote } from 'react-icons/md';
 import { HiUserGroup } from 'react-icons/hi';
+import { IoIosLock } from 'react-icons/io';
+import { PiSealCheckFill } from 'react-icons/pi';
 import { MatchPredictionsType } from '@/types';
 
 type PredictionSummaryProps = {
@@ -13,13 +15,12 @@ type PredictionSummaryProps = {
   showPredictionModal?: () => void;
 };
 
-type UserPredictionStatusProps =
+type PredictionActionButtonProps =
   | {
       type: 'hidden';
     }
   | {
       type: 'voted';
-      boxerName: string;
     }
   | {
       type: 'votable';
@@ -27,23 +28,27 @@ type UserPredictionStatusProps =
     };
 
 type PredictionStatsProps = {
-  matchPredictions: MatchPredictionsType;
+  matchPredictions: Extract<MatchPredictionsType, { isVisible: true }>;
+  userPrediction?: 'red' | 'blue' | false;
+};
+
+type PredictionSummaryContentProps = Pick<
+  PredictionSummaryProps,
+  'userPrediction' | 'matchPredictions' | 'isLoading'
+> & {
+  predictionActionButton: PredictionActionButtonProps;
 };
 
 export const PredictionSummary = ({
   userPrediction,
   matchPredictions,
   isLoading,
-  redBoxerName,
-  blueBoxerName,
   isShowVoteButton = false,
   showPredictionModal,
 }: PredictionSummaryProps) => {
   const canOpenPredictionModal = isShowVoteButton && showPredictionModal;
-  const userPredictionStatus = getUserPredictionStatus({
+  const predictionActionButton = getPredictionActionButtonProps({
     userPrediction,
-    redBoxerName,
-    blueBoxerName,
     showPredictionModal: canOpenPredictionModal ? showPredictionModal : undefined,
   });
 
@@ -52,40 +57,54 @@ export const PredictionSummary = ({
       className="mt-4 w-full rounded-lg border border-stone-700 bg-stone-950/95 p-3 text-white shadow-lg shadow-black/20 sm:p-4"
       aria-label="prediction-summary"
     >
-      {isLoading ? (
-        <PredictionSummaryLoading />
-      ) : matchPredictions ? (
-        <PredictionStats matchPredictions={matchPredictions} />
-      ) : (
-        <PredictionSummaryEmpty />
-      )}
-      <UserPredictionStatus {...userPredictionStatus} />
+      <PredictionSummaryContent
+        userPrediction={userPrediction}
+        matchPredictions={matchPredictions}
+        isLoading={isLoading}
+        predictionActionButton={predictionActionButton}
+      />
     </section>
   );
 };
 
-const getUserPredictionStatus = ({
+const PredictionSummaryContent = ({
   userPrediction,
-  redBoxerName,
-  blueBoxerName,
+  matchPredictions,
+  isLoading,
+  predictionActionButton,
+}: PredictionSummaryContentProps) => {
+  if (isLoading) {
+    return <PredictionSummaryLoading />;
+  }
+
+  if (!matchPredictions) {
+    return <PredictionSummaryEmpty />;
+  }
+
+  if (!matchPredictions.isVisible) {
+    return <PredictionSummaryLocked predictionActionButton={predictionActionButton} />;
+  }
+
+  return (
+    <>
+      <PredictionStats matchPredictions={matchPredictions} userPrediction={userPrediction} />
+      <div className="mt-3 flex justify-center">
+        <PredictionActionButton {...predictionActionButton} />
+      </div>
+    </>
+  );
+};
+
+const getPredictionActionButtonProps = ({
+  userPrediction,
   showPredictionModal,
 }: {
   userPrediction?: 'red' | 'blue' | false;
-  redBoxerName: string;
-  blueBoxerName: string;
   showPredictionModal?: () => void;
-}): UserPredictionStatusProps => {
-  if (userPrediction === 'red') {
+}): PredictionActionButtonProps => {
+  if (userPrediction === 'red' || userPrediction === 'blue') {
     return {
       type: 'voted',
-      boxerName: redBoxerName,
-    };
-  }
-
-  if (userPrediction === 'blue') {
-    return {
-      type: 'voted',
-      boxerName: blueBoxerName,
     };
   }
 
@@ -113,12 +132,36 @@ const PredictionSummaryLoading = () => {
 const PredictionSummaryEmpty = () => {
   return (
     <p className="flex min-h-[112px] items-center justify-center rounded-md bg-stone-900 px-3 py-4 text-sm text-stone-400">
-      取得中
+      勝敗予想を取得できませんでした
     </p>
   );
 };
 
-const PredictionStats = ({ matchPredictions }: PredictionStatsProps) => {
+const PredictionSummaryLocked = ({
+  predictionActionButton,
+}: {
+  predictionActionButton: PredictionActionButtonProps;
+}) => {
+  return (
+    <div className="relative min-h-[132px] overflow-hidden rounded-md bg-stone-900 px-3 py-3 sm:min-h-[168px] sm:px-4 sm:py-5">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(239,68,68,0.14),transparent_42%,transparent_58%,rgba(59,130,246,0.14))] blur-lg sm:blur-xl"
+      />
+      <div className="relative flex min-h-[108px] flex-col items-center justify-center gap-3 text-center sm:min-h-[128px] sm:gap-4">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-500 bg-stone-950/60 text-stone-200">
+          <IoIosLock className="h-[18px] w-[18px]" aria-hidden="true" />
+        </span>
+        <p className="text-base font-bold text-stone-100 sm:text-lg">
+          投票すると予想を確認できます
+        </p>
+        <PredictionActionButton {...predictionActionButton} />
+      </div>
+    </div>
+  );
+};
+
+const PredictionStats = ({ matchPredictions, userPrediction }: PredictionStatsProps) => {
   const totalVotes = matchPredictions.totalVotes;
   const redVotes = matchPredictions.red;
   const blueVotes = matchPredictions.blue;
@@ -137,18 +180,38 @@ const PredictionStats = ({ matchPredictions }: PredictionStatsProps) => {
         {totalVotes}
       </div>
 
-      <div className="grid grid-cols-2 items-center gap-3">
-        <div className="min-w-0 rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2">
-          <div className="flex items-end gap-2">
-            <span className="text-2xl font-black leading-none text-red-300">{redPercent}%</span>
-            <span className="pb-0.5 text-xs font-bold text-red-200/80">{redVotes}票</span>
+      <div className="grid grid-cols-1 items-center gap-3 pc:grid-cols-2">
+        <div
+          className={`min-w-0 rounded-md border px-3 py-2 ${
+            userPrediction === 'red'
+              ? 'border-red-400/80 bg-red-500/20 shadow-sm shadow-red-500/20'
+              : 'border-red-500/20 bg-red-500/10'
+          }`}
+          aria-label="赤コーナーの投票結果"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-end gap-2">
+              <span className="text-2xl font-black leading-none text-red-300">{redPercent}%</span>
+              <span className="pb-0.5 text-xs font-bold text-red-200/80">{redVotes}票</span>
+            </div>
+            {userPrediction === 'red' && <UserPredictionBadge />}
           </div>
         </div>
 
-        <div className="min-w-0 rounded-md border border-blue-500/20 bg-blue-500/10 px-3 py-2 text-right">
-          <div className="flex items-end justify-end gap-2">
-            <span className="pb-0.5 text-xs font-bold text-blue-200/80">{blueVotes}票</span>
-            <span className="text-2xl font-black leading-none text-blue-300">{bluePercent}%</span>
+        <div
+          className={`min-w-0 rounded-md border px-3 py-2 text-right ${
+            userPrediction === 'blue'
+              ? 'border-blue-400/80 bg-blue-500/20 shadow-sm shadow-blue-500/20'
+              : 'border-blue-500/20 bg-blue-500/10'
+          }`}
+          aria-label="青コーナーの投票結果"
+        >
+          <div className="flex items-center justify-between gap-3">
+            {userPrediction === 'blue' && <UserPredictionBadge />}
+            <div className="ml-auto flex items-end justify-end gap-2">
+              <span className="pb-0.5 text-xs font-bold text-blue-200/80">{blueVotes}票</span>
+              <span className="text-2xl font-black leading-none text-blue-300">{bluePercent}%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -173,28 +236,52 @@ const PredictionStats = ({ matchPredictions }: PredictionStatsProps) => {
   );
 };
 
-const UserPredictionStatus = (props: UserPredictionStatusProps) => {
+const PredictionActionButton = (props: PredictionActionButtonProps) => {
   if (props.type === 'hidden') {
     return null;
   }
 
   return (
-    <div className="mt-3 flex justify-center">
+    <>
       {props.type === 'votable' ? (
         <button
           type="button"
-          className="inline-flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-400 px-4 py-2 text-sm text-stone-950 shadow-md shadow-black/30 duration-300 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:ring-offset-2 focus:ring-offset-stone-950"
+          className="inline-flex min-h-11 w-auto items-center justify-center gap-2 rounded-lg border border-yellow-200 bg-yellow-400 px-4 py-2 text-sm text-stone-950 shadow-md shadow-black/30 duration-300 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:ring-offset-2 focus:ring-offset-stone-950"
           onClick={props.onVoteClick}
         >
-          <MdHowToVote className="text-xl" aria-hidden="true" />
-          投票する
+          <span className="relative inline-flex shrink-0">
+            <MdHowToVote className="text-xl" aria-hidden="true" />
+          </span>
+          勝者を予想する
         </button>
       ) : (
-        <span className="inline-flex max-w-full items-center gap-1 rounded-full border border-stone-600 bg-stone-900 px-3 py-1 text-xs font-bold text-stone-100">
-          <MdCheckCircle className="text-green-400" aria-hidden="true" />
-          <span className="truncate">{props.boxerName}</span>
-        </span>
+        <button
+          type="button"
+          className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-stone-500 bg-stone-600 px-4 py-2 text-sm text-stone-500 shadow-md shadow-black/20"
+          disabled
+        >
+          <span className="relative inline-flex shrink-0">
+            <MdHowToVote className="text-xl" aria-hidden="true" />
+            <VotedBadge />
+          </span>
+          投票済み
+        </button>
       )}
-    </div>
+    </>
+  );
+};
+
+const UserPredictionBadge = () => {
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-yellow-300">
+      <PiSealCheckFill className="h-5 w-5" aria-hidden="true" />
+      あなたの投票
+    </span>
+  );
+};
+
+const VotedBadge = () => {
+  return (
+    <PiSealCheckFill className="absolute -left-8 -top-4 h-8 w-8 rotate-[-12deg] place-items-center text-yellow-300" />
   );
 };

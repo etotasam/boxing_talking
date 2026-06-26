@@ -7,7 +7,6 @@ import { MatchDataType } from '@/types';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
 import { useModalState } from '@/hooks/useModalState';
 import {
-  useVoteMatchPrediction,
   useFetchUsersPrediction,
   useMatchPredictions,
 } from '@/hooks/apiHooks/prediction';
@@ -26,15 +25,8 @@ export const MatchContainer = (props: PropsType) => {
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get('match_id'));
-  //? 勝敗予想投票実行時の状態hook
-  const { userPredictionPostState } = useVoteMatchPrediction();
   //? userの勝敗予想投票をすべて取得など…
   const { data: usersPredictions } = useFetchUsersPrediction();
-  const {
-    refetch: refetchMatchPredictions,
-    data: matchPredictions,
-    matchPredictionFetchState,
-  } = useMatchPredictions(Number(matchId));
 
   const navigate = useNavigate();
   const commentsModalHeightHiddenState =
@@ -59,17 +51,15 @@ export const MatchContainer = (props: PropsType) => {
     return matchPrediction ? matchPrediction.prediction : false;
   }, [usersPredictions, matchId]);
 
+  const {
+    data: matchPredictions,
+    matchPredictionFetchState,
+  } = useMatchPredictions(Number(matchId), userPrediction);
+
   //? 読み込み時にscrollをtop位置へ移動
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  //? コメント投稿に成功したら投票してねモーダルを消す&勝敗予想を再取得
-  useEffect(() => {
-    if (userPredictionPostState === 'success') {
-      refetchMatchPredictions();
-    }
-  }, [userPredictionPostState]);
 
   //? vote iconの表示/非表示の判断
   const isShowVoteIconState = useVoteIconState({

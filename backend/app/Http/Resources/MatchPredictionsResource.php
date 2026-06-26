@@ -19,9 +19,19 @@ class MatchPredictionsResource extends JsonResource
      */
     public function toArray($request)
     {
-        $predictions = collect($this->matchPredictions);
+        if (!$this->matchPredictions["isVisible"]) {
+            return [
+                "isVisible" => false,
+                "totalVotes" => null,
+                "red" => null,
+                "blue" => null
+            ];
+        }
+
+        $predictions = collect($this->matchPredictions["predictions"]);
         $total = ($predictions["red"] ?? 0) + ($predictions["blue"] ?? 0);
         return [
+            "isVisible" => true,
             "totalVotes" => $total,
             "red" => $predictions["red"] ?? 0,
             "blue" => $predictions["blue"] ?? 0
