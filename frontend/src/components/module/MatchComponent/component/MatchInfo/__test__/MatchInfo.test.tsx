@@ -53,11 +53,40 @@ describe('MatchInfo', () => {
     showPredictionModal.mockClear();
   });
 
-  test('userPrediction がある時は自分の予想を表示する', () => {
-    render(<MatchInfo matchData={matchData} userPrediction="red" />);
+  test('赤ボクサーに投票済みの時は投票先と投票済み状態を表示する', () => {
+    render(
+      <MatchInfo
+        matchData={matchData}
+        userPrediction="red"
+        matchPredictions={{ isVisible: true, totalVotes: 1, red: 1, blue: 0 }}
+      />
+    );
 
     const predictionSummary = screen.getByRole('region', { name: 'prediction-summary' });
-    expect(within(predictionSummary).getByText('赤ボクサー')).toBeInTheDocument();
+    const voteButton = within(predictionSummary).getByRole('button', { name: '投票済み' });
+    const redPrediction = within(predictionSummary).getByLabelText('赤コーナーの投票結果');
+    const bluePrediction = within(predictionSummary).getByLabelText('青コーナーの投票結果');
+    expect(voteButton).toBeDisabled();
+    expect(within(redPrediction).getByText('あなたの投票')).toBeInTheDocument();
+    expect(within(bluePrediction).queryByText('あなたの投票')).not.toBeInTheDocument();
+    expect(within(predictionSummary).queryByText('赤ボクサー')).not.toBeInTheDocument();
+  });
+
+  test('青ボクサーに投票済みの時も投票先を表示する', () => {
+    render(
+      <MatchInfo
+        matchData={matchData}
+        userPrediction="blue"
+        matchPredictions={{ isVisible: true, totalVotes: 1, red: 0, blue: 1 }}
+      />
+    );
+
+    const predictionSummary = screen.getByRole('region', { name: 'prediction-summary' });
+    const redPrediction = within(predictionSummary).getByLabelText('赤コーナーの投票結果');
+    const bluePrediction = within(predictionSummary).getByLabelText('青コーナーの投票結果');
+    expect(within(bluePrediction).getByText('あなたの投票')).toBeInTheDocument();
+    expect(within(redPrediction).queryByText('あなたの投票')).not.toBeInTheDocument();
+    expect(within(predictionSummary).getByRole('button', { name: '投票済み' })).toBeDisabled();
   });
 
   test('試合日時と試合会場を表示する', () => {
@@ -140,12 +169,14 @@ describe('MatchInfo', () => {
       <MatchInfo
         matchData={matchData}
         userPrediction={false}
+        matchPredictions={{ isVisible: false, totalVotes: null, red: null, blue: null }}
         isShowVoteButton={true}
         showPredictionModal={showPredictionModal}
       />
     );
 
-    const voteButton = screen.getByRole('button', { name: '投票する' });
+    expect(screen.getByText('投票すると予想を確認できます')).toBeInTheDocument();
+    const voteButton = screen.getByRole('button', { name: '勝者を予想する' });
     expect(voteButton).toBeInTheDocument();
 
     fireEvent.click(voteButton);
@@ -155,7 +186,7 @@ describe('MatchInfo', () => {
   test('未投票で投票不可の時はあなたの予想を表示しない', () => {
     render(<MatchInfo matchData={matchData} userPrediction={false} isShowVoteButton={false} />);
 
-    expect(screen.queryByRole('button', { name: '投票する' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '勝者を予想する' })).not.toBeInTheDocument();
   });
 
   test('userPrediction が未取得の時は投票状態を表示しない', () => {
@@ -172,7 +203,7 @@ describe('MatchInfo', () => {
     expect(within(predictionSummary).queryByText('赤ボクサー')).not.toBeInTheDocument();
     expect(within(predictionSummary).queryByText('青ボクサー')).not.toBeInTheDocument();
     expect(
-      within(predictionSummary).queryByRole('button', { name: '投票する' })
+      within(predictionSummary).queryByRole('button', { name: '勝者を予想する' })
     ).not.toBeInTheDocument();
   });
 
@@ -181,6 +212,7 @@ describe('MatchInfo', () => {
       <MatchInfo
         matchData={matchData}
         matchPredictions={{
+          isVisible: true,
           totalVotes: 12,
           red: 7,
           blue: 5,
@@ -212,9 +244,24 @@ describe('MatchInfo', () => {
     expect(screen.getByText('勝敗予想を読み込み中...')).toBeInTheDocument();
   });
 
-  test('初回取得中ではなく matchPredictions がない時は取得中表示を出す', () => {
+  test('集計結果を取得できなかった時はエラー表示を出す', () => {
     render(<MatchInfo matchData={matchData} matchPredictions={undefined} />);
 
-    expect(screen.getByText('取得中')).toBeInTheDocument();
+    expect(screen.getByText('勝敗予想を取得できませんでした')).toBeInTheDocument();
+  });
+
+  test('未投票で集計結果が非公開の時は票数を表示しない', () => {
+    render(
+      <MatchInfo
+        matchData={matchData}
+        userPrediction={false}
+        matchPredictions={{ isVisible: false, totalVotes: null, red: null, blue: null }}
+      />
+    );
+
+    expect(screen.getByText('投票すると予想を確認できます')).toBeInTheDocument();
+    expect(screen.queryByLabelText(/合計 .*票/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('赤コーナーの投票結果')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('青コーナーの投票結果')).not.toBeInTheDocument();
   });
 });

@@ -73,6 +73,33 @@ class WinLossPredictionService
   }
 
   /**
+   * 試合の勝敗予想集計と、現在の閲覧者への公開可否を取得する
+   *
+   * @param int $matchId
+   * @return array
+   */
+  public function getMatchPrediction(int $matchId): array
+  {
+    if (!$this->matchRepository->isMatch($matchId)) {
+      throw new \Exception("Match is not exists", 404);
+    }
+
+    $isVisible = $this->matchService->isMatchDateInPastOrToday($matchId);
+
+    if (!$isVisible && (Auth::check() || $this->guest->isGuestUser())) {
+      $userId = $this->authService->getUserIdOrGuestUserId();
+      $isVisible = $this->predictionRepository->isVotedPredictionToMatch($userId, $matchId);
+    }
+
+    return [
+      "isVisible" => $isVisible,
+      "predictions" => $isVisible
+        ? $this->predictionRepository->getMatchPrediction($matchId)
+        : [],
+    ];
+  }
+
+  /**
    * ユーザーの試合への全予想投票を取得
    *
    * @return null|Collection
@@ -81,14 +108,13 @@ class WinLossPredictionService
   {
     $isUser = Auth::check();
     $isGuest = $this->guest->isGuestUser();
-    if (!$isUser && !$isGuest) {
-      return null;
-    }
     if ($isUser) {
       return Auth::user()->prediction;
     }
     if ($isGuest) {
       return $this->guest->getGuestUser()->prediction;
     }
+
+    return null;
   }
 }

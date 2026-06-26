@@ -12,16 +12,28 @@ export const Grade = ({ matchData }: { matchData: MatchDataType }) => {
       <div className="min-w-0 text-center">
         <p
           className={clsx(
-            'inline-flex items-center justify-center gap-1 break-words text-[clamp(16px,3vw,24px)] font-black leading-tight',
-            isTitleMatch ? 'text-yellow-200' : 'text-white'
+            'inline-flex items-center justify-center gap-1 break-words text-[clamp(18px,3vw,24px)] font-black leading-tight',
+            isTitleMatch ? 'text-amber-300' : 'text-white'
           )}
         >
           {isTitleMatch && (
-            <GiImperialCrown className="h-[0.9em] w-[0.9em] shrink-0" aria-hidden="true" />
+            <GiImperialCrown
+              className="h-[0.9em] w-[0.9em] shrink-0 text-amber-300 drop-shadow-[0_0_6px_rgba(251,191,36,0.72)]"
+              aria-hidden="true"
+            />
           )}
-          {matchData.weight}級
+          {isTitleMatch ? (
+            <span className="bg-gradient-to-b from-yellow-50 via-amber-300 to-yellow-600 bg-clip-text text-transparent">
+              {matchData.weight}級
+            </span>
+          ) : (
+            `${matchData.weight}級`
+          )}
           {isTitleMatch && (
-            <GiImperialCrown className="h-[0.9em] w-[0.9em] shrink-0" aria-hidden="true" />
+            <GiImperialCrown
+              className="h-[0.9em] w-[0.9em] shrink-0 text-amber-300 drop-shadow-[0_0_6px_rgba(251,191,36,0.72)]"
+              aria-hidden="true"
+            />
           )}
         </p>
         {shouldShowTitleBadges ? (
@@ -29,13 +41,17 @@ export const Grade = ({ matchData }: { matchData: MatchDataType }) => {
             {titleOrganizations.map((organization, index) => (
               <span
                 key={`${organization}-${index}`}
-                className="relative isolate overflow-hidden rounded-md border-2 border-yellow-400/70 bg-zinc-950/70 px-3 py-1 text-[clamp(13px,2.2vw,18px)] font-black leading-none text-yellow-200 shadow-[0_0_18px_rgba(250,204,21,0.26),inset_0_0_14px_rgba(250,204,21,0.12)] backdrop-blur-sm"
+                className="relative isolate overflow-hidden rounded-md bg-gradient-to-br from-yellow-100 via-amber-400 to-yellow-700 p-[1.4px]"
               >
-                <span
-                  className="absolute inset-x-2 top-[-10px] h-5 rounded-full bg-yellow-300/25 blur-md"
-                  aria-hidden="true"
-                />
-                <span className="relative tracking-wide">{organization}</span>
+                <span className="relative block overflow-hidden rounded-[4px] bg-zinc-950/80 px-2 py-1 backdrop-blur-sm">
+                  <span
+                    className="absolute inset-x-2 top-[-10px] h-5 rounded-full"
+                    aria-hidden="true"
+                  />
+                  <span className="relative bg-gradient-to-b from-yellow-50 via-amber-300 to-yellow-600 bg-clip-text text-[clamp(16px,2.2vw,18px)] font-black leading-none tracking-wide text-transparent">
+                    {organization}
+                  </span>
+                </span>
               </span>
             ))}
           </div>
