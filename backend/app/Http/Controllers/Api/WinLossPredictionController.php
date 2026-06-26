@@ -54,9 +54,12 @@ class WinLossPredictionController extends ApiController
     public function fetchOnMatch(Request $request)
     {
         try {
-            $matchPredictions = $this->predictionRepository->getMatchPrediction($request->match_id);
+            $matchPredictions = $this->predictionService->getMatchPrediction(intval($request->match_id));
             return new MatchPredictionsResource($matchPredictions);
         } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                return $this->responseNotFound($e->getMessage());
+            }
             return $this->responseInvalidQuery($e->getMessage() ?? "Failed get match predictions");
         }
     }

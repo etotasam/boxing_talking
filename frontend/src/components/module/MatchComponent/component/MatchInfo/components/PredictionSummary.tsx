@@ -1,6 +1,7 @@
 import { RotatingLines } from 'react-loader-spinner';
 import { MdHowToVote } from 'react-icons/md';
 import { HiUserGroup } from 'react-icons/hi';
+import { IoIosLock } from 'react-icons/io';
 import { PiSealCheckFill } from 'react-icons/pi';
 import { MatchPredictionsType } from '@/types';
 
@@ -14,7 +15,7 @@ type PredictionSummaryProps = {
   showPredictionModal?: () => void;
 };
 
-type UserPredictionStatusProps =
+type PredictionActionButtonProps =
   | {
       type: 'hidden';
     }
@@ -27,8 +28,15 @@ type UserPredictionStatusProps =
     };
 
 type PredictionStatsProps = {
-  matchPredictions: MatchPredictionsType;
+  matchPredictions: Extract<MatchPredictionsType, { isVisible: true }>;
   userPrediction?: 'red' | 'blue' | false;
+};
+
+type PredictionSummaryContentProps = Pick<
+  PredictionSummaryProps,
+  'userPrediction' | 'matchPredictions' | 'isLoading'
+> & {
+  predictionActionButton: PredictionActionButtonProps;
 };
 
 export const PredictionSummary = ({
@@ -39,7 +47,7 @@ export const PredictionSummary = ({
   showPredictionModal,
 }: PredictionSummaryProps) => {
   const canOpenPredictionModal = isShowVoteButton && showPredictionModal;
-  const userPredictionStatus = getUserPredictionStatus({
+  const predictionActionButton = getPredictionActionButtonProps({
     userPrediction,
     showPredictionModal: canOpenPredictionModal ? showPredictionModal : undefined,
   });
@@ -49,25 +57,51 @@ export const PredictionSummary = ({
       className="mt-4 w-full rounded-lg border border-stone-700 bg-stone-950/95 p-3 text-white shadow-lg shadow-black/20 sm:p-4"
       aria-label="prediction-summary"
     >
-      {isLoading ? (
-        <PredictionSummaryLoading />
-      ) : matchPredictions ? (
-        <PredictionStats matchPredictions={matchPredictions} userPrediction={userPrediction} />
-      ) : (
-        <PredictionSummaryEmpty />
-      )}
-      <UserPredictionStatus {...userPredictionStatus} />
+      <PredictionSummaryContent
+        userPrediction={userPrediction}
+        matchPredictions={matchPredictions}
+        isLoading={isLoading}
+        predictionActionButton={predictionActionButton}
+      />
     </section>
   );
 };
 
-const getUserPredictionStatus = ({
+const PredictionSummaryContent = ({
+  userPrediction,
+  matchPredictions,
+  isLoading,
+  predictionActionButton,
+}: PredictionSummaryContentProps) => {
+  if (isLoading) {
+    return <PredictionSummaryLoading />;
+  }
+
+  if (!matchPredictions) {
+    return <PredictionSummaryEmpty />;
+  }
+
+  if (!matchPredictions.isVisible) {
+    return <PredictionSummaryLocked predictionActionButton={predictionActionButton} />;
+  }
+
+  return (
+    <>
+      <PredictionStats matchPredictions={matchPredictions} userPrediction={userPrediction} />
+      <div className="mt-3 flex justify-center">
+        <PredictionActionButton {...predictionActionButton} />
+      </div>
+    </>
+  );
+};
+
+const getPredictionActionButtonProps = ({
   userPrediction,
   showPredictionModal,
 }: {
   userPrediction?: 'red' | 'blue' | false;
   showPredictionModal?: () => void;
-}): UserPredictionStatusProps => {
+}): PredictionActionButtonProps => {
   if (userPrediction === 'red' || userPrediction === 'blue') {
     return {
       type: 'voted',
@@ -98,8 +132,32 @@ const PredictionSummaryLoading = () => {
 const PredictionSummaryEmpty = () => {
   return (
     <p className="flex min-h-[112px] items-center justify-center rounded-md bg-stone-900 px-3 py-4 text-sm text-stone-400">
-      取得中
+      勝敗予想を取得できませんでした
     </p>
+  );
+};
+
+const PredictionSummaryLocked = ({
+  predictionActionButton,
+}: {
+  predictionActionButton: PredictionActionButtonProps;
+}) => {
+  return (
+    <div className="relative min-h-[132px] overflow-hidden rounded-md bg-stone-900 px-3 py-3 sm:min-h-[168px] sm:px-4 sm:py-5">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(239,68,68,0.14),transparent_42%,transparent_58%,rgba(59,130,246,0.14))] blur-lg sm:blur-xl"
+      />
+      <div className="relative flex min-h-[108px] flex-col items-center justify-center gap-3 text-center sm:min-h-[128px] sm:gap-4">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-500 bg-stone-950/60 text-stone-200">
+          <IoIosLock className="h-[18px] w-[18px]" aria-hidden="true" />
+        </span>
+        <p className="text-base font-bold text-stone-100 sm:text-lg">
+          投票すると予想を確認できます
+        </p>
+        <PredictionActionButton {...predictionActionButton} />
+      </div>
+    </div>
   );
 };
 
@@ -178,23 +236,23 @@ const PredictionStats = ({ matchPredictions, userPrediction }: PredictionStatsPr
   );
 };
 
-const UserPredictionStatus = (props: UserPredictionStatusProps) => {
+const PredictionActionButton = (props: PredictionActionButtonProps) => {
   if (props.type === 'hidden') {
     return null;
   }
 
   return (
-    <div className="mt-3 flex justify-center">
+    <>
       {props.type === 'votable' ? (
         <button
           type="button"
-          className="inline-flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-400 px-4 py-2 text-sm text-stone-950 shadow-md shadow-black/30 duration-300 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:ring-offset-2 focus:ring-offset-stone-950"
+          className="inline-flex min-h-11 w-auto items-center justify-center gap-2 rounded-lg border border-yellow-200 bg-yellow-400 px-4 py-2 text-sm text-stone-950 shadow-md shadow-black/30 duration-300 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:ring-offset-2 focus:ring-offset-stone-950"
           onClick={props.onVoteClick}
         >
           <span className="relative inline-flex shrink-0">
             <MdHowToVote className="text-xl" aria-hidden="true" />
           </span>
-          投票する
+          勝者を予想する
         </button>
       ) : (
         <button
@@ -209,7 +267,7 @@ const UserPredictionStatus = (props: UserPredictionStatusProps) => {
           投票済み
         </button>
       )}
-    </div>
+    </>
   );
 };
 

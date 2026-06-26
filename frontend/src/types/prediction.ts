@@ -1,11 +1,21 @@
 export type PredictionType = {
   id: number;
   matchId: number;
-  prediction: "red" | "blue";
+  prediction: 'red' | 'blue';
 };
 
-export type MatchPredictionsType = {
+type VisibleMatchPredictionsType = {
+  isVisible: true;
   totalVotes: number;
   red: number;
   blue: number;
 };
+
+type HiddenMatchPredictionsType = {
+  isVisible: false;
+  totalVotes: null;
+  red: null;
+  blue: null;
+};
+
+export type MatchPredictionsType = VisibleMatchPredictionsType | HiddenMatchPredictionsType;
