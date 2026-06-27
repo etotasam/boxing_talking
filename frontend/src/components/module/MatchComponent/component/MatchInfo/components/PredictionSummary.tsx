@@ -20,9 +20,6 @@ type PredictionActionButtonProps =
       type: 'hidden';
     }
   | {
-      type: 'voted';
-    }
-  | {
       type: 'votable';
       onVoteClick: () => void;
     };
@@ -88,9 +85,11 @@ const PredictionSummaryContent = ({
   return (
     <>
       <PredictionStats matchPredictions={matchPredictions} userPrediction={userPrediction} />
-      <div className="mt-3 flex justify-center">
-        <PredictionActionButton {...predictionActionButton} />
-      </div>
+      {predictionActionButton.type === 'votable' && (
+        <div className="mt-3 flex justify-center">
+          <PredictionActionButton {...predictionActionButton} />
+        </div>
+      )}
     </>
   );
 };
@@ -104,7 +103,7 @@ const getPredictionActionButtonProps = ({
 }): PredictionActionButtonProps => {
   if (userPrediction === 'red' || userPrediction === 'blue') {
     return {
-      type: 'voted',
+      type: 'hidden',
     };
   }
 
@@ -242,32 +241,16 @@ const PredictionActionButton = (props: PredictionActionButtonProps) => {
   }
 
   return (
-    <>
-      {props.type === 'votable' ? (
-        <button
-          type="button"
-          className="inline-flex min-h-11 w-auto items-center justify-center gap-2 rounded-lg border border-yellow-200 bg-yellow-400 px-4 py-2 text-sm text-stone-950 shadow-md shadow-black/30 duration-300 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:ring-offset-2 focus:ring-offset-stone-950"
-          onClick={props.onVoteClick}
-        >
-          <span className="relative inline-flex shrink-0">
-            <MdHowToVote className="text-xl" aria-hidden="true" />
-          </span>
-          勝者を予想する
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-stone-500 bg-stone-600 px-4 py-2 text-sm text-stone-500 shadow-md shadow-black/20"
-          disabled
-        >
-          <span className="relative inline-flex shrink-0">
-            <MdHowToVote className="text-xl" aria-hidden="true" />
-            <VotedBadge />
-          </span>
-          投票済み
-        </button>
-      )}
-    </>
+    <button
+      type="button"
+      className="inline-flex min-h-11 w-auto items-center justify-center gap-2 rounded-lg border border-yellow-200 bg-yellow-400 px-4 py-2 text-sm text-stone-950 shadow-md shadow-black/30 duration-300 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:ring-offset-2 focus:ring-offset-stone-950"
+      onClick={props.onVoteClick}
+    >
+      <span className="relative inline-flex shrink-0">
+        <MdHowToVote className="text-xl" aria-hidden="true" />
+      </span>
+      勝者を予想する
+    </button>
   );
 };
 
@@ -277,11 +260,5 @@ const UserPredictionBadge = () => {
       <PiSealCheckFill className="h-5 w-5" aria-hidden="true" />
       あなたの投票
     </span>
-  );
-};
-
-const VotedBadge = () => {
-  return (
-    <PiSealCheckFill className="absolute -left-8 -top-4 h-8 w-8 rotate-[-12deg] place-items-center text-yellow-300" />
   );
 };
