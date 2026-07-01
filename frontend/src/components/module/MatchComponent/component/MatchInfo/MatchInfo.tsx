@@ -3,6 +3,7 @@ import { BoxersData } from './components/BoxersData';
 import { Grade } from './components/Grade';
 import { MatchMeta } from './components/MatchMeta';
 import { PredictionSummary } from './components/PredictionSummary';
+import { TaleOfTheTape } from './components/TaleOfTheTape';
 
 type MatchInfoPropsType = {
   matchData: MatchDataType;
@@ -33,6 +34,11 @@ export const MatchInfo = ({
             venue={matchData.venue}
           />
           <BoxersData matchData={matchData} />
+          <TaleOfTheTape
+            redBoxer={matchData.redBoxer}
+            blueBoxer={matchData.blueBoxer}
+            matchDate={matchData.matchDate}
+          />
           <PredictionSummary
             userPrediction={userPrediction}
             matchPredictions={matchPredictions}
