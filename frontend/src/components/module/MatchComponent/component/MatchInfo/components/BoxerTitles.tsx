@@ -9,29 +9,33 @@ type BoxerTitlesProps = {
   titles: TitlesStateType[];
 };
 
-const titleStatePresentation = {
+const titlePresentation = {
   new: {
-    label: '獲得',
-    className: 'border-yellow-400 text-yellow-200',
+    label: 'New',
+    className: 'border-amber-400/60 bg-stone-900/90 text-amber-200',
   },
   still: {
-    label: '防衛',
-    className: 'border-blue-400 text-blue-200',
+    label: null,
+    className: 'border-amber-400/60 bg-stone-900/90 text-amber-200',
   },
   fall: {
-    label: '失冠',
-    className: 'border-stone-600 text-stone-500',
+    label: null,
+    className: 'border-stone-600 bg-stone-800/70 text-stone-500',
   },
   hold: {
     label: null,
-    className: 'border-amber-400/60 text-amber-200',
+    className: 'border-amber-400/60 bg-stone-900/90 text-amber-200',
   },
 } as const;
 
 const groupTitlesByWeight = (titles: TitlesStateType[]) => {
   const groupedTitles = titles.reduce<Map<WeightClassType, TitlesStateType[]>>((groups, title) => {
-    const titlesInWeight = groups.get(title.weight) ?? [];
-    groups.set(title.weight, [...titlesInWeight, title]);
+    const list = groups.get(title.weight);
+    if (list) {
+      list.push(title);
+    } else {
+      groups.set(title.weight, [title]);
+    }
     return groups;
   }, new Map());
 
@@ -47,6 +51,8 @@ export const BoxerTitles = ({ boxerName, side, titles }: BoxerTitlesProps) => {
   const isRedSide = side === 'red';
   const titleGroups = groupTitlesByWeight(titles);
 
+  const TITLE_TEXT_SIZE = 'text-[clamp(12px,2.5vw,14px)]';
+
   return (
     <section
       className={clsx(
@@ -58,33 +64,32 @@ export const BoxerTitles = ({ boxerName, side, titles }: BoxerTitlesProps) => {
       {titleGroups.map(({ weight, titles: titlesInWeight }) => {
         return (
           <div key={weight} className={clsx('max-w-full', !isRedSide && 'text-right')}>
-            <h3 className="mb-1 text-[clamp(9px,2.2vw,11px)] font-medium text-stone-400">
+            <h3 className="mb-1.5 text-[clamp(11px,2.3vw,13px)] font-medium text-stone-400">
               {weight}級
             </h3>
             <ul
               className={clsx(
-                'flex max-w-full flex-wrap gap-1',
+                'flex max-w-full flex-wrap gap-x-2 gap-y-3 pt-1',
                 isRedSide ? 'justify-start' : 'justify-end'
               )}
               aria-label={`${weight}級のタイトル団体`}
             >
               {titlesInWeight.map((title) => {
-                const presentation = titleStatePresentation[title.state ?? 'hold'];
+                const state = title.state ?? 'hold';
+                const presentation = titlePresentation[state];
 
                 return (
                   <li
-                    key={title.organization}
+                    key={`${title.weight}-${title.organization}`}
                     className={clsx(
-                      'inline-flex items-center gap-1 rounded border px-1.5 py-0.5',
-                      'text-[clamp(9px,2.2vw,11px)] font-black leading-none',
+                      'relative inline-flex items-center rounded-md border-[2px] px-2.5 py-1.5 font-black leading-none',
+                      TITLE_TEXT_SIZE,
                       presentation.className
                     )}
                   >
-                    <span className={clsx(title.state === 'fall' && 'line-through')}>
-                      {title.organization}
-                    </span>
+                    <span>{title.organization}</span>
                     {presentation.label && (
-                      <span className="text-[0.72em] font-bold no-underline">
+                      <span className="absolute -right-1.5 -top-2 rounded-full border border-yellow-200 bg-yellow-400 px-1.5 py-0.5 text-[9px] font-black leading-none text-stone-950 shadow-md no-underline">
                         {presentation.label}
                       </span>
                     )}

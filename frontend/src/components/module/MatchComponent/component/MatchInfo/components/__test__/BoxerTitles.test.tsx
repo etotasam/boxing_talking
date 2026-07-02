@@ -12,9 +12,9 @@ const renderTitles = (titles: TitlesStateType[]) => {
 describe('BoxerTitles', () => {
   test.each([
     { state: null, label: null },
-    { state: 'new', label: '獲得' },
-    { state: 'still', label: '防衛' },
-    { state: 'fall', label: '失冠' },
+    { state: 'new', label: 'New' },
+    { state: 'still', label: null },
+    { state: 'fall', label: null },
   ] as const)('タイトル状態が $state の時は「$label」と表示する', ({ state, label }) => {
     renderTitles([
       {
@@ -30,8 +30,9 @@ describe('BoxerTitles', () => {
     if (label) {
       expect(within(titles).getByText(label)).toBeInTheDocument();
     } else {
-      expect(within(titles).queryByText(/獲得|防衛|失冠|保持/)).not.toBeInTheDocument();
+      expect(within(titles).queryByText('New')).not.toBeInTheDocument();
     }
+    expect(within(titles).queryByText(/獲得|防衛|失冠|保持/)).not.toBeInTheDocument();
   });
 
   test('タイトルを階級順にまとめ、同じ階級の団体を並べて表示する', () => {
