@@ -1,0 +1,69 @@
+prefix_rule(
+    pattern = ["rm", ["-rf", "-fr"]],
+    decision = "forbidden",
+    justification = "再帰的な強制削除は禁止。安全な代替手段を使用すること。",
+    match = [
+        "rm -rf build",
+        "rm -fr node_modules",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", "-r", "-f"],
+    decision = "forbidden",
+    justification = "再帰的な強制削除は禁止。安全な代替手段を使用すること。",
+    match = ["rm -r -f build"],
+    not_match = [
+        "rm -r build",
+        "rm -f file.txt",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", "-f", "-r"],
+    decision = "forbidden",
+    justification = "再帰的な強制削除は禁止。安全な代替手段を使用すること。",
+    match = ["rm -f -r build"],
+    not_match = [
+        "rm -f file.txt",
+        "rm -r build",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", "--force", "--recursive"],
+    decision = "forbidden",
+    justification = "再帰的な強制削除は禁止。",
+    match = ["rm --force --recursive build"],
+)
+
+prefix_rule(
+    pattern = ["rm", "--recursive", "--force"],
+    decision = "forbidden",
+    justification = "再帰的な強制削除は禁止。",
+    match = ["rm --recursive --force build"],
+)
+
+prefix_rule(
+    pattern = ["rm", ["-Rf", "-fR"]],
+    decision = "forbidden",
+    justification = "再帰的な強制削除は禁止。",
+    match = [
+        "rm -Rf build",
+        "rm -fR build",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", "-R", "-f"],
+    decision = "forbidden",
+    justification = "再帰的な強制削除は禁止。",
+    match = ["rm -R -f build"],
+)
+
+prefix_rule(
+    pattern = ["rm", "-f", "-R"],
+    decision = "forbidden",
+    justification = "再帰的な強制削除は禁止。",
+    match = ["rm -f -R build"],
+)
