@@ -1,6 +1,7 @@
 
 .github
 .env*
+!.env.example
 .husky
 # backend
 backend/node_modules
