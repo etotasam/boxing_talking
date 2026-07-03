@@ -1,10 +1,15 @@
 import dayjs from 'dayjs';
+import type { ReactNode } from 'react';
+import { GiBodyHeight, GiHighPunch } from 'react-icons/gi';
+import { ImAccessibility } from 'react-icons/im';
+import { MdPermContactCalendar } from 'react-icons/md';
 import { BOXER_STANCE_LABELS } from '@/constants/boxerData';
 import type { BoxerType, MatchDataType } from '@/types';
 
 type TaleOfTheTapeProps = Pick<MatchDataType, 'redBoxer' | 'blueBoxer' | 'matchDate'>;
 
 type ComparisonRow = {
+  icon: ReactNode;
   label: string;
   red: string;
   blue: string;
@@ -23,21 +28,25 @@ const formatCentimeters = (value: number) => (value ? `${value}cm` : '-');
 export const TaleOfTheTape = ({ redBoxer, blueBoxer, matchDate }: TaleOfTheTapeProps) => {
   const comparisonRows: ComparisonRow[] = [
     {
+      icon: <MdPermContactCalendar className="text-base pc:text-xl" aria-hidden="true" />,
       label: '年齢',
       red: getAge(redBoxer.birth, matchDate),
       blue: getAge(blueBoxer.birth, matchDate),
     },
     {
+      icon: <GiBodyHeight className="text-base pc:text-xl" aria-hidden="true" />,
       label: '身長',
       red: formatCentimeters(redBoxer.height),
       blue: formatCentimeters(blueBoxer.height),
     },
     {
+      icon: <ImAccessibility className="text-base pc:text-xl" aria-hidden="true" />,
       label: 'リーチ',
       red: formatCentimeters(redBoxer.reach),
       blue: formatCentimeters(blueBoxer.reach),
     },
     {
+      icon: <GiHighPunch className="text-base pc:text-xl" aria-hidden="true" />,
       label: 'スタイル',
       red: BOXER_STANCE_LABELS[redBoxer.style],
       blue: BOXER_STANCE_LABELS[blueBoxer.style],
@@ -56,7 +65,7 @@ export const TaleOfTheTape = ({ redBoxer, blueBoxer, matchDate }: TaleOfTheTapeP
         </div>
         <table className="w-full table-fixed border-collapse text-center">
           <tbody>
-            {comparisonRows.map(({ label, red, blue }) => (
+            {comparisonRows.map(({ icon, label, red, blue }) => (
               <tr key={label} className="border-b border-stone-600 last:border-b-0">
                 <td className="w-[34%] px-1 py-2 text-sm font-bold text-red-400 pc:text-lg">
                   {red}
@@ -65,7 +74,10 @@ export const TaleOfTheTape = ({ redBoxer, blueBoxer, matchDate }: TaleOfTheTapeP
                   scope="row"
                   className="w-[32%] border-x border-stone-600 px-1 py-2 text-xs font-medium text-stone-200 pc:text-base"
                 >
-                  {label}
+                  <span className="inline-flex items-center justify-center gap-1">
+                    {icon}
+                    {label}
+                  </span>
                 </th>
                 <td className="w-[34%] px-1 py-2 text-sm font-bold text-blue-400 pc:text-lg">
                   {blue}
