@@ -231,6 +231,21 @@ describe('MatchInfo', () => {
     expect(within(predictionSummary).queryByText(/vs/i)).not.toBeInTheDocument();
   });
 
+  test('未投票で投票可能でも集計結果が公開されている時は投票ボタンを表示しない', () => {
+    render(
+      <MatchInfo
+        matchData={matchData}
+        userPrediction={false}
+        matchPredictions={{ isVisible: true, totalVotes: 12, red: 7, blue: 5 }}
+        isShowVoteButton={true}
+        showPredictionModal={showPredictionModal}
+      />
+    );
+
+    expect(screen.getByLabelText('合計 12票')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '勝者を予想する' })).not.toBeInTheDocument();
+  });
+
   test('初回取得中はローディング表示を出す', () => {
     render(
       <MatchInfo

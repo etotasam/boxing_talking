@@ -43,8 +43,6 @@ export const MatchInfo = ({
             userPrediction={userPrediction}
             matchPredictions={matchPredictions}
             isLoading={isMatchPredictionsLoading}
-            redBoxerName={matchData.redBoxer.name}
-            blueBoxerName={matchData.blueBoxer.name}
             isShowVoteButton={isShowVoteButton}
             showPredictionModal={showPredictionModal}
           />

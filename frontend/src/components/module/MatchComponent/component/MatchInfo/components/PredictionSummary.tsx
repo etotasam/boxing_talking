@@ -9,8 +9,6 @@ type PredictionSummaryProps = {
   userPrediction?: 'red' | 'blue' | false;
   matchPredictions?: MatchPredictionsType;
   isLoading: boolean;
-  redBoxerName: string;
-  blueBoxerName: string;
   isShowVoteButton?: boolean;
   showPredictionModal?: () => void;
 };
@@ -83,14 +81,7 @@ const PredictionSummaryContent = ({
   }
 
   return (
-    <>
-      <PredictionStats matchPredictions={matchPredictions} userPrediction={userPrediction} />
-      {predictionActionButton.type === 'votable' && (
-        <div className="mt-3 flex justify-center">
-          <PredictionActionButton {...predictionActionButton} />
-        </div>
-      )}
-    </>
+    <PredictionStats matchPredictions={matchPredictions} userPrediction={userPrediction} />
   );
 };
 
