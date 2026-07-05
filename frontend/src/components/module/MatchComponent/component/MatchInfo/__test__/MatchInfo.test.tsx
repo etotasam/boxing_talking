@@ -219,11 +219,13 @@ describe('MatchInfo', () => {
       />
     );
 
-    expect(screen.getByLabelText('合計 12票')).toBeInTheDocument();
-    expect(screen.getByText('7票')).toBeInTheDocument();
-    expect(screen.getByText('5票')).toBeInTheDocument();
-    expect(screen.getByText('58%')).toBeInTheDocument();
-    expect(screen.getByText('42%')).toBeInTheDocument();
+    const totalVotes = screen.getByLabelText('合計 12票');
+    expect(totalVotes).toHaveTextContent('12票');
+    expect(totalVotes.querySelector('svg')).toBeInTheDocument();
+    expect(screen.queryByText('7票')).not.toBeInTheDocument();
+    expect(screen.queryByText('5票')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('赤コーナーの投票結果')).toHaveTextContent('58%');
+    expect(screen.getByLabelText('青コーナーの投票結果')).toHaveTextContent('42%');
 
     const predictionSummary = screen.getByRole('region', { name: 'prediction-summary' });
     expect(within(predictionSummary).queryByText('赤ボクサー')).not.toBeInTheDocument();
