@@ -1,26 +1,6 @@
   approval_policy = "on-request"
-  default_permissions = "project-edit"
 
   [shell_environment_policy]
   inherit = "core"
   ignore_default_excludes = false
   exclude = ["*_KEY", "*_SECRET", "*_TOKEN", "*_PASSWORD", "DATABASE_*"]
-
-  [permissions.project-edit.filesystem]
-  ":minimal" = "read"
-
-  [permissions.project-edit.network]
-  enabled = true
-  allow_local_binding = true
-
-  [permissions.project-edit.network.domains]
-  "localhost" = "allow"
-  "127.0.0.1" = "allow"
-  "::1" = "allow"
-
-  [permissions.project-edit.filesystem.":workspace_roots"]
-  "." = "write"
-  ".git" = "write"
-  ".git/**" = "write"
-  "**/.env" = "deny"
-  "**/.env.production" = "deny"
