@@ -8,8 +8,16 @@ import { deviceState, DeviceStateType } from '@/store/deviceState';
 import { Header } from '../Header';
 
 vi.mock('../component/HeaderNavigation', () => ({
-  HeaderNavigation: ({ pathname }: { pathname: string }) => (
-    <div data-testid="header-navigation">{pathname}</div>
+  HeaderNavigation: ({
+    pathname,
+    showAdminLinks,
+  }: {
+    pathname: string;
+    showAdminLinks?: boolean;
+  }) => (
+    <div data-testid="header-navigation">
+      {pathname}:{String(showAdminLinks)}
+    </div>
   ),
 }));
 
@@ -44,18 +52,22 @@ describe('Header', () => {
     renderHeader('PC');
 
     expect(screen.getByRole('heading', { name: 'BOXING TALKING' })).toBeInTheDocument();
-    expect(screen.getByTestId('header-navigation')).toHaveTextContent(ROUTE_PATH.PAST_MATCHES);
+    expect(screen.getByTestId('header-navigation')).toHaveTextContent(
+      `${ROUTE_PATH.PAST_MATCHES}:true`
+    );
     expect(screen.queryByTestId('hamburger')).not.toBeInTheDocument();
     expect(screen.getByTestId('header-auth-info')).toBeInTheDocument();
     expect(screen.getByRole('banner')).toHaveClass('h-[80px]');
   });
 
-  test('SPではハンバーガーを表示する', () => {
+  test('SPでは通常ナビゲーションとハンバーガーを表示する', () => {
     renderHeader('SP');
 
     expect(screen.getByRole('heading', { name: 'BOXING TALKING' })).toBeInTheDocument();
+    expect(screen.getByTestId('header-navigation')).toHaveTextContent(
+      `${ROUTE_PATH.PAST_MATCHES}:false`
+    );
     expect(screen.getByTestId('hamburger')).toBeInTheDocument();
-    expect(screen.queryByTestId('header-navigation')).not.toBeInTheDocument();
-    expect(screen.getByRole('banner')).toHaveClass('h-[70px]', 'bg-red-600');
+    expect(screen.getByRole('banner')).toHaveClass('h-[126px]', 'bg-black/95');
   });
 });

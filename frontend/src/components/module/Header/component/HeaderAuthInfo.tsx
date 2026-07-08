@@ -27,7 +27,7 @@ export const HeaderAuthInfoView = ({
   onLogout,
 }: HeaderAuthInfoViewProps) => {
   return (
-    <div className="absolute sm:top-1 top-2 pc:right-5 right-2 flex">
+    <div className="flex pc:absolute pc:right-5 pc:top-1">
       <button
         type="button"
         onClick={onLogout}
@@ -43,7 +43,7 @@ export const HeaderAuthInfoView = ({
             iconBgColor
           )}
         />
-        <span>{userName}</span>
+        <span className="hidden pc:inline">{userName}</span>
         {device === 'PC' && (
           <span
             className={clsx(

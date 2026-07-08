@@ -145,10 +145,10 @@ Option 3 ほど大きく分離せず、既存の `Header` 周辺の責務を活�
 
 ### Phase 2: SP ヘッダー構造の整理
 
-- [ ] SP でも `Schedule / Match Result` の通常ナビゲーションを表示する。
-- [ ] SP のヘッダーを上段と下段に分ける。
-- [ ] `HeaderView` の SP 背景を添付画像に近い黒系へ変更する。
-- [ ] ヘッダー高さ変更が `elementSizeState('HEADER_HEIGHT')` 経由の main padding に反映されることを確認する。
+- [x] SP でも `Schedule / Match Result` の通常ナビゲーションを表示する。
+- [x] SP のヘッダーを上段と下段に分ける。
+- [x] `HeaderView` の SP 背景を添付画像に近い黒系へ変更する。
+- [x] ヘッダー高さ変更が `elementSizeState('HEADER_HEIGHT')` 経由の main padding に反映されることを確認する。
 
 確認観点:
 

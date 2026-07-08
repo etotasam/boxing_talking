@@ -12,10 +12,10 @@ vi.mock('@/hooks/apiHooks/auth', () => ({
   useAdmin: () => mockUseAdmin(),
 }));
 
-const renderHeaderNavigation = (pathname = ROUTE_PATH.HOME) => {
+const renderHeaderNavigation = (pathname = ROUTE_PATH.HOME, showAdminLinks = true) => {
   return render(
     <MemoryRouter initialEntries={[pathname]}>
-      <HeaderNavigation pathname={pathname} />
+      <HeaderNavigation pathname={pathname} showAdminLinks={showAdminLinks} />
     </MemoryRouter>
   );
 };
@@ -50,6 +50,16 @@ describe('HeaderNavigation', () => {
 
   test('管理者でなければ管理ページリンクを表示しない', () => {
     const { container } = renderHeaderNavigation();
+
+    ADMIN_PAGE_LINKS.forEach((link) => {
+      expect(container.querySelector(`a[href="${link.path}"]`)).not.toBeInTheDocument();
+    });
+  });
+
+  test('管理者でも管理ページリンクを非表示にできる', () => {
+    mockUseAdmin.mockReturnValue({ isAdmin: true });
+
+    const { container } = renderHeaderNavigation(ROUTE_PATH.HOME, false);
 
     ADMIN_PAGE_LINKS.forEach((link) => {
       expect(container.querySelector(`a[href="${link.path}"]`)).not.toBeInTheDocument();

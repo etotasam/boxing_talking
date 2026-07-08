@@ -18,7 +18,8 @@ export const Header = () => {
       device={device}
       headerRef={headerRef}
       siteTitle={siteTitle}
-      navigation={device === 'PC' ? <HeaderNavigation pathname={pathname} /> : <Hamburger />}
+      navigation={<HeaderNavigation pathname={pathname} showAdminLinks={device === 'PC'} />}
+      menuButton={device === 'SP' ? <Hamburger /> : null}
       authInfo={<HeaderAuthInfo />}
     />
   );
