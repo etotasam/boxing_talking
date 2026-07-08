@@ -1,32 +1,25 @@
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
-import { ROUTE_PATH } from '@/constants/routePath';
 import { Link } from 'react-router-dom';
 import { FaUserEdit } from 'react-icons/fa';
 import { RiEditBoxFill } from 'react-icons/ri';
 import { RiUserAddLine } from 'react-icons/ri';
 import { BsCalendarPlus } from 'react-icons/bs';
-
-const linksArray = [
-  { name: 'ボクサー登録', path: ROUTE_PATH.BOXER_REGISTER },
-  { name: 'ボクサー編集', path: ROUTE_PATH.BOXER_EDIT },
-  { name: '試合登録', path: ROUTE_PATH.MATCH_REGISTER },
-  { name: '試合編集', path: ROUTE_PATH.MATCH_EDIT },
-] as const;
+import { ADMIN_PAGE_LINKS, AdminPageLink } from '@/constants/adminPageLinks';
 
 export const AdministratorPageLinks = () => {
   const { pathname } = useLocation();
 
   return (
     <ul className="flex ">
-      {linksArray.map((link) => (
+      {ADMIN_PAGE_LINKS.map((link) => (
         <li key={`${link.name}_${link.path}`} className="pc:ml-5 ml-2">
           <Link to={link.path}>
             <LinkButton pathname={pathname} link={link}>
-              {link.name === 'ボクサー登録' && <RiUserAddLine />}
-              {link.name === 'ボクサー編集' && <FaUserEdit />}
-              {link.name === '試合登録' && <BsCalendarPlus />}
-              {link.name === '試合編集' && <RiEditBoxFill />}
+              {link.id === 'boxerRegister' && <RiUserAddLine />}
+              {link.id === 'boxerEdit' && <FaUserEdit />}
+              {link.id === 'matchRegister' && <BsCalendarPlus />}
+              {link.id === 'matchEdit' && <RiEditBoxFill />}
             </LinkButton>
           </Link>
         </li>
@@ -37,7 +30,7 @@ export const AdministratorPageLinks = () => {
 
 type LinkButtonPropsType = React.ComponentProps<'button'> & {
   pathname: string;
-  link: { name: string; path: string };
+  link: AdminPageLink;
 };
 const LinkButton = ({
   children,
