@@ -6,7 +6,7 @@ import { Comments } from '../Comments';
 import { useFetchComments } from '@/hooks/apiHooks/comment';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
-import { GoTriangleUp } from 'react-icons/go';
+import { GoChevronUp } from 'react-icons/go';
 import { modalState } from '@/store/modalState';
 import { RotatingLines } from 'react-loader-spinner';
 
@@ -51,18 +51,21 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
           ? { height: commentsModalHeight }
           : { height: commentsModalHeightHiddenState }
       }
-      className="bg-black/90 w-full fixed bottom-0 left-0"
+      className="fixed bottom-0 left-0 w-full rounded-t-[28px] border-t border-white/10 bg-gradient-to-b from-zinc-800/95 via-zinc-900/95 to-black/95 shadow-[0_-16px_40px_rgba(0,0,0,0.45)]"
     >
       <motion.div
-        //? translate-xが効かないので無理やり中央寄せにした( left-[calc(50%-15px)] 幅が30pxなので半分の15pxを引いている)
+        //? translate-xが効かないので無理やり中央寄せにした( left-[calc(50%-48px)] 幅が96pxなので半分の48pxを引いている)
         className={clsx(
-          'absolute top-0 left-[calc(50%-15px)] z-10',
+          'absolute left-[calc(50%-48px)] top-0 z-10 h-0 w-24',
           commentFetchState === 'loading' ? 'cursor-default' : 'cursor-pointer'
         )}
-        animate={isShowComments ? { top: '-30px', rotate: 180 } : { top: '0px' }}
         onClick={toggleShowComments}
       >
-        {commentFetchState === 'loading' ? <CommentsLoadingIcon /> : <CommentsModalToggleButton />}
+        {commentFetchState === 'loading' ? (
+          <CommentsLoadingIcon />
+        ) : (
+          <CommentsModalToggleButton isShowComments={isShowComments} />
+        )}
       </motion.div>
 
       <motion.div
@@ -85,13 +88,23 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
   );
 };
 
-const CommentsModalToggleButton = () => {
-  return <GoTriangleUp className="w-[30px] h-[30px] text-white" />;
+type CommentsModalToggleButtonProps = {
+  isShowComments: boolean;
+};
+
+const CommentsModalToggleButton = ({ isShowComments }: CommentsModalToggleButtonProps) => {
+  return (
+    <div className="absolute left-0 top-[-20px] flex h-8 w-20 items-center justify-center rounded-full border border-white/15 bg-zinc-800/95 shadow-[0_12px_26px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-1px_0_rgba(0,0,0,0.55)]">
+      <motion.span animate={isShowComments ? { rotate: 180 } : { rotate: 0 }}>
+        <GoChevronUp className="h-6 w-6 stroke-[0.8] text-zinc-50 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]" />
+      </motion.span>
+    </div>
+  );
 };
 
 const CommentsLoadingIcon = () => {
   return (
-    <div className="w-[30px] h-[30px] text-white">
+    <div className="absolute left-0 top-[-20px] h-8 w-20 rounded-full border border-white/15 bg-zinc-800/95 text-white shadow-[0_12px_26px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-1px_0_rgba(0,0,0,0.55)]">
       <motion.div
         initial={{ opacity: 1 }}
         animate={{ opacity: 1 }}
