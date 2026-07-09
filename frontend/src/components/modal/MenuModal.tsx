@@ -1,4 +1,5 @@
 import { ROUTE_PATH } from '@/constants/routePath';
+import { ADMIN_PAGE_LINKS } from '@/constants/adminPageLinks';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useMenuModal } from '@/hooks/useMenuModal';
@@ -6,6 +7,7 @@ import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 import { deviceState } from '@/store/deviceState';
 import { useEffect } from 'react';
+import { useAdmin } from '@/hooks/apiHooks/auth';
 
 export const MenuModal = () => {
   const { state: isShow, hide: hideMenuModal } = useMenuModal();
@@ -45,6 +47,7 @@ export const MenuModal = () => {
 
 const Content = () => {
   const { hide: hideMenuModal } = useMenuModal();
+  const { isAdmin } = useAdmin();
 
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   const LinkList: { text: string; engText: string; link: string }[] = [
@@ -53,7 +56,7 @@ const Content = () => {
   ];
   return (
     <div style={{ marginTop: `${headerHeight}px` }} className="pl-10 pt-10">
-      <ul>
+      <ul className="mb-8">
         {LinkList.map((el) => (
           <li key={el.text} className="tracking-[5px] text-sm mb-5 last-of-type:mb-0">
             <Link to={el.link} onClick={hideMenuModal}>
@@ -62,6 +65,17 @@ const Content = () => {
           </li>
         ))}
       </ul>
+      {isAdmin && (
+        <ul>
+          {ADMIN_PAGE_LINKS.map((link) => (
+            <li key={link.id} className="tracking-[5px] text-sm mb-5 last-of-type:mb-0">
+              <Link to={link.path} onClick={hideMenuModal}>
+                {link.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
