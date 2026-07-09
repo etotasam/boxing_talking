@@ -40,7 +40,6 @@ PropsType) => {
 
           <BoxerBox boxer={matchData.blueBoxer} />
 
-          {/* <PredictionIcon matchData={matchData} iconType={predictionIconType} /> */}
           {isShowVoteIcon && (
             <div className="absolute top-2 left-2">
               {/* <VoteIcon matchData={matchData} /> */}

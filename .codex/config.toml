@@ -1,0 +1,6 @@
+  approval_policy = "on-request"
+
+  [shell_environment_policy]
+  inherit = "core"
+  ignore_default_excludes = false
+  exclude = ["*_KEY", "*_SECRET", "*_TOKEN", "*_PASSWORD", "DATABASE_*"]

@@ -51,19 +51,30 @@ export const MatchResultSummary = ({ result }: MatchResultSummaryProps) => {
   return (
     <div
       className={clsx(
-        'grid grid-cols-[1fr_auto_1fr] items-center gap-x-4 px-3 pt-4',
-        'text-[clamp(13px,3.5vw,22px)] font-black leading-none',
-        'pc:px-7 pc:text-2xl'
+        'mx-3 mt-4 rounded-lg p-px pc:mx-7',
+        isRedWinner &&
+          'bg-gradient-to-r from-yellow-300 via-amber-400/70 to-stone-600 shadow-[0_0_16px_rgba(250,204,21,0.12)]',
+        isBlueWinner &&
+          'bg-gradient-to-r from-stone-600 via-amber-400/70 to-yellow-300 shadow-[0_0_16px_rgba(250,204,21,0.12)]',
+        !shouldShowSideResults && 'bg-stone-600'
       )}
       aria-label="match-result-summary"
     >
-      <span className={clsx('text-left', isRedWinner ? 'text-yellow-300' : 'text-stone-300')}>
-        {shouldShowSideResults && (isRedWinner ? 'WIN' : 'LOSE')}
-      </span>
-      <span className="text-center tracking-wide text-white">{resultLabel}</span>
-      <span className={clsx('text-right', isBlueWinner ? 'text-yellow-300' : 'text-stone-300')}>
-        {shouldShowSideResults && (isBlueWinner ? 'WIN' : 'LOSE')}
-      </span>
+      <div
+        className={clsx(
+          'grid grid-cols-[1fr_auto_1fr] items-center gap-x-4 rounded-[7px] bg-stone-950/95',
+          'px-3 py-3 text-[clamp(13px,3.5vw,22px)] font-black leading-none',
+          'pc:px-7 pc:text-2xl'
+        )}
+      >
+        <span className={clsx('text-left', isRedWinner ? 'text-yellow-300' : 'text-stone-400')}>
+          {shouldShowSideResults && (isRedWinner ? 'WIN' : 'LOSE')}
+        </span>
+        <span className="text-center tracking-wide text-white">{resultLabel}</span>
+        <span className={clsx('text-right', isBlueWinner ? 'text-yellow-300' : 'text-stone-400')}>
+          {shouldShowSideResults && (isBlueWinner ? 'WIN' : 'LOSE')}
+        </span>
+      </div>
     </div>
   );
 };

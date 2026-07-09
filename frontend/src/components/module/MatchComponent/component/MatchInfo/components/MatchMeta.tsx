@@ -22,7 +22,7 @@ export const MatchMeta = ({
     <section
       className={clsx(
         'mt-5 flex w-full flex-col rounded-lg border border-stone-600/80',
-        'bg-stone-950/80 text-white shadow-lg shadow-black/20 pc:flex-row pc:items-center'
+        'bg-stone-500/10 text-white shadow-lg shadow-black/20 pc:flex-row pc:items-center'
       )}
       aria-label="match-meta"
     >

@@ -4,13 +4,12 @@ import { HiUserGroup } from 'react-icons/hi';
 import { IoIosLock } from 'react-icons/io';
 import { PiSealCheckFill } from 'react-icons/pi';
 import { MatchPredictionsType } from '@/types';
+import clsx from 'clsx';
 
 type PredictionSummaryProps = {
   userPrediction?: 'red' | 'blue' | false;
   matchPredictions?: MatchPredictionsType;
   isLoading: boolean;
-  redBoxerName: string;
-  blueBoxerName: string;
   isShowVoteButton?: boolean;
   showPredictionModal?: () => void;
 };
@@ -18,9 +17,6 @@ type PredictionSummaryProps = {
 type PredictionActionButtonProps =
   | {
       type: 'hidden';
-    }
-  | {
-      type: 'voted';
     }
   | {
       type: 'votable';
@@ -85,14 +81,7 @@ const PredictionSummaryContent = ({
     return <PredictionSummaryLocked predictionActionButton={predictionActionButton} />;
   }
 
-  return (
-    <>
-      <PredictionStats matchPredictions={matchPredictions} userPrediction={userPrediction} />
-      <div className="mt-3 flex justify-center">
-        <PredictionActionButton {...predictionActionButton} />
-      </div>
-    </>
-  );
+  return <PredictionStats matchPredictions={matchPredictions} userPrediction={userPrediction} />;
 };
 
 const getPredictionActionButtonProps = ({
@@ -104,7 +93,7 @@ const getPredictionActionButtonProps = ({
 }): PredictionActionButtonProps => {
   if (userPrediction === 'red' || userPrediction === 'blue') {
     return {
-      type: 'voted',
+      type: 'hidden',
     };
   }
 
@@ -164,72 +153,76 @@ const PredictionSummaryLocked = ({
 const PredictionStats = ({ matchPredictions, userPrediction }: PredictionStatsProps) => {
   const totalVotes = matchPredictions.totalVotes;
   const redVotes = matchPredictions.red;
-  const blueVotes = matchPredictions.blue;
   const redPercent = totalVotes === 0 ? 0 : Math.round((redVotes / totalVotes) * 100);
   const bluePercent = totalVotes === 0 ? 0 : 100 - redPercent;
   const redBarWidth = totalVotes === 0 ? 50 : redPercent;
   const blueBarWidth = totalVotes === 0 ? 50 : bluePercent;
 
   return (
-    <div className="space-y-3">
+    <div className="grid grid-cols-2 items-stretch gap-x-4 gap-y-3 pc:grid-cols-[minmax(0,1fr)_minmax(240px,2fr)_minmax(0,1fr)] pc:items-center pc:gap-x-5">
       <div
-        className="flex items-center justify-center gap-1 text-xl font-bold text-stone-300"
-        aria-label={`合計 ${totalVotes}票`}
+        className={`col-start-1 row-start-1 min-w-0 rounded-md border px-3 py-7 ${
+          userPrediction === 'red'
+            ? 'border-red-400/80 bg-red-500/20 shadow-sm shadow-red-500/20'
+            : 'border-red-500/20 bg-red-500/10'
+        }`}
+        aria-label="赤コーナーの投票結果"
       >
-        <HiUserGroup aria-hidden="true" />
-        {totalVotes}
-      </div>
-
-      <div className="grid grid-cols-1 items-center gap-3 pc:grid-cols-2">
-        <div
-          className={`min-w-0 rounded-md border px-3 py-2 ${
-            userPrediction === 'red'
-              ? 'border-red-400/80 bg-red-500/20 shadow-sm shadow-red-500/20'
-              : 'border-red-500/20 bg-red-500/10'
-          }`}
-          aria-label="赤コーナーの投票結果"
-        >
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-end gap-2">
-              <span className="text-2xl font-black leading-none text-red-300">{redPercent}%</span>
-              <span className="pb-0.5 text-xs font-bold text-red-200/80">{redVotes}票</span>
-            </div>
-            {userPrediction === 'red' && <UserPredictionBadge />}
-          </div>
-        </div>
-
-        <div
-          className={`min-w-0 rounded-md border px-3 py-2 text-right ${
-            userPrediction === 'blue'
-              ? 'border-blue-400/80 bg-blue-500/20 shadow-sm shadow-blue-500/20'
-              : 'border-blue-500/20 bg-blue-500/10'
-          }`}
-          aria-label="青コーナーの投票結果"
-        >
-          <div className="flex items-center justify-between gap-3">
-            {userPrediction === 'blue' && <UserPredictionBadge />}
-            <div className="ml-auto flex items-end justify-end gap-2">
-              <span className="pb-0.5 text-xs font-bold text-blue-200/80">{blueVotes}票</span>
-              <span className="text-2xl font-black leading-none text-blue-300">{bluePercent}%</span>
-            </div>
-          </div>
+        <div className="relative flex h-full min-h-14 flex-col items-center justify-center gap-2 pc:min-h-16 pc:items-center">
+          <span className="text-5xl font-black leading-none text-red-500 pc:text-6xl">
+            {redPercent}
+            <span className="text-2xl pc:text-3xl">%</span>
+          </span>
+          {userPrediction === 'red' && <UserPredictionBadge />}
         </div>
       </div>
 
-      <div className="h-4 overflow-hidden rounded-full bg-stone-800" aria-hidden="true">
-        <div className="flex h-full">
-          <div
-            className="h-full bg-red-500"
-            style={{
-              width: `${redBarWidth}%`,
-            }}
-          />
-          <div
-            className="h-full bg-blue-500"
-            style={{
-              width: `${blueBarWidth}%`,
-            }}
-          />
+      <div
+        className={`col-start-2 row-start-1 min-w-0 rounded-md border px-3 py-7 text-right pc:col-start-3 ${
+          userPrediction === 'blue'
+            ? 'border-blue-400/80 bg-blue-500/20 shadow-sm shadow-blue-500/20'
+            : 'border-blue-500/20 bg-blue-500/10'
+        }`}
+        aria-label="青コーナーの投票結果"
+      >
+        <div className="relative flex h-full min-h-14 flex-col items-center justify-center gap-2 pc:min-h-16 pc:items-center">
+          <span className="text-5xl font-black leading-none text-blue-500 pc:text-6xl">
+            {bluePercent}
+            <span className="text-2xl pc:text-3xl">%</span>
+          </span>
+          {userPrediction === 'blue' && <UserPredictionBadge />}
+        </div>
+      </div>
+
+      <div className="col-span-2 col-start-1 row-start-2 flex flex-col pc:col-span-1 pc:col-start-2 pc:row-start-1">
+        <div className="order-1 h-4 overflow-hidden pc:order-2" aria-hidden="true">
+          <div className="flex h-full">
+            <div
+              className={clsx(
+                'h-full bg-red-600 rounded-full',
+                redBarWidth !== 100 && redBarWidth !== 0 && 'mr-1'
+              )}
+              style={{
+                width: `${redBarWidth}%`,
+              }}
+            />
+            <div
+              className={clsx(
+                'h-full bg-blue-600 rounded-full',
+                blueBarWidth !== 100 && blueBarWidth !== 0 && 'ml-1'
+              )}
+              style={{
+                width: `${blueBarWidth}%`,
+              }}
+            />
+          </div>
+        </div>
+        <div
+          className="order-2 mt-2 flex items-center justify-center gap-1 text-sm font-bold text-stone-300 pc:order-1 pc:mb-2 pc:mt-0 pc:text-base"
+          aria-label={`合計 ${totalVotes}票`}
+        >
+          <HiUserGroup aria-hidden="true" />
+          {totalVotes}票
         </div>
       </div>
     </div>
@@ -242,46 +235,24 @@ const PredictionActionButton = (props: PredictionActionButtonProps) => {
   }
 
   return (
-    <>
-      {props.type === 'votable' ? (
-        <button
-          type="button"
-          className="inline-flex min-h-11 w-auto items-center justify-center gap-2 rounded-lg border border-yellow-200 bg-yellow-400 px-4 py-2 text-sm text-stone-950 shadow-md shadow-black/30 duration-300 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:ring-offset-2 focus:ring-offset-stone-950"
-          onClick={props.onVoteClick}
-        >
-          <span className="relative inline-flex shrink-0">
-            <MdHowToVote className="text-xl" aria-hidden="true" />
-          </span>
-          勝者を予想する
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-stone-500 bg-stone-600 px-4 py-2 text-sm text-stone-500 shadow-md shadow-black/20"
-          disabled
-        >
-          <span className="relative inline-flex shrink-0">
-            <MdHowToVote className="text-xl" aria-hidden="true" />
-            <VotedBadge />
-          </span>
-          投票済み
-        </button>
-      )}
-    </>
+    <button
+      type="button"
+      className="inline-flex min-h-11 w-auto items-center justify-center gap-2 rounded-lg border border-yellow-200 bg-yellow-400 px-4 py-2 text-sm text-stone-950 shadow-md shadow-black/30 duration-300 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:ring-offset-2 focus:ring-offset-stone-950"
+      onClick={props.onVoteClick}
+    >
+      <span className="relative inline-flex shrink-0">
+        <MdHowToVote className="text-xl" aria-hidden="true" />
+      </span>
+      勝者を予想する
+    </button>
   );
 };
 
 const UserPredictionBadge = () => {
   return (
-    <span className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-yellow-300">
+    <span className="absolute -top-4 left-1/2 inline-flex -translate-x-1/2 shrink-0 items-center gap-1 whitespace-nowrap text-xs font-bold text-yellow-300">
       <PiSealCheckFill className="h-5 w-5" aria-hidden="true" />
       あなたの投票
     </span>
-  );
-};
-
-const VotedBadge = () => {
-  return (
-    <PiSealCheckFill className="absolute -left-8 -top-4 h-8 w-8 rotate-[-12deg] place-items-center text-yellow-300" />
   );
 };

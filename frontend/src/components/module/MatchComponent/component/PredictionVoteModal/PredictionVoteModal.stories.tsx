@@ -12,8 +12,8 @@ type Story = StoryObj<typeof PredictionVoteModal>;
 export const Element: Story = {
   args: {
     boxersData: {
-      red: { name: 'ティム・チュー', country: 'Australia', title: 0 },
-      blue: { name: 'ライアン・ガルシア', country: 'USA', title: 2 },
+      red: { name: 'ティム・チュー', country: 'Australia' },
+      blue: { name: 'ライアン・ガルシア', country: 'USA' },
     },
     voteExecution: () => {},
     close: () => {},
