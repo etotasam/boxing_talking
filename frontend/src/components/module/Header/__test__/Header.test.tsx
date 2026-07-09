@@ -7,6 +7,12 @@ import { ROUTE_PATH } from '@/constants/routePath';
 import { deviceState, DeviceStateType } from '@/store/deviceState';
 import { Header } from '../Header';
 
+const mockUseAdmin = vi.fn();
+
+vi.mock('@/hooks/apiHooks/auth', () => ({
+  useAdmin: () => mockUseAdmin(),
+}));
+
 vi.mock('../component/HeaderNavigation', () => ({
   HeaderNavigation: ({
     pathname,
@@ -46,6 +52,7 @@ const renderHeader = (device: DeviceStateType = 'PC') => {
 describe('Header', () => {
   beforeEach(() => {
     vi.stubEnv('VITE_APP_SITE_TITLE', 'BOXING TALKING');
+    mockUseAdmin.mockReturnValue({ isAdmin: false });
   });
 
   test('PCではサイトタイトルとナビゲーションを表示する', () => {
@@ -60,14 +67,22 @@ describe('Header', () => {
     expect(screen.getByRole('banner')).toHaveClass('h-[80px]');
   });
 
-  test('SPでは通常ナビゲーションとハンバーガーを表示する', () => {
+  test('SPでは通常ナビゲーションを表示する', () => {
     renderHeader('SP');
 
     expect(screen.getByRole('heading', { name: 'BOXING TALKING' })).toBeInTheDocument();
     expect(screen.getByTestId('header-navigation')).toHaveTextContent(
       `${ROUTE_PATH.PAST_MATCHES}:false`
     );
-    expect(screen.getByTestId('hamburger')).toBeInTheDocument();
+    expect(screen.queryByTestId('hamburger')).not.toBeInTheDocument();
     expect(screen.getByRole('banner')).toHaveClass('h-[126px]', 'bg-black/95');
+  });
+
+  test('SPでは管理者だけハンバーガーを表示する', () => {
+    mockUseAdmin.mockReturnValue({ isAdmin: true });
+
+    renderHeader('SP');
+
+    expect(screen.getByTestId('hamburger')).toBeInTheDocument();
   });
 });

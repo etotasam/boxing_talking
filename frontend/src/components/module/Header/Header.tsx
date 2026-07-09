@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
+import { useAdmin } from '@/hooks/apiHooks/auth';
 import { deviceState } from '@/store/deviceState';
 import { HeaderAuthInfo } from './component/HeaderAuthInfo';
 import { HeaderNavigation } from './component/HeaderNavigation';
@@ -19,8 +20,16 @@ export const Header = () => {
       headerRef={headerRef}
       siteTitle={siteTitle}
       navigation={<HeaderNavigation pathname={pathname} showAdminLinks={device === 'PC'} />}
-      menuButton={device === 'SP' ? <Hamburger /> : null}
+      menuButton={device === 'SP' ? <SpAdminMenuButton /> : null}
       authInfo={<HeaderAuthInfo />}
     />
+  );
+};
+
+const SpAdminMenuButton = () => {
+  const { isAdmin } = useAdmin();
+
+  return (
+    <div className="flex h-10 w-10 items-center justify-center">{isAdmin && <Hamburger />}</div>
   );
 };
