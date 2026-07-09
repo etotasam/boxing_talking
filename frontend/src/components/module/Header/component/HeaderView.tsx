@@ -23,20 +23,19 @@ export const HeaderView = ({
     <header
       ref={headerRef}
       className={clsx(
-        'z-10 group w-full fixed top-0 left-0 backdrop-blur-md text-white',
-        device === 'PC' && 'h-[80px]',
+        'z-10 w-full fixed top-0 left-0 backdrop-blur-md text-white',
+        device === 'PC' && 'h-[80px] border-b border-white/20 bg-black/95',
         device === 'SP' && 'h-[126px] bg-black/95'
       )}
     >
       {device === 'PC' ? (
-        <>
-          <div className="h-[80px] group-hover:h-[90px] group-hover:bg-red-600 duration-500" />
-          <div className="w-full fixed top-0 left-0 flex">
+        <div className="flex h-full w-full items-center px-6">
+          <div className="flex h-full min-w-0 flex-1 items-center">
             <SiteTitle siteTitle={siteTitle} />
             {navigation}
-            {authInfo}
           </div>
-        </>
+          {authInfo}
+        </div>
       ) : (
         <div className="flex h-full flex-col">
           <div className="relative flex h-[70px] items-center border-b border-white/20 px-4">

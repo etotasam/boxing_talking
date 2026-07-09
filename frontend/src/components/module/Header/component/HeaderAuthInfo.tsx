@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { AiOutlineUser } from 'react-icons/ai';
+import { AiOutlineLogout, AiOutlineUser } from 'react-icons/ai';
 import { useRecoilValue } from 'recoil';
 import { DeviceStateType, deviceState } from '@/store/deviceState';
 import { useHeaderAuthInfo } from '../hooks/useHeaderAuthInfo';
@@ -27,23 +27,31 @@ export const HeaderAuthInfoView = ({
   onLogout,
 }: HeaderAuthInfoViewProps) => {
   return (
-    <div className="flex pc:absolute pc:right-5 pc:top-1">
+    <div className="flex">
       <button
         type="button"
         onClick={onLogout}
         aria-label="ログアウト"
         className={clsx(
           'group/user relative flex items-center rounded-md text-[10px] transition-opacity',
+          'pc:gap-3 pc:text-[18px] pc:font-bold pc:text-white/80',
           'hover:opacity-80 cursor-pointer'
         )}
       >
         <AiOutlineUser
           className={clsx(
             'mr-1 mt-[2px] block h-[16px] w-[16px] rounded-[50%] text-white',
+            'pc:mr-0 pc:h-10 pc:w-10 pc:border pc:border-white/40 pc:bg-neutral-900 pc:p-2',
             iconBgColor
           )}
         />
         <span className="hidden pc:inline">{userName}</span>
+        {device === 'PC' && (
+          <>
+            <span className="h-10 w-px bg-white/30" />
+            <AiOutlineLogout className="h-7 w-7 text-white/80" />
+          </>
+        )}
         {device === 'PC' && (
           <span
             className={clsx(
