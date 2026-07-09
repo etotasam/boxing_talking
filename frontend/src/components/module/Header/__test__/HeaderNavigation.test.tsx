@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { ADMIN_PAGE_LINKS } from '@/constants/adminPageLinks';
 import { ROUTE_PATH } from '@/constants/routePath';
 import { HeaderNavigation } from '../component/HeaderNavigation';
 
@@ -11,10 +12,10 @@ vi.mock('@/hooks/apiHooks/auth', () => ({
   useAdmin: () => mockUseAdmin(),
 }));
 
-const renderHeaderNavigation = (pathname = ROUTE_PATH.HOME) => {
+const renderHeaderNavigation = (pathname = ROUTE_PATH.HOME, showAdminLinks = true) => {
   return render(
     <MemoryRouter initialEntries={[pathname]}>
-      <HeaderNavigation pathname={pathname} />
+      <HeaderNavigation pathname={pathname} showAdminLinks={showAdminLinks} />
     </MemoryRouter>
   );
 };
@@ -42,18 +43,26 @@ describe('HeaderNavigation', () => {
 
     const { container } = renderHeaderNavigation();
 
-    expect(container.querySelector(`a[href="${ROUTE_PATH.BOXER_REGISTER}"]`)).toBeInTheDocument();
-    expect(container.querySelector(`a[href="${ROUTE_PATH.MATCH_REGISTER}"]`)).toBeInTheDocument();
+    ADMIN_PAGE_LINKS.forEach((link) => {
+      expect(container.querySelector(`a[href="${link.path}"]`)).toBeInTheDocument();
+    });
   });
 
   test('管理者でなければ管理ページリンクを表示しない', () => {
     const { container } = renderHeaderNavigation();
 
-    expect(
-      container.querySelector(`a[href="${ROUTE_PATH.BOXER_REGISTER}"]`)
-    ).not.toBeInTheDocument();
-    expect(
-      container.querySelector(`a[href="${ROUTE_PATH.MATCH_REGISTER}"]`)
-    ).not.toBeInTheDocument();
+    ADMIN_PAGE_LINKS.forEach((link) => {
+      expect(container.querySelector(`a[href="${link.path}"]`)).not.toBeInTheDocument();
+    });
+  });
+
+  test('管理者でも管理ページリンクを非表示にできる', () => {
+    mockUseAdmin.mockReturnValue({ isAdmin: true });
+
+    const { container } = renderHeaderNavigation(ROUTE_PATH.HOME, false);
+
+    ADMIN_PAGE_LINKS.forEach((link) => {
+      expect(container.querySelector(`a[href="${link.path}"]`)).not.toBeInTheDocument();
+    });
   });
 });

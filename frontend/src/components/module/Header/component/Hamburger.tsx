@@ -95,11 +95,13 @@ export const Hamburger = () => {
   );
 
   return (
-    <div
+    <button
+      type="button"
+      aria-label="管理メニューを開閉"
       onClick={onClick}
-      className="z-30 fixed bottom-0 left-[50%] translate-x-[-50%] cursor-pointer"
+      className="z-30 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full"
     >
       {HamburgerIcon}
-    </div>
+    </button>
   );
 };

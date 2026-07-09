@@ -6,10 +6,7 @@ import { ROUTE_PATH } from '@/constants/routePath';
 import { MatchDataType } from '@/types';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
 import { useModalState } from '@/hooks/useModalState';
-import {
-  useFetchUsersPrediction,
-  useMatchPredictions,
-} from '@/hooks/apiHooks/prediction';
+import { useFetchUsersPrediction, useMatchPredictions } from '@/hooks/apiHooks/prediction';
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 import { MatchView, UsersPredictionType } from './MatchView';
@@ -51,10 +48,10 @@ export const MatchContainer = (props: PropsType) => {
     return matchPrediction ? matchPrediction.prediction : false;
   }, [usersPredictions, matchId]);
 
-  const {
-    data: matchPredictions,
-    matchPredictionFetchState,
-  } = useMatchPredictions(Number(matchId), userPrediction);
+  const { data: matchPredictions, matchPredictionFetchState } = useMatchPredictions(
+    Number(matchId),
+    userPrediction
+  );
 
   //? 読み込み時にscrollをtop位置へ移動
   useEffect(() => {

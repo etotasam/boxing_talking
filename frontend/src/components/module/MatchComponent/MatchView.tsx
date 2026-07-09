@@ -68,12 +68,13 @@ const MainContent = ({
   isShowVoteIcon,
   commentsModalHeightHiddenState,
 }: MainProps) => {
+  const MATCH_MAIN_CONTENT_BOTTOM_GAP = 32;
   return (
     <div className="w-full overflow-auto">
       <div
         data-testid="match-main-content"
         className="flex justify-center"
-        style={{ paddingBottom: commentsModalHeightHiddenState }}
+        style={{ paddingBottom: commentsModalHeightHiddenState + MATCH_MAIN_CONTENT_BOTTOM_GAP }}
       >
         <MatchInfo
           matchData={matchData}

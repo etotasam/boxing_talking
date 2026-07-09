@@ -1,6 +1,7 @@
 
 .github
 .env*
+!.env.example
 .husky
 # backend
 backend/node_modules
@@ -56,3 +57,4 @@ wiki.md
 HOOKS_NAMING_CONVENTION.md
 HOOKS_REFACTORING_TODO.md
 config.toml
+!.codex/config.toml

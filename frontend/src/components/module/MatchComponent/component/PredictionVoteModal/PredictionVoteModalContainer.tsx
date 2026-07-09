@@ -41,12 +41,10 @@ export const PredictionVoteModalContainer = (props: PropsType) => {
       red: {
         name: thisMatch.redBoxer.name,
         country: thisMatch.redBoxer.country,
-        title: thisMatch.redBoxer.titles.length,
       },
       blue: {
         name: thisMatch.blueBoxer.name,
         country: thisMatch.blueBoxer.country,
-        title: thisMatch.blueBoxer.titles.length,
       },
     },
     voteExecution,

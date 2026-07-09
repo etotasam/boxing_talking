@@ -5,6 +5,7 @@ import { FlagImage } from '@/components/atomic/FlagImage';
 import type { BoxerType, MatchResultType } from '@/types';
 import type { BoxerResultState, BoxerSide } from './helper/boxerRecord';
 import { getBoxerResultState, getDisplayedBoxerRecord } from './helper/boxerRecord';
+import { BoxerTitles } from './BoxerTitles';
 
 type BoxerSummaryProps = {
   boxer: BoxerType;
@@ -72,7 +73,7 @@ export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryPr
   return (
     <article
       className={clsx(
-        'flex min-w-0 flex-col justify-center py-5 text-white',
+        'flex min-w-0 flex-col justify-start py-5 text-white',
         isRedSide
           ? 'items-start border-l-4 border-red-500 pl-3 pr-7 text-left pc:pl-7 pc:pr-16'
           : 'items-end border-r-4 border-blue-500 pl-7 pr-3 text-right pc:pl-16 pc:pr-7'
@@ -138,6 +139,7 @@ export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryPr
         />
         <span className="min-w-0 whitespace-nowrap">{COUNTRY_LABELS[boxer.country]}</span>
       </span>
+      <BoxerTitles boxerName={boxer.name} side={side} titles={boxer.titles} />
     </article>
   );
 };
