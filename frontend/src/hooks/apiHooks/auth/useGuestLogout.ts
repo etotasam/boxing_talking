@@ -31,6 +31,8 @@ export const useGuestLogout = () => {
       undefined,
       {
         onSuccess: () => {
+          queryClient.removeQueries(QUERY_KEY.PREDICTION);
+          queryClient.removeQueries(QUERY_KEY.MATCH_PREDICTIONS);
           refetchMatchPrediction();
           queryClient.setQueryData<boolean>(QUERY_KEY.GUEST, false);
           showSuccessToast(MESSAGE.LOGOUT_SUCCESS);

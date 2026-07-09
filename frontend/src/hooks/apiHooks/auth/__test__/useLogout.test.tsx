@@ -82,6 +82,10 @@ type AuthUser = {
   name: string;
 };
 
+const usersPredictionCache = [{ matchId: 1, prediction: 'red' }];
+const matchPredictionsCacheKey = [QUERY_KEY.MATCH_PREDICTIONS, { id: 1, userPrediction: 'red' }];
+const matchPredictionsCache = { isVisible: true, totalVotes: 2, red: 1, blue: 1 };
+
 // QueryClientProvider 付きの hook テスト用 wrapper を生成する関数
 const createWrapper = (queryClient: QueryClient) => {
   return ({ children }: { children: ReactNode }) => {
@@ -113,6 +117,12 @@ const seedAuthCache = (queryClient: QueryClient) => {
   queryClient.setQueryData<AuthUser>(QUERY_KEY.AUTH, { name: 'test user' });
 };
 
+// 前ユーザーの勝敗予想キャッシュを投入する関数
+const seedPredictionCaches = (queryClient: QueryClient) => {
+  queryClient.setQueryData(QUERY_KEY.PREDICTION, usersPredictionCache);
+  queryClient.setQueryData(matchPredictionsCacheKey, matchPredictionsCache);
+};
+
 describe('useLogout', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -123,6 +133,7 @@ describe('useLogout', () => {
 
     const queryClient = createQueryClient();
     seedAuthCache(queryClient);
+    seedPredictionCaches(queryClient);
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const { result } = renderUseLogout(queryClient);
 
@@ -135,6 +146,8 @@ describe('useLogout', () => {
       expect(mocks.post).toHaveBeenCalledTimes(1);
       expect(mocks.post).toHaveBeenCalledWith(API_PATH.USER_LOGOUT);
       expect(queryClient.getQueryData(QUERY_KEY.AUTH)).toBeNull();
+      expect(queryClient.getQueryData(QUERY_KEY.PREDICTION)).toBeUndefined();
+      expect(queryClient.getQueryData(matchPredictionsCacheKey)).toBeUndefined();
       expect(invalidateQueriesSpy).toHaveBeenCalledTimes(1);
       expect(invalidateQueriesSpy).toHaveBeenCalledWith(QUERY_KEY.ADMIN);
       expect(mocks.refetchMatchPrediction).toHaveBeenCalledTimes(1);
@@ -151,6 +164,7 @@ describe('useLogout', () => {
 
     const queryClient = createQueryClient();
     seedAuthCache(queryClient);
+    seedPredictionCaches(queryClient);
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const { result } = renderUseLogout(queryClient);
 
@@ -165,6 +179,8 @@ describe('useLogout', () => {
       expect(mocks.showErrorToast).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).toHaveBeenCalledWith(MESSAGE.LOGOUT_FAILED);
       expect(queryClient.getQueryData(QUERY_KEY.AUTH)).toEqual({ name: 'test user' });
+      expect(queryClient.getQueryData(QUERY_KEY.PREDICTION)).toEqual(usersPredictionCache);
+      expect(queryClient.getQueryData(matchPredictionsCacheKey)).toEqual(matchPredictionsCache);
       expect(invalidateQueriesSpy).not.toHaveBeenCalled();
       expect(mocks.refetchMatchPrediction).not.toHaveBeenCalled();
       expect(mocks.showGrayBackToast).not.toHaveBeenCalled();

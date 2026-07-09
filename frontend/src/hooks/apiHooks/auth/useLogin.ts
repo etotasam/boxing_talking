@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
@@ -18,6 +18,7 @@ type LoginInput = {
 };
 
 export const useLogin = () => {
+  const queryClient = useQueryClient();
   const { refetch: refetchAdmin } = useAdmin();
   const { showSuccessToast, showErrorToast } = useToastModal();
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();
@@ -43,6 +44,8 @@ export const useLogin = () => {
       { ...props },
       {
         onSuccess: (userData) => {
+          queryClient.removeQueries(QUERY_KEY.PREDICTION);
+          queryClient.removeQueries(QUERY_KEY.MATCH_PREDICTIONS);
           refetchMatchPrediction();
           hideLoginModal();
           hideFullScreenLoading();

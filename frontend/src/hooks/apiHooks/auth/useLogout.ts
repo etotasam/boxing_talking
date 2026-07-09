@@ -30,6 +30,8 @@ export const useLogout = () => {
       undefined,
       {
         onSuccess: () => {
+          queryClient.removeQueries(QUERY_KEY.PREDICTION);
+          queryClient.removeQueries(QUERY_KEY.MATCH_PREDICTIONS);
           queryClient.setQueryData(QUERY_KEY.AUTH, null);
           queryClient.invalidateQueries(QUERY_KEY.ADMIN);
           refetchMatchPrediction();
