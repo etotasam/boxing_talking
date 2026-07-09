@@ -1,8 +1,8 @@
 name = "tester"
 description = "テスト設計・作成"
 
-model = "gpt-5.3-codex"
-model_reasoning_effort = "medium"
+model = "gpt-5.6-luna"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 
 developer_instructions = """
