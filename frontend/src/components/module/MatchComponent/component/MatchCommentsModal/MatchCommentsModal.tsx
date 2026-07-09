@@ -51,12 +51,11 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
           ? { height: commentsModalHeight }
           : { height: commentsModalHeightHiddenState }
       }
-      className="fixed bottom-0 left-0 w-full rounded-t-[28px] border-t border-white/10 bg-gradient-to-b from-zinc-800/95 via-zinc-900/95 to-black/95 shadow-[0_-16px_40px_rgba(0,0,0,0.45)]"
+      className="fixed bottom-0 left-0 w-full rounded-t-[28px] border-t border-white/10 bg-gradient-to-b from-zinc-800 via-zinc-900 to-black shadow-[0_-16px_40px_rgba(0,0,0,0.45)]"
     >
       <motion.div
-        //? translate-xが効かないので無理やり中央寄せにした( left-[calc(50%-48px)] 幅が96pxなので半分の48pxを引いている)
         className={clsx(
-          'absolute left-[calc(50%-48px)] top-0 z-10 h-0 w-24',
+          'absolute left-1/2 top-0 z-10 h-0 w-20 -translate-x-1/2',
           commentFetchState === 'loading' ? 'cursor-default' : 'cursor-pointer'
         )}
         onClick={toggleShowComments}

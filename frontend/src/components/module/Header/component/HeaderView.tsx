@@ -61,8 +61,8 @@ const SiteTitle = ({ siteTitle }: SiteTitleProps) => {
     <h1
       className={clsx(
         'pointer-events-none fixed left-4 max-w-[calc(100vw-120px)] translate-x-0',
-        'whitespace-nowrap text-[clamp(18px,6vw,24px)] font-bold',
-        'pc:static pc:left-0 pc:max-w-none pc:text-[38px]'
+        "whitespace-nowrap font-['Bebas_Neue'] text-[clamp(36px,7vw,48px)] font-normal tracking-[0.04em]",
+        'pc:static pc:left-0 pc:max-w-none pc:text-[48px]'
       )}
     >
       {siteTitle}
