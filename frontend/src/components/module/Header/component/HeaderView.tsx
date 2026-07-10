@@ -38,11 +38,11 @@ export const HeaderView = ({
         </div>
       ) : (
         <div className="flex h-full flex-col">
-          <div className="relative flex h-[70px] items-center border-b border-white/20 px-4">
+          <div className="flex h-[70px] items-center gap-2 border-b border-white/20 px-4">
             <SiteTitle siteTitle={siteTitle} />
-            <div className="ml-auto flex items-center gap-5">
-              {authInfo}
-              {menuButton}
+            <div className="ml-auto flex min-w-0 items-center gap-2 sm:gap-5">
+              <div className="min-w-0">{authInfo}</div>
+              <div className="shrink-0">{menuButton}</div>
             </div>
           </div>
           <div className="h-[56px] border-b border-white/20">{navigation}</div>
@@ -60,9 +60,9 @@ const SiteTitle = ({ siteTitle }: SiteTitleProps) => {
   return (
     <h1
       className={clsx(
-        'pointer-events-none fixed left-4 max-w-[calc(100vw-120px)] translate-x-0',
-        "whitespace-nowrap font-['Bebas_Neue'] text-[clamp(36px,7vw,48px)] font-normal tracking-[0.04em]",
-        'pc:static pc:left-0 pc:max-w-none pc:text-[48px]'
+        'pointer-events-none min-w-0 flex-1 truncate',
+        "font-['Bebas_Neue'] text-[clamp(36px,7vw,48px)] font-normal tracking-[0.04em]",
+        'pc:flex-none pc:overflow-visible pc:text-[48px]'
       )}
     >
       {siteTitle}
