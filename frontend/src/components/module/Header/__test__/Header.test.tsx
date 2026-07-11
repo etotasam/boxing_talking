@@ -14,25 +14,21 @@ vi.mock('@/hooks/apiHooks/auth', () => ({
 }));
 
 vi.mock('../component/HeaderNavigation', () => ({
-  HeaderNavigation: ({
-    pathname,
-    showAdminLinks,
-  }: {
-    pathname: string;
-    showAdminLinks?: boolean;
-  }) => (
-    <div data-testid="header-navigation">
-      {pathname}:{String(showAdminLinks)}
-    </div>
+  HeaderNavigation: ({ pathname }: { pathname: string }) => (
+    <div data-testid="header-navigation">{pathname}</div>
   ),
-}));
-
-vi.mock('../component/Hamburger', () => ({
-  Hamburger: () => <div data-testid="hamburger" />,
 }));
 
 vi.mock('../component/HeaderAuthInfo', () => ({
   HeaderAuthInfo: () => <div data-testid="header-auth-info" />,
+}));
+
+vi.mock('../component/AdminMenuPopover', () => ({
+  AdminMenuPopover: () => <div data-testid="pc-admin-menu-popover" />,
+}));
+
+vi.mock('../component/SpAdminMenuPopover', () => ({
+  SpAdminMenuPopover: () => <div data-testid="sp-admin-menu-popover" />,
 }));
 
 const renderHeader = (device: DeviceStateType = 'PC') => {
@@ -59,10 +55,9 @@ describe('Header', () => {
     renderHeader('PC');
 
     expect(screen.getByRole('heading', { name: 'BOXING TALKING' })).toBeInTheDocument();
-    expect(screen.getByTestId('header-navigation')).toHaveTextContent(
-      `${ROUTE_PATH.PAST_MATCHES}:true`
-    );
-    expect(screen.queryByTestId('hamburger')).not.toBeInTheDocument();
+    expect(screen.getByTestId('header-navigation')).toHaveTextContent(ROUTE_PATH.PAST_MATCHES);
+    expect(screen.getByTestId('pc-admin-menu-popover')).toBeInTheDocument();
+    expect(screen.queryByTestId('sp-admin-menu-popover')).not.toBeInTheDocument();
     expect(screen.getByTestId('header-auth-info')).toBeInTheDocument();
     expect(screen.getByRole('banner')).toHaveClass('h-[80px]');
   });
@@ -71,18 +66,10 @@ describe('Header', () => {
     renderHeader('SP');
 
     expect(screen.getByRole('heading', { name: 'BOXING TALKING' })).toBeInTheDocument();
-    expect(screen.getByTestId('header-navigation')).toHaveTextContent(
-      `${ROUTE_PATH.PAST_MATCHES}:false`
-    );
-    expect(screen.queryByTestId('hamburger')).not.toBeInTheDocument();
+    expect(screen.getByTestId('header-navigation')).toHaveTextContent(ROUTE_PATH.PAST_MATCHES);
+    expect(screen.queryByTestId('pc-admin-menu-popover')).not.toBeInTheDocument();
+    expect(screen.getByTestId('sp-admin-menu-popover')).toBeInTheDocument();
     expect(screen.getByRole('banner')).toHaveClass('h-[126px]', 'bg-black/95');
   });
 
-  test('SPでは管理者だけハンバーガーを表示する', () => {
-    mockUseAdmin.mockReturnValue({ isAdmin: true });
-
-    renderHeader('SP');
-
-    expect(screen.getByTestId('hamburger')).toBeInTheDocument();
-  });
 });

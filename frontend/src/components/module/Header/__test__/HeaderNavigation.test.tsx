@@ -2,7 +2,6 @@ import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { ADMIN_PAGE_LINKS } from '@/constants/adminPageLinks';
 import { ROUTE_PATH } from '@/constants/routePath';
 import { HeaderNavigation } from '../component/HeaderNavigation';
 
@@ -12,10 +11,10 @@ vi.mock('@/hooks/apiHooks/auth', () => ({
   useAdmin: () => mockUseAdmin(),
 }));
 
-const renderHeaderNavigation = (pathname = ROUTE_PATH.HOME, showAdminLinks = true) => {
+const renderHeaderNavigation = (pathname = ROUTE_PATH.HOME) => {
   return render(
     <MemoryRouter initialEntries={[pathname]}>
-      <HeaderNavigation pathname={pathname} showAdminLinks={showAdminLinks} />
+      <HeaderNavigation pathname={pathname} />
     </MemoryRouter>
   );
 };
@@ -38,31 +37,11 @@ describe('HeaderNavigation', () => {
     );
   });
 
-  test('管理者なら管理ページリンクを表示する', () => {
+  test('管理者でも管理ページリンクを常時表示しない', () => {
     mockUseAdmin.mockReturnValue({ isAdmin: true });
 
     const { container } = renderHeaderNavigation();
 
-    ADMIN_PAGE_LINKS.forEach((link) => {
-      expect(container.querySelector(`a[href="${link.path}"]`)).toBeInTheDocument();
-    });
-  });
-
-  test('管理者でなければ管理ページリンクを表示しない', () => {
-    const { container } = renderHeaderNavigation();
-
-    ADMIN_PAGE_LINKS.forEach((link) => {
-      expect(container.querySelector(`a[href="${link.path}"]`)).not.toBeInTheDocument();
-    });
-  });
-
-  test('管理者でも管理ページリンクを非表示にできる', () => {
-    mockUseAdmin.mockReturnValue({ isAdmin: true });
-
-    const { container } = renderHeaderNavigation(ROUTE_PATH.HOME, false);
-
-    ADMIN_PAGE_LINKS.forEach((link) => {
-      expect(container.querySelector(`a[href="${link.path}"]`)).not.toBeInTheDocument();
-    });
+    expect(container.querySelectorAll('a')).toHaveLength(2);
   });
 });

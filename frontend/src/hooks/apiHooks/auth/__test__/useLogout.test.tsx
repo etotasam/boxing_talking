@@ -23,7 +23,6 @@ const mocks = vi.hoisted(() => {
     showGrayBackToast: vi.fn(),
     showFullScreenLoading: vi.fn(),
     hideFullScreenLoading: vi.fn(),
-    hideMenuModal: vi.fn(),
     refetchMatchPrediction: vi.fn(),
   };
 });
@@ -53,16 +52,6 @@ vi.mock('@/hooks/useFullScreenLoading', () => {
       return {
         showFullScreenLoading: mocks.showFullScreenLoading,
         hideFullScreenLoading: mocks.hideFullScreenLoading,
-      };
-    }),
-  };
-});
-
-vi.mock('@/hooks/useMenuModal', () => {
-  return {
-    useMenuModal: vi.fn(() => {
-      return {
-        hide: mocks.hideMenuModal,
       };
     }),
   };
@@ -153,7 +142,6 @@ describe('useLogout', () => {
       expect(mocks.refetchMatchPrediction).toHaveBeenCalledTimes(1);
       expect(mocks.showGrayBackToast).toHaveBeenCalledTimes(1);
       expect(mocks.showGrayBackToast).toHaveBeenCalledWith(MESSAGE.LOGOUT_SUCCESS);
-      expect(mocks.hideMenuModal).toHaveBeenCalledTimes(1);
       expect(mocks.hideFullScreenLoading).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).not.toHaveBeenCalled();
     });
@@ -184,7 +172,6 @@ describe('useLogout', () => {
       expect(invalidateQueriesSpy).not.toHaveBeenCalled();
       expect(mocks.refetchMatchPrediction).not.toHaveBeenCalled();
       expect(mocks.showGrayBackToast).not.toHaveBeenCalled();
-      expect(mocks.hideMenuModal).not.toHaveBeenCalled();
     });
   });
 });

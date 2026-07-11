@@ -23,7 +23,6 @@ const mocks = vi.hoisted(() => {
     showSuccessToast: vi.fn(),
     showFullScreenLoading: vi.fn(),
     hideFullScreenLoading: vi.fn(),
-    hideMenuModal: vi.fn(),
     refetchMatchPrediction: vi.fn(),
   };
 });
@@ -53,16 +52,6 @@ vi.mock('@/hooks/useFullScreenLoading', () => {
       return {
         showFullScreenLoading: mocks.showFullScreenLoading,
         hideFullScreenLoading: mocks.hideFullScreenLoading,
-      };
-    }),
-  };
-});
-
-vi.mock('@/hooks/useMenuModal', () => {
-  return {
-    useMenuModal: vi.fn(() => {
-      return {
-        hide: mocks.hideMenuModal,
       };
     }),
   };
@@ -146,7 +135,6 @@ describe('useGuestLogout', () => {
       expect(queryClient.getQueryData(matchPredictionsCacheKey)).toBeUndefined();
       expect(mocks.showSuccessToast).toHaveBeenCalledTimes(1);
       expect(mocks.showSuccessToast).toHaveBeenCalledWith(MESSAGE.LOGOUT_SUCCESS);
-      expect(mocks.hideMenuModal).toHaveBeenCalledTimes(1);
       expect(mocks.hideFullScreenLoading).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).not.toHaveBeenCalled();
     });
@@ -175,7 +163,6 @@ describe('useGuestLogout', () => {
       expect(queryClient.getQueryData(matchPredictionsCacheKey)).toEqual(matchPredictionsCache);
       expect(mocks.refetchMatchPrediction).not.toHaveBeenCalled();
       expect(mocks.showSuccessToast).not.toHaveBeenCalled();
-      expect(mocks.hideMenuModal).not.toHaveBeenCalled();
     });
   });
 });

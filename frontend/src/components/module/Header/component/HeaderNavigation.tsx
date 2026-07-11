@@ -1,8 +1,6 @@
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
 import { ROUTE_PATH } from '@/constants/routePath';
-import { useAdmin } from '@/hooks/apiHooks/auth';
-import { AdministratorPageLinks } from '../../AdministratorPageLinks';
 
 const LINK_STYLES = {
   common:
@@ -18,14 +16,9 @@ const getLinkClassName = (targetPath: string, currentPath: string) =>
     currentPath === targetPath ? LINK_STYLES.currentPage : LINK_STYLES.normalPage
   );
 
-type HeaderNavigationProps = {
-  pathname: string;
-  showAdminLinks?: boolean;
-};
+type HeaderNavigationProps = { pathname: string };
 
-export const HeaderNavigation = ({ pathname, showAdminLinks = true }: HeaderNavigationProps) => {
-  const { isAdmin } = useAdmin();
-
+export const HeaderNavigation = ({ pathname }: HeaderNavigationProps) => {
   return (
     <nav className="flex h-full w-full pc:ml-12 pc:w-auto pc:items-center">
       <ul className="flex h-full w-full justify-center pc:w-auto">
@@ -44,7 +37,6 @@ export const HeaderNavigation = ({ pathname, showAdminLinks = true }: HeaderNavi
           </Link>
         </li>
       </ul>
-      {showAdminLinks && isAdmin && <AdministratorPageLinks />}
     </nav>
   );
 };
