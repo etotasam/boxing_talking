@@ -57,7 +57,7 @@ const SiteTitle = ({ siteTitle }: SiteTitleProps) => {
       className={clsx(
         'pointer-events-none min-w-0 flex-1 truncate',
         "font-['Bebas_Neue'] text-[clamp(36px,7vw,48px)] font-normal tracking-[0.04em]",
-        'pc:flex-none pc:overflow-visible pc:text-[48px]'
+        'pc:flex-none pc:max-w-[clamp(180px,32vw,360px)] pc:overflow-hidden pc:text-[clamp(32px,4.8vw,48px)]'
       )}
     >
       {siteTitle}
@@ -72,12 +72,12 @@ const HeaderContentPC = ({
   authInfo,
 }: Pick<HeaderViewProps, 'siteTitle' | 'navigation' | 'adminMenu' | 'authInfo'>) => {
   return (
-    <div className="flex h-full w-full items-center px-6">
+    <div className="flex h-full w-full items-center px-[clamp(12px,2.5vw,24px)]">
       <div className="flex h-full min-w-0 flex-1 items-center">
         <SiteTitle siteTitle={siteTitle} />
         {navigation}
       </div>
-      <div className="flex shrink-0 items-center gap-3">
+      <div className="ml-[clamp(8px,1.5vw,12px)] flex min-w-0 items-center gap-[clamp(8px,1.5vw,12px)]">
         {adminMenu}
         {authInfo}
       </div>
