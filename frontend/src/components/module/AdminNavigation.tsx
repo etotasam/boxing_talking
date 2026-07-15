@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { motion, Variants } from 'framer-motion';
 import { BsCalendarPlus } from 'react-icons/bs';
 import { FaUserEdit } from 'react-icons/fa';
 import { RiEditBoxFill, RiUserAddLine } from 'react-icons/ri';
@@ -47,6 +48,8 @@ type AdminPageLinkListProps = {
   getLinkClassName?: (link: AdminPageLink) => string | undefined;
   renderLinkContent?: (link: AdminPageLink) => ReactNode;
   onNavigate?: () => void;
+  listVariants?: Variants;
+  itemVariants?: Variants;
 };
 
 /** 管理ページごとのリンクアイコン。 */
@@ -65,27 +68,49 @@ export const AdminPageLinkList = ({
   getLinkClassName,
   renderLinkContent,
   onNavigate,
+  listVariants,
+  itemVariants,
 }: AdminPageLinkListProps) => {
   const { isAdmin } = useAdmin();
   const { pathname } = useLocation();
 
   if (!isAdmin) return null;
 
-  return (
-    <ul id={id} className={className}>
-      {ADMIN_PAGE_LINKS.map((link) => (
-        <li key={link.id} className={getItemClassName?.(link)}>
-          <Link
-            to={link.path}
-            aria-label={link.name}
-            aria-current={pathname === link.path ? 'page' : undefined}
-            className={getLinkClassName?.(link)}
-            onClick={onNavigate}
-          >
-            {renderLinkContent?.(link) ?? link.name}
-          </Link>
-        </li>
-      ))}
-    </ul>
-  );
+  const links = ADMIN_PAGE_LINKS.map((link) => {
+    const content = (
+      <Link
+        to={link.path}
+        aria-label={link.name}
+        aria-current={pathname === link.path ? 'page' : undefined}
+        className={getLinkClassName?.(link)}
+        onClick={onNavigate}
+      >
+        {renderLinkContent?.(link) ?? link.name}
+      </Link>
+    );
+
+    if (itemVariants) {
+      return (
+        <motion.li key={link.id} className={getItemClassName?.(link)} variants={itemVariants}>
+          {content}
+        </motion.li>
+      );
+    }
+
+    return (
+      <li key={link.id} className={getItemClassName?.(link)}>
+        {content}
+      </li>
+    );
+  });
+
+  if (listVariants) {
+    return (
+      <motion.ul id={id} className={className} variants={listVariants}>
+        {links}
+      </motion.ul>
+    );
+  }
+
+  return <ul id={id} className={className}>{links}</ul>;
 };

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { HiOutlineAdjustmentsHorizontal } from 'react-icons/hi2';
 import { IoChevronForwardOutline } from 'react-icons/io5';
 import { useLocation } from 'react-router-dom';
@@ -12,10 +13,27 @@ import {
 
 const ADMIN_PAGE_LINKS_ID = 'sp-admin-page-links';
 
+const panelVariants: Variants = {
+  initial: { clipPath: 'inset(0 0 100% 0)' },
+  open: { clipPath: 'inset(0 0 0 0)', transition: { duration: 0.2, ease: 'easeOut' } },
+  exit: { clipPath: 'inset(0 0 100% 0)', transition: { duration: 0.15, ease: 'easeIn' } },
+};
+
+const linkListVariants: Variants = {
+  initial: {},
+  open: { transition: { staggerChildren: 0.05 } },
+};
+
+const linkItemVariants: Variants = {
+  initial: { y: -12 },
+  open: { y: 0, transition: { duration: 0.15, ease: 'easeOut' } },
+};
+
 /** SPヘッダーの下段ナビゲーションから表示する管理ページリンクパネル。 */
 export const SpAdminMenuPopover = () => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const menuFrameRef = useRef<HTMLDivElement>(null);
   const { pathname } = useLocation();
 
   const close = () => setIsOpen(false);
@@ -38,6 +56,18 @@ export const SpAdminMenuPopover = () => {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    const menuFrame = menuFrameRef.current;
+    if (!menuFrame) return;
+
+    if (isOpen) {
+      menuFrame.removeAttribute('inert');
+      return;
+    }
+
+    menuFrame.setAttribute('inert', '');
+  }, [isOpen]);
+
   return (
     <div ref={containerRef} className="contents">
       <AdminMenuButton
@@ -53,26 +83,43 @@ export const SpAdminMenuPopover = () => {
         <HiOutlineAdjustmentsHorizontal className="h-6 w-6" />
       </AdminMenuButton>
 
-      {isOpen && (
-        <div
-          className="absolute left-0 top-full z-20 w-full overflow-hidden border-b border-white/20 bg-zinc-950 shadow-xl"
-          data-testid="sp-admin-menu-popover"
-          id={ADMIN_PAGE_LINKS_ID}
-        >
-          <AdminPageLinkList
-            className="divide-y divide-white/15"
-            getLinkClassName={(link) => getLinkClassName(link, pathname)}
-            renderLinkContent={(link) => (
-              <>
-                <AdminPageLinkIcon link={link} />
-                <span className="ml-4 flex-1 text-left">{link.name}</span>
-                <IoChevronForwardOutline className="h-5 w-5 text-white/60" aria-hidden="true" />
-              </>
-            )}
-            onNavigate={close}
-          />
-        </div>
-      )}
+      <div
+        ref={menuFrameRef}
+        aria-hidden={!isOpen}
+        className={clsx(
+          'absolute left-0 top-full z-20 w-full overflow-hidden',
+          !isOpen && 'pointer-events-none'
+        )}
+      >
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial="initial"
+              animate="open"
+              exit="exit"
+              variants={panelVariants}
+              className="border-b border-white/20 bg-zinc-950 shadow-xl"
+              data-testid="sp-admin-menu-popover"
+              id={ADMIN_PAGE_LINKS_ID}
+            >
+              <AdminPageLinkList
+                className="divide-y divide-white/15"
+                getLinkClassName={(link) => getLinkClassName(link, pathname)}
+                listVariants={linkListVariants}
+                itemVariants={linkItemVariants}
+                renderLinkContent={(link) => (
+                  <>
+                    <AdminPageLinkIcon link={link} />
+                    <span className="ml-4 flex-1 text-left">{link.name}</span>
+                    <IoChevronForwardOutline className="h-5 w-5 text-white/60" aria-hidden="true" />
+                  </>
+                )}
+                onNavigate={close}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
