@@ -1,10 +1,10 @@
-import { ReactNode } from 'react';
+import { ReactNode, RefObject } from 'react';
 import clsx from 'clsx';
 import { DeviceStateType } from '@/store/deviceState';
 
 type HeaderViewProps = {
   device: DeviceStateType;
-  headerRef: (node: HTMLElement | null) => void;
+  headerRef: RefObject<HTMLElement>;
   siteTitle: string;
   navigation: ReactNode;
   adminMenu: ReactNode;

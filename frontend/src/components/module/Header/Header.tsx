@@ -11,7 +11,7 @@ import { useHeaderHeightRef } from './hooks/useHeaderHeightRef';
 export const Header = () => {
   const { pathname } = useLocation();
   const device = useRecoilValue(deviceState);
-  const headerRef = useHeaderHeightRef(device);
+  const headerRef = useHeaderHeightRef();
   const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
   return (
