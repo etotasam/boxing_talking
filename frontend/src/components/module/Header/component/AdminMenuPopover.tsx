@@ -5,7 +5,11 @@ import { HiOutlineAdjustmentsHorizontal } from 'react-icons/hi2';
 import { IoChevronForwardOutline } from 'react-icons/io5';
 import { useLocation } from 'react-router-dom';
 import { AdminPageLink } from '@/constants/adminPageLinks';
-import { AdminMenuButton, AdminPageLinkIcon, AdminPageLinkList } from '@/components/module/AdminNavigation';
+import {
+  AdminMenuButton,
+  AdminPageLinkIcon,
+  AdminPageLinkList,
+} from '@/components/module/AdminNavigation';
 
 const ADMIN_PAGE_LINKS_ID = 'pc-admin-page-links';
 
