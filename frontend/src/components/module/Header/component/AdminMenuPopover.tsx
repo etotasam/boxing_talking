@@ -1,17 +1,39 @@
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { HiOutlineAdjustmentsHorizontal } from 'react-icons/hi2';
 import { IoChevronForwardOutline } from 'react-icons/io5';
 import { useLocation } from 'react-router-dom';
 import { AdminPageLink } from '@/constants/adminPageLinks';
-import { AdminMenuButton, AdminPageLinkIcon, AdminPageLinkList } from '@/components/module/AdminNavigation';
+import {
+  AdminMenuButton,
+  AdminPageLinkIcon,
+  AdminPageLinkList,
+} from '@/components/module/AdminNavigation';
 
 const ADMIN_PAGE_LINKS_ID = 'pc-admin-page-links';
+
+const panelVariants: Variants = {
+  initial: { clipPath: 'inset(0 0 100% 0)' },
+  open: { clipPath: 'inset(0 0 0 0)', transition: { duration: 0.2, ease: 'easeOut' } },
+  exit: { clipPath: 'inset(0 0 100% 0)', transition: { duration: 0.15, ease: 'easeIn' } },
+};
+
+const linkListVariants: Variants = {
+  initial: {},
+  open: { transition: { staggerChildren: 0.05 } },
+};
+
+const linkItemVariants: Variants = {
+  initial: { y: -12 },
+  open: { y: 0, transition: { duration: 0.15, ease: 'easeOut' } },
+};
 
 /** PCヘッダーで表示する管理ページリンクのポップオーバー。 */
 export const AdminMenuPopover = () => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const menuFrameRef = useRef<HTMLDivElement>(null);
   const { pathname } = useLocation();
 
   const close = () => setIsOpen(false);
@@ -34,6 +56,18 @@ export const AdminMenuPopover = () => {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    const menuFrame = menuFrameRef.current;
+    if (!menuFrame) return;
+
+    if (isOpen) {
+      menuFrame.removeAttribute('inert');
+      return;
+    }
+
+    menuFrame.setAttribute('inert', '');
+  }, [isOpen]);
+
   return (
     <div ref={containerRef} className="contents">
       <AdminMenuButton
@@ -49,26 +83,43 @@ export const AdminMenuPopover = () => {
         <HiOutlineAdjustmentsHorizontal className="h-6 w-6" />
       </AdminMenuButton>
 
-      {isOpen && (
-        <div
-          className="absolute right-6 top-full z-20 w-[260px] overflow-hidden rounded-b-md border border-white/20 bg-zinc-950 shadow-xl"
-          data-testid="pc-admin-menu-popover"
-          id={ADMIN_PAGE_LINKS_ID}
-        >
-          <AdminPageLinkList
-            className="divide-y divide-white/15"
-            getLinkClassName={(link) => getLinkClassName(link, pathname)}
-          renderLinkContent={(link) => (
-            <>
-              <AdminPageLinkIcon link={link} />
-              <span className="ml-4 flex-1 text-left">{link.name}</span>
-              <IoChevronForwardOutline className="h-5 w-5 text-white/60" aria-hidden="true" />
-            </>
+      <div
+        ref={menuFrameRef}
+        aria-hidden={!isOpen}
+        className={clsx(
+          'absolute right-6 top-full z-20 w-[260px] overflow-hidden rounded-b-md',
+          !isOpen && 'pointer-events-none'
+        )}
+      >
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial="initial"
+              animate="open"
+              exit="exit"
+              variants={panelVariants}
+              className="border border-white/20 bg-zinc-950 shadow-xl"
+              data-testid="pc-admin-menu-popover"
+              id={ADMIN_PAGE_LINKS_ID}
+            >
+              <AdminPageLinkList
+                className="divide-y divide-white/15"
+                getLinkClassName={(link) => getLinkClassName(link, pathname)}
+                listVariants={linkListVariants}
+                itemVariants={linkItemVariants}
+                renderLinkContent={(link) => (
+                  <>
+                    <AdminPageLinkIcon link={link} />
+                    <span className="ml-4 flex-1 text-left">{link.name}</span>
+                    <IoChevronForwardOutline className="h-5 w-5 text-white/60" aria-hidden="true" />
+                  </>
+                )}
+                onNavigate={close}
+              />
+            </motion.div>
           )}
-          onNavigate={close}
-        />
+        </AnimatePresence>
       </div>
-      )}
     </div>
   );
 };

@@ -59,6 +59,20 @@ describe('AdminNavigation', () => {
     });
   });
 
+  test.each([
+    ['再取得中', { isAdmin: true, isFetching: true, isError: false }],
+    ['取得エラー', { isAdmin: true, isFetching: false, isError: true }],
+  ])('管理者判定が%sの間は管理導線をfail-closedで隠す', (_label, adminState) => {
+    mockUseAdmin.mockReturnValue(adminState);
+
+    renderNavigation(true);
+
+    expect(screen.queryByRole('button', { name: '管理メニューを開閉' })).not.toBeInTheDocument();
+    ADMIN_PAGE_LINKS.forEach((link) => {
+      expect(screen.queryByRole('link', { name: link.name })).not.toBeInTheDocument();
+    });
+  });
+
   test('ボタン操作とリンク遷移を呼び出し元へ通知する', () => {
     const onClick = vi.fn();
     const onNavigate = vi.fn();

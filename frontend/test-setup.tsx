@@ -4,6 +4,16 @@ import { RecoilRoot } from 'recoil';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactElement } from 'react';
 
+class ResizeObserverMock implements ResizeObserver {
+  observe() {}
+
+  unobserve() {}
+
+  disconnect() {}
+}
+
+globalThis.ResizeObserver = ResizeObserverMock;
+
 // Suppress React 18 act() warnings in tests
 const originalError = console.error;
 beforeAll(() => {

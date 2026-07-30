@@ -49,21 +49,23 @@ const renderHeader = () =>
 describe('Headerのデバイス切替', () => {
   beforeEach(() => {
     vi.stubEnv('VITE_APP_SITE_TITLE', 'BOXING TALKING');
-    mockUseAdmin.mockReturnValue({ isAdmin: true });
+    mockUseAdmin.mockReturnValue({ isAdmin: true, isFetching: false, isError: false });
   });
 
-  test('SPで開いた管理パネルはPCを経由してSPへ戻ると閉じたままになる', () => {
+  test('SPで開いた一般ページアコーディオンはPCを経由してSPへ戻ると閉じたままになる', () => {
     renderHeader();
 
-    fireEvent.click(screen.getByRole('button', { name: '管理メニューを開閉' }));
-    expect(screen.getByTestId('sp-admin-menu-popover')).toBeInTheDocument();
+    const trigger = screen.getByRole('button', { name: '一般ページを開閉' });
+    fireEvent.click(trigger);
+    expect(screen.getByTestId('sp-common-menu-popover')).toBeInTheDocument();
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
 
     fireEvent.click(screen.getByRole('button', { name: 'PCに切替' }));
-    expect(screen.queryByTestId('sp-admin-menu-popover')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('sp-common-menu-popover')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'SPに切替' }));
-    expect(screen.queryByTestId('sp-admin-menu-popover')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '管理メニューを開閉' })).toHaveAttribute(
+    expect(screen.queryByTestId('sp-common-menu-popover')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '一般ページを開閉' })).toHaveAttribute(
       'aria-expanded',
       'false'
     );
