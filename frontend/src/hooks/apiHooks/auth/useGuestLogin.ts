@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { CUSTOM_ERROR_CODE } from '@/constants/customErrorCodes';
@@ -18,6 +18,7 @@ type GuestLoginError = {
 };
 
 export const useGuestLogin = () => {
+  const queryClient = useQueryClient();
   const { showErrorToast, showSuccessToast } = useToastModal();
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();
   const { hideLoginModal } = useLoginModal();
@@ -40,6 +41,8 @@ export const useGuestLogin = () => {
       {
         onSuccess: () => {
           hideLoginModal();
+          queryClient.removeQueries(QUERY_KEY.PREDICTION);
+          queryClient.removeQueries(QUERY_KEY.MATCH_PREDICTIONS);
           refetchMatchPrediction();
           hideFullScreenLoading();
           setReactQueryData<boolean>(QUERY_KEY.GUEST, true);

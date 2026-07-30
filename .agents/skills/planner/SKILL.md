@@ -10,12 +10,15 @@ description: 設計が必要な変更の影響範囲、選択肢、実装方針�
 - 実装前に要件、影響範囲、変更方針、テスト方針を明確にする。
 - 重要な変更では複数案を比較し、採用理由を明示する。
 - 変更前に提案し、ユーザー承認を得る。
-- 比較的大きい変更では、承認後に `docs/plans/<task-name>.md` を作成する。
+- 比較的大きい変更では、実装承認前に `docs/plans/<task-name>.md` を作成し、ユーザーが判断できる提案書として提示する。
 
 ## Plan Document
 
-比較的大きい変更では、Planner はユーザー承認後に `docs/plans/<task-name>.md` を作成する。
-Plan Document は承認済みの実装計画として扱い、Worker / Tester / Reviewer が参照する。
+比較的大きい変更では、Planner は実装承認前に `docs/plans/<task-name>.md` を作成する。
+Plan Document は、ユーザーが実装可否を判断するための提案書として扱う。
+
+ユーザー承認前に許可される変更は Plan Document の作成・更新のみとし、実装コード、テストコード、設定ファイルは変更しない。
+ユーザー承認後、Plan Document を承認済みの実装計画として扱い、Worker / Tester / Reviewer が参照する。
 
 ### When To Create
 
@@ -41,12 +44,17 @@ Plan Document は承認済みの実装計画として扱い、Worker / Tester / 
 1. 関連ファイル、既存実装、テスト配置、設定を確認する。
 2. 要件、成功条件、対象外、制約を整理する。
 3. 重要な変更では複数案を比較する。
-4. チャット上で、採用案、採用理由、影響範囲、リスク、テスト方針と `docs/plans/<task-name>.md` に記載する予定内容を提案する。
-5. ユーザー承認を得る。
-6. 承認後、提案内容を `docs/plans/<task-name>.md` に作成する。
-7. Plan Document 作成後、Worker に実装を引き継ぐ。
 
-ユーザー承認を得るまでは、Plan Document の作成以外の実装変更を行わない。
+以下の手順 4〜9 は、`When To Create` に該当し、Plan Document を作成する場合に行う。
+
+4. `docs/plans/<task-name>.md` に、採用案、採用理由、影響範囲、リスク、テスト方針を記載する。
+5. Reviewer subagent が Plan Document の仕様、影響範囲、実装方針、テスト方針、リグレッションリスクを評価する。
+6. Reviewer の指摘を確認し、必要に応じて Plan Document に反映する。
+7. チャット上で Plan Document の作成内容と Reviewer の評価結果を要約し、ユーザーに実装可否の判断を求める。
+8. ユーザー承認を得る。
+9. 承認後、Plan Document を承認済み計画として Worker に実装を引き継ぐ。
+
+ユーザー承認を得るまでは、Plan Document の作成・更新以外の実装変更を行わない。
 
 ## Output
 

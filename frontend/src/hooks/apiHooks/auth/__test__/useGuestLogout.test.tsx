@@ -23,7 +23,6 @@ const mocks = vi.hoisted(() => {
     showSuccessToast: vi.fn(),
     showFullScreenLoading: vi.fn(),
     hideFullScreenLoading: vi.fn(),
-    hideMenuModal: vi.fn(),
     refetchMatchPrediction: vi.fn(),
   };
 });
@@ -58,16 +57,6 @@ vi.mock('@/hooks/useFullScreenLoading', () => {
   };
 });
 
-vi.mock('@/hooks/useMenuModal', () => {
-  return {
-    useMenuModal: vi.fn(() => {
-      return {
-        hide: mocks.hideMenuModal,
-      };
-    }),
-  };
-});
-
 vi.mock('@/hooks/apiHooks/prediction', () => {
   return {
     useFetchUsersPrediction: vi.fn(() => {
@@ -77,6 +66,10 @@ vi.mock('@/hooks/apiHooks/prediction', () => {
     }),
   };
 });
+
+const usersPredictionCache = [{ matchId: 1, prediction: 'red' }];
+const matchPredictionsCacheKey = [QUERY_KEY.MATCH_PREDICTIONS, { id: 1, userPrediction: 'red' }];
+const matchPredictionsCache = { isVisible: true, totalVotes: 2, red: 1, blue: 1 };
 
 // QueryClientProvider 付きの hook テスト用 wrapper を生成する関数
 const createWrapper = (queryClient: QueryClient) => {
@@ -109,6 +102,12 @@ const seedGuestCache = (queryClient: QueryClient) => {
   queryClient.setQueryData<boolean>(QUERY_KEY.GUEST, true);
 };
 
+// 前ユーザーの勝敗予想キャッシュを投入する関数
+const seedPredictionCaches = (queryClient: QueryClient) => {
+  queryClient.setQueryData(QUERY_KEY.PREDICTION, usersPredictionCache);
+  queryClient.setQueryData(matchPredictionsCacheKey, matchPredictionsCache);
+};
+
 describe('useGuestLogout', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -119,6 +118,7 @@ describe('useGuestLogout', () => {
 
     const queryClient = createQueryClient();
     seedGuestCache(queryClient);
+    seedPredictionCaches(queryClient);
     const { result } = renderUseGuestLogout(queryClient);
 
     act(() => {
@@ -131,9 +131,10 @@ describe('useGuestLogout', () => {
       expect(mocks.post).toHaveBeenCalledWith(API_PATH.GUEST_LOGOUT);
       expect(mocks.refetchMatchPrediction).toHaveBeenCalledTimes(1);
       expect(queryClient.getQueryData(QUERY_KEY.GUEST)).toBe(false);
+      expect(queryClient.getQueryData(QUERY_KEY.PREDICTION)).toBeUndefined();
+      expect(queryClient.getQueryData(matchPredictionsCacheKey)).toBeUndefined();
       expect(mocks.showSuccessToast).toHaveBeenCalledTimes(1);
       expect(mocks.showSuccessToast).toHaveBeenCalledWith(MESSAGE.LOGOUT_SUCCESS);
-      expect(mocks.hideMenuModal).toHaveBeenCalledTimes(1);
       expect(mocks.hideFullScreenLoading).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).not.toHaveBeenCalled();
     });
@@ -144,6 +145,7 @@ describe('useGuestLogout', () => {
 
     const queryClient = createQueryClient();
     seedGuestCache(queryClient);
+    seedPredictionCaches(queryClient);
     const { result } = renderUseGuestLogout(queryClient);
 
     act(() => {
@@ -157,9 +159,10 @@ describe('useGuestLogout', () => {
       expect(mocks.showErrorToast).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).toHaveBeenCalledWith(MESSAGE.LOGOUT_FAILED);
       expect(queryClient.getQueryData(QUERY_KEY.GUEST)).toBe(true);
+      expect(queryClient.getQueryData(QUERY_KEY.PREDICTION)).toEqual(usersPredictionCache);
+      expect(queryClient.getQueryData(matchPredictionsCacheKey)).toEqual(matchPredictionsCache);
       expect(mocks.refetchMatchPrediction).not.toHaveBeenCalled();
       expect(mocks.showSuccessToast).not.toHaveBeenCalled();
-      expect(mocks.hideMenuModal).not.toHaveBeenCalled();
     });
   });
 });

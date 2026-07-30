@@ -11,7 +11,6 @@ import { useLoginModal } from '@/hooks/useLoginModal';
 import { FirstLoadingModal } from '@/components/modal/FirstLoadingModal';
 import { FullScreenSpinnerModal } from '@/components/modal/FullScreenSpinnerModal';
 import { LoginFormModal } from '@/components/modal/LoginFormModal';
-import { MenuModal } from '@/components/modal/MenuModal';
 import { ToastModal } from '@/components/modal/ToastModal';
 
 const AppShell = () => {
@@ -72,7 +71,6 @@ const AppShell = () => {
   return (
     <>
       <LoginFormModal isShow={isShowLoginModal} key={'LoginFormModal'} />
-      <MenuModal />
       <FullScreenSpinnerModal
         isShow={isShowFullScreenSpinnerCondition}
         key={'FullScreenSpinnerModal'}

@@ -37,12 +37,15 @@ describe('HeaderAuthInfo', () => {
     mockGuestLogout.mockReset();
   });
 
-  test('認証ユーザー時にユーザー名を表示して logout を呼ぶ', () => {
+  test('PCの認証ユーザー時はログアウトボタンでのみ logout を呼ぶ', () => {
     mockUseAuth.mockReturnValue({ data: { name: 'Taro' } });
 
     renderHeaderAuthInfo();
 
-    expect(screen.getByText('Taro')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Taro'));
+
+    expect(mockLogout).not.toHaveBeenCalled();
+    expect(mockGuestLogout).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole('button', { name: 'ログアウト' }));
 
@@ -69,11 +72,19 @@ describe('HeaderAuthInfo', () => {
     expect(screen.queryByRole('button', { name: 'ログアウト' })).not.toBeInTheDocument();
   });
 
-  test('SPでもログアウト操作がアクセシブルネームで認識できる', () => {
+  test('SPの認証ユーザー時もログアウトボタンでのみ logout を呼ぶ', () => {
     mockUseAuth.mockReturnValue({ data: { name: 'Taro' } });
 
     renderHeaderAuthInfo('SP');
 
-    expect(screen.getByRole('button', { name: 'ログアウト' })).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Taro'));
+
+    expect(mockLogout).not.toHaveBeenCalled();
+    expect(mockGuestLogout).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'ログアウト' }));
+
+    expect(mockLogout).toHaveBeenCalledTimes(1);
+    expect(mockGuestLogout).not.toHaveBeenCalled();
   });
 });

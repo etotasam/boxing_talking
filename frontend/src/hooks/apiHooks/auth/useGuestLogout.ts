@@ -6,14 +6,12 @@ import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { QUERY_KEY } from '@/constants/queryKeys';
 import { useFetchUsersPrediction } from '../prediction';
 import { useFullScreenLoading } from '../../useFullScreenLoading';
-import { useMenuModal } from '../../useMenuModal';
 import { useToastModal } from '../../useToastModal';
 
 export const useGuestLogout = () => {
   const { refetch: refetchMatchPrediction } = useFetchUsersPrediction();
   const queryClient = useQueryClient();
   const { showErrorToast, showSuccessToast } = useToastModal();
-  const { hide: hideMenuModal } = useMenuModal();
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();
 
   const api = useCallback(async () => {
@@ -31,10 +29,11 @@ export const useGuestLogout = () => {
       undefined,
       {
         onSuccess: () => {
+          queryClient.removeQueries(QUERY_KEY.PREDICTION);
+          queryClient.removeQueries(QUERY_KEY.MATCH_PREDICTIONS);
           refetchMatchPrediction();
           queryClient.setQueryData<boolean>(QUERY_KEY.GUEST, false);
           showSuccessToast(MESSAGE.LOGOUT_SUCCESS);
-          hideMenuModal();
         },
         onError: () => {
           showErrorToast(MESSAGE.LOGOUT_FAILED);
@@ -46,7 +45,6 @@ export const useGuestLogout = () => {
     );
   }, [
     hideFullScreenLoading,
-    hideMenuModal,
     mutate,
     queryClient,
     refetchMatchPrediction,
