@@ -9,7 +9,7 @@ export const useInitializeDevice = (): void => {
   useEffect(() => {
     const updateDevice = () => {
       const width = window.innerWidth;
-      const nextDevice = width > DEVICE_BREAKPOINT.pc ? 'PC' : 'SP';
+      const nextDevice = width >= DEVICE_BREAKPOINT.pc ? 'PC' : 'SP';
       setDevice(nextDevice);
     };
 

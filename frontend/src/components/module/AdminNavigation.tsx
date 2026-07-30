@@ -23,9 +23,9 @@ export const AdminMenuButton = ({
   children,
   className,
 }: AdminMenuButtonProps) => {
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isFetching, isError } = useAdmin();
 
-  if (!isAdmin) return null;
+  if (isAdmin !== true || isFetching || isError) return null;
 
   return (
     <button
@@ -53,11 +53,17 @@ type AdminPageLinkListProps = {
 };
 
 /** 管理ページごとのリンクアイコン。 */
-export const AdminPageLinkIcon = ({ link }: { link: AdminPageLink }) => {
-  if (link.id === 'boxerRegister') return <RiUserAddLine />;
-  if (link.id === 'boxerEdit') return <FaUserEdit />;
-  if (link.id === 'matchRegister') return <BsCalendarPlus />;
-  return <RiEditBoxFill />;
+export const AdminPageLinkIcon = ({
+  link,
+  className,
+}: {
+  link: AdminPageLink;
+  className?: string;
+}) => {
+  if (link.id === 'boxerRegister') return <RiUserAddLine className={className} />;
+  if (link.id === 'boxerEdit') return <FaUserEdit className={className} />;
+  if (link.id === 'matchRegister') return <BsCalendarPlus className={className} />;
+  return <RiEditBoxFill className={className} />;
 };
 
 /** 管理者だけに表示する管理ページへの標準リンクリスト。 */
@@ -71,10 +77,10 @@ export const AdminPageLinkList = ({
   listVariants,
   itemVariants,
 }: AdminPageLinkListProps) => {
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isFetching, isError } = useAdmin();
   const { pathname } = useLocation();
 
-  if (!isAdmin) return null;
+  if (isAdmin !== true || isFetching || isError) return null;
 
   const links = ADMIN_PAGE_LINKS.map((link) => {
     const content = (

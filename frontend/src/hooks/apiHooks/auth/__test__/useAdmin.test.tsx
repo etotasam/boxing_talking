@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
@@ -60,10 +60,56 @@ describe('useAdmin', () => {
 
     const { result } = renderUseAdmin();
 
+    expect(result.current.isFetching).toBe(true);
+
     await waitFor(() => {
       expect(mocks.get).toHaveBeenCalledTimes(1);
       expect(mocks.get).toHaveBeenCalledWith(API_PATH.ADMIN);
       expect(result.current.isAdmin).toBe(true);
+      expect(result.current.isFetching).toBe(false);
+      expect(result.current.isError).toBe(false);
+    });
+  });
+
+  test('API が number の 1 を返した時は isAdmin に true を入れる', async () => {
+    vi.mocked(Axios.get).mockResolvedValueOnce({
+      data: 1,
+    });
+
+    const { result } = renderUseAdmin();
+
+    await waitFor(() => {
+      expect(mocks.get).toHaveBeenCalledTimes(1);
+      expect(mocks.get).toHaveBeenCalledWith(API_PATH.ADMIN);
+      expect(result.current.isAdmin).toBe(true);
+      expect(result.current.isError).toBe(false);
+    });
+  });
+
+  test('API が number の 0 を返した時は isAdmin に false を入れる', async () => {
+    vi.mocked(Axios.get).mockResolvedValueOnce({
+      data: 0,
+    });
+
+    const { result } = renderUseAdmin();
+
+    await waitFor(() => {
+      expect(mocks.get).toHaveBeenCalledTimes(1);
+      expect(result.current.isAdmin).toBe(false);
+      expect(result.current.isError).toBe(false);
+    });
+  });
+
+  test('API が想定外の文字列を返した時は isAdmin に false を入れる', async () => {
+    vi.mocked(Axios.get).mockResolvedValueOnce({
+      data: 'true',
+    });
+
+    const { result } = renderUseAdmin();
+
+    await waitFor(() => {
+      expect(mocks.get).toHaveBeenCalledTimes(1);
+      expect(result.current.isAdmin).toBe(false);
       expect(result.current.isError).toBe(false);
     });
   });
@@ -92,6 +138,53 @@ describe('useAdmin', () => {
       expect(mocks.get).toHaveBeenCalledTimes(1);
       expect(mocks.get).toHaveBeenCalledWith(API_PATH.ADMIN);
       expect(result.current.isAdmin).toBeUndefined();
+      expect(result.current.isError).toBe(true);
+      expect(result.current.isFetching).toBe(false);
+    });
+  });
+
+  test('cached true の再取得中も isFetching を公開する', async () => {
+    let resolveSecondRequest: (value: { data: boolean }) => void = () => undefined;
+    vi.mocked(Axios.get)
+      .mockResolvedValueOnce({ data: true })
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolveSecondRequest = resolve;
+          })
+      );
+
+    const { result } = renderUseAdmin();
+    await waitFor(() => expect(result.current.isAdmin).toBe(true));
+
+    let refetchPromise: Promise<unknown> | undefined;
+    act(() => {
+      refetchPromise = result.current.refetch();
+    });
+    await waitFor(() => expect(result.current.isFetching).toBe(true));
+    expect(result.current.isAdmin).toBe(true);
+
+    await act(async () => {
+      resolveSecondRequest({ data: true });
+      await refetchPromise;
+    });
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+  });
+
+  test('cached true の再取得が失敗した時は isError を公開する', async () => {
+    vi.mocked(Axios.get)
+      .mockResolvedValueOnce({ data: true })
+      .mockRejectedValueOnce(new Error('refresh failed'));
+
+    const { result } = renderUseAdmin();
+    await waitFor(() => expect(result.current.isAdmin).toBe(true));
+
+    await act(async () => {
+      await result.current.refetch();
+    });
+
+    await waitFor(() => {
+      expect(result.current.isFetching).toBe(false);
       expect(result.current.isError).toBe(true);
     });
   });

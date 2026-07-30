@@ -76,7 +76,7 @@ export const MatchEdit = () => {
           style={{ minHeight: `calc(100vh - ${headerHeight}px)` }}
           className="w-[70%] border-r-[1px] border-stone-200"
         >
-          <div className="flex w-full sticky top-[100px]">
+          <div className="flex w-full sticky" style={{ top: `${(headerHeight ?? 0) + 20}px` }}>
             <div className="w-[45%] flex justify-center">
               {selectedMatch ? (
                 <div className="w-full flex flex-col items-center">

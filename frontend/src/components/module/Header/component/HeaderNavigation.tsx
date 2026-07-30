@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
-import { ROUTE_PATH } from '@/constants/routePath';
+import { COMMON_PAGE_LINKS } from '@/constants/commonPageLinks';
 
 const LINK_STYLES = {
   common:
@@ -22,20 +22,13 @@ export const HeaderNavigation = ({ pathname }: HeaderNavigationProps) => {
   return (
     <nav className="flex h-full w-full pc:ml-[clamp(12px,4vw,48px)] pc:w-auto pc:shrink-0 pc:items-center">
       <ul className="flex h-full w-full justify-center pc:w-auto">
-        <li className="pc:ml-0">
-          <Link className={getLinkClassName(ROUTE_PATH.HOME, pathname)} to={ROUTE_PATH.HOME}>
-            Schedule
-          </Link>
-        </li>
-
-        <li className="pc:ml-[clamp(8px,2vw,20px)]">
-          <Link
-            className={getLinkClassName(ROUTE_PATH.PAST_MATCHES, pathname)}
-            to={ROUTE_PATH.PAST_MATCHES}
-          >
-            Match Result
-          </Link>
-        </li>
+        {COMMON_PAGE_LINKS.map((link, index) => (
+          <li key={link.id} className={index === 0 ? 'pc:ml-0' : 'pc:ml-[clamp(8px,2vw,20px)]'}>
+            <Link className={getLinkClassName(link.path, pathname)} to={link.path}>
+              {link.name}
+            </Link>
+          </li>
+        ))}
       </ul>
     </nav>
   );
