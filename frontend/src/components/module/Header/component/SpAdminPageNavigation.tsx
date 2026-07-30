@@ -10,7 +10,7 @@ export const SpAdminPageNavigation = () => {
     <nav aria-label="管理ページ" className="h-full w-full">
       <AdminPageLinkList
         className="grid h-full w-full grid-cols-4"
-        getItemClassName={() => 'min-w-0 border-r border-white/15 last:border-r-0'}
+        getItemClassName={() => 'min-w-0 border-r border-white/15'}
         getLinkClassName={(link) =>
           clsx(
             'flex h-full min-h-14 min-w-0 flex-col items-center justify-center gap-0.5 px-0.5',
