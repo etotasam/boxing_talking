@@ -7,13 +7,19 @@ import { QUERY_KEY } from '@/constants/queryKeys';
 export const useAdmin = () => {
   const api = useCallback(async () => {
     const res = await Axios.get(API_PATH.ADMIN).then((result) => result.data);
-    return res;
+    return res === true || res === 1;
   }, []);
 
-  const { data: isAdmin, isLoading, isError, refetch } = useQuery<boolean>(QUERY_KEY.ADMIN, api, {
+  const {
+    data: isAdmin,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+  } = useQuery<boolean>(QUERY_KEY.ADMIN, api, {
     retry: false,
     staleTime: Infinity,
   });
 
-  return { isAdmin, isLoading, isError, refetch };
+  return { isAdmin, isLoading, isFetching, isError, refetch };
 };

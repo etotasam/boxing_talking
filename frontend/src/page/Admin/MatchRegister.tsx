@@ -31,7 +31,7 @@ export const MatchRegister = () => {
       </Helmet>
       <div className="w-full flex">
         <section className="w-[70%] border-r-[1px] border-stone-200">
-          <div className="sticky top-[10px]">
+          <div className="sticky" style={{ top: `${(headerHeight ?? 0) + 10}px` }}>
             <MatchSetUpBox boxers={matchBoxers} />
             <div className="flex mt-5">
               <div className="w-[50%] flex justify-center">

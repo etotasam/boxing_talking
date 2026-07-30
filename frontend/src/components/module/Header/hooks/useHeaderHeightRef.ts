@@ -1,17 +1,38 @@
-import { useCallback } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
-import { DeviceStateType } from '@/store/deviceState';
 
-export const useHeaderHeightRef = (device: DeviceStateType) => {
+/** ヘッダーの外形高を監視し、レイアウト用の共有状態へ反映する。 */
+export const useHeaderHeightRef = () => {
+  const headerRef = useRef<HTMLElement>(null);
   const setHeaderHeight = useSetRecoilState(elementSizeState('HEADER_HEIGHT'));
+  const previousHeightRef = useRef<number>();
 
-  return useCallback(
-    (node: HTMLElement | null) => {
-      if (node) {
-        setHeaderHeight(node.clientHeight);
+  useLayoutEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+
+    const updateHeaderHeight = (height: number) => {
+      if (previousHeightRef.current !== height) {
+        previousHeightRef.current = height;
+        setHeaderHeight(height);
       }
-    },
-    [device, setHeaderHeight]
-  );
+    };
+
+    updateHeaderHeight(header.getBoundingClientRect().height);
+
+    const observer = new ResizeObserver((entries) => {
+      entries.forEach((entry) => {
+        const height =
+          entry.borderBoxSize?.[0]?.blockSize ?? entry.target.getBoundingClientRect().height;
+        updateHeaderHeight(height);
+      });
+    });
+
+    observer.observe(header, { box: 'border-box' });
+
+    return () => observer.disconnect();
+  }, [setHeaderHeight]);
+
+  return headerRef;
 };
