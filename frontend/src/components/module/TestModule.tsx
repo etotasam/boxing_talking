@@ -58,7 +58,6 @@ export const TestModule = () => {
                   }}
                   transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
                   className="h-[10px] absolute top-0 left-[-1px] rounded-[50px] bg-red-600"
-                  // style={{ width: `calc(${redRaito}%)` }}
                 ></motion.div>
 
                 <motion.div
@@ -70,7 +69,6 @@ export const TestModule = () => {
                   }}
                   transition={{ duration: 2, ease: [0.25, 1, 0.5, 1] }}
                   className="h-[10px] absolute top-0 right-[-1px] rounded-[50px] bg-blue-600"
-                  // style={{ width: `calc(${blueRaito}%)` }}
                 ></motion.div>
                 {/*  */}
               </div>
@@ -81,5 +79,3 @@ export const TestModule = () => {
     </>
   );
 };
-
-//!@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

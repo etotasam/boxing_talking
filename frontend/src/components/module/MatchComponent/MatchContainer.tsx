@@ -3,20 +3,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ROUTE_PATH } from '@/constants/routePath';
 
-//! types
 import { MatchDataType } from '@/types';
-// ! hook
-// import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
 import { useModalState } from '@/hooks/useModalState';
-import {
-  useVoteMatchPrediction,
-  useFetchUsersPrediction,
-  useMatchPredictions,
-} from '@/hooks/apiHooks/useWinLossPrediction';
+import { useFetchUsersPrediction, useMatchPredictions } from '@/hooks/apiHooks/prediction';
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
-//! component
 import { MatchView, UsersPredictionType } from './MatchView';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
@@ -30,15 +22,8 @@ export const MatchContainer = (props: PropsType) => {
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const matchId = Number(query.get('match_id'));
-  //? 勝敗予想投票実行時の状態hook
-  const { userPredictionPostState } = useVoteMatchPrediction();
   //? userの勝敗予想投票をすべて取得など…
   const { data: usersPredictions } = useFetchUsersPrediction();
-  const {
-    refetch: refetchMatchPredictions,
-    data: matchPredictions,
-    matchPredictionFetchState,
-  } = useMatchPredictions(Number(matchId));
 
   const navigate = useNavigate();
   const commentsModalHeightHiddenState =
@@ -63,17 +48,15 @@ export const MatchContainer = (props: PropsType) => {
     return matchPrediction ? matchPrediction.prediction : false;
   }, [usersPredictions, matchId]);
 
+  const { data: matchPredictions, matchPredictionFetchState } = useMatchPredictions(
+    Number(matchId),
+    userPrediction
+  );
+
   //? 読み込み時にscrollをtop位置へ移動
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  //? コメント投稿に成功したら投票してねモーダルを消す&勝敗予想を再取得
-  useEffect(() => {
-    if (userPredictionPostState === 'success') {
-      refetchMatchPredictions();
-    }
-  }, [userPredictionPostState]);
 
   //? vote iconの表示/非表示の判断
   const isShowVoteIconState = useVoteIconState({
@@ -84,7 +67,6 @@ export const MatchContainer = (props: PropsType) => {
   const { state: isShowPredictionModal, showModal: showPredictionModal } =
     useModalState('PREDICTION_VOTE');
 
-  // if (!windowSize) return;
   if (!thisMatch) return;
   return (
     <>

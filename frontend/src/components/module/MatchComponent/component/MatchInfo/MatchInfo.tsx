@@ -1,10 +1,9 @@
-//! type
 import { MatchDataType, MatchPredictionsType } from '@/types';
-//! components
 import { BoxersData } from './components/BoxersData';
 import { Grade } from './components/Grade';
-import { MatchDate, MatchVenue } from './components/MatchMeta';
+import { MatchMeta } from './components/MatchMeta';
 import { PredictionSummary } from './components/PredictionSummary';
+import { TaleOfTheTape } from './components/TaleOfTheTape';
 
 type MatchInfoPropsType = {
   matchData: MatchDataType;
@@ -27,19 +26,23 @@ export const MatchInfo = ({
   return (
     <>
       {matchData && (
-        <div className="flex flex-col items-center w-full relative">
-          <BoxersData matchData={matchData} />
+        <div className="flex flex-col items-center relative w-full">
           <Grade matchData={matchData} />
-          <div className="flex w-[80%] mt-5">
-            <MatchDate matchDate={matchData.matchDate} />
-            <MatchVenue country={matchData.country} venue={matchData.venue} />
-          </div>
+          <MatchMeta
+            matchDate={matchData.matchDate}
+            country={matchData.country}
+            venue={matchData.venue}
+          />
+          <BoxersData matchData={matchData} />
+          <TaleOfTheTape
+            redBoxer={matchData.redBoxer}
+            blueBoxer={matchData.blueBoxer}
+            matchDate={matchData.matchDate}
+          />
           <PredictionSummary
             userPrediction={userPrediction}
             matchPredictions={matchPredictions}
             isLoading={isMatchPredictionsLoading}
-            redBoxerName={matchData.redBoxer.name}
-            blueBoxerName={matchData.blueBoxer.name}
             isShowVoteButton={isShowVoteButton}
             showPredictionModal={showPredictionModal}
           />

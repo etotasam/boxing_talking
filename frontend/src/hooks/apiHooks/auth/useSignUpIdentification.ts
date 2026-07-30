@@ -14,7 +14,6 @@ type SignUpIdentificationError = {
   };
 };
 
-//! ユーザ登録（本登録）
 export const useSignUpIdentification = () => {
   const setAuthenticatingState = useSetRecoilState(authCheckingState);
   const setTokenErrorMessage = useSetRecoilState(tokenErrorMessageState);

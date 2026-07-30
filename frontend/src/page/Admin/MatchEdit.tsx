@@ -3,17 +3,13 @@ import dayjs from 'dayjs';
 import clsx from 'clsx';
 import { Helmet } from 'react-helmet-async';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
-//! func
 import { isMatchDatePast } from '@/utils/match';
-//! components
 import { MatchInfo } from '@/components/module/MatchInfo';
 import { EditMatchForm } from '@/components/module/MatchSetForm/EditMatchForm';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { ConfirmDialog } from '@/components/modal/ConfirmDialog';
-//! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
-// ! hooks
 import {
   useDeleteMatch,
   useFetchMatches,
@@ -23,16 +19,13 @@ import {
 import { useToastModal } from '@/hooks/useToastModal';
 import { useSortMatches } from '@/hooks/useSortMatches';
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
-//! types
 import { MatchDataType } from '@/types';
-// ! image
 import { Button, CustomButton } from '@/components/atomic/Button';
 
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const MatchEdit = () => {
   const headerHeight = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
-  // ? use hook
   const { data: matchesData } = useFetchMatches();
   const { data: pastMatchesData } = useFetchPastMatches();
   const { beforeMatches, afterMatches } = useSortMatches(matchesData);
@@ -49,11 +42,7 @@ export const MatchEdit = () => {
   const isShowMatchResultRegisterButton = !isDayOnFight && isDayAfterFight;
 
   //? 初期設定(クリーンアップとか)
-  // useEffect(() => {
-  //   return () => {
   //     resetLoadingState();
-  //   };
-  // }, []);
 
   //? 試合の削除に成功したら...
   useEffect(() => {
@@ -292,8 +281,6 @@ const MatchResultSetDialog = ({
       detail,
       round,
     };
-    // console.log(matchResultValue);
-    // return;
     storeMatchResult(matchResultValue);
   };
 

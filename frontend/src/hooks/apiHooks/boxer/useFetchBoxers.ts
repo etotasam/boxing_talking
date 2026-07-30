@@ -25,7 +25,6 @@ type ResponseType = {
 
 const limit = 15;
 
-//! boxerデータ取得 and 登録済み選手の数を取得
 export const useFetchBoxers = () => {
   //? params の取得
   const { search } = useLocation();

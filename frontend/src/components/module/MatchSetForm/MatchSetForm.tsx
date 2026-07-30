@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-// ! types
 import {
   CountryType,
   GradeType,
@@ -8,10 +7,8 @@ import {
   OrganizationsType,
   MatchUpdateFormType,
 } from '@/types';
-//! data
 import { WEIGHT_CLASS, ORGANIZATIONS, GRADE } from '@/constants/boxerData';
 import { COUNTRY } from '@/constants/country';
-//! component
 import { Button } from '@/components/atomic/Button';
 type PropsType = {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -23,7 +20,6 @@ type PropsType = {
 
 export const MatchSetForm = (props: PropsType) => {
   const { onSubmit, formData, isTitle, onChange, onChangeTitle } = props;
-  // ! DOM
   return (
     <div>
       <form

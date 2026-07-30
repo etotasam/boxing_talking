@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
-import {
-  useFetchUsersPrediction
-} from '@/hooks/apiHooks/useWinLossPrediction';
+import { useFetchUsersPrediction } from '@/hooks/apiHooks/prediction';
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
-//! type
 import { MatchDataType } from '@/types';
 
 
@@ -34,4 +31,3 @@ export const useVoteIconState = ({ matchDate, id: matchId }: PropsType) => {
 
   return isShowVoteIcon;
 };
-

@@ -104,10 +104,15 @@ describe('MatchView', () => {
     expect(screen.getByTestId('prediction-vote-modal')).toBeInTheDocument();
   });
 
-  test('commentsModalHeightHiddenState を MainContent のレイアウトに反映する', () => {
-    renderComponent({ commentsModalHeightHiddenState: 180 });
+  test('commentsModalHeightHiddenState の差分を MainContent のレイアウトに反映する', () => {
+    const { rerender } = renderComponent({ commentsModalHeightHiddenState: 180 });
 
     const mainContent = screen.getByTestId('match-main-content');
-    expect(mainContent).toHaveStyle({ paddingBottom: '180px' });
+    const initialPaddingBottom = Number.parseInt(mainContent.style.paddingBottom, 10);
+
+    rerender(<MatchView {...defaultProps} commentsModalHeightHiddenState={220} />);
+
+    const updatedPaddingBottom = Number.parseInt(mainContent.style.paddingBottom, 10);
+    expect(updatedPaddingBottom - initialPaddingBottom).toBe(40);
   });
 });

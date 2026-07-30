@@ -1,7 +1,7 @@
 name = "planner"
 description = "設計と実装方針の決定"
 
-model = "gpt-5.5"
+model = "gpt-5.6-terra"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "read-only"
 

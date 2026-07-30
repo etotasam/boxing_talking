@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { CUSTOM_ERROR_CODE } from '@/constants/customErrorCodes';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { QUERY_KEY } from '@/constants/queryKeys';
-import { useFetchUsersPrediction } from '../useWinLossPrediction';
+import { useFetchUsersPrediction } from '../prediction';
 import { useFullScreenLoading } from '../../useFullScreenLoading';
 import { useLoginModal } from '../../useLoginModal';
 import { useReactQuery } from '../../useReactQuery';
@@ -17,15 +17,15 @@ type GuestLoginError = {
   };
 };
 
-//! ゲストログイン
 export const useGuestLogin = () => {
+  const queryClient = useQueryClient();
   const { showErrorToast, showSuccessToast } = useToastModal();
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();
   const { hideLoginModal } = useLoginModal();
   const { refetch: refetchMatchPrediction } = useFetchUsersPrediction();
   const { setReactQueryData } = useReactQuery();
 
-  const api = useCallback(async (_: unknown): Promise<void> => {
+  const api = useCallback(async (): Promise<void> => {
     await Axios.post<void>(API_PATH.GUEST_LOGIN).then((result) => result.data);
   }, []);
 
@@ -37,10 +37,12 @@ export const useGuestLogin = () => {
 
   const guestLogin = () => {
     mutate(
-      {},
+      undefined,
       {
         onSuccess: () => {
           hideLoginModal();
+          queryClient.removeQueries(QUERY_KEY.PREDICTION);
+          queryClient.removeQueries(QUERY_KEY.MATCH_PREDICTIONS);
           refetchMatchPrediction();
           hideFullScreenLoading();
           setReactQueryData<boolean>(QUERY_KEY.GUEST, true);

@@ -3,7 +3,6 @@ import { MatchDataType } from '@/types';
 import clsx from 'clsx';
 import { useRecoilValue } from 'recoil';
 import { deviceState } from '@/store/deviceState';
-//! type
 import { MatchResultType } from '@/types';
 
 export const MatchResult = ({ matchData }: { matchData: MatchDataType }) => {
@@ -30,9 +29,9 @@ export const MatchResult = ({ matchData }: { matchData: MatchDataType }) => {
         return;
       }
       if (isDecision) {
-        if (result.detail === 'ud') matchResult.current = '3-0';
-        if (result.detail === 'md') matchResult.current = '2-0';
-        if (result.detail === 'sd') matchResult.current = '2-1';
+        if (result.detail === 'ud') matchResult.current = '判定 3-0';
+        if (result.detail === 'md') matchResult.current = '判定 2-0';
+        if (result.detail === 'sd') matchResult.current = '判定 2-1';
         return;
       }
     }

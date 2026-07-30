@@ -1,5 +1,4 @@
 import { Outlet } from 'react-router-dom';
-//! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 

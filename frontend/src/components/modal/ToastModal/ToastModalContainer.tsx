@@ -1,6 +1,5 @@
 import { AnimatePresence } from 'framer-motion';
 import { ToastModal } from './ToastModal';
-// ! hooks
 import { useToastModal } from '@/hooks/useToastModal';
 
 export const ToastModalContainer = ({ isShow }: { isShow: boolean }) => {

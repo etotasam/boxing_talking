@@ -4,20 +4,17 @@ import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { QUERY_KEY } from '@/constants/queryKeys';
-import { useFetchUsersPrediction } from '../useWinLossPrediction';
+import { useFetchUsersPrediction } from '../prediction';
 import { useFullScreenLoading } from '../../useFullScreenLoading';
-import { useMenuModal } from '../../useMenuModal';
 import { useToastModal } from '../../useToastModal';
 
-//! ゲストログアウト
 export const useGuestLogout = () => {
   const { refetch: refetchMatchPrediction } = useFetchUsersPrediction();
   const queryClient = useQueryClient();
   const { showErrorToast, showSuccessToast } = useToastModal();
-  const { hide: hideMenuModal } = useMenuModal();
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();
 
-  const api = useCallback(async (_: unknown) => {
+  const api = useCallback(async () => {
     await Axios.post<void>(API_PATH.GUEST_LOGOUT).then((result) => result.data);
   }, []);
 
@@ -29,13 +26,14 @@ export const useGuestLogout = () => {
 
   const guestLogout = useCallback(() => {
     mutate(
-      {},
+      undefined,
       {
         onSuccess: () => {
+          queryClient.removeQueries(QUERY_KEY.PREDICTION);
+          queryClient.removeQueries(QUERY_KEY.MATCH_PREDICTIONS);
           refetchMatchPrediction();
           queryClient.setQueryData<boolean>(QUERY_KEY.GUEST, false);
           showSuccessToast(MESSAGE.LOGOUT_SUCCESS);
-          hideMenuModal();
         },
         onError: () => {
           showErrorToast(MESSAGE.LOGOUT_FAILED);
@@ -47,7 +45,6 @@ export const useGuestLogout = () => {
     );
   }, [
     hideFullScreenLoading,
-    hideMenuModal,
     mutate,
     queryClient,
     refetchMatchPrediction,

@@ -1,20 +1,15 @@
 import React, { useRef } from 'react';
 import { ClearFullScreenDiv } from '@/components/atomic/ClearFullScreenDiv';
 import { motion, AnimatePresence } from 'framer-motion';
-// ! recoil
 import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { formTypeState, FORM_TYPE } from '@/store/formTypeState';
-// ! components
 import { SignUpForm } from './SignUpForm';
 import { Button } from '@/components/atomic/Button';
-// ! hooks
 import { useLogin, useGuestLogin } from '@/hooks/apiHooks/auth';
 import { useToastModal } from '@/hooks/useToastModal';
-// !etc
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 
 export const LoginFormModal = ({ isShow }: { isShow: boolean }) => {
-  // ! recoil
   const formType = useRecoilValue(formTypeState);
 
   return (
@@ -38,10 +33,8 @@ export const LoginFormModal = ({ isShow }: { isShow: boolean }) => {
 const LoginForm = () => {
   const { guestLogin } = useGuestLogin();
 
-  // ! recoil
   const setFormType = useSetRecoilState(formTypeState);
 
-  // ! hooks
   const { showErrorToast } = useToastModal();
   const { login } = useLogin();
 
@@ -49,7 +42,6 @@ const LoginForm = () => {
     const emailPattern = /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+[.][A-Za-z0-9]+$/;
     return !emailPattern.test(email);
   };
-  // ! attempt login
   /**
    * ログイン実行
    * @param e event

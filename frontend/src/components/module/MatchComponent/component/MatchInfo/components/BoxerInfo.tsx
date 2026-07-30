@@ -2,16 +2,13 @@ import { ComponentProps } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { useRecoilValue } from 'recoil';
-//! type
 import { BoxerType, MatchResultType } from '@/types';
 import { BOXER_STANCE_LABELS } from '@/constants/boxerData';
-//! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
-//! recoil
 import { deviceState } from '@/store/deviceState';
-//! image
 import crown from '@/assets/images/etc/champion.svg';
 import fallOfCrown from '@/assets/images/etc/fall_champion.svg';
+import { getDisplayedBoxerRecord } from './helper/boxerRecord';
 
 type BoxerWithColor = BoxerType & { color: 'red' | 'blue' };
 
@@ -92,6 +89,8 @@ const BoxerRecord = (props: BoxerRecordType) => {
     : false;
   const resultState = getResultState({ result, boxerColor: boxer.color });
 
+  const { win, ko, draw, lose } = getDisplayedBoxerRecord({ boxer, resultState, isKo });
+
   return (
     <ul className="flex justify-between w-full mt-5 text-white">
       <li
@@ -102,14 +101,14 @@ const BoxerRecord = (props: BoxerRecordType) => {
             : 'before:text-stone-500'
         )}
       >
-        {boxer.win}
+        {win}
         <span
           className={clsx(
             "absolute text-sm bottom-[-20px] left-[50%] translate-x-[-50%] after:content-['KO']",
             resultState === 'win' && isKo ? 'text-red-700 font-bold' : 'text-stone-500'
           )}
         >
-          {boxer.ko}
+          {ko}
         </span>
       </li>
       <li
@@ -120,7 +119,7 @@ const BoxerRecord = (props: BoxerRecordType) => {
             : 'before:text-stone-500'
         )}
       >
-        {boxer.draw}
+        {draw}
       </li>
       <li
         className={clsx(
@@ -130,7 +129,7 @@ const BoxerRecord = (props: BoxerRecordType) => {
             : 'before:text-stone-500'
         )}
       >
-        {boxer.lose}
+        {lose}
       </li>
     </ul>
   );

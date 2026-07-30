@@ -1,14 +1,10 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { ROUTE_PATH } from '@/constants/routePath';
-//! layout
 import HeaderOnlyLayout from '@/layout/HeaderOnlyLayout';
-//! hook
 import { useSignUpIdentification } from '@/hooks/apiHooks/auth';
-//! component
 import { Footer } from '@/components/module/Footer';
 import { RotatingLines } from 'react-loader-spinner';
-// ! recoil
 import { useRecoilValue } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
 import { authCheckingState } from '@/store/authCheckingState';

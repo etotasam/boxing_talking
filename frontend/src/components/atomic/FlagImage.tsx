@@ -1,24 +1,23 @@
 import React from 'react';
 import clsx from 'clsx';
-// ! types
 import { CountryType } from '@/types';
-// ! Nationally
 import { getNationalFlag } from '@/utils/nationalFlag';
 
-type PropsType = React.ComponentProps<'div'> & {
+type PropsType = React.ComponentProps<'span'> & {
   nationality: CountryType;
 };
 
 export const FlagImage = ({ nationality, className }: PropsType) => {
+  const NationalFlag = getNationalFlag(nationality);
+
   return (
-    <>
-      <span className={clsx(className)}>
-        <img
-          className="w-full h-full object-cover"
-          src={getNationalFlag(nationality)}
-          alt={nationality}
-        />
-      </span>
-    </>
+    <span className={clsx(className)}>
+      <NationalFlag
+        aria-label={nationality}
+        className="h-full w-full object-cover"
+        preserveAspectRatio="xMidYMid slice"
+        role="img"
+      />
+    </span>
   );
 };

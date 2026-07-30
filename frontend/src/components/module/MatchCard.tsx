@@ -1,15 +1,11 @@
 import dayjs from 'dayjs';
 import clsx from 'clsx';
-// ! types
 import { MatchDataType } from '@/types';
 import { BoxerType } from '@/types';
-// ! components
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
 import { VoteIconForTop } from '@/components/module/MatchComponent/component/VoteIcon';
-// ! image
 import { GiImperialCrown } from 'react-icons/gi';
 
-//! hook
 import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
 import { useRecoilValue } from 'recoil';
@@ -33,8 +29,8 @@ PropsType) => {
         <div
           onClick={() => onClick(matchData.id)}
           className={clsx(
-            'relative flex justify-between w-full max-w-[1024px] cursor-pointer border-[1px] border-neutral-700  text-stone-300 bg-stone-50/10 rounded-md',
-            'pc:w-[80%] pc:hover:bg-red-600/80 hover:white pc:hover:border-neutral-300 pc:duration-300'
+            'relative flex justify-between w-full cursor-pointer border-[1px] border-neutral-700  text-stone-300 bg-stone-50/10 rounded-md',
+            'pc:hover:bg-red-600/80 hover:white pc:hover:border-neutral-300 pc:duration-300'
             // isMatchResult ? 'pc:pt-2 pc:pb-1 py-1' : 'pc:py-4 py-8'
           )}
         >
@@ -44,7 +40,6 @@ PropsType) => {
 
           <BoxerBox boxer={matchData.blueBoxer} />
 
-          {/* <PredictionIcon matchData={matchData} iconType={predictionIconType} /> */}
           {isShowVoteIcon && (
             <div className="absolute top-2 left-2">
               {/* <VoteIcon matchData={matchData} /> */}

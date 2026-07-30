@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 import { useRecoilState } from 'recoil'
-//! store
 import { fullScreenLoadingState } from '@/store/fullScreenLoadingState'
 
 export const useFullScreenLoading = () => {

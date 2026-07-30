@@ -1,54 +1,71 @@
 import clsx from 'clsx';
 import { GiImperialCrown } from 'react-icons/gi';
-//! type
 import { MatchDataType } from '@/types';
 
 export const Grade = ({ matchData }: { matchData: MatchDataType }) => {
   const isTitleMatch = matchData.grade === 'タイトルマッチ';
-  const isOneTitle = matchData.titles.length === 1;
-  const isUnificationMatch = matchData.titles.length > 1;
+  const titleOrganizations = matchData.titles.map(({ organization }) => organization);
+  const shouldShowTitleBadges = isTitleMatch && titleOrganizations.length > 0;
+
   return (
-    <div className={clsx('font-clamp-level-1 flex-1 text-white')}>
-      <div className={clsx('flex justify-center whitespace-nowrap')}>
-        <div className="flex items-end">
-          <span className="">{matchData.weight}級</span>
-
-          {isOneTitle && (
-            <span className="relative ml-1">
-              <GiImperialCrown className="text-yellow-500 w-[30px] h-[30px]" />
-              <CrownIconContainer title={matchData.titles[0].organization} />
-            </span>
+    <section className="flex w-full justify-center pt-4 text-white" aria-label="match-grade">
+      <div className="min-w-0 text-center">
+        <p
+          className={clsx(
+            'inline-flex items-center justify-center gap-1 break-words text-[clamp(18px,3vw,24px)] font-black leading-tight',
+            isTitleMatch ? 'text-amber-300' : 'text-white'
           )}
-          {!isTitleMatch && <span className="ml-3">{matchData.grade}</span>}
-        </div>
+        >
+          {isTitleMatch && (
+            <GiImperialCrown
+              className="h-[0.9em] w-[0.9em] shrink-0 text-amber-300 drop-shadow-[0_0_6px_rgba(251,191,36,0.72)]"
+              aria-hidden="true"
+            />
+          )}
+          {isTitleMatch ? (
+            <span className="bg-gradient-to-b from-yellow-50 via-amber-300 to-yellow-600 bg-clip-text text-transparent">
+              {matchData.weight}級
+            </span>
+          ) : (
+            `${matchData.weight}級`
+          )}
+          {isTitleMatch && (
+            <GiImperialCrown
+              className="h-[0.9em] w-[0.9em] shrink-0 text-amber-300 drop-shadow-[0_0_6px_rgba(251,191,36,0.72)]"
+              aria-hidden="true"
+            />
+          )}
+        </p>
+        {shouldShowTitleBadges ? (
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+            {titleOrganizations.map((organization, index) => (
+              <span
+                key={`${organization}-${index}`}
+                className="relative isolate overflow-hidden rounded-md bg-gradient-to-br from-yellow-100 via-amber-400 to-yellow-700 p-[1.4px]"
+              >
+                <span className="relative block overflow-hidden rounded-[4px] bg-zinc-950/80 px-2 py-1 backdrop-blur-sm">
+                  <span
+                    className="absolute inset-x-2 top-[-10px] h-5 rounded-full"
+                    aria-hidden="true"
+                  />
+                  <span className="relative bg-gradient-to-b from-yellow-50 via-amber-300 to-yellow-600 bg-clip-text text-[clamp(16px,2.2vw,18px)] font-black leading-none tracking-wide text-transparent">
+                    {organization}
+                  </span>
+                </span>
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p
+            className={clsx(
+              'mt-1 break-words text-[clamp(16px,3vw,24px)] font-black leading-tight',
+              isTitleMatch ? 'text-yellow-300' : 'text-white'
+            )}
+          >
+            {matchData.grade}
+          </p>
+        )}
       </div>
-      {isUnificationMatch && (
-        <div className="flex justify-center mt-1">
-          {matchData.titles.map((title) => (
-            <div key={title.organization} className="relative ml-2 first-of-type:ml-0">
-              <GiImperialCrown className="text-yellow-500 w-[30px] h-[30px]" />
-              <CrownIconContainer title={title.organization} />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-const CrownIconContainer = ({ title }: { title: string }) => {
-  const index = title.indexOf('暫定');
-  const titleArray: string[] | undefined =
-    index !== -1 ? [title.slice(0, index), title.slice(index)] : undefined;
-
-  return titleArray && titleArray.length ? (
-    <span className="text-[13px] absolute top-[70%] left-[50%] translate-x-[-50%] translate-y-[-50%] shadow-blur w-full">
-      <span className="w-full absolute top-[-18px]">{titleArray[1]}</span>
-      <span className="w-full absolute top-[-8px]">{titleArray[0]}</span>
-    </span>
-  ) : (
-    <span className="text-[13px] absolute top-[70%] left-[50%] translate-x-[-50%] translate-y-[-50%] shadow-blur">
-      {title}
-    </span>
+    </section>
   );
 };

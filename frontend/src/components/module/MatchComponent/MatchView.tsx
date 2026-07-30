@@ -1,8 +1,6 @@
-//! type
 import { MatchDataType } from '@/types';
 import { MatchPredictionsType } from '@/types';
 
-//! component
 import { MatchInfo } from './component/MatchInfo';
 import { PostComment } from './component/PostComment';
 import { PredictionVoteModal } from './component/PredictionVoteModal';
@@ -42,7 +40,7 @@ export const MatchView = ({
         isShowVoteIcon={isShowVoteIcon}
         commentsModalHeightHiddenState={commentsModalHeightHiddenState}
       />
-      <div className="fixed bottom-0 w-full">
+      <div className="fixed bottom-0 inset-x-0">
         <PostComment />
       </div>
 
@@ -70,12 +68,13 @@ const MainContent = ({
   isShowVoteIcon,
   commentsModalHeightHiddenState,
 }: MainProps) => {
+  const MATCH_MAIN_CONTENT_BOTTOM_GAP = 32;
   return (
-    <div className="w-[100vw] overflow-auto">
+    <div className="w-full overflow-auto">
       <div
         data-testid="match-main-content"
-        className="w-full flex justify-center"
-        style={{ paddingBottom: commentsModalHeightHiddenState }}
+        className="flex justify-center"
+        style={{ paddingBottom: commentsModalHeightHiddenState + MATCH_MAIN_CONTENT_BOTTOM_GAP }}
       >
         <MatchInfo
           matchData={matchData}

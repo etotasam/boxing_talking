@@ -7,7 +7,7 @@ import { ReactElement } from 'react';
 // Suppress React 18 act() warnings in tests
 const originalError = console.error;
 beforeAll(() => {
-  console.error = (...args: any[]) => {
+  console.error = (...args: Parameters<typeof console.error>) => {
     if (
       typeof args[0] === 'string' &&
       args[0].includes('Warning: An update to') &&
@@ -42,5 +42,6 @@ const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>
   });
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export * from '@testing-library/react';
 export { customRender as render };

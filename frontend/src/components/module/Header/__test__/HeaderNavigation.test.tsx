@@ -37,23 +37,11 @@ describe('HeaderNavigation', () => {
     );
   });
 
-  test('管理者なら管理ページリンクを表示する', () => {
+  test('管理者でも管理ページリンクを常時表示しない', () => {
     mockUseAdmin.mockReturnValue({ isAdmin: true });
 
     const { container } = renderHeaderNavigation();
 
-    expect(container.querySelector(`a[href="${ROUTE_PATH.BOXER_REGISTER}"]`)).toBeInTheDocument();
-    expect(container.querySelector(`a[href="${ROUTE_PATH.MATCH_REGISTER}"]`)).toBeInTheDocument();
-  });
-
-  test('管理者でなければ管理ページリンクを表示しない', () => {
-    const { container } = renderHeaderNavigation();
-
-    expect(
-      container.querySelector(`a[href="${ROUTE_PATH.BOXER_REGISTER}"]`)
-    ).not.toBeInTheDocument();
-    expect(
-      container.querySelector(`a[href="${ROUTE_PATH.MATCH_REGISTER}"]`)
-    ).not.toBeInTheDocument();
+    expect(container.querySelectorAll('a')).toHaveLength(2);
   });
 });

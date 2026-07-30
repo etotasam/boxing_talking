@@ -1,13 +1,8 @@
 import { useEffect } from 'react';
-// import { useInView } from 'react-intersection-observer';
-//! hooks
 import { useFetchNewComments } from '@/hooks/apiHooks/comment';
-//! recoil
 import { useRecoilValue } from 'recoil';
 import { apiFetchState, type ApiFetchStateType } from '@/store/apiFetchDataState';
-//! types
 import type { CommentType } from '@/types';
-//! component
 import { ErrorFallback } from './components/ErrorFallback';
 import { NoCommentFallback } from './components/NoCommentFallback';
 import { CommentsExist } from './components/CommentsExist';
@@ -33,9 +28,7 @@ export const Comments = (props: PropsType) => {
   });
 
   //? コメント投稿が成功したら新しいコメントをrefetchする
-  // const isNewPostSuccess = useRecoilValue(
   //   apiFetchDataState({ dataName: 'comments/post', state: 'isSuccess' })
-  // );
 
   const commentPostState = useRecoilValue(apiFetchState('comments/post'));
 

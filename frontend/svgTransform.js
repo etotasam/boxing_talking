@@ -1,6 +1,6 @@
 
 export default {
-  process(src, filename, config, options) {
+  process(src) {
     const processedCode = 'module.exports = ' + JSON.stringify(src) + ';';
     return {
       code: processedCode,

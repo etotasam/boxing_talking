@@ -1,4 +1,3 @@
-//! types
 import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 
 export const Reach = (props: { boxerReach: number; setBoxerFieldData: LocalDataEntryType }) => {

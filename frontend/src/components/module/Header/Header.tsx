@@ -4,7 +4,8 @@ import { deviceState } from '@/store/deviceState';
 import { HeaderAuthInfo } from './component/HeaderAuthInfo';
 import { HeaderNavigation } from './component/HeaderNavigation';
 import { HeaderView } from './component/HeaderView';
-import { Hamburger } from './component/Hamburger';
+import { AdminMenuPopover } from './component/AdminMenuPopover';
+import { SpAdminMenuPopover } from './component/SpAdminMenuPopover';
 import { useHeaderHeightRef } from './hooks/useHeaderHeightRef';
 
 export const Header = () => {
@@ -18,7 +19,8 @@ export const Header = () => {
       device={device}
       headerRef={headerRef}
       siteTitle={siteTitle}
-      navigation={device === 'PC' ? <HeaderNavigation pathname={pathname} /> : <Hamburger />}
+      navigation={<HeaderNavigation pathname={pathname} />}
+      adminMenu={device === 'PC' ? <AdminMenuPopover /> : <SpAdminMenuPopover />}
       authInfo={<HeaderAuthInfo />}
     />
   );

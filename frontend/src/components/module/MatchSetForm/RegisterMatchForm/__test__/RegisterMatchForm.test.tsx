@@ -4,7 +4,6 @@ import { expect, test, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { WEIGHT_CLASS, GRADE } from '@/constants/boxerData';
 import { COUNTRY } from '@/constants/country';
-// import { useRegisterMatch } from '@/hooks/apiHooks/match';
 
 import { RegisterMatchFormWrapper } from '../RegisterMatchForm';
 

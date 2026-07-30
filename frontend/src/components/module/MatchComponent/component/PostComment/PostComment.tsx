@@ -1,9 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
-//!icon
 import { RotatingLines } from 'react-loader-spinner';
 import { FaRegCommentDots } from 'react-icons/fa';
-//! hooks
 import { usePostComment } from '@/hooks/apiHooks/comment';
 
 type PostCommentType = {
@@ -23,7 +21,7 @@ export const PostComment = (props: PostCommentType) => {
   } = props;
   return (
     <div ref={commentPostRef} className="w-full flex justify-center pb-5">
-      <div className="md:w-[85%] sm:w-[85%] w-[95%] max-w-[800px]">
+      <div className="w-[96%] pc:max-w-[1200px] pc:w-[92%]">
         <PostCommentTextarea
           setComment={setComment}
           storeCommentExecute={storeCommentExecute}
@@ -35,7 +33,6 @@ export const PostComment = (props: PostCommentType) => {
   );
 };
 
-// ! コメント投稿テキストエリア
 type PostCommentTextareaType = {
   setComment: React.Dispatch<React.SetStateAction<string | undefined>>;
   storeCommentExecute: () => void;

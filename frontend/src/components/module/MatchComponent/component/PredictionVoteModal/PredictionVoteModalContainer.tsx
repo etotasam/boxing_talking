@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { PredictionVoteModal } from './PredictionVoteModal';
 import { MatchDataType } from '@/types';
-import { useVoteMatchPrediction } from '@/hooks/apiHooks/useWinLossPrediction';
+import { useVoteMatchPrediction } from '@/hooks/apiHooks/prediction';
 import { useModalState } from '@/hooks/useModalState';
 
 type PropsType = {
@@ -41,12 +41,10 @@ export const PredictionVoteModalContainer = (props: PropsType) => {
       red: {
         name: thisMatch.redBoxer.name,
         country: thisMatch.redBoxer.country,
-        title: thisMatch.redBoxer.titles.length,
       },
       blue: {
         name: thisMatch.blueBoxer.name,
         country: thisMatch.blueBoxer.country,
-        title: thisMatch.blueBoxer.titles.length,
       },
     },
     voteExecution,

@@ -69,7 +69,7 @@ vi.mock('@/hooks/useLoginModal', () => {
   };
 });
 
-vi.mock('@/hooks/apiHooks/useWinLossPrediction', () => {
+vi.mock('@/hooks/apiHooks/prediction', () => {
   return {
     useFetchUsersPrediction: vi.fn(() => {
       return {
@@ -89,9 +89,13 @@ vi.mock('@/hooks/useReactQuery', () => {
   };
 });
 
-// QueryClientProvider 付きの hook テスト用 wrapper を生成する関数
-const createWrapper = () => {
-  const queryClient = new QueryClient({
+const usersPredictionCache = [{ matchId: 1, prediction: 'red' }];
+const matchPredictionsCacheKey = [QUERY_KEY.MATCH_PREDICTIONS, { id: 1, userPrediction: 'red' }];
+const matchPredictionsCache = { isVisible: true, totalVotes: 2, red: 1, blue: 1 };
+
+// 共通の QueryClient を生成する関数
+const createQueryClient = () => {
+  return new QueryClient({
     defaultOptions: {
       queries: {
         retry: false,
@@ -101,15 +105,24 @@ const createWrapper = () => {
       },
     },
   });
+};
 
+// QueryClientProvider 付きの hook テスト用 wrapper を生成する関数
+const createWrapper = (queryClient: QueryClient) => {
   return ({ children }: { children: ReactNode }) => {
     return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
   };
 };
 
 // useGuestLogin を共通条件で renderHook する関数
-const renderUseGuestLogin = () => {
-  return renderHook(() => useGuestLogin(), { wrapper: createWrapper() });
+const renderUseGuestLogin = (queryClient: QueryClient) => {
+  return renderHook(() => useGuestLogin(), { wrapper: createWrapper(queryClient) });
+};
+
+// 前ユーザーの勝敗予想キャッシュを投入する関数
+const seedPredictionCaches = (queryClient: QueryClient) => {
+  queryClient.setQueryData(QUERY_KEY.PREDICTION, usersPredictionCache);
+  queryClient.setQueryData(matchPredictionsCacheKey, matchPredictionsCache);
 };
 
 describe('useGuestLogin', () => {
@@ -120,7 +133,9 @@ describe('useGuestLogin', () => {
   test('guestLogin成功時にモーダルを閉じて関連副作用を実行する', async () => {
     vi.mocked(Axios.post).mockResolvedValueOnce({ data: {} });
 
-    const { result } = renderUseGuestLogin();
+    const queryClient = createQueryClient();
+    seedPredictionCaches(queryClient);
+    const { result } = renderUseGuestLogin(queryClient);
 
     act(() => {
       result.current.guestLogin();
@@ -129,6 +144,8 @@ describe('useGuestLogin', () => {
     await waitFor(() => {
       expect(mocks.showFullScreenLoading).toHaveBeenCalledTimes(1);
       expect(mocks.hideLoginModal).toHaveBeenCalledTimes(1);
+      expect(queryClient.getQueryData(QUERY_KEY.PREDICTION)).toBeUndefined();
+      expect(queryClient.getQueryData(matchPredictionsCacheKey)).toBeUndefined();
       expect(mocks.refetchMatchPrediction).toHaveBeenCalledTimes(1);
       expect(mocks.hideFullScreenLoading).toHaveBeenCalledTimes(1);
       expect(mocks.setReactQueryData).toHaveBeenCalledTimes(1);
@@ -146,7 +163,9 @@ describe('useGuestLogin', () => {
       },
     });
 
-    const { result } = renderUseGuestLogin();
+    const queryClient = createQueryClient();
+    seedPredictionCaches(queryClient);
+    const { result } = renderUseGuestLogin(queryClient);
 
     act(() => {
       result.current.guestLogin();
@@ -156,6 +175,8 @@ describe('useGuestLogin', () => {
       expect(mocks.hideFullScreenLoading).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).toHaveBeenCalledWith(MESSAGE.NOT_CREATE_GUEST_BY_LIMIT);
+      expect(queryClient.getQueryData(QUERY_KEY.PREDICTION)).toEqual(usersPredictionCache);
+      expect(queryClient.getQueryData(matchPredictionsCacheKey)).toEqual(matchPredictionsCache);
       expect(mocks.showSuccessToast).not.toHaveBeenCalled();
       expect(mocks.hideLoginModal).not.toHaveBeenCalled();
       expect(mocks.setReactQueryData).not.toHaveBeenCalled();
@@ -169,7 +190,9 @@ describe('useGuestLogin', () => {
       },
     });
 
-    const { result } = renderUseGuestLogin();
+    const queryClient = createQueryClient();
+    seedPredictionCaches(queryClient);
+    const { result } = renderUseGuestLogin(queryClient);
 
     act(() => {
       result.current.guestLogin();
@@ -179,6 +202,8 @@ describe('useGuestLogin', () => {
       expect(mocks.hideFullScreenLoading).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).toHaveBeenCalledWith(MESSAGE.LOGIN_FAILED);
+      expect(queryClient.getQueryData(QUERY_KEY.PREDICTION)).toEqual(usersPredictionCache);
+      expect(queryClient.getQueryData(matchPredictionsCacheKey)).toEqual(matchPredictionsCache);
       expect(mocks.showSuccessToast).not.toHaveBeenCalled();
       expect(mocks.hideLoginModal).not.toHaveBeenCalled();
       expect(mocks.refetchMatchPrediction).not.toHaveBeenCalled();

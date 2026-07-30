@@ -24,7 +24,6 @@ type PreSignUpError = {
   };
 };
 
-//! ユーザ作成（仮登録）
 export const usePreSignUp = () => {
   const { showErrorToast } = useToastModal();
   const { showFullScreenLoading, hideFullScreenLoading } = useFullScreenLoading();

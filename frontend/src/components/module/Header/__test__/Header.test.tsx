@@ -7,18 +7,28 @@ import { ROUTE_PATH } from '@/constants/routePath';
 import { deviceState, DeviceStateType } from '@/store/deviceState';
 import { Header } from '../Header';
 
+const mockUseAdmin = vi.fn();
+
+vi.mock('@/hooks/apiHooks/auth', () => ({
+  useAdmin: () => mockUseAdmin(),
+}));
+
 vi.mock('../component/HeaderNavigation', () => ({
   HeaderNavigation: ({ pathname }: { pathname: string }) => (
     <div data-testid="header-navigation">{pathname}</div>
   ),
 }));
 
-vi.mock('../component/Hamburger', () => ({
-  Hamburger: () => <div data-testid="hamburger" />,
-}));
-
 vi.mock('../component/HeaderAuthInfo', () => ({
   HeaderAuthInfo: () => <div data-testid="header-auth-info" />,
+}));
+
+vi.mock('../component/AdminMenuPopover', () => ({
+  AdminMenuPopover: () => <div data-testid="pc-admin-menu-popover" />,
+}));
+
+vi.mock('../component/SpAdminMenuPopover', () => ({
+  SpAdminMenuPopover: () => <div data-testid="sp-admin-menu-popover" />,
 }));
 
 const renderHeader = (device: DeviceStateType = 'PC') => {
@@ -38,6 +48,7 @@ const renderHeader = (device: DeviceStateType = 'PC') => {
 describe('Header', () => {
   beforeEach(() => {
     vi.stubEnv('VITE_APP_SITE_TITLE', 'BOXING TALKING');
+    mockUseAdmin.mockReturnValue({ isAdmin: false });
   });
 
   test('PCではサイトタイトルとナビゲーションを表示する', () => {
@@ -45,17 +56,20 @@ describe('Header', () => {
 
     expect(screen.getByRole('heading', { name: 'BOXING TALKING' })).toBeInTheDocument();
     expect(screen.getByTestId('header-navigation')).toHaveTextContent(ROUTE_PATH.PAST_MATCHES);
-    expect(screen.queryByTestId('hamburger')).not.toBeInTheDocument();
+    expect(screen.getByTestId('pc-admin-menu-popover')).toBeInTheDocument();
+    expect(screen.queryByTestId('sp-admin-menu-popover')).not.toBeInTheDocument();
     expect(screen.getByTestId('header-auth-info')).toBeInTheDocument();
     expect(screen.getByRole('banner')).toHaveClass('h-[80px]');
   });
 
-  test('SPではハンバーガーを表示する', () => {
+  test('SPでは通常ナビゲーションを表示する', () => {
     renderHeader('SP');
 
     expect(screen.getByRole('heading', { name: 'BOXING TALKING' })).toBeInTheDocument();
-    expect(screen.getByTestId('hamburger')).toBeInTheDocument();
-    expect(screen.queryByTestId('header-navigation')).not.toBeInTheDocument();
-    expect(screen.getByRole('banner')).toHaveClass('h-[70px]', 'bg-red-600');
+    expect(screen.getByTestId('header-navigation')).toHaveTextContent(ROUTE_PATH.PAST_MATCHES);
+    expect(screen.queryByTestId('pc-admin-menu-popover')).not.toBeInTheDocument();
+    expect(screen.getByTestId('sp-admin-menu-popover')).toBeInTheDocument();
+    expect(screen.getByRole('banner')).toHaveClass('h-[126px]', 'bg-black/95');
   });
+
 });

@@ -1,13 +1,13 @@
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
 import { ROUTE_PATH } from '@/constants/routePath';
-import { useAdmin } from '@/hooks/apiHooks/auth';
-import { AdministratorPageLinks } from '../../AdministratorPageLinks';
 
 const LINK_STYLES = {
-  common: 'text-[14px] duration-300 px-4 py-1 rounded-[50px]',
-  currentPage: 'text-black bg-yellow-400 pointer-events-none',
-  normalPage: 'text-white hover:bg-gray-500/50 hover:scale-[110%]',
+  common:
+    'flex h-full items-center justify-center whitespace-nowrap border-b-[3px] border-transparent px-8 text-[18px] font-bold duration-300 pc:px-[clamp(8px,1.5vw,16px)] pc:text-[clamp(15px,1.8vw,18px)]',
+  currentPage:
+    'border-yellow-400 text-yellow-400 pointer-events-none',
+  normalPage: 'text-white/70 hover:text-white',
 } as const;
 
 const getLinkClassName = (targetPath: string, currentPath: string) =>
@@ -16,23 +16,19 @@ const getLinkClassName = (targetPath: string, currentPath: string) =>
     currentPath === targetPath ? LINK_STYLES.currentPage : LINK_STYLES.normalPage
   );
 
-type HeaderNavigationProps = {
-  pathname: string;
-};
+type HeaderNavigationProps = { pathname: string };
 
 export const HeaderNavigation = ({ pathname }: HeaderNavigationProps) => {
-  const { isAdmin } = useAdmin();
-
   return (
-    <nav className="absolute bottom-2 pc:static flex pc:items-end pc:mb-4">
-      <ul className="flex pc:items-end">
-        <li className="pc:ml-5 ml-2">
+    <nav className="flex h-full w-full pc:ml-[clamp(12px,4vw,48px)] pc:w-auto pc:shrink-0 pc:items-center">
+      <ul className="flex h-full w-full justify-center pc:w-auto">
+        <li className="pc:ml-0">
           <Link className={getLinkClassName(ROUTE_PATH.HOME, pathname)} to={ROUTE_PATH.HOME}>
             Schedule
           </Link>
         </li>
 
-        <li className="pc:ml-5 ml-2">
+        <li className="pc:ml-[clamp(8px,2vw,20px)]">
           <Link
             className={getLinkClassName(ROUTE_PATH.PAST_MATCHES, pathname)}
             to={ROUTE_PATH.PAST_MATCHES}
@@ -41,7 +37,6 @@ export const HeaderNavigation = ({ pathname }: HeaderNavigationProps) => {
           </Link>
         </li>
       </ul>
-      {isAdmin && <AdministratorPageLinks />}
     </nav>
   );
 };

@@ -1,9 +1,6 @@
-//! type
 import { BoxerType } from '@/types';
 import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
-// ! component
 import { Button } from '@/components/atomic/Button';
-//! fields components
 import { Name, Country, Birth, Height, Reach, Stance, BoxerResume, Titles } from './fields';
 
 type PropsType = {

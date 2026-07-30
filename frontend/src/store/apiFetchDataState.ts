@@ -1,11 +1,9 @@
 import { atomFamily } from "recoil";
 
-// const dataFetchState = [
 //   "isLoading",
 //   "isFetching",
 //   "isSuccess",
 //   "isError",
-// ] as const
 
 const state = [
   "loading",
@@ -29,10 +27,8 @@ type DataNameType = (typeof dataName)[number]
 export type ApiFetchStateType = (typeof state)[number]
 
 
-// export const apiFetchDataState = atomFamily<boolean, { dataName: DataNameType, state: DataFetchStateType }>({
 //   key: "apiFetchDataState",
 //   default: false
-// })
 
 export const apiFetchState = atomFamily<ApiFetchStateType, DataNameType>(
   {

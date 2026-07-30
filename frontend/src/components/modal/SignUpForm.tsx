@@ -2,14 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AiOutlineClose } from 'react-icons/ai';
 import { clsx } from 'clsx';
-// ! recoil
 import { useSetRecoilState } from 'recoil';
 import { formTypeState, FORM_TYPE } from '@/store/formTypeState';
-//! hooks
 import { usePreSignUp } from '@/hooks/apiHooks/auth';
-//! component
 import { CustomButton } from '@/components/atomic/Button';
-//! utils
 import { validateName, validateEmail, validatePassword } from '@/utils/validation/signUpValidation';
 
 export const SignUpForm = () => {
@@ -49,7 +45,6 @@ export const SignUpForm = () => {
     setIsShowPreSignUpModal(true);
   }, [isSuccessPreRegister]);
 
-  // ! recoil
   const setFormType = useSetRecoilState(formTypeState);
   const toLoginForm = () => {
     setFormType(FORM_TYPE.LOGIN_FORM);

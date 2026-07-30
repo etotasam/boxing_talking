@@ -72,7 +72,7 @@ vi.mock('@/hooks/useLoginModal', () => {
   };
 });
 
-vi.mock('@/hooks/apiHooks/useWinLossPrediction', () => {
+vi.mock('@/hooks/apiHooks/prediction', () => {
   return {
     useFetchUsersPrediction: vi.fn(() => {
       return {
@@ -106,9 +106,13 @@ const userData: UserType = {
   name: 'test user',
 };
 
-// QueryClientProvider 付きの hook テスト用 wrapper を生成する関数
-const createWrapper = () => {
-  const queryClient = new QueryClient({
+const usersPredictionCache = [{ matchId: 1, prediction: 'red' }];
+const matchPredictionsCacheKey = [QUERY_KEY.MATCH_PREDICTIONS, { id: 1, userPrediction: 'red' }];
+const matchPredictionsCache = { isVisible: true, totalVotes: 2, red: 1, blue: 1 };
+
+// 共通の QueryClient を生成する関数
+const createQueryClient = () => {
+  return new QueryClient({
     defaultOptions: {
       queries: {
         retry: false,
@@ -118,15 +122,18 @@ const createWrapper = () => {
       },
     },
   });
+};
 
+// QueryClientProvider 付きの hook テスト用 wrapper を生成する関数
+const createWrapper = (queryClient: QueryClient) => {
   return ({ children }: { children: ReactNode }) => {
     return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
   };
 };
 
 // useLogin を共通条件で renderHook する関数
-const renderUseLogin = () => {
-  return renderHook(() => useLogin(), { wrapper: createWrapper() });
+const renderUseLogin = (queryClient: QueryClient) => {
+  return renderHook(() => useLogin(), { wrapper: createWrapper(queryClient) });
 };
 
 // 共通の入力値で login を実行する関数
@@ -134,6 +141,12 @@ const executeLogin = (login: (props: LoginInput) => void) => {
   act(() => {
     login(input);
   });
+};
+
+// 前ユーザーの勝敗予想キャッシュを投入する関数
+const seedPredictionCaches = (queryClient: QueryClient) => {
+  queryClient.setQueryData(QUERY_KEY.PREDICTION, usersPredictionCache);
+  queryClient.setQueryData(matchPredictionsCacheKey, matchPredictionsCache);
 };
 
 describe('useLogin', () => {
@@ -149,7 +162,9 @@ describe('useLogin', () => {
       },
     });
 
-    const { result } = renderUseLogin();
+    const queryClient = createQueryClient();
+    seedPredictionCaches(queryClient);
+    const { result } = renderUseLogin(queryClient);
 
     await waitFor(() => {
       expect(mocks.get).toHaveBeenCalledWith(API_PATH.ADMIN);
@@ -163,6 +178,8 @@ describe('useLogin', () => {
       expect(mocks.showFullScreenLoading).toHaveBeenCalledTimes(1);
       expect(mocks.post).toHaveBeenCalledTimes(1);
       expect(mocks.post).toHaveBeenCalledWith(API_PATH.USER_LOGIN, input);
+      expect(queryClient.getQueryData(QUERY_KEY.PREDICTION)).toBeUndefined();
+      expect(queryClient.getQueryData(matchPredictionsCacheKey)).toBeUndefined();
       expect(mocks.refetchMatchPrediction).toHaveBeenCalledTimes(1);
       expect(mocks.hideLoginModal).toHaveBeenCalledTimes(1);
       expect(mocks.hideFullScreenLoading).toHaveBeenCalledTimes(1);
@@ -180,7 +197,9 @@ describe('useLogin', () => {
     vi.mocked(Axios.get).mockResolvedValue({ data: true });
     vi.mocked(Axios.post).mockRejectedValueOnce(new Error('login failed'));
 
-    const { result } = renderUseLogin();
+    const queryClient = createQueryClient();
+    seedPredictionCaches(queryClient);
+    const { result } = renderUseLogin(queryClient);
 
     await waitFor(() => {
       expect(mocks.get).toHaveBeenCalledWith(API_PATH.ADMIN);
@@ -195,6 +214,8 @@ describe('useLogin', () => {
       expect(mocks.hideFullScreenLoading).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).toHaveBeenCalledWith(MESSAGE.LOGIN_FAILED);
+      expect(queryClient.getQueryData(QUERY_KEY.PREDICTION)).toEqual(usersPredictionCache);
+      expect(queryClient.getQueryData(matchPredictionsCacheKey)).toEqual(matchPredictionsCache);
       expect(mocks.showSuccessToast).not.toHaveBeenCalled();
       expect(mocks.hideLoginModal).not.toHaveBeenCalled();
       expect(mocks.refetchMatchPrediction).not.toHaveBeenCalled();

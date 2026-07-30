@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-//! message controller
 import { BG_COLOR_ON_TOAST_MODAL } from '@/constants/statusesOnToastModal';
-//! type
 import { MessageType, BgColorType } from '@/types';
 
 export type PropsType = {

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { AiOutlineUser } from 'react-icons/ai';
+import { AiOutlineLogout, AiOutlineUser } from 'react-icons/ai';
 import { useRecoilValue } from 'recoil';
 import { DeviceStateType, deviceState } from '@/store/deviceState';
 import { useHeaderAuthInfo } from '../hooks/useHeaderAuthInfo';
@@ -27,36 +27,40 @@ export const HeaderAuthInfoView = ({
   onLogout,
 }: HeaderAuthInfoViewProps) => {
   return (
-    <div className="absolute sm:top-1 top-2 pc:right-5 right-2 flex">
+    <div
+      className={clsx(
+        'flex min-w-0 items-center',
+        device === 'PC' ? 'gap-3' : 'gap-2'
+      )}
+    >
+      <div
+        className={clsx(
+          'flex min-w-0 flex-1 items-center',
+          device === 'PC'
+            ? 'gap-3 text-[18px] font-bold text-white/80'
+            : 'gap-2 text-[10px] text-white/80'
+        )}
+      >
+        <AiOutlineUser
+          className={clsx(
+            'mt-[2px] block h-10 w-10 shrink-0 rounded-[50%] border border-white/40 p-2 text-white',
+            iconBgColor
+          )}
+        />
+        <span className="min-w-0 truncate">{userName}</span>
+      </div>
+      {device === 'PC' && <span className="h-10 w-px bg-white/30" />}
       <button
         type="button"
         onClick={onLogout}
         aria-label="ログアウト"
         className={clsx(
-          'group/user relative flex items-center rounded-md text-[10px] transition-opacity',
-          'hover:opacity-80 cursor-pointer'
+          'flex min-h-10 min-w-10 shrink-0 cursor-pointer items-center justify-center rounded-md border border-white/30',
+          'text-white/80 transition-opacity hover:opacity-80',
+          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
         )}
       >
-        <AiOutlineUser
-          className={clsx(
-            'mr-1 mt-[2px] block h-[16px] w-[16px] rounded-[50%] text-white',
-            iconBgColor
-          )}
-        />
-        <span>{userName}</span>
-        {device === 'PC' && (
-          <span
-            className={clsx(
-              'pointer-events-none absolute left-0 top-full mt-1',
-              'whitespace-nowrap rounded-md bg-neutral-900 px-3 py-[6px] text-[10px] font-medium text-white shadow-lg',
-              'after:absolute after:left-3 after:bottom-full after:h-0 after:w-0',
-              'after:border-x-[6px] after:border-b-[6px] after:border-x-transparent after:border-b-neutral-900',
-              'opacity-0 transition-opacity duration-200 group-hover/user:opacity-100'
-            )}
-          >
-            ログアウト
-          </span>
-        )}
+        <AiOutlineLogout className={device === 'PC' ? 'h-7 w-7' : 'h-6 w-6'} />
       </button>
     </div>
   );

@@ -1,7 +1,5 @@
-//! types
 import { LocalDataEntryType } from '@/page/Admin/BoxerEdit';
 import { StanceType } from '@/types';
-// ! data
 import { STANCE } from '@/constants/boxerData';
 
 export const Stance = (props: { stance: StanceType; setBoxerFieldData: LocalDataEntryType }) => {

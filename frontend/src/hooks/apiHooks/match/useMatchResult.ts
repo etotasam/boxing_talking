@@ -8,7 +8,6 @@ import type { MatchResultType } from '@/types';
 import { useFetchAllMatches } from './useFetchAllMatches';
 import { useFetchMatches } from './useFetchMatches';
 
-//! 試合結果の登録
 export const useMatchResult = () => {
   const { showErrorToast, showSuccessToast } = useToastModal();
   const { refetch: refetchMatches } = useFetchMatches();
