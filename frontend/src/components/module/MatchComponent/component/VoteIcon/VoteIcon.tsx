@@ -66,15 +66,15 @@ export const VoteIcon = ({
 
 export const VoteIconForTop = () => {
   return (
-    <div className="relative">
+    <span className="relative block h-full w-full">
       <span className="inline-block w-[25px] h-[25px] bg-black rounded-[50px] absolute top-[50%] translate-y-[-50%] left-[50%] translate-x-[-50%]"></span>
-      <motion.div
+      <motion.span
         animate={{ x: [0, 8, -3, 0] }}
         transition={{ duration: 0.3, repeat: Infinity, repeatDelay: 3 }}
-        className="flex justify-center items-center"
+        className="flex h-full w-full items-center justify-center"
       >
         <GiBoxingGlove className="w-[15px] h-[15px] text-red-600 rotate-[-40deg]" />
-      </motion.div>
-    </div>
+      </motion.span>
+    </span>
   );
 };

@@ -1,15 +1,11 @@
 import dayjs from 'dayjs';
 import clsx from 'clsx';
+import { MdLocationPin } from 'react-icons/md';
 import { MatchDataType } from '@/types';
 import { BoxerType } from '@/types';
-import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
+import { FlagImage } from '@/components/atomic/FlagImage';
 import { VoteIconForTop } from '@/components/module/MatchComponent/component/VoteIcon';
-import { GiImperialCrown } from 'react-icons/gi';
-
-import { useDayOfFightChecker } from '@/hooks/useDayOfFightChecker';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
-import { useRecoilValue } from 'recoil';
-import { deviceState } from '@/store/deviceState';
 
 type PropsType = {
   matchData: MatchDataType;
@@ -17,161 +13,143 @@ type PropsType = {
   className?: string;
 };
 
-export const MatchCard = ({
-  matchData,
-  onClick,
-}: // isPredictionVote,
-PropsType) => {
+export const MatchCard = ({ matchData, onClick, className }: PropsType) => {
   const isShowVoteIcon = useVoteIconState({ matchDate: matchData.matchDate, id: matchData.id });
+  const venue = matchData.venue.trim();
+
   return (
-    <>
-      {matchData && (
-        <div
-          onClick={() => onClick(matchData.id)}
-          className={clsx(
-            'relative flex justify-between w-full cursor-pointer border-[1px] border-neutral-700  text-stone-300 bg-stone-50/10 rounded-md',
-            'pc:hover:bg-red-600/80 hover:white pc:hover:border-neutral-300 pc:duration-300'
-            // isMatchResult ? 'pc:pt-2 pc:pb-1 py-1' : 'pc:py-4 py-8'
-          )}
-        >
-          <BoxerBox boxer={matchData.redBoxer} />
-
-          <MatchInfo matchData={matchData} />
-
-          <BoxerBox boxer={matchData.blueBoxer} />
-
-          {isShowVoteIcon && (
-            <div className="absolute top-2 left-2">
-              {/* <VoteIcon matchData={matchData} /> */}
-              <VoteIconForTop />
-            </div>
-          )}
-        </div>
+    <button
+      type="button"
+      onClick={() => onClick(matchData.id)}
+      className={clsx(
+        'relative flex w-full flex-col overflow-hidden border border-[#D99A2B]/60 bg-[#1B1D20] text-left text-[#F5F2E9]',
+        'cursor-pointer transition-colors pc:hover:border-[#D99A2B] pc:hover:bg-[#24262A]',
+        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D99A2B] focus-visible:outline-offset-2',
+        className
       )}
-    </>
-  );
-};
+    >
+      <span className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-x-2 px-3 pb-4 pt-3 pc:gap-x-6 pc:px-6">
+        <BoxerBox boxer={matchData.redBoxer} reserveVoteIconSpace={isShowVoteIcon} side="red" />
 
-const BoxerBox = ({ boxer }: { boxer: BoxerType }) => {
-  const device = useRecoilValue(deviceState);
-  //名前が10文字以上で"・"を含む場合、最後の部分を取り出してフォーマット
-  let formattedName: string | undefined;
-  if (boxer.name.length > 10 && boxer.name.includes('・')) {
-    const nameParts = boxer.name.split('・');
-    const extractedName: string = nameParts[nameParts.length - 1];
-    formattedName = extractedName;
-  }
-  const boxerName = formattedName ?? boxer.name;
-  const isLongName = device === 'SP' && boxerName.length > 7 && boxerName.length < 11;
-  const isTooLongName = device === 'SP' && boxerName.length > 11;
-  const normalLengthName = device === 'PC' || boxerName.length < 7;
-  return (
-    <div className="flex justify-center items-center flex-1 py-3">
-      <div className="flex flex-col justify-center items-center">
-        <EngNameWithFlag boxerCountry={boxer.country} boxerEngName={boxer.engName} />
-        <h2
-          className={clsx(
-            'mt-1 font-semibold whitespace-nowrap',
-            isLongName && `text-[12px]`,
-            isTooLongName && 'text-[10px]',
-            normalLengthName && 'text-[14px]'
-          )}
-        >
-          {boxerName}
-        </h2>
-      </div>
-    </div>
-  );
-};
-
-const MatchInfo = ({ matchData }: { matchData: MatchDataType }) => {
-  const isTitleMatch = matchData.titles.length;
-  const { isDayOnFight } = useDayOfFightChecker(matchData.matchDate);
-
-  return (
-    <div className={clsx('flex-1 py-3 relative')}>
-      {isTitleMatch ? (
-        <GradeTitleMatch matchData={matchData} />
-      ) : (
-        <GradeNonTitleMatch matchData={matchData} />
-      )}
-      {/* //? 日時 */}
-
-      <div className={clsx('mt-1')}>
-        <time
-          dateTime={dayjs(matchData.matchDate).toISOString()}
-          className={clsx(
-            'block text-center tracking-wide',
-            isDayOnFight && 'text-yellow-500 font-bold'
-          )}
-        >
-          {dayjs(matchData.matchDate).format('YYYY年M月D日')}
-        </time>
-        {/* {isMatchResult && (
-              <div className={clsx('')}>
-                <MatchResult matchData={matchData} />
-              </div>
-            )} */}
-      </div>
-    </div>
-  );
-};
-
-const GradeTitleMatch = ({ matchData }: { matchData: MatchDataType }) => {
-  const isOneTitle = matchData.titles.length === 1;
-  const isUnificationMatch = matchData.titles.length > 1;
-  return (
-    <div className={clsx('text-xs')}>
-      <div className={clsx('flex justify-center whitespace-nowrap')}>
-        <div className="flex items-end">
-          {matchData.weight}級
-          {isOneTitle && (
-            <span className="relative ml-1">
-              <GiImperialCrown className={'text-yellow-500 w-[20px] h-[20px]'} />
-              <CrownIconContainer title={matchData.titles[0].organization} />
+        <span className="flex min-w-[30px] flex-col items-center justify-center self-stretch">
+          {matchData.titles.length > 0 && (
+            <span
+              aria-label={`${matchData.titles.length}団体タイトル戦`}
+              role="img"
+              className="flex items-center justify-center gap-0.5 whitespace-nowrap text-[14px] leading-none text-[#D99A2B] pc:text-[16px]"
+            >
+              {matchData.titles.map((title, index) => (
+                <span key={`${title.organization}-${index}`} aria-hidden="true">
+                  ★
+                </span>
+              ))}
             </span>
           )}
-        </div>
-      </div>
-      {isUnificationMatch && (
-        <div className="flex justify-center mt-1">
-          {matchData.titles.map((title) => (
-            <div key={title.organization} className="relative ml-2 first-of-type:ml-0">
-              <GiImperialCrown className={'text-yellow-500 w-[20px] h-[20px]'} />
-              <CrownIconContainer title={title.organization} />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
+          <span className="font-['Bebas_Neue'] text-2xl leading-none tracking-wide text-[#D99A2B] pc:text-3xl">
+            VS
+          </span>
+        </span>
 
-const CrownIconContainer = ({ title }: { title: string }) => {
-  const index = title.indexOf('暫定');
-  const titleArray: string[] | undefined =
-    index !== -1 ? [title.slice(0, index), title.slice(index)] : undefined;
-
-  return titleArray && titleArray.length ? (
-    <span className="text-[10px] absolute top-[70%] left-[50%] translate-x-[-50%] translate-y-[-50%] shadow-blur w-full">
-      <span className="w-full absolute top-[-18px]">
-        {titleArray[1]} {/* 暫定 */}
+        <BoxerBox boxer={matchData.blueBoxer} side="blue" />
       </span>
-      <span className="w-full absolute top-[-8px]">{titleArray[0]}</span>
-    </span>
-  ) : (
-    <span className="text-[10px] absolute top-[70%] left-[50%] translate-x-[-50%] translate-y-[-50%] shadow-blur">
-      {title}
+
+      <MatchMetadata matchData={matchData} venue={venue} />
+
+      {isShowVoteIcon && (
+        <span className="absolute left-3 top-3 h-[25px] w-[25px]">
+          <VoteIconForTop />
+        </span>
+      )}
+    </button>
+  );
+};
+
+type BoxerBoxProps = {
+  boxer: BoxerType;
+  side: 'red' | 'blue';
+  reserveVoteIconSpace?: boolean;
+};
+
+const BoxerBox = ({ boxer, side, reserveVoteIconSpace = false }: BoxerBoxProps) => {
+  const isRed = side === 'red';
+
+  return (
+    <span
+      className={clsx(
+        'min-w-0 py-1',
+        isRed ? 'text-left' : 'text-right',
+        isRed && reserveVoteIconSpace && 'ml-[33px]'
+      )}
+    >
+      <span className={clsx('flex min-w-0 flex-col gap-1', isRed ? 'items-start' : 'items-end')}>
+        <FlagImage
+          nationality={boxer.country}
+          className="inline-block h-5 w-8 shrink-0 pc:h-6 pc:w-9"
+        />
+        <span
+          className={clsx(
+            'max-w-full break-words font-["M_PLUS_1p"] text-[clamp(14px,2.8vw,24px)] font-bold leading-tight text-[#F5F2E9]',
+            isRed ? 'text-left' : 'text-right'
+          )}
+        >
+          {boxer.name}
+        </span>
+      </span>
     </span>
   );
 };
 
-const GradeNonTitleMatch = ({ matchData }: { matchData: MatchDataType }) => {
+type MatchMetadataProps = {
+  matchData: MatchDataType;
+  venue: string;
+};
+
+const MatchMetadata = ({ matchData, venue }: MatchMetadataProps) => {
+  const formattedDate = dayjs(matchData.matchDate).format('YYYY.MM.DD ddd').toUpperCase();
+  const dateTime = dayjs(matchData.matchDate).format('YYYY-MM-DD');
+
   return (
-    <div className={clsx('text-center text-xs whitespace-nowrap')}>
-      <p>
-        {matchData.weight}級 {matchData.grade}
-      </p>
-    </div>
+    <span className="border-t border-[#AAA8A1]/40 px-3 py-2 pc:px-6">
+      <span
+        className={clsx(
+          'hidden min-w-0 items-center text-sm text-[#AAA8A1] pc:grid pc:gap-0',
+          venue ? 'pc:grid-cols-3' : 'pc:grid-cols-2'
+        )}
+      >
+        <time
+          dateTime={dateTime}
+          className="font-['Bebas_Neue'] tracking-[0.08em] text-center text-[#F5F2E9]"
+        >
+          {formattedDate}
+        </time>
+        <span className="border-l border-[#AAA8A1]/40 text-center">{matchData.weight}級</span>
+        {venue && <VenueContent venue={venue} className="border-l border-[#AAA8A1]/40" />}
+      </span>
+
+      <span className="pc:hidden">
+        <span className="grid min-w-0 grid-cols-2 items-center text-sm text-[#AAA8A1]">
+          <time
+            dateTime={dateTime}
+            className="font-['Bebas_Neue'] tracking-[0.08em] text-center text-[#F5F2E9]"
+          >
+            {formattedDate}
+          </time>
+          <span className="border-l border-[#AAA8A1]/40 text-center">{matchData.weight}級</span>
+        </span>
+        {venue && <VenueContent venue={venue} className="mt-2 border-t border-[#AAA8A1]/40 pt-2" />}
+      </span>
+    </span>
   );
 };
+
+const VenueContent = ({ venue, className }: { venue: string; className?: string }) => (
+  <span
+    className={clsx(
+      'flex min-w-0 items-center justify-center gap-1 text-center text-[#AAA8A1]',
+      className
+    )}
+  >
+    <MdLocationPin aria-hidden="true" className="shrink-0 text-[#D99A2B]" />
+    <span className="min-w-0 break-words">{venue}</span>
+  </span>
+);
