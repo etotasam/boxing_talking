@@ -13,10 +13,6 @@ vi.mock('@/hooks/useVoteIconState', () => ({
   useVoteIconState: (props: unknown) => mockUseVoteIconState(props),
 }));
 
-vi.mock('@/components/module/MatchComponent/component/VoteIcon', () => ({
-  VoteIconForTop: () => <span data-testid="vote-icon" aria-label="勝敗予想アイコン" />,
-}));
-
 const makeBoxer = (overrides: Partial<MatchDataType['redBoxer']> = {}) => ({
   id: 1,
   name: 'ホスベル・ペレス',
@@ -80,6 +76,22 @@ describe('MatchCard', () => {
 
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(onClick).toHaveBeenCalledWith(targetMatchId);
+  });
+
+  test('未投票の試合ではPC・SPの日時欄に勝敗予想バッジを表示する', () => {
+    mockUseVoteIconState.mockReturnValue(true);
+
+    render(<MatchCard matchData={makeMatch()} onClick={vi.fn()} />);
+
+    const badges = screen.getAllByRole('img', { name: '勝敗予想が未投票' });
+    expect(badges).toHaveLength(2);
+    badges.forEach((badge) => expect(badge.closest('time')).toBeInTheDocument());
+  });
+
+  test('投票済みまたは投票不可の試合では勝敗予想バッジを表示しない', () => {
+    render(<MatchCard matchData={makeMatch()} onClick={vi.fn()} />);
+
+    expect(screen.queryByRole('img', { name: '勝敗予想が未投票' })).not.toBeInTheDocument();
   });
 
   test('日本時間で当日・翌日の試合日を強調する', () => {

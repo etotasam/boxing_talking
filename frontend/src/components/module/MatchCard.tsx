@@ -2,11 +2,10 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import clsx from 'clsx';
-import { MdLocationPin } from 'react-icons/md';
+import { MdHowToVote, MdLocationPin } from 'react-icons/md';
 import { MatchDataType } from '@/types';
 import { BoxerType } from '@/types';
 import { FlagImage } from '@/components/atomic/FlagImage';
-import { VoteIconForTop } from '@/components/module/MatchComponent/component/VoteIcon';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
 
 dayjs.extend(utc);
@@ -34,7 +33,7 @@ export const MatchCard = ({ matchData, onClick, className }: PropsType) => {
       )}
     >
       <span className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-x-2 px-3 pb-4 pt-3 pc:gap-x-6 pc:px-6">
-        <BoxerBox boxer={matchData.redBoxer} reserveVoteIconSpace={isShowVoteIcon} side="red" />
+        <BoxerBox boxer={matchData.redBoxer} side="red" />
 
         <span className="flex min-w-[30px] flex-col items-center justify-center self-stretch">
           {matchData.titles.length > 0 && (
@@ -58,13 +57,7 @@ export const MatchCard = ({ matchData, onClick, className }: PropsType) => {
         <BoxerBox boxer={matchData.blueBoxer} side="blue" />
       </span>
 
-      <MatchMetadata matchData={matchData} venue={venue} />
-
-      {isShowVoteIcon && (
-        <span className="absolute left-3 top-3 h-[25px] w-[25px]">
-          <VoteIconForTop />
-        </span>
-      )}
+      <MatchMetadata matchData={matchData} venue={venue} isShowVoteIcon={isShowVoteIcon} />
     </button>
   );
 };
@@ -72,18 +65,16 @@ export const MatchCard = ({ matchData, onClick, className }: PropsType) => {
 type BoxerBoxProps = {
   boxer: BoxerType;
   side: 'red' | 'blue';
-  reserveVoteIconSpace?: boolean;
 };
 
-const BoxerBox = ({ boxer, side, reserveVoteIconSpace = false }: BoxerBoxProps) => {
+const BoxerBox = ({ boxer, side }: BoxerBoxProps) => {
   const isRed = side === 'red';
 
   return (
     <span
       className={clsx(
         'min-w-0 py-1',
-        isRed ? 'text-left' : 'text-right',
-        isRed && reserveVoteIconSpace && 'ml-[33px]'
+        isRed ? 'text-left' : 'text-right'
       )}
     >
       <span className={clsx('flex min-w-0 flex-col gap-1', isRed ? 'items-start' : 'items-end')}>
@@ -107,9 +98,10 @@ const BoxerBox = ({ boxer, side, reserveVoteIconSpace = false }: BoxerBoxProps) 
 type MatchMetadataProps = {
   matchData: MatchDataType;
   venue: string;
+  isShowVoteIcon: boolean;
 };
 
-const MatchMetadata = ({ matchData, venue }: MatchMetadataProps) => {
+const MatchMetadata = ({ matchData, venue, isShowVoteIcon }: MatchMetadataProps) => {
   const matchDate = dayjs.tz(matchData.matchDate, 'Asia/Tokyo');
   const formattedDate = matchDate.format('YYYY.MM.DD ddd').toUpperCase();
   const dateTime = matchDate.format('YYYY-MM-DD');
@@ -117,7 +109,7 @@ const MatchMetadata = ({ matchData, venue }: MatchMetadataProps) => {
   const isMatchTodayOrTomorrow =
     today.isSame(matchDate, 'day') || today.isSame(matchDate.subtract(1, 'day'), 'day');
   const dateClassName = clsx(
-    "font-['Bebas_Neue'] tracking-[0.08em] text-center",
+    "flex items-center justify-center gap-1.5 font-['Bebas_Neue'] tracking-[0.08em] text-center",
     isMatchTodayOrTomorrow ? 'text-[#D99A2B]' : 'text-[#F5F2E9]'
   );
 
@@ -130,6 +122,7 @@ const MatchMetadata = ({ matchData, venue }: MatchMetadataProps) => {
         )}
       >
         <time dateTime={dateTime} className={dateClassName}>
+          {isShowVoteIcon && <UnvotedBadge />}
           {formattedDate}
         </time>
         <span className="border-l border-[#AAA8A1]/40 text-center">{matchData.weight}級</span>
@@ -139,6 +132,7 @@ const MatchMetadata = ({ matchData, venue }: MatchMetadataProps) => {
       <span className="pc:hidden">
         <span className="grid min-w-0 grid-cols-2 items-center text-sm text-[#AAA8A1]">
           <time dateTime={dateTime} className={dateClassName}>
+            {isShowVoteIcon && <UnvotedBadge />}
             {formattedDate}
           </time>
           <span className="border-l border-[#AAA8A1]/40 text-center">{matchData.weight}級</span>
@@ -148,6 +142,16 @@ const MatchMetadata = ({ matchData, venue }: MatchMetadataProps) => {
     </span>
   );
 };
+
+const UnvotedBadge = () => (
+  <span
+    role="img"
+    aria-label="勝敗予想が未投票"
+    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[4px] bg-[#D99A2B] text-[#1B1D20]"
+  >
+    <MdHowToVote aria-hidden="true" className="h-4 w-4" />
+  </span>
+);
 
 const VenueContent = ({ venue, className }: { venue: string; className?: string }) => (
   <span
