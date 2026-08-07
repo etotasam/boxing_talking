@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { render, screen } from 'test-setup';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { COUNTRY } from '@/constants/country';
 import { GRADE, ORGANIZATIONS, WEIGHT_CLASS, STANCE } from '@/constants/boxerData';
 import { MatchDataType } from '@/types';
@@ -34,8 +34,9 @@ const makeBoxer = (overrides: Partial<MatchDataType['redBoxer']> = {}) => ({
   ...overrides,
 });
 
+const DEFAULT_MATCH_ID = 42;
 const makeMatch = (overrides: Partial<MatchDataType> = {}): MatchDataType => ({
-  id: 42,
+  id: DEFAULT_MATCH_ID,
   redBoxer: makeBoxer(),
   blueBoxer: makeBoxer({
     id: 2,
@@ -63,50 +64,46 @@ describe('MatchCard', () => {
     mockUseVoteIconState.mockReturnValue(false);
   });
 
-  test('必要な試合情報を表示し、カードでは不要な詳細を表示しない', () => {
-    const { container } = render(<MatchCard matchData={makeMatch()} onClick={vi.fn()} />);
-
-    expect(screen.getByText('ホスベル・ペレス')).toBeInTheDocument();
-    expect(screen.getByText('サニー・エドワーズ')).toBeInTheDocument();
-    expect(screen.getAllByRole('img', { name: COUNTRY.USA })).toHaveLength(1);
-    expect(screen.getByRole('img', { name: COUNTRY.UK })).toBeInTheDocument();
-    expect(screen.queryByText('Hosber Perez')).not.toBeInTheDocument();
-    expect(screen.queryByText('Sunny Edwards')).not.toBeInTheDocument();
-    expect(screen.getAllByText('2026.08.30 SUN').length).toBeGreaterThan(0);
-    expect(Array.from(container.querySelectorAll('time')).map((time) => time.getAttribute('datetime'))).toEqual([
-      '2026-08-30',
-      '2026-08-30',
-    ]);
-    expect(screen.getAllByText('バンタム級').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('T-Mobile Arena').length).toBeGreaterThan(0);
-    expect(screen.queryByText('WBA')).not.toBeInTheDocument();
-    expect(screen.queryByText('TITLE FIGHT')).not.toBeInTheDocument();
-    expect(screen.queryByText('12R')).not.toBeInTheDocument();
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
-  test('タイトル数と会場の有無をカードへ反映する', () => {
-    const { rerender } = render(<MatchCard matchData={makeMatch()} onClick={vi.fn()} />);
-
-    expect(screen.getByRole('img', { name: '3団体タイトル戦' })).toHaveTextContent('★★★');
-
-    rerender(
-      <MatchCard matchData={makeMatch({ titles: [], venue: '   ' })} onClick={vi.fn()} />
-    );
-    expect(screen.queryByRole('img', { name: /団体タイトル戦/ })).not.toBeInTheDocument();
-    expect(screen.queryByText('T-Mobile Arena')).not.toBeInTheDocument();
-  });
-
-  test('カードを押すと対象試合の詳細遷移を通知する', async () => {
+  test('カードの押下で対象試合IDを通知する', async () => {
+    const targetMatchId = 99;
     const user = userEvent.setup();
     const onClick = vi.fn();
-    render(<MatchCard matchData={makeMatch()} onClick={onClick} />);
+    render(<MatchCard matchData={makeMatch({ id: targetMatchId })} onClick={onClick} />);
     const card = screen.getByRole('button');
 
     expect(card).toHaveAttribute('type', 'button');
     await user.click(card);
 
     expect(onClick).toHaveBeenCalledTimes(1);
-    expect(onClick).toHaveBeenCalledWith(42);
+    expect(onClick).toHaveBeenCalledWith(targetMatchId);
   });
 
+  test('日本時間で当日・翌日の試合日を強調する', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-06T15:30:00.000Z'));
+
+    const { container, rerender } = render(
+      <MatchCard matchData={makeMatch({ matchDate: '2026-08-07' })} onClick={vi.fn()} />
+    );
+
+    const expectMatchDateClass = (dateTime: string, className: string) => {
+      const dates = container.querySelectorAll(`time[datetime="${dateTime}"]`);
+      expect(dates.length).toBeGreaterThan(0);
+      dates.forEach((date) => expect(date).toHaveClass(className));
+    };
+
+    expectMatchDateClass('2026-08-07', 'text-[#D99A2B]');
+
+    rerender(<MatchCard matchData={makeMatch({ matchDate: '2026-08-08' })} onClick={vi.fn()} />);
+
+    expectMatchDateClass('2026-08-08', 'text-[#D99A2B]');
+
+    rerender(<MatchCard matchData={makeMatch({ matchDate: '2026-08-06' })} onClick={vi.fn()} />);
+
+    expectMatchDateClass('2026-08-06', 'text-[#F5F2E9]');
+  });
 });

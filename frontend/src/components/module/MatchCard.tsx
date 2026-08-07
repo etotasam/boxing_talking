@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 import clsx from 'clsx';
 import { MdLocationPin } from 'react-icons/md';
 import { MatchDataType } from '@/types';
@@ -6,6 +8,9 @@ import { BoxerType } from '@/types';
 import { FlagImage } from '@/components/atomic/FlagImage';
 import { VoteIconForTop } from '@/components/module/MatchComponent/component/VoteIcon';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type PropsType = {
   matchData: MatchDataType;
@@ -105,8 +110,16 @@ type MatchMetadataProps = {
 };
 
 const MatchMetadata = ({ matchData, venue }: MatchMetadataProps) => {
-  const formattedDate = dayjs(matchData.matchDate).format('YYYY.MM.DD ddd').toUpperCase();
-  const dateTime = dayjs(matchData.matchDate).format('YYYY-MM-DD');
+  const matchDate = dayjs.tz(matchData.matchDate, 'Asia/Tokyo');
+  const formattedDate = matchDate.format('YYYY.MM.DD ddd').toUpperCase();
+  const dateTime = matchDate.format('YYYY-MM-DD');
+  const today = dayjs().tz('Asia/Tokyo').startOf('day');
+  const isMatchTodayOrTomorrow =
+    today.isSame(matchDate, 'day') || today.isSame(matchDate.subtract(1, 'day'), 'day');
+  const dateClassName = clsx(
+    "font-['Bebas_Neue'] tracking-[0.08em] text-center",
+    isMatchTodayOrTomorrow ? 'text-[#D99A2B]' : 'text-[#F5F2E9]'
+  );
 
   return (
     <span className="border-t border-[#AAA8A1]/40 px-3 py-2 pc:px-6">
@@ -116,10 +129,7 @@ const MatchMetadata = ({ matchData, venue }: MatchMetadataProps) => {
           venue ? 'pc:grid-cols-3' : 'pc:grid-cols-2'
         )}
       >
-        <time
-          dateTime={dateTime}
-          className="font-['Bebas_Neue'] tracking-[0.08em] text-center text-[#F5F2E9]"
-        >
+        <time dateTime={dateTime} className={dateClassName}>
           {formattedDate}
         </time>
         <span className="border-l border-[#AAA8A1]/40 text-center">{matchData.weight}級</span>
@@ -128,10 +138,7 @@ const MatchMetadata = ({ matchData, venue }: MatchMetadataProps) => {
 
       <span className="pc:hidden">
         <span className="grid min-w-0 grid-cols-2 items-center text-sm text-[#AAA8A1]">
-          <time
-            dateTime={dateTime}
-            className="font-['Bebas_Neue'] tracking-[0.08em] text-center text-[#F5F2E9]"
-          >
+          <time dateTime={dateTime} className={dateClassName}>
             {formattedDate}
           </time>
           <span className="border-l border-[#AAA8A1]/40 text-center">{matchData.weight}級</span>
