@@ -66,7 +66,7 @@ const CommentBox = ({ comment }: { comment: CommentType }) => {
   return (
     <motion.div
       className={clsx(
-        'sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded-lg'
+        'sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded'
       )}
     >
       <PostTimeAndUserName commentData={comment} />
@@ -190,7 +190,7 @@ const CommentsLoadingEl = () => {
   return (
     <div
       className={clsx(
-        'flex justify-center items-center sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded-lg'
+        'flex justify-center items-center sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded'
       )}
     >
       <RotatingLines strokeColor="#ffffff" strokeWidth="3" animationDuration="1" width="30" />

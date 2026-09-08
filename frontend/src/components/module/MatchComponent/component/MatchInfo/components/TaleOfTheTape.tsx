@@ -55,7 +55,7 @@ export const TaleOfTheTape = ({ redBoxer, blueBoxer, matchDate }: TaleOfTheTapeP
 
   return (
     <section className="mt-5 w-full text-white" aria-labelledby="tale-of-the-tape-title">
-      <div className="mt-2 overflow-hidden rounded-lg border border-stone-600 bg-stone-500/10">
+      <div className="mt-2 overflow-hidden border border-stone-600 bg-stone-500/10">
         <div className="flex items-center gap-3 px-4 border-b border-stone-600 py-3">
           <span className="h-[2px] flex-1 bg-stone-400" aria-hidden="true" />
           <h2 id="tale-of-the-tape-title" className="shrink-0 text-base font-bold pc:text-xl">

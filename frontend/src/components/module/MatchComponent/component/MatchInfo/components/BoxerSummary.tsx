@@ -80,7 +80,7 @@ export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryPr
       )}
     >
       <span
-        className="max-w-full whitespace-normal break-words text-[clamp(10px,2vw,14px)] font-semibold leading-tight text-stone-400"
+        className="max-w-full whitespace-normal break-words text-[clamp(14px,2vw,18px)] pb-1 font-semibold leading-tight text-stone-400"
         title={boxer.engName}
       >
         {boxer.engName}

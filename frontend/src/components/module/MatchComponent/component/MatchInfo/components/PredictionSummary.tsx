@@ -50,7 +50,7 @@ export const PredictionSummary = ({
 
   return (
     <section
-      className="mt-4 w-full rounded-lg border border-stone-700 bg-stone-950/95 p-3 text-white shadow-lg shadow-black/20 sm:p-4"
+      className="mt-4 w-full border border-stone-700 bg-stone-950/95 p-3 text-white shadow-lg shadow-black/20 sm:p-4"
       aria-label="prediction-summary"
     >
       <PredictionSummaryContent
@@ -111,7 +111,7 @@ const getPredictionActionButtonProps = ({
 
 const PredictionSummaryLoading = () => {
   return (
-    <div className="flex min-h-[112px] items-center justify-center gap-3 rounded-md bg-stone-900 px-3 py-4 text-sm text-stone-200">
+    <div className="flex min-h-[112px] items-center justify-center gap-3 bg-stone-900 px-3 py-4 text-sm text-stone-200">
       <RotatingLines strokeColor="#f5f5f5" strokeWidth="3" animationDuration="1" width="24" />
       <span>勝敗予想を読み込み中...</span>
     </div>
@@ -120,7 +120,7 @@ const PredictionSummaryLoading = () => {
 
 const PredictionSummaryEmpty = () => {
   return (
-    <p className="flex min-h-[112px] items-center justify-center rounded-md bg-stone-900 px-3 py-4 text-sm text-stone-400">
+    <p className="flex min-h-[112px] items-center justify-center bg-stone-900 px-3 py-4 text-sm text-stone-400">
       勝敗予想を取得できませんでした
     </p>
   );
@@ -132,7 +132,7 @@ const PredictionSummaryLocked = ({
   predictionActionButton: PredictionActionButtonProps;
 }) => {
   return (
-    <div className="relative min-h-[132px] overflow-hidden rounded-md bg-stone-900 px-3 py-3 sm:min-h-[168px] sm:px-4 sm:py-5">
+    <div className="relative min-h-[132px] overflow-hidden bg-stone-900 px-3 py-3 sm:min-h-[168px] sm:px-4 sm:py-5">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(239,68,68,0.14),transparent_42%,transparent_58%,rgba(59,130,246,0.14))] blur-lg sm:blur-xl"
@@ -161,7 +161,7 @@ const PredictionStats = ({ matchPredictions, userPrediction }: PredictionStatsPr
   return (
     <div className="grid grid-cols-2 items-stretch gap-x-4 gap-y-3 pc:grid-cols-[minmax(0,1fr)_minmax(240px,2fr)_minmax(0,1fr)] pc:items-center pc:gap-x-5">
       <div
-        className={`col-start-1 row-start-1 min-w-0 rounded-md border px-3 py-7 ${
+        className={`col-start-1 row-start-1 min-w-0 border px-3 py-7 ${
           userPrediction === 'red'
             ? 'border-red-400/80 bg-red-500/20 shadow-sm shadow-red-500/20'
             : 'border-red-500/20 bg-red-500/10'
@@ -178,7 +178,7 @@ const PredictionStats = ({ matchPredictions, userPrediction }: PredictionStatsPr
       </div>
 
       <div
-        className={`col-start-2 row-start-1 min-w-0 rounded-md border px-3 py-7 text-right pc:col-start-3 ${
+        className={`col-start-2 row-start-1 min-w-0 border px-3 py-7 text-right pc:col-start-3 ${
           userPrediction === 'blue'
             ? 'border-blue-400/80 bg-blue-500/20 shadow-sm shadow-blue-500/20'
             : 'border-blue-500/20 bg-blue-500/10'
@@ -237,7 +237,7 @@ const PredictionActionButton = (props: PredictionActionButtonProps) => {
   return (
     <button
       type="button"
-      className="inline-flex min-h-11 w-auto items-center justify-center gap-2 rounded-lg border border-yellow-200 bg-yellow-400 px-4 py-2 text-sm text-stone-950 shadow-md shadow-black/30 duration-300 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:ring-offset-2 focus:ring-offset-stone-950"
+      className="inline-flex min-h-11 w-auto items-center justify-center gap-2 rounded border border-yellow-200 bg-yellow-400 px-4 py-2 text-sm text-stone-950 shadow-md shadow-black/30 duration-300 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:ring-offset-2 focus:ring-offset-stone-950"
       onClick={props.onVoteClick}
     >
       <span className="relative inline-flex shrink-0">
