@@ -98,8 +98,7 @@ export const BoxerSummary = ({ boxer, side, matchResult = null }: BoxerSummaryPr
       <div
         className={clsx(
           'mt-1 grid grid-cols-3 gap-x-1 text-left text-[clamp(16px,3vw,22px)] font-bold leading-tight',
-          'pc:mt-2 pc:gap-x-2',
-          isRedSide ? 'text-red-300' : 'text-blue-300'
+          'pc:mt-2 pc:gap-x-2'
         )}
         title={recordLabel}
       >

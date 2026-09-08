@@ -58,7 +58,10 @@ export const TaleOfTheTape = ({ redBoxer, blueBoxer, matchDate }: TaleOfTheTapeP
       <div className="mt-2 overflow-hidden border border-stone-600 bg-stone-500/10">
         <div className="flex items-center gap-3 px-4 border-b border-stone-600 py-3">
           <span className="h-[2px] flex-1 bg-stone-400" aria-hidden="true" />
-          <h2 id="tale-of-the-tape-title" className="shrink-0 text-base font-bold pc:text-xl">
+          <h2
+            id="tale-of-the-tape-title"
+            className="shrink-0 text-base font-bold pc:text-xl text-yellow-500"
+          >
             Tale of the Tape
           </h2>
           <span className="h-[2px] flex-1 bg-stone-400" aria-hidden="true" />
@@ -67,21 +70,17 @@ export const TaleOfTheTape = ({ redBoxer, blueBoxer, matchDate }: TaleOfTheTapeP
           <tbody>
             {comparisonRows.map(({ icon, label, red, blue }) => (
               <tr key={label} className="border-b border-stone-600 last:border-b-0">
-                <td className="w-[34%] px-1 py-2 text-sm font-bold text-red-400 pc:text-lg">
-                  {red}
-                </td>
+                <td className="w-[34%] px-1 py-2 text-sm font-bold pc:text-lg">{red}</td>
                 <th
                   scope="row"
                   className="w-[32%] border-x border-stone-600 px-1 py-2 text-xs font-medium text-stone-200 pc:text-base"
                 >
-                  <span className="inline-flex items-center justify-center gap-1">
+                  <span className="inline-flex items-center justify-center gap-1 text-stone-500">
                     {icon}
                     {label}
                   </span>
                 </th>
-                <td className="w-[34%] px-1 py-2 text-sm font-bold text-blue-400 pc:text-lg">
-                  {blue}
-                </td>
+                <td className="w-[34%] px-1 py-2 text-sm font-bold pc:text-lg">{blue}</td>
               </tr>
             ))}
           </tbody>
