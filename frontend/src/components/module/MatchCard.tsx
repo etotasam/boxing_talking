@@ -8,7 +8,7 @@ import { MatchDataType } from '@/types';
 import { BoxerType } from '@/types';
 import { FlagImage } from '@/components/atomic/FlagImage';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
-import { deviceState } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -99,11 +99,11 @@ type MatchMetadataProps = {
 };
 
 const MatchMetadata = (props: MatchMetadataProps) => {
-  const device = useRecoilValue(deviceState);
+  const isPc = useRecoilValue(isPcState);
 
   return (
     <span className="border-t border-[#AAA8A1]/40 px-3 py-2 pc:px-6">
-      {device === 'PC' ? <DesktopMatchMetadata {...props} /> : <MobileMatchMetadata {...props} />}
+      {isPc ? <DesktopMatchMetadata {...props} /> : <MobileMatchMetadata {...props} />}
     </span>
   );
 };

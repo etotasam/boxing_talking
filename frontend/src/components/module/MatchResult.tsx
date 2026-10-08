@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { MatchDataType } from '@/types';
 import clsx from 'clsx';
 import { useRecoilValue } from 'recoil';
-import { deviceState } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 import { MatchResultType } from '@/types';
 
 export const MatchResult = ({ matchData }: { matchData: MatchDataType }) => {
@@ -10,7 +10,7 @@ export const MatchResult = ({ matchData }: { matchData: MatchDataType }) => {
   const matchResult = useRef<string | null>(null);
   const winner = useRef<string | null>(null);
 
-  const device = useRecoilValue(deviceState);
+  const isPc = useRecoilValue(isPcState);
 
   const isWinner: boolean = result?.result === 'red' || result?.result === 'blue';
   const isKo: boolean = isWinner && (result?.detail === 'ko' || result?.detail === 'tko');
@@ -54,8 +54,7 @@ export const MatchResult = ({ matchData }: { matchData: MatchDataType }) => {
     matchResult: matchResult.current,
   };
 
-  if (device === 'SP') return <SPType {...resultData} />;
-  if (device === 'PC') return <PCType {...resultData} />;
+  return isPc ? <PCType {...resultData} /> : <SPType {...resultData} />;
 };
 
 type ResultDataType = {

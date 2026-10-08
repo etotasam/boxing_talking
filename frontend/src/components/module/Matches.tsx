@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { MatchDataType } from '@/types';
 import { MatchCard } from '@/components/module/MatchCard';
 import { useRecoilValue } from 'recoil';
-import { deviceState } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 
 type MatchesPropsType = {
   beforeMatches: MatchDataType[];
@@ -10,7 +10,7 @@ type MatchesPropsType = {
   toMatchPage: (matchId: number) => void;
 };
 export const Matches = ({ beforeMatches, toMatchPage, afterMatches }: MatchesPropsType) => {
-  const device = useRecoilValue(deviceState);
+  const isPc = useRecoilValue(isPcState);
 
   return (
     <>
@@ -23,10 +23,7 @@ export const Matches = ({ beforeMatches, toMatchPage, afterMatches }: MatchesPro
           <div className="flex justify-center">
             <div
               // onClick={() => setIsShow(true)}
-              className={clsx(
-                'relative w-full text-white tracking-widest',
-                device === 'SP' ? 'px-2' : 'px-0'
-              )}
+              className={clsx('relative w-full text-white tracking-widest', isPc ? 'px-0' : 'px-2')}
             >
               <p className="after:absolute after:top-[-10px] after:left-0 after:bg-white after:h-[1px] after:w-full">
                 直近の試合

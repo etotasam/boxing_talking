@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { GiBoxingGlove } from 'react-icons/gi';
 
 import { useRecoilValue } from 'recoil';
-import { deviceState } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 
 const ICON_TEXT = '勝敗予想' as const;
 
@@ -17,7 +17,7 @@ export const VoteIcon = ({
   showPredictionModal: () => void;
   bottomPosition: number;
 }) => {
-  const device = useRecoilValue(deviceState);
+  const isPc = useRecoilValue(isPcState);
 
   return (
     <AnimatePresence>
@@ -30,7 +30,7 @@ export const VoteIcon = ({
         }
         className={clsx(
           'fixed w-[120px] h-[35px] rounded-[50px] bg-black/80',
-          device === 'SP' ? 'right-[10px]' : 'right-[50px]'
+          !isPc ? 'right-[10px]' : 'right-[50px]'
         )}
         style={{ bottom: bottomPosition }}
       />

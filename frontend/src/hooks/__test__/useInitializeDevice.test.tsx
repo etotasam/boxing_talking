@@ -2,14 +2,14 @@ import '@testing-library/jest-dom/vitest';
 import { act, render, screen } from '@testing-library/react';
 import { RecoilRoot, useRecoilValue } from 'recoil';
 import { describe, expect, test } from 'vitest';
-import { deviceState } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 import { useInitializeDevice } from '../useInitializeDevice';
 
 const DeviceProbe = () => {
   useInitializeDevice();
-  const device = useRecoilValue(deviceState);
+  const isPc = useRecoilValue(isPcState);
 
-  return <output data-testid="device">{device}</output>;
+  return <output data-testid="isPc">{isPc ? 'PC' : 'SP'}</output>;
 };
 
 const renderDeviceProbe = () =>
@@ -29,19 +29,25 @@ describe('useInitializeDevice', () => {
 
     renderDeviceProbe();
 
-    expect(screen.getByTestId('device')).toHaveTextContent(expectedDevice);
+    expect(screen.getByTestId('isPc')).toHaveTextContent(expectedDevice);
   });
 
-  test('リサイズ時に768px境界をPCへ切り替える', () => {
-    window.innerWidth = 767;
-    renderDeviceProbe();
-    expect(screen.getByTestId('device')).toHaveTextContent('SP');
+  test.each([
+    [767, 768, 'SP', 'PC'],
+    [768, 767, 'PC', 'SP'],
+  ])(
+    'リサイズ時に%dpxから%dpxへ表示を切り替える',
+    (initialWidth, nextWidth, before, after) => {
+      window.innerWidth = initialWidth;
+      renderDeviceProbe();
+      expect(screen.getByTestId('isPc')).toHaveTextContent(before);
 
-    act(() => {
-      window.innerWidth = 768;
-      window.dispatchEvent(new Event('resize'));
-    });
+      act(() => {
+        window.innerWidth = nextWidth;
+        window.dispatchEvent(new Event('resize'));
+      });
 
-    expect(screen.getByTestId('device')).toHaveTextContent('PC');
-  });
+      expect(screen.getByTestId('isPc')).toHaveTextContent(after);
+    }
+  );
 });

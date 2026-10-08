@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { PostComment } from './PostComment';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { elementSizeState } from '@/store/elementSizeState';
-import { deviceState } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 import { useLocation } from 'react-router-dom';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { useToastModal } from '@/hooks/useToastModal';
@@ -26,9 +26,9 @@ export const PostCommentContainer = () => {
 
   const { postComment, commentPostState } = usePostComment();
 
-  const device = useRecoilValue(deviceState);
+  const isPc = useRecoilValue(isPcState);
   const commentPostEl = useRef<HTMLDivElement>();
-  //? deviceのサイズが変わるとcommentPostElementの高さも変わる様になってるから依存関係に"device"を入れてるよ
+  // 表示区分の切り替えでコメント入力欄の高さが変わるため、isPcを依存関係に含める。
   const commentPostRef = useCallback(
     (node: HTMLDivElement) => {
       if (node) {
@@ -37,7 +37,7 @@ export const PostCommentContainer = () => {
         setRecoilPostCommentHeight(node.clientHeight);
       }
     },
-    [device]
+    [isPc]
   );
 
   const textareaRef = useRef(null);

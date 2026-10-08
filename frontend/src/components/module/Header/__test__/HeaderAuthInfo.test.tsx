@@ -2,7 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { RecoilRoot } from 'recoil';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { deviceState, DeviceStateType } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 import { HeaderAuthInfo } from '../component/HeaderAuthInfo';
 
 const mockUseGuest = vi.fn();
@@ -17,11 +17,11 @@ vi.mock('@/hooks/apiHooks/auth', () => ({
   useGuestLogout: () => ({ guestLogout: mockGuestLogout }),
 }));
 
-const renderHeaderAuthInfo = (device: DeviceStateType = 'PC') => {
+const renderHeaderAuthInfo = (isPc: boolean = true) => {
   return render(
     <RecoilRoot
       initializeState={({ set }) => {
-        set(deviceState, device);
+        set(isPcState, isPc);
       }}
     >
       <HeaderAuthInfo />
@@ -75,7 +75,7 @@ describe('HeaderAuthInfo', () => {
   test('SPの認証ユーザー時もログアウトボタンでのみ logout を呼ぶ', () => {
     mockUseAuth.mockReturnValue({ data: { name: 'Taro' } });
 
-    renderHeaderAuthInfo('SP');
+    renderHeaderAuthInfo(false);
 
     fireEvent.click(screen.getByText('Taro'));
 

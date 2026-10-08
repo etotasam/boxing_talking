@@ -1,42 +1,37 @@
 import clsx from 'clsx';
 import { AiOutlineLogout, AiOutlineUser } from 'react-icons/ai';
 import { useRecoilValue } from 'recoil';
-import { DeviceStateType, deviceState } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 import { useHeaderAuthInfo } from '../hooks/useHeaderAuthInfo';
 
 export const HeaderAuthInfo = () => {
-  const device = useRecoilValue(deviceState);
+  const isPc = useRecoilValue(isPcState);
   const authInfo = useHeaderAuthInfo();
 
   if (!authInfo) return null;
 
-  return <HeaderAuthInfoView {...authInfo} device={device} />;
+  return <HeaderAuthInfoView {...authInfo} isPc={isPc} />;
 };
 
 type HeaderAuthInfoViewProps = {
-  device: DeviceStateType;
+  isPc: boolean;
   userName: string;
   iconBgColor: string;
   onLogout: () => void;
 };
 
 export const HeaderAuthInfoView = ({
-  device,
+  isPc,
   userName,
   iconBgColor,
   onLogout,
 }: HeaderAuthInfoViewProps) => {
   return (
-    <div
-      className={clsx(
-        'flex min-w-0 items-center',
-        device === 'PC' ? 'gap-3' : 'gap-2'
-      )}
-    >
+    <div className={clsx('flex min-w-0 items-center', isPc ? 'gap-3' : 'gap-2')}>
       <div
         className={clsx(
           'flex min-w-0 flex-1 items-center',
-          device === 'PC'
+          isPc
             ? 'gap-3 text-[18px] font-bold text-white/80'
             : 'gap-2 text-[10px] text-white/80'
         )}
@@ -49,7 +44,7 @@ export const HeaderAuthInfoView = ({
         />
         <span className="min-w-0 truncate">{userName}</span>
       </div>
-      {device === 'PC' && <span className="h-10 w-px bg-white/30" />}
+      {isPc && <span className="h-10 w-px bg-white/30" />}
       <button
         type="button"
         onClick={onLogout}
@@ -60,7 +55,7 @@ export const HeaderAuthInfoView = ({
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
         )}
       >
-        <AiOutlineLogout className={device === 'PC' ? 'h-7 w-7' : 'h-6 w-6'} />
+        <AiOutlineLogout className={isPc ? 'h-7 w-7' : 'h-6 w-6'} />
       </button>
     </div>
   );

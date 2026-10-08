@@ -7,7 +7,7 @@ import { COUNTRY } from '@/constants/country';
 import { GRADE, ORGANIZATIONS, WEIGHT_CLASS, STANCE } from '@/constants/boxerData';
 import { MatchDataType } from '@/types';
 import { MatchCard } from '@/components/module/MatchCard';
-import { deviceState, DeviceStateType } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 
 const mockUseVoteIconState = vi.fn();
 
@@ -57,14 +57,14 @@ const makeMatch = (overrides: Partial<MatchDataType> = {}): MatchDataType => ({
 });
 
 const DeviceSwitchButtons = () => {
-  const setDevice = useSetRecoilState(deviceState);
+  const setIsPc = useSetRecoilState(isPcState);
 
   return (
     <>
-      <button type="button" onClick={() => setDevice('PC')}>
+      <button type="button" onClick={() => setIsPc(true)}>
         PCに切替
       </button>
-      <button type="button" onClick={() => setDevice('SP')}>
+      <button type="button" onClick={() => setIsPc(false)}>
         SPに切替
       </button>
     </>
@@ -95,13 +95,13 @@ describe('MatchCard', () => {
     expect(onClick).toHaveBeenCalledWith(targetMatchId);
   });
 
-  test.each<DeviceStateType>(['PC', 'SP'])(
-    '%sでは日時欄と未投票バッジを1件だけ表示する',
-    (device) => {
+  test.each<boolean>([true, false])(
+    'isPc=%sでは日時欄と未投票バッジを1件だけ表示する',
+    (isPc) => {
       mockUseVoteIconState.mockReturnValue(true);
 
       const { container } = render(
-        <RecoilRoot initializeState={({ set }) => set(deviceState, device)}>
+        <RecoilRoot initializeState={({ set }) => set(isPcState, isPc)}>
           <MatchCard matchData={makeMatch()} onClick={vi.fn()} />
         </RecoilRoot>
       );
@@ -148,14 +148,14 @@ describe('MatchCard', () => {
     expect(screen.queryByRole('img', { name: '勝敗予想が未投票' })).not.toBeInTheDocument();
   });
 
-  test.each<DeviceStateType>(['PC', 'SP'])(
-    '%sで日本時間の当日・翌日の試合日を強調する',
-    (device) => {
+  test.each<boolean>([true, false])(
+    'isPc=%sで日本時間の当日・翌日の試合日を強調する',
+    (isPc) => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date('2026-08-06T15:30:00.000Z'));
 
       const card = (matchDate: string) => (
-        <RecoilRoot initializeState={({ set }) => set(deviceState, device)}>
+        <RecoilRoot initializeState={({ set }) => set(isPcState, isPc)}>
           <MatchCard matchData={makeMatch({ matchDate })} onClick={vi.fn()} />
         </RecoilRoot>
       );

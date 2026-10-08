@@ -5,7 +5,7 @@ import { RecoilRoot } from 'recoil';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { ADMIN_PAGE_LINKS } from '@/constants/adminPageLinks';
 import { ROUTE_PATH } from '@/constants/routePath';
-import { deviceState, DeviceStateType } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 import { Header } from '../Header';
 
 const mockUseAdmin = vi.fn();
@@ -28,11 +28,11 @@ vi.mock('../component/SpCommonMenuPopover', () => ({
   SpCommonMenuPopover: () => <button type="button">一般ページを開閉</button>,
 }));
 
-const renderHeader = (device: DeviceStateType = 'PC') =>
+const renderHeader = (isPc: boolean = true) =>
   render(
     <RecoilRoot
       initializeState={({ set }) => {
-        set(deviceState, device);
+        set(isPcState, isPc);
       }}
     >
       <MemoryRouter initialEntries={[ROUTE_PATH.PAST_MATCHES]}>
@@ -50,7 +50,7 @@ describe('Header', () => {
   test('PC admin は通常導線と4件の管理リンクを表示し、旧PCポップオーバーを描画しない', () => {
     mockUseAdmin.mockReturnValue({ isAdmin: true, isFetching: false, isError: false });
 
-    renderHeader('PC');
+    renderHeader(true);
 
     expect(screen.getByRole('heading', { name: 'BOXING TALKING' })).toBeInTheDocument();
     expect(screen.getByTestId('header-navigation')).toHaveTextContent(ROUTE_PATH.PAST_MATCHES);
@@ -66,7 +66,7 @@ describe('Header', () => {
   });
 
   test('PC non-admin は管理導線を表示せず1段ヘッダーを表示する', () => {
-    renderHeader('PC');
+    renderHeader(true);
 
     expect(screen.getByTestId('header-navigation')).toBeInTheDocument();
     expect(screen.queryByRole('navigation', { name: '管理ページ' })).not.toBeInTheDocument();
@@ -77,7 +77,7 @@ describe('Header', () => {
   test('SP admin は管理リンクと一般ページアコーディオンを表示する', () => {
     mockUseAdmin.mockReturnValue({ isAdmin: true, isFetching: false, isError: false });
 
-    renderHeader('SP');
+    renderHeader(false);
 
     const adminNavigation = screen.getByRole('navigation', { name: '管理ページ' });
     expect(adminNavigation.querySelectorAll('a')).toHaveLength(4);
@@ -90,7 +90,7 @@ describe('Header', () => {
   });
 
   test('SP non-admin は共通ナビゲーションのみを表示する', () => {
-    renderHeader('SP');
+    renderHeader(false);
 
     expect(screen.getByTestId('header-navigation')).toBeInTheDocument();
     expect(screen.queryByRole('navigation', { name: '管理ページ' })).not.toBeInTheDocument();
@@ -104,7 +104,7 @@ describe('Header', () => {
   ])('admin判定が%sの間はfail-closedで管理導線を表示しない', (_label, adminState) => {
     mockUseAdmin.mockReturnValue(adminState);
 
-    renderHeader('PC');
+    renderHeader(true);
 
     expect(screen.queryByRole('navigation', { name: '管理ページ' })).not.toBeInTheDocument();
     expect(screen.getByRole('banner')).toHaveClass('h-[80px]');
