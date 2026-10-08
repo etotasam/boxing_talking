@@ -1,11 +1,13 @@
 import '@testing-library/jest-dom/vitest';
 import { render, screen } from 'test-setup';
 import userEvent from '@testing-library/user-event';
+import { RecoilRoot, useSetRecoilState } from 'recoil';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { COUNTRY } from '@/constants/country';
 import { GRADE, ORGANIZATIONS, WEIGHT_CLASS, STANCE } from '@/constants/boxerData';
 import { MatchDataType } from '@/types';
 import { MatchCard } from '@/components/module/MatchCard';
+import { deviceState, DeviceStateType } from '@/store/deviceState';
 
 const mockUseVoteIconState = vi.fn();
 
@@ -54,6 +56,21 @@ const makeMatch = (overrides: Partial<MatchDataType> = {}): MatchDataType => ({
   ...overrides,
 });
 
+const DeviceSwitchButtons = () => {
+  const setDevice = useSetRecoilState(deviceState);
+
+  return (
+    <>
+      <button type="button" onClick={() => setDevice('PC')}>
+        PCに切替
+      </button>
+      <button type="button" onClick={() => setDevice('SP')}>
+        SPに切替
+      </button>
+    </>
+  );
+};
+
 describe('MatchCard', () => {
   beforeEach(() => {
     mockUseVoteIconState.mockReset();
@@ -78,14 +95,51 @@ describe('MatchCard', () => {
     expect(onClick).toHaveBeenCalledWith(targetMatchId);
   });
 
-  test('未投票の試合ではPC・SPの日時欄に勝敗予想バッジを表示する', () => {
+  test.each<DeviceStateType>(['PC', 'SP'])(
+    '%sでは日時欄と未投票バッジを1件だけ表示する',
+    (device) => {
+      mockUseVoteIconState.mockReturnValue(true);
+
+      const { container } = render(
+        <RecoilRoot initializeState={({ set }) => set(deviceState, device)}>
+          <MatchCard matchData={makeMatch()} onClick={vi.fn()} />
+        </RecoilRoot>
+      );
+
+      const badges = screen.getAllByRole('img', { name: '勝敗予想が未投票' });
+      expect(badges).toHaveLength(1);
+      expect(container.querySelectorAll('time')).toHaveLength(1);
+      badges.forEach((badge) => expect(badge.closest('time')).toBeInTheDocument());
+    }
+  );
+
+  test('PC/SPを切り替えても日付・階級・会場・未投票バッジを重複なく表示する', async () => {
     mockUseVoteIconState.mockReturnValue(true);
+    const user = userEvent.setup();
+    const { container } = render(
+      <>
+        <MatchCard matchData={makeMatch()} onClick={vi.fn()} />
+        <DeviceSwitchButtons />
+      </>
+    );
 
-    render(<MatchCard matchData={makeMatch()} onClick={vi.fn()} />);
+    const expectMetadata = () => {
+      expect(container.querySelectorAll('time')).toHaveLength(1);
+      expect(screen.getByText('2026.08.30 SUN')).toBeInTheDocument();
+      expect(screen.getByText(`${WEIGHT_CLASS.BANTAM}級`)).toBeInTheDocument();
+      expect(screen.getByText('T-Mobile Arena')).toBeInTheDocument();
+      expect(screen.getByRole('img', { name: '勝敗予想が未投票' })).toBeInTheDocument();
+    };
 
-    const badges = screen.getAllByRole('img', { name: '勝敗予想が未投票' });
-    expect(badges).toHaveLength(2);
-    badges.forEach((badge) => expect(badge.closest('time')).toBeInTheDocument());
+    expectMetadata();
+    const mobileDate = container.querySelector('time');
+    await user.click(screen.getByRole('button', { name: 'PCに切替' }));
+    expect(mobileDate).not.toBeInTheDocument();
+    expectMetadata();
+    const desktopDate = container.querySelector('time');
+    await user.click(screen.getByRole('button', { name: 'SPに切替' }));
+    expect(desktopDate).not.toBeInTheDocument();
+    expectMetadata();
   });
 
   test('投票済みまたは投票不可の試合では勝敗予想バッジを表示しない', () => {
@@ -94,28 +148,34 @@ describe('MatchCard', () => {
     expect(screen.queryByRole('img', { name: '勝敗予想が未投票' })).not.toBeInTheDocument();
   });
 
-  test('日本時間で当日・翌日の試合日を強調する', () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-08-06T15:30:00.000Z'));
+  test.each<DeviceStateType>(['PC', 'SP'])(
+    '%sで日本時間の当日・翌日の試合日を強調する',
+    (device) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-08-06T15:30:00.000Z'));
 
-    const { container, rerender } = render(
-      <MatchCard matchData={makeMatch({ matchDate: '2026-08-07' })} onClick={vi.fn()} />
-    );
+      const card = (matchDate: string) => (
+        <RecoilRoot initializeState={({ set }) => set(deviceState, device)}>
+          <MatchCard matchData={makeMatch({ matchDate })} onClick={vi.fn()} />
+        </RecoilRoot>
+      );
+      const { container, rerender } = render(card('2026-08-07'));
 
-    const expectMatchDateClass = (dateTime: string, className: string) => {
-      const dates = container.querySelectorAll(`time[datetime="${dateTime}"]`);
-      expect(dates.length).toBeGreaterThan(0);
-      dates.forEach((date) => expect(date).toHaveClass(className));
-    };
+      const expectMatchDateClass = (dateTime: string, className: string) => {
+        const dates = container.querySelectorAll(`time[datetime="${dateTime}"]`);
+        expect(dates.length).toBeGreaterThan(0);
+        dates.forEach((date) => expect(date).toHaveClass(className));
+      };
 
-    expectMatchDateClass('2026-08-07', 'text-[#D99A2B]');
+      expectMatchDateClass('2026-08-07', 'text-[#D99A2B]');
 
-    rerender(<MatchCard matchData={makeMatch({ matchDate: '2026-08-08' })} onClick={vi.fn()} />);
+      rerender(card('2026-08-08'));
 
-    expectMatchDateClass('2026-08-08', 'text-[#D99A2B]');
+      expectMatchDateClass('2026-08-08', 'text-[#D99A2B]');
 
-    rerender(<MatchCard matchData={makeMatch({ matchDate: '2026-08-06' })} onClick={vi.fn()} />);
+      rerender(card('2026-08-06'));
 
-    expectMatchDateClass('2026-08-06', 'text-[#F5F2E9]');
-  });
+      expectMatchDateClass('2026-08-06', 'text-[#F5F2E9]');
+    }
+  );
 });

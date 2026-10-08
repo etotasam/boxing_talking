@@ -2,11 +2,13 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import clsx from 'clsx';
+import { useRecoilValue } from 'recoil';
 import { MdHowToVote, MdLocationPin } from 'react-icons/md';
 import { MatchDataType } from '@/types';
 import { BoxerType } from '@/types';
 import { FlagImage } from '@/components/atomic/FlagImage';
 import { useVoteIconState } from '@/hooks/useVoteIconState';
+import { deviceState } from '@/store/deviceState';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -101,8 +103,46 @@ type MatchMetadataProps = {
   isShowVoteIcon: boolean;
 };
 
-const MatchMetadata = ({ matchData, venue, isShowVoteIcon }: MatchMetadataProps) => {
-  const matchDate = dayjs.tz(matchData.matchDate, 'Asia/Tokyo');
+const MatchMetadata = (props: MatchMetadataProps) => {
+  const device = useRecoilValue(deviceState);
+
+  return (
+    <span className="border-t border-[#AAA8A1]/40 px-3 py-2 pc:px-6">
+      {device === 'PC' ? <DesktopMatchMetadata {...props} /> : <MobileMatchMetadata {...props} />}
+    </span>
+  );
+};
+
+const DesktopMatchMetadata = ({ matchData, venue, isShowVoteIcon }: MatchMetadataProps) => (
+  <span
+    className={clsx(
+      'grid min-w-0 items-center gap-0 text-sm text-[#AAA8A1]',
+      venue ? 'grid-cols-3' : 'grid-cols-2'
+    )}
+  >
+    <MatchDate matchDate={matchData.matchDate} isShowVoteIcon={isShowVoteIcon} />
+    <span className="border-l border-[#AAA8A1]/40 text-center">{matchData.weight}級</span>
+    {venue && <VenueContent venue={venue} className="border-l border-[#AAA8A1]/40" />}
+  </span>
+);
+
+const MobileMatchMetadata = ({ matchData, venue, isShowVoteIcon }: MatchMetadataProps) => (
+  <span>
+    <span className="grid min-w-0 grid-cols-2 items-center text-sm text-[#AAA8A1]">
+      <MatchDate matchDate={matchData.matchDate} isShowVoteIcon={isShowVoteIcon} />
+      <span className="border-l border-[#AAA8A1]/40 text-center">{matchData.weight}級</span>
+    </span>
+    {venue && <VenueContent venue={venue} className="mt-2 border-t border-[#AAA8A1]/40 pt-2" />}
+  </span>
+);
+
+type MatchDateProps = {
+  matchDate: MatchDataType['matchDate'];
+  isShowVoteIcon: boolean;
+};
+
+const MatchDate = ({ matchDate: rawMatchDate, isShowVoteIcon }: MatchDateProps) => {
+  const matchDate = dayjs.tz(rawMatchDate, 'Asia/Tokyo');
   const formattedDate = matchDate.format('YYYY.MM.DD ddd').toUpperCase();
   const dateTime = matchDate.format('YYYY-MM-DD');
   const today = dayjs().tz('Asia/Tokyo').startOf('day');
@@ -114,32 +154,10 @@ const MatchMetadata = ({ matchData, venue, isShowVoteIcon }: MatchMetadataProps)
   );
 
   return (
-    <span className="border-t border-[#AAA8A1]/40 px-3 py-2 pc:px-6">
-      <span
-        className={clsx(
-          'hidden min-w-0 items-center text-sm text-[#AAA8A1] pc:grid pc:gap-0',
-          venue ? 'pc:grid-cols-3' : 'pc:grid-cols-2'
-        )}
-      >
-        <time dateTime={dateTime} className={dateClassName}>
-          {isShowVoteIcon && <UnvotedBadge />}
-          {formattedDate}
-        </time>
-        <span className="border-l border-[#AAA8A1]/40 text-center">{matchData.weight}級</span>
-        {venue && <VenueContent venue={venue} className="border-l border-[#AAA8A1]/40" />}
-      </span>
-
-      <span className="pc:hidden">
-        <span className="grid min-w-0 grid-cols-2 items-center text-sm text-[#AAA8A1]">
-          <time dateTime={dateTime} className={dateClassName}>
-            {isShowVoteIcon && <UnvotedBadge />}
-            {formattedDate}
-          </time>
-          <span className="border-l border-[#AAA8A1]/40 text-center">{matchData.weight}級</span>
-        </span>
-        {venue && <VenueContent venue={venue} className="mt-2 border-t border-[#AAA8A1]/40 pt-2" />}
-      </span>
-    </span>
+    <time dateTime={dateTime} className={dateClassName}>
+      {isShowVoteIcon && <UnvotedBadge />}
+      {formattedDate}
+    </time>
   );
 };
 
