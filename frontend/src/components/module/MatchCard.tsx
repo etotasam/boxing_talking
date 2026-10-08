@@ -73,12 +73,7 @@ const BoxerBox = ({ boxer, side }: BoxerBoxProps) => {
   const isRed = side === 'red';
 
   return (
-    <span
-      className={clsx(
-        'min-w-0 py-1',
-        isRed ? 'text-left' : 'text-right'
-      )}
-    >
+    <span className={clsx('min-w-0 py-1', isRed ? 'text-left' : 'text-right')}>
       <span className={clsx('flex min-w-0 flex-col gap-1', isRed ? 'items-start' : 'items-end')}>
         <FlagImage
           nationality={boxer.country}
