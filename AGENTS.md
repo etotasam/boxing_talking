@@ -9,6 +9,16 @@
 - 関連テストを実行し、実行できない場合は理由を報告すること
 - 重要な変更では複数案を比較し、採用理由を明示したうえで最適案を選ぶこと
 
+## 領域別の開発規約
+
+以下のパスはリポジトリルートを基準とする。
+
+- フロントエンドの調査・設計・変更・レビューを行う前に、`docs/development/frontend.md` を必ず読むこと
+- バックエンドの調査・設計・変更・レビューを行う前に、`docs/development/backend.md` を必ず読むこと
+- 両方に関わる作業では、両方の文書を読むこと
+- エラーコードの追加・変更、または `frontend/src/constants/customErrorCodes.ts` を扱う場合は、両方の文書を読むこと
+- 領域別の規約本文は参照先に一本化し、AGENTS.mdには重複記載しないこと
+
 ## エージェント選択ルール
 
 - 小規模タスク（単一ファイル・単純修正）は単一エージェントで実行する
@@ -55,51 +65,13 @@
 ## プロジェクト構成
 
 - フロントエンドは `frontend/`、バックエンドは `backend/` にあります
-- フロントエンド実装は `frontend/src`、Cypress は `frontend/cypress/e2e`、ユニットテストは各機能近くの `__test__` に配置します
-- バックエンドのアプリ本体は `backend/app`、ルートは `backend/routes`、マイグレーションと Seeder は `backend/database`、PHP テストは `backend/tests` にあります
 - Docker 関連のファイルは `docker/` にあり、起動定義はルートの `docker-compose.yml` です
+- 各領域の詳細な構成は、領域別の開発規約を参照すること
 
-## コマンド
+## 全体起動
 
 - `docker compose up --build`: Nginx、PHP、MySQL、フロント開発サーバーをまとめて起動します
-- `cd frontend && npm run dev`: Vite 開発サーバーを起動します
-- `cd frontend && npm run build`: TypeScript の型検査と本番ビルドを実行します
-- `cd frontend && npm run lint`: `ts` / `tsx` を ESLint で検査します
-- `cd frontend && npm test`: Vitest を実行します
-- `cd frontend && npm run test:coverage`: カバレッジ付きで Vitest を実行します
-- `cd frontend && npm run cy`: Cypress を起動します
-- `docker compose exec php php artisan test`: バックエンドの PHPUnit / Laravel テストを Docker 経由で実行します
-- `npm run backend:generate-error-codes`: バックエンドの `CustomErrorCodes` からフロントエンドのエラーコード定数を生成します
-
-## フロントエンドルール
-
-- フロントエンドは TypeScript を使用すること
-- コードフォーマットは `frontend/.prettierrc` に必ず従うこと
-  - シングルクォート
-  - `printWidth: 100`
-
-- React コンポーネント・ページ
-  - ファイル名・コンポーネント名ともに `PascalCase` を使用する
-  - 例) `UserInfo.tsx`, `LoginPage.tsx`
-
-- カスタムフック
-  - `use` で始まる `camelCase` を使用する
-  - 例) `useUserData.ts`, `useComments.ts`
-
-- `any` 型の使用は禁止（やむを得ない場合は理由をコメントで明示すること）
-- `console.error` 以外の `console` は使用しないこと（デバッグ用途も含む）
-- 共有定数は `frontend/src/constants` に配置すること
-
-## バックエンドルール
-
-- Controller・Service・Model・Repository は `PascalCase`
-- 1 ファイル 1 クラスで管理する
-- バックエンドの PHP / artisan / PHPUnit コマンドは Docker 経由で実行すること
-  - テスト: `docker compose exec php php artisan test`
-  - マイグレーション: `docker compose exec php php artisan migrate`
-  - ローカルの `php` や `./vendor/bin/phpunit` を直接実行しない
-- エラーコードを追加・変更する時は `backend/app/Exceptions/CustomErrorCodes.php` を編集し、`npm run backend:generate-error-codes` でフロントエンド側の `frontend/src/constants/customErrorCodes.ts` を生成すること
-- 公開メソッド・複雑な処理・意図が読み取りにくい関数には日本語コメントを入れること
+- 各領域の開発・ビルド・テストコマンドは、領域別の開発規約を参照すること
 
 ## テスト
 
@@ -119,7 +91,6 @@
 
 - `.env.production` および本番環境の秘密情報を含む設定ファイルは参照しないこと
 - 必要な場合は理由を説明し、承認を得てから参照すること
-- 生成物である `frontend/dist/` は手動で編集しない
 - 依存パッケージの `node_modules/` は手動で編集しない
 - 環境変数や秘密情報はコミットしない
 - 新しい設定値を追加した場合は、対応する README も更新すること
