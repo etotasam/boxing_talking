@@ -21,7 +21,11 @@ export const SpCommonMenuPopover = () => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const { pathname } = useLocation();
 
-  const close = () => setIsOpen(false);
+  const close = () => {
+    // 退場アニメーション中もリンクが残るため、隠す前にフォーカスを外へ戻す。
+    if (menuFrameRef.current?.contains(document.activeElement)) triggerRef.current?.focus();
+    setIsOpen(false);
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -64,7 +68,7 @@ export const SpCommonMenuPopover = () => {
         aria-label="一般ページを開閉"
         aria-controls={COMMON_PAGE_LINKS_ID}
         aria-expanded={isOpen}
-        onClick={() => setIsOpen((current) => !current)}
+        onClick={() => (isOpen ? close() : setIsOpen(true))}
         className={clsx(
           'flex h-full min-h-14 w-full min-w-14 flex-col items-center justify-center gap-0.5 px-1',
           'text-[clamp(9px,2.7vw,12px)] font-bold leading-tight text-white/85 transition-colors',

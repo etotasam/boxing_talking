@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom/vitest';
+import userEvent from '@testing-library/user-event';
 import {
   fireEvent,
   render,
@@ -77,27 +78,34 @@ describe('SpCommonMenuPopover', () => {
     await waitForElementToBeRemoved(panel);
   });
 
-  test('パネル外タップで閉じる', async () => {
+  test('パネル外タップで閉じ、外側の操作先にフォーカスを移せる', async () => {
+    const user = userEvent.setup();
     renderPopover();
 
     const trigger = screen.getByRole('button', { name: '一般ページを開閉' });
     fireEvent.click(trigger);
     const panel = screen.getByTestId('sp-common-menu-popover');
+    screen.getByRole('link', { name: COMMON_PAGE_LINKS[1].name }).focus();
 
-    fireEvent.pointerDown(screen.getByRole('button', { name: 'パネル外' }));
+    const outside = screen.getByRole('button', { name: 'パネル外' });
+    await user.click(outside);
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(outside).toHaveFocus();
     await waitForElementToBeRemoved(panel);
   });
 
-  test('リンク遷移時にパネルを閉じる', async () => {
+  test('リンク遷移時はフォーカスをトリガーへ戻してパネルを閉じる', async () => {
+    const user = userEvent.setup();
     renderPopover();
 
-    fireEvent.click(screen.getByRole('button', { name: '一般ページを開閉' }));
+    const trigger = screen.getByRole('button', { name: '一般ページを開閉' });
+    await user.click(trigger);
     const panel = screen.getByTestId('sp-common-menu-popover');
 
-    fireEvent.click(screen.getByRole('link', { name: COMMON_PAGE_LINKS[1].name }));
+    await user.click(screen.getByRole('link', { name: COMMON_PAGE_LINKS[1].name }));
 
+    expect(trigger).toHaveFocus();
     expect(screen.getByTestId('current-pathname')).toHaveTextContent(COMMON_PAGE_LINKS[1].path);
     await waitForElementToBeRemoved(panel);
     await waitFor(() => {
