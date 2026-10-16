@@ -3,7 +3,7 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import clsx from 'clsx';
 import { useRecoilValue } from 'recoil';
-import { MdHowToVote, MdLocationPin } from 'react-icons/md';
+import { MdLocationPin } from 'react-icons/md';
 import { MatchDataType } from '@/types';
 import { BoxerType } from '@/types';
 import { FlagImage } from '@/components/atomic/FlagImage';
@@ -54,12 +54,13 @@ export const MatchCard = ({ matchData, onClick, className }: PropsType) => {
           <span className="font-['Bebas_Neue'] text-2xl leading-none tracking-wide text-[#D99A2B] pc:text-3xl">
             VS
           </span>
+          {isShowVoteIcon && <UnvotedBadge />}
         </span>
 
         <BoxerBox boxer={matchData.blueBoxer} side="blue" />
       </span>
 
-      <MatchMetadata matchData={matchData} venue={venue} isShowVoteIcon={isShowVoteIcon} />
+      <MatchMetadata matchData={matchData} venue={venue} />
     </button>
   );
 };
@@ -95,7 +96,6 @@ const BoxerBox = ({ boxer, side }: BoxerBoxProps) => {
 type MatchMetadataProps = {
   matchData: MatchDataType;
   venue: string;
-  isShowVoteIcon: boolean;
 };
 
 const MatchMetadata = (props: MatchMetadataProps) => {
@@ -108,23 +108,23 @@ const MatchMetadata = (props: MatchMetadataProps) => {
   );
 };
 
-const DesktopMatchMetadata = ({ matchData, venue, isShowVoteIcon }: MatchMetadataProps) => (
+const DesktopMatchMetadata = ({ matchData, venue }: MatchMetadataProps) => (
   <span
     className={clsx(
       'grid min-w-0 items-center gap-0 text-sm text-[#AAA8A1]',
       venue ? 'grid-cols-3' : 'grid-cols-2'
     )}
   >
-    <MatchDate matchDate={matchData.matchDate} isShowVoteIcon={isShowVoteIcon} />
+    <MatchDate matchDate={matchData.matchDate} />
     <span className="border-l border-[#AAA8A1]/40 text-center">{matchData.weight}級</span>
     {venue && <VenueContent venue={venue} className="border-l border-[#AAA8A1]/40" />}
   </span>
 );
 
-const MobileMatchMetadata = ({ matchData, venue, isShowVoteIcon }: MatchMetadataProps) => (
+const MobileMatchMetadata = ({ matchData, venue }: MatchMetadataProps) => (
   <span>
     <span className="grid min-w-0 grid-cols-2 items-center text-sm text-[#AAA8A1]">
-      <MatchDate matchDate={matchData.matchDate} isShowVoteIcon={isShowVoteIcon} />
+      <MatchDate matchDate={matchData.matchDate} />
       <span className="border-l border-[#AAA8A1]/40 text-center">{matchData.weight}級</span>
     </span>
     {venue && <VenueContent venue={venue} className="mt-2 border-t border-[#AAA8A1]/40 pt-2" />}
@@ -133,10 +133,9 @@ const MobileMatchMetadata = ({ matchData, venue, isShowVoteIcon }: MatchMetadata
 
 type MatchDateProps = {
   matchDate: MatchDataType['matchDate'];
-  isShowVoteIcon: boolean;
 };
 
-const MatchDate = ({ matchDate: rawMatchDate, isShowVoteIcon }: MatchDateProps) => {
+const MatchDate = ({ matchDate: rawMatchDate }: MatchDateProps) => {
   const matchDate = dayjs.tz(rawMatchDate, 'Asia/Tokyo');
   const formattedDate = matchDate.format('YYYY.MM.DD ddd').toUpperCase();
   const dateTime = matchDate.format('YYYY-MM-DD');
@@ -150,7 +149,6 @@ const MatchDate = ({ matchDate: rawMatchDate, isShowVoteIcon }: MatchDateProps) 
 
   return (
     <time dateTime={dateTime} className={dateClassName}>
-      {isShowVoteIcon && <UnvotedBadge />}
       {formattedDate}
     </time>
   );
@@ -158,11 +156,9 @@ const MatchDate = ({ matchDate: rawMatchDate, isShowVoteIcon }: MatchDateProps) 
 
 const UnvotedBadge = () => (
   <span
-    role="img"
-    aria-label="勝敗予想が未投票"
-    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[4px] bg-[#D99A2B] text-[#1B1D20]"
+    className="mt-2 whitespace-nowrap rounded-full border border-[#D99A2B]/70 px-1.5 py-1 text-[10px] font-bold leading-none text-[#D99A2B] pc:mt-3 pc:px-3 pc:text-xs"
   >
-    <MdHowToVote aria-hidden="true" className="h-4 w-4" />
+    勝敗予想受付中
   </span>
 );
 

@@ -96,7 +96,7 @@ describe('MatchCard', () => {
   });
 
   test.each<boolean>([true, false])(
-    'isPc=%sでは日時欄と未投票バッジを1件だけ表示する',
+    'isPc=%sでは表示条件を満たす時に勝敗予想受付中を1件だけ表示する',
     (isPc) => {
       mockUseVoteIconState.mockReturnValue(true);
 
@@ -106,10 +106,9 @@ describe('MatchCard', () => {
         </RecoilRoot>
       );
 
-      const badges = screen.getAllByRole('img', { name: '勝敗予想が未投票' });
+      const badges = screen.getAllByText('勝敗予想受付中');
       expect(badges).toHaveLength(1);
       expect(container.querySelectorAll('time')).toHaveLength(1);
-      badges.forEach((badge) => expect(badge.closest('time')).toBeInTheDocument());
     }
   );
 
@@ -128,7 +127,7 @@ describe('MatchCard', () => {
       expect(screen.getByText('2026.08.30 SUN')).toBeInTheDocument();
       expect(screen.getByText(`${WEIGHT_CLASS.BANTAM}級`)).toBeInTheDocument();
       expect(screen.getByText('T-Mobile Arena')).toBeInTheDocument();
-      expect(screen.getByRole('img', { name: '勝敗予想が未投票' })).toBeInTheDocument();
+      expect(screen.getAllByText('勝敗予想受付中')).toHaveLength(1);
     };
 
     expectMetadata();
@@ -142,11 +141,18 @@ describe('MatchCard', () => {
     expectMetadata();
   });
 
-  test('投票済みまたは投票不可の試合では勝敗予想バッジを表示しない', () => {
-    render(<MatchCard matchData={makeMatch()} onClick={vi.fn()} />);
+  test.each<boolean>([true, false])(
+    'isPc=%sでは表示条件を満たさない時に勝敗予想受付中を表示しない',
+    (isPc) => {
+      render(
+        <RecoilRoot initializeState={({ set }) => set(isPcState, isPc)}>
+          <MatchCard matchData={makeMatch()} onClick={vi.fn()} />
+        </RecoilRoot>
+      );
 
-    expect(screen.queryByRole('img', { name: '勝敗予想が未投票' })).not.toBeInTheDocument();
-  });
+      expect(screen.queryByText('勝敗予想受付中')).not.toBeInTheDocument();
+    }
+  );
 
   test.each<boolean>([true, false])(
     'isPc=%sで日本時間の当日・翌日の試合日を強調する',
