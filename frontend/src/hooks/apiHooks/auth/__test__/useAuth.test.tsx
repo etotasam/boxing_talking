@@ -90,4 +90,17 @@ describe('useAuth', () => {
       expect(queryClient.getQueryData([QUERY_KEY.AUTH])).toBeNull();
     });
   });
+
+  test('未認証時の空レスポンスを null として扱い、読み込みを終了する', async () => {
+    vi.mocked(Axios.get).mockResolvedValueOnce({ data: '' });
+    const queryClient = createQueryClient();
+    const { result } = renderUseAuth(queryClient);
+
+    await waitFor(() => {
+      expect(result.current.data).toBeNull();
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.isError).toBe(false);
+      expect(queryClient.getQueryData([QUERY_KEY.AUTH])).toBeNull();
+    });
+  });
 });

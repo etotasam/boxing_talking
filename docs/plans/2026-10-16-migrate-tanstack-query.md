@@ -113,3 +113,12 @@ React Query v3 を `@tanstack/react-query` v5 へ移行し、既存の取得・�
 - コピー後の再検証: `npm run build` 成功（TypeScript / Vite とも成功）、`VITE_APP_API_URL=http://localhost:3000 npm test -- --run` は 52 ファイル / 203 テスト成功、`npm run lint` 成功。
 - ビルド警告: Browserslist データの古さと 500 kB 超の生成チャンクに関する警告あり。今回の移行の対象として依存更新や分割変更は追加しない。
 - [ ] 実ブラウザで主要画面と Devtools の接続を確認する。
+
+## Runtime Follow-up
+
+- マージ後、ホスト側と Docker 内の両方に v5.104.3 が存在する一方、稼働中の古い Vite は旧依存キャッシュを参照し、TanStack Query の事前バンドル配信で HTTP 504 を返していた。ユーザー承認のもと node コンテナのみ再起動し、起動時インストールと Vite の再起動後に画面表示を回復した。
+- 実ブラウザで未認証 API の空本文が queryFn の `undefined` として扱われる移行漏れを発見した。バックエンドの `AuthController::fetch()` は未認証時に `null` を返し、HTTP 応答本文は空になる。旧 v3 の onSuccess による null 補正を維持するため、`useAuth` の queryFn で `res?.data ?? null` に正規化した。
+- 空本文（Axios response の `data: ''`）を用いる回帰テストを追加し、正常な未認証データ・null キャッシュ・読み込み終了・非エラーを保証した。Reviewer subagent の再レビューでも追加の重要指摘なし。
+- 実配信環境の Docker 内で全 52 ファイル / 204 テスト成功、lint 成功、本番ビルド成功。追跡対象の lockfile 変更なし。
+- 実ブラウザでホームの試合一覧、Devtools の React Query v5 表示、Fresh 6 / Fetching 0、および再読込後の新規コンソールエラーがないことを確認した。他画面・フォーム送信の実ブラウザ操作は未実施。
+- この追加修正は専用 worktree と元の feature の両方に反映した。ユーザー承認により feature へコミットして保存し、保存内容を確認したうえで専用 worktree・移行ブランチ・検証用 worktree を整理する。

@@ -7,8 +7,11 @@ import type { UserType } from '@/types';
 
 export const useAuth = () => {
   const api = useCallback(async () => {
-    const res = await Axios.get(API_PATH.USER).then((result) => result.data);
-    return res.data;
+    const res = await Axios.get<{ data?: UserType | null }>(API_PATH.USER).then(
+      (result) => result.data
+    );
+    // 未認証時の空レスポンスも、従来の onSuccess と同様に null として保持する。
+    return res?.data ?? null;
   }, []);
 
   const { data, isLoading, isError } = useQuery<UserType | null>({
