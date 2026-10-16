@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { STANCE } from '@/constants/boxerData';
@@ -11,14 +11,6 @@ import { HTTP_STATUS_CODE } from '@/constants/httpStatusCodes';
 import { QUERY_KEY } from '@/constants/queryKeys';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { useRegisterBoxer } from '@/hooks/apiHooks/boxer';
-
-const noop = () => undefined;
-
-setLogger({
-  log: noop,
-  warn: noop,
-  error: noop,
-});
 
 const mocks = vi.hoisted(() => {
   return {

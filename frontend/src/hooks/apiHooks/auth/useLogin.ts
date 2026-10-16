@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
@@ -33,7 +33,12 @@ export const useLogin = () => {
     return res.data;
   }, []);
 
-  const { mutate, isLoading, isSuccess } = useMutation(api, {
+  const {
+    mutate,
+    isPending: isLoading,
+    isSuccess,
+  } = useMutation({
+    mutationFn: api,
     onMutate: () => {
       showFullScreenLoading();
     },
@@ -44,8 +49,8 @@ export const useLogin = () => {
       { ...props },
       {
         onSuccess: (userData) => {
-          queryClient.removeQueries(QUERY_KEY.PREDICTION);
-          queryClient.removeQueries(QUERY_KEY.MATCH_PREDICTIONS);
+          queryClient.removeQueries({ queryKey: [QUERY_KEY.PREDICTION] });
+          queryClient.removeQueries({ queryKey: [QUERY_KEY.MATCH_PREDICTIONS] });
           refetchMatchPrediction();
           hideLoginModal();
           hideFullScreenLoading();

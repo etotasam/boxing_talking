@@ -1,20 +1,12 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { useGuestLogout } from '@/hooks/apiHooks/auth';
-
-const noop = () => undefined;
-
-setLogger({
-  log: noop,
-  warn: noop,
-  error: noop,
-});
 
 const mocks = vi.hoisted(() => {
   return {
@@ -99,12 +91,12 @@ const createQueryClient = () => {
 
 // 共通のゲスト状態キャッシュを投入する関数
 const seedGuestCache = (queryClient: QueryClient) => {
-  queryClient.setQueryData<boolean>(QUERY_KEY.GUEST, true);
+  queryClient.setQueryData<boolean>([QUERY_KEY.GUEST], true);
 };
 
 // 前ユーザーの勝敗予想キャッシュを投入する関数
 const seedPredictionCaches = (queryClient: QueryClient) => {
-  queryClient.setQueryData(QUERY_KEY.PREDICTION, usersPredictionCache);
+  queryClient.setQueryData([QUERY_KEY.PREDICTION], usersPredictionCache);
   queryClient.setQueryData(matchPredictionsCacheKey, matchPredictionsCache);
 };
 
@@ -130,8 +122,8 @@ describe('useGuestLogout', () => {
       expect(mocks.post).toHaveBeenCalledTimes(1);
       expect(mocks.post).toHaveBeenCalledWith(API_PATH.GUEST_LOGOUT);
       expect(mocks.refetchMatchPrediction).toHaveBeenCalledTimes(1);
-      expect(queryClient.getQueryData(QUERY_KEY.GUEST)).toBe(false);
-      expect(queryClient.getQueryData(QUERY_KEY.PREDICTION)).toBeUndefined();
+      expect(queryClient.getQueryData([QUERY_KEY.GUEST])).toBe(false);
+      expect(queryClient.getQueryData([QUERY_KEY.PREDICTION])).toBeUndefined();
       expect(queryClient.getQueryData(matchPredictionsCacheKey)).toBeUndefined();
       expect(mocks.showSuccessToast).toHaveBeenCalledTimes(1);
       expect(mocks.showSuccessToast).toHaveBeenCalledWith(MESSAGE.LOGOUT_SUCCESS);
@@ -158,8 +150,8 @@ describe('useGuestLogout', () => {
       expect(mocks.hideFullScreenLoading).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).toHaveBeenCalledWith(MESSAGE.LOGOUT_FAILED);
-      expect(queryClient.getQueryData(QUERY_KEY.GUEST)).toBe(true);
-      expect(queryClient.getQueryData(QUERY_KEY.PREDICTION)).toEqual(usersPredictionCache);
+      expect(queryClient.getQueryData([QUERY_KEY.GUEST])).toBe(true);
+      expect(queryClient.getQueryData([QUERY_KEY.PREDICTION])).toEqual(usersPredictionCache);
       expect(queryClient.getQueryData(matchPredictionsCacheKey)).toEqual(matchPredictionsCache);
       expect(mocks.refetchMatchPrediction).not.toHaveBeenCalled();
       expect(mocks.showSuccessToast).not.toHaveBeenCalled();

@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRecoilState } from 'recoil';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
@@ -32,10 +32,11 @@ export const usePostComment = () => {
 
   const {
     mutate,
-    isLoading: isPostLoading,
+    isPending: isPostLoading,
     isSuccess: isPostSuccess,
     isError,
-  } = useMutation<void, PostCommentApiError, PostCommentParams>(api, {
+  } = useMutation<void, PostCommentApiError, PostCommentParams>({
+    mutationFn: api,
     onMutate: () => {},
   });
   const postComment = ({ matchId, comment }: PostCommentParams) => {
@@ -46,7 +47,7 @@ export const usePostComment = () => {
         onSuccess: () => {
           showSuccessToast(MESSAGE.COMMENT_POST_SUCCESS);
           // ? match_idを指定してコメントを再取得
-          queryClient.invalidateQueries([QUERY_KEY.COMMENT, { id: matchId }]);
+          queryClient.invalidateQueries({ queryKey: [QUERY_KEY.COMMENT, { id: matchId }] });
           return;
         },
         onError: (error) => {

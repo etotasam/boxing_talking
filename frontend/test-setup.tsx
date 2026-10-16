@@ -1,7 +1,7 @@
 import { beforeAll, afterAll } from 'vitest';
 import { render, RenderOptions } from '@testing-library/react';
 import { RecoilRoot } from 'recoil';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactElement } from 'react';
 
 class ResizeObserverMock implements ResizeObserver {

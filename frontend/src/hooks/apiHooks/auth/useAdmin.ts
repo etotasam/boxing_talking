@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
@@ -16,7 +16,9 @@ export const useAdmin = () => {
     isFetching,
     isError,
     refetch,
-  } = useQuery<boolean>(QUERY_KEY.ADMIN, api, {
+  } = useQuery<boolean>({
+    queryKey: [QUERY_KEY.ADMIN],
+    queryFn: api,
     retry: false,
     staleTime: Infinity,
   });

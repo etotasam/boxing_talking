@@ -1,21 +1,14 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { QueryClient, QueryClientProvider, onlineManager } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
 import { useLogin } from '@/hooks/apiHooks/auth';
+import { createQueryClient } from '@/queryClient';
 import type { UserType } from '@/types';
-
-const noop = () => undefined;
-
-setLogger({
-  log: noop,
-  warn: noop,
-  error: noop,
-});
 
 const mocks = vi.hoisted(() => {
   return {
@@ -110,20 +103,6 @@ const usersPredictionCache = [{ matchId: 1, prediction: 'red' }];
 const matchPredictionsCacheKey = [QUERY_KEY.MATCH_PREDICTIONS, { id: 1, userPrediction: 'red' }];
 const matchPredictionsCache = { isVisible: true, totalVotes: 2, red: 1, blue: 1 };
 
-// 共通の QueryClient を生成する関数
-const createQueryClient = () => {
-  return new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-      mutations: {
-        retry: false,
-      },
-    },
-  });
-};
-
 // QueryClientProvider 付きの hook テスト用 wrapper を生成する関数
 const createWrapper = (queryClient: QueryClient) => {
   return ({ children }: { children: ReactNode }) => {
@@ -145,13 +124,44 @@ const executeLogin = (login: (props: LoginInput) => void) => {
 
 // 前ユーザーの勝敗予想キャッシュを投入する関数
 const seedPredictionCaches = (queryClient: QueryClient) => {
-  queryClient.setQueryData(QUERY_KEY.PREDICTION, usersPredictionCache);
+  queryClient.setQueryData([QUERY_KEY.PREDICTION], usersPredictionCache);
   queryClient.setQueryData(matchPredictionsCacheKey, matchPredictionsCache);
 };
 
 describe('useLogin', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    onlineManager.setOnline(true);
+  });
+
+  test('オフラインでも送信失敗を通知し、送信中表示と全画面ローディングを終了する', async () => {
+    onlineManager.setOnline(false);
+    mocks.get.mockResolvedValue({ data: false });
+    let rejectRequest!: (reason: Error) => void;
+    mocks.post.mockReturnValueOnce(
+      new Promise((_resolve, reject) => {
+        rejectRequest = reject;
+      })
+    );
+    const { result } = renderUseLogin(createQueryClient());
+
+    executeLogin(result.current.login);
+    await waitFor(() => {
+      expect(mocks.post).toHaveBeenCalledWith(API_PATH.USER_LOGIN, input);
+      expect(result.current.isLoading).toBe(true);
+    });
+    await act(async () => {
+      rejectRequest(new Error('offline'));
+    });
+    await waitFor(() => {
+      expect(mocks.showErrorToast).toHaveBeenCalledWith(MESSAGE.LOGIN_FAILED);
+      expect(mocks.hideFullScreenLoading).toHaveBeenCalledTimes(1);
+      expect(result.current.isLoading).toBe(false);
+    });
+    expect(mocks.showFullScreenLoading).toHaveBeenCalledTimes(1);
   });
 
   test('login成功時に認証キャッシュ更新と関連副作用を実行する', async () => {
@@ -178,7 +188,7 @@ describe('useLogin', () => {
       expect(mocks.showFullScreenLoading).toHaveBeenCalledTimes(1);
       expect(mocks.post).toHaveBeenCalledTimes(1);
       expect(mocks.post).toHaveBeenCalledWith(API_PATH.USER_LOGIN, input);
-      expect(queryClient.getQueryData(QUERY_KEY.PREDICTION)).toBeUndefined();
+      expect(queryClient.getQueryData([QUERY_KEY.PREDICTION])).toBeUndefined();
       expect(queryClient.getQueryData(matchPredictionsCacheKey)).toBeUndefined();
       expect(mocks.refetchMatchPrediction).toHaveBeenCalledTimes(1);
       expect(mocks.hideLoginModal).toHaveBeenCalledTimes(1);
@@ -214,7 +224,7 @@ describe('useLogin', () => {
       expect(mocks.hideFullScreenLoading).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).toHaveBeenCalledTimes(1);
       expect(mocks.showErrorToast).toHaveBeenCalledWith(MESSAGE.LOGIN_FAILED);
-      expect(queryClient.getQueryData(QUERY_KEY.PREDICTION)).toEqual(usersPredictionCache);
+      expect(queryClient.getQueryData([QUERY_KEY.PREDICTION])).toEqual(usersPredictionCache);
       expect(queryClient.getQueryData(matchPredictionsCacheKey)).toEqual(matchPredictionsCache);
       expect(mocks.showSuccessToast).not.toHaveBeenCalled();
       expect(mocks.hideLoginModal).not.toHaveBeenCalled();

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
@@ -13,26 +13,29 @@ export const useFetchUsersPrediction = () => {
   const isAuthOrGuest = Boolean(authUser || isGuest);
 
   const api = useCallback(async () => {
-    const res = await Axios.get<{ data: PredictionType[] | null }>(API_PATH.PREDICTION).then((v) => v.data);
-    const formattedData = res.data === null ? undefined : res.data;
-    return formattedData;
+    const res = await Axios.get<{ data: PredictionType[] | null }>(API_PATH.PREDICTION).then(
+      (v) => v.data
+    );
+    return res.data;
   }, []);
-  const { data, isLoading: isUserPredictionLoading, isRefetching, refetch } = useQuery(
-    QUERY_KEY.PREDICTION,
-    api,
-    {
-      staleTime: Infinity,
-      enabled: isAuthOrGuest,
-      onError: () => {},
-      onSuccess: () => {},
-    }
-  );
+  const {
+    data,
+    isLoading: isUserPredictionLoading,
+    isRefetching,
+    refetch,
+  } = useQuery({
+    queryKey: [QUERY_KEY.PREDICTION],
+    queryFn: api,
+    staleTime: Infinity,
+    enabled: isAuthOrGuest,
+  });
 
   const usePredictionFetchState = isUserPredictionLoading
     ? 'loading'
     : isRefetching
-      ? 'refetching'
-      : 'idle';
+    ? 'refetching'
+    : 'idle';
 
-  return { data, refetch, usePredictionFetchState };
+  // TanStack Query の成功データには null を保持し、既存の公開値は維持する。
+  return { data: data ?? undefined, refetch, usePredictionFetchState };
 };

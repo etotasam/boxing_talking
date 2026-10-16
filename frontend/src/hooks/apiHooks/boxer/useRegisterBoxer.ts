@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { CUSTOM_ERROR_CODE } from '@/constants/customErrorCodes';
@@ -19,11 +19,13 @@ export const useRegisterBoxer = () => {
   const api = useCallback(async (newBoxerData: RegisterBoxerDataType): Promise<void> => {
     await Axios.post<void>(API_PATH.BOXER, newBoxerData).then((v) => v.data);
   }, []);
-  const { mutate, isLoading, isError, isSuccess } = useMutation<
-    void,
-    BoxerApiErrorResponseType,
-    RegisterBoxerDataType
-  >(api, {
+  const {
+    mutate,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useMutation<void, BoxerApiErrorResponseType, RegisterBoxerDataType>({
+    mutationFn: api,
     onMutate: async () => {
       showFullScreenLoading();
     },

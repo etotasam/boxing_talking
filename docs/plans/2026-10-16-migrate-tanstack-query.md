@@ -10,7 +10,8 @@ React Query v3 を `@tanstack/react-query` v5 へ移行し、既存の取得・�
 - `frontend/src` の 47 ファイルが旧パッケージを参照する。Provider、Devtools、API hooks、共通キャッシュ操作、テストを含む。
 - React 18 / TypeScript 5 を使用している。
 - query の文字列キー、位置引数、query callbacks、`cacheTime`、`keepPreviousData`、テストの `setLogger` を使用している。
-- 計画作成時点で作業ツリーに既存差分なし。実装は未承認。
+- 計画作成時点で作業ツリーに既存差分なし。2026-10-16 にユーザーから実装承認を得た。
+- 専用 worktree `/Users/terashimamasato/.codex/worktrees/1338/boxing_talking` の `codex/migrate-tanstack-query` で実装する。起点は `af93059f`（作成時の `feature` と同じ）。`.codex/environments/` の未追跡ファイルは作業対象外。
 
 ## Scope
 
@@ -26,7 +27,7 @@ React Query v3 を `@tanstack/react-query` v5 へ移行し、既存の取得・�
 
 ## Impact Area
 
-- `frontend/package.json`、`frontend/package-lock.json`、`frontend/src/main.tsx`。
+- `frontend/package.json`、`frontend/package-lock.json`、`frontend/src/main.tsx`、`frontend/src/queryClient.ts`、`frontend/README.md`。
 - `frontend/src/hooks/useReactQuery.ts` と auth / boxer / match / comment / prediction の API hooks。
 - 上記 hooks のテスト・共通 wrapper。必要に応じて利用側の状態判定を確認する。
 - `QUERY_KEY` 定数の文字列値は維持し、利用時に配列化する。既存の複合配列キーを二重配列化しない。
@@ -39,7 +40,7 @@ React Query v3 を `@tanstack/react-query` v5 へ移行し、既存の取得・�
 
 ## Decision
 
-v5 系へ一括移行する案を提案する。具体的なパッチバージョンは実装時にレジストリ・peer dependencies を確認して確定し、lockfile に記録する。
+承認済みの v5 一括移行を実装した。npm レジストリと React peer dependencies を確認し、Query / Devtools はともに 5.104.3 を lockfile に記録した。既存依存パッケージの解決済みバージョン変更はない。
 
 ## Rationale
 
@@ -47,19 +48,20 @@ v5 系へ一括移行する案を提案する。具体的なパッチバージ�
 
 ## Tasks
 
-- [ ] 承認後、既存の test / build / lint を実行し、既存失敗と移行由来の失敗を分ける。
-- [ ] `react-query` を v5 の `@tanstack/react-query` に置換し、Devtools を専用パッケージへ移す。無関係な lockfile 更新を避ける。
-- [ ] hooks をオブジェクト構文に統一し、query key を配列化する。QueryClient のフィルタ API を `{ queryKey }` へ変更する。`getQueryData` / `setQueryData` は配列キーを渡す。
-- [ ] 共通 `useReactQuery` は既存の文字列引数を維持し、内部で配列化する。`setQueriesData` の更新範囲を維持する。
-- [ ] mutation の `isPending` を既存 hook の `isLoading` として返し、利用側の公開インターフェースを維持する。query の初回取得・無効化中・再取得・エラーは別途意味を照合する。
-- [ ] `keepPreviousData: true` は `placeholderData: keepPreviousData` に、false は省略へ移す。成功状態や更新時刻の差異が UI に影響しないか確認する。`cacheTime` は `gcTime` に移す。
-- [ ] 削除された query callbacks のうち空処理は除去する。`useAuth` の未認証キャッシュは queryFn が `null` を返す契約で維持する。成功時に `undefined` を返す取得処理がないか確認する。
-- [ ] `useFetchUsersPrediction` は現在 API の `null` を `undefined` に変換している。v4 以降は成功データの `undefined` が禁止されるため、queryFn / キャッシュは `null` を保持し、hook の公開 `data` は `null` を `undefined` に変換する。予想なし時の投票アイコン・試合表示と、未認証時の取得停止を維持し、専用 hook テストを追加する。
-- [ ] `useFetchPastMatches` の全画面 loading は queryFn 内で開始し、`try/finally` で成功・失敗のどちらでも終了させる。cache hit 時に不要な表示を開始しない。
-- [ ] コメント無限取得に明示的な `initialPageParam` を設定する。初回 cursor は既存 API 呼び出しと同等になる値を選び、末尾到達時の停止と一覧結合を維持する。
-- [ ] 無効化した新着取得の初回手動 refetch は v5 の `isRefetching` だけに依存せず `isFetching` を使い、既存の取得状態を維持する。queryFn のないキャッシュ監視は無効化を維持し、自動リクエストを発生させない。
-- [ ] v3 のテスト用 `setLogger` を除去する。必要なログ検証があればテスト内で限定し、想定外のエラーを一括で隠さない。mock・キャッシュ seed・フィルタ引数の期待値を更新する。
-- [ ] Reviewer subagent に実装差分レビューを依頼し、必要な修正後に関連検証を完了する。
+- [x] 承認後、既存の test / build / lint を実行し、既存失敗と移行由来の失敗を分ける。
+- [x] `react-query` を v5 の `@tanstack/react-query` に置換し、Devtools を専用パッケージへ移す。無関係な lockfile 更新を避ける。
+- [x] hooks をオブジェクト構文に統一し、query key を配列化する。QueryClient のフィルタ API を `{ queryKey }` へ変更する。`getQueryData` / `setQueryData` は配列キーを渡す。
+- [x] 共通 `useReactQuery` は既存の文字列引数を維持し、内部で配列化する。`setQueriesData` の更新範囲を維持する。
+- [x] mutation の `isPending` を既存 hook の `isLoading` として返し、利用側の公開インターフェースを維持する。query の初回取得・無効化中・再取得・エラーは別途意味を照合する。
+- [x] `keepPreviousData: true` は `placeholderData: keepPreviousData` に、false は省略へ移す。成功状態や更新時刻の差異が UI に影響しないか確認する。`cacheTime` は `gcTime` に移す。
+- [x] 削除された query callbacks のうち空処理は除去する。`useAuth` の未認証キャッシュは queryFn が `null` を返す契約で維持する。成功時に `undefined` を返す取得処理がないか確認する。
+- [x] `useFetchUsersPrediction` は現在 API の `null` を `undefined` に変換している。v4 以降は成功データの `undefined` が禁止されるため、queryFn / キャッシュは `null` を保持し、hook の公開 `data` は `null` を `undefined` に変換する。予想なし時の投票アイコン・試合表示と、未認証時の取得停止を維持し、専用 hook テストを追加する。
+- [x] `useFetchPastMatches` の全画面 loading は queryFn 内で開始し、`try/finally` で成功・失敗のどちらでも終了させる。cache hit 時に不要な表示を開始しない。
+- [x] コメント無限取得に明示的な `initialPageParam` を設定する。初回 cursor は既存 API 呼び出しと同等になる値を選び、末尾到達時の停止と一覧結合を維持する。
+- [x] 無効化した新着取得の初回手動 refetch は v5 の `isRefetching` だけに依存せず `isFetching` を使い、既存の取得状態を維持する。queryFn のないキャッシュ監視は無効化を維持し、自動リクエストを発生させない。
+- [x] v3 のテスト用 `setLogger` を除去する。必要なログ検証があればテスト内で限定し、想定外のエラーを一括で隠さない。mock・キャッシュ seed・フィルタ引数の期待値を更新する。
+- [x] オフライン時の初回通信と失敗処理を維持する `networkMode: offlineFirst` を query / mutation 両方に設定し、本番 factory を用いる回帰テストと README の説明を追加する。
+- [x] Reviewer subagent に実装差分レビューを依頼し、必要な修正後に関連検証を完了する。
 
 ## Test Plan
 
@@ -77,17 +79,7 @@ v5 系へ一括移行する案を提案する。具体的なパッチバージ�
 - 配列キーとフィルタの変換漏れは、認証キャッシュや更新後の一覧を古いまま残す。
 - query callbacks の削除は全画面 loading を終了できなくする可能性がある。
 - placeholderData は以前のデータ維持と完全に同義ではないため、失敗時表示も確認する。
-- v4 以降のネットワーク状態による pause、無限 query の再取得動作など、既定動作の差異がある。既存用途への影響を確認し、根拠なく global option を増やさない。
-
-## Worktree / Rollback Plan
-
-- 実装承認後、計画書を含むコミットを起点に専用ブランチ・新しい worktree を作成する。現在の worktree は v3 の比較用環境として残す。
-- 依存関係は各 worktree で個別にインストールする。同時起動する場合は開発サーバーのポートを分ける。
-- 移行前のコミット SHA と検証結果を記録し、移行コード・テスト・`package.json`・lockfile を無関係な変更から分離した移行コミットにまとめる。
-- 切り戻し時は移行コミットを `git revert` し、frontend で `npm ci` を実行して v3 の依存関係を復元する。パッケージだけをダウングレードせず、コードと lockfile も一緒に戻す。
-- 取り込み前に使い捨ての検証用 worktree で revert・依存復元・関連テスト・ビルドを確認する。後続変更が v5 API に依存すると revert に競合が起こり得るため、移行の動作確認中は変更を混在させない。
-- 本番反映を行う場合は移行前の成果物を保持し、既存のデプロイ方法で旧版へ戻せることを確認する。本番反映そのものは今回の実装承認に含めない。
-- この計画書のコミットは実装の承認を意味しない。現時点で移行実装は未承認。
+- v4 以降のネットワーク状態による pause は既存の全画面 loading を終了できなくするため、公式の v3 互換設定 `networkMode: offlineFirst` を query / mutation 両方へ設定した。本番とテストは `src/queryClient.ts` の factory を共有し、オフライン取得・送信失敗を検証する。無限 query の再取得など、実ブラウザでの確認は残る。
 
 ## References
 
@@ -97,4 +89,27 @@ v5 系へ一括移行する案を提案する。具体的なパッチバージ�
 ## Design Review
 
 - Reviewer subagent による設計レビュー済み。実装承認を妨げる重要指摘なし。
-- 新着コメントの既存テストの所在に関する指摘を反映した。実装・テストは承認後に行う。
+- 新着コメントの既存テストの所在に関する指摘を反映した。
+- 実装レビューでオフライン mutation 停止による loading 継続の P2 指摘があり、互換設定と回帰テストで修正した。再レビューで P2 解消、追加の重要指摘なし。
+
+## Rollback / Integration
+
+- 実装時は未コミットで検証し、その後ユーザー承認により `bc999c4b` に移行差分を保存した。ビルド・全テスト・lint 成功後、ユーザーから元 worktree へのマージ指示を受けた。
+- 不採用の場合は、必要な成果物を確認したうえでユーザーの指示に従って専用 worktree を整理する。元の worktree と `feature` は移行中も維持する。
+- 採用する場合は、検証後に移行差分をコミットし、別途承認を得て `feature` へマージする。切り戻しを容易にするためマージコミットを残す方針。
+- 取り込み後の切り戻しではコード・package.json・lockfile を一緒に戻し、`npm ci` とビルド・関連テストを行う。パッケージだけのダウングレードは行わない。
+- マージ先は元 worktree の `feature` とし、`--no-ff` でマージコミットを残す。取り込み後はこのマージコミットに対する `git revert -m 1 <merge-commit>` で移行全体を取り消せる。
+- 元の `feature` にある計画書コミット `0e1fd4b9` の切り戻し方針も維持する。worktree ごとに依存関係をインストールし、同時起動時はポートを分ける。元環境はマージまで v3 比較用として保持した。
+- 取り消し後の実行検証には別の検証用 worktree を使い、依存復元・テスト・ビルドを確認する。切り戻し後の動作確認そのものは未実施。後続の v5 依存変更により競合し得る点に注意する。
+- 本番反映時は旧成果物を保持し、既存のデプロイ方法で旧版へ戻せることを確認する。本番への反映は今回のローカルマージには含めない。
+
+## Verification Results
+
+- 移行前: テスト用 API URL を指定すると 49 ファイル / 190 テスト成功、lint 成功。環境変数なしでは MSW の URL が一致せずコメント関連の 5 件が失敗したため、前後で同じテスト用 URL を指定した。
+- 移行前後とも `npm run build` は `src/App.tsx:15` の `@/page/Test` を解決できず停止する。このファイルは元 worktree にのみある Git 管理外・gitignore 対象の開発用ページで、新 worktree には含まれない。今回の移行では変更・補完しない。
+- 最終確認: `VITE_APP_API_URL=http://localhost:3000 npm test -- --run` は 52 ファイル / 203 テスト成功（既存 190 + 追加 13）。`npm run lint` 成功。`npm run build` は上記の既存欠落 1 件のみで失敗し、移行由来の型エラーはない。
+- `git diff --check` 成功。旧パッケージ参照・削除された API の残存なし。依存更新による既存パッケージのバージョン変更なし。
+- [x] Git 管理外の開発用ページ欠落を解決した環境で本番ビルドを確認する。ユーザー承認のもと、元 worktree の `frontend/src/page/Test.tsx` を同じ内容でコピーした。gitignore 対象を維持し、移行コミットには含めない。
+- コピー後の再検証: `npm run build` 成功（TypeScript / Vite とも成功）、`VITE_APP_API_URL=http://localhost:3000 npm test -- --run` は 52 ファイル / 203 テスト成功、`npm run lint` 成功。
+- ビルド警告: Browserslist データの古さと 500 kB 超の生成チャンクに関する警告あり。今回の移行の対象として依存更新や分割変更は追加しない。
+- [ ] 実ブラウザで主要画面と Devtools の接続を確認する。

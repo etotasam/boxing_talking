@@ -1,16 +1,8 @@
 import type { ReactNode } from 'react';
-import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GRADE, ORGANIZATIONS, STANCE, WEIGHT_CLASS } from '@/constants/boxerData';
 import { COUNTRY } from '@/constants/country';
 import type { MatchDataType, MatchResultType, RegisterMatchPropsType } from '@/types';
-
-const noop = () => undefined;
-
-setLogger({
-  log: noop,
-  warn: noop,
-  error: noop,
-});
 
 export const createWrapper = () => {
   const queryClient = new QueryClient({

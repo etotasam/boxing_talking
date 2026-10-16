@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
@@ -14,7 +14,9 @@ export const useGuest = () => {
     }
   }, []);
 
-  const { data, isLoading, isError } = useQuery<boolean>(QUERY_KEY.GUEST, api, {
+  const { data, isLoading, isError } = useQuery<boolean>({
+    queryKey: [QUERY_KEY.GUEST],
+    queryFn: api,
     retry: false,
     staleTime: Infinity,
   });
