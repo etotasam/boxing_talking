@@ -10,7 +10,6 @@ export const useHeaderAuthInfo = () => {
 
   return {
     userName: authUser ? authUser.name ?? '' : 'ゲスト',
-    iconBgColor: authUser ? 'bg-cyan-700' : 'bg-stone-400',
     onLogout: authUser ? logout : guestLogout,
   };
 };

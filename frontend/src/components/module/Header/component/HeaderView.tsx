@@ -1,9 +1,8 @@
 import { ReactNode, RefObject } from 'react';
 import clsx from 'clsx';
-import { DeviceStateType } from '@/store/deviceState';
 
 type HeaderViewProps = {
-  device: DeviceStateType;
+  isPc: boolean;
   headerRef: RefObject<HTMLElement>;
   siteTitle: string;
   navigation: ReactNode;
@@ -14,7 +13,7 @@ type HeaderViewProps = {
 };
 
 export const HeaderView = ({
-  device,
+  isPc,
   headerRef,
   siteTitle,
   navigation,
@@ -28,14 +27,14 @@ export const HeaderView = ({
       ref={headerRef}
       className={clsx(
         'z-10 w-full fixed top-0 left-0 backdrop-blur-md text-white',
-        device === 'PC' &&
+        isPc &&
           (isAdmin
             ? 'h-[132px] border-b border-white/20 bg-black/95'
             : 'h-[80px] border-b border-white/20 bg-black/95'),
-        device === 'SP' && 'h-[126px] bg-black/95'
+        !isPc && 'h-[126px] bg-black/95'
       )}
     >
-      {device === 'PC' ? (
+      {isPc ? (
         <HeaderContentPC
           siteTitle={siteTitle}
           navigation={navigation}

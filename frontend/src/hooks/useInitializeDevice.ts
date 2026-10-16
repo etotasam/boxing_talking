@@ -1,23 +1,22 @@
 import { useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { DEVICE_BREAKPOINT } from '@/constants/deviceBreakpoint';
-import { deviceState } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 
 export const useInitializeDevice = (): void => {
-  const setDevice = useSetRecoilState(deviceState);
+  const setIsPc = useSetRecoilState(isPcState);
 
   useEffect(() => {
-    const updateDevice = () => {
+    const updateIsPc = () => {
       const width = window.innerWidth;
-      const nextDevice = width >= DEVICE_BREAKPOINT.pc ? 'PC' : 'SP';
-      setDevice(nextDevice);
+      setIsPc(width >= DEVICE_BREAKPOINT.pc);
     };
 
-    updateDevice();
-    window.addEventListener('resize', updateDevice, false);
+    updateIsPc();
+    window.addEventListener('resize', updateIsPc, false);
 
     return () => {
-      window.removeEventListener('resize', updateDevice, false);
+      window.removeEventListener('resize', updateIsPc, false);
     };
-  }, [setDevice]);
+  }, [setIsPc]);
 };

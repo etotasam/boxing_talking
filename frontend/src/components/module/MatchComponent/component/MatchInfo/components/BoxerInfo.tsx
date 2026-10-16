@@ -5,7 +5,7 @@ import { useRecoilValue } from 'recoil';
 import { BoxerType, MatchResultType } from '@/types';
 import { BOXER_STANCE_LABELS } from '@/constants/boxerData';
 import { EngNameWithFlag } from '@/components/atomic/EngNameWithFlag';
-import { deviceState } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 import crown from '@/assets/images/etc/champion.svg';
 import fallOfCrown from '@/assets/images/etc/fall_champion.svg';
 import { getDisplayedBoxerRecord } from './helper/boxerRecord';
@@ -20,10 +20,10 @@ type BoxerInfoPropsType = ComponentProps<'div'> & {
 
 export const BoxerInfo = (props: BoxerInfoPropsType) => {
   const { className, boxer, matchResult = null, matchDate } = props;
-  const device = useRecoilValue(deviceState);
+  const isPc = useRecoilValue(isPcState);
   return (
     <div className={clsx('w-full h-full flex justify-center', className)}>
-      <div className={clsx('text-center w-full py-5', device === 'PC' ? 'px-5' : 'px-2')}>
+      <div className={clsx('text-center w-full py-5', isPc ? 'px-5' : 'px-2')}>
         <BoxerName boxer={boxer} />
         <BoxerRecord boxer={boxer} matchResult={matchResult} />
         <BoxerStatus boxer={boxer} matchDate={matchDate} />

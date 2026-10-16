@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { GiBoxingGlove } from 'react-icons/gi';
 
 import { useRecoilValue } from 'recoil';
-import { deviceState } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 
 const ICON_TEXT = '勝敗予想' as const;
 
@@ -17,7 +17,7 @@ export const VoteIcon = ({
   showPredictionModal: () => void;
   bottomPosition: number;
 }) => {
-  const device = useRecoilValue(deviceState);
+  const isPc = useRecoilValue(isPcState);
 
   return (
     <AnimatePresence>
@@ -30,7 +30,7 @@ export const VoteIcon = ({
         }
         className={clsx(
           'fixed w-[120px] h-[35px] rounded-[50px] bg-black/80',
-          device === 'SP' ? 'right-[10px]' : 'right-[50px]'
+          !isPc ? 'right-[10px]' : 'right-[50px]'
         )}
         style={{ bottom: bottomPosition }}
       />
@@ -66,15 +66,15 @@ export const VoteIcon = ({
 
 export const VoteIconForTop = () => {
   return (
-    <div className="relative">
+    <span className="relative block h-full w-full">
       <span className="inline-block w-[25px] h-[25px] bg-black rounded-[50px] absolute top-[50%] translate-y-[-50%] left-[50%] translate-x-[-50%]"></span>
-      <motion.div
+      <motion.span
         animate={{ x: [0, 8, -3, 0] }}
         transition={{ duration: 0.3, repeat: Infinity, repeatDelay: 3 }}
-        className="flex justify-center items-center"
+        className="flex h-full w-full items-center justify-center"
       >
         <GiBoxingGlove className="w-[15px] h-[15px] text-red-600 rotate-[-40deg]" />
-      </motion.div>
-    </div>
+      </motion.span>
+    </span>
   );
 };

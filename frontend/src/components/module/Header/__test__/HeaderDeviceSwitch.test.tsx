@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { RecoilRoot, useSetRecoilState } from 'recoil';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { ROUTE_PATH } from '@/constants/routePath';
-import { deviceState } from '@/store/deviceState';
+import { isPcState } from '@/store/isPcState';
 import { Header } from '../Header';
 
 const mockUseAdmin = vi.fn();
@@ -18,14 +18,14 @@ vi.mock('../component/HeaderAuthInfo', () => ({
 }));
 
 const DeviceSwitchButtons = () => {
-  const setDevice = useSetRecoilState(deviceState);
+  const setIsPc = useSetRecoilState(isPcState);
 
   return (
     <>
-      <button type="button" onClick={() => setDevice('PC')}>
+      <button type="button" onClick={() => setIsPc(true)}>
         PCに切替
       </button>
-      <button type="button" onClick={() => setDevice('SP')}>
+      <button type="button" onClick={() => setIsPc(false)}>
         SPに切替
       </button>
     </>
@@ -36,7 +36,7 @@ const renderHeader = () =>
   render(
     <RecoilRoot
       initializeState={({ set }) => {
-        set(deviceState, 'SP');
+        set(isPcState, false);
       }}
     >
       <MemoryRouter initialEntries={[ROUTE_PATH.HOME]}>
