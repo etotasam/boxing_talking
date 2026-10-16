@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AxiosResponse } from 'axios';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
@@ -29,11 +29,13 @@ export const useVoteMatchPrediction = () => {
       prediction,
     });
   }, []);
-  const { mutate, isLoading: isMutateLoading, isSuccess: isMutateSuccess, isError } = useMutation<
-    void,
-    AxiosResponse<PredictionErrorResponse>,
-    ApiPropsType
-  >(api, {
+  const {
+    mutate,
+    isPending: isMutateLoading,
+    isSuccess: isMutateSuccess,
+    isError,
+  } = useMutation<void, AxiosResponse<PredictionErrorResponse>, ApiPropsType>({
+    mutationFn: api,
     onMutate: () => {
       showFullScreenLoading();
     },
@@ -47,7 +49,9 @@ export const useVoteMatchPrediction = () => {
         },
         onSuccess: (_, variables) => {
           refetchAllFetchMatchPredictionOfAuthUser();
-          queryClient.invalidateQueries([QUERY_KEY.MATCH_PREDICTIONS, { id: variables.matchId }]);
+          queryClient.invalidateQueries({
+            queryKey: [QUERY_KEY.MATCH_PREDICTIONS, { id: variables.matchId }],
+          });
           showSuccessToast(MESSAGE.SUCCESSFUL_VOTE_WIN_LOSS_PREDICTION);
         },
         onError: (error: AxiosResponse<PredictionErrorResponse>) => {
@@ -68,10 +72,10 @@ export const useVoteMatchPrediction = () => {
   const userPredictionPostState = isMutateLoading
     ? 'loading'
     : isMutateSuccess
-      ? 'success'
-      : isError
-        ? 'error'
-        : 'idle';
+    ? 'success'
+    : isError
+    ? 'error'
+    : 'idle';
 
   return { matchVotePrediction, userPredictionPostState, isSuccess: isMutateSuccess, isError };
 };

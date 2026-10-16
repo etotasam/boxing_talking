@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { CUSTOM_ERROR_CODE } from '@/constants/customErrorCodes';
@@ -29,38 +29,40 @@ export const useGuestLogin = () => {
     await Axios.post<void>(API_PATH.GUEST_LOGIN).then((result) => result.data);
   }, []);
 
-  const { mutate, isLoading, isSuccess } = useMutation(api, {
+  const {
+    mutate,
+    isPending: isLoading,
+    isSuccess,
+  } = useMutation({
+    mutationFn: api,
     onMutate: () => {
       showFullScreenLoading();
     },
   });
 
   const guestLogin = () => {
-    mutate(
-      undefined,
-      {
-        onSuccess: () => {
-          hideLoginModal();
-          queryClient.removeQueries(QUERY_KEY.PREDICTION);
-          queryClient.removeQueries(QUERY_KEY.MATCH_PREDICTIONS);
-          refetchMatchPrediction();
-          hideFullScreenLoading();
-          setReactQueryData<boolean>(QUERY_KEY.GUEST, true);
-          showSuccessToast(MESSAGE.LOGIN_SUCCESS);
-        },
-        onError: (error: unknown) => {
-          hideFullScreenLoading();
-          if (
-            (error as GuestLoginError).data?.errorCode ===
-            CUSTOM_ERROR_CODE.UNABLE_TO_GENERATE_GUEST_TODAY
-          ) {
-            showErrorToast(MESSAGE.NOT_CREATE_GUEST_BY_LIMIT);
-            return;
-          }
-          showErrorToast(MESSAGE.LOGIN_FAILED);
-        },
-      }
-    );
+    mutate(undefined, {
+      onSuccess: () => {
+        hideLoginModal();
+        queryClient.removeQueries({ queryKey: [QUERY_KEY.PREDICTION] });
+        queryClient.removeQueries({ queryKey: [QUERY_KEY.MATCH_PREDICTIONS] });
+        refetchMatchPrediction();
+        hideFullScreenLoading();
+        setReactQueryData<boolean>(QUERY_KEY.GUEST, true);
+        showSuccessToast(MESSAGE.LOGIN_SUCCESS);
+      },
+      onError: (error: unknown) => {
+        hideFullScreenLoading();
+        if (
+          (error as GuestLoginError).data?.errorCode ===
+          CUSTOM_ERROR_CODE.UNABLE_TO_GENERATE_GUEST_TODAY
+        ) {
+          showErrorToast(MESSAGE.NOT_CREATE_GUEST_BY_LIMIT);
+          return;
+        }
+        showErrorToast(MESSAGE.LOGIN_FAILED);
+      },
+    });
   };
 
   return { guestLogin, isLoading, isSuccess };

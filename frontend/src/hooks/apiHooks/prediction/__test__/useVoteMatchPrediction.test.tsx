@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
@@ -60,14 +60,6 @@ vi.mock('@/hooks/apiHooks/prediction/useFetchUsersPrediction', () => {
       };
     }),
   };
-});
-
-const noop = () => undefined;
-
-setLogger({
-  log: noop,
-  warn: noop,
-  error: noop,
 });
 
 const createWrapper = () => {

@@ -1,22 +1,14 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { MemoryRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { COUNTRY } from '@/constants/country';
 import { STANCE } from '@/constants/boxerData';
 import { useFetchBoxers } from '@/hooks/apiHooks/boxer';
 import type { BoxerType } from '@/types';
-
-const noop = () => undefined;
-
-setLogger({
-  log: noop,
-  warn: noop,
-  error: noop,
-});
 
 const mocks = vi.hoisted(() => {
   return {
@@ -131,6 +123,39 @@ describe('useFetchBoxers', () => {
       expect(result.current.boxersData).toEqual([]);
       expect(result.current.boxersCount).toBe(0);
       expect(result.current.pageCount).toBe(0);
+    });
+  });
+
+  test('ページ切り替え中は以前の一覧を保持し、取得完了後に新しい一覧へ切り替える', async () => {
+    type Response = { data: { data: { boxers: BoxerType[]; count: number } } };
+    let finishRequest!: (value: Response) => void;
+    mocks.get
+      .mockResolvedValueOnce({ data: { data: { boxers: [boxer], count: 16 } } })
+      .mockReturnValueOnce(
+        new Promise<Response>((resolve) => {
+          finishRequest = resolve;
+        })
+      );
+    const { result } = renderHook(
+      () => ({
+        boxers: useFetchBoxers(),
+        navigate: useNavigate(),
+      }),
+      { wrapper: createWrapper('/admin/boxers?page=1') }
+    );
+    await waitFor(() => expect(result.current.boxers.boxersData).toEqual([boxer]));
+
+    act(() => result.current.navigate('/admin/boxers?page=2'));
+    await waitFor(() => expect(result.current.boxers.isPreviousData).toBe(true));
+    expect(result.current.boxers.boxersData).toEqual([boxer]);
+    expect(result.current.boxers.isLoading).toBe(false);
+
+    await act(async () => {
+      finishRequest({ data: { data: { boxers: [], count: 16 } } });
+    });
+    await waitFor(() => {
+      expect(result.current.boxers.boxersData).toEqual([]);
+      expect(result.current.boxers.isPreviousData).toBe(false);
     });
   });
 });

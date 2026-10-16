@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import type { ReactNode } from 'react';
-import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RecoilRoot, useRecoilValue } from 'recoil';
 import { Axios } from '@/api/axios';
 import { CUSTOM_ERROR_CODE } from '@/constants/customErrorCodes';
@@ -9,14 +9,6 @@ import { TOKEN_ERROR_MESSAGE } from '@/constants/tokenErrorMessage';
 import { useSignUpIdentification } from '@/hooks/apiHooks/auth';
 import { authCheckingState } from '@/store/authCheckingState';
 import { tokenErrorMessageState } from '@/store/tokenErrorMessageState';
-
-const noop = () => undefined;
-
-setLogger({
-  log: noop,
-  warn: noop,
-  error: noop,
-});
 
 const mocks = vi.hoisted(() => {
   return {

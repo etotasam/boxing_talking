@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import dayjs from 'dayjs';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient, keepPreviousData, skipToken } from '@tanstack/react-query';
 import { useRecoilState } from 'recoil';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
@@ -22,32 +22,29 @@ const useFetchNewCommentsQuery = ({ matchId, createdAt }: FetchNewCommentsParams
     return res.data;
   };
 
-  const { data, refetch, isRefetching, isError, isStale } = useQuery<CommentType[]>(
-    [QUERY_KEY.COMMENT_NEW, { matchId }],
-    api,
-    {
-      cacheTime: 0,
-      staleTime: 500,
-      enabled: false,
-      keepPreviousData: false,
-      refetchInterval: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-    }
-  );
+  const { data, refetch, isFetching, isError, isStale } = useQuery<CommentType[]>({
+    queryKey: [QUERY_KEY.COMMENT_NEW, { matchId }],
+    queryFn: api,
+    gcTime: 0,
+    staleTime: 500,
+    enabled: false,
+    refetchInterval: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+  });
 
   const [newCommentFetchState, setNewCommentFetchState] = useRecoilState(
     apiFetchState('comments/fetch')
   );
   useEffect(() => {
-    if (isRefetching) {
+    if (isFetching) {
       setNewCommentFetchState('refetching');
     } else if (isError) {
       setNewCommentFetchState('error');
     } else {
       setNewCommentFetchState('idle');
     }
-  }, [isRefetching, isError, setNewCommentFetchState]);
+  }, [isFetching, isError, setNewCommentFetchState]);
 
   return { data, refetch, isStale, newCommentFetchState };
 };
@@ -62,10 +59,12 @@ export const useFetchNewComments = ({
   //? ここに新しいコメントをキャッシュしておく
   const queryClient = useQueryClient();
   const newCommentsCacheKey = useMemo(() => ['cache/comments/new', { matchId }], [matchId]);
-  const { data: newCommentsData } = useQuery<CommentType[] | undefined>(newCommentsCacheKey, {
+  const { data: newCommentsData } = useQuery<CommentType[] | undefined>({
+    queryKey: newCommentsCacheKey,
+    queryFn: skipToken,
     enabled: false,
     staleTime: Infinity,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   const newestPostTime =

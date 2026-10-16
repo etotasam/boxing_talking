@@ -1,4 +1,4 @@
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { CUSTOM_ERROR_CODE } from '@/constants/customErrorCodes';
@@ -18,11 +18,12 @@ export const useUpdateBoxerData = () => {
   const api = async (updateFighterData: UpdateBoxerDataType): Promise<void> => {
     await Axios.patch<void>(API_PATH.BOXER, updateFighterData);
   };
-  const { mutate, isLoading, isSuccess } = useMutation<
-    void,
-    BoxerApiErrorResponseType,
-    UpdateBoxerDataType
-  >(api, {
+  const {
+    mutate,
+    isPending: isLoading,
+    isSuccess,
+  } = useMutation<void, BoxerApiErrorResponseType, UpdateBoxerDataType>({
+    mutationFn: api,
     onMutate: async () => {
       showFullScreenLoading();
     },

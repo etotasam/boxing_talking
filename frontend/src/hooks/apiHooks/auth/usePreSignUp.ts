@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { HTTP_STATUS_CODE } from '@/constants/httpStatusCodes';
@@ -37,7 +37,13 @@ export const usePreSignUp = () => {
     return res;
   }, []);
 
-  const { mutate, isLoading, isSuccess, isError } = useMutation(api, {
+  const {
+    mutate,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+  } = useMutation({
+    mutationFn: api,
     onMutate: () => {
       showFullScreenLoading();
     },
@@ -67,11 +73,7 @@ export const usePreSignUp = () => {
               return;
             }
 
-            if (
-              errorMessages?.name?.includes(
-                'The name must not be greater than 30 characters.'
-              )
-            ) {
+            if (errorMessages?.name?.includes('The name must not be greater than 30 characters.')) {
               showErrorToast(MESSAGE.NAME_CHAR_LIMIT_OVER);
               return;
             }

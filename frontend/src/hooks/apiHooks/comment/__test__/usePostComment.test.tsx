@@ -62,7 +62,7 @@ describe('usePostComment', () => {
       expect(mocks.showSuccessToast).toHaveBeenCalledTimes(1);
       expect(mocks.showSuccessToast).toHaveBeenCalledWith(MESSAGE.COMMENT_POST_SUCCESS);
       expect(invalidateQueries).toHaveBeenCalledTimes(1);
-      expect(invalidateQueries).toHaveBeenCalledWith([QUERY_KEY.COMMENT, { id: 1 }]);
+      expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: [QUERY_KEY.COMMENT, { id: 1 }] });
       expect(result.current.commentPostState).toBe('success');
       expect(mocks.showErrorToast).not.toHaveBeenCalled();
     });

@@ -1,11 +1,12 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { describe, expect, test, vi, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
-import { RecoilRoot } from 'recoil';
+import { RecoilRoot, useRecoilValue } from 'recoil';
 import React from 'react';
-import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import { API_PATH } from '@/constants/apiPath';
+import { apiFetchState } from '@/store/apiFetchDataState';
 import { useFetchComments, useFetchNewComments } from '@/hooks/apiHooks/comment';
 
 const comments = {
@@ -51,14 +52,6 @@ const newComments = {
 };
 
 const mockFetchNewComments = vi.fn();
-
-const noop = () => undefined;
-
-setLogger({
-  log: noop,
-  warn: noop,
-  error: noop,
-});
 
 const page2Cursor = 'cursor-page-2';
 
@@ -236,5 +229,60 @@ describe('useFetchComments', () => {
       expect(result.current.isNextComments).toBe(false);
       expect(result.current.commentFetchState).toBe('error');
     });
+  });
+
+  test('新着は自動取得せず、初回の手動取得中も取得状態を通知する', async () => {
+    let finishRequest!: () => void;
+    const pending = new Promise<void>((resolve) => {
+      finishRequest = resolve;
+    });
+    server.use(
+      rest.get(`${baseURL}${API_PATH.COMMENT_NEW}`, async (_req, res, ctx) => {
+        await pending;
+        return res(ctx.status(200), ctx.json({ data: newComments.newComment1 }));
+      })
+    );
+    const { result } = renderHook(
+      () => ({
+        comments: useFetchNewComments({ matchId: 1, resentPostTime: '' }),
+        fetchState: useRecoilValue(apiFetchState('comments/fetch')),
+      }),
+      { wrapper: createWrapper() }
+    );
+
+    expect(result.current.fetchState).toBe('idle');
+    expect(mockFetchNewComments).not.toHaveBeenCalled();
+    let request!: ReturnType<typeof result.current.comments.refetch>;
+    act(() => {
+      request = result.current.comments.refetch();
+    });
+    await waitFor(() => expect(result.current.fetchState).toBe('refetching'));
+    await act(async () => {
+      finishRequest();
+      await request;
+    });
+    await waitFor(() => {
+      expect(result.current.comments.data).toEqual(newComments.newComment1);
+      expect(result.current.fetchState).toBe('idle');
+    });
+  });
+
+  test('新着の手動取得失敗時は error を通知して未取得の一覧を維持する', async () => {
+    server.use(
+      rest.get(`${baseURL}${API_PATH.COMMENT_NEW}`, (_req, res, ctx) => res(ctx.status(500)))
+    );
+    const { result } = renderHook(
+      () => ({
+        comments: useFetchNewComments({ matchId: 1, resentPostTime: '' }),
+        fetchState: useRecoilValue(apiFetchState('comments/fetch')),
+      }),
+      { wrapper: createWrapper() }
+    );
+
+    await act(async () => {
+      await result.current.comments.refetch();
+    });
+    await waitFor(() => expect(result.current.fetchState).toBe('error'));
+    expect(result.current.comments.data).toEqual([]);
   });
 });
