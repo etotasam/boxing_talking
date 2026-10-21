@@ -8,20 +8,21 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
         "aws/aws-sdk-php": "^3.281",
         "firebase/php-jwt": "^6.8",
         "guzzlehttp/guzzle": "^7.0.1",
-        "laravel/framework": "^11.0@stable",
+        "laravel/framework": "^12.69.0@stable",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.5"
+        "laravel/tinker": "^2.5",
+        "nesbot/carbon": "^3.0",
+        "php": "^8.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.1",
-        "phpunit/phpunit": "^10.5",
+        "phpunit/phpunit": "^11.5",
         "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
@@ -60,27 +61,7 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true,
-        "audit": {
-            "ignore": {
-                "PKSA-d5tc-s1qs-h781": {
-                    "apply": "block",
-                    "reason": "未公開の隔離環境でLaravel 11を通過するための一時例外（S4）。デバッグ画面XSS。公開不可。監査は継続し修正版到達時に削除。docs/plans/2026-10-19-laravel-php-upgrade.md参照。"
-                },
-                "PKSA-m5cs-t1y6-qpcs": {
-                    "apply": "block",
-                    "reason": "未公開の隔離環境でLaravel 11を通過するための一時例外（S4）。一時署名URL。該当アプリ処理は未検出。監査は継続し修正版到達時に削除。docs/plans/2026-10-19-laravel-php-upgrade.md参照。"
-                },
-                "PKSA-3r5d-mb8f-1qw9": {
-                    "apply": "block",
-                    "reason": "未公開の隔離環境でLaravel 11を通過するための一時例外（S4）。メールCRLF。送信先はローカルSMTP限定。監査は継続し修正版到達時に削除。docs/plans/2026-10-19-laravel-php-upgrade.md参照。"
-                },
-                "PKSA-mdq4-51ck-6kdq": {
-                    "apply": "block",
-                    "reason": "未公開の隔離環境でLaravel 11を通過するための一時例外（S4）。メールCRLFの別登録。送信先はローカルSMTP限定。監査は継続し修正版到達時に削除。docs/plans/2026-10-19-laravel-php-upgrade.md参照。"
-                }
-            }
-        }
+        "sort-packages": true
     },
     "minimum-stability": "stable",
     "prefer-stable": true

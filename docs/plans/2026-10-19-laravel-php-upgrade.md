@@ -427,10 +427,10 @@ Reviewer結果と対応:
 
 - [x] Reviewerの具体案確認と復旧基点の保存。
 - [x] S4の必須依存・Sanctum設定を移行。
-- [ ] S4中間ゲート・Reviewer確認後コミット。
-- [ ] S5の依存更新・日時境界テスト追加。
-- [ ] S5最終検証・ブラウザ・DB・メール・キュー・日次処理。
-- [ ] Reviewer最終確認・結果記録、S6前で停止。
+- [x] S4中間ゲート・Reviewer確認後コミット。
+- [x] S5の依存更新・日時境界テスト追加。
+- [x] S5最終検証・ブラウザ・DB・メール・キュー・日次処理。
+- [x] Reviewer最終確認・結果記録、S6前で停止。
 
 公式資料: https://laravel.com/framework/docs/11.x/upgrade / https://laravel.com/framework/docs/12.x/upgrade / https://github.com/laravel/sanctum/blob/4.x/UPGRADE.md
 
@@ -445,3 +445,9 @@ Reviewer結果と対応:
 - fixture補完はDestroyBoxerTestにも必要（計5クラス）。GradeSeeder追加とTitle Factoryの参照先をseed済みid1へ明示。0〜10のランダム参照による非決定的なFK違反を除去し、削除対象/期待値は維持。
 
 - S4中間ゲート完了: Laravel11.57.0/Sanctum4.3.3/Collision8.5.0、Carbon2/PHPUnit10維持。101件=100成功/既存1skip/306assertions、追加回帰SQLite/MySQL成功、旧98件全残存、fresh/引継ぎスキーマ機能差なし、実HTTP両23項目成功。監査9件/5。Reviewer未解決指摘なし。詳細 [S4結果](2026-10-21-laravel-php-s4-result.md)。承認済み中間コミット後S5へ続ける。
+
+- S4中間コミット `664033da` を保存しS5開始。S4コード/lockと専用dumpを復旧基点とする。Carbon3の日次境界をTokyo 00:00:01/23:59:59に固定し、2日前末尾/前日始端・末尾/当日/activeを確認するテストを追加する。
+
+- S5 dry-run初回は既存Tinker2.10.0のLaravel11までの制約で停止。必須互換対応としてTinkerのみ部分update対象に追加する。
+
+- S5実装結果: Laravel12.70.1/Carbon3.15.0/PHPUnit11.5.57/Collision8.9.5/Tinker2.11.1。103件=102成功/既存1skip/320assertions、旧101件全残存・追加は日次境界2件。frontend52ファイル204件成功。MySQL追加5回帰41assertions成功。Laravelの4例外を撤去し、監査Laravel0件・全体4件/3パッケージへ減少。ブラウザ主要操作と仮登録→実worker/ローカルSMTP→受信リンク→本登録→新規loginまで成功。削除UIは既存画面に未提供のため管理者削除/一般拒否は実HTTPで代替し、Reviewerも妥当と判断。一時的コメント重複表示の観測と未確定の原因はS5結果へ記録。最終Reviewer確認済み、修正必須/未実施の必須確認なし。S5完了、S6前で停止。S4は664033daで保存済み。S5の保存コミットはGit履歴を参照。詳細 [S5結果](2026-10-21-laravel-php-s5-result.md)。
