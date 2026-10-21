@@ -13,6 +13,14 @@ class UpdateBoxerTitleSnapshotsTable extends Migration
      */
     public function up()
     {
+        if (Schema::getConnection()->getDriverName() === 'sqlite') {
+            Schema::table('boxer_title_snapshots', function (Blueprint $table) {
+                // SQLiteでは主キー列を直接削除できないため、再構築で自動採番と主キーを先に解除する。
+                $table->unsignedBigInteger('id')->autoIncrement(false)->change();
+                $table->dropPrimary();
+            });
+        }
+
         Schema::table('boxer_title_snapshots', function (Blueprint $table) {
             // id主キーを削除してから複合主キーへ切り替える
             $table->dropColumn('id');
@@ -31,6 +39,20 @@ class UpdateBoxerTitleSnapshotsTable extends Migration
      */
     public function down()
     {
+        if (Schema::getConnection()->getDriverName() === 'sqlite') {
+            Schema::table('boxer_title_snapshots', function (Blueprint $table) {
+                $table->dropPrimary();
+                $table->unsignedBigInteger('id')->nullable();
+            });
+
+            Schema::table('boxer_title_snapshots', function (Blueprint $table) {
+                // 再構築でid主キーを採番する。削除前のid値は復元しない。
+                $table->id()->change();
+            });
+
+            return;
+        }
+
         Schema::table('boxer_title_snapshots', function (Blueprint $table) {
             // 主キー切替中だけmatch_idの外部キー制約を外す
             $table->dropForeign(['match_id']);

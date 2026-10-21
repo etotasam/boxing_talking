@@ -5,6 +5,8 @@ namespace Tests\Feature\CommentController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Database\Seeders\GradeSeeder;
+use Database\Seeders\WeightDivisionSeeder;
 use App\Models\BoxingMatch;
 use App\Models\Boxer;
 use App\Models\Comment;
@@ -20,6 +22,9 @@ class IndexCommentTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // 試合Factoryが参照するマスターを用意し、外部キー制約を満たす。
+        $this->seed([GradeSeeder::class, WeightDivisionSeeder::class]);
 
         $this->user = User::factory()->create(["name" => 'testUserName']);
         $this->user2 = User::factory()->create(["name" => 'testUserName2']);

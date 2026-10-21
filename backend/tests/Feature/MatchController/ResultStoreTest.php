@@ -13,6 +13,7 @@ use App\Models\MatchResult;
 use App\Models\BoxerTitleSnapshot;
 use Database\Seeders\OrganizationSeeder;
 use Database\Seeders\WeightDivisionSeeder;
+use Database\Seeders\GradeSeeder;
 
 class ResultStoreTest extends TestCase
 {
@@ -29,6 +30,7 @@ class ResultStoreTest extends TestCase
 
         $this->seed(OrganizationSeeder::class);
         $this->seed(WeightDivisionSeeder::class);
+        $this->seed(GradeSeeder::class);
 
         $this->division = [
             "heavy" => 1,

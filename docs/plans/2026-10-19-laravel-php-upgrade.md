@@ -406,3 +406,42 @@ Reviewer結果と対応:
 - Reviewer: 設計・実装・最終証跡を確認済み、S3完了判断は妥当。未解決の実装・必須検証の指摘なし。
 - 詳細と復旧: [S3実行結果](2026-10-21-laravel-php-s3-result.md)。基点e8f7015a、旧イメージ/専用DB dumpを保持。
 - 未コミット、push・本番反映なし。**S4は開始指示待ち。自動実行しない。**
+
+
+### S4・S5合同実行計画（ユーザー承認済み）
+
+- 基点 `81cbfc17`、ブランチ `codex/laravel-php-s4-s5`。ユーザーが「S4実装→中間テスト→コミット→S5実装→最終テスト」を承認。上記の1実行1ステージ/毎段階のブラウザ総合確認に対する今回限定の変更として、S4の中間ゲートを通過後は再承認待ちで止まらずS5へ続ける。S6は開始しない。
+- 目的: PHP8.3.35/Composer2.9.4/Nodeを固定しLaravel10→11→12を順に検証する。選択肢は(1)最後のみテスト、(2)各段階で毎回すべてを検証、(3)S4中間ゲートとS5総合確認。(3)を採用し、原因切分けと重複するブラウザ確認の削減を両立する。
+- S4対象: framework ^11.0@stable、Sanctum ^4.0、Collision ^8.1、PHP要件 ^8.2。PHPUnit10.5とCarbon2.73.0は中間検証まで維持し、Carbonは必要ならupdateの一時制約で固定する。必須の推移依存だけ -W --minimal-changes で更新する。
+- rorecek/laravel-ulidはLaravel10までの制約。app/config/routes/database/tests/bootstrapの手書きコードに参照なし、唯一の実登録は自動生成package-discovery。ProviderはULID用Factory bindingのみで、bootは空。モデルUser/PreUser/GuestUserはStr::uuid()を使用。未使用ULID依存を削除し、ID生成仕様を変えない。
+- doctrine/dbalはアプリからの直接呼出しなし。Laravel11ではnative schema操作のため直接依存から削除する。change()3箇所はvenue非null/defaultなし、guest UUID主キー、state nullableの現状と照合済み。freshと引継ぎで型/nullable/default/index/外部キーを比較し、必要な互換修正だけを行う。適用済み履歴を既存DBへ再実行しない。DBAL由来のDC2Typeコメントはnative freshとの機能に無関係な差として分けて記録する。
+- Sanctum middlewareはverify_csrf_token→validate_csrf_tokenへキー変更し、既存App\Http\Middleware\VerifyCsrfTokenとEncryptCookiesの参照を維持する。authenticate_sessionにはSanctum公式のAuthenticateSessionを指定。既存guard/Kernel/Provider構造/CSRFトークン必須条件を維持。既存2019トークン表とS2 expires_at migrationが公開済み相当のため、vendor:publishで重複migrationを追加しない。
+- S4中間必須: Composer実要件・validate/lock一致、テスト検出98件維持/全backend成功/新規診断なし、S3dump復元MySQLのデータ保持と未適用migration確認、空DB全履歴と実スキーマ比較、FPM実HTTP CSRF/CORS/通常・管理者権限/コメント、audit/例外照合。Reviewer確認後S4の説明的なコミットを保存する。S4のブラウザ総合/実メールはS5へ集約する。
+- S5対象: framework ^12.69.0@stable、PHPUnit ^11.5、Carbon3を明示し対応Collisionを維持する。S4のDBとコード/lockを基点に部分更新。Carbon3の日時・日次削除境界を保証するテストを追加/実行し、検出一覧は旧98件+追加の対応を比較する。PHPUnit11の非推奨を一括抑制しない。
+- Laravel12のHasUuids変更は独自Str::uuid()の現行モデルに影響させない。local diskはstorage/appを明示済み、DIにoptional class引数依存なし。Kernel/Providerの新ひな型への置換やアプリ設計変更は行わない。
+- セキュリティ: S4は既承認4IDのapply:block/監査表示を維持し理由を更新。S5は4件すべてが修正された最低版12.69.0以上を解決し、4例外を削除して監査する。Laravel由来の監査0件をゲートとする。未承認の新規例外は追加しない。PHP8.3.35の未修正2件は今回のPHP固定方針の残課題で、隔離/合成データ/loopback/ローカルSMTP条件を維持。
+- 復旧: S3専用DBを/private/tmp/boxing-upgrade-s4/laravel10-before.sqlへdumpしschema-before.sqlも保存。PHP image boxing-talking-php:s3-8.3.35と基点コード/lockを保持。S3 PHP/FPM/Nginxを停止し、S4/S5各別project・tmpfs DBへ復元して検証。旧DBを初期化しない。
+- S5最終必須: backend全件/警告・非推奨/検出対比、frontend全Vitest（認証影響のため）、MySQL fresh・引継ぎ・型/制約/index比較と主要読み書き、CLI/FPM実要件、FPM/HTTP、通常/guest/adminブラウザログイン・ログアウト/権限/一覧・詳細/コメント投稿・管理者削除/投票/ブラウザ仮登録→SMTP受信→リンク→本登録→新規login、実キューワーカー、日次処理のTokyo日付境界とログ、auditを確認。記録と最終Reviewer確認後S6前で停止する。
+
+#### 合同実行Tasks
+
+- [x] Reviewerの具体案確認と復旧基点の保存。
+- [x] S4の必須依存・Sanctum設定を移行。
+- [ ] S4中間ゲート・Reviewer確認後コミット。
+- [ ] S5の依存更新・日時境界テスト追加。
+- [ ] S5最終検証・ブラウザ・DB・メール・キュー・日次処理。
+- [ ] Reviewer最終確認・結果記録、S6前で停止。
+
+公式資料: https://laravel.com/framework/docs/11.x/upgrade / https://laravel.com/framework/docs/12.x/upgrade / https://github.com/laravel/sanctum/blob/4.x/UPGRADE.md
+
+- Reviewer設計判断: 実行方針は妥当、S4開始を妨げる問題なし。debug XSS修正12.69.0に合わせS5の下限を補強した。
+
+- S4 dry-run初回は既存Sail1.25.0のLaravel10までの依存制約で停止。必須互換対応としてSailのみ更新対象に追加し再試行する。
+
+- S4互換修正: SQLite3.35以降のnative DROP COLUMNでは主キーidを削除できず92件がDB構築で失敗。MySQLfreshは成功。後続migrationでは救済できないため、2024_12_23_234609のSQLite限定分岐で再構築によりautoIncrement/primaryを解除してからidを削除する。downもnullable id追加→再構築で採番へ戻す。MySQL経路を変更せず、既存DBへ履歴を再実行しない。Reviewerが設計承認。データ入りdown/up2回・複合キー/重複拒否/NULL/4FK/cascadeを追加テストで保証し、S5でも実行する。
+
+- S4追加確認: native SQLiteの再構築がboxing_matchesの外部キーを保持するため、旧4テストクラスの不足したGrade/WeightDivision fixtureが30件のsetup失敗として顕在化。参照Seederのみ補い、Factory/本番制約/既存期待値を変更しない。SQLite/MySQLの追加3回帰テストは各27assertions成功。
+
+- fixture補完はDestroyBoxerTestにも必要（計5クラス）。GradeSeeder追加とTitle Factoryの参照先をseed済みid1へ明示。0〜10のランダム参照による非決定的なFK違反を除去し、削除対象/期待値は維持。
+
+- S4中間ゲート完了: Laravel11.57.0/Sanctum4.3.3/Collision8.5.0、Carbon2/PHPUnit10維持。101件=100成功/既存1skip/306assertions、追加回帰SQLite/MySQL成功、旧98件全残存、fresh/引継ぎスキーマ機能差なし、実HTTP両23項目成功。監査9件/5。Reviewer未解決指摘なし。詳細 [S4結果](2026-10-21-laravel-php-s4-result.md)。承認済み中間コミット後S5へ続ける。

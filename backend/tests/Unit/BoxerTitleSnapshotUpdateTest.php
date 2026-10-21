@@ -17,6 +17,7 @@ use App\Repositories\BoxerTitleSnapshotRepository;
 use App\Repositories\Interfaces\BoxerTitleSnapshotInterface;
 use Database\Seeders\OrganizationSeeder;
 use Database\Seeders\WeightDivisionSeeder;
+use Database\Seeders\GradeSeeder;
 
 class BoxerTitleSnapshotUpdateTest extends TestCase
 {
@@ -37,6 +38,7 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
         $this->seed([
             OrganizationSeeder::class,
             WeightDivisionSeeder::class,
+            GradeSeeder::class,
         ]);
 
         $this->weight = [

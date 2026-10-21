@@ -32,7 +32,7 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 DockerのPHPは8.3.35（Debian 13/trixie）、Composerは2.9.4に固定しています。PHP・Composerの取得元digestは `docker/php/dockerfile` を参照してください。Nodeは既存の16.13.2を維持しています。
 PHP 8.3.36の公式掲載を確認していますが、S3実行時点では公式Dockerタグが未配信のため、8.3.35は重大な2件（CVE-2026-109618 / CVE-2026-109619）が未修正の検証用中間版です。修正版イメージが利用可能になった時点で更新・再検証が必要です。
 
-現在のLaravel 10は、未公開アプリの段階更新を検証するための中間版です。
+現在のLaravel 11は、未公開アプリの段階更新を検証するための中間版です。
 外部公開せず、loopbackに公開先を限定した隔離環境・合成データ・ローカルSMTPのみで使用します。
 
 Composer 2.9.2以降で利用できる `config.audit.ignore` の `apply: block` により、以下のIDだけ更新時のブロックを一時的に例外とします。`composer audit`での報告・失敗判定は維持します。グローバル設定と `block-insecure` は変更しません。
@@ -46,6 +46,8 @@ Composer 2.9.2以降で利用できる `config.audit.ignore` の `apply: block` 
 
 例外IDはバージョンに自動限定されません。各ステージで監査と照合して不要になったものから削除し、最終公開の前に例外なしで監査を確認します。現在のメール処理が無影響と確認されたという意味ではありません。
 ファイル検証回避の例外 `PKSA-8qx3-n5y5-vvnd` はLaravel 10.48.29以上で修正済みのためS2で削除しました。Sanctum 3移行のため、既存のトークン表には新規マイグレーションでnullableの `expires_at` を追加します。既存のCookie認証方式は維持します。
+Laravel 11では未使用の `rorecek/laravel-ulid` と、native schema移行に伴い未使用となった `doctrine/dbal` の直接依存を除去しました。ID生成は既存の `Str::uuid()` を維持します。Sanctum 4の設定キーへ移行し、公開済みのトークン表マイグレーションは重複追加しません。
+SQLiteで全履歴を新規構築できるよう、スナップショット表の主キー切替はSQLite限定で再構築してから `id` を削除します。MySQLの処理と既存DBの適用済み履歴は維持します。
 
 詳細な承認範囲・検証・復旧方法は [アップグレード計画](../docs/plans/2026-10-19-laravel-php-upgrade.md) を参照してください。
 
