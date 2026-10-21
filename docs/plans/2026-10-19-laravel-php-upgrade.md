@@ -451,3 +451,12 @@ Reviewer結果と対応:
 - S5 dry-run初回は既存Tinker2.10.0のLaravel11までの制約で停止。必須互換対応としてTinkerのみ部分update対象に追加する。
 
 - S5実装結果: Laravel12.70.1/Carbon3.15.0/PHPUnit11.5.57/Collision8.9.5/Tinker2.11.1。103件=102成功/既存1skip/320assertions、旧101件全残存・追加は日次境界2件。frontend52ファイル204件成功。MySQL追加5回帰41assertions成功。Laravelの4例外を撤去し、監査Laravel0件・全体4件/3パッケージへ減少。ブラウザ主要操作と仮登録→実worker/ローカルSMTP→受信リンク→本登録→新規loginまで成功。削除UIは既存画面に未提供のため管理者削除/一般拒否は実HTTPで代替し、Reviewerも妥当と判断。一時的コメント重複表示の観測と未確定の原因はS5結果へ記録。最終Reviewer確認済み、修正必須/未実施の必須確認なし。S5完了、S6前で停止。S4は664033daで保存済み。S5の保存コミットはGit履歴を参照。詳細 [S5結果](2026-10-21-laravel-php-s5-result.md)。
+
+### S6実行結果（2026-10-22）
+
+- ユーザー承認済みの推奨案で、S5基点c1dae83eから既存worktree内にcodex/laravel-php-s6を作成。Laravel13.38.0/Tinker3.0.2/PHPUnit12.5.40、必須互換依存Ignition2.12.1へ部分更新。PHP8.3.35を維持。
+- Laravel13標準CSRFをweb/Sanctum双方へ適用。session.serialization=phpと既存Cookie名/接頭辞を維持、cache.serializable_classes=falseを明示。新ひな型への全面移植なし。
+- backend163成功/既存1skip/392assertions、旧103識別子全残存。frontend204成功、MySQL回帰5成功/41assertions、fresh35履歴/引継ぎ/スキーマ構造差0。実HTTP/HTTPS CSRF135件と実ブラウザ13要求、通常/guest/admin/投稿/投票/権限、ブラウザ仮登録→実worker→ローカルSMTP→受信リンク→本登録→新規loginを確認。
+- 別承認と本人OS認証で一時CAを信頼登録し、ブラウザ警告を迂回せずHTTPSを検証。終了後に信頼設定/対象証明書項目を解除、OSが信頼しないことを確認。
+- 最終Reviewerが必須指摘/未実施ゲートなしと確認。**S6完了、S7以降は未着手。** PHP重大2件・依存監査4件（Laravel0件）は残課題。本番公開可能とは判断しない。変更は未コミット、push/本番反映なし。
+- 詳細は[S6実行結果](2026-10-22-laravel-php-s6-result.md)。復旧はc1dae83eのコード/lock、S5イメージ、S6一時領域のlaravel12-before.sqlと更新前storageを基点とする。旧S5 DB/dumpを保持。

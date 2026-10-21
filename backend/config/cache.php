@@ -17,6 +17,9 @@ return [
 
     'default' => env('CACHE_DRIVER', 'file'),
 
+    // キャッシュはスカラー・配列を保存し、PHPオブジェクトを復元しない。
+    'serializable_classes' => false,
+
     /*
     |--------------------------------------------------------------------------
     | Cache Stores

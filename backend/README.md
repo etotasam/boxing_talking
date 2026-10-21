@@ -84,3 +84,12 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Laravel 13への移行設定（S6）
+
+- PHP 8.3以上が必要です。S6の検証イメージはPHP 8.3.35です。
+- `App\Http\Middleware\VerifyCsrfToken`はLaravel 13の`PreventRequestForgery`を継承します。webとSanctumのstateful APIに同じ方針を適用し、`Sec-Fetch-Site: same-origin`の要求はトークン検証を省略、それ以外は従来のCSRFトークン検証を行います。認証・権限の確認は引き続き必要です。
+- `config/session.php`の`serialization`は`php`を維持し、既存セッションを引き継ぎます。`json`への切替はセッション失効を伴うため別途判断します。
+- `config/cache.php`の`serializable_classes`は`false`です。キャッシュはスカラー・配列を使用し、PHPオブジェクトの保存が必要になった場合は必要なクラスの許可リストを検討してください。
+- `SESSION_COOKIE`、`CACHE_PREFIX`、`REDIS_PREFIX`の既定値は既存設定を維持しています。新ひな型の接頭辞へ一括変更しないでください。
+- HTTPSでの送信元検証は、信頼できる証明書を使って別途検証します。詳細・残課題はリポジトリルートの`docs/plans/2026-10-22-laravel-php-s6-plan.md`を参照してください。
