@@ -86,9 +86,6 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
     }
 
 
-    /**
-     * @test
-     */
     public function testSetUp()
     {
         $this->markTestSkipped();
@@ -97,7 +94,6 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
     }
 
     /**
-     * @test
      * BoxerTitleSnapshotのupdate時にstateの初期化に失敗したら例外を投げられるかをテスト
      */
     public function testThrowExceptionWhenResetFailed()
@@ -123,7 +119,6 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
     }
 
     /**
-     * @test
      *  BoxerTitleSnapshotのstateを更新するテスト
      * 勝者がいる場合はstateを更新する
      * 試合に掛けられたタイトルと選手の保持していたタイトルが同じ場合にstateを更新し、それ以外はnullのままにする
@@ -143,7 +138,6 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
     }
 
     /**
-     * @test
      * ! 新たなタイトルを取得した時に新しいスナップショットを作成し、stateはnewになるか
      */
     public function testNewBoxerTitle()
@@ -159,7 +153,6 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
     }
 
     /**
-     * @test
      * ! 試合結果を変更する際、勝敗が変わる場合はstateがnewのレコードを削除する
      */
     public function testDeleteNewTitleSnapshot()
@@ -193,7 +186,6 @@ class BoxerTitleSnapshotUpdateTest extends TestCase
         ]);
     }
     /**
-     * @test
      * 試合結果を登録、変更した際にBoxerTitleSnapshotのstateが正しく更新されるか
      */
     public function testStoreOrUpdateBoxerTitleSnapshot()

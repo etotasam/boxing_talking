@@ -27,9 +27,6 @@ class MailSendJobTest extends TestCase
         Queue::fake();
         Mail::fake();
     }
-    /**
-     * @test
-     */
     public function testMailQueueSetToJob()
     {
         $preUser = PreUser::create([

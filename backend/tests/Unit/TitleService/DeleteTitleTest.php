@@ -49,7 +49,6 @@ class DeleteTitleTest extends TestCase
 
 
     /**
-     * @test
      * titleの削除テスト
      */
     public function testDeleteTitle()

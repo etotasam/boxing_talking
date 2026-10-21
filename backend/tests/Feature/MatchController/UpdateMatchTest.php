@@ -48,7 +48,6 @@ class UpdateMatchTest extends TestCase
   }
 
   /**
-   * @test
    * patch '/api/match' 時のboxing_matchesテーブルのupdate確認(それに伴うtitle_matchesテーブルの更新はモックしている)
    */
   public function testUpdateMatchFailedNoAdminUser()
@@ -67,7 +66,6 @@ class UpdateMatchTest extends TestCase
   }
 
   /**
-   * @test
    * patch '/api/match' 時のboxing_matchesテーブルのupdate確認(それに伴うtitle_matchesテーブルの更新はモックしている)
    */
   public function testUpdateMatchWithOnlyTitlesData()
@@ -87,7 +85,6 @@ class UpdateMatchTest extends TestCase
   }
 
   /**
-   * @test
    * patch '/api/match' 時のboxing_matchesテーブルのupdate確認(それに伴うtitle_matchesテーブルの更新はモックしている)
    */
   public function testUpdateMatchWithBothData()
@@ -108,7 +105,6 @@ class UpdateMatchTest extends TestCase
   }
 
   /**
-   * @test
    * 試合会場が文字数制限を超えた時は専用のエラーコードを返す
    */
   public function testUpdateMatchReturnsVenueTooLongErrorCode()

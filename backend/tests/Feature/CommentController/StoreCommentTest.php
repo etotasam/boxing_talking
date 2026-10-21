@@ -44,7 +44,6 @@ class StoreCommentTest extends TestCase
     }
 
     /**
-     * @test
      * 認証なしでのコメント投稿
      */
     public function testPostWithNoAuth(): void
@@ -90,7 +89,6 @@ class StoreCommentTest extends TestCase
     }
 
     /**
-     * @test
      * ログインユーザーによるコメント投稿
      */
     public function testPostByLoginUser(): void
@@ -109,7 +107,6 @@ class StoreCommentTest extends TestCase
     }
 
     /**
-     * @test
      * ログインユーザーが1000文字ちょうどのコメントを投稿できる
      */
     public function testPostByLoginUserWithMaxLengthComment(): void
@@ -131,7 +128,6 @@ class StoreCommentTest extends TestCase
     }
 
     /**
-     * @test
      * ログインユーザーが空コメントを投稿した場合はバリデーションエラー
      */
     public function testPostByLoginUserWithEmptyComment(): void
@@ -151,7 +147,6 @@ class StoreCommentTest extends TestCase
     }
 
     /**
-     * @test
      * ログインユーザーが1001文字のコメントを投稿した場合はバリデーションエラー
      */
     public function testPostByLoginUserWithTooLongComment(): void
@@ -173,7 +168,6 @@ class StoreCommentTest extends TestCase
     }
 
     /**
-     * @test
      * ログインユーザーがmatch_idなしで投稿した場合はバリデーションエラー
      */
     public function testPostByLoginUserWithoutMatchId(): void
@@ -191,7 +185,6 @@ class StoreCommentTest extends TestCase
         $this->assertDatabaseMissing('comments', ['user_id' => $this->user->id, 'comment' => 'コメント投稿']);
     }
     /**
-     * @test
      * ゲストによるコメント投稿
      */
     public function testPostByGuestUser(): void

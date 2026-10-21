@@ -49,7 +49,6 @@ class IndexCommentTest extends TestCase
         $this->comments = Comment::insert($commentsArray);
     }
     /**
-     * @test
      * 存在しない試合のコメントをリクエストされたら正しいエラーハンドリングで404を返す
      */
     public function testCommentsFetchRequestWithNotExistsBoxingMatchId(): void
@@ -63,7 +62,6 @@ class IndexCommentTest extends TestCase
         $this->assertEquals('Match not found', $responseData['message']);
     }
     /**
-     * @test
      * 通常
      */
     public function testSuccessCommentsFetch(): void
@@ -79,7 +77,6 @@ class IndexCommentTest extends TestCase
     }
 
     /**
-     * @test
      * cursor指定時は次のコメントを取得する
      */
     public function testSuccessCommentsFetchWithCursor(): void
@@ -98,7 +95,6 @@ class IndexCommentTest extends TestCase
     }
 
     /**
-     * @test
      * limitを指定されてもバックエンド固定件数を超えて取得しない
      */
     public function testCommentsFetchIgnoresLimitParameter(): void

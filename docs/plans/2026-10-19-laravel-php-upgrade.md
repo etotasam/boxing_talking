@@ -348,3 +348,30 @@ Reviewer結果と対応:
 - Reviewer: 設計・実装・最終証跡の確認完了。未解決の実装指摘なし。本文空白のsignup画像は成功証拠にせず、AX・DB・新規ログインと描画済み画像を根拠とする。
 - 結果・実版・復旧・残課題: [S1実行結果](2026-10-21-laravel-php-s1-result.md)。基点コミット `7ee95218`。PHP本体のパッチ更新は未実施で別作業。
 - 作業は未コミット。push・本番反映なし。**S2は開始指示待ち。自動実行しない。**
+
+
+### S2開始 / 2026-10-21（ユーザー承認済み）
+
+- 基点 `37eee6e3`、ブランチ `codex/laravel-php-s2`。S2のみ開始しS3前で停止する。
+- PHP8.2.30/Composer2.9.4を維持し、Laravel10安定版・Sanctum3・Ignition2・Collision7・PHPUnit10.5へ必須範囲を部分更新。`minimum-stability`は公式手順に合わせstableへ変更。
+- Sanctum公式手順のexpires_at列が既存表にないため、新規マイグレーションでnullable timestampを追加する。既存履歴/ID形式/認証guardを変更しない。トークンの既存tokenable_id型とUser UUIDの非整合は今回無関係に変更しない。
+- PHPUnit XMLを10系へ移行、@testだけのメソッドはtest接頭辞へ変更し、旧96件と名称対応を保存・照合する。期待値を弱めたり警告を一括抑制したりしない。
+- ファイル検証PKSA-8qx3の例外は10.48.29以上で解消するため削除。他4IDは承認済みの隔離検証条件と監査表示を維持し、S2の理由に更新。追加の例外は自動追加しない。
+- 選択: Laravel本体のみ上げてテスト基盤を後送りにする案より、計画どおり必須周辺依存とPHPUnitを同時に整えてテスト検出を保証する。無差別な依存更新やPHP主版更新はしない。
+- S1 PHP・フロントを停止し、同じソースを更新中に旧版プロセスが動かないようにする。S1の隔離DBに合成トークンを加えdumpし、S2専用DBへ復元。S2は別projectでAPI18081/frontend13001/SMTP11027をloopbackで利用。
+- 検証: 旧データ/トークン保持と期限NULL/新規期限保存、全履歴空DB35件、SQLite、全backend検出数と非推奨/警告、frontend関連、実HTTP CSRF/CORS/認可、ブラウザ主要操作、メールキュー、日次処理、Monolog stack/error/task出力。
+- Reviewer設計確認: 問題なし。旧サービス停止、トークン入りdump、テスト名称対応表、ログ各出力、監査と例外削除の確認を反映。
+- 復旧基点: `37eee6e3`のコード/lock、PHP image、`/private/tmp/boxing-upgrade-s2/laravel9-before.sql`。tmpfs/一時ファイルは恒久資産ではない。実利用者DB/本番設定には触れない。
+
+
+### S2最終結果 / 2026-10-21
+
+- **S2完了**。Laravel9.52.22→10.50.3、Sanctum3.3.3、Monolog3.12.1、Ignition2.9.1、Collision7.12.0、PHPUnit10.5.66。PHP8.2.30/Composer2.9.4を維持。
+- Sanctumのexpires_at列を新規マイグレーションで追加。旧履歴・ID生成・Cookie認証guard・API仕様の変更なし。PHPUnitXMLと10件のテスト名を移行し、冗長な@testメタデータを除去。
+- backend98検出=97成功/既存1スキップ/279assertions、errors/failures0。旧96件全残存、追加は期限列の2件。警告/非推奨表示を有効にし新規診断なし。frontend52ファイル204件成功。
+- 合成トークン入りLaravel9DBをS2専用DBへ復元し、旧データ保持と期限NULL/日時保存を確認。新規DB35件成功、複製DBdown/up2回で旧トークン保持。Monolog stack/error/taskの実出力、日次削除境界も成功。
+- 実HTTP22項目成功、通常/ゲスト/管理者のブラウザ主要操作、権限拒否、メールキュー→ローカルSMTP→確認リンク→本登録→新規ログインまで成功。登録後user1/preuser0/jobs0/failed0。
+- 監査は15→13件/6パッケージ、終了コード1。ファイル検証とPHPUnitのIDが消失、新規IDなし。修正済みファイル検証の例外を削除し、承認済み4IDのみapply:blockで監査表示を維持。
+- Reviewer: 設計・実装・最終証跡照合を完了、S2完了判断は妥当。未解決の実装指摘なし。
+- 詳細・名称対応・復旧・残課題: [S2実行結果](2026-10-21-laravel-php-s2-result.md)。基点37eee6e3、専用dumpとPHP imageで復旧。PHPパッチ未更新、監査残13件、Bearer認証の既存UUID整合性は別途確認が必要。
+- 未コミット、push・本番反映なし。**S3は開始指示待ち。自動実行しない。**

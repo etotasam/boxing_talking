@@ -25,10 +25,9 @@ class GuestAuthTest extends TestCase
 
 
     /**
-     * @test
      * guestでログインしていない場合はfalseを返す
      */
-    public function noGuestAuthCheck()
+    public function testNoGuestAuthCheck()
     {
         $response = $this->get('/api/guest/user');
         //認証がなくてもステータスは成功を返す
@@ -37,10 +36,9 @@ class GuestAuthTest extends TestCase
         $this->assertEquals($guest, false);
     }
     /**
-     * @test
      * guestでログインしていない場合はtrueを返す
      */
-    public function hasGuestAuthCheck()
+    public function testHasGuestAuthCheck()
     {
         $response = $this->actingAs($this->guestUser, 'guest')
             ->get('/api/guest/user');
@@ -51,7 +49,6 @@ class GuestAuthTest extends TestCase
 
 
     /**
-     * @test
      * ゲストログイン成功
      */
     public function testSuccessGuestLogin()

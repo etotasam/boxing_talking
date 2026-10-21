@@ -36,7 +36,6 @@ class UserCreateTest extends TestCase
     }
 
     /**
-     * @test
      * トークンの期限切れ
      */
     public function testExpiredToken()
@@ -50,7 +49,6 @@ class UserCreateTest extends TestCase
         $this->assertDatabaseMissing('users', ["id" => $this->preUser["id"], "email" => $this->preUser['email']]);
     }
     /**
-     * @test
      * secretKeyが違う場合
      */
     public function testUnmatchedSecretKey()
@@ -61,10 +59,9 @@ class UserCreateTest extends TestCase
         $this->assertDatabaseMissing('users', ["id" => $this->preUser["id"], "email" => $this->preUser['email']]);
     }
     /**
-     * @test
      * 成功
      */
-    public function successUserCreate()
+    public function testSuccessUserCreate()
     {
         $validToken = JWT::encode($this->validPayload, $this->secretKey, 'HS256');
         $response = $this->post('/api/user/create', ["token" => $validToken]);

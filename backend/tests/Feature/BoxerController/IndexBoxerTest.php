@@ -33,7 +33,6 @@ class IndexBoxerTest extends TestCase
   }
   /**
    * ボクサーデータの一覧を取得(limitの設定あり)
-   * @test
    */
   public function testBoxerFetchWithLimit()
   {

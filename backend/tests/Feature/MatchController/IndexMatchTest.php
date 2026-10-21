@@ -58,7 +58,6 @@ class IndexMatchTest extends TestCase
     }
 
     /**
-     * @test
      * setupでセットした数のボクサーがちゃんとDBに入ってるかテスト
      */
     public function testSetUp()
@@ -68,7 +67,6 @@ class IndexMatchTest extends TestCase
     }
 
     /**
-     * @test
      * 指定がない場合は過去の試合を取得しない(2週間前までの試合は取得)
      */
     public function testFetchMatchesDefault()
@@ -82,7 +80,6 @@ class IndexMatchTest extends TestCase
     }
 
     /**
-     * @test
      * 過去の試合を取得(現在から2週間よりも前の試合)
      */
     public function testFetchPastMatches()
@@ -96,7 +93,6 @@ class IndexMatchTest extends TestCase
     }
 
     /**
-     * @test
      * すべての試合の取得(admin認証なしのユーザー)
      */
     public function testFetchAllMatchesWithoutAdminAuth()
@@ -107,7 +103,6 @@ class IndexMatchTest extends TestCase
     }
 
     /**
-     * @test
      * すべての試合の取得(admin認証あり)
      */
     public function testFetchAllMatchesWithAdminAuth()

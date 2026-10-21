@@ -29,57 +29,51 @@ class UserLoginTest extends TestCase
         $this->notRightPassword = 'test123';
     }
     /**
-     * @test
      *  emailが空の場合
      */
-    public function emptyEmailInput()
+    public function testEmptyEmailInput()
     {
         $response = $this->post('/api/login', ['email' => '', 'password' => $this->rightPassword]);
         $response->assertStatus(422);
     }
 
     /**
-     * @test
      * email形式が不正な場合
      */
-    public function invalidEmailFormat()
+    public function testInvalidEmailFormat()
     {
         $response = $this->post('/api/login', ['email' => 'invalid-email-format', 'password' => $this->rightPassword]);
         $response->assertStatus(422);
     }
 
     /**
-     * @test
      * passwordが空の場合
      */
-    public function emptyPasswordInput()
+    public function testEmptyPasswordInput()
     {
         $response = $this->post('/api/login', ['email' => $this->rightEmail, 'password' => '']);
         $response->assertStatus(422);
     }
     /**
-     * @test
      *  リクエストのemailがDBに存在しない場合401
      */
-    public function emailNotExistsOnDatabase()
+    public function testEmailNotExistsOnDatabase()
     {
         $response = $this->post('/api/login', ['email' => $this->notRightEmail, 'password' => $this->rightPassword]);
         $response->assertStatus(401);
     }
     /**
-     * @test
      *  パスワードの間違い
      */
-    public function passwordMistake()
+    public function testPasswordMistake()
     {
         $response = $this->post('/api/login', ['email' => $this->rightEmail, 'password' => $this->notRightPassword]);
         $response->assertStatus(401);
     }
     /**
-     * @test
      * 成功
      */
-    public function loginSuccess()
+    public function testLoginSuccess()
     {
 
         $response = $this->post('/api/login', ['email' => $this->rightEmail, 'password' => $this->rightPassword]);
