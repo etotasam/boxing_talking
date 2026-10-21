@@ -375,3 +375,34 @@ Reviewer結果と対応:
 - Reviewer: 設計・実装・最終証跡照合を完了、S2完了判断は妥当。未解決の実装指摘なし。
 - 詳細・名称対応・復旧・残課題: [S2実行結果](2026-10-21-laravel-php-s2-result.md)。基点37eee6e3、専用dumpとPHP imageで復旧。PHPパッチ未更新、監査残13件、Bearer認証の既存UUID整合性は別途確認が必要。
 - 未コミット、push・本番反映なし。**S3は開始指示待ち。自動実行しない。**
+
+
+### S3開始計画 / 2026-10-21（ユーザー承認済み）
+
+- 基点 `e8f7015a`、ブランチ `codex/laravel-php-s3`。S3のみ実行しS4前で停止する。
+- PHP8.2.30→8.3.35、Laravel10.50.3・composer.json/lock・Composer2.9.4・Node16.13.2を維持する。
+- 選択肢: 可変の8.3タグのみを変更する案と、パッチ版/OS/digestを固定する案を比較し、復旧・再構築時の版を特定できる後者を採用する。OSは旧イメージと同じDebian13/trixie、linux/amd64。
+- PHP公式に8.3.36の掲載を確認（CVE-2026-109618/109619修正）。公式Dockerの8.3.36-fpm-trixieはnot found、8.3-fpm-trixieは8.3.35を指す。既承認のloopback・合成データ・ローカルSMTP限定で8.3.35を中間検証し、2件は未修正として記録する。ソースビルドやセキュリティ対策の設定変更は混在させない。
+- 変更対象はdocker/php/dockerfileのPHP取得元とComposer取得元の固定、READMEと本計画・結果記録。PHP互換性で必要な修正だけ追加検討し、Node更新やアプリ仕様変更は行わない。
+- PHP取得元: php:8.3.35-fpm-trixie@sha256:d39c9597ccbf6dd86be11e933831e37c6f5fd7719a4571c569d7d208e45e73f8。Composer取得元: composer:2.9.4@sha256:22a95bd2bc3cf6ff19550a246208138d35f0015602db3d67dc6841945324acc1。
+- 既存Node導入行は維持する。ビルド障害があればNode更新を勝手に混在させず切り分ける。
+- 復旧: S2イメージsha256:967f0c79493da979089eb14c7bf7d7d1365ef5431a8d9d159a92ff27dc1f5740をboxing-talking-php:s2-8.2.30として保持。S2専用DBを/private/tmp/boxing-upgrade-s3/laravel10-php82-before.sqlへdump済み。S2の既存DBは初期化しない。
+- S3専用Compose project/空のtmpfs MySQLへdumpを復元し、S2 PHPを停止して同じloopback APIポート18081/frontend13001を使う。新規マイグレーションは予定しない。合成ユーザー・コメント・投票・トークンの保持と主要読み書きを確認する。
+- 検証: Dockerビルドと再ビルド、CLI/FPMのPHP実版と設定、隔離Nginx→PHP-FPM経由のAPIとCookie/session smoke、PHP拡張の差分・SQLite/PDO MySQL・日時/メモリ/error_reporting、Composer validate/check-platform-reqs/install dry-runとlock不変、98テスト検出/97成功/既存1skip/279assertions、新規警告・非推奨、実HTTP認証/CSRF/CORS/認可/コメント、メールqueue→ローカルSMTP、日次処理/ログを確認する。フロント実装は変更しない。
+- 公式移行ガイド https://www.php.net/manual/en/migration83.incompatible.php と https://www.php.net/manual/en/migration83.deprecated.php を照合。アプリでrangeは整数1〜12のみ。日時例外やtrait静的プロパティ等は実テストも確認し、未実行経路を包括保証とはしない。
+- Reviewerで具体案と最終差分・検証を確認し、実版・失敗/未実施・残課題を記録して停止する。自動commit/pushなし。
+
+- Reviewer設計確認: 問題なし。提案されたNginx→FPM検証と公式掲載日の表現修正を反映。
+
+
+### S3最終結果 / 2026-10-21
+
+- **S3完了**。PHP8.2.30→8.3.35（Debian13/trixie、linux/amd64）。Laravel10.50.3/Composer2.9.4/Node16.13.2を維持。PHP・Composerの取得元をパッチ版/OS/digestで固定。composer.json/lockはSHA256一致。
+- PHP215ファイル構文成功、全98テスト検出維持=97成功/既存1skip/279assertions、新規警告・非推奨なし。CLI/FPMの設定・拡張・SQLite/MySQL・Composer実要件成功。
+- S2専用DBのdumpとS3復元直後dumpは完全一致。既存35履歴維持・追加migrationなし。既存トークン/データ保持、日時読み書き、日次境界、各ログ成功。
+- artisan serve/Nginx→FPM各23HTTP確認成功。通常/guest/adminのブラウザ認証、コメント投稿/reload保持、投票更新、管理者フォーム許可/一般直接URL拒否、ブラウザ仮登録→ローカルSMTP→受信リンク→本登録→新規login成功。
+- 初回ビルド成功、キャッシュ利用の再ビルド成功。将来の完全同一イメージ再生成保証ではない。frontendコード/API契約変更がないためS3でVitest/build/lintは再実行していない。
+- 監査13件/6パッケージ、exit1、S2からID増減なし。PHP8.3.36の公式掲載を確認したがDocker未配信のため8.3.35を隔離検証。重大2件は未修正で、修正イメージ取得後の更新・再検証が必要。公開可能とは判断しない。
+- Reviewer: 設計・実装・最終証跡を確認済み、S3完了判断は妥当。未解決の実装・必須検証の指摘なし。
+- 詳細と復旧: [S3実行結果](2026-10-21-laravel-php-s3-result.md)。基点e8f7015a、旧イメージ/専用DB dumpを保持。
+- 未コミット、push・本番反映なし。**S4は開始指示待ち。自動実行しない。**

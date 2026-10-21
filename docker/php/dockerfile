@@ -1,5 +1,5 @@
-# FROM php:fpm
-FROM php:8.2-fpm
+# 検証したPHPのパッチ版・OS・取得元を固定する。
+FROM php:8.3.35-fpm-trixie@sha256:d39c9597ccbf6dd86be11e933831e37c6f5fd7719a4571c569d7d208e45e73f8
 
 
 RUN apt-get update \
@@ -11,7 +11,7 @@ RUN apt-get update \
     default-mysql-client
 
 # install composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.9.4@sha256:22a95bd2bc3cf6ff19550a246208138d35f0015602db3d67dc6841945324acc1 /usr/bin/composer /usr/bin/composer
 
 RUN docker-php-ext-install pdo_mysql
 

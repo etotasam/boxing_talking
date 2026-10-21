@@ -29,6 +29,9 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 
 ## Laravel / PHPの段階更新中の制約
 
+DockerのPHPは8.3.35（Debian 13/trixie）、Composerは2.9.4に固定しています。PHP・Composerの取得元digestは `docker/php/dockerfile` を参照してください。Nodeは既存の16.13.2を維持しています。
+PHP 8.3.36の公式掲載を確認していますが、S3実行時点では公式Dockerタグが未配信のため、8.3.35は重大な2件（CVE-2026-109618 / CVE-2026-109619）が未修正の検証用中間版です。修正版イメージが利用可能になった時点で更新・再検証が必要です。
+
 現在のLaravel 10は、未公開アプリの段階更新を検証するための中間版です。
 外部公開せず、loopbackに公開先を限定した隔離環境・合成データ・ローカルSMTPのみで使用します。
 
