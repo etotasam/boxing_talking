@@ -27,6 +27,24 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 | --- | --- | --- |
 | `CUSTOM_ERROR_CODES_FRONTEND_OUTPUT_PATH` | `custom-error-codes:generate`で生成するフロントエンド定数ファイルの出力先 | `../frontend/src/constants/customErrorCodes.ts` |
 
+## Laravel / PHPの段階更新中の制約
+
+現在のLaravel 9は、未公開アプリの段階更新を検証するための中間版です。
+外部公開せず、loopbackに公開先を限定した隔離環境・合成データ・ローカルSMTPのみで使用します。
+
+Composer 2.9.2以降で利用できる `config.audit.ignore` の `apply: block` により、以下のIDだけ更新時のブロックを一時的に例外とします。`composer audit`での報告・失敗判定は維持します。グローバル設定と `block-insecure` は変更しません。
+
+| ID | 理由 / 解除する修正版の目安 |
+| --- | --- |
+| `PKSA-d5tc-s1qs-h781` | デバッグ画面XSS。12.69.0 / 13.30.0以上 |
+| `PKSA-m5cs-t1y6-qpcs` | 一時署名URL。12.61.1 / 13.12.0以上 |
+| `PKSA-3r5d-mb8f-1qw9` | メールCRLF。12.60.0 / 13.10.0以上 |
+| `PKSA-mdq4-51ck-6kdq` | 同じメールCRLFの別登録。上記と同時に解除 |
+| `PKSA-8qx3-n5y5-vvnd` | ファイル検証回避。10.48.29以上 |
+
+例外IDはバージョンに自動限定されません。各ステージで監査と照合して不要になったものから削除し、最終公開の前に例外なしで監査を確認します。現在のメール処理が無影響と確認されたという意味ではありません。
+詳細な承認範囲・検証・復旧方法は [アップグレード計画](../docs/plans/2026-10-19-laravel-php-upgrade.md) を参照してください。
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.

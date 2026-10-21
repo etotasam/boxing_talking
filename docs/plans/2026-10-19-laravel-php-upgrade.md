@@ -300,3 +300,51 @@ Reviewer結果と対応:
 - 本登録成功は画面・DB・新規ユーザーログインで確認し、描画後のログイン画像を追加取得した。遷移直後の空本文画像は完了証拠として扱わない。
 - 既存スキップ・警告、およびローカル構成に限る検証の制限はS0報告に明記済み。
 - **S1は開始しない**。次段階はユーザーの開始指示待ち。今回分は未コミットなので、変更を保存してから区切る。
+
+
+### S1 / 2026-10-21: 依存解決で保留
+
+- 開始承認: ユーザーからS1（Laravel 8→9）の実行指示を受領。PHP 8.2を維持し、S2には進まない。
+- 基点: `7ee95218`。作業ブランチ `codex/laravel-php-s1`。S0のコミットは保存済み。
+- 環境: Laravel 8.83.29 / PHP 8.2.30 / Composer 2.9.4。PHPイメージはS0と同じ `boxing_talking-php:latest`（ID先頭 `967f0c79493d`）。
+- S0の一時Compose・DBは残っていない。独立した `boxing-upgrade-s1` Composeプロジェクト、tmpfsのMySQL 8.0.21、専用DB `boxing_upgrade_s1` を作成し、Laravel 8で全34マイグレーションが成功した。既存開発DB・本番設定は操作していない。S0当日のデータを復元したという意味ではない。
+- 実装前Reviewer: 提案は問題なし。消失したDBの扱い、メール例外時のデータ保持、非許可Originの確認を指摘し検証方針に反映。
+- リポジトリ外のコンテナ内 `/tmp/s1-resolver` にcomposer.jsonとlockを複製して依存解決のみ試行。Laravel `^9.0`、Collision `^6.1`、Spatie Laravel Ignition `^1.0`、PHP `^8.0.2` とし、Facade IgnitionとFruitcake Laravel CORSを除く案を確認。
+- 既存の `minimum-stability: dev` ではLaravel `9.x-dev` が選択された。開発版を安定版の代用として採用しない。
+- Laravelを `^9.0@stable` に限定し、`composer update laravel/framework nunomaduro/collision spatie/laravel-ignition facade/ignition fruitcake/laravel-cors -W --minimal-changes --dry-run --no-scripts --no-interaction` を試行。終了コード2。候補 `v9.0.0`〜`v9.52.22` がセキュリティアドバイザリにより拒否された。
+- Laravel 9について表示されたID: `PKSA-d5tc-s1qs-h781`、`PKSA-m5cs-t1y6-qpcs`、`PKSA-3r5d-mb8f-1qw9`、`PKSA-mdq4-51ck-6kdq`、`PKSA-8qx3-n5y5-vvnd`、`PKSA-w7xr-vk7n-rstm`。本段階では各アドバイザリの適用条件・影響の個別評価は未実施。
+- 計画書の「中間版がセキュリティ制約で解決不能なら停止」に従い、**S1保留**。audit設定の無効化・ignore追加・開発版への迂回は行っていない。
+- アプリ実装・composer.json・composer.lock・テストコードに変更なし。今回の追跡対象差分はこの実行記録のみ。依存更新後の自動テスト・ブラウザ・SMTP・実HTTP・MySQL引継ぎ検証は未実施。合成データ入りDBのdump・復元も未実施であり、S1完了と扱わない。
+- 証跡: `/private/tmp/boxing-upgrade-s1/compose.yml`、`composer-stable-dry-run.log`。一時ファイル・tmpfsは恒久的な復旧資産ではない。
+- 復旧: 依存・コードは更新していないためLaravel 8の基点を維持。隔離DBのみ新規構築済み。S1の追加コード修正・バージョン復元は不要。
+- Reviewer: 依存解決不能での停止は妥当。開発版へ迂回せず、例外を検討するなら影響・隔離条件・適用場所・撤去方法を具体化して再提案する。
+- 次の対応: アドバイザリの影響と、隔離検証に限定した個別の一時例外の要否を調査して再提案する。例外適用や計画変更は別途承認後に行う。コミット・push・本番反映なし。S2未着手。
+
+
+### S1再開方針 / 2026-10-21（ユーザー承認済み）
+
+- 未公開の隔離検証環境でLaravel 9を通過点として使うため、必要なアドバイザリのみ一時例外にして再開する。PHP 8.2.30を維持し、PHP本体のパッチ更新は別作業とする。
+- 選択肢: 9を飛ばす案は原因切分けが難しく10にも未修正事項が残るため不採用。全体のblock-insecure無効化・開発版採用も不採用。**安定版＋個別IDの更新ブロックだけの例外**を採用し、監査報告は維持する。
+- Laravelは `^9.52.22@stable`。既修正の環境操作 `PKSA-w7xr-vk7n-rstm` は例外にしない。
+- `config.audit.ignore` の詳細形式 `apply: block` と理由を記録する。対象はdebug XSS `PKSA-d5tc-s1qs-h781`、一時署名URL `PKSA-m5cs-t1y6-qpcs`、メールCRLF `PKSA-3r5d-mb8f-1qw9` と同件の `PKSA-mdq4-51ck-6kdq`、ファイル検証 `PKSA-8qx3-n5y5-vvnd`。
+- 適用先はこのプロジェクトのcomposer.jsonのみ。グローバル設定は変更しない。READMEに用途・制約・撤去条件を記載する。
+- 検証はホスト127.0.0.1のみへ公開する専用コンテナ・合成データ・ローカルSMTPで行う。既存開発DB・実利用者・外部SMTPは使わない。中間版を公開環境へデプロイしない。
+- 各Laravel更新で不要な例外を削除する。ファイル検証は10.48.29以上、メールは12.60.0または13.10.0以上、一時URLは12.61.1または13.12.0以上、debug XSSは12.69.0または13.30.0以上を目安に、その時点の監査結果で照合する。S9までに例外なしの監査へ戻す。
+- メール入力と送信処理が存在するため、未使用と断定しない。今回の例外は修正や無影響の保証ではない。
+- 実装: Ignition置換、Collision更新、Fruitcake依存除去と標準HandleCorsへ参照移行。Flysystem/Symfony Mailerの独自API利用は見つからず、既存設定は維持して動作検証する。ULIDパッケージは自動検出も確認しS1で無条件削除しない。
+- テスト: メールジョブの正常・例外と本文/署名/期限、全backendの検出数比較、隔離MySQL新規/引継ぎ、実HTTP Cookie/CSRF/CORS/非許可Origin/認可、ブラウザ主要操作、キューSMTP、関連フロントテスト。Reviewer確認後にS1結果を報告して停止。
+- 復旧基点: `7ee95218` のコード・lock、既存PHP image。Laravel8で再構築したDBのdump/復元と基準テストを更新前に確認する。S0当日のDBではない。
+- 公式資料: https://getcomposer.org/doc/06-config.md#audit-ignore / https://laravel.com/framework/docs/9.x/upgrade
+
+
+### S1最終結果 / 2026-10-21
+
+- **S1完了**。ユーザー承認済みの個別5件の更新ブロック例外を適用し、Laravel8.83.29→9.52.22安定版へ更新。PHP8.2.30/Sanctum2.15.1/PHPUnit9.6.22は維持。
+- Ignition置換、Collision6、CORS標準ミドルウェアへの移行、メールジョブ正常/失敗テスト3件追加。認証guard・API仕様・既存マイグレーションは維持。
+- 全backend96検出=95成功/既存1スキップ/272assertions、errors/failures/warnings0。S0の93件に検出漏れなし。frontend52ファイル204件成功。
+- Laravel8再構築DBのdump復元と更新後データ読み書き、Laravel9空MySQL全34件、Flysystem local往復を確認。
+- 実HTTP22項目、通常/ゲスト/管理者のブラウザ認証・権限・投稿・投票、受信メールリンクからの本登録と新規ログイン、非同期キューSMTP、日次削除境界の確認が成功。
+- 監査は51件/17パッケージ→15件/7パッケージ。終了コード1を維持し、成功とは扱わない。Laravel5件の例外と、今回の更新前から残る他パッケージ10件を明記。各段階で例外再評価・修正版到達後に撤去する。
+- Reviewer: 設計・実装・最終証跡の確認完了。未解決の実装指摘なし。本文空白のsignup画像は成功証拠にせず、AX・DB・新規ログインと描画済み画像を根拠とする。
+- 結果・実版・復旧・残課題: [S1実行結果](2026-10-21-laravel-php-s1-result.md)。基点コミット `7ee95218`。PHP本体のパッチ更新は未実施で別作業。
+- 作業は未コミット。push・本番反映なし。**S2は開始指示待ち。自動実行しない。**
