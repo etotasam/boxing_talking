@@ -7,8 +7,8 @@ S9までの成果を元worktreeのcodex/laravel-php-upgradeへ統合し、元環
 ## Background / Context
 
 - 元: /Users/terashimamasato/learns/my_project/boxing_talking、codex/laravel-php-upgrade、e3e50cef。追跡ファイルclean、未追跡.codex/environments/を保持する。
-- 旧作業: /Users/terashimamasato/.codex/worktrees/laravel-php-s0/boxing_talking、codex/laravel-php-s9、959490c5。
-- 統合先独自commit0/作業側9commitでfast-forward可能。S9文書・次期計画は未コミット。
+- 旧作業: /Users/terashimamasato/.codex/worktrees/laravel-php-s0/boxing_talking、codex/laravel-php-s9、50cc397b（文書保存後）。
+- 開始時は統合先独自commit0/作業側9commit。文書commit50cc397b後、10commitをfast-forward統合済み。
 - 元Dockerを起動し、PHP8.2.30/Laravel8.83.29/Node21.6.1と永続MySQL8.0.21を確認。backend APP_ENV=local、frontend localhost3000/API localhost8080。本番設定参照なし。
 - 元DBdumpをdocker/db/backup/laravel-php-integration-20261022/before.sqlへ保存済み。Git除外・非公開permissionで保管。
 - 旧worktreeは管理ツールが「別チャット所有」と返しattach不可。強制削除やGit削除で迂回しない。所有元チャットによるarchiveかユーザー操作が必要なら、元環境確認後に説明する。
@@ -49,13 +49,13 @@ Laravel/PHP更新の完了地点を確定してから、依存・実行環境更
 
 - [x] 元/旧worktreeのstatus・基点・差分・fast-forward可否、元Docker実版と永続DB保存先を確認。
 - [x] 元DBdumpをGit除外された保存先へ取得。
-- [ ] 元image/lock/storage/envと旧worktreeの必要ignoredデータを非公開backupへ保護し、DBdumpを別DBへrestore確認。
-- [ ] Reviewerが統合・データ保護・元環境テスト・archive境界を確認。
-- [ ] 文書だけをstage/検証し、日本語Conventional Commitメッセージを提示・承認後にcommit。
-- [ ] backup/restore成功後、元PHP/Nginx/Nodeと関連workerを停止してからgit merge --ff-only。未追跡設定は保持。旧PHP/vendorで統合後コードを処理させない。
-- [ ] サービス停止中に元PHP再build・composer install/validate/platform/cache整合、DB名・履歴・schemaを確認して未適用分だけmigrate。SMTP overrideと依存/DB整合を確認後にサービスを再開。
-- [ ] 元worktreeソースを使い、専用SQLite/storageのDockerで全backendと識別子を確認。
-- [ ] 元frontend起動・API health、ブラウザ通常/guest/admin・投稿/投票・実ローカルメール登録を確認。
+- [x] 元image/lock/storage/envと旧worktreeの必要ignoredデータを非公開backupへ保護し、DBdumpを別DBへrestore確認。
+- [x] Reviewerが統合・データ保護・元環境テスト・archive境界を確認。
+- [x] 文書だけをstage/検証し、日本語Conventional Commitメッセージを提示・承認後にcommit。
+- [x] backup/restore成功後、元PHP/Nginx/Nodeと関連workerを停止してからgit merge --ff-only。未追跡設定は保持。旧PHP/vendorで統合後コードを処理させない。
+- [x] サービス停止中に元PHP再build・composer install/validate/platform/cache整合、DB名・履歴・schemaを確認して未適用分だけmigrate。SMTP overrideと依存/DB整合を確認後にサービスを再開。
+- [x] 元worktreeソースを使い、専用SQLite/storageのDockerで全backendと識別子を確認。
+- [x] 元frontend起動・API health、ブラウザ通常/guest/admin・投稿/投票・実ローカルメール登録を確認。
 - [ ] Reviewer最終確認、元環境の結果・完了地点を保存。
 - [ ] 旧worktreeの変更/必要ignoredデータ/稼働プロセスを確認し、所有制約を満たす方法でarchive。不可なら保留して報告。
 - [ ] 統合完了commitからcodex/backend-sdk-securityの新worktreeを用意。P1実装は開始しない。
@@ -88,3 +88,5 @@ Laravel/PHP更新の完了地点を確定してから、依存・実行環境更
 
 - [S9結果](2026-10-22-laravel-php-s9-result.md)
 - [次期更新計画](2026-10-22-dependency-runtime-update.md)
+
+- [元worktree統合結果](2026-10-22-laravel-php-integration-result.md)
