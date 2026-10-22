@@ -29,7 +29,7 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 
 ## Laravel / PHPの段階更新中の制約
 
-現在のLaravel 13は、未公開アプリの段階更新を検証するための中間版です。外部公開せず、loopbackに公開先を限定した隔離環境・合成データ・ローカルSMTPのみで使用します。
+現在のLaravel 13.38.0 / PHP 8.5.12は、段階更新の最終構成です。S9で隔離環境の再構築・総合検証を完了しました。依存監査残件とNode/MySQLのサポート終了があるため、本番公開可能とは判定していません。検証ではloopback・合成データ・ローカルSMTPのみを使用します。
 
 DockerのPHPは8.5.12（Debian 13/trixie）、Composerは2.9.4に固定しています。取得元digestは `docker/php/dockerfile` を参照してください。Nodeは既存の16.13.2を維持しています。
 S7でPHP 8.4.27へ更新しました。S6までのPHP 8.3.35に残っていた重大な2件（CVE-2026-109618 / CVE-2026-109619）は、この更新版で修正されています。依存パッケージの監査残件は引き続き実行結果を参照してください。
@@ -107,3 +107,9 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - PHP 8.5で削除されたdisable_classes、非推奨のreport_memleaksは指定しません。register_argc_argv=Offを維持します。
 - MySQLのSSL CAオプションにはPdo\Mysql::ATTR_SSL_CAを使用し、MYSQL_ATTR_SSL_CA環境変数の意味と証明書検証の条件を維持します。
 - PHP 8.5ではOPcacheが組み込まれるため、外部opcache.soの追加ロードは行いません。
+
+## 最終統合検証・公開前の残課題（S9）
+
+最終lockから空vendorへComposer installし、frontendもlockからnpm ciして全テスト・build・lintを確認しました。専用MySQLの空DB構築と旧データ移行、実HTTP/ブラウザ、実worker/SMTP登録を含みます。詳細と復旧手順は[最終検証結果](../docs/plans/2026-10-22-laravel-php-s9-result.md)を参照してください。
+
+既存の依存脆弱性、PHPイメージ内Node16・frontend用DockerのNode21・MySQL8.0のサポート終了は別途対応が必要です。今回のfrontend検証はホストNode22.10.0で行い、既存DockerのNode21で成功したとは扱いません。本番デプロイ、外部SMTP/S3、本番TLS/DB、worker/cron運用と永続backup/restoreは別タスクで確認します。

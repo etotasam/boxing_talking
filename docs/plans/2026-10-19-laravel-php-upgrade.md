@@ -137,12 +137,12 @@ LaravelとPHPを同時に上げず、動作する組み合わせを確認地点�
 - S7: `Throwable $previous = null`、`int $organizationId = null`などをnullable明示に変更。宣言元インターフェースも合わせ、引数の意味を変えない。依存由来の警告は対応版を調べる。
 - S8: PHP 8.5の移行ガイドにある非互換・非推奨・拡張変更を実利用箇所に照合する。必要な依存更新を限定し、全テストとブラウザ操作を再確認する。
 
-### S9: 最終確認（開始承認待ち）
+### S9: 最終確認（検証完了・公開前残課題あり）
 
-- [ ] 最終lockと記録したPHP / Composerで隔離環境を再構築し、依存の再現性を確認する。
-- [ ] 全自動テスト、実HTTP主要フロー、隔離MySQLの新規構築・既存相当データ移行、メール・非同期キュー・日次処理を確認する。
-- [ ] 対応期限・依存のセキュリティ監査結果・既存からの警告を再確認する。未解決の重大な問題があれば公開可能とは判定しない。
-- [ ] README、最終構成、復旧方法、残課題と別途必要なデプロイ作業をまとめ、完了報告する。
+- [x] 最終lockと記録したPHP / Composerで隔離環境を再構築し、依存の再現性を確認する。
+- [x] 全自動テスト、実HTTP主要フロー、隔離MySQLの新規構築・既存相当データ移行、メール・非同期キュー・日次処理を確認する。
+- [x] 対応期限・依存のセキュリティ監査結果・既存からの警告を再確認する。未解決の重大な問題があれば公開可能とは判定しない。
+- [x] README、最終構成、復旧方法、残課題と別途必要なデプロイ作業をまとめ、完了報告する。
 
 ## Test Plan
 
@@ -478,3 +478,13 @@ Reviewer結果と対応:
 - MySQL専用5成功41assertions、実HTTP/HTTPS各23check・CSRF135、保存session/cache/job、トークン・日次・ログ・ブラウザ主要操作と実worker/SMTPメールリンク登録→新規login成功。対象user1/pre0/jobs0/failed0。
 - 新規runtime診断なし。既知PSR-4通知・MySQL configuration重複CLI警告・依存監査4件は区別して継続記録。ブラウザHTTP/CA検証HTTPS clientsを区別、OS信頼変更なし。
 - Reviewer必須修正/未実施ゲートなし、レビュー後の最終backend再実行とdiffチェック成功。**S8完了、S9未着手。** 未コミット、push/本番反映なし。[S8実行結果](2026-10-22-laravel-php-s8-result.md)に証跡・復旧情報・残課題を記録。
+
+### S9最終統合検証（2026-10-22）
+
+- S8 commit 959490c5を基点にcodex/laravel-php-s9で実行。固定Dockerfileをno-cache再ビルドし空vendorへlockから120依存導入、すべて版/reference一致。PHP8.5.12/Laravel13.38.0、コード/lock不変。
+- frontendもGit管理ソースの一時コピーへnpm ci。52ファイル204件成功、build/lint成功。backend170成功/既存1skip/440assertions、171識別子維持・構文240成功。新規テスト追加なし。
+- 空DB35履歴、旧Laravel8相当34→35履歴、19データテーブルの全元カラム内容保持、fresh/legacyカラム/索引/FK規則一致。S8dumpを別DBへも復元し既存ユーザー保持を確認。MySQL回帰5成功41assertions。
+- 実HTTP/HTTPS各23check・CSRF135、保存session/cache・ブラウザ認証引継ぎ、通常/guest/admin主要操作、実worker/SMTP登録→本登録→新規login、日次処理・ログ成功。新規PHP診断なし。
+- 準備中のS8一時DB OOM終了は保存済み完了時dumpから復元。旧専用DBをダンプ保存して停止しメモリ確保。制約と復旧情報を記録し、通常開発DBには操作していない。
+- Reviewer必須指摘/未実施ゲートなし。レビュー後の最終backendと差分チェック成功。**S9の機能・再構築検証は完了。本番公開可能とは判定しない。** Composer監査4件、npm監査111パッケージ（omit-dev24）、Node16/21・MySQL8.0のEOLと本番運用確認を別途対応事項として引き継ぐ。
+- 文書のみ更新、未コミット、push/本番反映なし。詳細は[S9最終検証結果](2026-10-22-laravel-php-s9-result.md)。
