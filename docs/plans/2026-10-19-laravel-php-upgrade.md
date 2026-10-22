@@ -469,3 +469,12 @@ Reviewer結果と対応:
 - HTTP/HTTPS主要各23項目・CSRF135通り、旧8.3 session/cache/queued job互換、MySQL回帰5件41assertions、日次境界、実ブラウザ通常/guest/admin/権限/一覧/詳細/投稿/削除補完/投票/仮登録→受信メール→本登録→新規loginを確認。
 - ブラウザ登録時の旧SMTP停止はS7専用受信環境で再検証して解消。初回失敗の証跡を保存し、最終対象user1/pre_user0/jobs0/failed_jobs0。MySQL artisanの既存CLI警告・既知監査4件は結果記録で区別。
 - 最終Reviewer必須指摘なし、最終backend再実行とdiffチェック成功。**S7完了、S8未着手。** 未コミット、push/本番反映なし。詳細は[S7実行結果](2026-10-22-laravel-php-s7-result.md)。
+
+### S8実行結果（2026-10-22）
+
+- S7 commit 225c5b0cからcodex/laravel-php-s8を作成し、ユーザーの具体案承認後に実行。
+- PHP8.4上でnette/schema1.3.3・nette/utils4.0.8のみ更新・全件確認後、PHP8.5.12/trixie/digest固定へ更新。Laravel13.38.0と他118依存を維持。PHP要件/lock・PDO定数・ini・READMEを最小修正。
+- 更新前/依存更新後8.4/8.5/最終再実行すべて170成功・既存1skip・440assertions。171識別子維持、新規テスト追加なし。構文240成功、Composer整合・実導入成功。
+- MySQL専用5成功41assertions、実HTTP/HTTPS各23check・CSRF135、保存session/cache/job、トークン・日次・ログ・ブラウザ主要操作と実worker/SMTPメールリンク登録→新規login成功。対象user1/pre0/jobs0/failed0。
+- 新規runtime診断なし。既知PSR-4通知・MySQL configuration重複CLI警告・依存監査4件は区別して継続記録。ブラウザHTTP/CA検証HTTPS clientsを区別、OS信頼変更なし。
+- Reviewer必須修正/未実施ゲートなし、レビュー後の最終backend再実行とdiffチェック成功。**S8完了、S9未着手。** 未コミット、push/本番反映なし。[S8実行結果](2026-10-22-laravel-php-s8-result.md)に証跡・復旧情報・残課題を記録。

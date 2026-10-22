@@ -1,5 +1,5 @@
 # 検証したPHPのパッチ版・OS・取得元を固定する。
-FROM php:8.4.27-fpm-trixie@sha256:070c5a1dac19c108905c09093e3f5cf228ece8feaea84e33135b3da99de32946
+FROM php:8.5.12-fpm-trixie@sha256:f665ad19c093eee54db3a03c89102d6828b1bbf4f327689e5947a8686c6585a1
 
 
 RUN apt-get update \
