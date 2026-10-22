@@ -460,3 +460,12 @@ Reviewer結果と対応:
 - 別承認と本人OS認証で一時CAを信頼登録し、ブラウザ警告を迂回せずHTTPSを検証。終了後に信頼設定/対象証明書項目を解除、OSが信頼しないことを確認。
 - 最終Reviewerが必須指摘/未実施ゲートなしと確認。**S6完了、S7以降は未着手。** PHP重大2件・依存監査4件（Laravel0件）は残課題。本番公開可能とは判断しない。変更は未コミット、push/本番反映なし。
 - 詳細は[S6実行結果](2026-10-22-laravel-php-s6-result.md)。復旧はc1dae83eのコード/lock、S5イメージ、S6一時領域のlaravel12-before.sqlと更新前storageを基点とする。旧S5 DB/dumpを保持。
+
+### S7実行結果（2026-10-22）
+
+- 具体計画の承認後、S6完了HEAD6b62b109から作成済みのcodex/laravel-php-s7でPHP8.3.35→8.4.27へ更新。Laravel13.38.0、全120依存のversion/reference、Composer2.9.4と既存Node/MySQL版を維持。
+- nullable6宣言、CSVの従来escape明示、native sessionの非推奨設定整理、PHP要件^8.4とlockメタデータ、READMEを更新。新機能・API/DBスキーマ変更なし。
+- backend170成功/既存1skip/440assertions、旧164識別子全残存、追加7。PHP構文240成功、実拡張増減0、CLI/FPM実環境・Composer整合成功。
+- HTTP/HTTPS主要各23項目・CSRF135通り、旧8.3 session/cache/queued job互換、MySQL回帰5件41assertions、日次境界、実ブラウザ通常/guest/admin/権限/一覧/詳細/投稿/削除補完/投票/仮登録→受信メール→本登録→新規loginを確認。
+- ブラウザ登録時の旧SMTP停止はS7専用受信環境で再検証して解消。初回失敗の証跡を保存し、最終対象user1/pre_user0/jobs0/failed_jobs0。MySQL artisanの既存CLI警告・既知監査4件は結果記録で区別。
+- 最終Reviewer必須指摘なし、最終backend再実行とdiffチェック成功。**S7完了、S8未着手。** 未コミット、push/本番反映なし。詳細は[S7実行結果](2026-10-22-laravel-php-s7-result.md)。

@@ -52,5 +52,5 @@ interface TitleRepositoryInterface
    * @param int|null $organizationId
    * @return bool isDeleteTarget
    */
-  public function deleteTitle(int $boxerId, int $weightDivisionId, int $organizationId = null);
+  public function deleteTitle(int $boxerId, int $weightDivisionId, ?int $organizationId = null);
 }

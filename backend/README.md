@@ -29,10 +29,10 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 
 ## Laravel / PHPの段階更新中の制約
 
-現在のLaravel 12は、未公開アプリの段階更新を検証するための中間版です。外部公開せず、loopbackに公開先を限定した隔離環境・合成データ・ローカルSMTPのみで使用します。
+現在のLaravel 13は、未公開アプリの段階更新を検証するための中間版です。外部公開せず、loopbackに公開先を限定した隔離環境・合成データ・ローカルSMTPのみで使用します。
 
-DockerのPHPは8.3.35（Debian 13/trixie）、Composerは2.9.4に固定しています。取得元digestは `docker/php/dockerfile` を参照してください。Nodeは既存の16.13.2を維持しています。
-PHP 8.3.35は重大な2件（CVE-2026-109618 / CVE-2026-109619）が未修正です。S3実行時には修正版8.3.36の公式Dockerタグが未配信でした。今回PHPは固定し、修正イメージ取得後の更新・再検証は別途必要です。
+DockerのPHPは8.4.27（Debian 13/trixie）、Composerは2.9.4に固定しています。取得元digestは `docker/php/dockerfile` を参照してください。Nodeは既存の16.13.2を維持しています。
+S7でPHP 8.4.27へ更新しました。S6までのPHP 8.3.35に残っていた重大な2件（CVE-2026-109618 / CVE-2026-109619）は、この更新版で修正されています。依存パッケージの監査残件は引き続き実行結果を参照してください。
 
 Laravel 12.69.0以上への更新に伴い、中間版を通過するための4件の `config.audit.ignore` 例外をS5で削除しました。Composerの監査と更新ブロックは有効です。残る依存監査は実行結果を参照してください。グローバル設定や `block-insecure` は変更していません。
 
@@ -93,3 +93,9 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - `config/cache.php`の`serializable_classes`は`false`です。キャッシュはスカラー・配列を使用し、PHPオブジェクトの保存が必要になった場合は必要なクラスの許可リストを検討してください。
 - `SESSION_COOKIE`、`CACHE_PREFIX`、`REDIS_PREFIX`の既定値は既存設定を維持しています。新ひな型の接頭辞へ一括変更しないでください。
 - HTTPSでの送信元検証は、信頼できる証明書を使って別途検証します。詳細・残課題はリポジトリルートの`docs/plans/2026-10-22-laravel-php-s6-plan.md`を参照してください。
+
+## PHP 8.4への移行（S7）
+
+- プロジェクトのPHP要件は8.4以上です。Laravelは13.38.0を維持し、PHPイメージを8.4.27へ更新しています。
+- 暗黙nullable引数を明示し、省略/null時の意味を維持します。CSVのescapeは従来のバックスラッシュを明示し、出力形式を維持します。
+- PHP8.4で非推奨となるnative session設定は指定せず既定値を使用します。native PHPのID設定は32桁/16進数になり、Laravel側のID生成、Cookie名、保存形式は維持します。

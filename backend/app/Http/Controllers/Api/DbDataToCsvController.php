@@ -54,11 +54,11 @@ class DbDataToCsvController extends Controller
             $handle = fopen($filePath, 'w');
 
             // header 行の書き込み
-            fputcsv($handle, array_keys((array) $tableData->first()));
+            fputcsv($handle, array_keys((array) $tableData->first()), escape: '\\');
 
             // データを CSV 形式に変換して書き込む
             foreach ($tableData as $record) {
-                fputcsv($handle, (array) $record);
+                fputcsv($handle, (array) $record, escape: '\\');
             }
 
             // ファイルを閉じる
