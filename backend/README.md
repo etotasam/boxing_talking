@@ -113,3 +113,11 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 最終lockから空vendorへComposer installし、frontendもlockからnpm ciして全テスト・build・lintを確認しました。専用MySQLの空DB構築と旧データ移行、実HTTP/ブラウザ、実worker/SMTP登録を含みます。詳細と復旧手順は[最終検証結果](../docs/plans/2026-10-22-laravel-php-s9-result.md)を参照してください。
 
 既存の依存脆弱性、PHPイメージ内Node16・frontend用DockerのNode21・MySQL8.0のサポート終了は別途対応が必要です。今回のfrontend検証はホストNode22.10.0で行い、既存DockerのNode21で成功したとは扱いません。本番デプロイ、外部SMTP/S3、本番TLS/DB、worker/cron運用と永続backup/restoreは別タスクで確認します。
+
+
+## JWT 7系の鍵要件（P2）
+
+- firebase/php-jwtは7.2.1を使用します。登録確認メールのJWTは従来どおりHS256・30分期限です。
+- `storage/app/private/jwt-private.key`の内容をHS256の共通鍵として読み込みます。7系は32バイト未満の鍵を拒否します。長さだけでなく、十分な暗号学的乱数から生成された鍵を使用してください。
+- JWT鍵とAPP_KEYを更新作業で一括変更しないでください。同じ要件適合鍵で署名された、有効期限内の6系tokenを引き継ぐ方針です。鍵を変更すると既存メールリンクに影響するため、再送・未処理queue・切替時点を含む移行を別途計画してください。
+- 開発用鍵の最低長は値を表示せず確認しました。本番鍵の長さ・生成方法・メール/queue運用は未確認です。本番反映前に別途確認が必要です。

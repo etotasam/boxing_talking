@@ -9,7 +9,7 @@
     "license": "MIT",
     "require": {
         "aws/aws-sdk-php": "^3.281",
-        "firebase/php-jwt": "^6.8",
+        "firebase/php-jwt": "^7.2",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^13.0@stable",
         "laravel/sanctum": "^4.0",

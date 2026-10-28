@@ -2,34 +2,72 @@
 
 ## Goal
 
-Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持しながら、残る依存脆弱性とNode/MySQLのサポート終了へ段階的に対応する。本書は実装判断のための提案書であり、今回の依頼はPlan Document作成まで。依存・コード・設定・DBは変更しない。
+Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持しながら、残る依存脆弱性とNode/MySQLのサポート終了へ段階的に対応する。本書を全体計画と進捗管理の入口とし、段階ごとの詳細な計画・実績へリンクする。実装・検証の完了と、コミットによる保存の完了を分けて記録する。
+
+## Current Progress
+
+最終更新: **2026-10-29 JST**。**P2まで実装・検証・コミット保存済み。P3用branchへ切り替え済みで、P3の調査・実装は未着手。**
+
+- 継続利用するworktree: `/Users/terashimamasato/.codex/worktrees/backend-sdk-security/boxing_talking`。追加のworktreeは作成しない。
+- 現在のbranch: `codex/node-lts-update`。作業基点は`codex/backend-jwt-security`先端のP2完了コミット（本書の進捗更新を含む）。P2保存後、同worktreeで`git switch -c codex/node-lts-update`により作成・切替。
+- 下記P1/P2の版・検証結果は専用worktreeのもの。P1/P2を元checkout/元Composeへ統合・反映する作業はまだ行っていない。本番反映も未実施。
+
+| 段階 | 実装・検証 | コミット・保存 | 結果・根拠 |
+| --- | --- | --- | --- |
+| P0: Laravel/PHP統合・作業基点 | 完了。元環境確認、旧worktree処理、次期worktree準備済み | `8aed4bd34012ba2979be311d60d0943b83f82899` | [元環境への統合結果](2026-10-22-laravel-php-integration-result.md)。末尾の旧worktree処理待ちは当時の記録で、現在は削除・次期作業先準備済み |
+| P1: AWS SDK / JMESPath | 完了。SDK3.401.3/JMESPath2.9.1、必須symfony/filesystem8.1.9追加。backend170成功・既存skip1・440 assertions | `8b8dc1157e008e103133ef04bffc7db6e5a940ea` | [P1計画・結果](2026-10-22-backend-sdk-security.md)。対象3 advisories解消、Reviewer問題なし |
+| P2: JWT 7系 | 完了。JWT7.2.1、旧token互換、実登録/worker/ローカルSMTP/login、backend172成功・既存skip1・446 assertions | `codex/backend-jwt-security`先端（本書を含むP2完了コミット） | [P2計画・結果](2026-10-29-backend-jwt-security.md)。JWT指摘解消、Reviewer問題なし |
+| P3: Node LTS・導入経路 | **調査・実装は未着手。次の段階** | branch `codex/node-lts-update`作成・切替済み | P2完了コミットを基点に準備済み。版・PHP内Nodeの扱いは調査/具体案承認後 |
+| P4: frontend依存 | 未着手 | 未作成 | P3完了後に小段階ごとに対応 |
+| P5: MySQL8.4 LTS | 未着手 | 未作成 | Node/frontend更新と分離して対応 |
+| P6: 最終統合・公開準備 | 未着手 | 未作成 | 全段階の再構築・回帰・残課題確認。本番公開承認を含まない |
+
+### 次に行うこと
+
+1. P3のNode候補版・PHP内Nodeの必要性・起動/依存導入方法を調査し、具体案を提示する。現在は作業branch準備までで、調査・実装には着手していない。
+2. P3具体案をReviewerで確認し、ユーザー承認後に実装する。
+
+### 残課題
+
+- **Composer監査は0ではない。** P2時点の同時監査は更新前JWT low+Symfony Mime mediumの2件→更新後Mime mediumのみ1件。`symfony/mime v7.4.19` / `PKSA-wtxr-p26d-nn42` / `CVE-2026-45070`が残る。更新前後でpackage/ref・advisoryは同一で、JWT更新による追加ではない。配信された修正範囲と公式GHSAの記載差を別途照合し、対応する段階・具体版は未決。公開判断までに対応案を提示し承認を得る。P2へ無断追加せず、監査ignoreもしない。[P2の残存監査記録](2026-10-29-backend-jwt-security.md#残存監査p2対象外)
+- P1はユーザー指定により、依存更新と既存backendテストまでに限定。新規テスト・SES補足・SDK/JMESPath smokeは実施していない。この限定はP1のもの。[P1承認範囲](2026-10-22-backend-sdk-security.md)
+- JWTの開発用鍵は最低長のみ確認済みで、実鍵/APP_KEYは変更していない。本番鍵の適合性・生成強度・本番queue切替、外部SMTP/S3、本番公開は未確認・未実施。
+- Node21/PHP内Node16/MySQL8.0とfrontend依存の更新は未着手。P2のブラウザ用frontend build成功をP3/P4完了とは扱わない。
+
+実装・検証の完了時、コミット時、branch切り替え時には、本節・版情報・Tasksを対応する実績に合わせて更新する。過去時点の結果は日付を付けて残し、現在の状態と区別する。
 
 ## Background / Context
 
-2026-10-22 JST調査。
+### 計画作成時の調査記録（2026-10-22 JST）
 
-- 現worktree: /Users/terashimamasato/.codex/worktrees/laravel-php-s0/boxing_talking。2026-10-22の追加承認により、S9を元worktreeのcodex/laravel-php-upgradeへ統合し、元環境のブラウザ確認後に旧作業worktreeをアーカイブする。その完了地点から次期更新用の新しいworktreeを作成し、以後はそのworktreeを継続利用する。
-- branch: codex/laravel-php-s9、HEAD: 959490c5aa40b96368cb9fae55383a8a13dba0b5（S8コミット）。
-- S9の変更はbackend/README.md、全体計画、S9計画・結果の文書のみで未コミット。この既存差分を保持する。本書も現branchに作成する。
+以下は初版時点の記録。現在の作業先・進捗・監査は上記Current Progressを参照する。
+
+- 計画作成時のworktree: `/Users/terashimamasato/.codex/worktrees/laravel-php-s0/boxing_talking`。元checkout統合・元環境確認後、ユーザー承認により旧worktreeを削除済み。次期worktreeは作成済みで現在も継続利用している。
+- 当時のbranch: `codex/laravel-php-s9`、当時のHEAD: `959490c5aa40b96368cb9fae55383a8a13dba0b5`（S8コミット）。
+- 初版作成時に未コミットだったS9文書・本計画は、その後P0で保存・統合済み。P2と今回の進捗更新もP2完了コミットへ保存済み。
 - S9基準: PHP8.5.12/Laravel13.38.0/Composer2.9.4、backend171識別子=170成功/既存1skip/440assertions。frontend52ファイル204成功、build/lint成功。
 - MySQL新規35履歴・旧Laravel8相当34→35履歴、19データテーブル保持、fresh/legacyスキーマ一致、実HTTP/HTTPS・保存session/cache・ブラウザ登録・実worker/SMTPまで成功。
 - S9で機能・再構築検証は完了したが、本番公開承認は行っていない。詳細は[S9結果](2026-10-22-laravel-php-s9-result.md)。
 - Composer監査は4advisories/3packages、Laravel0。npm監査は脆弱と判定された111パッケージ（critical7/high72/moderate29/low3）、omit-devは24（critical0/high15/moderate8/low1）。npmの数字は重複を除いたCVE数ではなく、omit-devにもbuild用依存が含まれる。
 - S9一時DBのOOM終了があったため、旧検証DBを保存して停止し、保存済みdumpの別DB復元を確認した。一時領域/tmpfsを永続バックアップとして扱わない。
 
-### 現在値と候補
+### 現worktreeの値と残る更新候補（2026-10-29）
 
-| 対象 | 現在 | 更新方針・候補 |
-| --- | --- | --- |
-| aws/aws-sdk-php | 3.336.2 | 3系のサポート/監査を満たす修正版。現監査では少なくとも3.371.3を超える版が必要 |
-| mtdowling/jmespath.php | 2.8.0（間接依存） | 2.9.1以上の修正版。SDK制約と併せて部分更新 |
-| firebase/php-jwt | 6.10.2 | 鍵長検証のある7系安定版。例外・旧token・fixture互換を先に設計 |
-| frontend Node | Docker21.6.1 | Node24 LTSを第一候補に、実行時の最新修正・サポート・配布を再照会しパッチ/digest固定 |
-| PHP image内Node | 16.13.2 | 利用調査で不要なら導入を削除。必要なら対応中Nodeへ統一。削除も採用案の承認後 |
-| frontend主要依存 | Axios1.13.4、Lodash4.17.23、PostCSS8.5.6、Vite4.5.14、Vitest1.6.1、Tailwind3.4.19、React Router DOM6.30.3、uuid9.0.1 | サポート中・修正済みの互換候補を段階ごとに決定。単純な全最新版化はしない |
-| MySQL | 8.0.21 | 次のLTS系列である8.4を第一候補。実行時の修正済みパッチ/digestと更新経路を決定 |
+値は現在のlock/設定を示す。P1/P2は専用worktreeで更新済みであり、元環境へ反映済みという意味ではない。
 
-候補は実装時の確定版ではない。実行前に公式情報・監査・依存解決dry-runから具体的な版と変更対象を提示し、承認を得る。PHP8.5.12とLaravel13.38.0は原則維持し、更新が必要なら理由と最小案を別途提示する。
+| 対象 | 計画開始時 | 現worktree | 状態・残る方針 |
+| --- | --- | --- | --- |
+| aws/aws-sdk-php | 3.336.2 | **3.401.3** | P1完了・コミット済み |
+| mtdowling/jmespath.php | 2.8.0 | **2.9.1** | P1完了・コミット済み。間接依存を維持 |
+| symfony/filesystem | 未導入 | **8.1.9** | P1でSDKの必須間接依存として追加 |
+| firebase/php-jwt | 6.10.2 | **7.2.1** | P2完了・コミット保存済み |
+| symfony/mime | 7.4.19 | **7.4.19（未変更）** | P2で残存medium指摘を把握。情報源照合・対応段階/版は別途決定 |
+| frontend Node | Docker21.6.1 | 21.6.1 | P3未着手。Node24 LTSを初期候補とし、具体版・サポート・配布をP3開始時に再確認して決定 |
+| PHP image内Node | 16.13.2 | 16.13.2 | P3未着手。不要なら削除、必要なら対応中Nodeへ統一する案を調査後に提示 |
+| frontend主要依存 | Axios1.13.4、Lodash4.17.23、PostCSS8.5.6、Vite4.5.14、Vitest1.6.1、Tailwind3.4.19、React Router DOM6.30.3、uuid9.0.1 | 計画開始時のまま | P4未着手。必要な組だけ段階更新 |
+| MySQL | 8.0.21 | 8.0.21 | P5未着手。8.4 LTSを初期候補とし、具体版/digest・更新経路を実行前に決定 |
+
+未着手段階の候補は確定版ではない。実行前に公式情報・監査・依存解決dry-runから具体的な版と変更対象を提示し、承認を得る。PHP8.5.12とLaravel13.38.0は維持しており、追加更新が必要なら理由と最小案を別途提示する。
 
 ## Scope
 
@@ -80,9 +118,9 @@ Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持�
 
 ### P0: S9結果と作業基点を保存
 
-S9の既存文書差分・本計画・[統合実行計画](2026-10-22-laravel-php-integration.md)を確認し、git-commit手順で対象・メッセージを提示して承認後に保存する。元worktreeのcodex/laravel-php-upgradeへ統合し、元環境の再構築・DB/依存整合・ブラウザ動作を確認して完了地点を保存する。旧作業worktreeは必要なignoredデータも保護したうえでアーカイブし、その地点から次期更新用worktree/branchを作成する。所有元チャットの制約でアーカイブできない場合、削除で迂回せず保留して報告する。現在の未コミット差分を次期branchへ混ぜない。以後の段階は直前の完了コミットからbranchを作る。branch名は提案名であり作成時に未使用を確認する。
+**進捗: 完了・保存済み。** S9文書・本計画を保存し、元checkoutの`codex/laravel-php-upgrade`へ統合した。元環境の再構築・依存/DB整合・ブラウザ・実worker/ローカルSMTP登録を確認し、`8aed4bd34012ba2979be311d60d0943b83f82899`を統合完了基点として保存済み。旧作業worktreeはユーザー承認により削除済みで、その基点から現在の次期worktree/`codex/backend-sdk-security`を準備した。旧worktree処理や次期worktree作成を再実行しない。詳細は[統合結果](2026-10-22-laravel-php-integration-result.md)。所有制限が出た場合に迂回しない制約は引き続き適用する。
 
-| 段階 | branch提案 | 基点 |
+| 段階 | branch（P1〜P3作成済み、P4以降予定） | 基点 |
 | --- | --- | --- |
 | P1 | codex/backend-sdk-security | P0完了commit |
 | P2 | codex/backend-jwt-security | P1完了commit |
@@ -95,14 +133,18 @@ P0の統合完了後は新worktree内でローカルbranchを順に切り替え�
 
 ### P1: AWS SDK / JMESPathの脆弱性対応
 
-- criticalのJMESPathを優先し、SDKの2件も修正版へ更新。依存関係が許せば同一段階内でJMESPath→SDKの順に検証し、SDK更新が先に必要な場合はdry-run根拠を示す。
-- Composer部分更新で、JWT/Laravel/Nette等の無関係な版/referenceを維持。間接依存を不用意に直接依存へ昇格しない。
-- 手書きのSDK利用・Filesystem adapter・CloudFront署名・S3暗号化・JMESPath式/コンパイル設定の利用を確認し、実際の到達条件と監査severityを区別する。文字列検索だけで未使用/悪用可能を断定しない。
-- 外部AWSへ接続せず、利用がある経路の振る舞いを適切なfake/mock・合成入力で確認する。利用していない機能を新設しない。
+**進捗: 承認範囲の実装・検証・コミットまで完了。** 保存commit: `8b8dc1157e008e103133ef04bffc7db6e5a940ea`。[P1計画・結果](2026-10-22-backend-sdk-security.md)。
 
-完了条件: 当該SDK/JMESPathの既知3advisoriesが解消し、新規監査悪化なし。全backend・実要件・lock整合成功。SDK利用箇所に必要な回帰確認がある。
+- JMESPath `2.8.0→2.9.1`を先に、続いてSDK `3.336.2→3.401.3`へ部分更新。必須の`symfony/filesystem 8.1.9`だけを追加した。他118 packagesは全オブジェクト/reference不変。
+- 対象3 advisories解消。P1実行時の監査は4件→JWT1件。後から判明したMimeの指摘はCurrent Progressの残課題に記録する。
+- Composer validate/platform/install・lock整合成功。既存backend171識別子=170成功・既存skip1・440 assertions。Reviewer問題なし。
+- ユーザーの範囲指定により、P1は依存更新後の既存テストまでに限定した。新規テスト・SES補足・SDK/JMESPath smoke・外部AWS接続は行っていない。間接依存を直接依存へ昇格せず、アプリ/設定/API仕様は変更していない。
+
+承認後の完了条件: 対象3 advisories解消、新規監査悪化なし、lock整合と既存全backend成功。上記結果で達成し、コミット済み。
 
 ### P2: JWT 7系への更新
+
+**進捗: 実装・検証・Reviewer確認・コミット保存まで完了。** JWT7.2.1へ更新し、既存テストの鍵修正と改ざん/不正形式2ケース追加、旧token互換・実ブラウザ登録/worker/ローカルSMTP/loginまで成功。backend173識別子=172成功・既存skip1・446 assertions。実鍵/APP_KEYは変更していない。[P2計画・結果](2026-10-29-backend-jwt-security.md)。下記方針の実装・検証結果と本書を、`codex/backend-jwt-security`のP2完了コミットへ保存した。
 
 - JWT::encodeはMailSendJob、decodeはUserServiceでHS256を使用。既存UserCreateTestは正常/期限切れ/不正署名、MailSendJobTestは実Markdown・送信失敗時状態を保証している。
 - 7系は短い鍵を拒否するため、鍵の供給元・要件適合性を秘密値を出力せず確認する。本番設定ファイルは読まず、運用環境については必要な適合確認/切替手順を別途依頼する。
@@ -114,6 +156,8 @@ P0の統合完了後は新worktree内でローカルbranchを順に切り替え�
 完了条件: JWT監査解消、既存HTTP/エラー仕様・30分期限維持、旧tokenの扱いが決まり、実ブラウザ仮登録→worker→ローカルSMTP受信リンク→本登録→login成功。
 
 ### P3: Node24 LTSと導入経路の整理
+
+**進捗: 作業branch作成・切替済み。調査・実装は未着手。** 以下はこれから具体案・承認を得て実施する計画。
 
 - Node24 LTSの最新修正版を実行時に再確認し、Docker tag/digestとNode/npm実版を記録する。S9で使ったホスト22.10.0の成功だけを根拠にしない。
 - frontend用DockerのNode21を対応版へ更新する。PHP image内Node16は、Compose/README/CI/スクリプトの実利用を調査して「削除」または「同じ対応版へ統一」を具体案に含める。
@@ -128,6 +172,8 @@ P0の統合完了後は新worktree内でローカルbranchを順に切り替え�
 
 ### P4: frontend依存の脆弱性対応
 
+**進捗: 未着手。** 以下はこれから具体案・承認を得て実施する計画。
+
 - P4a: Axios/Lodash/PostCSS等の互換修正版と必要な間接依存から対応する。React Router/uuid等も利用経路・公開影響を確認して候補を決定。
 - P4b以降: Vite/Vitest/@vitest/ui/coverage、対応plugin/Storybook/TypeScriptの制約を照合し、互換性が必要な組だけを更新。CSS基盤の更新はさらに別の小段階にする。
 - Tailwindはまず現系列で間接依存更新によって解消できるか確認。4系移行が必要ならCSS/config/pluginの互換修正・対象画面・見た目の完了条件を別途提示。監査のfixAvailableだけでメジャー更新を決めない。
@@ -139,6 +185,8 @@ P0の統合完了後は新worktree内でローカルbranchを順に切り替え�
 
 ### P5: MySQL8.4 LTSへ移行
 
+**進捗: 未着手。** 以下はこれから具体案・承認を得て実施する計画。
+
 - 8.0.21→8.4の公式対応経路とUpgrade Checkerを実行時に確認。必要なら一時的に8.0系列の最終修正版を経由する案を提示する。中間環境は公開しない。
 - 旧DBの停止/上書きを始める前に、永続保存可能なdumpと復元手順・対象DB名・接続先を確認する。本計画の実装検証は合成DBのみ。本番データは扱わない。
 - 原則、旧8.0データディレクトリを保持し、別8.4データディレクトリ/専用volumeへlogical dump/loadする。古いvolumeを新imageで直接開かない。
@@ -149,6 +197,8 @@ P0の統合完了後は新worktree内でローカルbranchを順に切り替え�
 完了条件: 新規/既存データ移行・PHP接続/主要read-write・全backend/MySQL回帰・データ保持/restore成功。旧環境へ復旧できる対応するcode/lock/image/DBの組が記録されている。
 
 ### P6: 最終統合・公開準備の引き継ぎ
+
+**進捗: 未着手。** 以下はこれから具体案・承認を得て実施する計画。
 
 - 全lockから再構築し、PHP/Laravel・Node/MySQL・全依存の実版・サポート期限・監査を再確認。
 - backend/frontend全自動テスト、build/lint、空DB/既存DB/復元、実HTTP/HTTPS・ブラウザ・メール/実queue/日次/ログを総合実行。
@@ -162,18 +212,20 @@ P0の統合完了後は新worktree内でローカルbranchを順に切り替え�
 
 ## Tasks
 
-### 計画作成（今回）
+### 計画作成（2026-10-22完了）
 
 - [x] 現branch/HEAD/既存差分、lock実版、S9結果・監査・公式の更新経路を確認。
 - [x] 同じworktreeで段階ごとのbranchを切る方針、実行範囲・完了条件・復旧/停止条件を文書化。
 - [x] Reviewerが設計を確認。P3/P4のStorybook・coverage・Vitest UI検証を補完し、再レビューで必須指摘解消・新規必須指摘なし（2026-10-22）。
-- [x] 提案書を提示。今回の変更は本書の作成のみで、実装・branch作成・commitは未実施。
+- [x] 2026-10-22に初版提案を提示。その後の実装・保存状況はCurrent Progressと以下のチェックリストで管理する。
 
-### 実装（別途承認後）
+### 段階別進捗
 
-- [ ] P0: S9文書と計画の対象確認・commit message承認・基点保存。
-- [ ] P1: SDK/JMESPathの具体版/dry-run/設計レビュー/実装承認→更新・検証・最終レビュー・保存。
-- [ ] P2: JWT鍵/旧token移行の具体案と承認→更新・テスト・実登録・レビュー・保存。
+各段階は実装・検証・コミットによる保存まで完了した時点でチェックする。
+
+- [x] P0: S9文書/本計画の保存、元環境統合・動作確認、旧worktree処理と次期worktree準備。統合完了commit `8aed4bd3`。
+- [x] P1: SDK/JMESPathの具体版/dry-run/レビュー/承認、更新・既存backend全件・最終レビュー・保存。commit `8b8dc115`。
+- [x] P2: JWT7系への更新・旧token互換・全backend・実登録・レビュー・保存。`codex/backend-jwt-security`先端のP2完了コミットへ保存済み。
 - [ ] P3: Node導入/削除案と具体版の承認→実Docker再構築/起動・全frontend・必要backend検証・保存。
 - [ ] P4: 互換更新と必要メジャー更新ごとに具体案/承認→監査/全テスト/画面確認・保存。
 - [ ] P5: MySQLの更新経路/復旧具体案と承認→複製DB移行/restore/主要動作・レビュー・保存。
@@ -186,7 +238,7 @@ P0の統合完了後は新worktree内でローカルbranchを順に切り替え�
 | 段階 | 最低限の検証 |
 | --- | --- |
 | P0 | git diff/check・秘密/生成物混入なし・既存S9結果との整合。文書だけなら全件テスト再実行不要 |
-| P1 | Docker内Composer validate/platform/install dry-run・変更package/ref比較・audit、全backend、利用するSDK/JMESPathの公開動作 |
+| P1（完了・承認範囲限定済み） | Docker内Composer validate/platform/install dry-run・変更package/ref比較・audit、既存全backend。ユーザー指定により新規テスト・SES補足・SDK/JMESPath smokeは対象外 |
 | P2 | 上記backend基準+JWT正常/期限/不正署名/形式・旧token互換・鍵長・SMTP失敗時状態・実worker/ローカルSMTP/ブラウザ登録 |
 | P3 | 実Node24 Dockerのnpm ci/全Vitest/build/lint・server起動/再起動、Storybook build/loopback起動・既存story表示、非対話coverage生成、Vitest UIのloopback起動/結果表示。PHP image再build時の拡張/ini/Composer/全backend |
 | P4各小段階 | npm監査全依存/omit-dev、全Vitest/build/lint、production buildのブラウザ/API。変更するStorybook/plugin、Vitest/UI/coverageに応じてStorybook build/loopback起動・既存story表示、coverage生成、Vitest UIのloopback起動/結果表示も確認。通信・状態分岐/CSS変更に応じて不足のテストと画面確認 |
@@ -195,7 +247,7 @@ P0の統合完了後は新worktree内でローカルbranchを順に切り替え�
 
 - PHP/artisan/PHPUnit/ComposerはDockerのみ。backendはdocker compose exec php php artisan test。
 - frontendは対応NodeのDocker内でnpm test -- --run / npm run build / npm run lint。Cypressは使用しない。
-- S9のbackend171/170成功1skip/440assertions、frontend52ファイル204件と検出一覧を比較し、増減は理由を説明する。既存skip/PSR-4/MySQL CLI/Browserslist/chunk通知と新規診断を分ける。
+- S9/P1基準はbackend171識別子=170成功・既存skip1・440 assertions。P2で拒否2ケースを追加したため、今後のbackend比較基準は173識別子=172成功・既存skip1・446 assertions。frontendは52ファイル204件のまま。検出一覧を比較し、増減は理由を説明する。既存skip/PSR-4/MySQL CLI/Browserslist/chunk通知と新規診断を分ける。
 - APIのstatus/JSON・認証/認可・session/cache形式・UUID/ULID・既存エラーコード・CSRF期待値を維持する。
 - 実HTTPではLaravel13のsame-origin token省略とfallbackを踏まえ、HTTP/HTTPS/送信元/tokenの組合せを確認。必要な段階で既存135ケースを再利用する。
 - ブラウザは通常/guest/admin login/logout、一般管理URL拒否、一覧/詳細、コメント投稿/reload、一般DELETE拒否/admin成功と再表示、投票、管理フォーム、過去空一覧、仮登録→受信HTMLリンク→本登録→新規login。
@@ -218,7 +270,7 @@ P0の統合完了後は新worktree内でローカルbranchを順に切り替え�
 
 ## References
 
-2026-10-22確認。具体版は各段階開始時に再照会する。
+初版の外部参照は2026-10-22確認。2026-10-29にP0/P1/P2の保存状況・個別結果と照合して進捗を更新した。未着手段階の具体版は各段階開始時に再照会する。
 
 - [S9最終結果・監査・復旧情報](2026-10-22-laravel-php-s9-result.md)
 - [Laravel/PHP段階更新計画](2026-10-19-laravel-php-upgrade.md)

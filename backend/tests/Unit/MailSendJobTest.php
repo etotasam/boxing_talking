@@ -48,7 +48,7 @@ class MailSendJobTest extends TestCase
     /** 登録メールに本人の名前と署名付き・30分期限の確認リンクが含まれることを保証する。 */
     public function testHandleSendsRegistrationMailAndKeepsPreUser()
     {
-        config(['const.jwt_secret_key' => 's1-mail-test-key-only', 'app.url' => 'http://localhost:13000']);
+        config(['const.jwt_secret_key' => 'p2-mail-test-key-only-with-at-least-32-bytes', 'app.url' => 'http://localhost:13000']);
         $preUser = PreUser::create([
             'name' => 'Mail Test User',
             'email' => 'mail-test@example.test',
@@ -78,7 +78,7 @@ class MailSendJobTest extends TestCase
     /** SMTP例外時は対象だけ削除し、他の仮登録を保持してキュージョブを失敗させる。 */
     public function testHandleMailFailureDeletesOnlyItsPreUserAndFailsJob()
     {
-        config(['const.jwt_secret_key' => 's1-mail-test-key-only']);
+        config(['const.jwt_secret_key' => 'p2-mail-test-key-only-with-at-least-32-bytes']);
         $target = PreUser::create(['name' => 'Target', 'email' => 'target@example.test', 'password' => 'Password1']);
         $other = PreUser::create(['name' => 'Other', 'email' => 'other@example.test', 'password' => 'Password1']);
         $exception = new RuntimeException('SMTP test failure');
@@ -100,7 +100,7 @@ class MailSendJobTest extends TestCase
     /** 処理前に仮登録が消えていても、送信例外は別の例外にせずジョブ失敗として扱う。 */
     public function testHandleMailFailureWhenPreUserWasAlreadyDeleted()
     {
-        config(['const.jwt_secret_key' => 's1-mail-test-key-only']);
+        config(['const.jwt_secret_key' => 'p2-mail-test-key-only-with-at-least-32-bytes']);
         $exception = new RuntimeException('SMTP test failure');
         $pendingMail = Mockery::mock();
         $pendingMail->shouldReceive('send')->once()->andThrow($exception);
