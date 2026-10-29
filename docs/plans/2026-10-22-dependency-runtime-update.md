@@ -6,33 +6,33 @@ Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持�
 
 ## Current Progress
 
-最終更新: **2026-10-29 JST**。**P2まで実装・検証・コミット保存済み。P3用branchへ切り替え済みで、P3の調査・実装は未着手。**
+最終更新: **2026-10-29 JST**。**P3まで実装・検証・Reviewer確認とコミット保存済み。P3保存先は本書を含むcodex/node-lts-updateの完了コミット。元環境への統合は別計画で進める。**
 
 - 継続利用するworktree: `/Users/terashimamasato/.codex/worktrees/backend-sdk-security/boxing_talking`。追加のworktreeは作成しない。
 - 現在のbranch: `codex/node-lts-update`。作業基点は`codex/backend-jwt-security`先端のP2完了コミット（本書の進捗更新を含む）。P2保存後、同worktreeで`git switch -c codex/node-lts-update`により作成・切替。
-- 下記P1/P2の版・検証結果は専用worktreeのもの。P1/P2を元checkout/元Composeへ統合・反映する作業はまだ行っていない。本番反映も未実施。
+- 下記P1〜P3の版・検証結果は専用worktreeのもの。元checkout/元Composeへの統合・反映、本番反映は未実施。
 
 | 段階 | 実装・検証 | コミット・保存 | 結果・根拠 |
 | --- | --- | --- | --- |
 | P0: Laravel/PHP統合・作業基点 | 完了。元環境確認、旧worktree処理、次期worktree準備済み | `8aed4bd34012ba2979be311d60d0943b83f82899` | [元環境への統合結果](2026-10-22-laravel-php-integration-result.md)。末尾の旧worktree処理待ちは当時の記録で、現在は削除・次期作業先準備済み |
 | P1: AWS SDK / JMESPath | 完了。SDK3.401.3/JMESPath2.9.1、必須symfony/filesystem8.1.9追加。backend170成功・既存skip1・440 assertions | `8b8dc1157e008e103133ef04bffc7db6e5a940ea` | [P1計画・結果](2026-10-22-backend-sdk-security.md)。対象3 advisories解消、Reviewer問題なし |
 | P2: JWT 7系 | 完了。JWT7.2.1、旧token互換、実登録/worker/ローカルSMTP/login、backend172成功・既存skip1・446 assertions | `codex/backend-jwt-security`先端（本書を含むP2完了コミット） | [P2計画・結果](2026-10-29-backend-jwt-security.md)。JWT指摘解消、Reviewer問題なし |
-| P3: Node LTS・導入経路 | **調査・実装は未着手。次の段階** | branch `codex/node-lts-update`作成・切替済み | P2完了コミットを基点に準備済み。版・PHP内Nodeの扱いは調査/具体案承認後 |
+| P3: Node LTS・導入経路 | **実装・検証・Reviewer確認完了** | `codex/node-lts-update`のP3完了コミット（本書を含む） | [P3計画・結果](2026-10-29-node-lts-update.md)。Node24.22.1/npm11.19.1、npm ci/再導入・全frontend204・build/lint・Storybook/coverage/UI・backend172成功 |
 | P4: frontend依存 | 未着手 | 未作成 | P3完了後に小段階ごとに対応 |
 | P5: MySQL8.4 LTS | 未着手 | 未作成 | Node/frontend更新と分離して対応 |
 | P6: 最終統合・公開準備 | 未着手 | 未作成 | 全段階の再構築・回帰・残課題確認。本番公開承認を含まない |
 
 ### 次に行うこと
 
-1. P3のNode候補版・PHP内Nodeの必要性・起動/依存導入方法を調査し、具体案を提示する。現在は作業branch準備までで、調査・実装には着手していない。
-2. P3具体案をReviewerで確認し、ユーザー承認後に実装する。
+1. P3まで保存後、元worktreeへのP1〜P3統合と実起動確認をユーザー承認済みの別計画で実施する。
+2. P4は次の作業依頼・具体案承認後に着手する。
 
 ### 残課題
 
 - **Composer監査は0ではない。** P2時点の同時監査は更新前JWT low+Symfony Mime mediumの2件→更新後Mime mediumのみ1件。`symfony/mime v7.4.19` / `PKSA-wtxr-p26d-nn42` / `CVE-2026-45070`が残る。更新前後でpackage/ref・advisoryは同一で、JWT更新による追加ではない。配信された修正範囲と公式GHSAの記載差を別途照合し、対応する段階・具体版は未決。公開判断までに対応案を提示し承認を得る。P2へ無断追加せず、監査ignoreもしない。[P2の残存監査記録](2026-10-29-backend-jwt-security.md#残存監査p2対象外)
 - P1はユーザー指定により、依存更新と既存backendテストまでに限定。新規テスト・SES補足・SDK/JMESPath smokeは実施していない。この限定はP1のもの。[P1承認範囲](2026-10-22-backend-sdk-security.md)
 - JWTの開発用鍵は最低長のみ確認済みで、実鍵/APP_KEYは変更していない。本番鍵の適合性・生成強度・本番queue切替、外部SMTP/S3、本番公開は未確認・未実施。
-- Node21/PHP内Node16/MySQL8.0とfrontend依存の更新は未着手。P2のブラウザ用frontend build成功をP3/P4完了とは扱わない。
+- P3のNode24.22.1は承認済み暫定版。latest24.22.2の対応Alpine image取得は未確認。frontend依存の版更新とMySQL8.4移行は未着手。npm同条件監査は補完前後79 packages（critical7/high32/moderate30/low10）で同じadvisory/範囲/経路。P4で対応する。
 
 実装・検証の完了時、コミット時、branch切り替え時には、本節・版情報・Tasksを対応する実績に合わせて更新する。過去時点の結果は日付を付けて残し、現在の状態と区別する。
 
@@ -62,8 +62,8 @@ Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持�
 | symfony/filesystem | 未導入 | **8.1.9** | P1でSDKの必須間接依存として追加 |
 | firebase/php-jwt | 6.10.2 | **7.2.1** | P2完了・コミット保存済み |
 | symfony/mime | 7.4.19 | **7.4.19（未変更）** | P2で残存medium指摘を把握。情報源照合・対応段階/版は別途決定 |
-| frontend Node | Docker21.6.1 | 21.6.1 | P3未着手。Node24 LTSを初期候補とし、具体版・サポート・配布をP3開始時に再確認して決定 |
-| PHP image内Node | 16.13.2 | 16.13.2 | P3未着手。不要なら削除、必要なら対応中Nodeへ統一する案を調査後に提示 |
+| frontend Node | Docker21.6.1 | **24.22.1 / npm11.19.1** | P3実装・検証・保存済み。承認済み暫定版をdigest固定 |
+| PHP image内Node | 16.13.2 | **削除済み** | P3で現行経路に不要と確認。PHP/Composer/FPM/全backendの回帰成功 |
 | frontend主要依存 | Axios1.13.4、Lodash4.17.23、PostCSS8.5.6、Vite4.5.14、Vitest1.6.1、Tailwind3.4.19、React Router DOM6.30.3、uuid9.0.1 | 計画開始時のまま | P4未着手。必要な組だけ段階更新 |
 | MySQL | 8.0.21 | 8.0.21 | P5未着手。8.4 LTSを初期候補とし、具体版/digest・更新経路を実行前に決定 |
 
@@ -157,7 +157,7 @@ P0の統合完了後は新worktree内でローカルbranchを順に切り替え�
 
 ### P3: Node24 LTSと導入経路の整理
 
-**進捗: 作業branch作成・切替済み。調査・実装は未着手。** 以下はこれから具体案・承認を得て実施する計画。
+**進捗: 実装・検証・保存完了。Reviewer問題なし。** [P3詳細計画・結果](2026-10-29-node-lts-update.md)。以下は初版の方針・完了条件。実績・追加承認は詳細計画を参照。
 
 - Node24 LTSの最新修正版を実行時に再確認し、Docker tag/digestとNode/npm実版を記録する。S9で使ったホスト22.10.0の成功だけを根拠にしない。
 - frontend用DockerのNode21を対応版へ更新する。PHP image内Node16は、Compose/README/CI/スクリプトの実利用を調査して「削除」または「同じ対応版へ統一」を具体案に含める。
@@ -226,7 +226,7 @@ P0の統合完了後は新worktree内でローカルbranchを順に切り替え�
 - [x] P0: S9文書/本計画の保存、元環境統合・動作確認、旧worktree処理と次期worktree準備。統合完了commit `8aed4bd3`。
 - [x] P1: SDK/JMESPathの具体版/dry-run/レビュー/承認、更新・既存backend全件・最終レビュー・保存。commit `8b8dc115`。
 - [x] P2: JWT7系への更新・旧token互換・全backend・実登録・レビュー・保存。`codex/backend-jwt-security`先端のP2完了コミットへ保存済み。
-- [ ] P3: Node導入/削除案と具体版の承認→実Docker再構築/起動・全frontend・必要backend検証・保存。
+- [x] P3: Node24更新・PHP内Node削除・lock補完、全検証・Reviewer確認・保存。本書を含むP3完了コミット。
 - [ ] P4: 互換更新と必要メジャー更新ごとに具体案/承認→監査/全テスト/画面確認・保存。
 - [ ] P5: MySQLの更新経路/復旧具体案と承認→複製DB移行/restore/主要動作・レビュー・保存。
 - [ ] P6: 最終全件・監査・サポート・残課題と公開準備引き継ぎ。実deployは行わない。

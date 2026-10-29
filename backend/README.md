@@ -121,3 +121,12 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - `storage/app/private/jwt-private.key`の内容をHS256の共通鍵として読み込みます。7系は32バイト未満の鍵を拒否します。長さだけでなく、十分な暗号学的乱数から生成された鍵を使用してください。
 - JWT鍵とAPP_KEYを更新作業で一括変更しないでください。同じ要件適合鍵で署名された、有効期限内の6系tokenを引き継ぐ方針です。鍵を変更すると既存メールリンクに影響するため、再送・未処理queue・切替時点を含む移行を別途計画してください。
 - 開発用鍵の最低長は値を表示せず確認しました。本番鍵の長さ・生成方法・メール/queue運用は未確認です。本番反映前に別途確認が必要です。
+
+## Nodeとfrontendのビルド
+
+PHP image内のNode 16/npmはP3で削除しました。現在のReact/Viteの開発・ビルドは
+Composeのnodeサービスで行います。導入・起動手順は[frontend README](../frontend/README.md#dockerでの開発)を参照してください。
+backend/package.jsonとwebpack.mix.jsの旧Laravel Mix設定は今回変更していませんが、
+PHP container内では旧Mixのnpmコマンドを実行できません。
+リポジトリルートの`npm run backend:generate-error-codes`等はホストnpmからDocker内PHPを呼ぶ手順であり、
+PHP image内Nodeの削除による変更はありません。
