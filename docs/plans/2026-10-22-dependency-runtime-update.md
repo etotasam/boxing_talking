@@ -13,8 +13,10 @@ P4cは[Router・uuid計画と結果](2026-10-30-frontend-router-uuid.md)を承�
 
 P4d-1は[未使用Cypress削除](2026-10-30-frontend-cypress-removal.md)を承認後に実装。既存204件・lint/build・旧4ケース相当の手動画面確認・最終Reviewer確認完了（問題なし）。監査32→26、omit-dev7不変、新規指摘なし。Cypress回避変数なしでnpm ci成功。ユーザー依頼により本書を含むP4c/P4d保存コミットへ保存。元環境未統合。
 
+P4eは[React Router 7移行](2026-10-30-frontend-router-v7.md)を承認後に実装。7.18.5と必須の型互換1行へ限定し、既存204件・lint/build・合成API画面確認・最終Reviewer確認完了（問題なし）。監査26→24/omit-dev7→5、Routerの残存2advisory解消・新規指摘なし。ユーザー依頼により本書を含むP4e保存コミットへ保存。元環境未統合。
+
 - 継続利用するworktree: `/Users/terashimamasato/.codex/worktrees/backend-sdk-security/boxing_talking`。追加のworktreeは作成しない。
-- 現在のbranch: `codex/frontend-build-update`（P4b保存済み・P4c/P4d-1も本書を含む保存コミットへ保存）。P4a保存`a3c14326`から同じ作業worktreeで`git switch -c`により作成・切替。P4aのbranchは`codex/frontend-dependency-security`、P3時は`codex/node-lts-update`。
+- 現在のbranch: `codex/frontend-build-update`（P4b/P4c/P4d-1保存済み、P4eも本書を含む保存コミットへ保存）。P4a保存`a3c14326`から同じ作業worktreeで`git switch -c`により作成・切替。P4aのbranchは`codex/frontend-dependency-security`、P3時は`codex/node-lts-update`。
 - P1〜P3は元checkout/元Composeへa5648642まで統合・実起動確認済み。統合結果文書は元側で未コミットとして保持。本P4作業へ無断で移動・保存しない。本番反映は未実施。
 
 | 段階 | 実装・検証 | コミット・保存 | 結果・根拠 |
@@ -23,21 +25,21 @@ P4d-1は[未使用Cypress削除](2026-10-30-frontend-cypress-removal.md)を承�
 | P1: AWS SDK / JMESPath | 完了。SDK3.401.3/JMESPath2.9.1、必須symfony/filesystem8.1.9追加。backend170成功・既存skip1・440 assertions | `8b8dc1157e008e103133ef04bffc7db6e5a940ea` | [P1計画・結果](2026-10-22-backend-sdk-security.md)。対象3 advisories解消、Reviewer問題なし |
 | P2: JWT 7系 | 完了。JWT7.2.1、旧token互換、実登録/worker/ローカルSMTP/login、backend172成功・既存skip1・446 assertions | `codex/backend-jwt-security`先端（本書を含むP2完了コミット） | [P2計画・結果](2026-10-29-backend-jwt-security.md)。JWT指摘解消、Reviewer問題なし |
 | P3: Node LTS・導入経路 | **実装・検証・Reviewer確認完了** | `a5648642` | [P3計画・結果](2026-10-29-node-lts-update.md)。Node24.22.1/npm11.19.1、npm ci/再導入・全frontend204・build/lint・Storybook/coverage/UI・backend172成功 |
-| P4: frontend依存 | **P4a保存済み。P4b実装・検証完了、最終Reviewer確認完了（必須指摘なし）。P4c/P4d-1も実装・検証・Reviewer確認と保存完了。P4全体は未完了** | `a3c14326`（P4a）、`e3deec3a`（P4b）、本書を含むP4c/P4d保存コミット | [P4a計画・結果](2026-10-29-frontend-dependency-security.md)。Axios/Lodash/PostCSSを先行し、各小段階で承認・検証 |
+| P4: frontend依存 | **P4a保存済み。P4b実装・検証完了、最終Reviewer確認完了（必須指摘なし）。P4c/P4d-1も実装・検証・Reviewer確認と保存完了。P4eも実装・検証・Reviewer確認と保存完了。P4全体は未完了** | `a3c14326`（P4a）、`e3deec3a`（P4b）、`49069b16`（P4c/P4d）、本書を含むP4e保存コミット | [P4a計画・結果](2026-10-29-frontend-dependency-security.md)。Axios/Lodash/PostCSSを先行し、各小段階で承認・検証 |
 | P5: MySQL8.4 LTS | 未着手 | 未作成 | Node/frontend更新と分離して対応 |
 | P6: 最終統合・公開準備 | 未着手 | 未作成 | 全段階の再構築・回帰・残課題確認。本番公開承認を含まない |
 
 ### 次に行うこと
 
 1. [P4a具体案](2026-10-29-frontend-dependency-security.md)は同条件監査・設計レビュー済み。対象版/間接依存/検証をユーザー承認済み。
-2. P4aは全frontend204件・lint/build・coverage/UI・Storybook・合成APIの実通信を確認済み。最終Reviewerも必須指摘なし。ユーザーの保存依頼により本書を含むP4a完了コミットへ保存。P4bは[Vite/Vitest/Storybook計画・結果](2026-10-29-frontend-build-update.md)を承認後に実装・検証済み。Vite7.3.7/Vitest4.1.12組/Storybook10.6.5組、全依存72→33・critical7→0、全204件・build/lint・coverage/UI・HMR・実通信を確認。最終Reviewer確認完了（必須指摘なし）。ユーザーの依頼により本書を含むP4b完了コミットへ保存。P4d-1でCypress削除後は26 packagesが残る。次は他の未使用開発依存、MSW、ESLint/Babel/CSS関連とRouter残存指摘の具体案を調査する。Storybook7維持では保守中Viteへ移れないため、ユーザーがStorybookも更新する案の調査を選択。その後go aheadで具体版・実装を承認済み。
+2. P4aは全frontend204件・lint/build・coverage/UI・Storybook・合成APIの実通信を確認済み。最終Reviewerも必須指摘なし。ユーザーの保存依頼により本書を含むP4a完了コミットへ保存。P4bは[Vite/Vitest/Storybook計画・結果](2026-10-29-frontend-build-update.md)を承認後に実装・検証済み。Vite7.3.7/Vitest4.1.12組/Storybook10.6.5組、全依存72→33・critical7→0、全204件・build/lint・coverage/UI・HMR・実通信を確認。最終Reviewer確認完了（必須指摘なし）。ユーザーの依頼により本書を含むP4b完了コミットへ保存。P4d-1でCypress削除後は26 packagesが残る。P4eでRouter7.18.5へ移行後は24 packagesが残る。次は他の未使用開発依存、MSW、ESLint/Babel/CSS関連の具体案を調査する。Storybook7維持では保守中Viteへ移れないため、ユーザーがStorybookも更新する案の調査を選択。その後go aheadで具体版・実装を承認済み。
 
 ### 残課題
 
 - **Composer監査は0ではない。** P2時点の同時監査は更新前JWT low+Symfony Mime mediumの2件→更新後Mime mediumのみ1件。`symfony/mime v7.4.19` / `PKSA-wtxr-p26d-nn42` / `CVE-2026-45070`が残る。更新前後でpackage/ref・advisoryは同一で、JWT更新による追加ではない。配信された修正範囲と公式GHSAの記載差を別途照合し、対応する段階・具体版は未決。公開判断までに対応案を提示し承認を得る。P2へ無断追加せず、監査ignoreもしない。[P2の残存監査記録](2026-10-29-backend-jwt-security.md#残存監査p2対象外)
 - P1はユーザー指定により、依存更新と既存backendテストまでに限定。新規テスト・SES補足・SDK/JMESPath smokeは実施していない。この限定はP1のもの。[P1承認範囲](2026-10-22-backend-sdk-security.md)
 - JWTの開発用鍵は最低長のみ確認済みで、実鍵/APP_KEYは変更していない。本番鍵の適合性・生成強度・本番queue切替、外部SMTP/S3、本番公開は未確認・未実施。
-- P3のNode24.22.1は承認済み暫定版。latest24.22.2の対応Alpine image取得は未確認。P4aでAxios/Lodash/PostCSSを更新・検証済み（コミット保存済み・元環境未統合）。全依存監査79→72 packages（critical7/high26/moderate29/low10）、omit-dev19→12。P4bでも同条件72→33（critical0/high14/moderate10/low9）、omit-dev12→9へ改善。残る33件は次の小段階で具体案を提示。MySQL8.4移行は未着手。
+- P3のNode24.22.1は承認済み暫定版。latest24.22.2の対応Alpine image取得は未確認。P4aでAxios/Lodash/PostCSSを更新・検証済み（コミット保存済み・元環境未統合）。全依存監査79→72 packages（critical7/high26/moderate29/low10）、omit-dev19→12。P4bでも同条件72→33（critical0/high14/moderate10/low9）、omit-dev12→9へ改善。その後P4c/P4d-1/P4eで24 packagesまで改善。残存は次の小段階で具体案を提示。MySQL8.4移行は未着手。
 
 実装・検証の完了時、コミット時、branch切り替え時には、本節・版情報・Tasksを対応する実績に合わせて更新する。過去時点の結果は日付を付けて残し、現在の状態と区別する。
 
