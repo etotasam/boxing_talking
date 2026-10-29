@@ -3,7 +3,7 @@ import { describe, expect, test, vi, beforeAll, afterAll, beforeEach, afterEach 
 import { RecoilRoot, useRecoilValue } from 'recoil';
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw/http';
 import { setupServer } from 'msw/node';
 import { API_PATH } from '@/constants/apiPath';
 import { apiFetchState } from '@/store/apiFetchDataState';
@@ -59,25 +59,25 @@ const page2Cursor = 'cursor-page-2';
 const baseURL = import.meta.env.VITE_APP_API_URL;
 const server = setupServer(
   //? コメント取得リクエスト
-  rest.get(`${baseURL}${API_PATH.COMMENT}`, (req, res, context) => {
-    const cursor = req.url.searchParams.get('cursor');
+  http.get(`${baseURL}${API_PATH.COMMENT}`, ({ request }) => {
+    const cursor = new URL(request.url).searchParams.get('cursor');
     if (!cursor) {
-      return res(
-        context.status(200),
-        context.json({ data: comments.page1, meta: { nextCursor: page2Cursor, hasMore: true } })
-      );
+      return HttpResponse.json({
+        data: comments.page1,
+        meta: { nextCursor: page2Cursor, hasMore: true },
+      });
     }
     if (cursor === page2Cursor) {
-      return res(
-        context.status(200),
-        context.json({ data: comments.page2, meta: { nextCursor: null, hasMore: false } })
-      );
+      return HttpResponse.json({
+        data: comments.page2,
+        meta: { nextCursor: null, hasMore: false },
+      });
     }
   }),
 
   //? 新しいコメント取得リクエスト
-  rest.get(`${baseURL}${API_PATH.COMMENT_NEW}`, (_req, res, ctx) => {
-    return res(ctx.status(200), ctx.json({ data: mockFetchNewComments() }));
+  http.get(`${baseURL}${API_PATH.COMMENT_NEW}`, () => {
+    return HttpResponse.json({ data: mockFetchNewComments() });
   })
 );
 
@@ -196,8 +196,8 @@ describe('useFetchComments', () => {
 
   test('新しいコメントが0件の時は空配列を返す', async () => {
     server.use(
-      rest.get(`${baseURL}${API_PATH.COMMENT_NEW}`, (_req, res, ctx) => {
-        return res(ctx.status(200), ctx.json({ data: [] }));
+      http.get(`${baseURL}${API_PATH.COMMENT_NEW}`, () => {
+        return HttpResponse.json({ data: [] });
       })
     );
 
@@ -216,8 +216,8 @@ describe('useFetchComments', () => {
 
   test('コメント取得に失敗した時はコメント一覧を返さない', async () => {
     server.use(
-      rest.get(`${baseURL}${API_PATH.COMMENT}`, (_req, res, ctx) => {
-        return res(ctx.status(500));
+      http.get(`${baseURL}${API_PATH.COMMENT}`, () => {
+        return new HttpResponse(null, { status: 500 });
       })
     );
 
@@ -237,9 +237,9 @@ describe('useFetchComments', () => {
       finishRequest = resolve;
     });
     server.use(
-      rest.get(`${baseURL}${API_PATH.COMMENT_NEW}`, async (_req, res, ctx) => {
+      http.get(`${baseURL}${API_PATH.COMMENT_NEW}`, async () => {
         await pending;
-        return res(ctx.status(200), ctx.json({ data: newComments.newComment1 }));
+        return HttpResponse.json({ data: newComments.newComment1 });
       })
     );
     const { result } = renderHook(
@@ -269,7 +269,7 @@ describe('useFetchComments', () => {
 
   test('新着の手動取得失敗時は error を通知して未取得の一覧を維持する', async () => {
     server.use(
-      rest.get(`${baseURL}${API_PATH.COMMENT_NEW}`, (_req, res, ctx) => res(ctx.status(500)))
+      http.get(`${baseURL}${API_PATH.COMMENT_NEW}`, () => new HttpResponse(null, { status: 500 }))
     );
     const { result } = renderHook(
       () => ({
