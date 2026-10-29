@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest';
-import { expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { pickModifiedData } from "../functions"
 import { WEIGHT_CLASS, GRADE } from '@/constants/boxerData';
 import { COUNTRY } from '@/constants/country';
