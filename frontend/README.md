@@ -53,6 +53,24 @@ docker compose run --rm --no-deps node npm run lint
 docker compose run --rm --no-deps node npm run build
 ```
 
+## build・テスト・Storybookの互換設定
+
+Vite 7への更新後も、`vite.config.ts`の`build.target`はVite 4の既定値
+（es2020 / Edge 88 / Firefox 78 / Chrome 87 / Safari 14）を維持しています。
+これは変換対象の維持であり、各ブラウザでの動作試験を保証するものではありません。
+
+Vitest 4では未テストファイルもcoverageに含めるため、`vitest.config.mjs`で
+`coverage.include: ['src/**/*.{ts,tsx}']`を指定しています。
+coverageの集計方式が変わるため、以前との比較では対象ファイルと集計方式も確認してください。
+Docker等の非対話実行でVitest UIを開き続ける場合は、`npm test -- --ui --watch`のように
+watchモードを明示します。
+
+Storybook 10は`npm run sb`で別途起動し、`npm run build-storybook`で静的buildします。
+既存4ストーリーを維持し、Docsは`@storybook/addon-docs`、Controls/Actions等は本体の機能を使用します。
+既存の`autodocs`タグが付いたストーリーのDocsを生成します。
+型から生成する選択式Controlsを維持するため、`reactDocgen`は旧版と同じ
+`react-docgen-typescript`を明示しています。
+
 ## Server state
 
 サーバーデータは TanStack Query v5 (`@tanstack/react-query`) で管理します。

@@ -1,5 +1,5 @@
 import { ToastModal, PropsType } from './ToastModal';
-import { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 import { BG_COLOR_ON_TOAST_MODAL, MESSAGE } from '@/constants/statusesOnToastModal';
 import { RecoilRoot } from 'recoil';
 

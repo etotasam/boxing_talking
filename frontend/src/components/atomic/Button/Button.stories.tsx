@@ -1,5 +1,5 @@
 import { Button } from './Button';
-import { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 
 export default {
   title: 'Button',

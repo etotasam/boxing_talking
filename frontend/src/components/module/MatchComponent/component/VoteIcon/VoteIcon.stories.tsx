@@ -1,5 +1,5 @@
 import { VoteIcon } from './VoteIcon';
-import { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 
 const COLOR = [
   '',

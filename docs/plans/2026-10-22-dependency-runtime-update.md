@@ -6,10 +6,10 @@ Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持�
 
 ## Current Progress
 
-最終更新: **2026-10-29 JST**。**P3まで実装・検証・Reviewer確認とコミット保存済み。P3保存先は`a5648642`。元worktreeへのP1〜P3統合と実起動確認も完了。P4aは依存実装・検証・Reviewer確認・コミット保存完了。元環境へ未統合。P4全体は未完了。**
+最終更新: **2026-10-29 JST**。**P3まで実装・検証・Reviewer確認とコミット保存済み。P3保存先は`a5648642`。元worktreeへのP1〜P3統合と実起動確認も完了。P4aは依存実装・検証・Reviewer確認・コミット保存完了。元環境へ未統合。P4全体は未完了。P4bも実装・検証完了、最終Reviewer確認完了（必須指摘なし）。コミット保存済み・元環境未統合。**
 
 - 継続利用するworktree: `/Users/terashimamasato/.codex/worktrees/backend-sdk-security/boxing_talking`。追加のworktreeは作成しない。
-- 現在のbranch: `codex/frontend-dependency-security`（P4a）。P3完了`a56486426a398e65b01d2f39a3f120c41cce0843`から同じ作業worktreeで`git switch -c`により作成・切替。P3時のbranchは`codex/node-lts-update`。
+- 現在のbranch: `codex/frontend-build-update`（P4b）。P4a保存`a3c14326`から同じ作業worktreeで`git switch -c`により作成・切替。P4aのbranchは`codex/frontend-dependency-security`、P3時は`codex/node-lts-update`。
 - P1〜P3は元checkout/元Composeへa5648642まで統合・実起動確認済み。統合結果文書は元側で未コミットとして保持。本P4作業へ無断で移動・保存しない。本番反映は未実施。
 
 | 段階 | 実装・検証 | コミット・保存 | 結果・根拠 |
@@ -18,21 +18,21 @@ Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持�
 | P1: AWS SDK / JMESPath | 完了。SDK3.401.3/JMESPath2.9.1、必須symfony/filesystem8.1.9追加。backend170成功・既存skip1・440 assertions | `8b8dc1157e008e103133ef04bffc7db6e5a940ea` | [P1計画・結果](2026-10-22-backend-sdk-security.md)。対象3 advisories解消、Reviewer問題なし |
 | P2: JWT 7系 | 完了。JWT7.2.1、旧token互換、実登録/worker/ローカルSMTP/login、backend172成功・既存skip1・446 assertions | `codex/backend-jwt-security`先端（本書を含むP2完了コミット） | [P2計画・結果](2026-10-29-backend-jwt-security.md)。JWT指摘解消、Reviewer問題なし |
 | P3: Node LTS・導入経路 | **実装・検証・Reviewer確認完了** | `a5648642` | [P3計画・結果](2026-10-29-node-lts-update.md)。Node24.22.1/npm11.19.1、npm ci/再導入・全frontend204・build/lint・Storybook/coverage/UI・backend172成功 |
-| P4: frontend依存 | **P4a実装・検証・Reviewer確認完了。P4全体は未完了** | 本書を含む`codex/frontend-dependency-security`のP4a完了コミット | [P4a計画・結果](2026-10-29-frontend-dependency-security.md)。Axios/Lodash/PostCSSを先行し、各小段階で承認・検証 |
+| P4: frontend依存 | **P4a保存済み。P4b実装・検証完了、最終Reviewer確認完了（必須指摘なし）。P4全体は未完了** | `a3c14326`（P4a）と本書を含むcodex/frontend-build-updateのP4b完了コミット | [P4a計画・結果](2026-10-29-frontend-dependency-security.md)。Axios/Lodash/PostCSSを先行し、各小段階で承認・検証 |
 | P5: MySQL8.4 LTS | 未着手 | 未作成 | Node/frontend更新と分離して対応 |
 | P6: 最終統合・公開準備 | 未着手 | 未作成 | 全段階の再構築・回帰・残課題確認。本番公開承認を含まない |
 
 ### 次に行うこと
 
 1. [P4a具体案](2026-10-29-frontend-dependency-security.md)は同条件監査・設計レビュー済み。対象版/間接依存/検証をユーザー承認済み。
-2. P4aは全frontend204件・lint/build・coverage/UI・Storybook・合成APIの実通信を確認済み。最終Reviewerも必須指摘なし。ユーザーの保存依頼により本書を含むP4a完了コミットへ保存。次の作業依頼後、P4bの互換組とcritical7件の対応案を調査する。
+2. P4aは全frontend204件・lint/build・coverage/UI・Storybook・合成APIの実通信を確認済み。最終Reviewerも必須指摘なし。ユーザーの保存依頼により本書を含むP4a完了コミットへ保存。P4bは[Vite/Vitest/Storybook計画・結果](2026-10-29-frontend-build-update.md)を承認後に実装・検証済み。Vite7.3.7/Vitest4.1.12組/Storybook10.6.5組、全依存72→33・critical7→0、全204件・build/lint・coverage/UI・HMR・実通信を確認。最終Reviewer確認完了（必須指摘なし）。ユーザーの依頼により本書を含むP4b完了コミットへ保存。次の作業依頼後に残存33件の対応案を調査する。Storybook7維持では保守中Viteへ移れないため、ユーザーがStorybookも更新する案の調査を選択。その後go aheadで具体版・実装を承認済み。
 
 ### 残課題
 
 - **Composer監査は0ではない。** P2時点の同時監査は更新前JWT low+Symfony Mime mediumの2件→更新後Mime mediumのみ1件。`symfony/mime v7.4.19` / `PKSA-wtxr-p26d-nn42` / `CVE-2026-45070`が残る。更新前後でpackage/ref・advisoryは同一で、JWT更新による追加ではない。配信された修正範囲と公式GHSAの記載差を別途照合し、対応する段階・具体版は未決。公開判断までに対応案を提示し承認を得る。P2へ無断追加せず、監査ignoreもしない。[P2の残存監査記録](2026-10-29-backend-jwt-security.md#残存監査p2対象外)
 - P1はユーザー指定により、依存更新と既存backendテストまでに限定。新規テスト・SES補足・SDK/JMESPath smokeは実施していない。この限定はP1のもの。[P1承認範囲](2026-10-22-backend-sdk-security.md)
 - JWTの開発用鍵は最低長のみ確認済みで、実鍵/APP_KEYは変更していない。本番鍵の適合性・生成強度・本番queue切替、外部SMTP/S3、本番公開は未確認・未実施。
-- P3のNode24.22.1は承認済み暫定版。latest24.22.2の対応Alpine image取得は未確認。P4aでAxios/Lodash/PostCSSを更新・検証済み（コミット保存済み・元環境未統合）。全依存監査79→72 packages（critical7/high26/moderate29/low10）、omit-dev19→12。critical7を含む残存対象はP4b以降で対応。MySQL8.4移行は未着手。
+- P3のNode24.22.1は承認済み暫定版。latest24.22.2の対応Alpine image取得は未確認。P4aでAxios/Lodash/PostCSSを更新・検証済み（コミット保存済み・元環境未統合）。全依存監査79→72 packages（critical7/high26/moderate29/low10）、omit-dev19→12。P4bでも同条件72→33（critical0/high14/moderate10/low9）、omit-dev12→9へ改善。残る33件は次の小段階で具体案を提示。MySQL8.4移行は未着手。
 
 実装・検証の完了時、コミット時、branch切り替え時には、本節・版情報・Tasksを対応する実績に合わせて更新する。過去時点の結果は日付を付けて残し、現在の状態と区別する。
 
@@ -64,7 +64,7 @@ Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持�
 | symfony/mime | 7.4.19 | **7.4.19（未変更）** | P2で残存medium指摘を把握。情報源照合・対応段階/版は別途決定 |
 | frontend Node | Docker21.6.1 | **24.22.1 / npm11.19.1** | P3実装・検証・保存済み。承認済み暫定版をdigest固定 |
 | PHP image内Node | 16.13.2 | **削除済み** | P3で現行経路に不要と確認。PHP/Composer/FPM/全backendの回帰成功 |
-| frontend主要依存 | Axios1.13.4、Lodash4.17.23、PostCSS8.5.6、Vite4.5.14、Vitest1.6.1、Tailwind3.4.19、React Router DOM6.30.3、uuid9.0.1 | **Axios1.20.0、Lodash4.18.1、PostCSS8.5.32**。他は計画開始時のまま | P4a実装・検証・コミット保存済み。残存対象はP4b以降で段階更新 |
+| frontend主要依存 | Axios1.13.4、Lodash4.17.23、PostCSS8.5.6、Vite4.5.14、Vitest1.6.1、Tailwind3.4.19、React Router DOM6.30.3、uuid9.0.1 | **Axios1.20.0、Lodash4.18.1、PostCSS8.5.32、Vite7.3.7、Vitest4.1.12、Storybook10.6.5**。Tailwind/Router/uuidは維持 | P4a保存済み。P4b実装・検証・保存済み。残存対象は次の小段階で対応 |
 | MySQL | 8.0.21 | 8.0.21 | P5未着手。8.4 LTSを初期候補とし、具体版/digest・更新経路を実行前に決定 |
 
 未着手段階の候補は確定版ではない。実行前に公式情報・監査・依存解決dry-runから具体的な版と変更対象を提示し、承認を得る。PHP8.5.12とLaravel13.38.0は維持しており、追加更新が必要なら理由と最小案を別途提示する。
@@ -125,7 +125,7 @@ Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持�
 | P1 | codex/backend-sdk-security | P0完了commit |
 | P2 | codex/backend-jwt-security | P1完了commit |
 | P3 | codex/node-lts-update | P2完了commit |
-| P4 | codex/frontend-dependency-security（P4a作成済み）、以降は小段階ごとに作成 | P3完了commit / 直前小段階の完了commit |
+| P4 | codex/frontend-dependency-security（P4a保存済み）/ codex/frontend-build-update（P4b保存済み）、以降は小段階ごと | P3完了commit / 直前小段階の完了commit |
 | P5 | codex/mysql-lts-update | P4完了commit |
 | P6 | codex/security-runtime-final-check | P5完了commit |
 
@@ -172,7 +172,7 @@ P0の統合完了後は新worktree内でローカルbranchを順に切り替え�
 
 ### P4: frontend依存の脆弱性対応
 
-**進捗: P4aの依存実装・検証・Reviewer確認・コミット保存完了。元環境未統合。P4全体は未完了。** [P4a詳細](2026-10-29-frontend-dependency-security.md)。以下は全体方針。
+**進捗: P4aの依存実装・検証・Reviewer確認・コミット保存完了（a3c14326）。元環境未統合。P4bは実装・検証完了、最終Reviewer確認完了（必須指摘なし）。コミット保存済み。P4全体は未完了。** [P4a詳細](2026-10-29-frontend-dependency-security.md)。以下は全体方針。
 
 - P4a: Axios/Lodash/PostCSS等の互換修正版と必要な間接依存から対応する。React Router/uuid等も利用経路・公開影響を確認して候補を決定。
 - P4b以降: Vite/Vitest/@vitest/ui/coverage、対応plugin/Storybook/TypeScriptの制約を照合し、互換性が必要な組だけを更新。CSS基盤の更新はさらに別の小段階にする。
