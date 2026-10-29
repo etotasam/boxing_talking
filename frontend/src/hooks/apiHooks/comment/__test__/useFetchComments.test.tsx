@@ -3,7 +3,7 @@ import { describe, expect, test, vi, beforeAll, afterAll, beforeEach, afterEach 
 import { RecoilRoot, useRecoilValue } from 'recoil';
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { http, HttpResponse } from 'msw/http';
+import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { API_PATH } from '@/constants/apiPath';
 import { apiFetchState } from '@/store/apiFetchDataState';
