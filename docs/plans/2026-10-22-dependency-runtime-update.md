@@ -21,6 +21,8 @@ P4gは[未使用テスト関連直接依存の整理](2026-10-30-frontend-unused
 
 P4hは[MSW/Vitest peer整合](2026-10-30-frontend-msw-vitest-peer.md)のA案をユーザー承認後に適用。Vitest4.1.12を維持しMSW2.15.0へ調整、テストimport1行を変更。実npm ciとnpm ls --all exit0、全204件・coverage・lint/型検査/build・Storybook/UI成功。監査15/omit-dev5維持、新規advisoryなし。最終Reviewer確認完了（問題なし）。ユーザー依頼により本書を含むP4h保存コミットへ保存。元環境未統合。
 
+P4i-1は[ESLint・Babel・CSS計画と結果](2026-10-30-frontend-eslint-babel-css.md)の第1段階Aのみユーザー承認後に適用。manifest不変のlock更新、通常npm ci/実tree、全204件・coverage・lint/型検査/build・Storybook/UI・PC/SPと合成API操作を確認。本番全6assetは基点とhash一致。監査15→6/omit-dev5→0。最終Reviewer確認完了（問題なし・必須指摘なし）。ユーザー依頼により本書を含むP4i-1保存コミットへ保存。元環境未統合。ESLint10移行の第2段階は未着手で、結果確認後のユーザー判断を待つ。P4全体は未完了。
+
 - 継続利用するworktree: `/Users/terashimamasato/.codex/worktrees/backend-sdk-security/boxing_talking`。追加のworktreeは作成しない。
 - 現在のbranch: `codex/frontend-build-update`（P4b/P4c/P4d-1保存済み、P4e/P4fも各計画を含む保存コミットへ保存）。P4a保存`a3c14326`から同じ作業worktreeで`git switch -c`により作成・切替。P4aのbranchは`codex/frontend-dependency-security`、P3時は`codex/node-lts-update`。
 - P1〜P3は元checkout/元Composeへa5648642まで統合・実起動確認済み。統合結果文書は元側で未コミットとして保持。本P4作業へ無断で移動・保存しない。本番反映は未実施。
@@ -38,11 +40,11 @@ P4hは[MSW/Vitest peer整合](2026-10-30-frontend-msw-vitest-peer.md)のA案を�
 ### 次に行うこと
 
 1. [P4a具体案](2026-10-29-frontend-dependency-security.md)は同条件監査・設計レビュー済み。対象版/間接依存/検証をユーザー承認済み。
-2. P4aは全frontend204件・lint/build・coverage/UI・Storybook・合成APIの実通信を確認済み。最終Reviewerも必須指摘なし。ユーザーの保存依頼により本書を含むP4a完了コミットへ保存。P4bは[Vite/Vitest/Storybook計画・結果](2026-10-29-frontend-build-update.md)を承認後に実装・検証済み。Vite7.3.7/Vitest4.1.12組/Storybook10.6.5組、全依存72→33・critical7→0、全204件・build/lint・coverage/UI・HMR・実通信を確認。最終Reviewer確認完了（必須指摘なし）。ユーザーの依頼により本書を含むP4b完了コミットへ保存。P4d-1でCypress削除後は26 packagesが残る。P4eでRouter7.18.5へ移行後は24 packagesが残る。P4fでMSW3.0.3へ移行後は21 packagesが残る。P4gでテスト関連6直接指定を整理後は15 packagesが残る。P4hでMSW/Vitest optional peer整合を解消。次はESLint/Babel/CSS関連の具体案を調査する。Storybook7維持では保守中Viteへ移れないため、ユーザーがStorybookも更新する案の調査を選択。その後go aheadで具体版・実装を承認済み。
+2. P4aは全frontend204件・lint/build・coverage/UI・Storybook・合成APIの実通信を確認済み。最終Reviewerも必須指摘なし。ユーザーの保存依頼により本書を含むP4a完了コミットへ保存。P4bは[Vite/Vitest/Storybook計画・結果](2026-10-29-frontend-build-update.md)を承認後に実装・検証済み。Vite7.3.7/Vitest4.1.12組/Storybook10.6.5組、全依存72→33・critical7→0、全204件・build/lint・coverage/UI・HMR・実通信を確認。最終Reviewer確認完了（必須指摘なし）。ユーザーの依頼により本書を含むP4b完了コミットへ保存。P4d-1でCypress削除後は26 packagesが残る。P4eでRouter7.18.5へ移行後は24 packagesが残る。P4fでMSW3.0.3へ移行後は21 packagesが残る。P4gでテスト関連6直接指定を整理後は15 packagesが残る。P4hでMSW/Vitest optional peer整合を解消。ESLint/Babel/CSS調査後、第1段階の互換範囲内更新を実装・検証し監査6件。本結果確認後に第2段階ESLint10移行の実施可否をユーザーが判断する。Storybook7維持では保守中Viteへ移れないため、ユーザーがStorybookも更新する案の調査を選択。その後go aheadで具体版・実装を承認済み。
 
 ### 残課題
 
-- P4fからのMSW/Vitest optional peer不整合はP4hで解消。ユーザー承認に基づきMSW2.15.0/Vitest4.1.12へ揃え、実npm ls --allがexit0となった。詳細は[P4h検証結果](2026-10-30-frontend-msw-vitest-peer.md#承認後の実装検証結果)。監査15件は引き続き残る。
+- P4fからのMSW/Vitest optional peer不整合はP4hで解消。ユーザー承認に基づきMSW2.15.0/Vitest4.1.12へ揃え、実npm ls --allがexit0となった。詳細は[P4h検証結果](2026-10-30-frontend-msw-vitest-peer.md#承認後の実装検証結果)。P4i-1適用後の監査は6件（TypeScript ESLint6固定経路）、omit-dev0。
 
 - **Composer監査は0ではない。** P2時点の同時監査は更新前JWT low+Symfony Mime mediumの2件→更新後Mime mediumのみ1件。`symfony/mime v7.4.19` / `PKSA-wtxr-p26d-nn42` / `CVE-2026-45070`が残る。更新前後でpackage/ref・advisoryは同一で、JWT更新による追加ではない。配信された修正範囲と公式GHSAの記載差を別途照合し、対応する段階・具体版は未決。公開判断までに対応案を提示し承認を得る。P2へ無断追加せず、監査ignoreもしない。[P2の残存監査記録](2026-10-29-backend-jwt-security.md#残存監査p2対象外)
 - P1はユーザー指定により、依存更新と既存backendテストまでに限定。新規テスト・SES補足・SDK/JMESPath smokeは実施していない。この限定はP1のもの。[P1承認範囲](2026-10-22-backend-sdk-security.md)
