@@ -86,7 +86,9 @@ Babel/CSSが生成物に与える影響と、lint設定のメジャー移行を�
 - [x] 第1段階Aの実装承認・適用・実検証。
 - [x] 第1段階Aの最終Reviewer確認（問題なし・必須指摘なし）。
 - [x] 第1段階Aのcommit保存（ユーザー依頼により本書を含む保存コミットへ保存）。
-- [ ] 第2段階Cの設定/ルール/対象範囲の具体化・設計確認・実装承認。
+- [x] 第2段階Cの設定/ルール/対象範囲を具体化・Reviewer設計確認。[詳細提案](2026-10-30-frontend-eslint10-migration.md)。
+- [x] 第2段階Cの実装承認・適用・検証。ユーザー方針で6配列を直接文字列union化へ改訂。最終Reviewer確認完了（問題なし・必須指摘なし）。
+- [ ] 新規監査情報に基づくmoderate14件への追加方針決定。
 
 ## Test Plan（各段階の実装承認後）
 
@@ -138,3 +140,7 @@ Babel/CSSが生成物に与える影響と、lint設定のメジャー移行を�
 - 証跡: Git除外 `docker/db/backup/frontend-compatible-update-p4i1-20261030/`。npm ci/tree、全件/coverage、lint/build、監査、asset比較、画面操作、専用serviceログ、summaryとhash manifest。DB・秘密鍵・合成資格情報のスクリプトは含めない。
 - 最終Reviewer確認完了（問題なし・必須指摘なし）。Reviewerは候補一致・実tree・全204件の識別子/結果・本番6asset・監査・証跡24項目のhashを確認。比較用build-browser.logを補完し、checks用build.logとの環境差をsummaryへ明記。
 - 検証用Composeは終了済み、volume/合成データは保持。ユーザー依頼により本書を含む第1段階保存コミットへ保存。元環境未統合。第2段階へ進むかはユーザー判断待ち。
+
+## 第2段階の続報（2026-10-31）
+
+[ESLint10移行の実績](2026-10-30-frontend-eslint10-migration.md)を参照。union直接定義とESLint10移行は実装・全件/build等検証済み、最終Reviewer確認完了（問題なし）・ユーザー依頼により本書を含むP4i-2保存コミットへ保存。新規配信advisoryにより同時点監査は旧18→新14（high6→0、omit-dev0）。当初候補監査0は調査時点の結果であり、現状の全監査0ではない。P4全体は未完了。

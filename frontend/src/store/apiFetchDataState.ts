@@ -5,26 +5,20 @@ import { atomFamily } from "recoil";
 //   "isSuccess",
 //   "isError",
 
-const state = [
-  "loading",
-  "fetching",
-  "refetching",
-  "success",
-  "error",
-  "idle"
-] as const
-
-const dataName = [
-  "comments/fetch",
-  "comments/post",
-  "userPrediction/fetch",
-  "userPrediction/post",
-  "matchPrediction/fetch",
-] as const
-
 // type DataFetchStateType = (typeof dataFetchState)[number]
-type DataNameType = (typeof dataName)[number]
-export type ApiFetchStateType = (typeof state)[number]
+type DataNameType =
+  | 'comments/fetch'
+  | 'comments/post'
+  | 'userPrediction/fetch'
+  | 'userPrediction/post'
+  | 'matchPrediction/fetch';
+export type ApiFetchStateType =
+  | 'loading'
+  | 'fetching'
+  | 'refetching'
+  | 'success'
+  | 'error'
+  | 'idle';
 
 
 //   key: "apiFetchDataState",

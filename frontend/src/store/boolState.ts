@@ -1,10 +1,6 @@
 import { atomFamily } from "recoil";
 
-const boolTypeName = [
-  "IS_SCROLL"
-] as const
-
-export type AtomType = (typeof boolTypeName)[number]
+export type AtomType = 'IS_SCROLL';
 
 export const boolState = atomFamily<boolean, AtomType>({
   key: "boolState",

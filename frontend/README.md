@@ -93,21 +93,14 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+## ESLintの設定
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+ESLint 10とTypeScript ESLint 8を使用し、設定は`eslint.config.mjs`へ集約しています。
+`npm run lint`で従来と同じ`.ts`/`.tsx`を検査し、警告も失敗として扱います。
+`dist`、隠しファイル/ディレクトリ、JavaScript設定ファイルは従来どおり対象外です。
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+依存更新による検査方針の変更を避けるため、旧実効ルールを明示しています。
+新recommended、React Compiler向けルール、型情報を使うlintの採用は別途判断します。
+`no-console`は`console.error`のみ許可し、既存の`exhaustive-deps`無効化方針も維持しています。
+削除された`ban-types`の検査は`no-restricted-types`へ引き継ぎ、旧来のグローバル定義を
+維持するため`globals`は13系を直接指定しています。
