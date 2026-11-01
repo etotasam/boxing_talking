@@ -305,3 +305,17 @@ P0の統合完了後は新worktree内でローカルbranchを順に切り替え�
 - [Node対応状況](https://nodejs.org/en/about/previous-releases)
 - [MySQL8.4更新経路](https://dev.mysql.com/doc/refman/8.4/en/upgrade-paths.html)
 - [MySQL更新前準備](https://dev.mysql.com/doc/refman/8.4/en/upgrade-prerequisites.html)
+
+
+## 元worktreeで保持するP1〜P3の追記（2026-10-29の履歴）
+
+以下は統合前から元worktreeにあった追記の当時の記録。2026-11-02に本書を含む文書保存コミットへ保存する。上のP4進捗と区別し、以下の「未コミット」は2026-10-29時点を示す。
+
+最終更新: **2026-10-29 JST**。**P3まで実装・検証・Reviewer確認とコミット保存済み。P3保存先は本書を含むcodex/node-lts-updateの完了コミット。元worktreeへのP1〜P3統合・実起動確認も完了し、結果の最終Reviewer問題なし。**
+- 段階作業側branch: `codex/node-lts-update`。作業基点は`codex/backend-jwt-security`先端のP2完了コミット（本書の進捗更新を含む）。P2保存後、同worktreeで`git switch -c codex/node-lts-update`により作成・切替。
+- P1〜P3を元checkoutの`codex/laravel-php-upgrade`へ`a5648642`までfast-forward済み。元Composeでも依存導入・実起動・全テストと読み取り表示、既存DB/queue保持を確認。[統合計画・結果](2026-10-29-p1-p3-integration.md)。本番反映は未実施。
+1. P3保存・元worktree統合・実起動検証まで完了。統合結果もReviewer問題なし。結果追記は未コミット。
+
+### 元worktreeへの中間統合（2026-10-29）
+
+元側branchは`codex/laravel-php-upgrade`、HEAD`a5648642`。P1〜P3の依存/runtimeを元Composeへ反映し、backend172成功・既存skip1、frontend204成功・lint/build、元HTTP/browserと全20テーブル/既存queue保持を確認。最終Reviewer問題なし。詳細は[統合結果](2026-10-29-p1-p3-integration.md)。この結果追記は未コミット。

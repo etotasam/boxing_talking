@@ -187,3 +187,7 @@ Git対象外の`docker/db/backup/node-lts-update-20261029/`にresult-final.json/
 - 最終Reviewer確認（2026-10-29）: **問題なし、必須の未実施・不整合なし**。再導入/再起動と各テスト・ブラウザ結果、lock三者一致、最終文書、保存証跡294件のmanifestを照合済み。P3専用container/networkは全profileを含め終了・除去し、元php/web/node/dbの継続稼働を確認した。
 
 - 保存依頼・message承認: ユーザーのok! go ahead!!により`chore(runtime): Node24への更新と依存導入手順を整備`で保存。続く元worktreeへのP1〜P3統合は別計画で承認済み。
+
+## 元worktreeへの反映（2026-10-29）
+
+P3を`a56486426a398e65b01d2f39a3f120c41cce0843`へ保存後、元branch`codex/laravel-php-upgrade`へP1〜P3をfast-forward統合した。元ComposeでもNode24/npm11とPHP内Node削除・新namedvolumeを確認し、全backend/frontend・lint/build・HTTP/browser読み取りと既存DB/queue保持を確認。最終Reviewer問題なし。詳細は[中間統合結果](2026-10-29-p1-p3-integration.md)。この反映追記は2026-11-02に本書を含む文書保存コミットへ保存する。以前の未統合の記載はP3専用検証時点の履歴として扱う。
