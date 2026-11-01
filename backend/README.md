@@ -39,7 +39,7 @@ Laravel 12.69.0以上への更新に伴い、中間版を通過するための4�
 Laravel 11では未使用の `rorecek/laravel-ulid` と、native schema移行に伴い未使用となった `doctrine/dbal` の直接依存を除去しました。ID生成は既存の `Str::uuid()` を維持します。Sanctum 4の設定キーへ移行し、既存のCookie認証方式と公開済みのトークン表・期限列マイグレーションを維持しています。
 SQLiteで全履歴を新規構築できるよう、スナップショット表の主キー切替はSQLite限定で再構築してから `id` を削除します。MySQLの処理と既存DBの適用済み履歴は維持します。
 
-詳細な承認範囲・検証・復旧方法は [アップグレード計画](../docs/plans/2026-10-19-laravel-php-upgrade.md) を参照してください。
+詳細な承認範囲・検証・復旧方法は [アップグレード計画](../docs/plans/archive/laravel-php/2026-10-19-laravel-php-upgrade.md) を参照してください。
 
 ## Learning Laravel
 
@@ -92,7 +92,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - `config/session.php`の`serialization`は`php`を維持し、既存セッションを引き継ぎます。`json`への切替はセッション失効を伴うため別途判断します。
 - `config/cache.php`の`serializable_classes`は`false`です。キャッシュはスカラー・配列を使用し、PHPオブジェクトの保存が必要になった場合は必要なクラスの許可リストを検討してください。
 - `SESSION_COOKIE`、`CACHE_PREFIX`、`REDIS_PREFIX`の既定値は既存設定を維持しています。新ひな型の接頭辞へ一括変更しないでください。
-- HTTPSでの送信元検証は、信頼できる証明書を使って別途検証します。詳細・残課題はリポジトリルートの`docs/plans/2026-10-22-laravel-php-s6-plan.md`を参照してください。
+- HTTPSでの送信元検証は、信頼できる証明書を使って別途検証します。詳細・残課題はリポジトリルートの`docs/plans/archive/laravel-php/2026-10-22-laravel-php-s6-plan.md`を参照してください。
 
 ## PHP 8.4への移行（S7）
 
@@ -110,7 +110,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 ## 最終統合検証・公開前の残課題（S9）
 
-最終lockから空vendorへComposer installし、frontendもlockからnpm ciして全テスト・build・lintを確認しました。専用MySQLの空DB構築と旧データ移行、実HTTP/ブラウザ、実worker/SMTP登録を含みます。詳細と復旧手順は[最終検証結果](../docs/plans/2026-10-22-laravel-php-s9-result.md)を参照してください。
+最終lockから空vendorへComposer installし、frontendもlockからnpm ciして全テスト・build・lintを確認しました。専用MySQLの空DB構築と旧データ移行、実HTTP/ブラウザ、実worker/SMTP登録を含みます。詳細と復旧手順は[最終検証結果](../docs/plans/archive/laravel-php/2026-10-22-laravel-php-s9-result.md)を参照してください。
 
 既存の依存脆弱性、PHPイメージ内Node16・frontend用DockerのNode21・MySQL8.0のサポート終了は別途対応が必要です。今回のfrontend検証はホストNode22.10.0で行い、既存DockerのNode21で成功したとは扱いません。本番デプロイ、外部SMTP/S3、本番TLS/DB、worker/cron運用と永続backup/restoreは別タスクで確認します。
 
