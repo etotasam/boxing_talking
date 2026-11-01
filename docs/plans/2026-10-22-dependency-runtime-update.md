@@ -23,6 +23,8 @@ P4hは[MSW/Vitest peer整合](2026-10-30-frontend-msw-vitest-peer.md)のA案を�
 
 P4i-1は[ESLint・Babel・CSS計画と結果](2026-10-30-frontend-eslint-babel-css.md)の第1段階Aのみユーザー承認後に適用。manifest不変のlock更新、通常npm ci/実tree、全204件・coverage・lint/型検査/build・Storybook/UI・PC/SPと合成API操作を確認。本番全6assetは基点とhash一致。監査15→6/omit-dev5→0。最終Reviewer確認完了（問題なし・必須指摘なし）。ユーザー依頼により本書を含むP4i-1保存コミットへ保存。元環境未統合。ESLint10移行の[第2段階具体案](2026-10-30-frontend-eslint10-migration.md)は設計・Reviewer確認完了（問題なし）。2026-10-31にユーザーが6配列の直接文字列union化を承認し、ESLint10移行と併せて実装・全204件/coverage/lint/build/画面検証済み。最終Reviewer確認完了（問題なし）・ユーザー依頼により本書を含むP4i-2保存コミットへ保存。新しい監査情報の同時点比較は旧18→新14（high6→0、omit-dev0）で、moderate14件の追加対応は未決。P4全体は未完了。
 
+P4jは[残存moderate advisory調査](2026-11-02-frontend-moderate-advisories.md)を実施。2026-11-02の基点・通常更新候補ともmoderate14/omit-dev0。修正版minimatch11/glob14を上位安定版の依存指定がまだ許容せず、現時点の通常更新による解消経路は確認できなかった。ESLint10.14.0だけの更新候補は指摘が減らないため未適用。Reviewer問題なし。実依存の変更は提案せず上位対応待ちを推奨し、部分改善も再評価する。指摘は未解決・P4未完了、調査文書はユーザーの統合依頼に伴い本書を含むコミットへ保存。
+
 - 継続利用するworktree: `/Users/terashimamasato/.codex/worktrees/backend-sdk-security/boxing_talking`。追加のworktreeは作成しない。
 - 現在のbranch: `codex/frontend-build-update`（P4b/P4c/P4d-1保存済み、P4e/P4fも各計画を含む保存コミットへ保存）。P4a保存`a3c14326`から同じ作業worktreeで`git switch -c`により作成・切替。P4aのbranchは`codex/frontend-dependency-security`、P3時は`codex/node-lts-update`。
 - P1〜P3は元checkout/元Composeへa5648642まで統合・実起動確認済み。統合結果文書は元側で未コミットとして保持。本P4作業へ無断で移動・保存しない。本番反映は未実施。
