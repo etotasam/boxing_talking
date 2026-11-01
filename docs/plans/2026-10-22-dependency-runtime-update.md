@@ -6,6 +6,10 @@ Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持�
 
 ## Current Progress
 
+最終更新: **2026-11-02 JST**。P4の実装とP4jの保留記録は元worktreeの`codex/laravel-php-upgrade`へff-only統合済み。コード衝突なし、元の文書追記も保持。全204 frontendテスト・lint/型/build/Storybook buildと隔離backend172成功/skip1、元環境の読取起動確認を実施。[統合計画・結果](2026-11-02-frontend-main-integration.md)を参照。**moderate14/2advisoryは上流待ちで保留し、P4全体は未完了。**
+
+以下は各段階の保存時点の履歴であり、「元環境未統合」は当時の状態を示す。
+
 最終更新: **2026-10-30 JST**。**P3まで実装・検証・Reviewer確認とコミット保存済み。P3保存先は`a5648642`。元worktreeへのP1〜P3統合と実起動確認も完了。P4aは依存実装・検証・Reviewer確認・コミット保存完了。元環境へ未統合。P4全体は未完了。P4bも実装・検証完了、最終Reviewer確認完了（必須指摘なし）。コミット保存済み・元環境未統合。**
 
 
