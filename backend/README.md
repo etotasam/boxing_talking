@@ -133,7 +133,7 @@ PHP image内Nodeの削除による変更はありません。
 
 ## MySQL更新用の隔離baseline（P5・A0）
 
-通常Composeとは別の `docker-compose.mysql-upgrade.yml` を使います。以下はMySQL8.0.21の初期baseline準備手順です。隔離検証の第1段階Aと、承認後の元環境適用の第2段階Bは完了しました。Aの手順は通常Composeや実データに流用しないでください。[P5計画](../docs/plans/2026-11-02-mysql-lts-update.md)を参照してください。
+通常Composeとは別の `docker-compose.mysql-upgrade.yml` を使います。以下はMySQL8.0.21の初期baseline準備手順です。隔離検証の第1段階Aと、承認後の元環境適用の第2段階Bは完了しました。Aの手順は通常Composeや実データに流用しないでください。[P5計画](../docs/plans/archive/dependency-runtime/2026-11-02-mysql-lts-update.md)を参照してください。
 
 - projectは`boxing-mysql-p5`、DB名は`boxing_p5_baseline`、DB serviceは`db80`。ホストへの公開ポートはありません。
 - DBはproject専用`baseline_db80` volume、DB/PHPはinternal networkだけを使います。元の`db`・`my_data`・通常Composeのnetworkを使いません。

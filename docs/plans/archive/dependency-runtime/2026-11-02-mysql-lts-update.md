@@ -1,12 +1,14 @@
 # P5: MySQL 8.4 LTS更新の準備・隔離検証計画
 
+> 完了済みの計画・実行記録。2026-11-02に`710864720e67f1c0042278536ddd9f8531eb9184`へ保存し、元branchへff-only統合済み。push未実施。以下の未コミット・統合待ち表記は各確認時点の履歴。現在の判断は[全体計画](../../2026-10-22-dependency-runtime-update.md)を参照する。件数・稼働状態は検証当時の値であり、通常利用再開後の不変を意味しない。
+
 ## Goal
 
 MySQL8.0.21から8.4 LTSへの更新を段階的に検証・適用する。第1段階Aの隔離検証と、別承認された第2段階Bの元環境適用・切替確認まで実行完了。main-worktreeのDBは8.4.13で、元データ20table/53履歴/未処理jobs3件を保持し、Web/PHP/Node/DBの通常利用を再開した。旧データ/旧image/各dumpを保持し、実.env/実鍵の本文は表示・コピーしていない。P5の技術作業は完了、変更は未コミット。P4監査保留/P6/本番公開承認は別とする。途中の停止・修正結果は履歴として以下に保持する。
 
 ## Background / Context
 
-- 2026-11-02 JST。worktreeはmysql-lts-update、branchはcodex/mysql-lts-update、基点97d6bdea。調査開始時clean。[全体計画](2026-10-22-dependency-runtime-update.md)のP5に対応する。P4 moderate14/2advisoryは上流待ちのまま別管理し、P4完了とは扱わない。
+- 2026-11-02 JST。worktreeはmysql-lts-update、branchはcodex/mysql-lts-update、基点97d6bdea。調査開始時clean。[全体計画](../../2026-10-22-dependency-runtime-update.md)のP5に対応する。P4 moderate14/2advisoryは上流待ちのまま別管理し、P4完了とは扱わない。
 - docker-compose.ymlのdbはmysql:8.0.21/linux/amd64、固定container_name=db、DBポートと資格情報は環境変数から取得。元DBのbindは./docker/db/my_data、backupは./docker/db/backup。web/php/nodeにも固定名・ポートがあり、そのまま別worktreeから起動しない。
 - 元Composeのweb/php/node/dbは稼働中、実db imageもmysql:8.0.21。今回はコンテナ名/image名と稼働状態のみ確認し、元DBへの接続・設定内容の取得は行っていない。
 - PHP8.5.12/Laravel13.38.0、pdo_mysqlを使用。DB設定はutf8mb4/utf8mb4_unicode_ci/strict。アプリtimezoneはAsia/Tokyo。ソースmigrationは35ファイル。元DBの実行履歴53件という過去記録とは区別する。
@@ -146,8 +148,8 @@ Cを推奨する。実行範囲の「第1段階A」と比較案の記号は別�
 - [8.0リリース情報](https://dev.mysql.com/doc/relnotes/mysql/8.0/en/)
 - [公式Docker8.4.13の定義](https://github.com/docker-library/mysql/blob/c92fbc392511086e6c1500f28a21421413f0bb51/8.4/Dockerfile.oracle)
 - [検査ツール用公式imageの定義](https://github.com/docker-library/mysql/blob/9b6c81572125a4ff828e3037c71940f3f8311978/innovation/Dockerfile.oracle)
-- [直近のbackend基準](archive/dependency-runtime/2026-11-02-frontend-main-integration.md)
-- [S9のMySQL検証範囲](archive/laravel-php/2026-10-22-laravel-php-s9-result.md)
+- [直近のbackend基準](2026-11-02-frontend-main-integration.md)
+- [S9のMySQL検証範囲](../laravel-php/2026-10-22-laravel-php-s9-result.md)
 
 ## Preparation Verification
 

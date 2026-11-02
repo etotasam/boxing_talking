@@ -4,14 +4,13 @@
 
 ## 現在の計画・保留事項
 
-保存状況の追記（2026-11-02）: ユーザー依頼によりP5を本コミットへ保存する。下表のP5「未コミット」は保存依頼前の記録。元branchへのコミット統合は別途行う。定期DBバックアップの仕組みは後日検討する。
+P5は`710864720e67f1c0042278536ddd9f8531eb9184`へ保存し、元branchへff-only統合済み（push未実施）。過去文書の未コミット・統合待ち表記は当時の履歴です。P6は提案済みですが実行未承認・未着手で、今回の文書整理承認には含みません。定期DBバックアップの仕組みは未実装で、後日検討します。
 
 | 文書 | 状態 |
 | --- | --- |
-| [2026-10-22-dependency-runtime-update.md](2026-10-22-dependency-runtime-update.md) | P0〜P6の入口。P0〜P3完了、P4個別実装・元統合済み/P4全体未完了、P5は隔離A/元適用Bまで技術完了・未コミット、P6未着手 |
+| [2026-10-22-dependency-runtime-update.md](2026-10-22-dependency-runtime-update.md) | P0〜P6の入口。P0〜P3完了、P4個別実装・元統合済み/P4全体未完了、P5完了・保存・元統合済み、P6提案済み・実行未承認・未着手 |
 | [2026-11-02-frontend-moderate-advisories.md](2026-11-02-frontend-moderate-advisories.md) | P4j。11月2日確認時点のmoderate14/devのみ・2advisory、上流待ちと再評価条件 |
-| [2026-11-02-plan-documents-organization.md](2026-11-02-plan-documents-organization.md) | 承認済みの文書整理計画・実施結果 |
-| [2026-11-02-mysql-lts-update.md](2026-11-02-mysql-lts-update.md) | P5。隔離A/元適用Bまで技術完了。main8.4.13で20table/53履歴/jobs3を保持し通常利用再開、旧保存先/image/backup保持。未コミット |
+| [2026-11-02-security-runtime-final-check.md](2026-11-02-security-runtime-final-check.md) | P6の作業案。実行未承認・未着手、本番公開承認は別途 |
 
 Composer Mimeの残存指摘、Node暫定版、本番HTTPS/SMTP/S3/queue等の未確認事項も全体計画の[残課題](2026-10-22-dependency-runtime-update.md#残課題)に保持しています。P4統合前のDB内容hashを復旧できない確認限界は[統合記録](archive/dependency-runtime/2026-11-02-frontend-main-integration.md)を参照してください。
 
@@ -46,9 +45,9 @@ S0〜S9と元統合の計画・結果。現在の構成は全体計画、最終�
 | [2026-10-22-laravel-php-s9-plan.md](archive/laravel-php/2026-10-22-laravel-php-s9-plan.md) | S9 最終統合検証・引き継ぎ計画 |
 | [2026-10-22-laravel-php-s9-result.md](archive/laravel-php/2026-10-22-laravel-php-s9-result.md) | S9 最終統合検証・引き継ぎ結果 |
 
-## 依存・実行環境更新：15文書
+## 依存・実行環境更新：16文書
 
-P1〜P4個別段階と元統合の記録。MSW3更新後に2.15.0へ調整した経緯など、版の変遷も保持しています。P4全体の保留は直下のP4j調査を参照してください。
+P1〜P5個別段階と元統合の記録。MSW3更新後に2.15.0へ調整した経緯など、版の変遷も保持しています。P4全体の保留は直下のP4j調査を参照してください。
 
 | 文書（旧ファイル名） | 対象・記録 |
 | --- | --- |
@@ -67,6 +66,13 @@ P1〜P4個別段階と元統合の記録。MSW3更新後に2.15.0へ調整した
 | [2026-10-30-frontend-router-v7.md](archive/dependency-runtime/2026-10-30-frontend-router-v7.md) | P4e: React Router 7系への移行 |
 | [2026-10-30-frontend-unused-test-dependencies.md](archive/dependency-runtime/2026-10-30-frontend-unused-test-dependencies.md) | P4g: 未使用のテスト関連直接依存の整理 |
 | [2026-11-02-frontend-main-integration.md](archive/dependency-runtime/2026-11-02-frontend-main-integration.md) | P4のmain-worktree統合・起動確認 |
+| [2026-11-02-mysql-lts-update.md](archive/dependency-runtime/2026-11-02-mysql-lts-update.md) | P5完了・保存・元統合済み（71086472）。8.4.13へ切替、検証時20table/53履歴/jobs3保持。通常利用再開済み、旧DB/image/backup保持。更新再開後の単純rollbackは禁止 |
+
+## 文書整理：1文書
+
+| 文書（旧ファイル名） | 対象・記録 |
+| --- | --- |
+| [2026-11-02-plan-documents-organization.md](archive/documentation/2026-11-02-plan-documents-organization.md) | 初回整理とP6前の追加整理の計画・実施記録 |
 
 ## 画面改善・Query移行：3文書
 
