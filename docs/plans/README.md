@@ -4,11 +4,14 @@
 
 ## 現在の計画・保留事項
 
+保存状況の追記（2026-11-02）: ユーザー依頼によりP5を本コミットへ保存する。下表のP5「未コミット」は保存依頼前の記録。元branchへのコミット統合は別途行う。定期DBバックアップの仕組みは後日検討する。
+
 | 文書 | 状態 |
 | --- | --- |
-| [2026-10-22-dependency-runtime-update.md](2026-10-22-dependency-runtime-update.md) | P0〜P6の入口。P0〜P3完了、P4個別実装・元統合済み/P4全体未完了、P5・P6未着手 |
+| [2026-10-22-dependency-runtime-update.md](2026-10-22-dependency-runtime-update.md) | P0〜P6の入口。P0〜P3完了、P4個別実装・元統合済み/P4全体未完了、P5は隔離A/元適用Bまで技術完了・未コミット、P6未着手 |
 | [2026-11-02-frontend-moderate-advisories.md](2026-11-02-frontend-moderate-advisories.md) | P4j。11月2日確認時点のmoderate14/devのみ・2advisory、上流待ちと再評価条件 |
 | [2026-11-02-plan-documents-organization.md](2026-11-02-plan-documents-organization.md) | 承認済みの文書整理計画・実施結果 |
+| [2026-11-02-mysql-lts-update.md](2026-11-02-mysql-lts-update.md) | P5。隔離A/元適用Bまで技術完了。main8.4.13で20table/53履歴/jobs3を保持し通常利用再開、旧保存先/image/backup保持。未コミット |
 
 Composer Mimeの残存指摘、Node暫定版、本番HTTPS/SMTP/S3/queue等の未確認事項も全体計画の[残課題](2026-10-22-dependency-runtime-update.md#残課題)に保持しています。P4統合前のDB内容hashを復旧できない確認限界は[統合記録](archive/dependency-runtime/2026-11-02-frontend-main-integration.md)を参照してください。
 

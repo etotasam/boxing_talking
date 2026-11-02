@@ -1,0 +1,181 @@
+name: boxing-mysql-p5
+
+# 通常Composeを継承しない。検証用設定ファイルを--env-fileで明示する。
+services:
+  db80:
+    image: mysql:8.0.21@sha256:86b7c83e24c824163927db1016d5ab153a9a04358951be8b236171286e3289a4
+    platform: linux/amd64
+    hostname: p5-baseline-db80
+    environment:
+      MYSQL_ROOT_PASSWORD: ${P5_ROOT_PASSWORD:?synthetic configuration required}
+      MYSQL_DATABASE: boxing_p5_baseline
+      MYSQL_USER: boxing_p5_app
+      MYSQL_PASSWORD: ${P5_DB_PASSWORD:?synthetic configuration required}
+      TZ: Asia/Tokyo
+    command:
+      - mysqld
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - baseline_db80:/var/lib/mysql
+    networks: [isolated]
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$${MYSQL_PASSWORD}" mysqladmin ping -h 127.0.0.1 -u "$${MYSQL_USER}" --silent']
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  restore80:
+    profiles: [restore]
+    image: mysql:8.0.21@sha256:86b7c83e24c824163927db1016d5ab153a9a04358951be8b236171286e3289a4
+    platform: linux/amd64
+    hostname: p5-restore-db80
+    environment:
+      MYSQL_ROOT_PASSWORD: ${P5_ROOT_PASSWORD:?synthetic configuration required}
+      MYSQL_DATABASE: boxing_p5_restore80
+      MYSQL_USER: boxing_p5_app
+      MYSQL_PASSWORD: ${P5_DB_PASSWORD:?synthetic configuration required}
+      TZ: Asia/Tokyo
+    command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci]
+    volumes:
+      - restore_db80:/var/lib/mysql
+    networks: [isolated]
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$${MYSQL_PASSWORD}" mysqladmin ping -h 127.0.0.1 -u "$${MYSQL_USER}" --silent']
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  relay80:
+    profiles: [upgrade]
+    image: mysql:8.0.46@sha256:7dcddc01f13bab2f15cde676d44d01f61fc9f99fe7785e86196dfc07d358ae2b
+    platform: linux/amd64
+    hostname: p5-relay-db80
+    environment:
+      MYSQL_ROOT_PASSWORD: ${P5_ROOT_PASSWORD:?synthetic configuration required}
+      MYSQL_DATABASE: boxing_p5_relay80
+      MYSQL_USER: boxing_p5_app
+      MYSQL_PASSWORD: ${P5_DB_PASSWORD:?synthetic configuration required}
+      TZ: Asia/Tokyo
+    command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci]
+    volumes:
+      - relay_db80:/var/lib/mysql
+    networks: [isolated]
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$${MYSQL_PASSWORD}" mysqladmin ping -h 127.0.0.1 -u "$${MYSQL_USER}" --silent']
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  db84:
+    profiles: [upgrade]
+    image: mysql:8.4.13@sha256:a0225d1ea6631c8bc2385dc4c2faba17bbf1834ecf369e1659a9a382bd8d5dd7
+    platform: linux/amd64
+    hostname: p5-migrated-db84
+    environment:
+      MYSQL_ROOT_PASSWORD: ${P5_ROOT_PASSWORD:?synthetic configuration required}
+      MYSQL_DATABASE: boxing_p5_migrated84
+      MYSQL_USER: boxing_p5_app
+      MYSQL_PASSWORD: ${P5_DB_PASSWORD:?synthetic configuration required}
+      TZ: Asia/Tokyo
+    command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci]
+    volumes:
+      - migrated_db84:/var/lib/mysql
+    networks: [isolated]
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$${MYSQL_PASSWORD}" mysqladmin ping -h 127.0.0.1 -u "$${MYSQL_USER}" --silent']
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  restore84:
+    profiles: [restore]
+    image: mysql:8.4.13@sha256:a0225d1ea6631c8bc2385dc4c2faba17bbf1834ecf369e1659a9a382bd8d5dd7
+    platform: linux/amd64
+    hostname: p5-restore-db84
+    environment:
+      MYSQL_ROOT_PASSWORD: ${P5_ROOT_PASSWORD:?synthetic configuration required}
+      MYSQL_DATABASE: boxing_p5_restore84
+      MYSQL_USER: boxing_p5_app
+      MYSQL_PASSWORD: ${P5_DB_PASSWORD:?synthetic configuration required}
+      TZ: Asia/Tokyo
+    command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci]
+    volumes:
+      - restore_db84:/var/lib/mysql
+    networks: [isolated]
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$${MYSQL_PASSWORD}" mysqladmin ping -h 127.0.0.1 -u "$${MYSQL_USER}" --silent']
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  checker:
+    profiles: [tools]
+    image: mysql:26.10.0@sha256:7b16ec7caa94ca7e92f4c5ec287de69d2e8738db056ceb629022951a6f6d910b
+    platform: linux/amd64
+    entrypoint: [mysqlsh, --no-defaults]
+    command: [--version]
+    environment:
+      P5_CHECK_PASSWORD: ${P5_DB_PASSWORD:?synthetic configuration required}
+    tmpfs:
+      - /var/lib/mysql
+    volumes:
+      - ./docker/mysql-upgrade:/p5-tools:ro
+      - ${P5_RUNTIME_DIR:?absolute isolated runtime required}/checker-config:/p5-config:ro
+    networks: [isolated]
+
+  php:
+    image: ${P5_PHP_IMAGE:?verified local PHP image required}
+    platform: linux/amd64
+    working_dir: /var/www/html
+    command: [php, -r, 'sleep(86400);']
+    environment:
+      APP_ENV: testing
+      APP_DEBUG: "false"
+      APP_KEY: ${P5_APP_KEY:?synthetic configuration required}
+      DB_CONNECTION: mysql
+      DATABASE_URL: ""
+      DB_SOCKET: ""
+      DB_HOST: db80
+      DB_PORT: "3306"
+      DB_DATABASE: boxing_p5_baseline
+      DB_USERNAME: boxing_p5_app
+      DB_PASSWORD: ${P5_DB_PASSWORD:?synthetic configuration required}
+      CACHE_STORE: array
+      CACHE_DRIVER: array
+      SESSION_DRIVER: array
+      MAIL_MAILER: array
+      QUEUE_CONNECTION: sync
+      AWS_EC2_METADATA_DISABLED: "true"
+    volumes:
+      - ${P5_RUNTIME_DIR:?absolute isolated runtime required}/backend:/var/www/html
+      - ./docker/mysql-upgrade:/p5-tools:ro
+      - ${P5_RUNTIME_DIR:?absolute isolated runtime required}/evidence:/p5-evidence
+      - ./frontend/src/constants/customErrorCodes.ts:/var/www/frontend/src/constants/customErrorCodes.ts:ro
+    networks: [isolated]
+    depends_on:
+      db80:
+        condition: service_healthy
+
+  # 依存導入だけ外向きnetworkを使う。DBのnetworkには接続しない。
+  deps:
+    profiles: [setup]
+    image: ${P5_PHP_IMAGE:?verified local PHP image required}
+    platform: linux/amd64
+    working_dir: /var/www/html
+    command: [composer, install, --no-interaction, --prefer-dist, --no-progress, --no-scripts]
+    volumes:
+      - ${P5_RUNTIME_DIR:?absolute isolated runtime required}/backend:/var/www/html
+    networks: [downloads]
+
+volumes:
+  baseline_db80:
+  restore_db80:
+  relay_db80:
+  migrated_db84:
+  restore_db84:
+
+networks:
+  isolated:
+    internal: true
+  downloads:
