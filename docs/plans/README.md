@@ -1,94 +1,21 @@
 # 計画文書一覧
 
-確認日: **2026-11-03 JST**。現在の判断は全体計画、作業の理由・検証・復旧情報は各履歴文書を参照してください。監査情報は各文書の確認時点の記録であり、文書整理時の再監査は行っていません。
-
 ## 現在の計画・保留事項
 
-P5は`710864720e67f1c0042278536ddd9f8531eb9184`へ保存・元branch統合済み（push未実施）。P6-1〜5は承認済み縮小範囲の検証を確認済みです。日次は今回の成功テスト、queueはP5証跡を利用し、最小PC/SP接続確認も成功。工程2の結果・残課題を整理し、P6-6独立最終レビューPASS・必須指摘なしです。工程3で専用8コンテナを停止し、証跡等をGit除外`docker/db/p6-archive/20261103/`へ保全済み。ユーザー承認により専用container/network/検証ソースを削除し、runtime/元audit/preflightはゴミ箱へ移動しました。削除後の独立確認PASS・必須指摘なしです。ゴミ箱は空にしていません。メール/登録全体・全画面総当たりは対象外。ローカル検証・レビュー・停止/保全と、本番公開可は別判定です。定期DBバックアップは未実装です。
+- [依存・実行環境更新](2026-10-22-dependency-runtime-update.md)
+  - 進捗：P0〜P3・P5完了。P4は一部保留。P6は承認範囲の検証・レビュー・後片付け完了。
+  - 残課題：Composer Mimeの指摘、Node暫定版、本番環境の確認、定期DBバックアップ。
+- [フロントエンドの残存advisory](2026-11-02-frontend-moderate-advisories.md)
+  - 保留：2026-11-02確認時点で通常更新による解消経路なし。上流の修正版公開後に再調査。
+- [最終統合検証](2026-11-02-security-runtime-final-check.md)
+  - 進捗：承認範囲の検証・最終レビュー・専用環境の整理完了。archiveへの移動は未実施。
+  - 対象外：本番公開、全画面・メール全体の検証。
+- [最終監査報告](2026-11-02-final-audit-review.md)
+  - 状態：再監査結果と修正候補を記録済み。修正候補は未適用。
 
-| 文書 | 状態 |
-| --- | --- |
-| [2026-10-22-dependency-runtime-update.md](2026-10-22-dependency-runtime-update.md) | P0〜P6の入口。P0〜P3完了、P4個別実装・元統合済み/P4全体未完了、P5完了・保存・元統合済み、P6-1〜5検証確認済み、P6-6最終レビューPASS・停止/保全と承認済み削除を実施、削除後確認PASS |
-| [2026-11-02-frontend-moderate-advisories.md](2026-11-02-frontend-moderate-advisories.md) | P4j。11月2日確認時点のmoderate14/devのみ・2advisory、上流待ちと再評価条件 |
-| [2026-11-02-security-runtime-final-check.md](2026-11-02-security-runtime-final-check.md) | P6の計画・実績と工程2最終集計。検証確認・独立最終レビューPASS、専用停止/保全・承認済み削除実施、削除後確認PASS。本番公開承認は別途 |
-| [2026-11-02-final-audit-review.md](2026-11-02-final-audit-review.md) | P6-5再監査。11月2日取得のfrontend moderate14/omit-dev0・Mime medium1を保持、修正候補未適用 |
+## 履歴一覧
 
-追加の承認済みimage整理で、過去検証の停止済みコンテナ18件と未使用image17件も除去しました。現在は通常稼働4コンテナ/4imageのみ。全30volume、実backup/旧my_data、P5・P6 archiveは保持しています。旧MySQL imageはローカルに残しておらず、必要時は記録の版/digestを確認して再取得する方針です。追加整理の削除後独立確認PASS・必須指摘なし。検証記録・監査報告・README更新と検証用ソース削除は本コミットで保存し、pushは未実施です。Git除外証跡/backupと無関係な`.vscode/`はコミット対象外です。
-
-Composer Mimeの残存指摘、Node暫定版、本番HTTPS/SMTP/S3/queue等の未確認事項も全体計画の[残課題](2026-10-22-dependency-runtime-update.md#残課題)に保持しています。P4統合前のDB内容hashを復旧できない確認限界は[統合記録](archive/dependency-runtime/2026-11-02-frontend-main-integration.md)を参照してください。
-
-## 履歴の読み方
-
-archiveは過去の計画・実行記録です。移動は全課題の解決・全確認の実施・本番公開可を意味しません。版・監査値・branch名・未コミット/次に行うこと等の説明は記録当時のものです。未確認範囲と復旧条件は各原本に残しています。branchを整理しても、保存コミットと文書の記録は残します。
-
-元の日付・ファイル名を維持しています。過去のチャットなどの旧パスは自動更新できませんが、以下の同名リンクから移動先を確認できます。Git管理外の証跡・SQL・バックアップは今回の整理対象外で、worktree削除前には別途保全が必要です。
-
-## Laravel / PHP：18文書
-
-S0〜S9と元統合の計画・結果。現在の構成は全体計画、最終検証の範囲はS9結果と統合結果を参照してください。
-
-| 文書（旧ファイル名） | 対象・記録 |
-| --- | --- |
-| [2026-10-19-laravel-php-upgrade.md](archive/laravel-php/2026-10-19-laravel-php-upgrade.md) | Laravel / PHP の段階的アップグレード計画 |
-| [2026-10-20-laravel-php-s0-baseline.md](archive/laravel-php/2026-10-20-laravel-php-s0-baseline.md) | S0: Laravel / PHP 更新前の基準結果 |
-| [2026-10-21-laravel-php-s1-result.md](archive/laravel-php/2026-10-21-laravel-php-s1-result.md) | S1: Laravel 8→9 実行結果（2026-10-21） |
-| [2026-10-21-laravel-php-s2-result.md](archive/laravel-php/2026-10-21-laravel-php-s2-result.md) | S2: Laravel 9→10 実行結果（2026-10-21） |
-| [2026-10-21-laravel-php-s3-result.md](archive/laravel-php/2026-10-21-laravel-php-s3-result.md) | S3: Laravel 10のPHP 8.2→8.3 実行結果（2026-10-21） |
-| [2026-10-21-laravel-php-s4-result.md](archive/laravel-php/2026-10-21-laravel-php-s4-result.md) | S4: Laravel 10→11 中間検証結果 |
-| [2026-10-21-laravel-php-s5-result.md](archive/laravel-php/2026-10-21-laravel-php-s5-result.md) | S5: Laravel 11→12 実行結果 |
-| [2026-10-22-laravel-php-integration-result.md](archive/laravel-php/2026-10-22-laravel-php-integration-result.md) | Laravel13/PHP8.5 元worktree統合結果 |
-| [2026-10-22-laravel-php-integration.md](archive/laravel-php/2026-10-22-laravel-php-integration.md) | Laravel13/PHP8.5成果の元worktree統合・確認・引き継ぎ |
-| [2026-10-22-laravel-php-s6-handoff.md](archive/laravel-php/2026-10-22-laravel-php-s6-handoff.md) | S6引き継ぎ：Laravel 12→13 |
-| [2026-10-22-laravel-php-s6-plan.md](archive/laravel-php/2026-10-22-laravel-php-s6-plan.md) | S6: Laravel 12→13 実行提案 |
-| [2026-10-22-laravel-php-s6-result.md](archive/laravel-php/2026-10-22-laravel-php-s6-result.md) | S6: Laravel 12→13 実行記録 |
-| [2026-10-22-laravel-php-s7-plan.md](archive/laravel-php/2026-10-22-laravel-php-s7-plan.md) | S7: PHP 8.3→8.4 実行提案 |
-| [2026-10-22-laravel-php-s7-result.md](archive/laravel-php/2026-10-22-laravel-php-s7-result.md) | S7: PHP 8.3→8.4 実行記録 |
-| [2026-10-22-laravel-php-s8-plan.md](archive/laravel-php/2026-10-22-laravel-php-s8-plan.md) | S8: PHP 8.4→8.5 実行提案 |
-| [2026-10-22-laravel-php-s8-result.md](archive/laravel-php/2026-10-22-laravel-php-s8-result.md) | S8実行結果: PHP 8.4→8.5 |
-| [2026-10-22-laravel-php-s9-plan.md](archive/laravel-php/2026-10-22-laravel-php-s9-plan.md) | S9 最終統合検証・引き継ぎ計画 |
-| [2026-10-22-laravel-php-s9-result.md](archive/laravel-php/2026-10-22-laravel-php-s9-result.md) | S9 最終統合検証・引き継ぎ結果 |
-
-## 依存・実行環境更新：16文書
-
-P1〜P5個別段階と元統合の記録。MSW3更新後に2.15.0へ調整した経緯など、版の変遷も保持しています。P4全体の保留は直下のP4j調査を参照してください。
-
-| 文書（旧ファイル名） | 対象・記録 |
-| --- | --- |
-| [2026-10-22-backend-sdk-security.md](archive/dependency-runtime/2026-10-22-backend-sdk-security.md) | P1 AWS SDK / JMESPath セキュリティ更新提案 |
-| [2026-10-29-backend-jwt-security.md](archive/dependency-runtime/2026-10-29-backend-jwt-security.md) | P2 JWT 7系への更新 |
-| [2026-10-29-frontend-build-update.md](archive/dependency-runtime/2026-10-29-frontend-build-update.md) | P4b: frontend build・テスト基盤とStorybookの更新計画・結果 |
-| [2026-10-29-frontend-dependency-security.md](archive/dependency-runtime/2026-10-29-frontend-dependency-security.md) | P4a: frontend通信・ユーティリティ・CSS依存の脆弱性対応 |
-| [2026-10-29-node-lts-update.md](archive/dependency-runtime/2026-10-29-node-lts-update.md) | P3: Node LTS・依存導入経路の更新 |
-| [2026-10-29-p1-p3-integration.md](archive/dependency-runtime/2026-10-29-p1-p3-integration.md) | P1〜P3の元worktree統合・実起動確認 |
-| [2026-10-30-frontend-cypress-removal.md](archive/dependency-runtime/2026-10-30-frontend-cypress-removal.md) | P4d-1: 未使用Cypressの削除 |
-| [2026-10-30-frontend-eslint-babel-css.md](archive/dependency-runtime/2026-10-30-frontend-eslint-babel-css.md) | P4i: ESLint・Babel・CSS関連の調査と段階的更新案 |
-| [2026-10-30-frontend-eslint10-migration.md](archive/dependency-runtime/2026-10-30-frontend-eslint10-migration.md) | P4i-2: ESLint 10への設定移行案 |
-| [2026-10-30-frontend-msw-update.md](archive/dependency-runtime/2026-10-30-frontend-msw-update.md) | P4f: MSW更新の調査・実装提案 |
-| [2026-10-30-frontend-msw-vitest-peer.md](archive/dependency-runtime/2026-10-30-frontend-msw-vitest-peer.md) | P4h: MSW / Vitest peer整合の調査・提案 |
-| [2026-10-30-frontend-router-uuid.md](archive/dependency-runtime/2026-10-30-frontend-router-uuid.md) | P4c: React Router・未使用uuid直接依存の整理 |
-| [2026-10-30-frontend-router-v7.md](archive/dependency-runtime/2026-10-30-frontend-router-v7.md) | P4e: React Router 7系への移行 |
-| [2026-10-30-frontend-unused-test-dependencies.md](archive/dependency-runtime/2026-10-30-frontend-unused-test-dependencies.md) | P4g: 未使用のテスト関連直接依存の整理 |
-| [2026-11-02-frontend-main-integration.md](archive/dependency-runtime/2026-11-02-frontend-main-integration.md) | P4のmain-worktree統合・起動確認 |
-| [2026-11-02-mysql-lts-update.md](archive/dependency-runtime/2026-11-02-mysql-lts-update.md) | P5完了・保存・元統合済み（71086472）。8.4.13へ切替、検証時20table/53履歴/jobs3保持。通常利用再開済み、旧DB/image/backup保持。更新再開後の単純rollbackは禁止 |
-
-## 文書整理：1文書
-
-| 文書（旧ファイル名） | 対象・記録 |
-| --- | --- |
-| [2026-11-02-plan-documents-organization.md](archive/documentation/2026-11-02-plan-documents-organization.md) | 初回整理とP6前の追加整理の計画・実施記録 |
-
-## 画面改善・Query移行：3文書
-
-バッジ・メニュー変更とQuery移行の記録。Query移行のブラウザー確認は実施範囲が限定されており、未チェックを一括で完了扱いしていません。
-
-| 文書（旧ファイル名） | 対象・記録 |
-| --- | --- |
-| [2026-10-08-prediction-vote-badge.md](archive/frontend-features/2026-10-08-prediction-vote-badge.md) | 勝敗予想受付バッジの配置・表示変更 |
-| [2026-10-16-header-user-menu.md](archive/frontend-features/2026-10-16-header-user-menu.md) | ヘッダーの名前付きユーザーメニュー（A案） |
-| [2026-10-16-migrate-tanstack-query.md](archive/frontend-features/2026-10-16-migrate-tanstack-query.md) | TanStack Query v5 への移行 |
-
-## 更新時の方針
-
-- 新しい計画は従来どおり`docs/plans/YYYY-MM-DD-<task-name>.md`に作成し、進行中は直下に置きます。
-- 履歴化する場合は、未解決事項・再評価条件を現在の入口へ引き継ぎ、相対リンクと見出し参照を確認します。
-- 実績・確認日・未実施範囲を区別し、古いチェック項目を機械的に完了へ変更しません。
+- [Laravel / PHP](archive/laravel-php/)：段階的アップグレード・検証・統合の記録。
+- [依存・実行環境更新](archive/dependency-runtime/)：依存パッケージ・Node・MySQL更新と統合の記録。
+- [画面改善・Query移行](archive/frontend-features/)：予想受付バッジ・ユーザーメニュー・TanStack Query移行の記録。
+- [文書整理](archive/documentation/)：Plan Documentの配置・参照整理の記録。
