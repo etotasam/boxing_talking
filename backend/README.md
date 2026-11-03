@@ -131,30 +131,13 @@ PHP container内では旧Mixのnpmコマンドを実行できません。
 リポジトリルートの`npm run backend:generate-error-codes`等はホストnpmからDocker内PHPを呼ぶ手順であり、
 PHP image内Nodeの削除による変更はありません。
 
-## MySQL更新用の隔離baseline（P5・A0）
+## MySQL 8.4への移行完了（P5）
 
-通常Composeとは別の `docker-compose.mysql-upgrade.yml` を使います。以下はMySQL8.0.21の初期baseline準備手順です。隔離検証の第1段階Aと、承認後の元環境適用の第2段階Bは完了しました。Aの手順は通常Composeや実データに流用しないでください。[P5計画](../docs/plans/archive/dependency-runtime/2026-11-02-mysql-lts-update.md)を参照してください。
+MySQL 8.4.13への移行・検証は完了しています。詳細は[移行記録](../docs/plans/archive/dependency-runtime/2026-11-02-mysql-lts-update.md)と[現在の全体計画](../docs/plans/2026-10-22-dependency-runtime-update.md)を参照してください。
 
-- projectは`boxing-mysql-p5`、DB名は`boxing_p5_baseline`、DB serviceは`db80`。ホストへの公開ポートはありません。
-- DBはproject専用`baseline_db80` volume、DB/PHPはinternal networkだけを使います。元の`db`・`my_data`・通常Composeのnetworkを使いません。
-- Git除外の`docker/db/p5-runtime/`に、tracked backendファイルのenvなしコピー・独立vendor・合成設定`synthetic.env`・証跡を置きます。元の.env、鍵、storage、vendor、config cacheはコピーしません。合成.envにはコメントだけを書きます。起動時に必要な`storage/app/private/jwt-private.key`も、runtime内だけにRSA2048以上で新規生成し、600で保存します。元の鍵は使用しません。
-- `P5_RUNTIME_DIR`はこのruntimeの絶対パス、`P5_PHP_IMAGE`は既存Dockerfileに対応する検証済みローカルPHP imageのIDです。`P5_ROOT_PASSWORD`/`P5_DB_PASSWORD`/`P5_APP_KEY`は合成専用値を生成し、設定ファイルを600・runtime親を700にしてGitへ入れません。実環境の値は使いません。
-- 合成設定の作成と接続先・mount・空DBの事前確認後、以下をリポジトリルートから実行します。設定ファイルがなければ停止します。通常Composeで代用しないでください。
+検証専用スクリプトとCompose定義は検証終了後、ユーザー承認により削除しました。元の内容はコミット`710864720e67f1c0042278536ddd9f8531eb9184`に保存されています。通常起動には不要です。バックアップ・旧DB・volumeは保持しています。その後の承認済み整理で、旧MySQLを含む未使用imageと停止済み検証コンテナも除去し、現在は通常稼働4サービスのimageだけを保持しています。旧版での復旧が必要なら、当時の版/digestと設定を記録から確認し再取得してください。旧DBを8.4で開かないでください。
 
-```sh
-docker compose --env-file docker/db/p5-runtime/synthetic.env -f docker-compose.mysql-upgrade.yml run --rm --no-deps deps
-docker compose --env-file docker/db/p5-runtime/synthetic.env -f docker-compose.mysql-upgrade.yml up -d php
-docker compose --env-file docker/db/p5-runtime/synthetic.env -f docker-compose.mysql-upgrade.yml exec -T php php /p5-tools/baseline.php preflight
-docker compose --env-file docker/db/p5-runtime/synthetic.env -f docker-compose.mysql-upgrade.yml exec -T php php /p5-tools/baseline.php migrate
-docker compose --env-file docker/db/p5-runtime/synthetic.env -f docker-compose.mysql-upgrade.yml exec -T php php /p5-tools/baseline.php seed
-docker compose --env-file docker/db/p5-runtime/synthetic.env -f docker-compose.mysql-upgrade.yml exec -T php php /p5-tools/baseline.php verify
-```
-
-`migrate`は完全に空のDBだけ、`seed`は35履歴適用済み・19データtableが全て空のDBだけで許可します。接続先/版/hostnameが違う場合も拒否します。再確認は`verify`を使い、再投入のためにDBを初期化しないでください。
-
-合成ユーザー3・選手4・試合3など計64行を作り、元データは使用しません。tokenable_idが数値でusers.idがUUIDという既存の型差があるため、無理な変換や孤立tokenを入れずtoken表は空にします。jobs/failed_jobsも空で、worker・メール・API操作は実行しません。投入用パスワードは実行時にランダム生成してハッシュ化し、実ログインの資格情報としては提供しません。
-
-件数・FK・NULL・UTF8・soft deleteと、全20tableの内容/schema hashを確認します。これは合成データの準備確認であり、MySQL更新・バックアップ復元・本番互換の成功を意味しません。baselineへRefreshDatabaseや全テストを向けないでください。停止する場合はこの専用Composeの`stop`を使い、volumeを削除しません。
+以下の節は2026-11-02当時の実績です。旧パスや未保存の記述は記録当時の状態を示し、現在の状態は全体計画を参照してください。終了した検証手順を通常DBに向けて再実行しないでください。
 
 
 ### P5続行状況：第1段階Aの隔離検証結果（2026-11-02）

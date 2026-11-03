@@ -6,11 +6,11 @@ Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持�
 
 ## Current Progress
 
-保存・統合状況（2026-11-02）: P5の実装・検証記録は`710864720e67f1c0042278536ddd9f8531eb9184`へ保存し、元branchへff-only統合済み。元branch `codex/laravel-php-upgrade`と既存作業branch `codex/mysql-lts-update`は同コミット。push未実施。過去文書の「未コミット」「元branchへの統合は別途」は記録当時の状態を示す。定期DBバックアップは未実装で、後日検討する。
+保存・統合状況（2026-11-02）: P5の実装・検証記録は`710864720e67f1c0042278536ddd9f8531eb9184`へ保存し、元branchへff-only統合済み。P5保存・統合完了時は両branch同コミット。本検証開始時の元branch `codex/laravel-php-upgrade`は文書保存の`0beb3ef8`で、`codex/mysql-lts-update`はP5完了地点を保持している。今回の検証記録と整理差分は本コミットで保存する。push未実施。過去文書の「未コミット」「元branchへの統合は別途」は記録当時の状態を示す。定期DBバックアップは未実装で、後日検討する。
 
-確認日: **2026-11-02 JST**。P0〜P3とP4の各実装・元環境への統合は保存済み。元worktreeの`codex/laravel-php-upgrade`で管理する。P4統合の到達点は`84262908`、P1〜P3の未保存だった統合記録は`6182bff`へ保存済み。P4の残存監査は保留し、**P4全体は未完了。P5は隔離検証A・元環境適用B・保存・元統合まで完了。mainのMySQLは8.4.13・通常利用再開済み。P6は作業案を提示済み、実行未承認・未着手**。本番反映は行っていない。
+確認日: **2026-11-03 JST**。P0〜P3とP4の個別実装・元統合は保存済み。P4の監査残件は保留し全体未完了。P5は保存・元統合まで完了し、通常MySQL8.4.13の利用を再開済み。**P6-1〜P6-5は承認済み縮小範囲の検証を確認済み。工程2の結果・残課題整理を行い、P6-6の独立最終レビューPASS・必須指摘なし。工程3でP6専用8コンテナを停止し、証跡等をarchiveへ保全済み。停止/保全と削除候補のReviewer確認PASS後、承認されたcontainer/networkと検証ソースを削除し、生成3dirをゴミ箱へ移動した。削除後の独立確認PASS・必須指摘なし。今回の検証記録と整理差分は本コミットで保存し、push未実施。本番公開可とは別判定。** 作業先は元worktreeの`codex/laravel-php-upgrade`。
 
-[計画一覧](README.md)から履歴を辿れる。以下の監査・版情報は記載した確認時点の値であり、本整理では監査を再実行していない。過去の判断・監査推移・branch運用は末尾の履歴へ分ける。
+[計画一覧](README.md)から履歴を辿れる。監査・版情報は記載した確認時点の値。[P6-5再監査](2026-11-02-final-audit-review.md)は2026-11-02取得・11月3日レビュー確認で、修正候補は未適用。過去の判断・監査推移・branch運用は末尾の履歴へ分ける。
 
 | 段階 | 現在の状態 | 保存先・根拠 |
 | --- | --- | --- |
@@ -20,21 +20,23 @@ Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持�
 | P3: Node24/導入経路 | 完了・元環境統合済み | `a5648642`、[P3結果](archive/dependency-runtime/2026-10-29-node-lts-update.md)、[P1〜P3統合](archive/dependency-runtime/2026-10-29-p1-p3-integration.md) |
 | P4: frontend依存 | 個別実装・検証・元統合済み。残存監査は保留 | 実装`a2e3e709`、統合`84262908`、[統合結果](archive/dependency-runtime/2026-11-02-frontend-main-integration.md)、[P4j保留調査](2026-11-02-frontend-moderate-advisories.md) |
 | P5: MySQL | 完了・保存・元統合済み。8.4.13へ切替、検証時20table/53履歴/jobs3保持・通常利用再開 | `71086472`、[P5計画・検証結果](archive/dependency-runtime/2026-11-02-mysql-lts-update.md) |
-| P6: 最終統合・公開準備 | 作業案提示済み、実行未承認・未着手 | [P6提案書](2026-11-02-security-runtime-final-check.md)。今回の文書整理承認にP6実行・本番公開承認は含まない |
+| P6: 最終統合・公開準備 | P6-1〜5検証確認済み、P6-6最終レビューPASS・停止/保全と承認済み削除を実施、削除後確認PASS | [P6計画・実績](2026-11-02-security-runtime-final-check.md)。テスト/証跡再利用/最小ブラウザ確認の範囲を明記。停止/保全まで実施、削除実行/commit/pushは別依頼。本番公開承認は別途 |
 
 ### 次に行うこと
 
-P5完了地点`71086472`と`codex/mysql-lts-update` branchを保持する。P5作業用worktreeは記録保存後の削除をユーザー承認済みで、今回の文書commit後に削除する。以後の作業先は元worktreeとし、新worktreeは作成しない。今回のcommit依頼は文書整理とP6提案書の保存であり、P6実行は未承認のまま。
+P5完了commit/branchと復旧資材を保持し、元worktreeで作業を継続する。P6の追加機能検証は終了し、日次は今回のテスト、queueはP5成功証跡を再利用。最小PC/SPのbuild/Web/API接続も成功した。
 
-1. [P5計画・検証結果](archive/dependency-runtime/2026-11-02-mysql-lts-update.md)を確認する。Aの移行/空DB/旧新版比較/復元/全回帰/主要動作に続き、別承認のBで実データ20table/53履歴/jobs3を別保存先へ完全保持してmainを8.4.13へ切替。通常PHP/内部・公開API200/JSONと全snapshot一致を確認し、書込み停止の永続値を解除して通常利用を再開した。旧8.0の保存先/imageと元worktree内の専用backupを保持。実.env本文や実鍵は表示・コピーせず、実データへ破壊的テストや既存jobs workerを向けていない。
-2. [P6提案書](2026-11-02-security-runtime-final-check.md)の検証範囲を確認し、別途実行承認を得る。P6は合成隔離環境を使う案で、元環境の再構築・DB更新・既存jobs実行を含まない。既に書込み再開済みなので、旧DBへの無断単純rollbackは禁止し、再開後の更新を保全して復旧方法を再判断する。
-3. P4の上流修正版対応は保留を継続し、再評価条件を満たした時に別途確認する。
+1. 工程2の[結果・残課題集計](2026-11-02-security-runtime-final-check.md)は独立Reviewer最終確認PASS・必須指摘なし。追加の全件テストや再監査・版更新は行っていない。
+2. 工程3でP6専用8コンテナを停止し、証跡・正本ハーネス・監査/preflightをGit除外`docker/db/p6-archive/20261103/`へ保全した。通常4metadata不変・4volume/参照image保持を確認。その後ユーザー承認により専用Compose/ハーネスとP6 container/networkを削除、runtime/元audit/preflightをゴミ箱へ移動した。archive/4volume/参照image/P5保存物は保持し、削除後の独立確認PASS・必須指摘なし。ゴミ箱消去・commit/pushは未実施。
+3. frontend監査、Mime、Node候補、本番運用/定期backupは下記の別課題として保持する。既に通常書込み再開済みなので、旧DBへの無断単純rollbackはしない。
 
 ### 残課題
 
+追加整理（2026-11-03）: ユーザーの保持方針変更と削除承認により、停止済み検証コンテナ18件・未使用image17件を除去。通常稼働4コンテナと4imageのみを保持し、全30volume/実backup/旧my_data/P5・P6 archiveは保持した。旧MySQL imageは当時の版/digestから必要時に再取得する方針で、過去のimage保持記録は当時の履歴と区別する。追加整理の削除後独立確認PASS・必須指摘なし。アプリ/依存lock/通常Composeの変更・追加テスト・commit/pushなし。
+
 - **frontend監査**: 2026-11-02のP4j調査でmoderate14/devのみ・omit-dev0、2advisory。minimatch/globの修正版を上位の依存範囲がまだ許容せず、通常更新だけの解消経路は確認できなかった。候補ESLint10.14.0は未適用、実版は10.13.0。開発/build/CIへの影響は残り、保留を解消扱いしない。部分改善も含めた[再評価条件](2026-11-02-frontend-moderate-advisories.md#risks--再開条件)を参照。
-- **Composer監査**: P2確認時点でSymfony Mime medium1件（symfony/mime7.4.19、PKSA-wtxr-p26d-nn42 / CVE-2026-45070）が残存。情報源の範囲差と修正版を照合し、対応段階・版は別途決定する。今回再監査せず、0件とは扱わない。[P2記録](archive/dependency-runtime/2026-10-29-backend-jwt-security.md#残存監査p2対象外)。
-- **Node**: 24.22.1は承認済み暫定版。P3時点の候補24.22.2の対応Alpine image取得は未確認。将来更新時に再評価する。
+- **Composer監査**: P2確認時点でSymfony Mime medium1件（symfony/mime7.4.19、PKSA-wtxr-p26d-nn42 / CVE-2026-45070）が残存。P6-5再監査でも残存。Symfony公式の誤記訂正と照合し、修正版7.4.22を確認した。backend依存の別更新提案とし、未適用のまま。0件とは扱わない。[P2記録](archive/dependency-runtime/2026-10-29-backend-jwt-security.md#残存監査p2対象外)。
+- **Node**: 24.22.1は承認済み暫定版。P6-5で24.22.2の公式releaseと対応Alpine tagの公開を確認したが、候補digest/pull/実行検証・適用は未実施。別更新提案で扱う。
 - **本番・外部接続**: 本番HTTPS/Cookie/CSRF/CORS、実鍵の強度・適合性、外部SMTP/S3、queue/cron・監視・本番切替と復旧は未確認・未実施。本番公開承認は含まない。
 - **検証範囲**: P1は承認により既存backendテストまでに限定し、新規テスト・SES補足・SDK/JMESPath smokeは未実施。VoteIcon単独storyのRecoilRoot不足も既知の制限として残る。
 - **DB記録の限界**: P4統合では統合前の内容hashを保存時に上書きしたため、統合前からの全内容不変は証明できない。統合前後の件数と、home GET後から後続読取終了までの全20table内容/schema hash一致を確認した。P1〜P3統合の前後比較とは区別する。[P4統合結果](archive/dependency-runtime/2026-11-02-frontend-main-integration.md)。
@@ -198,7 +200,7 @@ P5完了地点`71086472`と`codex/mysql-lts-update` branchを保持する。P5�
 
 ### P6: 最終統合・公開準備の引き継ぎ
 
-**進捗: [具体案](2026-11-02-security-runtime-final-check.md)を提示済み。実行は未承認・未着手。** 以下は全体方針であり、実行範囲は具体案と別途承認で確定する。定期DBバックアップ機能の実装・実デプロイは含まない。
+**進捗: [P6結果と残課題](2026-11-02-security-runtime-final-check.md)を参照。承認済み縮小範囲のP6-1〜5を確認済み。P6-6最終レビューPASS、専用環境停止・保全済み。承認された除去を実施、削除後確認PASS。** 定期DBバックアップ機能の実装・実デプロイは含まない。
 
 - 全lockから再構築し、PHP/Laravel・Node/MySQL・全依存の実版・サポート期限・監査を再確認。
 - backend/frontend全自動テスト、build/lint、空DB/既存DB/復元、実HTTP/HTTPS・ブラウザ・メール/実queue/日次/ログを総合実行。

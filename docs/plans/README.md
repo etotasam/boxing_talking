@@ -1,16 +1,19 @@
 # 計画文書一覧
 
-確認日: **2026-11-02 JST**。現在の判断は全体計画、作業の理由・検証・復旧情報は各履歴文書を参照してください。監査情報は各文書の確認時点の記録であり、文書整理時の再監査は行っていません。
+確認日: **2026-11-03 JST**。現在の判断は全体計画、作業の理由・検証・復旧情報は各履歴文書を参照してください。監査情報は各文書の確認時点の記録であり、文書整理時の再監査は行っていません。
 
 ## 現在の計画・保留事項
 
-P5は`710864720e67f1c0042278536ddd9f8531eb9184`へ保存し、元branchへff-only統合済み（push未実施）。過去文書の未コミット・統合待ち表記は当時の履歴です。P6は提案済みですが実行未承認・未着手で、今回の文書整理承認には含みません。定期DBバックアップの仕組みは未実装で、後日検討します。
+P5は`710864720e67f1c0042278536ddd9f8531eb9184`へ保存・元branch統合済み（push未実施）。P6-1〜5は承認済み縮小範囲の検証を確認済みです。日次は今回の成功テスト、queueはP5証跡を利用し、最小PC/SP接続確認も成功。工程2の結果・残課題を整理し、P6-6独立最終レビューPASS・必須指摘なしです。工程3で専用8コンテナを停止し、証跡等をGit除外`docker/db/p6-archive/20261103/`へ保全済み。ユーザー承認により専用container/network/検証ソースを削除し、runtime/元audit/preflightはゴミ箱へ移動しました。削除後の独立確認PASS・必須指摘なしです。ゴミ箱は空にしていません。メール/登録全体・全画面総当たりは対象外。ローカル検証・レビュー・停止/保全と、本番公開可は別判定です。定期DBバックアップは未実装です。
 
 | 文書 | 状態 |
 | --- | --- |
-| [2026-10-22-dependency-runtime-update.md](2026-10-22-dependency-runtime-update.md) | P0〜P6の入口。P0〜P3完了、P4個別実装・元統合済み/P4全体未完了、P5完了・保存・元統合済み、P6提案済み・実行未承認・未着手 |
+| [2026-10-22-dependency-runtime-update.md](2026-10-22-dependency-runtime-update.md) | P0〜P6の入口。P0〜P3完了、P4個別実装・元統合済み/P4全体未完了、P5完了・保存・元統合済み、P6-1〜5検証確認済み、P6-6最終レビューPASS・停止/保全と承認済み削除を実施、削除後確認PASS |
 | [2026-11-02-frontend-moderate-advisories.md](2026-11-02-frontend-moderate-advisories.md) | P4j。11月2日確認時点のmoderate14/devのみ・2advisory、上流待ちと再評価条件 |
-| [2026-11-02-security-runtime-final-check.md](2026-11-02-security-runtime-final-check.md) | P6の作業案。実行未承認・未着手、本番公開承認は別途 |
+| [2026-11-02-security-runtime-final-check.md](2026-11-02-security-runtime-final-check.md) | P6の計画・実績と工程2最終集計。検証確認・独立最終レビューPASS、専用停止/保全・承認済み削除実施、削除後確認PASS。本番公開承認は別途 |
+| [2026-11-02-final-audit-review.md](2026-11-02-final-audit-review.md) | P6-5再監査。11月2日取得のfrontend moderate14/omit-dev0・Mime medium1を保持、修正候補未適用 |
+
+追加の承認済みimage整理で、過去検証の停止済みコンテナ18件と未使用image17件も除去しました。現在は通常稼働4コンテナ/4imageのみ。全30volume、実backup/旧my_data、P5・P6 archiveは保持しています。旧MySQL imageはローカルに残しておらず、必要時は記録の版/digestを確認して再取得する方針です。追加整理の削除後独立確認PASS・必須指摘なし。検証記録・監査報告・README更新と検証用ソース削除は本コミットで保存し、pushは未実施です。Git除外証跡/backupと無関係な`.vscode/`はコミット対象外です。
 
 Composer Mimeの残存指摘、Node暫定版、本番HTTPS/SMTP/S3/queue等の未確認事項も全体計画の[残課題](2026-10-22-dependency-runtime-update.md#残課題)に保持しています。P4統合前のDB内容hashを復旧できない確認限界は[統合記録](archive/dependency-runtime/2026-11-02-frontend-main-integration.md)を参照してください。
 
