@@ -48,7 +48,7 @@ npm の「14」は影響を受けるパッケージ数であり、根本 advisor
 
 ## 関連ファイル・依存関係・影響範囲
 
-- 関連ファイル: `frontend/package.json`, `frontend/package-lock.json`, `backend/composer.json`, `backend/composer.lock`; runtime 参照は `docs/plans/2026-11-02-security-runtime-final-check.md` と Docker image 定義。
+- 関連ファイル: `frontend/package.json`, `frontend/package-lock.json`, `backend/composer.json`, `backend/composer.lock`; runtime 参照は [最終統合検証](2026-11-02-security-runtime-final-check.md) と Docker image 定義。
 - npm の影響は frontend の開発依存に限定されるという P4 の依存経路調査と、今回の omit-dev 監査 0 件が整合する。ただし omit-dev 0 件だけで全ビルド環境の到達可能性を否定しない。
 - Composer は Laravel framework の依存経路を通じた Symfony MIME 7.4.19。利用時の到達性は別途アプリケーションコードとデータ経路の確認が必要。
 - 想定リスク: 現 lock の moderate 2 advisory と medium 1 advisory は未解消。Node 24.22.2 image の置換検証、Symfony patch 更新時の回帰確認も未実施。support 情報と修正版の公開は、実環境が更新済みであることを意味しない。
@@ -62,3 +62,7 @@ npm の「14」は影響を受けるパッケージ数であり、根本 advisor
 生の監査出力、終了コード、audit 前後の依存 lock コピー、現在公開版の npm Registry metadata は Git 除外領域 `docker/db/p6-archive/20261103/audit/` に保存した。npm 全依存・omit-dev 監査と Composer 監査は現行 lock の未変更コピーを使い、npm audit の全依存と omit-dev の advisory ID 集合も照合した。証跡一覧、SHA-256、入力ファイルのモード照合は同ディレクトリの `evidence-summary.txt` を参照。
 
 2026-11-03の後片付けで証跡を上記archiveへ保全・hash照合後、元の`docker/db/p6-audit-20261102/`はユーザー承認によりゴミ箱へ移動した。監査の取得日時・入力・結果は変更せず、再監査は行っていない。
+
+## Outcome
+
+2026-11-02に監査結果を取得し、翌日に訂正と独立確認を完了した。再監査時点の結果と候補を保持する。依存の修正候補はこの作業では適用していない。Node 24.22.2の後続更新と依存監査の扱いは[全体計画](../../2026-10-22-dependency-runtime-update.md)を参照。

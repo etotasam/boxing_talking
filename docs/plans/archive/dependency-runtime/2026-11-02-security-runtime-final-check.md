@@ -12,7 +12,7 @@ P0〜P5の最終構成を合成隔離環境で再構築・総合検証し、検�
 ## Background / Context
 
 - 2026-11-02 JST。元worktreeと既存mysql-lts-update worktreeはともに`710864720e67f1c0042278536ddd9f8531eb9184`、計画作成前cleanを確認。元branchは`codex/laravel-php-upgrade`、作業branchは`codex/mysql-lts-update`。P5は保存・元branchへのff-only統合済み、push未実施。
-- [全体計画](2026-10-22-dependency-runtime-update.md)と[P5記録](archive/dependency-runtime/2026-11-02-mysql-lts-update.md)の保存直前の「未コミット」「元branch統合別」は当時の履歴。P0〜P3完了、P4個別更新・統合済みだが残監査により全体未完了、P5完了、P6実行未着手。
+- [全体計画](../../2026-10-22-dependency-runtime-update.md)と[P5記録](2026-11-02-mysql-lts-update.md)の保存直前の「未コミット」「元branch統合別」は当時の履歴。P0〜P3完了、P4個別更新・統合済みだが残監査により全体未完了、P5完了、P6実行未着手。
 - 引き継ぎ上の元環境はMySQL8.4.13固定digest、新volume `boxing_talking_mysql84_data`、通常利用再開済み。20table/53migration履歴/jobs3/failed0はP5切替確認時の値であり、現在不変とは主張しない。
 - 旧my_data/8.0.21 image、元worktreeの`docker/db/backup/mysql-lts-update-p5-20261102/`、停止済み合成DB volumeを保持する。P5の比較結果・テストログ・検証スクリプト275ファイルは、元worktreeのGit除外`docker/db/p5-archive/20261102/`へ保存し、保存元との全件一致を確認済み。再構築可能なruntime本体と合成dumpは保存対象外。SQL本文は機密として参照・表示しない。
 - 比較基準はbackend173識別子=172成功/既存skip1/446assertions、frontend52ファイル204成功。MySQL全件は固定ID fixtureと採番rollback仕様のためP5同様process isolationが必要。
@@ -480,3 +480,7 @@ P5は既に実データ切替と通常利用再開まで完了している。再
 - 旧MySQL8.0.21・8.0.46/旧PHP/旧Nodeのimageも今回の承認で除去済み。過去節のimage保持は当時の状態を記録したもの。再取得/再build前提となり、旧my_dataを現在のMySQL8.4で開くことや、通常書込み再開後の旧DBへの単純巻戻しは引き続き禁止する。backupは移行時点のもの、定期backupは未実装。
 - 証跡はP6 archive内`evidence/docker-image-cleanup-before.json`、`docker-image-cleanup-execution.log`、`docker-image-cleanup-removed.json`、`docker-image-cleanup-result.json`（600）。当初21ID/保持6案のinventoryと提案は履歴として上書きしない。共有layer/cacheがあるため解放容量は未計測・未報告。追加アプリテストは不要で、通常DB接続/アプリ変更/commit/pushは行っていない。削除後の独立Reviewer確認PASS・必須指摘なし。
 - 最終Reviewerはlive4container/4imageと除去18/17の集合、通常4metadata/全30volume metadata不変、backup/旧DB/archive所在、元manifestと764payload全hash/byte数/600、新規実行証跡/文書の整合を独立確認。判定はarchive内`evidence/docker-image-cleanup-review.json`（600）へ保存した。
+
+## Outcome
+
+承認済みの縮小範囲で、隔離再構築、回帰テスト、DB移行・復元、実HTTP/HTTPS、最小PC/SP確認、再監査、独立レビュー、専用環境の停止・証跡保全と承認済みの整理を完了。queueはP5の成功証跡を再利用した。全画面・メール／登録フロー全体は縮小範囲の対象外。本番確認・定期DBバックアップ・残存監査は[全体計画](../../2026-10-22-dependency-runtime-update.md#残課題)を参照。

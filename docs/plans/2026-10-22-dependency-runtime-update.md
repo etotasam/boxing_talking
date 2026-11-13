@@ -6,11 +6,13 @@ Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持�
 
 ## Current Progress
 
+2026-11-13のユーザー判断で、P4は監査残件を未対応のまま完了した。
+
 保存・統合状況（2026-11-02）: P5の実装・検証記録は`710864720e67f1c0042278536ddd9f8531eb9184`へ保存し、元branchへff-only統合済み。P5保存・統合完了時は両branch同コミット。本検証開始時の元branch `codex/laravel-php-upgrade`は文書保存の`0beb3ef8`で、`codex/mysql-lts-update`はP5完了地点を保持している。今回の検証記録と整理差分は本コミットで保存する。push未実施。過去文書の「未コミット」「元branchへの統合は別途」は記録当時の状態を示す。定期DBバックアップは未実装で、後日検討する。
 
-確認日: **2026-11-03 JST**。P0〜P3とP4の個別実装・元統合は保存済み。P4の監査残件は保留し全体未完了。P5は保存・元統合まで完了し、通常MySQL8.4.13の利用を再開済み。**P6-1〜P6-5は承認済み縮小範囲の検証を確認済み。工程2の結果・残課題整理を行い、P6-6の独立最終レビューPASS・必須指摘なし。工程3でP6専用8コンテナを停止し、証跡等をarchiveへ保全済み。停止/保全と削除候補のReviewer確認PASS後、承認されたcontainer/networkと検証ソースを削除し、生成3dirをゴミ箱へ移動した。削除後の独立確認PASS・必須指摘なし。今回の検証記録と整理差分は本コミットで保存し、push未実施。本番公開可とは別判定。** 作業先は元worktreeの`codex/laravel-php-upgrade`。
+確認日: **2026-11-03 JST**。P0〜P3とP4の個別実装・元統合は保存済み。P5は保存・元統合まで完了し、通常MySQL8.4.13の利用を再開済み。**P6-1〜P6-5は承認済み縮小範囲の検証を確認済み。工程2の結果・残課題整理を行い、P6-6の独立最終レビューPASS・必須指摘なし。工程3でP6専用8コンテナを停止し、証跡等をarchiveへ保全済み。停止/保全と削除候補のReviewer確認PASS後、承認されたcontainer/networkと検証ソースを削除し、生成3dirをゴミ箱へ移動した。削除後の独立確認PASS・必須指摘なし。今回の検証記録と整理差分は本コミットで保存し、push未実施。本番公開可とは別判定。** 作業先は元worktreeの`codex/laravel-php-upgrade`。
 
-[計画一覧](README.md)から履歴を辿れる。監査・版情報は記載した確認時点の値。[P6-5再監査](2026-11-02-final-audit-review.md)は2026-11-02取得・11月3日レビュー確認で、修正候補は未適用。過去の判断・監査推移・branch運用は末尾の履歴へ分ける。
+[計画一覧](README.md)から履歴を辿れる。監査・版情報は記載した確認時点の値。[P6-5再監査](archive/dependency-runtime/2026-11-02-final-audit-review.md)は2026-11-02取得・11月3日レビュー確認で、修正候補は未適用。過去の判断・監査推移・branch運用は末尾の履歴へ分ける。
 
 | 段階 | 現在の状態 | 保存先・根拠 |
 | --- | --- | --- |
@@ -18,23 +20,23 @@ Laravel/PHPのS0〜S9で確保した公開動作とデータ互換性を維持�
 | P1: SDK/JMESPath | 完了・保存済み | `8b8dc115`、[計画・結果](archive/dependency-runtime/2026-10-22-backend-sdk-security.md) |
 | P2: JWT7 | 完了・保存済み | `7c6ef535`、[計画・結果](archive/dependency-runtime/2026-10-29-backend-jwt-security.md) |
 | P3: Node24/導入経路 | 完了・元環境統合済み | `a5648642`、[P3結果](archive/dependency-runtime/2026-10-29-node-lts-update.md)、[P1〜P3統合](archive/dependency-runtime/2026-10-29-p1-p3-integration.md) |
-| P4: frontend依存 | 個別実装・検証・元統合済み。残存監査は保留 | 実装`a2e3e709`、統合`84262908`、[統合結果](archive/dependency-runtime/2026-11-02-frontend-main-integration.md)、[P4j保留調査](2026-11-02-frontend-moderate-advisories.md) |
+| P4: frontend依存 | 完了。P4jの監査指摘2件は未対応 | 実装`a2e3e709`、統合`84262908`、[統合結果](archive/dependency-runtime/2026-11-02-frontend-main-integration.md)、[P4j調査と終了判断](archive/dependency-runtime/2026-11-02-frontend-moderate-advisories.md) |
 | P5: MySQL | 完了・保存・元統合済み。8.4.13へ切替、検証時20table/53履歴/jobs3保持・通常利用再開 | `71086472`、[P5計画・検証結果](archive/dependency-runtime/2026-11-02-mysql-lts-update.md) |
-| P6: 最終統合・公開準備 | P6-1〜5検証確認済み、P6-6最終レビューPASS・停止/保全と承認済み削除を実施、削除後確認PASS | [P6計画・実績](2026-11-02-security-runtime-final-check.md)。テスト/証跡再利用/最小ブラウザ確認の範囲を明記。停止/保全まで実施、削除実行/commit/pushは別依頼。本番公開承認は別途 |
+| P6: 最終統合・公開準備 | P6-1〜5検証確認済み、P6-6最終レビューPASS・停止/保全と承認済み削除を実施、削除後確認PASS | [P6計画・実績](archive/dependency-runtime/2026-11-02-security-runtime-final-check.md)。テスト/証跡再利用/最小ブラウザ確認の範囲を明記。専用環境の停止・保全と承認済みの削除まで実施。本番公開承認は別途 |
 
 ### 次に行うこと
 
 P5完了commit/branchと復旧資材を保持し、元worktreeで作業を継続する。P6の追加機能検証は終了し、日次は今回のテスト、queueはP5成功証跡を再利用。最小PC/SPのbuild/Web/API接続も成功した。
 
-1. 工程2の[結果・残課題集計](2026-11-02-security-runtime-final-check.md)は独立Reviewer最終確認PASS・必須指摘なし。追加の全件テストや再監査・版更新は行っていない。
+1. 工程2の[結果・残課題集計](archive/dependency-runtime/2026-11-02-security-runtime-final-check.md)は独立Reviewer最終確認PASS・必須指摘なし。追加の全件テストや再監査・版更新は行っていない。
 2. 工程3でP6専用8コンテナを停止し、証跡・正本ハーネス・監査/preflightをGit除外`docker/db/p6-archive/20261103/`へ保全した。通常4metadata不変・4volume/参照image保持を確認。その後ユーザー承認により専用Compose/ハーネスとP6 container/networkを削除、runtime/元audit/preflightをゴミ箱へ移動した。archive/4volume/参照image/P5保存物は保持し、削除後の独立確認PASS・必須指摘なし。ゴミ箱消去・commit/pushは未実施。
-3. frontend監査、Mime、Node候補、本番運用/定期backupは下記の別課題として保持する。既に通常書込み再開済みなので、旧DBへの無断単純rollbackはしない。
+3. Mimeと本番運用・定期DBバックアップは下記の別課題として保持する。既に通常書込み再開済みなので、旧DBへの無断単純rollbackはしない。
 
 ### 残課題
 
 追加整理（2026-11-03）: ユーザーの保持方針変更と削除承認により、停止済み検証コンテナ18件・未使用image17件を除去。通常稼働4コンテナと4imageのみを保持し、全30volume/実backup/旧my_data/P5・P6 archiveは保持した。旧MySQL imageは当時の版/digestから必要時に再取得する方針で、過去のimage保持記録は当時の履歴と区別する。追加整理の削除後独立確認PASS・必須指摘なし。アプリ/依存lock/通常Composeの変更・追加テスト・commit/pushなし。
 
-- **frontend監査**: 2026-11-02のP4j調査でmoderate14/devのみ・omit-dev0、2advisory。minimatch/globの修正版を上位の依存範囲がまだ許容せず、通常更新だけの解消経路は確認できなかった。候補ESLint10.14.0は未適用、実版は10.13.0。開発/build/CIへの影響は残り、保留を解消扱いしない。部分改善も含めた[再評価条件](2026-11-02-frontend-moderate-advisories.md#risks--再開条件)を参照。
+- **frontend監査**: 2026-11-02のP4j調査でmoderate14/devのみ・omit-dev0、2advisory。minimatch/globの修正版を上位の依存範囲がまだ許容せず、通常更新だけの解消経路は確認できなかった。候補ESLint10.14.0は未適用、実版は10.13.0。2026-11-13のユーザー判断で、指摘を未対応のまま今回の対応を終了。将来見直す場合の[再評価条件](archive/dependency-runtime/2026-11-02-frontend-moderate-advisories.md#risks--再開条件)を参照。
 - **Composer監査**: P2確認時点でSymfony Mime medium1件（symfony/mime7.4.19、PKSA-wtxr-p26d-nn42 / CVE-2026-45070）が残存。P6-5再監査でも残存。Symfony公式の誤記訂正と照合し、修正版7.4.22を確認した。backend依存の別更新提案とし、未適用のまま。0件とは扱わない。[P2記録](archive/dependency-runtime/2026-10-29-backend-jwt-security.md#残存監査p2対象外)。
 - **Node**: 2026-11-04に24.22.2の公式image取得・Dockerfile更新・隔離検証・通常環境への反映まで完了。暫定版の残課題は解消。下記の更新記録を参照。
 - **本番・外部接続**: 本番HTTPS/Cookie/CSRF/CORS、実鍵の強度・適合性、外部SMTP/S3、queue/cron・監視・本番切替と復旧は未確認・未実施。本番公開承認は含まない。
@@ -188,7 +190,7 @@ P5完了commit/branchと復旧資材を保持し、元worktreeで作業を継続
 
 ### P4: frontend依存の脆弱性対応
 
-**進捗: P4a〜P4i-2の実装・検証・保存と元環境統合まで完了。P4jのmoderate14/2advisoryは保留し、P4全体は未完了。** [統合結果](archive/dependency-runtime/2026-11-02-frontend-main-integration.md)と[保留調査](2026-11-02-frontend-moderate-advisories.md)を参照。以下は初版の全体方針であり、個別結果は計画一覧と履歴を参照。
+**進捗: P4a〜P4i-2の実装・検証・保存と元環境統合まで完了。P4jのmoderate14/2advisoryは未対応のまま、2026-11-13のユーザー判断でP4を完了。** [統合結果](archive/dependency-runtime/2026-11-02-frontend-main-integration.md)と[P4j調査](archive/dependency-runtime/2026-11-02-frontend-moderate-advisories.md)を参照。以下は初版の全体方針であり、個別結果は計画一覧と履歴を参照。
 
 - P4a: Axios/Lodash/PostCSS等の互換修正版と必要な間接依存から対応する。React Router/uuid等も利用経路・公開影響を確認して候補を決定。
 - P4b以降: Vite/Vitest/@vitest/ui/coverage、対応plugin/Storybook/TypeScriptの制約を照合し、互換性が必要な組だけを更新。CSS基盤の更新はさらに別の小段階にする。
@@ -214,7 +216,7 @@ P5完了commit/branchと復旧資材を保持し、元worktreeで作業を継続
 
 ### P6: 最終統合・公開準備の引き継ぎ
 
-**進捗: [P6結果と残課題](2026-11-02-security-runtime-final-check.md)を参照。承認済み縮小範囲のP6-1〜5を確認済み。P6-6最終レビューPASS、専用環境停止・保全済み。承認された除去を実施、削除後確認PASS。** 定期DBバックアップ機能の実装・実デプロイは含まない。
+**進捗: [P6結果と残課題](archive/dependency-runtime/2026-11-02-security-runtime-final-check.md)を参照。承認済み縮小範囲のP6-1〜5を確認済み。P6-6最終レビューPASS、専用環境停止・保全済み。承認された除去を実施、削除後確認PASS。** 定期DBバックアップ機能の実装・実デプロイは含まない。
 
 - 全lockから再構築し、PHP/Laravel・Node/MySQL・全依存の実版・サポート期限・監査を再確認。
 - backend/frontend全自動テスト、build/lint、空DB/既存DB/復元、実HTTP/HTTPS・ブラウザ・メール/実queue/日次/ログを総合実行。
@@ -243,9 +245,9 @@ P5完了commit/branchと復旧資材を保持し、元worktreeで作業を継続
 - [x] P1: SDK/JMESPathの具体版/dry-run/レビュー/承認、更新・既存backend全件・最終レビュー・保存。commit `8b8dc115`。
 - [x] P2: JWT7系への更新・旧token互換・全backend・実登録・レビュー・保存。`7c6ef535`へ保存済み。
 - [x] P3: Node24更新・PHP内Node削除・lock補完、全検証・Reviewer確認・保存。`a5648642`。
-- [ ] P4: 互換更新と必要メジャー更新ごとに具体案/承認→監査/全テスト/画面確認・保存。
+- [x] P4: P4a〜P4i-2の依存更新・検証・保存・統合を完了。P4jで確認した開発依存の監査指摘2件はユーザー判断で未対応のまま終了。
 - [x] P5: 更新経路/復旧案の承認、隔離移行/restore/回帰/主要動作、別承認の元環境切替・確認・Reviewer確認を完了。コード/文書は`71086472`へ保存し、元branchへff-only統合済み。
-- [ ] P6: 最終全件・監査・サポート・残課題と公開準備引き継ぎ。実deployは行わない。
+- [x] P6: 承認済みの縮小範囲で最終統合検証・監査・サポート確認・公開準備の引き継ぎを完了。全画面・メール／登録フロー全体の検証は対象外とし、database queueはP5の成功証跡を再利用。本番確認・実デプロイは別途扱う。
 
 ## Test Plan
 
@@ -337,7 +339,7 @@ P4hは[MSW/Vitest peer整合](archive/dependency-runtime/2026-10-30-frontend-msw
 
 P4i-1は[ESLint・Babel・CSS計画と結果](archive/dependency-runtime/2026-10-30-frontend-eslint-babel-css.md)の第1段階Aのみユーザー承認後に適用。manifest不変のlock更新、通常npm ci/実tree、全204件・coverage・lint/型検査/build・Storybook/UI・PC/SPと合成API操作を確認。本番全6assetは基点とhash一致。監査15→6/omit-dev5→0。最終Reviewer確認完了（問題なし・必須指摘なし）。ユーザー依頼により本書を含むP4i-1保存コミットへ保存。元環境未統合。ESLint10移行の[第2段階具体案](archive/dependency-runtime/2026-10-30-frontend-eslint10-migration.md)は設計・Reviewer確認完了（問題なし）。2026-10-31にユーザーが6配列の直接文字列union化を承認し、ESLint10移行と併せて実装・全204件/coverage/lint/build/画面検証済み。最終Reviewer確認完了（問題なし）・ユーザー依頼により本書を含むP4i-2保存コミットへ保存。新しい監査情報の同時点比較は旧18→新14（high6→0、omit-dev0）で、moderate14件の追加対応は未決。P4全体は未完了。
 
-P4jは[残存moderate advisory調査](2026-11-02-frontend-moderate-advisories.md)を実施。2026-11-02の基点・通常更新候補ともmoderate14/omit-dev0。修正版minimatch11/glob14を上位安定版の依存指定がまだ許容せず、現時点の通常更新による解消経路は確認できなかった。ESLint10.14.0だけの更新候補は指摘が減らないため未適用。Reviewer問題なし。実依存の変更は提案せず上位対応待ちを推奨し、部分改善も再評価する。指摘は未解決・P4未完了、調査文書はユーザーの統合依頼に伴い本書を含むコミットへ保存。
+P4jは[残存moderate advisory調査](archive/dependency-runtime/2026-11-02-frontend-moderate-advisories.md)を実施。2026-11-02の基点・通常更新候補ともmoderate14/omit-dev0。修正版minimatch11/glob14を上位安定版の依存指定がまだ許容せず、現時点の通常更新による解消経路は確認できなかった。ESLint10.14.0だけの更新候補は指摘が減らないため未適用。Reviewer問題なし。実依存の変更は提案せず上位対応待ちを推奨し、部分改善も再評価する。指摘は未解決・P4未完了、調査文書はユーザーの統合依頼に伴い本書を含むコミットへ保存。
 
 - 継続利用するworktree: `/Users/terashimamasato/.codex/worktrees/backend-sdk-security/boxing_talking`。追加のworktreeは作成しない。
 - 現在のbranch: `codex/frontend-build-update`（P4b/P4c/P4d-1保存済み、P4e/P4fも各計画を含む保存コミットへ保存）。P4a保存`a3c14326`から同じ作業worktreeで`git switch -c`により作成・切替。P4aのbranchは`codex/frontend-dependency-security`、P3時は`codex/node-lts-update`。
