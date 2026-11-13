@@ -50,7 +50,6 @@ class DestroyMatchTest extends TestCase
   }
 
   /**
-   * @test
    * セットアップで入れたデーががDBに入っているか
    */
   public function testDeleteMatchSetUp()
@@ -60,7 +59,6 @@ class DestroyMatchTest extends TestCase
   }
 
   /**
-   * @test
    * 正常に削除されている
    */
   public function testDeleteMatch()
@@ -74,7 +72,6 @@ class DestroyMatchTest extends TestCase
   }
 
   /**
-   * @test
    * 存在しないmatchをdeleteしようとすると403
    */
   public function testDeleteMatchIfMatchNotExists()
@@ -88,7 +85,6 @@ class DestroyMatchTest extends TestCase
   }
 
   /**
-   * @test
    * admin認証がない場合のリクエストは401
    */
   public function testDeleteMatchWithNoAdmin()

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { AxiosError } from 'axios';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
@@ -22,7 +22,12 @@ export const useDeleteComment = () => {
     });
   }, []);
 
-  const { mutate, isLoading, isSuccess } = useMutation(api, {
+  const {
+    mutate,
+    isPending: isLoading,
+    isSuccess,
+  } = useMutation({
+    mutationFn: api,
     onMutate: () => {
       showFullScreenLoading();
     },
@@ -33,7 +38,7 @@ export const useDeleteComment = () => {
       {
         onSuccess: () => {
           //? コメントの再取得。※refetch()を使うとmatchID=0での呼び出しが1回入るのでうざい
-          queryClient.invalidateQueries([QUERY_KEY.COMMENT, { id: matchID }]);
+          queryClient.invalidateQueries({ queryKey: [QUERY_KEY.COMMENT, { id: matchID }] });
           hideFullScreenLoading();
           showGrayBackToast(MESSAGE.COMMENT_DELETED);
           return;

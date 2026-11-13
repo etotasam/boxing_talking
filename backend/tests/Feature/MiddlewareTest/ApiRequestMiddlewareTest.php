@@ -10,9 +10,6 @@ use App\Http\Middleware\ApiRequestMiddleware;
 
 class ApiRequestMiddlewareTest extends TestCase
 {
-  /**
-   * @test
-   */
   public function testApiRequestToSnakeCase()
   {
 

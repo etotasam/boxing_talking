@@ -1,5 +1,91 @@
 # React + TypeScript + Vite
 
+## Dockerでの開発
+
+Node 24.22.2 / npm 11.19.1を固定したDocker imageを使用します。
+`node:24.22.2-alpine3.24`の公式imageをdigest固定しています。
+24.22.1の暫定採用からの更新結果は[依存・実行環境更新記録](../docs/plans/2026-10-22-dependency-runtime-update.md#node-24222へのパッチ更新2026-11-04)を参照してください。
+
+以下はリポジトリルートで実行します。元の環境と別worktreeを同時起動する場合は、
+既存の固定container名・port・DB mountが衝突するため、そのまま同時起動しないでください。
+
+初回はimageをbuildして依存を導入した後、全サービスを起動します。
+
+```sh
+docker compose build node
+docker compose run --rm --no-deps node npm ci
+docker compose up -d
+```
+
+nodeサービスの起動コマンドは`npm run dev`です。通常の起動・再起動では依存を再導入しません。
+
+```sh
+docker compose up -d
+# 起動済みの開発サーバーを再起動する場合
+docker compose restart node
+```
+
+`package-lock.json`を更新・取得した場合やNode imageを更新した場合は、開発サーバーを止めて再導入します。
+Node image更新時は`build node`も実行してください。
+
+```sh
+docker compose stop node
+docker compose build node
+docker compose run --rm --no-deps node npm ci
+docker compose up -d node
+```
+
+依存はCompose projectごとの`frontend_node_modules` named volumeへ導入します。
+ホストの`frontend/node_modules`はcontainer内では使用しません。
+空volumeで`up`だけを実行すると依存不足で起動に失敗するため、初回の`npm ci`が必要です。
+lock更新後の再導入忘れは自動検出しないため、更新を取り込んだ際も上記手順を実行してください。
+稼働中のnodeサービスと`npm ci`を同時に実行しないでください。
+
+依存を意図的に追加・更新する場合だけ、停止後に同じサービスで`npm install <package>@<version>`を使い、
+`package.json`と`package-lock.json`の差分を確認して一緒に保存します。
+通常の再現導入には、既存lockを変更しない`npm ci`を使用します。
+
+検証も同じNode環境で実行できます。
+
+```sh
+docker compose run --rm --no-deps -e VITE_APP_API_URL=http://localhost:3000 node npm test -- --run
+docker compose run --rm --no-deps node npm run lint
+docker compose run --rm --no-deps node npm run build
+```
+
+## build・テスト・Storybookの互換設定
+
+Vite 7への更新後も、`vite.config.ts`の`build.target`はVite 4の既定値
+（es2020 / Edge 88 / Firefox 78 / Chrome 87 / Safari 14）を維持しています。
+これは変換対象の維持であり、各ブラウザでの動作試験を保証するものではありません。
+
+Vitest 4では未テストファイルもcoverageに含めるため、`vitest.config.mjs`で
+`coverage.include: ['src/**/*.{ts,tsx}']`を指定しています。
+coverageの集計方式が変わるため、以前との比較では対象ファイルと集計方式も確認してください。
+Docker等の非対話実行でVitest UIを開き続ける場合は、`npm test -- --ui --watch`のように
+watchモードを明示します。
+
+Storybook 10は`npm run sb`で別途起動し、`npm run build-storybook`で静的buildします。
+既存4ストーリーを維持し、Docsは`@storybook/addon-docs`、Controls/Actions等は本体の機能を使用します。
+既存の`autodocs`タグが付いたストーリーのDocsを生成します。
+型から生成する選択式Controlsを維持するため、`reactDocgen`は旧版と同じ
+`react-docgen-typescript`を明示しています。
+
+## Server state
+
+サーバーデータは TanStack Query v5 (`@tanstack/react-query`) で管理します。
+開発用 Devtools は `@tanstack/react-query-devtools` を使用します。
+
+共通設定は `src/queryClient.ts` の `createQueryClient` に集約しています。
+query / mutation の `networkMode: 'offlineFirst'` は、React Query v3 と同様に
+オフラインでも初回の通信を実行し、失敗時の通知・ローディング終了へ進むための互換設定です。
+query の自動リトライとウィンドウフォーカス時の再取得は従来どおり無効です。
+
+テスト用 API URL が未設定の場合は、外部 API に接続せず MSW で処理できるよう
+`VITE_APP_API_URL=http://localhost:3000 npm test -- --run` でテストを実行できます。
+
+## Vite template
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
@@ -7,21 +93,14 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+## ESLintの設定
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+ESLint 10とTypeScript ESLint 8を使用し、設定は`eslint.config.mjs`へ集約しています。
+`npm run lint`で従来と同じ`.ts`/`.tsx`を検査し、警告も失敗として扱います。
+`dist`、隠しファイル/ディレクトリ、JavaScript設定ファイルは従来どおり対象外です。
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+依存更新による検査方針の変更を避けるため、旧実効ルールを明示しています。
+新recommended、React Compiler向けルール、型情報を使うlintの採用は別途判断します。
+`no-console`は`console.error`のみ許可し、既存の`exhaustive-deps`無効化方針も維持しています。
+削除された`ban-types`の検査は`no-restricted-types`へ引き継ぎ、旧来のグローバル定義を
+維持するため`globals`は13系を直接指定しています。

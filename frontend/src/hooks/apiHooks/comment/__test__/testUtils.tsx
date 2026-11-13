@@ -1,15 +1,7 @@
 import type { ReactNode } from 'react';
-import { QueryClient, QueryClientProvider, setLogger } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RecoilRoot } from 'recoil';
 import type { CommentType } from '@/types';
-
-const noop = () => undefined;
-
-setLogger({
-  log: noop,
-  warn: noop,
-  error: noop,
-});
 
 export const comment: CommentType = {
   id: 1,

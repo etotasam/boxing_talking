@@ -77,7 +77,7 @@ describe('useDeleteComment', () => {
       expect(mocks.showGrayBackToast).toHaveBeenCalledTimes(1);
       expect(mocks.showGrayBackToast).toHaveBeenCalledWith(MESSAGE.COMMENT_DELETED);
       expect(invalidateQueries).toHaveBeenCalledTimes(1);
-      expect(invalidateQueries).toHaveBeenCalledWith([QUERY_KEY.COMMENT, { id: 2 }]);
+      expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: [QUERY_KEY.COMMENT, { id: 2 }] });
       expect(result.current.isSuccess).toBe(true);
       expect(mocks.showErrorToast).not.toHaveBeenCalled();
     });

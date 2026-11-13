@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useSetRecoilState } from 'recoil';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
@@ -18,29 +18,33 @@ export const useSignUpIdentification = () => {
   const setAuthenticatingState = useSetRecoilState(authCheckingState);
   const setTokenErrorMessage = useSetRecoilState(tokenErrorMessageState);
 
-  const api = useCallback(async ({ token }: { token: string }) => {
-    try {
-      const res = await Axios.post<boolean>(API_PATH.USER_CREATE, { token }).then(
-        (result) => result.data
-      );
-      setAuthenticatingState({ isLoading: false, isError: false, isSuccess: true });
-      return res;
-    } catch (error) {
-      const errorCode = (error as SignUpIdentificationError).data?.errorCode;
+  const api = useCallback(
+    async ({ token }: { token: string }) => {
+      try {
+        const res = await Axios.post<boolean>(API_PATH.USER_CREATE, { token }).then(
+          (result) => result.data
+        );
+        setAuthenticatingState({ isLoading: false, isError: false, isSuccess: true });
+        return res;
+      } catch (error) {
+        const errorCode = (error as SignUpIdentificationError).data?.errorCode;
 
-      if (errorCode === CUSTOM_ERROR_CODE.EXPIRED_TOKEN) {
-        setTokenErrorMessage(TOKEN_ERROR_MESSAGE.EXPIRED_TOKEN);
+        if (errorCode === CUSTOM_ERROR_CODE.EXPIRED_TOKEN) {
+          setTokenErrorMessage(TOKEN_ERROR_MESSAGE.EXPIRED_TOKEN);
+        }
+
+        if (errorCode === CUSTOM_ERROR_CODE.INVALID_TOKEN) {
+          setTokenErrorMessage(TOKEN_ERROR_MESSAGE.INVALID_TOKEN);
+        }
+
+        setAuthenticatingState({ isLoading: false, isError: true, isSuccess: false });
       }
+    },
+    [setAuthenticatingState, setTokenErrorMessage]
+  );
 
-      if (errorCode === CUSTOM_ERROR_CODE.INVALID_TOKEN) {
-        setTokenErrorMessage(TOKEN_ERROR_MESSAGE.INVALID_TOKEN);
-      }
-
-      setAuthenticatingState({ isLoading: false, isError: true, isSuccess: false });
-    }
-  }, [setAuthenticatingState, setTokenErrorMessage]);
-
-  const { mutate } = useMutation(api, {
+  const { mutate } = useMutation({
+    mutationFn: api,
     onMutate: () => {
       setAuthenticatingState({ isLoading: true, isError: false, isSuccess: false });
     },

@@ -76,7 +76,7 @@ class TitleRepository implements TitleRepositoryInterface
    * @param int|null $organizationId
    * @return bool isDeleteTarget
    */
-  public function deleteTitle(int $boxerId, int $weightDivisionId, int $organizationId = null): bool
+  public function deleteTitle(int $boxerId, int $weightDivisionId, ?int $organizationId = null): bool
   {
     $query = Title::where('boxer_id', $boxerId)
       ->where('weight_division_id', $weightDivisionId);

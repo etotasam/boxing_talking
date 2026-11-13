@@ -13,6 +13,7 @@ use App\Models\MatchResult;
 use App\Models\BoxerTitleSnapshot;
 use Database\Seeders\OrganizationSeeder;
 use Database\Seeders\WeightDivisionSeeder;
+use Database\Seeders\GradeSeeder;
 
 class ResultStoreTest extends TestCase
 {
@@ -29,6 +30,7 @@ class ResultStoreTest extends TestCase
 
         $this->seed(OrganizationSeeder::class);
         $this->seed(WeightDivisionSeeder::class);
+        $this->seed(GradeSeeder::class);
 
         $this->division = [
             "heavy" => 1,
@@ -88,7 +90,6 @@ class ResultStoreTest extends TestCase
     }
 
     /**
-     * @test
      * ! 試合結果を登録時にボクサー戦績が正常に反映されている(試合結果未登録時)
      */
     public function testUpdateBoxerRecordWithResult()
@@ -141,7 +142,6 @@ class ResultStoreTest extends TestCase
     }
 
     /**
-     * @test
      * ! 試合結果を登録時にボクサー戦績の更新が正常に行われている(試合結果登録済み時)
      */
     public function testUpdateBoxerRecordWithResultAndAlreadyHasResult()
@@ -173,7 +173,6 @@ class ResultStoreTest extends TestCase
 
 
     /**
-     * @test
      * ! 勝者がタイトルを防衛した時はstateがstillになり、敗者のタイトルのstateはfallになる
      */
     public function testUpdateBoxerTitleStateWhenRedBoxerWins()
@@ -207,7 +206,6 @@ class ResultStoreTest extends TestCase
     }
 
     /**
-     * @test
      * ! 試合結果が引き分けの場合はstateがnullになる
      */
     public function testUpdateBoxerTitleForResultDraw()
@@ -246,7 +244,6 @@ class ResultStoreTest extends TestCase
 
     /**
      * ! 試合結果を更新する際の正常にデータが変更されているか(既にstateが設定されている場合)
-     * @test
      */
     public function testUpdateBoxerTitleAlreadyHasState()
     {
@@ -292,7 +289,6 @@ class ResultStoreTest extends TestCase
     }
 
     /**
-     * @test
      * ! 勝敗でタイトルを獲得、奪取された場合にtitlesテーブルから対象を追加、削除する
      */
     public function testAdjustTitleWithResult()
@@ -339,7 +335,6 @@ class ResultStoreTest extends TestCase
     }
 
     /**
-     * @test
      * ! タイトル未所持ボクサーがタイトルマッチで勝利した場合正常にタイトルがstoreされる
      */
     public function testNotHasTitle()

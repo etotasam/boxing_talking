@@ -1,13 +1,10 @@
 import { atom } from "recoil";
 
-const state = [
-  "loading",
-  "success",
-  "error",
-  "idle"
-]
-
-type StateType = typeof state[number]
+type StateType =
+  | 'loading'
+  | 'success'
+  | 'error'
+  | 'idle';
 
 
 export const authCheckState = atom<StateType>({

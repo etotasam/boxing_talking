@@ -1,14 +1,11 @@
 import { atomFamily } from "recoil";
 
-const elementNameAndPosition = [
-  "HEADER_HEIGHT",
-  "FOOTER_HEIGHT",
-  "POST_COMMENT_HEIGHT",
-  "MATCH_PAGE_BOXER_SECTION_HEIGHT",
-  'COMMENTS_MODAL_HIDDEN_HEIGHT'
-] as const
-
-type ElementNameAndPositionType = (typeof elementNameAndPosition)[number]
+type ElementNameAndPositionType =
+  | 'HEADER_HEIGHT'
+  | 'FOOTER_HEIGHT'
+  | 'POST_COMMENT_HEIGHT'
+  | 'MATCH_PAGE_BOXER_SECTION_HEIGHT'
+  | 'COMMENTS_MODAL_HIDDEN_HEIGHT';
 
 export const elementSizeState = atomFamily<number | undefined, ElementNameAndPositionType>({
   key: "elementSizeState",

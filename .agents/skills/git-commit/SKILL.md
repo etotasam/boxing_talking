@@ -31,7 +31,7 @@ description: git に今回の変更だけを安全に保存する
 ## Test Selection
 
 - frontend 差分: 関連する Vitest、`npm run lint`、必要に応じて `npm run build` / `npx tsc --noEmit`。
-- backend 差分: 関連する PHPUnit、必要に応じて `cd backend && npm test`。
+- backend 差分: リポジトリルートで `docker compose exec php php artisan test` を実行し、関連するバックエンドテストを確認する。
 - ドキュメント・skill のみの差分: `git diff --check` など、内容に合う軽い検証を優先する。
 
 ## Commit Message

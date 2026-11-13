@@ -17,7 +17,10 @@ description: 設計が必要な変更の影響範囲、選択肢、実装方針�
 比較的大きい変更では、Planner は実装承認前に `docs/plans/YYYY-MM-DD-<task-name>.md` を作成する。
 Plan Document は、ユーザーが実装可否を判断するための提案書として扱う。
 
-ユーザー承認前に許可される変更は Plan Document の作成・更新のみとし、実装コード、テストコード、設定ファイルは変更しない。
+ユーザー承認前に許可される変更は、Plan Document の作成・更新と、
+`docs/plans/README.md` の「現在の計画・保留事項」への、
+対象計画のリンク・提案中の状態の追加・更新に限る。
+実装コード、テストコード、設定ファイルは変更しない。
 ユーザー承認後、Plan Document を承認済みの実装計画として扱い、Worker / Tester / Reviewer が参照する。
 
 ### File Naming
@@ -49,6 +52,9 @@ Plan Document は `docs/plans/YYYY-MM-DD-<task-name>.md` の形式で作成す�
 - 設計判断を伴わない明らかな修正
 - テストや lint の単純な修正
 
+設計判断や仕様変更を伴わない機械的な修正は、複数ファイルにまたがる場合も Plan Document を不要とし、上記の作成条件よりこの例外を優先する。
+Plan Document の作成要否の判断に迷う場合は、必ずユーザーへ確認する。
+
 ## Workflow
 
 1. 関連ファイル、既存実装、テスト配置、設定を確認する。
@@ -57,14 +63,18 @@ Plan Document は `docs/plans/YYYY-MM-DD-<task-name>.md` の形式で作成す�
 
 以下の手順 4〜9 は、`When To Create` に該当し、Plan Document を作成する場合に行う。
 
-4. `docs/plans/YYYY-MM-DD-<task-name>.md` に、採用案、採用理由、影響範囲、リスク、テスト方針を記載する。
+4. `docs/plan-document-template.md` を読み、その構成と記載指示に従って `docs/plans/YYYY-MM-DD-<task-name>.md` を作成する。
+   `docs/plans/README.md` の「現在の計画・保留事項」に、
+   対象文書へのリンクと「提案中・実装未承認」であることを記載する。
 5. Reviewer subagent が Plan Document の仕様、影響範囲、実装方針、テスト方針、リグレッションリスクを評価する。
 6. Reviewer の指摘を確認し、必要に応じて Plan Document に反映する。
 7. チャット上で Plan Document の作成内容と Reviewer の評価結果を要約し、ユーザーに実装可否の判断を求める。
 8. ユーザー承認を得る。
+   `docs/plans/README.md` の対象計画を承認済みの状態へ更新し、
+   次に行う作業を記載する。
 9. 承認後、Plan Document を承認済み計画として Worker に実装を引き継ぐ。
 
-ユーザー承認を得るまでは、Plan Document の作成・更新以外の実装変更を行わない。
+ユーザー承認を得るまでは、上記で許可した提案用の文書変更以外は行わない。
 
 ## Output
 
@@ -77,57 +87,6 @@ Plan Document は `docs/plans/YYYY-MM-DD-<task-name>.md` の形式で作成す�
 
 ## Plan Document Format
 
-`docs/plans/YYYY-MM-DD-<task-name>.md` は以下の構成で作成する。
-
-```md
-# Task Name
-
-## Goal
-
-この作業で達成する目的を書く。
-
-## Background / Context
-
-既存実装、問題点、前提条件を書く。
-
-## Scope
-
-今回変更する範囲を書く。
-
-### In Scope
-
-今回対応することを書く。
-
-### Out of Scope
-
-今回対応しないことを書く。
-
-## Impact Area
-
-影響を受ける画面、API、DB、テスト、設定を書く。
-
-## Options
-
-検討した実装案を複数書く。
-各案には、変更方針、メリット、デメリット、リスクを書く。
-
-## Decision
-
-採用する案を明記する。
-
-## Rationale
-
-採用理由を、要件、影響範囲、保守性、リスク、テスト容易性に基づいて書く。
-
-## Tasks
-
-実装タスクをチェックリストで書く。
-
-## Test Plan
-
-追加・更新・実行するテストと、何を保証するかを書く。
-
-## Risks
-
-想定されるリグレッションや注意点を書く。
-```
+Plan Document を作成・更新する際は、[Plan Document Template](../../../docs/plan-document-template.md) を必ず読み、その構成と各項目の記載指示に従う。
+参照パスはリポジトリルート基準で `docs/plan-document-template.md` とする。
+書式の定義はテンプレートに一本化し、このスキル内には重複して記載しない。

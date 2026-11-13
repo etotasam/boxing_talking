@@ -9,7 +9,7 @@ const AdminOnly = () => {
 
   useEffect(() => {
     if (isLoading) return;
-    if (!isAdmin) return navigate(ROUTE_PATH.HOME);
+    if (!isAdmin) navigate(ROUTE_PATH.HOME);
   }, [isAdmin, isLoading]);
 
   if (isLoading)

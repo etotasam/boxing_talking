@@ -6,5 +6,9 @@ export default mergeConfig(viteConfig, defineConfig({
     include: ['src/**/*.test.(tsx|ts)'],
     environment: 'jsdom',
     setupFiles: './test-setup.tsx',
+    coverage: {
+      // 未テストのソースも引き続きレポート対象にする。
+      include: ['src/**/*.{ts,tsx}'],
+    },
   }
 }))

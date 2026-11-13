@@ -1,27 +1,24 @@
 import { useCallback } from 'react';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
 import type { UserType } from '@/types';
 
 export const useAuth = () => {
-  const queryClient = useQueryClient();
-
   const api = useCallback(async () => {
-    const res = await Axios.get(API_PATH.USER).then((result) => result.data);
-    return res.data;
+    const res = await Axios.get<{ data?: UserType | null }>(API_PATH.USER).then(
+      (result) => result.data
+    );
+    // 未認証時の空レスポンスも、従来の onSuccess と同様に null として保持する。
+    return res?.data ?? null;
   }, []);
 
-  const { data, isLoading, isError } = useQuery<UserType | null>(QUERY_KEY.AUTH, api, {
+  const { data, isLoading, isError } = useQuery<UserType | null>({
+    queryKey: [QUERY_KEY.AUTH],
+    queryFn: api,
     retry: false,
     staleTime: Infinity,
-    onSuccess: (data) => {
-      if (!data) {
-        queryClient.setQueryData<UserType | null>(QUERY_KEY.AUTH, null);
-      }
-    },
-    onError: () => {},
   });
 
   return { data, isLoading, isError };

@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom';
-import { useQuery } from 'react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
@@ -55,27 +55,23 @@ export const useFetchBoxers = () => {
     data: result,
     isLoading,
     isError,
-    isPreviousData,
+    isPlaceholderData: isPreviousData,
     refetch,
     isRefetching,
   } = useQuery<{
     boxers: BoxerType[];
     count: number;
-  }>(
-    [QUERY_KEY.BOXER, { ...queryKey }],
-    () =>
+  }>({
+    queryKey: [QUERY_KEY.BOXER, { ...queryKey }],
+    queryFn: () =>
       fetchBoxerAPI({
         page: paramPage,
         limit,
         searchWords: { name: paramName, country: paramCountry },
       }),
-    {
-      keepPreviousData: true,
-      staleTime: Infinity,
-      onSuccess: () => {},
-      onError: () => {},
-    }
-  );
+    placeholderData: keepPreviousData,
+    staleTime: Infinity,
+  });
 
   let boxersData;
   let boxersCount;

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { QUERY_KEY } from '@/constants/queryKeys';
@@ -11,11 +11,13 @@ export const useFetchMatchById = (matchId: number) => {
     return res.data;
   }, [matchId]);
 
-  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType>(
-    [QUERY_KEY.MATCH_SINGLE, { id: matchId }],
-    api,
-    { keepPreviousData: true, staleTime: Infinity, enabled: true }
-  );
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery<MatchDataType>({
+    queryKey: [QUERY_KEY.MATCH_SINGLE, { id: matchId }],
+    queryFn: api,
+    placeholderData: keepPreviousData,
+    staleTime: Infinity,
+    enabled: true,
+  });
 
   return { data, isLoading, isError, isRefetching, refetch };
 };

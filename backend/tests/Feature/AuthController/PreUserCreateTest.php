@@ -11,9 +11,6 @@ use Illuminate\Support\Facades\Hash;
 class PreUserCreateTest extends TestCase
 {
     use RefreshDatabase;
-    /**
-     * @test
-     */
     public function testPreUserCreate()
     {
         //?成功(メールの送信は非同期なので別でテスト)

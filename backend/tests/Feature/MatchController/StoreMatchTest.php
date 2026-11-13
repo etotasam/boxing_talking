@@ -48,10 +48,7 @@ class StoreMatchTest extends TestCase
     $this->seed(OrganizationSeeder::class);
   }
 
-  /**
-   * @test
-   */
-  public function storeMatchSetUpTest()
+  public function testStoreMatchSetUpTest()
   {
     $boxerCount = Boxer::count();
     $this->assertSame(count($this->boxerNames), $boxerCount);
@@ -84,7 +81,6 @@ class StoreMatchTest extends TestCase
   }
 
   /**
-   * @test
    * タイトルマッチでは無い時はtitle_matchesテーブルへの登録はされない
    */
   public function testStoreMatchWithNonTitleMatch()

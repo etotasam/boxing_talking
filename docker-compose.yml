@@ -26,7 +26,7 @@ services:
       - db
 
   db:
-    image: mysql:8.0.21
+    image: mysql:8.4.13@sha256:a0225d1ea6631c8bc2385dc4c2faba17bbf1834ecf369e1659a9a382bd8d5dd7
     platform: linux/amd64
     container_name: db
     environment:
@@ -37,7 +37,7 @@ services:
       TZ: ${TZ}
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - ./docker/db/my_data:/var/lib/mysql
+      - mysql84_data:/var/lib/mysql
       # - ./docker/db/sql:/docker-entrypoint-initdb.d
       - ./docker/db/backup:/backup
     ports:
@@ -49,7 +49,12 @@ services:
     container_name: node
     volumes:
       - "./frontend/:/usr/src/app"
-    command: sh -c "npm install && npm run dev"
+      - frontend_node_modules:/usr/src/app/node_modules
+    command: npm run dev
     ports:
       - "3000:3000"
     # tty: true
+
+volumes:
+  frontend_node_modules:
+  mysql84_data:

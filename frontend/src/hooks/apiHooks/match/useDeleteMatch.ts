@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
@@ -18,7 +18,12 @@ export const useDeleteMatch = () => {
     await Axios.delete(API_PATH.MATCH, { data: { matchId } });
   }, []);
 
-  const { mutate, isLoading, isSuccess } = useMutation(api, {
+  const {
+    mutate,
+    isPending: isLoading,
+    isSuccess,
+  } = useMutation({
+    mutationFn: api,
     onMutate: () => {
       showFullScreenLoading();
     },

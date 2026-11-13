@@ -1,4 +1,4 @@
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { MESSAGE } from '@/constants/statusesOnToastModal';
@@ -36,7 +36,12 @@ export const useRegisterMatch = () => {
     });
   };
 
-  const { mutate, isLoading, isSuccess } = useMutation(api, {
+  const {
+    mutate,
+    isPending: isLoading,
+    isSuccess,
+  } = useMutation({
+    mutationFn: api,
     onMutate: () => {
       showFullScreenLoading();
     },

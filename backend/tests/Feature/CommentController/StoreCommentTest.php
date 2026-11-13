@@ -6,6 +6,8 @@ namespace Tests\Feature\CommentController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Database\Seeders\GradeSeeder;
+use Database\Seeders\WeightDivisionSeeder;
 use App\Models\User;
 use App\Models\GuestUser;
 use App\Models\BoxingMatch;
@@ -21,6 +23,9 @@ class StoreCommentTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // 試合Factoryが参照するマスターを用意し、外部キー制約を満たす。
+        $this->seed([GradeSeeder::class, WeightDivisionSeeder::class]);
 
         $this->user = User::factory()->create([
             "name" => 'auth_user_name',
@@ -44,7 +49,6 @@ class StoreCommentTest extends TestCase
     }
 
     /**
-     * @test
      * 認証なしでのコメント投稿
      */
     public function testPostWithNoAuth(): void
@@ -90,7 +94,6 @@ class StoreCommentTest extends TestCase
     }
 
     /**
-     * @test
      * ログインユーザーによるコメント投稿
      */
     public function testPostByLoginUser(): void
@@ -109,7 +112,6 @@ class StoreCommentTest extends TestCase
     }
 
     /**
-     * @test
      * ログインユーザーが1000文字ちょうどのコメントを投稿できる
      */
     public function testPostByLoginUserWithMaxLengthComment(): void
@@ -131,7 +133,6 @@ class StoreCommentTest extends TestCase
     }
 
     /**
-     * @test
      * ログインユーザーが空コメントを投稿した場合はバリデーションエラー
      */
     public function testPostByLoginUserWithEmptyComment(): void
@@ -151,7 +152,6 @@ class StoreCommentTest extends TestCase
     }
 
     /**
-     * @test
      * ログインユーザーが1001文字のコメントを投稿した場合はバリデーションエラー
      */
     public function testPostByLoginUserWithTooLongComment(): void
@@ -173,7 +173,6 @@ class StoreCommentTest extends TestCase
     }
 
     /**
-     * @test
      * ログインユーザーがmatch_idなしで投稿した場合はバリデーションエラー
      */
     public function testPostByLoginUserWithoutMatchId(): void
@@ -191,7 +190,6 @@ class StoreCommentTest extends TestCase
         $this->assertDatabaseMissing('comments', ['user_id' => $this->user->id, 'comment' => 'コメント投稿']);
     }
     /**
-     * @test
      * ゲストによるコメント投稿
      */
     public function testPostByGuestUser(): void

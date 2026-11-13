@@ -8,6 +8,10 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   envDir: './',
+  // Vite 4の既定値を維持し、更新によって変換対象を狭めない。
+  build: {
+    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
+  },
   server: {
     port: 3000,
     host: true,

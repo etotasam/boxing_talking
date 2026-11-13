@@ -36,7 +36,6 @@ class UserCreateTest extends TestCase
     }
 
     /**
-     * @test
      * トークンの期限切れ
      */
     public function testExpiredToken()
@@ -50,21 +49,43 @@ class UserCreateTest extends TestCase
         $this->assertDatabaseMissing('users', ["id" => $this->preUser["id"], "email" => $this->preUser['email']]);
     }
     /**
-     * @test
      * secretKeyが違う場合
      */
     public function testUnmatchedSecretKey()
     {
-        $invalidToken = JWT::encode($this->validPayload, "invalid secret key", 'HS256');
+        $invalidToken = JWT::encode($this->validPayload, "p2-intentionally-wrong-hs256-key-with-valid-length", 'HS256');
         $response = $this->post('/api/user/create', ["token" => $invalidToken]);
         $response->assertStatus(400);
         $this->assertDatabaseMissing('users', ["id" => $this->preUser["id"], "email" => $this->preUser['email']]);
     }
+    /** 署名後にpayloadを書き換えたリンクは拒否し、仮登録を保持する。 */
+    public function testTamperedToken()
+    {
+        $token = JWT::encode($this->validPayload, $this->secretKey, 'HS256');
+        $segments = explode('.', $token);
+        $tamperedPayload = $this->validPayload;
+        $tamperedPayload['user_id'] = '00000000-0000-4000-8000-000000000099';
+        $segments[1] = JWT::urlsafeB64Encode(json_encode($tamperedPayload));
+
+        $this->post('/api/user/create', ['token' => implode('.', $segments)])->assertStatus(400);
+
+        $this->assertDatabaseHas('pre_users', ['id' => $this->preUser->id]);
+        $this->assertDatabaseMissing('users', ['email' => $this->preUser->email]);
+    }
+
+    /** JWT形式ではないリンクは拒否し、仮登録を保持する。 */
+    public function testMalformedToken()
+    {
+        $this->post('/api/user/create', ['token' => 'not-a-jwt-token'])->assertStatus(400);
+
+        $this->assertDatabaseHas('pre_users', ['id' => $this->preUser->id]);
+        $this->assertDatabaseMissing('users', ['email' => $this->preUser->email]);
+    }
+
     /**
-     * @test
      * 成功
      */
-    public function successUserCreate()
+    public function testSuccessUserCreate()
     {
         $validToken = JWT::encode($this->validPayload, $this->secretKey, 'HS256');
         $response = $this->post('/api/user/create', ["token" => $validToken]);

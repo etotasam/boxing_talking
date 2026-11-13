@@ -1,4 +1,4 @@
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Axios } from '@/api/axios';
 import { API_PATH } from '@/constants/apiPath';
 import { CUSTOM_ERROR_CODE } from '@/constants/customErrorCodes';
@@ -22,11 +22,13 @@ export const useDeleteBoxer = () => {
     }).then((v) => v.data);
   };
 
-  const { mutate, isLoading, isError, isSuccess } = useMutation<
-    void,
-    BoxerApiErrorResponseType,
-    BoxerType
-  >(api, {
+  const {
+    mutate,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useMutation<void, BoxerApiErrorResponseType, BoxerType>({
+    mutationFn: api,
     onMutate: () => {
       showFullScreenLoading();
     },

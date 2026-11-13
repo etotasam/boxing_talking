@@ -11,6 +11,7 @@ use App\Helpers\TestHelper;
 use App\Repositories\Interfaces\BoxerRepositoryInterface;
 use Database\Seeders\OrganizationSeeder;
 use Database\Seeders\WeightDivisionSeeder;
+use Database\Seeders\GradeSeeder;
 use Database\Seeders\TitleSeeder;
 use Database\Seeders\BoxerSeeder;
 
@@ -30,12 +31,17 @@ class DestroyBoxerTest extends TestCase
     parent::setUp();
     $this->seed([
       WeightDivisionSeeder::class,
+      GradeSeeder::class,
       OrganizationSeeder::class,
       BoxerSeeder::class,
 
     ]);
     $this->boxerData = Boxer::factory()->create(["name" => "試合が組まれていないボクサー"]);
-    $this->title = Title::factory()->create(["boxer_id" => $this->boxerData->id]);
+    $this->title = Title::factory()->create([
+      "boxer_id" => $this->boxerData->id,
+      "organization_id" => 1,
+      "weight_division_id" => 1,
+    ]);
     $this->boxers = Boxer::factory()->count(2)->create(); // 試合が組まれているボクサー
     $this->match = BoxingMatch::factory()->create([
       'red_boxer_id' => $this->boxers[0]->id,

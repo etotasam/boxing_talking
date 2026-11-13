@@ -3,6 +3,7 @@
 namespace Tests\Unit\TitleService;
 
 use Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Boxer;
 use App\Models\Title;
@@ -49,7 +50,6 @@ class DeleteTitleTest extends TestCase
 
 
     /**
-     * @test
      * titleの削除テスト
      */
     public function testDeleteTitle()
@@ -61,5 +61,29 @@ class DeleteTitleTest extends TestCase
 
         $this->assertTrue($isDeleted);
         $this->assertDatabaseMissing('titles', $this->titles->toArray());
+    }
+
+    /** 団体の省略・明示nullは同階級を削除し、別階級・別選手を残す。 */
+    #[DataProvider('unspecifiedOrganizations')]
+    public function testDeleteTitleWithoutOrganization(bool $omitArgument): void
+    {
+        $sameWeight = Title::create(['boxer_id' => $this->redBoxer->id, 'weight_division_id' => $this->weight['superMiddle'], 'organization_id' => $this->organization['WBA']]);
+        $otherWeight = Title::create(['boxer_id' => $this->redBoxer->id, 'weight_division_id' => $this->weight['heavy'], 'organization_id' => $this->organization['WBC']]);
+        $otherBoxer = Title::create(['boxer_id' => $this->blueBoxer->id, 'weight_division_id' => $this->weight['superMiddle'], 'organization_id' => $this->organization['WBC']]);
+
+        $deleted = $omitArgument
+            ? $this->titleRepository->deleteTitle($this->redBoxer->id, $this->weight['superMiddle'])
+            : $this->titleRepository->deleteTitle($this->redBoxer->id, $this->weight['superMiddle'], null);
+
+        $this->assertTrue($deleted);
+        $this->assertDatabaseMissing('titles', $this->titles->toArray());
+        $this->assertDatabaseMissing('titles', $sameWeight->toArray());
+        $this->assertDatabaseHas('titles', $otherWeight->toArray());
+        $this->assertDatabaseHas('titles', $otherBoxer->toArray());
+    }
+
+    public static function unspecifiedOrganizations(): array
+    {
+        return ['omitted' => [true], 'explicit null' => [false]];
     }
 }

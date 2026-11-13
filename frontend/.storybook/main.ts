@@ -5,16 +5,16 @@ const config: StorybookConfig = {
   stories: ["../src/components/**/*.stories.@(js|jsx|ts|tsx)"],
   addons: [
     '@storybook/addon-links',
-    '@storybook/addon-essentials',
+    '@storybook/addon-docs',
     '@storybook/addon-onboarding',
-    '@storybook/addon-interactions',
   ],
+  // Storybook 7と同じ型解析で、既存の選択式Controlsを維持する。
+  typescript: {
+    reactDocgen: 'react-docgen-typescript',
+  },
   framework: {
     name: '@storybook/react-vite',
     options: {},
-  },
-  docs: {
-    autodocs: 'tag',
   },
 };
 export default config;

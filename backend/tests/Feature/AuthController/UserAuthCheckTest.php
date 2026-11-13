@@ -31,7 +31,6 @@ class UserAuthCheckTest extends TestCase
   }
 
   /**
-   * @test
    * 認証チェック（ありの場合）で200を返す
    */
   public function testHasAuthCheck()
@@ -44,7 +43,6 @@ class UserAuthCheckTest extends TestCase
   }
 
   /**
-   * @test
    * 認証なしの場合は何も返さない(null)
    */
   public function testAuthCheck()

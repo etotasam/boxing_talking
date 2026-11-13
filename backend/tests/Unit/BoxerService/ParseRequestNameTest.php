@@ -17,9 +17,6 @@ class ParseRequestNameTest extends TestCase
   }
 
 
-  /**
-   * @test
-   */
   public function testParseRequestNameInThatCaseNull(): void
   {
     $response = $this->boxerService->parseRequestName(null);
@@ -29,9 +26,6 @@ class ParseRequestNameTest extends TestCase
   }
 
 
-  /**
-   * @test
-   */
   public function testParseRequestNameInThatCaseJapanese(): void
   {
     $japaneseName = "ボクサーの名前";
@@ -40,9 +34,6 @@ class ParseRequestNameTest extends TestCase
     $this->assertSame($japaneseName, $name);
     $this->assertSame(null, $eng_name);
   }
-  /**
-   * @test
-   */
   public function testParseRequestNameInThatCaseEnglish(): void
   {
     $engName = "english name";

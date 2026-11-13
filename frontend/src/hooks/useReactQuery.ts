@@ -1,29 +1,31 @@
-import { useQueryClient } from "react-query"
-
+import { useQueryClient } from '@tanstack/react-query';
 
 export const useReactQuery = () => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const getReactQueryData = <T>(queryKey: string): T => {
-    const res = queryClient.getQueryData(queryKey) as T
-    return res
-  }
+    const res = queryClient.getQueryData([queryKey]) as T;
+    return res;
+  };
 
   const setReactQueryData = <T>(queryKey: string, newData: T): void => {
-    queryClient.setQueriesData(queryKey, newData) as T
-  }
+    queryClient.setQueriesData({ queryKey: [queryKey] }, newData);
+  };
 
   const refetchReactQueryData = (queryKey: string): void => {
-    queryClient.refetchQueries(queryKey)
-  }
+    queryClient.refetchQueries({ queryKey: [queryKey] });
+  };
 
   const refetchReactQueryArrayKeys = (queryKeys: string[]) => {
-    queryKeys.forEach(key => {
-      queryClient.refetchQueries(key)
+    queryKeys.forEach((key) => {
+      queryClient.refetchQueries({ queryKey: [key] });
     });
-  }
+  };
 
-
-  return { getReactQueryData, setReactQueryData, refetchReactQueryData, refetchReactQueryArrayKeys }
-
-}
+  return {
+    getReactQueryData,
+    setReactQueryData,
+    refetchReactQueryData,
+    refetchReactQueryArrayKeys,
+  };
+};

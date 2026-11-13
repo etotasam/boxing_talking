@@ -5,6 +5,8 @@ namespace Tests\Feature\CommentController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Database\Seeders\GradeSeeder;
+use Database\Seeders\WeightDivisionSeeder;
 use App\Models\BoxingMatch;
 use App\Models\Boxer;
 use App\Models\Comment;
@@ -20,6 +22,9 @@ class IndexCommentTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // 試合Factoryが参照するマスターを用意し、外部キー制約を満たす。
+        $this->seed([GradeSeeder::class, WeightDivisionSeeder::class]);
 
         $this->user = User::factory()->create(["name" => 'testUserName']);
         $this->user2 = User::factory()->create(["name" => 'testUserName2']);
@@ -49,7 +54,6 @@ class IndexCommentTest extends TestCase
         $this->comments = Comment::insert($commentsArray);
     }
     /**
-     * @test
      * 存在しない試合のコメントをリクエストされたら正しいエラーハンドリングで404を返す
      */
     public function testCommentsFetchRequestWithNotExistsBoxingMatchId(): void
@@ -63,7 +67,6 @@ class IndexCommentTest extends TestCase
         $this->assertEquals('Match not found', $responseData['message']);
     }
     /**
-     * @test
      * 通常
      */
     public function testSuccessCommentsFetch(): void
@@ -79,7 +82,6 @@ class IndexCommentTest extends TestCase
     }
 
     /**
-     * @test
      * cursor指定時は次のコメントを取得する
      */
     public function testSuccessCommentsFetchWithCursor(): void
@@ -98,7 +100,6 @@ class IndexCommentTest extends TestCase
     }
 
     /**
-     * @test
      * limitを指定されてもバックエンド固定件数を超えて取得しない
      */
     public function testCommentsFetchIgnoresLimitParameter(): void
