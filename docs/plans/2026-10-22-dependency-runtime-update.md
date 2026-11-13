@@ -36,10 +36,24 @@ P5完了commit/branchと復旧資材を保持し、元worktreeで作業を継続
 
 - **frontend監査**: 2026-11-02のP4j調査でmoderate14/devのみ・omit-dev0、2advisory。minimatch/globの修正版を上位の依存範囲がまだ許容せず、通常更新だけの解消経路は確認できなかった。候補ESLint10.14.0は未適用、実版は10.13.0。開発/build/CIへの影響は残り、保留を解消扱いしない。部分改善も含めた[再評価条件](2026-11-02-frontend-moderate-advisories.md#risks--再開条件)を参照。
 - **Composer監査**: P2確認時点でSymfony Mime medium1件（symfony/mime7.4.19、PKSA-wtxr-p26d-nn42 / CVE-2026-45070）が残存。P6-5再監査でも残存。Symfony公式の誤記訂正と照合し、修正版7.4.22を確認した。backend依存の別更新提案とし、未適用のまま。0件とは扱わない。[P2記録](archive/dependency-runtime/2026-10-29-backend-jwt-security.md#残存監査p2対象外)。
-- **Node**: 24.22.1は承認済み暫定版。P6-5で24.22.2の公式releaseと対応Alpine tagの公開を確認したが、候補digest/pull/実行検証・適用は未実施。別更新提案で扱う。
+- **Node**: 2026-11-04に24.22.2の公式image取得・Dockerfile更新・隔離検証・通常環境への反映まで完了。暫定版の残課題は解消。下記の更新記録を参照。
 - **本番・外部接続**: 本番HTTPS/Cookie/CSRF/CORS、実鍵の強度・適合性、外部SMTP/S3、queue/cron・監視・本番切替と復旧は未確認・未実施。本番公開承認は含まない。
 - **検証範囲**: P1は承認により既存backendテストまでに限定し、新規テスト・SES補足・SDK/JMESPath smokeは未実施。VoteIcon単独storyのRecoilRoot不足も既知の制限として残る。
 - **DB記録の限界**: P4統合では統合前の内容hashを保存時に上書きしたため、統合前からの全内容不変は証明できない。統合前後の件数と、home GET後から後続読取終了までの全20table内容/schema hash一致を確認した。P1〜P3統合の前後比較とは区別する。[P4統合結果](archive/dependency-runtime/2026-11-02-frontend-main-integration.md)。
+
+### Node 24.22.2へのパッチ更新（2026-11-04）
+
+- 承認: Node 24.22.2のDocker image公開確認後、ユーザーの「解消できそうだね、よろしく」により更新・検証を承認。既存worktreeで実施する。
+- 方針: 同じAlpine 3.24のパッチ更新を採用。暫定版維持は公開済み修正版を利用できない状態を残し、別major/Alpine変更は影響を広げるため採用しない。機械的な版指定と文書の追随に限定し、独立Plan Documentは作成しない。Reviewerの方針確認は必須指摘なし。
+- 固定image: `node:24.22.2-alpine3.24@sha256:8a32c8cf649a49915a66e81e7a609223c708d0adabf288ee3f4077d765542f85`。公式[Docker Hub API](https://hub.docker.com/v2/repositories/library/node/tags/24.22.2-alpine3.24)でactive・amd64/arm64/v8/s390xを確認し、digest指定pullとDockerfileからのbuildに成功。実版はNode 24.22.2 / npm 11.19.1 / linux arm64。amd64/s390xでの実行は今回未検証。
+- 検証: HEAD `b102583e`のtracked frontendを`git archive`で単発containerに投入。実env/鍵・DB・通常node_modulesを使わず、合成API URLと独立依存で実行する。アプリ仕様・依存manifest/lock・backend・通常Composeは変更しない。
+- 結果: `npm ci --no-audit --no-fund`・`npm ls --all`成功。coverage付きVitestは52ファイル204件成功、lint・型検査/本番build・Storybook build成功。coverageのstatementsは50.79%。Vite開発serverの起動/再起動、Storybook本体/index.json、Vitest UI、本番previewのHTTP 200と期待するHTML/JSONの内容を確認。package.json/lockは検証前後SHA-256一致、作業ツリーにも依存差分なし。
+- 検証ハーネスの修正: 初回UI起動は誤った`--host`で失敗し、CLI helpを根拠に`--api.host`へ修正して再実行。次のUI起動は成功したが、プローブが`Vitest`を小文字`vitest`で判定し、HTTP 200を誤って失敗扱いした。別の最終プローブで正しい`<title>Vitest</title>`と本番preview、lock hashを確認してexit0/PASS。旧失敗ログを成功ログへ置換せず保持する。
+- 反映範囲: 通常起動用`boxing_talking-node` imageをbuild済み（image ID `sha256:8f766b8f19b376a345543c39ff53b934a7060c52757d27490abaded397479a02`、検証用と同一）。通常4containerは作業前から停止しており、起動・再作成・DB接続は行っていない。次回はfrontend READMEのimage更新手順で依存再導入・起動する。旧node container自体は旧imageのままであり、起動中の通常runtimeが24.22.2になったという意味ではない。
+- 限界: HTTP確認はserver起動と配信のsmokeであり、ブラウザ全画面・実API/DB接続・VoteIconの既知制限の解消は検証していない。backend/CI設定は変更しておらず、backendテスト・リモートCIは未実行。Rollupの注釈/大chunk警告、whatwg-encodingの非推奨通知、esbuild/MSWのallowScripts未登録通知は残る。監査の再取得は本作業に含めず、frontend/Composerの残課題は維持する。
+- 証跡: Git除外`docker/db/node-patch-20261104/`に初回/再実行ログ・最終プローブ結果・修正済みハーネスを保存（600）。修正済みハーネスの全体を三度目に実行したわけではなく、最後のUI/preview確認は`final-probes.sh`の結果で示す。単発containerは`--rm`で終了時に除去済み。
+- 最終レビュー: Reviewer subagentが4ファイルの差分・検証ログ・最終プローブ・manifest hash・通常4containerの停止維持と通常用image IDを独立確認し、必須指摘なし。Node暫定版のIssueは上記の反映範囲を明記して完了扱い可と判定。任意指摘のallowScripts通知追記を反映。commit/pushは未実施。
+- 通常環境への反映（後続承認）: 同日、ユーザーの「コンテナを稼働させてイメージを反映」により、`docker compose run --rm --no-deps node npm ci --no-audit --no-fund`で通常volumeへ既存lockから614 packageを導入（exit0）し、`docker compose up -d --no-build`を実行。nodeだけ再作成し、db/php/webも起動。4サービスrunning、稼働nodeのNode 24.22.2 / npm 11.19.1とimage ID `sha256:8f766b8f19b376a345543c39ff53b934a7060c52757d27490abaded397479a02`の一致、`http://localhost:3000/`のHTTP 200を確認した。上の停止維持はこの追加承認前の記録。通常DBへのmigration/seed/テストやworkerは実行していない。アプリ仕様・lockの変更がないため全テストは再実行せず、実runtimeへの反映と起動を検証した。
 
 ### 統合済み構成（2026-11-02のlock・既存検証記録）
 

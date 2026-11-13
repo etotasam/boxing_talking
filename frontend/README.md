@@ -2,9 +2,9 @@
 
 ## Dockerでの開発
 
-Node 24.22.1 / npm 11.19.1を固定したDocker imageを使用します。
-24系の最新配布版24.22.2に対応する公式Alpine imageが調査時点では取得できなかったため、
-確認済み24.22.1を暫定採用しています。詳細は[P3計画](../docs/plans/archive/dependency-runtime/2026-10-29-node-lts-update.md)を参照してください。
+Node 24.22.2 / npm 11.19.1を固定したDocker imageを使用します。
+`node:24.22.2-alpine3.24`の公式imageをdigest固定しています。
+24.22.1の暫定採用からの更新結果は[依存・実行環境更新記録](../docs/plans/2026-10-22-dependency-runtime-update.md#node-24222へのパッチ更新2026-11-04)を参照してください。
 
 以下はリポジトリルートで実行します。元の環境と別worktreeを同時起動する場合は、
 既存の固定container名・port・DB mountが衝突するため、そのまま同時起動しないでください。
