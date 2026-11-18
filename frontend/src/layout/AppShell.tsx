@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { modalState } from '@/store/modalState';
 import { ROUTE_PATH } from '@/constants/routePath';
 import { useFullScreenLoading } from '@/hooks/useFullScreenLoading';
 import { useFetchBoxers } from '@/hooks/apiHooks/boxer';
@@ -19,6 +21,19 @@ const AppShell = () => {
   const { isLoading: isFullScreenLoading } = useFullScreenLoading();
   const { isLoading: isBoxersFetching, isRefetching: isRefetchingBoxers } = useFetchBoxers();
   const isShowFullScreenSpinnerCondition = isFullScreenLoading || isRefetchingBoxers;
+  const isShowCommentsModal = useRecoilValue(modalState('COMMENTS_MODAL'));
+  const isScrollLocked = isShowFullScreenSpinnerCondition || isShowCommentsModal;
+
+  useEffect(() => {
+    if (!isScrollLocked) return;
+
+    const previousOverflowY = document.body.style.overflowY;
+    document.body.style.overflowY = 'hidden';
+
+    return () => {
+      document.body.style.overflowY = previousOverflowY;
+    };
+  }, [isScrollLocked]);
 
   const { data: isAuth, isLoading: isFirstCheckingAuth } = useAuth();
   const { data: isGuest } = useGuest();
