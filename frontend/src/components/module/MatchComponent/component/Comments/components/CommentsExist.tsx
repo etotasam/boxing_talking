@@ -19,6 +19,8 @@ export const CommentsExist = (props: CommentsExistType) => {
   const { newComments, comments, isStale, isNextComments, fetchNextComments } = props;
   const { inView, ref } = useInView();
 
+  const LAST_PADDING_FOR_COMMENT_POST_EL_HEIGHT = 'last:pb-[60px]'; //? コメント投稿欄の高さ分のパディング（px）
+
   useEffect(() => {
     if (!inView) return;
     fetchNextComments();
@@ -35,7 +37,7 @@ export const CommentsExist = (props: CommentsExistType) => {
             animate={{ y: 0, opacity: 1, transition: { delay: isStale ? 0 : 0.4 } }}
             transition={{ duration: 0.5, ease: [0.25, 1, 0.7, 1] }}
             key={comment.id}
-            className="mt-3 last:pb-7"
+            className={`mt-3 ${LAST_PADDING_FOR_COMMENT_POST_EL_HEIGHT}`}
           >
             <CommentBox comment={comment} />
           </motion.div>
@@ -46,7 +48,7 @@ export const CommentsExist = (props: CommentsExistType) => {
             animate={{ y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 1, 0.7, 1] }}
             key={comment.id}
-            className="mt-3 last:pb-7"
+            className={`mt-3 ${LAST_PADDING_FOR_COMMENT_POST_EL_HEIGHT}`}
           >
             <CommentBox comment={comment} />
           </motion.div>
@@ -66,7 +68,7 @@ const CommentBox = ({ comment }: { comment: CommentType }) => {
   return (
     <motion.div
       className={clsx(
-        'sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded'
+        'sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded',
       )}
     >
       <PostTimeAndUserName commentData={comment} />
@@ -100,7 +102,7 @@ const Comment = ({ commentData }: { commentData: CommentType }) => {
         transition={{ duration: 0.2 }}
         className={clsx(
           'text-neutral-300 duration-300 overflow-hidden',
-          isExpanded ? 'line-clamp-none' : 'line-clamp-4'
+          isExpanded ? 'line-clamp-none' : 'line-clamp-4',
         )}
         dangerouslySetInnerHTML={{
           __html: commentData.comment,
@@ -130,7 +132,7 @@ const PostTimeAndUserName = ({ commentData }: { commentData: CommentType }) => {
             <p
               className={clsx(
                 'flex',
-                commentData.postUserName.length > 20 ? 'text-[12px] sm:text-sm' : 'text-sm'
+                commentData.postUserName.length > 20 ? 'text-[12px] sm:text-sm' : 'text-sm',
               )}
             >
               <AiOutlineUser className="mr-1 block bg-cyan-700/70 text-white mt-[2px] w-[16px] h-[16px] rounded-[50%]" />
@@ -190,7 +192,7 @@ const CommentsLoadingEl = () => {
   return (
     <div
       className={clsx(
-        'flex justify-center items-center sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded'
+        'flex justify-center items-center sm:p-5 p-3 pt-1 text-stone-200 sm:text-base text-sm bg-neutral-800/50 rounded',
       )}
     >
       <RotatingLines strokeColor="#ffffff" strokeWidth="3" animationDuration="1" width="30" />

@@ -12,7 +12,7 @@ export const CommentsWrapper = (props: CommentsWrapperType) => {
   const el = useRef<HTMLDivElement>(null);
   const commentPostElementHeightState = useRecoilValue(elementSizeState('POST_COMMENT_HEIGHT'));
   const [isShowCommentsModalState, setIsShowCommentsModalState] = useRecoilState(
-    modalState('COMMENTS_MODAL')
+    modalState('COMMENTS_MODAL'),
   );
   const setIsScroll = useSetRecoilState(boolState('IS_SCROLL'));
 
@@ -51,8 +51,8 @@ export const CommentsWrapper = (props: CommentsWrapperType) => {
     <div
       ref={el}
       className={clsx(
-        'relative w-full flex justify-center scroll-bar-gray',
-        isShowCommentsModalState ? 'overflow-auto' : 'overflow-hidden'
+        'relative w-full flex justify-center scroll-bar-gray overscroll-contain',
+        isShowCommentsModalState ? 'overflow-auto' : 'overflow-hidden',
       )}
       style={{
         height: `calc(80vh - (${commentPostElementHeightState}px) - 1px)`,

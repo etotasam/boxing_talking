@@ -25,7 +25,7 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
   const headerHeightState = useRecoilValue(elementSizeState('HEADER_HEIGHT'));
   const hiddenCommentsHeight: number = (postCommentAreaHeight ?? 0) + 50;
   const [commentsModalHeightHiddenState, setCommentsModalHightHiddenState] = useRecoilState(
-    elementSizeState('COMMENTS_MODAL_HIDDEN_HEIGHT')
+    elementSizeState('COMMENTS_MODAL_HIDDEN_HEIGHT'),
   );
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export const MatchCommentsModal = ({ matchId }: PropsType) => {
       <motion.div
         className={clsx(
           'absolute left-1/2 top-0 z-10 h-0 w-20 -translate-x-1/2',
-          commentFetchState === 'loading' ? 'cursor-default' : 'cursor-pointer'
+          commentFetchState === 'loading' ? 'cursor-default' : 'cursor-pointer',
         )}
         onClick={toggleShowComments}
       >

@@ -1,17 +1,6 @@
-import React from 'react';
 import { RotatingLines } from 'react-loader-spinner';
 
 export const FullScreenSpinnerModal = ({ isShow }: { isShow: boolean }) => {
-  React.useEffect(() => {
-    if (isShow) {
-      document.body.style.overflowY = 'hidden';
-    } else {
-      document.body.style.overflowY = 'scroll';
-    }
-    return () => {
-      document.body.style.overflowY = 'scroll';
-    };
-  }, [isShow]);
   return (
     <>
       {isShow && (
