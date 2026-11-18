@@ -1,5 +1,7 @@
 import { TailSpin } from 'react-loader-spinner';
 import { motion, AnimatePresence } from 'framer-motion';
+import ringBackground from '@/assets/images/etc/first-loading-ring.jpg';
+
 const siteTitle = import.meta.env.VITE_APP_SITE_TITLE;
 
 export const FirstLoadingModal = ({ isShow }: { isShow: boolean }) => {
@@ -9,18 +11,26 @@ export const FirstLoadingModal = ({ isShow }: { isShow: boolean }) => {
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.5 } }}
-          className="z-[999] fixed top-0 left-0 bg-red-600 flex justify-center items-center w-[100vw] min-h-[100vh]"
+          className="fixed inset-0 z-[999] flex items-center justify-center bg-[#101010] bg-cover bg-center px-4"
+          style={{ backgroundImage: `url("${ringBackground}")` }}
         >
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, translateY: -30, transition: { duration: 0.3 } }}
-            className=" text-stone-100"
+            className="text-stone-100"
           >
-            <h1 className="pc:text-[50px] sm:text-[36px] text-[24px] font-bold text-center select-none">
+            <h1 className="select-none text-center font-['Bebas_Neue'] text-[clamp(36px,7vw,88px)] font-normal tracking-[0.04em]">
               {siteTitle}
             </h1>
             <div className="flex justify-center items-center mt-8">
-              <TailSpin color="#e3e3e3" height="35" width="35" ariaLabel="loading" />
+              <TailSpin
+                color="#dc2626"
+                height="35"
+                width="35"
+                strokeWidth="5"
+                radius="1"
+                ariaLabel="loading"
+              />
             </div>
           </motion.div>
         </motion.div>
