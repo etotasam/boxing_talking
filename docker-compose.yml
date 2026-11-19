@@ -1,7 +1,7 @@
 # version: "3"
 services:
   web:
-    image: nginx
+    image: nginx:1.31.9
     platform: linux/amd64
     container_name: web
     ports:
