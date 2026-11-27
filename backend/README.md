@@ -29,9 +29,9 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 
 ## Laravel / PHPの段階更新中の制約
 
-現在のLaravel 13.38.0 / PHP 8.5.12は、段階更新の最終構成です。S9で隔離環境の再構築・総合検証を完了しました。その後P3/P5でNode24/MySQL8.4へ更新しましたが、依存監査の保留残件とP6の最終確認があるため、本番公開可能とは判定していません。検証ではloopback・合成データ・ローカルSMTPのみを使用します。
+現在の構成はLaravel 13.38.0 / PHP 8.5.13です。S9ではPHP 8.5.12の構成で隔離環境の再構築・総合検証を完了しました。その後P3/P5でNode24/MySQL8.4へ更新しましたが、依存監査の保留残件とP6の最終確認があるため、本番公開可能とは判定していません。検証ではloopback・合成データ・ローカルSMTPのみを使用します。
 
-DockerのPHPは8.5.12（Debian 13/trixie）、Composerは2.9.4に固定しています。取得元digestは `docker/php/dockerfile` を参照してください。Nodeは既存の16.13.2を維持しています。
+DockerのPHPは8.5.13（Debian 13/trixie）、Composerは2.9.4に固定しています。取得元digestは `docker/php/dockerfile` を参照してください。Nodeは既存の16.13.2を維持しています。
 S7でPHP 8.4.27へ更新しました。S6までのPHP 8.3.35に残っていた重大な2件（CVE-2026-109618 / CVE-2026-109619）は、この更新版で修正されています。依存パッケージの監査残件は引き続き実行結果を参照してください。
 
 Laravel 12.69.0以上への更新に伴い、中間版を通過するための4件の `config.audit.ignore` 例外をS5で削除しました。Composerの監査と更新ブロックは有効です。残る依存監査は実行結果を参照してください。グローバル設定や `block-insecure` は変更していません。
@@ -102,7 +102,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 ## PHP 8.5への移行（S8）
 
-- 現在のPHP要件は8.5以上です。Laravel 13.38.0を維持し、PHPイメージを8.5.12へ更新します。
+- PHP要件は8.5以上です。S8ではLaravel 13.38.0を維持し、PHPイメージを8.5.12へ更新しました。
 - PHP 8.4上でnette/schemaを1.3.3、nette/utilsを4.0.8へ先に更新し、その他の依存版を維持します。
 - PHP 8.5で削除されたdisable_classes、非推奨のreport_memleaksは指定しません。register_argc_argv=Offを維持します。
 - MySQLのSSL CAオプションにはPdo\Mysql::ATTR_SSL_CAを使用し、MYSQL_ATTR_SSL_CA環境変数の意味と証明書検証の条件を維持します。
